@@ -1,5 +1,6 @@
 # Editor temp files
 *~
+.idea
 
 # macOS Finder attribute files
 .DS_Store
