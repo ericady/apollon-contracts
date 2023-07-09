@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: MIT
 
-pragma solidity 0.6.11;
+pragma solidity ^0.8.9;
 
 import "../Dependencies/CheckContract.sol";
 import "../Dependencies/SafeMath.sol";
@@ -94,12 +94,6 @@ contract LQTYToken is CheckContract, ILQTYToken {
     uint internal immutable lpRewardsEntitlement;
 
     ILockupContractFactory public immutable lockupContractFactory;
-
-    // --- Events ---
-
-    event CommunityIssuanceAddressSet(address _communityIssuanceAddress);
-    event LQTYStakingAddressSet(address _lqtyStakingAddress);
-    event LockupContractFactoryAddressSet(address _lockupContractFactoryAddress);
 
     // --- Functions ---
 
@@ -249,7 +243,7 @@ contract LQTYToken is CheckContract, ILQTYToken {
         external 
         override 
     {            
-        require(deadline >= now, 'LQTY: expired deadline');
+        require(deadline >= block.timestamp, 'LQTY: expired deadline');
         bytes32 digest = keccak256(abi.encodePacked('\x19\x01', 
                          domainSeparator(), keccak256(abi.encode(
                          _PERMIT_TYPEHASH, owner, spender, amount, 
@@ -265,7 +259,7 @@ contract LQTYToken is CheckContract, ILQTYToken {
 
     // --- Internal operations ---
 
-    function _chainID() private pure returns (uint256 chainID) {
+    function _chainID() private view returns (uint256 chainID) {
         assembly {
             chainID := chainid()
         }

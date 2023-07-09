@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: MIT
 
-pragma solidity 0.6.11;
+pragma solidity ^0.8.9;
     
 interface ILockupContractFactory {
     
@@ -12,8 +12,6 @@ interface ILockupContractFactory {
     // --- Functions ---
 
     function setLQTYTokenAddress(address _lqtyTokenAddress) external;
-
     function deployLockupContract(address _beneficiary, uint _unlockTime) external;
-
     function isRegisteredLockup(address _addr) external view returns (bool);
 }

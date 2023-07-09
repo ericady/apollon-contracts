@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: MIT
 
-pragma solidity 0.6.11;
+pragma solidity ^0.8.9;
 
 import "./Interfaces/ITroveManager.sol";
 import "./Interfaces/ISortedTroves.sol";
@@ -72,49 +72,50 @@ contract HintHelpers is LiquityBase, Ownable, CheckContract {
             uint truncatedLUSDamount
         )
     {
-        ISortedTroves sortedTrovesCached = sortedTroves;
-
-        uint remainingLUSD = _LUSDamount;
-        address currentTroveuser = sortedTrovesCached.getLast();
-
-        while (currentTroveuser != address(0) && troveManager.getCurrentICR(currentTroveuser, _price) < MCR) {
-            currentTroveuser = sortedTrovesCached.getPrev(currentTroveuser);
-        }
-
-        firstRedemptionHint = currentTroveuser;
-
-        if (_maxIterations == 0) {
-            _maxIterations = uint(-1);
-        }
-
-        while (currentTroveuser != address(0) && remainingLUSD > 0 && _maxIterations-- > 0) {
-            uint netLUSDDebt = _getNetDebt(troveManager.getTroveDebt(currentTroveuser))
-                .add(troveManager.getPendingLUSDDebtReward(currentTroveuser));
-
-            if (netLUSDDebt > remainingLUSD) {
-                if (netLUSDDebt > MIN_NET_DEBT) {
-                    uint maxRedeemableLUSD = LiquityMath._min(remainingLUSD, netLUSDDebt.sub(MIN_NET_DEBT));
-
-                    uint ETH = troveManager.getTroveColl(currentTroveuser)
-                        .add(troveManager.getPendingETHReward(currentTroveuser));
-
-                    uint newColl = ETH.sub(maxRedeemableLUSD.mul(DECIMAL_PRECISION).div(_price));
-                    uint newDebt = netLUSDDebt.sub(maxRedeemableLUSD);
-
-                    uint compositeDebt = _getCompositeDebt(newDebt);
-                    partialRedemptionHintNICR = LiquityMath._computeNominalCR(newColl, compositeDebt);
-
-                    remainingLUSD = remainingLUSD.sub(maxRedeemableLUSD);
-                }
-                break;
-            } else {
-                remainingLUSD = remainingLUSD.sub(netLUSDDebt);
-            }
-
-            currentTroveuser = sortedTrovesCached.getPrev(currentTroveuser);
-        }
-
-        truncatedLUSDamount = _LUSDamount.sub(remainingLUSD);
+        // todo...
+//        ISortedTroves sortedTrovesCached = sortedTroves;
+//
+//        uint remainingLUSD = _LUSDamount;
+//        address currentTroveuser = sortedTrovesCached.getLast();
+//
+//        while (currentTroveuser != address(0) && troveManager.getCurrentICR(currentTroveuser, _price) < MCR) {
+//            currentTroveuser = sortedTrovesCached.getPrev(currentTroveuser);
+//        }
+//
+//        firstRedemptionHint = currentTroveuser;
+//
+//        if (_maxIterations == 0) {
+//            _maxIterations = uint(-1);
+//        }
+//
+//        while (currentTroveuser != address(0) && remainingLUSD > 0 && _maxIterations-- > 0) {
+//            uint netLUSDDebt = _getNetDebt(troveManager.getTroveDebt(currentTroveuser))
+//                .add(troveManager.getPendingLUSDDebtReward(currentTroveuser));
+//
+//            if (netLUSDDebt > remainingLUSD) {
+//                if (netLUSDDebt > MIN_NET_DEBT) {
+//                    uint maxRedeemableLUSD = LiquityMath._min(remainingLUSD, netLUSDDebt.sub(MIN_NET_DEBT));
+//
+//                    uint ETH = troveManager.getTroveColl(currentTroveuser)
+//                        .add(troveManager.getPendingETHReward(currentTroveuser));
+//
+//                    uint newColl = ETH.sub(maxRedeemableLUSD.mul(DECIMAL_PRECISION).div(_price));
+//                    uint newDebt = netLUSDDebt.sub(maxRedeemableLUSD);
+//
+//                    uint compositeDebt = _getCompositeDebt(newDebt);
+//                    partialRedemptionHintNICR = LiquityMath._computeNominalCR(newColl, compositeDebt);
+//
+//                    remainingLUSD = remainingLUSD.sub(maxRedeemableLUSD);
+//                }
+//                break;
+//            } else {
+//                remainingLUSD = remainingLUSD.sub(netLUSDDebt);
+//            }
+//
+//            currentTroveuser = sortedTrovesCached.getPrev(currentTroveuser);
+//        }
+//
+//        truncatedLUSDamount = _LUSDamount.sub(remainingLUSD);
     }
 
     /* getApproxHint() - return address of a Trove that is, on average, (length / numTrials) positions away in the 
@@ -128,9 +129,9 @@ contract HintHelpers is LiquityBase, Ownable, CheckContract {
     */
     function getApproxHint(uint _CR, uint _numTrials, uint _inputRandomSeed)
         external
-        view
         returns (address hintAddress, uint diff, uint latestRandomSeed)
     {
+        PriceCache memory priceCache;
         uint arrayLength = troveManager.getTroveOwnersCount();
 
         if (arrayLength == 0) {
@@ -138,7 +139,7 @@ contract HintHelpers is LiquityBase, Ownable, CheckContract {
         }
 
         hintAddress = sortedTroves.getLast();
-        diff = LiquityMath._getAbsoluteDifference(_CR, troveManager.getNominalICR(hintAddress));
+        diff = LiquityMath._getAbsoluteDifference(_CR, troveManager.getNominalICR(hintAddress, priceCache));
         latestRandomSeed = _inputRandomSeed;
 
         uint i = 1;
@@ -148,7 +149,7 @@ contract HintHelpers is LiquityBase, Ownable, CheckContract {
 
             uint arrayIndex = latestRandomSeed % arrayLength;
             address currentAddress = troveManager.getTroveFromTroveOwnersArray(arrayIndex);
-            uint currentNICR = troveManager.getNominalICR(currentAddress);
+            uint currentNICR = troveManager.getNominalICR(currentAddress, priceCache);
 
             // check if abs(current - CR) > abs(closest - CR), and update closest if current is closer
             uint currentDiff = LiquityMath._getAbsoluteDifference(currentNICR, _CR);
@@ -165,7 +166,7 @@ contract HintHelpers is LiquityBase, Ownable, CheckContract {
         return LiquityMath._computeNominalCR(_coll, _debt);
     }
 
-    function computeCR(uint _coll, uint _debt, uint _price) external pure returns (uint) {
-        return LiquityMath._computeCR(_coll, _debt, _price);
+    function computeCR(uint _coll, uint _debt) external pure returns (uint) {
+        return LiquityMath._computeCR(_coll, _debt);
     }
 }

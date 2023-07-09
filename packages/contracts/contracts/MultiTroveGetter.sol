@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: MIT
 
-pragma solidity 0.6.11;
+pragma solidity ^0.8.9;
 pragma experimental ABIEncoderV2;
 
 import "./TroveManager.sol";
@@ -71,22 +71,23 @@ contract MultiTroveGetter {
 
         _troves = new CombinedTroveData[](_count);
 
-        for (uint idx = 0; idx < _count; ++idx) {
-            _troves[idx].owner = currentTroveowner;
-            (
-                _troves[idx].debt,
-                _troves[idx].coll,
-                _troves[idx].stake,
-                /* status */,
-                /* arrayIndex */
-            ) = troveManager.Troves(currentTroveowner);
-            (
-                _troves[idx].snapshotETH,
-                _troves[idx].snapshotLUSDDebt
-            ) = troveManager.rewardSnapshots(currentTroveowner);
-
-            currentTroveowner = sortedTroves.getNext(currentTroveowner);
-        }
+        // todo
+//        for (uint idx = 0; idx < _count; ++idx) {
+//            _troves[idx].owner = currentTroveowner;
+//            (
+//                _troves[idx].debt,
+//                _troves[idx].coll,
+//                _troves[idx].stake,
+//                /* status */,
+//                /* arrayIndex */
+//            ) = troveManager.Troves(currentTroveowner);
+//            (
+//                _troves[idx].snapshotETH,
+//                _troves[idx].snapshotLUSDDebt
+//            ) = troveManager.rewardSnapshots(currentTroveowner);
+//
+//            currentTroveowner = sortedTroves.getNext(currentTroveowner);
+//        }
     }
 
     function _getMultipleSortedTrovesFromTail(uint _startIdx, uint _count)
@@ -100,21 +101,22 @@ contract MultiTroveGetter {
 
         _troves = new CombinedTroveData[](_count);
 
-        for (uint idx = 0; idx < _count; ++idx) {
-            _troves[idx].owner = currentTroveowner;
-            (
-                _troves[idx].debt,
-                _troves[idx].coll,
-                _troves[idx].stake,
-                /* status */,
-                /* arrayIndex */
-            ) = troveManager.Troves(currentTroveowner);
-            (
-                _troves[idx].snapshotETH,
-                _troves[idx].snapshotLUSDDebt
-            ) = troveManager.rewardSnapshots(currentTroveowner);
-
-            currentTroveowner = sortedTroves.getPrev(currentTroveowner);
-        }
+        // todo
+//        for (uint idx = 0; idx < _count; ++idx) {
+//            _troves[idx].owner = currentTroveowner;
+//            (
+//                _troves[idx].debt,
+//                _troves[idx].coll,
+//                _troves[idx].stake,
+//                /* status */,
+//                /* arrayIndex */
+//            ) = troveManager.Troves(currentTroveowner);
+//            (
+//                _troves[idx].snapshotETH,
+//                _troves[idx].snapshotLUSDDebt
+//            ) = troveManager.rewardSnapshots(currentTroveowner);
+//
+//            currentTroveowner = sortedTroves.getPrev(currentTroveowner);
+//        }
     }
 }

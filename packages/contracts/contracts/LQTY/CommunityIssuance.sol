@@ -1,23 +1,23 @@
 // SPDX-License-Identifier: MIT
 
-pragma solidity 0.6.11;
+pragma solidity ^0.8.9;
 
 import "../Interfaces/ILQTYToken.sol";
 import "../Interfaces/ICommunityIssuance.sol";
-import "../Dependencies/BaseMath.sol";
 import "../Dependencies/LiquityMath.sol";
 import "../Dependencies/Ownable.sol";
 import "../Dependencies/CheckContract.sol";
 import "../Dependencies/SafeMath.sol";
 
 
-contract CommunityIssuance is ICommunityIssuance, Ownable, CheckContract, BaseMath {
+contract CommunityIssuance is ICommunityIssuance, Ownable, CheckContract {
     using SafeMath for uint;
 
     // --- Data ---
 
     string constant public NAME = "CommunityIssuance";
 
+    uint internal constant DECIMAL_PRECISION = 1e18;
     uint constant public SECONDS_IN_ONE_MINUTE = 60;
 
    /* The issuance factor F determines the curvature of the issuance curve.
@@ -50,12 +50,6 @@ contract CommunityIssuance is ICommunityIssuance, Ownable, CheckContract, BaseMa
 
     uint public totalLQTYIssued;
     uint public immutable deploymentTime;
-
-    // --- Events ---
-
-    event LQTYTokenAddressSet(address _lqtyTokenAddress);
-    event StabilityPoolAddressSet(address _stabilityPoolAddress);
-    event TotalLQTYIssuedUpdated(uint _totalLQTYIssued);
 
     // --- Functions ---
 

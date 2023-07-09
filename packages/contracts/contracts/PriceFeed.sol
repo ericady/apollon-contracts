@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: MIT
 
-pragma solidity 0.6.11;
+pragma solidity ^0.8.9;
+
 
 import "./Interfaces/IPriceFeed.sol";
 import "./Interfaces/ITellorCaller.sol";
@@ -8,7 +9,6 @@ import "./Dependencies/AggregatorV3Interface.sol";
 import "./Dependencies/SafeMath.sol";
 import "./Dependencies/Ownable.sol";
 import "./Dependencies/CheckContract.sol";
-import "./Dependencies/BaseMath.sol";
 import "./Dependencies/LiquityMath.sol";
 import "./Dependencies/console.sol";
 
@@ -20,7 +20,7 @@ import "./Dependencies/console.sol";
 * switching oracles based on oracle failures, timeouts, and conditions for returning to the primary
 * Chainlink oracle.
 */
-contract PriceFeed is Ownable, CheckContract, BaseMath, IPriceFeed {
+contract PriceFeed is Ownable, CheckContract, IPriceFeed {
     using SafeMath for uint256;
 
     string constant public NAME = "PriceFeed";
@@ -32,6 +32,7 @@ contract PriceFeed is Ownable, CheckContract, BaseMath, IPriceFeed {
     address borrowerOperationsAddress;
     address troveManagerAddress;
 
+    uint internal constant DECIMAL_PRECISION = 1e18;
     uint constant public ETHUSD_TELLOR_REQ_ID = 1;
 
     // Use to convert a price answer to an 18-digit precision uint
@@ -68,19 +69,8 @@ contract PriceFeed is Ownable, CheckContract, BaseMath, IPriceFeed {
         bool success;
     }
 
-    enum Status {
-        chainlinkWorking, 
-        usingTellorChainlinkUntrusted, 
-        bothOraclesUntrusted,
-        usingTellorChainlinkFrozen, 
-        usingChainlinkTellorUntrusted
-    }
-
     // The current status of the PricFeed, which determines the conditions for the next price fetch attempt
     Status public status;
-
-    event LastGoodPriceUpdated(uint _lastGoodPrice);
-    event PriceFeedStatusChanged(Status newStatus);
 
     // --- Dependency setters ---
     
@@ -113,6 +103,21 @@ contract PriceFeed is Ownable, CheckContract, BaseMath, IPriceFeed {
     }
 
     // --- Functions ---
+
+
+    function getPrice(PriceCache memory _priceCache, address _tokenAddress) override external returns (uint price) {
+        // first try to get the price from the cache
+        for (uint i = 0; i < _priceCache.prices.length; i++) {
+            if (_priceCache.prices[i].tokenAddress != _tokenAddress) continue;
+
+            price = _priceCache.prices[i].amount;
+            if (price != 0) return price;
+        }
+
+        price = 1; // fetchPrice(_tokenAddress); // todo (flat) hier kommt die token adresse als parameter rein...
+//        _priceCache.push(TokenAmount(_tokenAddress, price)); todo der price feed array muss initiert werden, mit allen token die wir im system haben...
+        return price;
+    }
 
     /*
     * fetchPrice():

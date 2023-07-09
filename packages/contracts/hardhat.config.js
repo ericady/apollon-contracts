@@ -4,6 +4,15 @@ require("@nomiclabs/hardhat-etherscan");
 require("solidity-coverage");
 require("hardhat-gas-reporter");
 
+// todo tmp, ignores all contracts with _hardhatIgnore in the name
+const {subtask} = require("hardhat/config");
+const {TASK_COMPILE_SOLIDITY_GET_SOURCE_PATHS} = require("hardhat/builtin-tasks/task-names")
+subtask(TASK_COMPILE_SOLIDITY_GET_SOURCE_PATHS)
+    .setAction(async (_, __, runSuper) => {
+        const paths = await runSuper();
+        return paths.filter(p => !p.includes('_hardhatIgnore') && !p.includes('/Proxy/') && !p.includes('/TestContracts/'));
+    });
+
 const accounts = require("./hardhatAccountsList2k.js");
 const accountsList = accounts.accountsList
 
@@ -34,28 +43,8 @@ module.exports = {
     solidity: {
         compilers: [
             {
-                version: "0.4.23",
-                settings: {
-                    optimizer: {
-                        enabled: true,
-                        runs: 100
-                    }
-                }
-            },
-            {
-                version: "0.5.17",
-                settings: {
-                    optimizer: {
-                        enabled: true,
-                        runs: 100
-                    }
-                }
-            },
-            {
-                version: "0.6.11",
-                settings: {
-                    optimizer: {
-                        enabled: true,
+                version: "0.8.9",
+                settings: {optimizer: {enabled: true,
                         runs: 100
                     }
                 }
