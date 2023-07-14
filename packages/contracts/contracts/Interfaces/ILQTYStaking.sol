@@ -3,11 +3,10 @@
 pragma solidity ^0.8.9;
 
 interface ILQTYStaking {
-
     // --- Events --
 
     event LQTYTokenAddressSet(address _lqtyTokenAddress);
-//    event LUSDTokenAddressSet(address _lusdTokenAddress);
+    //    event LUSDTokenAddressSet(address _lusdTokenAddress);
     event TroveManagerAddressSet(address _troveManager);
     event BorrowerOperationsAddressSet(address _borrowerOperationsAddress);
     event ActivePoolAddressSet(address _activePoolAddress);
@@ -23,9 +22,14 @@ interface ILQTYStaking {
     // --- Functions ---
 
     function stake(uint _LQTYamount) external;
+
     function unstake(uint _LQTYamount) external;
+
     function increaseF_ETH(uint _ETHFee) external;
+
     function increaseF_LUSD(uint _LQTYFee) external;
+
     function getPendingETHGain(address _user) external view returns (uint);
+
     function getPendingLUSDGain(address _user) external view returns (uint);
 }

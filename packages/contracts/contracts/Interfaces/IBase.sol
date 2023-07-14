@@ -2,12 +2,11 @@
 
 pragma solidity ^0.8.9;
 
-
 interface IBase {
     enum PoolType {
         Active, // assets in active troves
         Default, // assets from redistributions, which are not yet claimed
-        Surplus,  // collateral from troves, which got fully redeamed (due to its initial over-collateralization)
+        Surplus, // collateral from troves, which got fully redeamed (due to its initial over-collateralization)
         GasCompensation // stableCoin from gas compensation
     }
 

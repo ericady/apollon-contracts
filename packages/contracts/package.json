@@ -13,7 +13,8 @@
     "prepare:set-version": "node scripts/set-version.js",
     "test": "hardhat test",
     "coverage": "hardhat coverage",
-    "coveralls": "cat coverage/lcov.info | coveralls"
+    "coveralls": "cat coverage/lcov.info | coveralls",
+    "prettier": "prettier --write --plugin=prettier-plugin-solidity \"**/*.{js,sol,md,json}\""
   },
   "keywords": [],
   "author": "",
@@ -23,6 +24,8 @@
     "eth-mutants": "^0.1.1",
     "ethereumjs-util": "^7.0.9",
     "ethers": "^5.4.3",
+    "prettier": "^3.0.0",
+    "prettier-plugin-solidity": "1.1.3",
     "solc": "^0.6.11",
     "xmlhttprequest": "^1.8.0"
   },

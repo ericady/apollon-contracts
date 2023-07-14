@@ -2,18 +2,16 @@
 
 pragma solidity ^0.8.9;
 
-
 import "./IBBase.sol";
 
 // Common interface for the Trove Manager.
 interface IBorrowerOperations is IBBase {
-
     // --- Events ---
 
     event TroveManagerAddressChanged(address _newTroveManagerAddress);
     event StoragePoolAddressChanged(address _storagePoolAddress);
     event StabilityPoolAddressChanged(address _stabilityPoolAddress);
-    event PriceFeedAddressChanged(address  _newPriceFeedAddress);
+    event PriceFeedAddressChanged(address _newPriceFeedAddress);
     event SortedTrovesAddressChanged(address _sortedTrovesAddress);
     event DebtTokenManagerAddressChanged(address _debtTokenManagerAddress);
 
@@ -23,8 +21,17 @@ interface IBorrowerOperations is IBBase {
 
     // --- Functions ---
 
-    function openTrove(uint _maxFeePercentage, TokenAmount[] memory _colls, TokenAmount[] memory _debts, address _upperHint, address _lowerHint) external payable;
+    function openTrove(
+        uint _maxFeePercentage,
+        TokenAmount[] memory _colls,
+        TokenAmount[] memory _debts,
+        address _upperHint,
+        address _lowerHint
+    ) external payable;
+
     function closeTrove() external;
+
     function claimCollateral() external;
+
     function getCompositeDebt(DebtTokenAmount[] memory _debts) external pure returns (uint);
 }

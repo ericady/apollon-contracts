@@ -10,7 +10,7 @@ import "./Dependencies/LiquityBase.sol";
 import "./DebtToken.sol";
 
 contract DebtTokenManager is Ownable, CheckContract, IDebtTokenManager {
-    string constant public NAME = "DTokenManager";
+    string public constant NAME = "DTokenManager";
 
     address public troveManagerAddress;
     address public stabilityPoolAddress;
@@ -19,7 +19,7 @@ contract DebtTokenManager is Ownable, CheckContract, IDebtTokenManager {
 
     // --- Data structures ---
 
-    mapping (address => IDebtToken) public debtTokens;
+    mapping(address => IDebtToken) public debtTokens;
     IDebtToken[] public debtTokensArray;
     IDebtToken public stableCoin;
 
@@ -53,21 +53,25 @@ contract DebtTokenManager is Ownable, CheckContract, IDebtTokenManager {
 
     // --- Getters ---
 
-    function getStableCoin() override external view returns (IDebtToken) {
+    function getStableCoin() external view override returns (IDebtToken) {
         return stableCoin;
     }
 
-    function getDebtToken(address _address) override external view returns (IDebtToken debtToken) {
+    function getDebtToken(address _address) external view override returns (IDebtToken debtToken) {
         debtToken = debtTokens[_address];
         require(address(debtToken) != address(0), "debtToken does not exist");
         return debtToken;
     }
 
-
     // --- Setters ---
 
     // todo (flat) owner only, should be also callable after deployment
-    function addDebtToken(string memory _symbol, string memory _name, string memory _version, bool _isStableCoin) external override onlyOwner returns (bool) {
+    function addDebtToken(
+        string memory _symbol,
+        string memory _name,
+        string memory _version,
+        bool _isStableCoin
+    ) external override onlyOwner returns (bool) {
         if (_isStableCoin) require(address(stableCoin) == address(0), "stableCoin already exists");
 
         for (uint i = 0; i < debtTokensArray.length; i++) {

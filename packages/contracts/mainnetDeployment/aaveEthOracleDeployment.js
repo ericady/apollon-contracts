@@ -19,13 +19,15 @@ async function main() {
 
   const deployerWallet = (await ethers.getSigners())[0];
   const deployerWalletAddress = deployerWallet.address;
-  console.log('Deployer: ', deployerWalletAddress);
+  console.log("Deployer: ", deployerWalletAddress);
 
-  const LUSDUsdToLUSDEthEthersFactory = await ethers.getContractFactory("LUSDUsdToLUSDEth", deployerWallet)
-  const lusdUsdToLUSDEth = await LUSDUsdToLUSDEthEthersFactory.deploy()
-  console.log(`LUSDUsdToLUSDEth address: ${lusdUsdToLUSDEth.address}`)
-  console.log(`LUSDUsdToLUSDEth price:   ${await lusdUsdToLUSDEth.latestAnswer()}`)
-
+  const LUSDUsdToLUSDEthEthersFactory = await ethers.getContractFactory(
+    "LUSDUsdToLUSDEth",
+    deployerWallet
+  );
+  const lusdUsdToLUSDEth = await LUSDUsdToLUSDEthEthersFactory.deploy();
+  console.log(`LUSDUsdToLUSDEth address: ${lusdUsdToLUSDEth.address}`);
+  console.log(`LUSDUsdToLUSDEth price:   ${await lusdUsdToLUSDEth.latestAnswer()}`);
 }
 
 main()

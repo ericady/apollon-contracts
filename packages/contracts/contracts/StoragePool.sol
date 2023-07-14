@@ -2,8 +2,7 @@
 
 pragma solidity ^0.8.9;
 
-
-import './Interfaces/IStoragePool.sol';
+import "./Interfaces/IStoragePool.sol";
 import "./Dependencies/SafeMath.sol";
 import "./Dependencies/Ownable.sol";
 import "./Dependencies/CheckContract.sol";
@@ -21,7 +20,7 @@ import "./Interfaces/IPriceFeed.sol";
 contract StoragePool is LiquityBase, Ownable, CheckContract, IStoragePool {
     using SafeMath for uint256;
 
-    string constant public NAME = "StoragePool";
+    string public constant NAME = "StoragePool";
 
     address public borrowerOperationsAddress;
     address public troveManagerAddress;
@@ -32,10 +31,10 @@ contract StoragePool is LiquityBase, Ownable, CheckContract, IStoragePool {
         address tokenAddress;
         bool isColl;
         uint256 totalAmount;
-        mapping (PoolType => uint256) poolTypes;
+        mapping(PoolType => uint256) poolTypes;
         bool exists;
     }
-    mapping (address => mapping (bool => PoolEntry)) internal poolEntries; // [tokenAddress][isColl] => PoolEntry
+    mapping(address => mapping(bool => PoolEntry)) internal poolEntries; // [tokenAddress][isColl] => PoolEntry
     address[] public collTokenAddresses;
     address[] public debtTokenAddresses;
 
@@ -46,10 +45,7 @@ contract StoragePool is LiquityBase, Ownable, CheckContract, IStoragePool {
         address _troveManagerAddress,
         address _stabilityPoolAddress,
         address _priceFeedAddress
-    )
-        external
-        onlyOwner
-    {
+    ) external onlyOwner {
         checkContract(_borrowerOperationsAddress);
         checkContract(_troveManagerAddress);
         checkContract(_stabilityPoolAddress);
@@ -72,13 +68,22 @@ contract StoragePool is LiquityBase, Ownable, CheckContract, IStoragePool {
 
     // --- Getters for public variables. Required by IPool interface ---
 
-    function getValue(address _tokenAddress, bool _isColl, PoolType _poolType) external view override returns (uint) {
+    function getValue(
+        address _tokenAddress,
+        bool _isColl,
+        PoolType _poolType
+    ) external view override returns (uint) {
         return poolEntries[_tokenAddress][_isColl].poolTypes[_poolType];
     }
 
     // --- Pool functionality ---
 
-    function addValue(address _tokenAddress, bool _isColl, PoolType _poolType, uint _amount) override external {
+    function addValue(
+        address _tokenAddress,
+        bool _isColl,
+        PoolType _poolType,
+        uint _amount
+    ) external override {
         _requireCallerIsBOorTroveMorSP();
 
         PoolEntry storage entry = poolEntries[_tokenAddress][_isColl];
@@ -94,7 +99,12 @@ contract StoragePool is LiquityBase, Ownable, CheckContract, IStoragePool {
         emit PoolValueUpdated(_tokenAddress, _isColl, _poolType, entry.poolTypes[_poolType]);
     }
 
-    function subtractValue(address _tokenAddress, bool _isColl, PoolType _poolType, uint _amount) override external {
+    function subtractValue(
+        address _tokenAddress,
+        bool _isColl,
+        PoolType _poolType,
+        uint _amount
+    ) external override {
         _requireCallerIsBOorTroveMorSP();
 
         PoolEntry storage entry = poolEntries[_tokenAddress][_isColl];
@@ -104,7 +114,13 @@ contract StoragePool is LiquityBase, Ownable, CheckContract, IStoragePool {
         emit PoolValueUpdated(_tokenAddress, _isColl, _poolType, entry.poolTypes[_poolType]);
     }
 
-    function transferBetweenTypes(address _tokenAddress, bool _isCool, PoolType _fromType, PoolType _toType, uint _amount) override  external {
+    function transferBetweenTypes(
+        address _tokenAddress,
+        bool _isCool,
+        PoolType _fromType,
+        PoolType _toType,
+        uint _amount
+    ) external override {
         _requireCallerIsBOorTroveMorSP();
         _requirePositiveAmount(_amount);
 
@@ -117,7 +133,9 @@ contract StoragePool is LiquityBase, Ownable, CheckContract, IStoragePool {
         emit PoolValueUpdated(_tokenAddress, _isCool, _toType, entry.poolTypes[_toType]);
     }
 
-    function getEntireSystemColl(PriceCache memory _priceCache) override external returns (uint entireSystemColl) {
+    function getEntireSystemColl(
+        PriceCache memory _priceCache
+    ) external override returns (uint entireSystemColl) {
         IPriceFeed priceFeedCached = priceFeed;
         for (uint i = 0; i < collTokenAddresses.length; i++) {
             uint price = priceFeedCached.getPrice(_priceCache, collTokenAddresses[i]);
@@ -126,7 +144,9 @@ contract StoragePool is LiquityBase, Ownable, CheckContract, IStoragePool {
         return entireSystemColl;
     }
 
-    function getEntireSystemDebt(PriceCache memory _priceCache) override external returns (uint entireSystemDebt) {
+    function getEntireSystemDebt(
+        PriceCache memory _priceCache
+    ) external override returns (uint entireSystemDebt) {
         IPriceFeed priceFeedCached = priceFeed;
         for (uint i = 0; i < debtTokenAddresses.length; i++) {
             uint price = priceFeedCached.getPrice(_priceCache, debtTokenAddresses[i]);
@@ -153,9 +173,10 @@ contract StoragePool is LiquityBase, Ownable, CheckContract, IStoragePool {
     function _requireCallerIsBOorTroveMorSP() internal view {
         require(
             msg.sender == borrowerOperationsAddress ||
-            msg.sender == troveManagerAddress ||
-            msg.sender == stabilityPoolAddress,
-            "ActivePool: Caller is neither BorrowerOperations nor TroveManager nor StabilityPool");
+                msg.sender == troveManagerAddress ||
+                msg.sender == stabilityPoolAddress,
+            "ActivePool: Caller is neither BorrowerOperations nor TroveManager nor StabilityPool"
+        );
     }
 
     function _requirePositiveAmount(uint _amount) internal view {

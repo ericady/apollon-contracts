@@ -4,7 +4,6 @@ pragma solidity ^0.8.9;
 
 import "../Interfaces/ISortedTroves.sol";
 
-
 contract SortedTrovesTester {
     ISortedTroves sortedTroves;
 

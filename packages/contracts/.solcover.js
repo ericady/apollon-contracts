@@ -3,7 +3,10 @@ const { accountsList } = require("./hardhatAccountsList2k.js");
 // https://hardhat.org/plugins/solidity-coverage.html#configuration
 // Link in providerOptions:
 // https://github.com/trufflesuite/ganache-core#options
-const accounts = accountsList.map(a => ({ secretKey: a.privateKey, balance: '0xc097ce7bc90715b34b9f1000000000' }))
+const accounts = accountsList.map(a => ({
+  secretKey: a.privateKey,
+  balance: "0xc097ce7bc90715b34b9f1000000000"
+}));
 
 module.exports = {
   providerOptions: {
@@ -29,11 +32,11 @@ module.exports = {
     "Dependencies/Ownable.sol",
     "Dependencies/SafeMath.sol",
     "Dependencies/SafeMath128.sol",
-    "Dependencies/console.sol",
+    "Dependencies/console.sol"
   ],
   // https://github.com/sc-forks/solidity-coverage/blob/master/docs/advanced.md#skipping-tests
   mocha: {
     grep: "@skip-on-coverage", // Find everything with this tag
-    invert: true               // Run the grep's inverse set.
+    invert: true // Run the grep's inverse set.
   }
 };

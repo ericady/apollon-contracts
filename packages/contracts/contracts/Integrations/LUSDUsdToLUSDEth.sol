@@ -1,11 +1,9 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.9;
 
-
 interface IPriceFeed {
     function latestAnswer() external view returns (int256);
 }
-
 
 contract LUSDUsdToLUSDEth is IPriceFeed {
     IPriceFeed public constant LUSD_USD = IPriceFeed(0x3D7aE7E594f2f2091Ad8798313450130d0Aba3a0);

@@ -2,7 +2,6 @@
 
 pragma solidity ^0.8.9;
 
-
 import "./Interfaces/ISortedTroves.sol";
 import "./Interfaces/ITroveManager.sol";
 import "./Interfaces/IBorrowerOperations.sol";
@@ -12,63 +11,67 @@ import "./Dependencies/CheckContract.sol";
 import "./Dependencies/console.sol";
 
 /*
-* A sorted doubly linked list with nodes sorted in descending order.
-*
-* Nodes map to active Troves in the system - the ID property is the address of a Trove owner.
-* Nodes are ordered according to their nominal individual collateral ratio (NICR) at the time of any trove operation
-* which is like the ICR but without the price, i.e., just collateral / debt.
-*
-* The list optionally accepts insert position hints.
-*
-* NICRs are computed dynamically at runtime, and not stored on the Node. This is because NICRs of active Troves
-* change dynamically as liquidation events occur.
-*
-* The list relies on the fact that liquidation events preserve ordering: a liquidation decreases the NICRs of all active Troves,
-* but maintains their order. A node inserted based on current NICR will maintain the correct position,
-* relative to it's peers, as rewards accumulate, as long as it's raw collateral and debt have not changed.
-* Thus, Nodes remain sorted by current NICR.
-*
-* Nodes need only be re-inserted upon a Trove operation - when the owner adds or removes collateral or debt
-* to their position.
-*
-* The list is a modification of the following audited SortedDoublyLinkedList:
-* https://github.com/livepeer/protocol/blob/master/contracts/libraries/SortedDoublyLL.sol
-*
-*
-* Changes made in the Liquity implementation:
-*
-* - Keys have been removed from nodes
-*
-* - Ordering checks for insertion are performed by comparing an NICR argument to the current NICR, calculated at runtime.
-*   The list relies on the property that ordering by ICR is maintained as the ETH:USD price varies.
-*
-* - Public functions with parameters have been made internal to save gas, and given an external wrapper function for external access
-*/
+ * A sorted doubly linked list with nodes sorted in descending order.
+ *
+ * Nodes map to active Troves in the system - the ID property is the address of a Trove owner.
+ * Nodes are ordered according to their nominal individual collateral ratio (NICR) at the time of any trove operation
+ * which is like the ICR but without the price, i.e., just collateral / debt.
+ *
+ * The list optionally accepts insert position hints.
+ *
+ * NICRs are computed dynamically at runtime, and not stored on the Node. This is because NICRs of active Troves
+ * change dynamically as liquidation events occur.
+ *
+ * The list relies on the fact that liquidation events preserve ordering: a liquidation decreases the NICRs of all active Troves,
+ * but maintains their order. A node inserted based on current NICR will maintain the correct position,
+ * relative to it's peers, as rewards accumulate, as long as it's raw collateral and debt have not changed.
+ * Thus, Nodes remain sorted by current NICR.
+ *
+ * Nodes need only be re-inserted upon a Trove operation - when the owner adds or removes collateral or debt
+ * to their position.
+ *
+ * The list is a modification of the following audited SortedDoublyLinkedList:
+ * https://github.com/livepeer/protocol/blob/master/contracts/libraries/SortedDoublyLL.sol
+ *
+ *
+ * Changes made in the Liquity implementation:
+ *
+ * - Keys have been removed from nodes
+ *
+ * - Ordering checks for insertion are performed by comparing an NICR argument to the current NICR, calculated at runtime.
+ *   The list relies on the property that ordering by ICR is maintained as the ETH:USD price varies.
+ *
+ * - Public functions with parameters have been made internal to save gas, and given an external wrapper function for external access
+ */
 contract SortedTroves is Ownable, CheckContract, ISortedTroves {
     using SafeMath for uint256;
 
-    string constant public NAME = "SortedTroves";
+    string public constant NAME = "SortedTroves";
 
     address public borrowerOperationsAddress;
     ITroveManager public troveManager;
 
     struct Node {
         bool exists;
-        address nextId;                  // Id of next node (smaller NICR) in the list
-        address prevId;                  // Id of previous node (larger NICR) in the list
+        address nextId; // Id of next node (smaller NICR) in the list
+        address prevId; // Id of previous node (larger NICR) in the list
     }
     struct Data {
-        address head;                        // Head of the list. Also the node in the list with the largest NICR
-        address tail;                        // Tail of the list. Also the node in the list with the smallest NICR
-        uint256 maxSize;                     // Maximum size of the list
-        uint256 size;                        // Current size of the list
-        mapping (address => Node) nodes;     // Track the corresponding ids for each node in the list
+        address head; // Head of the list. Also the node in the list with the largest NICR
+        address tail; // Tail of the list. Also the node in the list with the smallest NICR
+        uint256 maxSize; // Maximum size of the list
+        uint256 size; // Current size of the list
+        mapping(address => Node) nodes; // Track the corresponding ids for each node in the list
     }
     Data public data;
 
     // --- Dependency setters ---
 
-    function setParams(uint256 _size, address _troveManagerAddress, address _borrowerOperationsAddress) external override onlyOwner {
+    function setParams(
+        uint256 _size,
+        address _troveManagerAddress,
+        address _borrowerOperationsAddress
+    ) external override onlyOwner {
         require(_size > 0, "SortedTroves: Size can not be zero");
         checkContract(_troveManagerAddress);
         checkContract(_borrowerOperationsAddress);
@@ -92,13 +95,25 @@ contract SortedTroves is Ownable, CheckContract, ISortedTroves {
      * @param _nextId Id of next node for the insert position
      */
 
-    function insert (PriceCache memory _priceCache, address _id, uint256 _NICR, address _prevId, address _nextId) external override {
+    function insert(
+        PriceCache memory _priceCache,
+        address _id,
+        uint256 _NICR,
+        address _prevId,
+        address _nextId
+    ) external override {
         _requireCallerIsBOorTroveM();
 
         _insert(_priceCache, _id, _NICR, _prevId, _nextId);
     }
 
-    function _insert(PriceCache memory _priceCache, address _id, uint256 _NICR, address _prevId, address _nextId) internal {
+    function _insert(
+        PriceCache memory _priceCache,
+        address _id,
+        uint256 _NICR,
+        address _prevId,
+        address _nextId
+    ) internal {
         require(!isFull(), "SortedTroves: List is full"); // List must not be full
         require(!contains(_id), "SortedTroves: List already contains the node"); // List must not already contain node
         require(_id != address(0), "SortedTroves: Id cannot be zero"); // Node id must not be null
@@ -113,7 +128,7 @@ contract SortedTroves is Ownable, CheckContract, ISortedTroves {
             (prevId, nextId) = _findInsertPosition(troveManager, _priceCache, _NICR, prevId, nextId);
         }
 
-         data.nodes[_id].exists = true;
+        data.nodes[_id].exists = true;
 
         if (prevId == address(0) && nextId == address(0)) {
             // Insert as head and tail
@@ -194,7 +209,13 @@ contract SortedTroves is Ownable, CheckContract, ISortedTroves {
      * @param _prevId Id of previous node for the new insert position
      * @param _nextId Id of next node for the new insert position
      */
-    function reInsert(PriceCache memory _priceCache, address _id, uint256 _newNICR, address _prevId, address _nextId) external override {
+    function reInsert(
+        PriceCache memory _priceCache,
+        address _id,
+        uint256 _newNICR,
+        address _prevId,
+        address _nextId
+    ) external override {
         _requireCallerIsBOorTroveM();
 
         // List must contain the node
@@ -277,25 +298,39 @@ contract SortedTroves is Ownable, CheckContract, ISortedTroves {
      * @param _prevId Id of previous node for the insert position
      * @param _nextId Id of next node for the insert position
      */
-    function validInsertPosition(PriceCache memory _priceCache, uint256 _NICR, address _prevId, address _nextId) external override returns (bool) {
+    function validInsertPosition(
+        PriceCache memory _priceCache,
+        uint256 _NICR,
+        address _prevId,
+        address _nextId
+    ) external override returns (bool) {
         return _validInsertPosition(troveManager, _priceCache, _NICR, _prevId, _nextId);
     }
 
-    function _validInsertPosition(ITroveManager _troveManager, PriceCache memory _priceCache, uint256 _NICR, address _prevId, address _nextId) internal returns (bool) {
+    function _validInsertPosition(
+        ITroveManager _troveManager,
+        PriceCache memory _priceCache,
+        uint256 _NICR,
+        address _prevId,
+        address _nextId
+    ) internal returns (bool) {
         if (_prevId == address(0) && _nextId == address(0)) {
             // `(null, null)` is a valid insert position if the list is empty
             return isEmpty();
         } else if (_prevId == address(0)) {
             // `(null, _nextId)` is a valid insert position if `_nextId` is the head of the list
-            return data.head == _nextId && _NICR >= _troveManager.getNominalICR(_nextId, _priceCache);
+            return
+                data.head == _nextId && _NICR >= _troveManager.getNominalICR(_nextId, _priceCache);
         } else if (_nextId == address(0)) {
             // `(_prevId, null)` is a valid insert position if `_prevId` is the tail of the list
-            return data.tail == _prevId && _NICR <= _troveManager.getNominalICR(_prevId, _priceCache);
+            return
+                data.tail == _prevId && _NICR <= _troveManager.getNominalICR(_prevId, _priceCache);
         } else {
             // `(_prevId, _nextId)` is a valid insert position if they are adjacent nodes and `_NICR` falls between the two nodes' NICRs
-            return data.nodes[_prevId].nextId == _nextId &&
-            _troveManager.getNominalICR(_prevId, _priceCache) >= _NICR &&
-                   _NICR >= _troveManager.getNominalICR(_nextId, _priceCache);
+            return
+                data.nodes[_prevId].nextId == _nextId &&
+                _troveManager.getNominalICR(_prevId, _priceCache) >= _NICR &&
+                _NICR >= _troveManager.getNominalICR(_nextId, _priceCache);
         }
     }
 
@@ -305,7 +340,12 @@ contract SortedTroves is Ownable, CheckContract, ISortedTroves {
      * @param _NICR Node's NICR
      * @param _startId Id of node to start descending the list from
      */
-    function _descendList(ITroveManager _troveManager, PriceCache memory _priceCache, uint256 _NICR, address _startId) internal returns (address, address) {
+    function _descendList(
+        ITroveManager _troveManager,
+        PriceCache memory _priceCache,
+        uint256 _NICR,
+        address _startId
+    ) internal returns (address, address) {
         // If `_startId` is the head, check if the insert position is before the head
         if (data.head == _startId && _NICR >= _troveManager.getNominalICR(_startId, _priceCache)) {
             return (address(0), _startId);
@@ -315,7 +355,10 @@ contract SortedTroves is Ownable, CheckContract, ISortedTroves {
         address nextId = data.nodes[prevId].nextId;
 
         // Descend the list until we reach the end or until we find a valid insert position
-        while (prevId != address(0) && !_validInsertPosition(_troveManager, _priceCache, _NICR, prevId, nextId)) {
+        while (
+            prevId != address(0) &&
+            !_validInsertPosition(_troveManager, _priceCache, _NICR, prevId, nextId)
+        ) {
             prevId = data.nodes[prevId].nextId;
             nextId = data.nodes[prevId].nextId;
         }
@@ -329,7 +372,12 @@ contract SortedTroves is Ownable, CheckContract, ISortedTroves {
      * @param _NICR Node's NICR
      * @param _startId Id of node to start ascending the list from
      */
-    function _ascendList(ITroveManager _troveManager, PriceCache memory _priceCache, uint256 _NICR, address _startId) internal returns (address, address) {
+    function _ascendList(
+        ITroveManager _troveManager,
+        PriceCache memory _priceCache,
+        uint256 _NICR,
+        address _startId
+    ) internal returns (address, address) {
         // If `_startId` is the tail, check if the insert position is after the tail
         if (data.tail == _startId && _NICR <= _troveManager.getNominalICR(_startId, _priceCache)) {
             return (_startId, address(0));
@@ -339,7 +387,10 @@ contract SortedTroves is Ownable, CheckContract, ISortedTroves {
         address prevId = data.nodes[nextId].prevId;
 
         // Ascend the list until we reach the end or until we find a valid insertion point
-        while (nextId != address(0) && !_validInsertPosition(_troveManager, _priceCache, _NICR, prevId, nextId)) {
+        while (
+            nextId != address(0) &&
+            !_validInsertPosition(_troveManager, _priceCache, _NICR, prevId, nextId)
+        ) {
             nextId = data.nodes[nextId].prevId;
             prevId = data.nodes[nextId].prevId;
         }
@@ -353,11 +404,22 @@ contract SortedTroves is Ownable, CheckContract, ISortedTroves {
      * @param _prevId Id of previous node for the insert position
      * @param _nextId Id of next node for the insert position
      */
-    function findInsertPosition(PriceCache memory _priceCache, uint256 _NICR, address _prevId, address _nextId) external override returns (address, address) {
+    function findInsertPosition(
+        PriceCache memory _priceCache,
+        uint256 _NICR,
+        address _prevId,
+        address _nextId
+    ) external override returns (address, address) {
         return _findInsertPosition(troveManager, _priceCache, _NICR, _prevId, _nextId);
     }
 
-    function _findInsertPosition(ITroveManager _troveManager, PriceCache memory _priceCache, uint256 _NICR, address _prevId, address _nextId) internal returns (address, address) {
+    function _findInsertPosition(
+        ITroveManager _troveManager,
+        PriceCache memory _priceCache,
+        uint256 _NICR,
+        address _prevId,
+        address _nextId
+    ) internal returns (address, address) {
         address prevId = _prevId;
         address nextId = _nextId;
 
@@ -383,7 +445,7 @@ contract SortedTroves is Ownable, CheckContract, ISortedTroves {
             return _ascendList(_troveManager, _priceCache, _NICR, nextId);
         } else if (nextId == address(0)) {
             // No `nextId` for hint - descend list starting from `prevId`
-            return _descendList(_troveManager,_priceCache, _NICR, prevId);
+            return _descendList(_troveManager, _priceCache, _NICR, prevId);
         } else {
             // Descend list starting from `prevId`
             return _descendList(_troveManager, _priceCache, _NICR, prevId);
@@ -397,7 +459,9 @@ contract SortedTroves is Ownable, CheckContract, ISortedTroves {
     }
 
     function _requireCallerIsBOorTroveM() internal view {
-        require(msg.sender == borrowerOperationsAddress || msg.sender == address(troveManager),
-                "SortedTroves: Caller is neither BO nor TroveM");
+        require(
+            msg.sender == borrowerOperationsAddress || msg.sender == address(troveManager),
+            "SortedTroves: Caller is neither BO nor TroveM"
+        );
     }
 }

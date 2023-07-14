@@ -2,8 +2,7 @@
 
 pragma solidity ^0.8.9;
 
-interface ICommunityIssuance { 
-    
+interface ICommunityIssuance {
     // --- Events ---
 
     event LQTYTokenAddressSet(address _lqtyTokenAddress);
@@ -13,6 +12,8 @@ interface ICommunityIssuance {
     // --- Functions ---
 
     function setAddresses(address _lqtyTokenAddress, address _stabilityPoolAddress) external;
+
     function issueLQTY() external returns (uint);
+
     function sendLQTY(address _account, uint _LQTYamount) external;
 }

@@ -33,18 +33,18 @@ module.exports = {
     optimizer: {
       enabled: true,
       runs: 1000
-    },
+    }
   },
-  // use native binaries rather than solc.js 
+  // use native binaries rather than solc.js
   compilers: {
     solc: {
       version: "0.6.11"
     }
-  },
+  }
   // plugins: [
   //   'truffle-ganache-test'
   // ],
   // mocha: {
   //   reporter: 'eth-gas-reporter'
   // }
-}
+};

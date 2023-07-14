@@ -2,7 +2,6 @@
 
 pragma solidity ^0.8.9;
 
-
 import "./IBase.sol";
 import "./IDebtToken.sol";
 import "./IStabilityPool.sol";
@@ -19,7 +18,6 @@ interface IBBase is IBase {
         IStabilityPool stabilityPool;
         address tokenAddress;
         uint remaining;
-
         uint debtToOffset; // debt amount which will be removed from the stability pool to liquidate the trove
         TokenAmount[] collGained; // coll which will be sent to the SP as rewards (multiple entries with same token address are possible)
     }

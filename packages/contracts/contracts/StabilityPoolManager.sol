@@ -2,7 +2,6 @@
 
 pragma solidity ^0.8.9;
 
-
 import "./Interfaces/IDebtToken.sol";
 import "./Dependencies/Ownable.sol";
 import "./Dependencies/CheckContract.sol";
@@ -12,11 +11,11 @@ import "./Interfaces/IStabilityPool.sol";
 import "./Interfaces/IStabilityPoolManager.sol";
 
 contract StabilityPoolManager is Ownable, CheckContract, IStabilityPoolManager {
-    string constant public NAME = "StabilityPoolManager";
+    string public constant NAME = "StabilityPoolManager";
 
     // --- Data structures ---
 
-    mapping (IDebtToken => IStabilityPool) public stabilityPools;
+    mapping(IDebtToken => IStabilityPool) public stabilityPools;
     IStabilityPool[] public stabilityPoolsArray;
 
     // --- Dependency setter ---
@@ -37,8 +36,12 @@ contract StabilityPoolManager is Ownable, CheckContract, IStabilityPoolManager {
         return stabilityPoolsArray;
     }
 
-    function getRemainingStability(address[] memory collTokenAddresses) external override view returns (RemainingStability[] memory) {
-        RemainingStability[] memory remainingStability = new RemainingStability[](stabilityPoolsArray.length);
+    function getRemainingStability(
+        address[] memory collTokenAddresses
+    ) external view override returns (RemainingStability[] memory) {
+        RemainingStability[] memory remainingStability = new RemainingStability[](
+            stabilityPoolsArray.length
+        );
         for (uint i = 0; i < stabilityPoolsArray.length; i++) {
             TokenAmount[] memory collGained = new TokenAmount[](collTokenAddresses.length);
             for (uint a = 0; a < collTokenAddresses.length; a++) {
@@ -59,18 +62,18 @@ contract StabilityPoolManager is Ownable, CheckContract, IStabilityPoolManager {
     // --- Setters ---
 
     // todo (flat) owner only, should be also callable after deployment
-//    function addStabilityPool(IDebtToken _debtToken) external onlyOwner returns (bool) {
-//        require(stabilityPools[_debtToken] == address(0), "pool already exists");
-//
-//        IStabilityPool stabilityPool = new IStabilityPool(
-//            troveManagerAddress,
-//            borrowerOperationsAddress,
-//            _debtToken
-//        );
-//
-//        stabilityPools[_debtToken] = stabilityPool;
-//        stabilityPoolsArray.push(stabilityPool);
-//        emit StabilityPoolAdded(stabilityPool);
-//        return true;
-//    }
+    //    function addStabilityPool(IDebtToken _debtToken) external onlyOwner returns (bool) {
+    //        require(stabilityPools[_debtToken] == address(0), "pool already exists");
+    //
+    //        IStabilityPool stabilityPool = new IStabilityPool(
+    //            troveManagerAddress,
+    //            borrowerOperationsAddress,
+    //            _debtToken
+    //        );
+    //
+    //        stabilityPools[_debtToken] = stabilityPool;
+    //        stabilityPoolsArray.push(stabilityPool);
+    //        emit StabilityPoolAdded(stabilityPool);
+    //        return true;
+    //    }
 }
