@@ -8,7 +8,6 @@ import "./Interfaces/IBorrowerOperations.sol";
 import "./Interfaces/ITroveManager.sol";
 import "./Interfaces/IDebtToken.sol";
 import "./Interfaces/ISortedTroves.sol";
-import "./Interfaces/ICommunityIssuance.sol";
 import "./Dependencies/LiquityBase.sol";
 import "./Dependencies/SafeMath.sol";
 import "./Dependencies/LiquitySafeMath128.sol";

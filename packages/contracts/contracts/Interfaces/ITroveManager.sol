@@ -4,8 +4,6 @@ pragma solidity ^0.8.9;
 
 import "./IStabilityPool.sol";
 import "./IDebtToken.sol";
-import "./ILQTYToken.sol";
-import "./ILQTYStaking.sol";
 import "./IBBase.sol";
 
 // Common interface for the Trove Manager.

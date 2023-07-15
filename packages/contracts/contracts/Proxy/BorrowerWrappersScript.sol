@@ -9,13 +9,11 @@ import "../Interfaces/IBorrowerOperations.sol";
 import "../Interfaces/ITroveManager.sol";
 import "../Interfaces/IStabilityPool.sol";
 import "../Interfaces/IPriceFeed.sol";
-import "../Interfaces/ILQTYStaking.sol";
 import "./BorrowerOperationsScript.sol";
 import "./ETHTransferScript.sol";
-import "./LQTYStakingScript.sol";
 import "../Dependencies/console.sol";
 
-contract BorrowerWrappersScript is BorrowerOperationsScript, ETHTransferScript, LQTYStakingScript {
+contract BorrowerWrappersScript is BorrowerOperationsScript, ETHTransferScript {
     using SafeMath for uint;
 
     string public constant NAME = "BorrowerWrappersScript";
@@ -25,17 +23,11 @@ contract BorrowerWrappersScript is BorrowerOperationsScript, ETHTransferScript, 
     IPriceFeed immutable priceFeed;
     IERC20 immutable lusdToken;
     IERC20 immutable lqtyToken;
-    ILQTYStaking immutable lqtyStaking;
 
     constructor(
         address _borrowerOperationsAddress,
-        address _troveManagerAddress,
-        address _lqtyStakingAddress
-    )
-        public
-        BorrowerOperationsScript(IBorrowerOperations(_borrowerOperationsAddress))
-        LQTYStakingScript(_lqtyStakingAddress)
-    {
+        address _troveManagerAddress
+    ) public BorrowerOperationsScript(IBorrowerOperations(_borrowerOperationsAddress)) {
         checkContract(_troveManagerAddress);
         ITroveManager troveManagerCached = ITroveManager(_troveManagerAddress);
         troveManager = troveManagerCached;
@@ -55,13 +47,6 @@ contract BorrowerWrappersScript is BorrowerOperationsScript, ETHTransferScript, 
         address lqtyTokenCached = address(troveManagerCached.lqtyToken());
         checkContract(lqtyTokenCached);
         lqtyToken = IERC20(lqtyTokenCached);
-
-        ILQTYStaking lqtyStakingCached = troveManagerCached.lqtyStaking();
-        require(
-            _lqtyStakingAddress == address(lqtyStakingCached),
-            "BorrowerWrappersScript: Wrong LQTYStaking address"
-        );
-        lqtyStaking = lqtyStakingCached;
     }
 
     function claimCollateralAndOpenTrove(
@@ -126,9 +111,9 @@ contract BorrowerWrappersScript is BorrowerOperationsScript, ETHTransferScript, 
 
         // Stake claimed LQTY
         uint claimedLQTY = lqtyBalanceAfter.sub(lqtyBalanceBefore);
-        if (claimedLQTY > 0) {
-            lqtyStaking.stake(claimedLQTY);
-        }
+        //        if (claimedLQTY > 0) {
+        //            lqtyStaking.stake(claimedLQTY);
+        //        }
     }
 
     function claimStakingGainsAndRecycle(
@@ -141,7 +126,7 @@ contract BorrowerWrappersScript is BorrowerOperationsScript, ETHTransferScript, 
         uint lqtyBalanceBefore = lqtyToken.balanceOf(address(this));
 
         // Claim gains
-        lqtyStaking.unstake(0);
+        //        lqtyStaking.unstake(0);
 
         uint gainedCollateral = address(this).balance.sub(collBalanceBefore); // stack too deep issues :'(
         uint gainedLUSD = lusdToken.balanceOf(address(this)).sub(lusdBalanceBefore);
@@ -168,9 +153,9 @@ contract BorrowerWrappersScript is BorrowerOperationsScript, ETHTransferScript, 
             // Providing to Stability Pool also triggers LQTY claim, so stake it if any
             uint lqtyBalanceAfter = lqtyToken.balanceOf(address(this));
             uint claimedLQTY = lqtyBalanceAfter.sub(lqtyBalanceBefore);
-            if (claimedLQTY > 0) {
-                lqtyStaking.stake(claimedLQTY);
-            }
+            //            if (claimedLQTY > 0) {
+            //                lqtyStaking.stake(claimedLQTY);
+            //            }
         }
     }
 

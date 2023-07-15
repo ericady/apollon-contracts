@@ -6,8 +6,6 @@ import "./Interfaces/ITroveManager.sol";
 import "./Interfaces/IStabilityPool.sol";
 import "./Interfaces/IDebtToken.sol";
 import "./Interfaces/ISortedTroves.sol";
-import "./Interfaces/ILQTYToken.sol";
-import "./Interfaces/ILQTYStaking.sol";
 import "./Interfaces/IDebtTokenManager.sol";
 import "./Dependencies/LiquityBase.sol";
 import "./Interfaces/IPriceFeed.sol";
@@ -134,7 +132,6 @@ contract TroveManager is LiquityBase, Ownable, CheckContract, ITroveManager {
     struct ContractsCache {
         IStoragePool activePool;
         IDebtTokenManager dTokenManager;
-        ILQTYStaking lqtyStaking;
         ISortedTroves sortedTroves;
         address gasPoolAddress;
     }
