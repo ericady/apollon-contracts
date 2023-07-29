@@ -72,6 +72,7 @@ contract BorrowerOperations is
     ITroveManager troveManager;
     IStoragePool storagePool;
     IDebtTokenManager debtTokenManager;
+    ISortedTroves sortedTroves;
   }
 
   enum BorrowerOperation {
@@ -124,53 +125,62 @@ contract BorrowerOperations is
   // --- Borrower Trove Operations ---
 
   function openTrove(
-    uint _maxFeePercentage,
+    //    uint _maxFeePercentage,
     TokenAmount[] memory _colls,
-    TokenAmount[] memory _debts,
+    //    TokenAmount[] memory _debts,
     address _upperHint,
     address _lowerHint
   ) external payable override {
     ContractsCache memory contractsCache = ContractsCache(
       troveManager,
       storagePool,
-      debtTokenManager
+      debtTokenManager,
+      sortedTroves
     );
     LocalVariables_openTrove memory vars;
     PriceCache memory priceCache;
 
     _requireTroveIsNotActive(contractsCache.troveManager, msg.sender);
 
-    bool isRecoveryMode = contractsCache.storagePool.checkRecoveryMode(
-      priceCache
-    );
-    _requireValidMaxFeePercentage(_maxFeePercentage, isRecoveryMode);
-
-    DebtTokenAmount memory stableCoinAmount;
-    (vars.debts, stableCoinAmount) = _getDebtTokenAmountsWithFetchedPrices(
-      contractsCache.debtTokenManager,
-      priceCache,
-      _debts
-    );
-
-    // checking if new debt is above the minimum
-    for (uint i = 0; i < vars.debts.length; i++) {
-      _requireAtLeastMinNetDebt(vars.debts[i].netDebt);
-    }
-
-    // adding the borrowing fee to the net debt (+ gas compensation)
-    uint borrowingFeesPaid = 0;
-    if (!isRecoveryMode)
-      borrowingFeesPaid = _addBorrowingFees(
-        contractsCache.troveManager,
-        vars.debts,
-        stableCoinAmount,
-        _maxFeePercentage
-      );
+    //    bool isRecoveryMode = contractsCache.storagePool.checkRecoveryMode(
+    //      priceCache
+    //    );
+    //    _requireValidMaxFeePercentage(_maxFeePercentage, isRecoveryMode);
 
     // adding gas compensation to the net debt
-    stableCoinAmount.netDebt = stableCoinAmount.netDebt.add(
-      STABLE_COIN_GAS_COMPENSATION
-    );
+    DebtTokenAmount memory stableCoinAmount = DebtTokenAmount({
+      debtToken: contractsCache.debtTokenManager.getStableCoin(),
+      netDebt: STABLE_COIN_GAS_COMPENSATION
+    });
+    stableCoinAmount.price = stableCoinAmount.debtToken.getPrice(priceCache);
+    vars.debts = new DebtTokenAmount[](1);
+    vars.debts[0] = stableCoinAmount;
+
+    //    (vars.debts, stableCoinAmount) = _getDebtTokenAmountsWithFetchedPrices(
+    //      contractsCache.debtTokenManager,
+    //      priceCache,
+    //      _debts
+    //    );
+    //    // checking if new debt is above the minimum
+    //    for (uint i = 0; i < vars.debts.length; i++) {
+    //      _requireAtLeastMinNetDebt(vars.debts[i].netDebt);
+    //    }
+    //
+    //    // adding the borrowing fee to the net debt (+ gas compensation)
+    //    uint borrowingFeesPaid = 0;
+    //    if (!isRecoveryMode)
+    //      borrowingFeesPaid = _addBorrowingFees(
+    //        contractsCache.troveManager,
+    //        vars.debts,
+    //        stableCoinAmount,
+    //        _maxFeePercentage
+    //      );
+    //
+    //    // adding gas compensation to the net debt
+    //    stableCoinAmount.netDebt = stableCoinAmount.netDebt.add(
+    //      STABLE_COIN_GAS_COMPENSATION
+    //    );
+
     vars.compositeDebtInStable = _getCompositeDebt(vars.debts); // ICR is based on the composite debt, i.e. the requested debt amount + borrowing fee + debt gas comp.
 
     vars.colls = _getCollTokenAmountsWithFetchedPrices(priceCache, _colls);
@@ -186,6 +196,9 @@ contract BorrowerOperations is
     );
 
     // checking collateral ratios
+    bool isRecoveryMode = contractsCache.storagePool.checkRecoveryMode(
+      priceCache
+    );
     if (isRecoveryMode) {
       _requireICRisAboveCCR(vars.ICR); // > 150 %
     } else {
@@ -205,24 +218,23 @@ contract BorrowerOperations is
     contractsCache.troveManager.setTroveStatus(msg.sender, 1); // active
     contractsCache.troveManager.increaseTroveColl(msg.sender, vars.colls);
     contractsCache.troveManager.increaseTroveDebt(msg.sender, vars.debts);
-
-    // todo das beides muss noch nachgezogen werden
     contractsCache.troveManager.updateTroveRewardSnapshots(msg.sender);
     contractsCache.troveManager.updateStakeAndTotalStakes(msg.sender);
 
-    sortedTroves.insert(
+    vars.arrayIndex = contractsCache.troveManager.addTroveOwnerToArray(
+      msg.sender
+    );
+    emit TroveCreated(msg.sender, vars.arrayIndex);
+
+    contractsCache.sortedTroves.insert(
       priceCache,
       msg.sender,
       vars.NICR,
       _upperHint,
       _lowerHint
     );
-    vars.arrayIndex = contractsCache.troveManager.addTroveOwnerToArray(
-      msg.sender
-    );
-    emit TroveCreated(msg.sender, vars.arrayIndex);
 
-    // Move the coll to the active pool, and mint the debt to the borrower
+    // Move the coll to the active pool
     for (uint i = 0; i < vars.colls.length; i++) {
       CollTokenAmount memory collTokenAmount = vars.colls[i];
       _poolAddColl(
@@ -232,31 +244,33 @@ contract BorrowerOperations is
         PoolType.Active
       );
     }
-    for (uint i = 0; i < vars.debts.length; i++) {
-      DebtTokenAmount memory debtTokenAmount = vars.debts[i];
-      _withdrawalDebt(
-        contractsCache.storagePool,
-        msg.sender,
-        debtTokenAmount.debtToken,
-        debtTokenAmount.netDebt,
-        debtTokenAmount.netDebt.sub(debtTokenAmount.borrowingFee)
-      );
-    }
+
+    //    // mint the debt to the borrower
+    //    for (uint i = 0; i < vars.debts.length; i++) {
+    //      DebtTokenAmount memory debtTokenAmount = vars.debts[i];
+    //      _withdrawalDebt(
+    //        contractsCache.storagePool,
+    //        msg.sender,
+    //        debtTokenAmount.debtToken,
+    //        debtTokenAmount.netDebt,
+    //        debtTokenAmount.netDebt.sub(debtTokenAmount.borrowingFee)
+    //      );
+    //    }
 
     // Move the stable coin gas compensation to the Gas Pool
     contractsCache.storagePool.addValue(
       address(stableCoinAmount.debtToken),
       false,
-      PoolType.GasCompensation,
+      stableCoinAmount.netDebt,
       STABLE_COIN_GAS_COMPENSATION
     );
     stableCoinAmount.debtToken.mint(
       address(contractsCache.storagePool),
-      STABLE_COIN_GAS_COMPENSATION
+      stableCoinAmount.netDebt
     );
 
     //        emit TroveUpdated(msg.sender, vars.compositeDebtInStable, vars.compositeCollInStable, vars.stake, BorrowerOperation.openTrove);
-    emit LUSDBorrowingFeePaid(msg.sender, borrowingFeesPaid);
+    //    emit LUSDBorrowingFeePaid(msg.sender, borrowingFeesPaid);
   }
 
   // todo
