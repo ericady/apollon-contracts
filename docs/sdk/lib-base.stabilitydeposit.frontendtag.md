@@ -15,4 +15,3 @@ readonly frontendTag: string;
 ## Remarks
 
 If the Stability Deposit was made through a frontend that doesn't tag deposits, this will be the zero-address.
-

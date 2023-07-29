@@ -9,13 +9,12 @@ Extra state added to [LiquityStoreState](./lib-base.liquitystorestate.md) by [Bl
 <b>Signature:</b>
 
 ```typescript
-export interface BlockPolledLiquityStoreExtraState 
+export interface BlockPolledLiquityStoreExtraState
 ```
 
 ## Properties
 
-|  Property | Type | Description |
-|  --- | --- | --- |
-|  [blockTag?](./lib-ethers.blockpolledliquitystoreextrastate.blocktag.md) | number | <i>(Optional)</i> Number of block that the store state was fetched from. |
-|  [blockTimestamp](./lib-ethers.blockpolledliquitystoreextrastate.blocktimestamp.md) | number | Timestamp of latest block (number of seconds since epoch). |
-
+| Property                                                                           | Type   | Description                                                              |
+| ---------------------------------------------------------------------------------- | ------ | ------------------------------------------------------------------------ |
+| [blockTag?](./lib-ethers.blockpolledliquitystoreextrastate.blocktag.md)            | number | <i>(Optional)</i> Number of block that the store state was fetched from. |
+| [blockTimestamp](./lib-ethers.blockpolledliquitystoreextrastate.blocktimestamp.md) | number | Timestamp of latest block (number of seconds since epoch).               |

@@ -1,5 +1,5 @@
-const deploymentHelper = require("../utils/deploymentHelpers.js");
-const testHelpers = require("../utils/testHelpers.js");
+const deploymentHelper = require('../utils/deploymentHelpers.js');
+const testHelpers = require('../utils/testHelpers.js');
 
 const th = testHelpers.TestHelper;
 const dec = th.dec;
@@ -7,7 +7,7 @@ const toBN = th.toBN;
 
 const ZERO_ADDRESS = th.ZERO_ADDRESS;
 
-const ZERO = toBN("0");
+const ZERO = toBN('0');
 
 /*
  * Naive fuzz test that checks whether all SP depositors can successfully withdraw from the SP, after a random sequence
@@ -17,7 +17,7 @@ const ZERO = toBN("0");
  */
 
 contract(
-  "PoolManager - random liquidations/deposits, then check all depositors can withdraw",
+  'PoolManager - random liquidations/deposits, then check all depositors can withdraw',
   async accounts => {
     const whale = accounts[accounts.length - 1];
     const bountyAddress = accounts[998];
@@ -40,24 +40,33 @@ contract(
       assert.isTrue(lowestICR.gt(toBN(dec(110, 16))));
     };
 
-    const performLiquidation = async (remainingDefaulters, liquidatedAccountsDict) => {
+    const performLiquidation = async (
+      remainingDefaulters,
+      liquidatedAccountsDict
+    ) => {
       if (remainingDefaulters.length === 0) {
         return;
       }
 
-      const randomDefaulterIndex = Math.floor(Math.random() * remainingDefaulters.length);
+      const randomDefaulterIndex = Math.floor(
+        Math.random() * remainingDefaulters.length
+      );
       const randomDefaulter = remainingDefaulters[randomDefaulterIndex];
 
       const liquidatedLUSD = (await troveManager.Troves(randomDefaulter))[0];
       const liquidatedETH = (await troveManager.Troves(randomDefaulter))[1];
 
       const price = await priceFeed.getPrice();
-      const ICR = (await troveManager.getCurrentICR(randomDefaulter, price)).toString();
+      const ICR = (
+        await troveManager.getCurrentICR(randomDefaulter, price)
+      ).toString();
       const ICRPercent = ICR.slice(0, ICR.length - 16);
 
       console.log(`SP address: ${stabilityPool.address}`);
       const LUSDinPoolBefore = await stabilityPool.getTotalLUSDDeposits();
-      const liquidatedTx = await troveManager.liquidate(randomDefaulter, { from: accounts[0] });
+      const liquidatedTx = await troveManager.liquidate(randomDefaulter, {
+        from: accounts[0],
+      });
       const LUSDinPoolAfter = await stabilityPool.getTotalLUSDDeposits();
 
       assert.isTrue(liquidatedTx.receipt.status);
@@ -67,7 +76,7 @@ contract(
         remainingDefaulters.splice(randomDefaulterIndex, 1);
       }
       if (await troveManager.checkRecoveryMode(price)) {
-        console.log("recovery mode: TRUE");
+        console.log('recovery mode: TRUE');
       }
 
       console.log(
@@ -79,7 +88,11 @@ contract(
       );
     };
 
-    const performSPDeposit = async (depositorAccounts, currentDepositors, currentDepositorsDict) => {
+    const performSPDeposit = async (
+      depositorAccounts,
+      currentDepositors,
+      currentDepositorsDict
+    ) => {
       const randomIndex = Math.floor(Math.random() * depositorAccounts.length);
       const randomDepositor = depositorAccounts[randomIndex];
 
@@ -88,9 +101,13 @@ contract(
 
       const randomLUSDAmount = th.randAmountInWei(1, maxLUSDDeposit);
 
-      const depositTx = await stabilityPool.provideToSP(randomLUSDAmount, ZERO_ADDRESS, {
-        from: randomDepositor
-      });
+      const depositTx = await stabilityPool.provideToSP(
+        randomLUSDAmount,
+        ZERO_ADDRESS,
+        {
+          from: randomDepositor,
+        }
+      );
 
       assert.isTrue(depositTx.receipt.status);
 
@@ -118,22 +135,36 @@ contract(
       if (randomSelection === 0) {
         await performLiquidation(remainingDefaulters, liquidatedAccountsDict);
       } else if (randomSelection === 1) {
-        await performSPDeposit(depositorAccounts, currentDepositors, currentDepositorsDict);
+        await performSPDeposit(
+          depositorAccounts,
+          currentDepositors,
+          currentDepositorsDict
+        );
       }
     };
 
     const systemContainsTroveUnder110 = async price => {
-      const lowestICR = await troveManager.getCurrentICR(await sortedTroves.getLast(), price);
+      const lowestICR = await troveManager.getCurrentICR(
+        await sortedTroves.getLast(),
+        price
+      );
       console.log(
-        `lowestICR: ${lowestICR}, lowestICR.lt(dec(110, 16)): ${lowestICR.lt(toBN(dec(110, 16)))}`
+        `lowestICR: ${lowestICR}, lowestICR.lt(dec(110, 16)): ${lowestICR.lt(
+          toBN(dec(110, 16))
+        )}`
       );
       return lowestICR.lt(dec(110, 16));
     };
 
     const systemContainsTroveUnder100 = async price => {
-      const lowestICR = await troveManager.getCurrentICR(await sortedTroves.getLast(), price);
+      const lowestICR = await troveManager.getCurrentICR(
+        await sortedTroves.getLast(),
+        price
+      );
       console.log(
-        `lowestICR: ${lowestICR}, lowestICR.lt(dec(100, 16)): ${lowestICR.lt(toBN(dec(100, 16)))}`
+        `lowestICR: ${lowestICR}, lowestICR.lt(dec(100, 16)): ${lowestICR.lt(
+          toBN(dec(100, 16))
+        )}`
       );
       return lowestICR.lt(dec(100, 16));
     };
@@ -175,19 +206,31 @@ contract(
         (await troveManager.checkRecoveryMode())
       ) {
         const lowestTrove = await sortedTroves.getLast();
-        const lastTroveDebt = (await troveManager.getEntireDebtAndColl(trove))[0];
-        await borrowerOperations.adjustTrove(0, 0, lastTroveDebt, true, whale, { from: whale });
+        const lastTroveDebt = (
+          await troveManager.getEntireDebtAndColl(trove)
+        )[0];
+        await borrowerOperations.adjustTrove(0, 0, lastTroveDebt, true, whale, {
+          from: whale,
+        });
         await lusdToken.transfer(lowestTrove, lowestTroveDebt, { from: whale });
         await borrowerOperations.closeTrove({ from: lowestTrove });
       }
 
       while (await systemContainsTroveUnder110(price)) {
-        const debtLowest50Troves = await getTotalDebtFromUndercollateralizedTroves(50, price);
+        const debtLowest50Troves =
+          await getTotalDebtFromUndercollateralizedTroves(50, price);
 
         if (debtLowest50Troves.gt(ZERO)) {
-          await borrowerOperations.adjustTrove(0, 0, debtLowest50Troves, true, whale, {
-            from: whale
-          });
+          await borrowerOperations.adjustTrove(
+            0,
+            0,
+            debtLowest50Troves,
+            true,
+            whale,
+            {
+              from: whale,
+            }
+          );
           await stabilityPool.provideToSP(debtLowest50Troves, { from: whale });
         }
 
@@ -198,24 +241,36 @@ contract(
     const attemptWithdrawAllDeposits = async currentDepositors => {
       // First, liquidate all remaining undercollateralized troves, so that SP depositors may withdraw
 
-      console.log("\n");
-      console.log("--- Attempt to withdraw all deposits ---");
+      console.log('\n');
+      console.log('--- Attempt to withdraw all deposits ---');
       console.log(`Depositors count: ${currentDepositors.length}`);
 
       for (depositor of currentDepositors) {
         const initialDeposit = (await stabilityPool.deposits(depositor))[0];
-        const finalDeposit = await stabilityPool.getCompoundedLUSDDeposit(depositor);
+        const finalDeposit = await stabilityPool.getCompoundedLUSDDeposit(
+          depositor
+        );
         const ETHGain = await stabilityPool.getDepositorETHGain(depositor);
         const ETHinSP = (await stabilityPool.getETH()).toString();
-        const LUSDinSP = (await stabilityPool.getTotalLUSDDeposits()).toString();
+        const LUSDinSP = (
+          await stabilityPool.getTotalLUSDDeposits()
+        ).toString();
 
         // Attempt to withdraw
-        const withdrawalTx = await stabilityPool.withdrawFromSP(dec(1, 36), { from: depositor });
+        const withdrawalTx = await stabilityPool.withdrawFromSP(dec(1, 36), {
+          from: depositor,
+        });
 
         const ETHinSPAfter = (await stabilityPool.getETH()).toString();
-        const LUSDinSPAfter = (await stabilityPool.getTotalLUSDDeposits()).toString();
-        const LUSDBalanceSPAfter = await lusdToken.balanceOf(stabilityPool.address);
-        const depositAfter = await stabilityPool.getCompoundedLUSDDeposit(depositor);
+        const LUSDinSPAfter = (
+          await stabilityPool.getTotalLUSDDeposits()
+        ).toString();
+        const LUSDBalanceSPAfter = await lusdToken.balanceOf(
+          stabilityPool.address
+        );
+        const depositAfter = await stabilityPool.getCompoundedLUSDDeposit(
+          depositor
+        );
 
         console.log(`--Before withdrawal--
                     withdrawer addr: ${th.squeezeAddr(depositor)}
@@ -234,11 +289,11 @@ contract(
                      `);
         // Check each deposit can be withdrawn
         assert.isTrue(withdrawalTx.receipt.status);
-        assert.equal(depositAfter, "0");
+        assert.equal(depositAfter, '0');
       }
     };
 
-    describe("Stability Pool Withdrawals", async () => {
+    describe('Stability Pool Withdrawals', async () => {
       before(async () => {
         console.log(`Number of accounts: ${accounts.length}`);
       });
@@ -260,7 +315,10 @@ contract(
 
         await deploymentHelper.connectLQTYContracts(LQTYContracts);
         await deploymentHelper.connectCoreContracts(contracts, LQTYContracts);
-        await deploymentHelper.connectLQTYContractsToCore(LQTYContracts, contracts);
+        await deploymentHelper.connectLQTYContractsToCore(
+          LQTYContracts,
+          contracts
+        );
       });
 
       // mixed deposits/liquidations
@@ -273,11 +331,17 @@ contract(
 
       it("Defaulters' Collateral in range [1, 1e8]. SP Deposits in range [100, 1e10]. ETH:USD = 100", async () => {
         // whale adds coll that holds TCR > 150%
-        await borrowerOperations.openTrove(0, 0, whale, whale, { from: whale, value: dec(5, 29) });
+        await borrowerOperations.openTrove(0, 0, whale, whale, {
+          from: whale,
+          value: dec(5, 29),
+        });
 
         const numberOfOps = 5;
         const defaulterAccounts = accounts.slice(1, numberOfOps);
-        const depositorAccounts = accounts.slice(numberOfOps + 1, numberOfOps * 2);
+        const depositorAccounts = accounts.slice(
+          numberOfOps + 1,
+          numberOfOps * 2
+        );
 
         const defaulterCollMin = 1;
         const defaulterCollMax = 100000000;
@@ -333,35 +397,49 @@ contract(
 
         await skyrocketPriceAndCheckAllTrovesSafe();
 
-        const totalLUSDDepositsBeforeWithdrawals = await stabilityPool.getTotalLUSDDeposits();
+        const totalLUSDDepositsBeforeWithdrawals =
+          await stabilityPool.getTotalLUSDDeposits();
         const totalETHRewardsBeforeWithdrawals = await stabilityPool.getETH();
 
         await attemptWithdrawAllDeposits(currentDepositors);
 
-        const totalLUSDDepositsAfterWithdrawals = await stabilityPool.getTotalLUSDDeposits();
+        const totalLUSDDepositsAfterWithdrawals =
+          await stabilityPool.getTotalLUSDDeposits();
         const totalETHRewardsAfterWithdrawals = await stabilityPool.getETH();
 
         console.log(
           `Total LUSD deposits before any withdrawals: ${totalLUSDDepositsBeforeWithdrawals}`
         );
-        console.log(`Total ETH rewards before any withdrawals: ${totalETHRewardsBeforeWithdrawals}`);
+        console.log(
+          `Total ETH rewards before any withdrawals: ${totalETHRewardsBeforeWithdrawals}`
+        );
 
         console.log(
           `Remaining LUSD deposits after withdrawals: ${totalLUSDDepositsAfterWithdrawals}`
         );
-        console.log(`Remaining ETH rewards after withdrawals: ${totalETHRewardsAfterWithdrawals}`);
+        console.log(
+          `Remaining ETH rewards after withdrawals: ${totalETHRewardsAfterWithdrawals}`
+        );
 
         console.log(`current depositors length: ${currentDepositors.length}`);
-        console.log(`remaining defaulters length: ${remainingDefaulters.length}`);
+        console.log(
+          `remaining defaulters length: ${remainingDefaulters.length}`
+        );
       });
 
       it("Defaulters' Collateral in range [1, 10]. SP Deposits in range [1e8, 1e10]. ETH:USD = 100", async () => {
         // whale adds coll that holds TCR > 150%
-        await borrowerOperations.openTrove(0, 0, whale, whale, { from: whale, value: dec(5, 29) });
+        await borrowerOperations.openTrove(0, 0, whale, whale, {
+          from: whale,
+          value: dec(5, 29),
+        });
 
         const numberOfOps = 5;
         const defaulterAccounts = accounts.slice(1, numberOfOps);
-        const depositorAccounts = accounts.slice(numberOfOps + 1, numberOfOps * 2);
+        const depositorAccounts = accounts.slice(
+          numberOfOps + 1,
+          numberOfOps * 2
+        );
 
         const defaulterCollMin = 1;
         const defaulterCollMax = 10;
@@ -415,35 +493,49 @@ contract(
 
         await skyrocketPriceAndCheckAllTrovesSafe();
 
-        const totalLUSDDepositsBeforeWithdrawals = await stabilityPool.getTotalLUSDDeposits();
+        const totalLUSDDepositsBeforeWithdrawals =
+          await stabilityPool.getTotalLUSDDeposits();
         const totalETHRewardsBeforeWithdrawals = await stabilityPool.getETH();
 
         await attemptWithdrawAllDeposits(currentDepositors);
 
-        const totalLUSDDepositsAfterWithdrawals = await stabilityPool.getTotalLUSDDeposits();
+        const totalLUSDDepositsAfterWithdrawals =
+          await stabilityPool.getTotalLUSDDeposits();
         const totalETHRewardsAfterWithdrawals = await stabilityPool.getETH();
 
         console.log(
           `Total LUSD deposits before any withdrawals: ${totalLUSDDepositsBeforeWithdrawals}`
         );
-        console.log(`Total ETH rewards before any withdrawals: ${totalETHRewardsBeforeWithdrawals}`);
+        console.log(
+          `Total ETH rewards before any withdrawals: ${totalETHRewardsBeforeWithdrawals}`
+        );
 
         console.log(
           `Remaining LUSD deposits after withdrawals: ${totalLUSDDepositsAfterWithdrawals}`
         );
-        console.log(`Remaining ETH rewards after withdrawals: ${totalETHRewardsAfterWithdrawals}`);
+        console.log(
+          `Remaining ETH rewards after withdrawals: ${totalETHRewardsAfterWithdrawals}`
+        );
 
         console.log(`current depositors length: ${currentDepositors.length}`);
-        console.log(`remaining defaulters length: ${remainingDefaulters.length}`);
+        console.log(
+          `remaining defaulters length: ${remainingDefaulters.length}`
+        );
       });
 
       it("Defaulters' Collateral in range [1e6, 1e8]. SP Deposits in range [100, 1000]. Every liquidation empties the Pool. ETH:USD = 100", async () => {
         // whale adds coll that holds TCR > 150%
-        await borrowerOperations.openTrove(0, 0, whale, whale, { from: whale, value: dec(5, 29) });
+        await borrowerOperations.openTrove(0, 0, whale, whale, {
+          from: whale,
+          value: dec(5, 29),
+        });
 
         const numberOfOps = 5;
         const defaulterAccounts = accounts.slice(1, numberOfOps);
-        const depositorAccounts = accounts.slice(numberOfOps + 1, numberOfOps * 2);
+        const depositorAccounts = accounts.slice(
+          numberOfOps + 1,
+          numberOfOps * 2
+        );
 
         const defaulterCollMin = 1000000;
         const defaulterCollMax = 100000000;
@@ -497,36 +589,50 @@ contract(
 
         await skyrocketPriceAndCheckAllTrovesSafe();
 
-        const totalLUSDDepositsBeforeWithdrawals = await stabilityPool.getTotalLUSDDeposits();
+        const totalLUSDDepositsBeforeWithdrawals =
+          await stabilityPool.getTotalLUSDDeposits();
         const totalETHRewardsBeforeWithdrawals = await stabilityPool.getETH();
 
         await attemptWithdrawAllDeposits(currentDepositors);
 
-        const totalLUSDDepositsAfterWithdrawals = await stabilityPool.getTotalLUSDDeposits();
+        const totalLUSDDepositsAfterWithdrawals =
+          await stabilityPool.getTotalLUSDDeposits();
         const totalETHRewardsAfterWithdrawals = await stabilityPool.getETH();
 
         console.log(
           `Total LUSD deposits before any withdrawals: ${totalLUSDDepositsBeforeWithdrawals}`
         );
-        console.log(`Total ETH rewards before any withdrawals: ${totalETHRewardsBeforeWithdrawals}`);
+        console.log(
+          `Total ETH rewards before any withdrawals: ${totalETHRewardsBeforeWithdrawals}`
+        );
 
         console.log(
           `Remaining LUSD deposits after withdrawals: ${totalLUSDDepositsAfterWithdrawals}`
         );
-        console.log(`Remaining ETH rewards after withdrawals: ${totalETHRewardsAfterWithdrawals}`);
+        console.log(
+          `Remaining ETH rewards after withdrawals: ${totalETHRewardsAfterWithdrawals}`
+        );
 
         console.log(`current depositors length: ${currentDepositors.length}`);
-        console.log(`remaining defaulters length: ${remainingDefaulters.length}`);
+        console.log(
+          `remaining defaulters length: ${remainingDefaulters.length}`
+        );
       });
 
       it("Defaulters' Collateral in range [1e6, 1e8]. SP Deposits in range [1e8 1e10]. ETH:USD = 100", async () => {
         // whale adds coll that holds TCR > 150%
-        await borrowerOperations.openTrove(0, 0, whale, whale, { from: whale, value: dec(5, 29) });
+        await borrowerOperations.openTrove(0, 0, whale, whale, {
+          from: whale,
+          value: dec(5, 29),
+        });
 
         // price drops, all L liquidateable
         const numberOfOps = 5;
         const defaulterAccounts = accounts.slice(1, numberOfOps);
-        const depositorAccounts = accounts.slice(numberOfOps + 1, numberOfOps * 2);
+        const depositorAccounts = accounts.slice(
+          numberOfOps + 1,
+          numberOfOps * 2
+        );
 
         const defaulterCollMin = 1000000;
         const defaulterCollMax = 100000000;
@@ -580,26 +686,34 @@ contract(
 
         await skyrocketPriceAndCheckAllTrovesSafe();
 
-        const totalLUSDDepositsBeforeWithdrawals = await stabilityPool.getTotalLUSDDeposits();
+        const totalLUSDDepositsBeforeWithdrawals =
+          await stabilityPool.getTotalLUSDDeposits();
         const totalETHRewardsBeforeWithdrawals = await stabilityPool.getETH();
 
         await attemptWithdrawAllDeposits(currentDepositors);
 
-        const totalLUSDDepositsAfterWithdrawals = await stabilityPool.getTotalLUSDDeposits();
+        const totalLUSDDepositsAfterWithdrawals =
+          await stabilityPool.getTotalLUSDDeposits();
         const totalETHRewardsAfterWithdrawals = await stabilityPool.getETH();
 
         console.log(
           `Total LUSD deposits before any withdrawals: ${totalLUSDDepositsBeforeWithdrawals}`
         );
-        console.log(`Total ETH rewards before any withdrawals: ${totalETHRewardsBeforeWithdrawals}`);
+        console.log(
+          `Total ETH rewards before any withdrawals: ${totalETHRewardsBeforeWithdrawals}`
+        );
 
         console.log(
           `Remaining LUSD deposits after withdrawals: ${totalLUSDDepositsAfterWithdrawals}`
         );
-        console.log(`Remaining ETH rewards after withdrawals: ${totalETHRewardsAfterWithdrawals}`);
+        console.log(
+          `Remaining ETH rewards after withdrawals: ${totalETHRewardsAfterWithdrawals}`
+        );
 
         console.log(`current depositors length: ${currentDepositors.length}`);
-        console.log(`remaining defaulters length: ${remainingDefaulters.length}`);
+        console.log(
+          `remaining defaulters length: ${remainingDefaulters.length}`
+        );
       });
     });
   }

@@ -15,4 +15,3 @@ collateralSurplusBalance: Decimal;
 ## Remarks
 
 See [getCollateralSurplusBalance()](./lib-base.readableliquity.getcollateralsurplusbalance.md) for more information.
-

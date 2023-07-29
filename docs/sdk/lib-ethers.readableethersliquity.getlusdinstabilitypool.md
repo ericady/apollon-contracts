@@ -14,11 +14,10 @@ getLUSDInStabilityPool(overrides?: EthersCallOverrides): Promise<Decimal>;
 
 ## Parameters
 
-|  Parameter | Type | Description |
-|  --- | --- | --- |
-|  overrides | [EthersCallOverrides](./lib-ethers.etherscalloverrides.md) |  |
+| Parameter | Type                                                       | Description |
+| --------- | ---------------------------------------------------------- | ----------- |
+| overrides | [EthersCallOverrides](./lib-ethers.etherscalloverrides.md) |             |
 
 <b>Returns:</b>
 
 Promise&lt;[Decimal](./lib-base.decimal.md)<!-- -->&gt;
-

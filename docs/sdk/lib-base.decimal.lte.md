@@ -12,11 +12,10 @@ lte(that: Decimalish): boolean;
 
 ## Parameters
 
-|  Parameter | Type | Description |
-|  --- | --- | --- |
-|  that | [Decimalish](./lib-base.decimalish.md) |  |
+| Parameter | Type                                   | Description |
+| --------- | -------------------------------------- | ----------- |
+| that      | [Decimalish](./lib-base.decimalish.md) |             |
 
 <b>Returns:</b>
 
 boolean
-

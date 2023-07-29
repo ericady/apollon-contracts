@@ -9,7 +9,10 @@ Parameters of an [adjustTrove()](./lib-base.transactableliquity.adjusttrove.md) 
 <b>Signature:</b>
 
 ```typescript
-export declare type TroveAdjustmentParams<T = unknown> = (_CollateralChange<T> & _NoDebtChange) | (_DebtChange<T> & _NoCollateralChange) | (_CollateralChange<T> & _DebtChange<T>);
+export declare type TroveAdjustmentParams<T = unknown> =
+  | (_CollateralChange<T> & _NoDebtChange)
+  | (_DebtChange<T> & _NoCollateralChange)
+  | (_CollateralChange<T> & _DebtChange<T>);
 ```
 
 ## Remarks
@@ -35,4 +38,3 @@ Defining both `depositCollateral` and `withdrawCollateral`<!-- -->, or both `bor
 <tr> <td> repayLUSD? </td> <td> T </td> <td> <i>(Optional)</i> The amount of LUSD that's repaid. </td> </tr>
 
 </table>
-

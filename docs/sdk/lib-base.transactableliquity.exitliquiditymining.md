@@ -11,6 +11,7 @@ Withdraw all staked LP tokens from liquidity mining and claim reward.
 ```typescript
 exitLiquidityMining(): Promise<void>;
 ```
+
 <b>Returns:</b>
 
 Promise&lt;void&gt;
@@ -18,4 +19,3 @@ Promise&lt;void&gt;
 ## Exceptions
 
 Throws [TransactionFailedError](./lib-base.transactionfailederror.md) in case of transaction failure.
-

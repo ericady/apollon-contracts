@@ -14,11 +14,10 @@ isOpenableInRecoveryMode(price: Decimalish): boolean;
 
 ## Parameters
 
-|  Parameter | Type | Description |
-|  --- | --- | --- |
-|  price | [Decimalish](./lib-base.decimalish.md) |  |
+| Parameter | Type                                   | Description |
+| --------- | -------------------------------------- | ----------- |
+| price     | [Decimalish](./lib-base.decimalish.md) |             |
 
 <b>Returns:</b>
 
 boolean
-

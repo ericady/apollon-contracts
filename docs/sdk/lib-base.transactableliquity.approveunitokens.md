@@ -14,9 +14,9 @@ approveUniTokens(allowance?: Decimalish): Promise<void>;
 
 ## Parameters
 
-|  Parameter | Type | Description |
-|  --- | --- | --- |
-|  allowance | [Decimalish](./lib-base.decimalish.md) | Maximum amount of LP tokens that will be transferrable to liquidity mining (<code>2^256 - 1</code> by default). |
+| Parameter | Type                                   | Description                                                                                                     |
+| --------- | -------------------------------------- | --------------------------------------------------------------------------------------------------------------- |
+| allowance | [Decimalish](./lib-base.decimalish.md) | Maximum amount of LP tokens that will be transferrable to liquidity mining (<code>2^256 - 1</code> by default). |
 
 <b>Returns:</b>
 
@@ -29,4 +29,3 @@ Throws [TransactionFailedError](./lib-base.transactionfailederror.md) in case of
 ## Remarks
 
 Must be performed before calling [stakeUniTokens()](./lib-base.transactableliquity.stakeunitokens.md)<!-- -->.
-

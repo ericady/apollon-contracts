@@ -14,11 +14,10 @@ getFees(overrides?: EthersCallOverrides): Promise<Fees>;
 
 ## Parameters
 
-|  Parameter | Type | Description |
-|  --- | --- | --- |
-|  overrides | [EthersCallOverrides](./lib-ethers.etherscalloverrides.md) |  |
+| Parameter | Type                                                       | Description |
+| --------- | ---------------------------------------------------------- | ----------- |
+| overrides | [EthersCallOverrides](./lib-ethers.etherscalloverrides.md) |             |
 
 <b>Returns:</b>
 
 Promise&lt;[Fees](./lib-base.fees.md)<!-- -->&gt;
-

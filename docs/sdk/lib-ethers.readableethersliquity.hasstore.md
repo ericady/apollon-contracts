@@ -11,7 +11,7 @@ Check whether this `ReadableEthersLiquity` is a [ReadableEthersLiquityWithStore]
 ```typescript
 hasStore(): this is ReadableEthersLiquityWithStore;
 ```
+
 <b>Returns:</b>
 
 this is [ReadableEthersLiquityWithStore](./lib-ethers.readableethersliquitywithstore.md)
-

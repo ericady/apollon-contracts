@@ -12,11 +12,10 @@ pow(exponent: number): Decimal;
 
 ## Parameters
 
-|  Parameter | Type | Description |
-|  --- | --- | --- |
-|  exponent | number |  |
+| Parameter | Type   | Description |
+| --------- | ------ | ----------- |
+| exponent  | number |             |
 
 <b>Returns:</b>
 
 [Decimal](./lib-base.decimal.md)
-

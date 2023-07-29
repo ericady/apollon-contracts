@@ -9,13 +9,13 @@ Details of a [depositLUSDInStabilityPool()](./lib-base.transactableliquity.depos
 <b>Signature:</b>
 
 ```typescript
-export interface StabilityDepositChangeDetails extends StabilityPoolGainsWithdrawalDetails 
+export interface StabilityDepositChangeDetails extends StabilityPoolGainsWithdrawalDetails
 ```
+
 <b>Extends:</b> [StabilityPoolGainsWithdrawalDetails](./lib-base.stabilitypoolgainswithdrawaldetails.md)
 
 ## Properties
 
-|  Property | Type | Description |
-|  --- | --- | --- |
-|  [change](./lib-base.stabilitydepositchangedetails.change.md) | [StabilityDepositChange](./lib-base.stabilitydepositchange.md)<!-- -->&lt;[Decimal](./lib-base.decimal.md)<!-- -->&gt; | Change that was made to the deposit by this transaction. |
-
+| Property                                                     | Type                                                                                                                   | Description                                              |
+| ------------------------------------------------------------ | ---------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------- |
+| [change](./lib-base.stabilitydepositchangedetails.change.md) | [StabilityDepositChange](./lib-base.stabilitydepositchange.md)<!-- -->&lt;[Decimal](./lib-base.decimal.md)<!-- -->&gt; | Change that was made to the deposit by this transaction. |

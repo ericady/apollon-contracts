@@ -14,12 +14,11 @@ getLQTYStake(address?: string, overrides?: EthersCallOverrides): Promise<LQTYSta
 
 ## Parameters
 
-|  Parameter | Type | Description |
-|  --- | --- | --- |
-|  address | string | Address that owns the LQTY Stake. |
-|  overrides | [EthersCallOverrides](./lib-ethers.etherscalloverrides.md) |  |
+| Parameter | Type                                                       | Description                       |
+| --------- | ---------------------------------------------------------- | --------------------------------- |
+| address   | string                                                     | Address that owns the LQTY Stake. |
+| overrides | [EthersCallOverrides](./lib-ethers.etherscalloverrides.md) |                                   |
 
 <b>Returns:</b>
 
 Promise&lt;[LQTYStake](./lib-base.lqtystake.md)<!-- -->&gt;
-

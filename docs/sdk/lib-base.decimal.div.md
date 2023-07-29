@@ -12,11 +12,10 @@ div(divider: Decimalish): Decimal;
 
 ## Parameters
 
-|  Parameter | Type | Description |
-|  --- | --- | --- |
-|  divider | [Decimalish](./lib-base.decimalish.md) |  |
+| Parameter | Type                                   | Description |
+| --------- | -------------------------------------- | ----------- |
+| divider   | [Decimalish](./lib-base.decimalish.md) |             |
 
 <b>Returns:</b>
 
 [Decimal](./lib-base.decimal.md)
-

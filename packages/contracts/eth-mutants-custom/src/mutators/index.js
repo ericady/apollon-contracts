@@ -1,8 +1,8 @@
-const ConditionalBoundaryMutator = require("./conditional-boundary");
-const ConditionalInversionMutator = require("./conditional-inversion");
-const NumberDecreaseMutator = require("./number-decrease");
-const NumberIncreaseMutator = require("./number-increase");
-const BooleanMutator = require("./boolean");
+const ConditionalBoundaryMutator = require('./conditional-boundary');
+const ConditionalInversionMutator = require('./conditional-inversion');
+const NumberDecreaseMutator = require('./number-decrease');
+const NumberIncreaseMutator = require('./number-increase');
+const BooleanMutator = require('./boolean');
 
 function CompositeMutator(mutators) {
   this.mutators = mutators;
@@ -22,5 +22,5 @@ module.exports = {
   NumberDecreaseMutator: NumberDecreaseMutator,
   NumberIncreaseMutator: NumberIncreaseMutator,
   BooleanMutator: BooleanMutator,
-  CompositeMutator: CompositeMutator
+  CompositeMutator: CompositeMutator,
 };

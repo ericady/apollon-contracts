@@ -1,38 +1,42 @@
-const SortedTroves = artifacts.require("./SortedTroves.sol");
-const TroveManager = artifacts.require("./TroveManager.sol");
-const PriceFeedTestnet = artifacts.require("./PriceFeedTestnet.sol");
-const LUSDToken = artifacts.require("./LUSDToken.sol");
-const ActivePool = artifacts.require("./ActivePool.sol");
-const DefaultPool = artifacts.require("./DefaultPool.sol");
-const StabilityPool = artifacts.require("./StabilityPool.sol");
-const GasPool = artifacts.require("./GasPool.sol");
-const CollSurplusPool = artifacts.require("./CollSurplusPool.sol");
-const FunctionCaller = artifacts.require("./TestContracts/FunctionCaller.sol");
-const BorrowerOperations = artifacts.require("./BorrowerOperations.sol");
-const HintHelpers = artifacts.require("./HintHelpers.sol");
+const SortedTroves = artifacts.require('./SortedTroves.sol');
+const TroveManager = artifacts.require('./TroveManager.sol');
+const PriceFeedTestnet = artifacts.require('./PriceFeedTestnet.sol');
+const LUSDToken = artifacts.require('./LUSDToken.sol');
+const ActivePool = artifacts.require('./ActivePool.sol');
+const DefaultPool = artifacts.require('./DefaultPool.sol');
+const StabilityPool = artifacts.require('./StabilityPool.sol');
+const GasPool = artifacts.require('./GasPool.sol');
+const CollSurplusPool = artifacts.require('./CollSurplusPool.sol');
+const FunctionCaller = artifacts.require('./TestContracts/FunctionCaller.sol');
+const BorrowerOperations = artifacts.require('./BorrowerOperations.sol');
+const HintHelpers = artifacts.require('./HintHelpers.sol');
 
-const LQTYStaking = artifacts.require("./LQTYStaking.sol");
-const LQTYToken = artifacts.require("./LQTYToken.sol");
-const LockupContractFactory = artifacts.require("./LockupContractFactory.sol");
-const CommunityIssuance = artifacts.require("./CommunityIssuance.sol");
+const LQTYStaking = artifacts.require('./LQTYStaking.sol');
+const LQTYToken = artifacts.require('./LQTYToken.sol');
+const LockupContractFactory = artifacts.require('./LockupContractFactory.sol');
+const CommunityIssuance = artifacts.require('./CommunityIssuance.sol');
 
-const LQTYTokenTester = artifacts.require("./LQTYTokenTester.sol");
-const CommunityIssuanceTester = artifacts.require("./CommunityIssuanceTester.sol");
-const StabilityPoolTester = artifacts.require("./StabilityPoolTester.sol");
-const ActivePoolTester = artifacts.require("./ActivePoolTester.sol");
-const DefaultPoolTester = artifacts.require("./DefaultPoolTester.sol");
-const LiquityMathTester = artifacts.require("./LiquityMathTester.sol");
-const BorrowerOperationsTester = artifacts.require("./BorrowerOperationsTester.sol");
-const TroveManagerTester = artifacts.require("./TroveManagerTester.sol");
-const LUSDTokenTester = artifacts.require("./LUSDTokenTester.sol");
+const LQTYTokenTester = artifacts.require('./LQTYTokenTester.sol');
+const CommunityIssuanceTester = artifacts.require(
+  './CommunityIssuanceTester.sol'
+);
+const StabilityPoolTester = artifacts.require('./StabilityPoolTester.sol');
+const ActivePoolTester = artifacts.require('./ActivePoolTester.sol');
+const DefaultPoolTester = artifacts.require('./DefaultPoolTester.sol');
+const LiquityMathTester = artifacts.require('./LiquityMathTester.sol');
+const BorrowerOperationsTester = artifacts.require(
+  './BorrowerOperationsTester.sol'
+);
+const TroveManagerTester = artifacts.require('./TroveManagerTester.sol');
+const LUSDTokenTester = artifacts.require('./LUSDTokenTester.sol');
 
 // Proxy scripts
-const BorrowerOperationsScript = artifacts.require("BorrowerOperationsScript");
-const BorrowerWrappersScript = artifacts.require("BorrowerWrappersScript");
-const TroveManagerScript = artifacts.require("TroveManagerScript");
-const StabilityPoolScript = artifacts.require("StabilityPoolScript");
-const TokenScript = artifacts.require("TokenScript");
-const LQTYStakingScript = artifacts.require("LQTYStakingScript");
+const BorrowerOperationsScript = artifacts.require('BorrowerOperationsScript');
+const BorrowerWrappersScript = artifacts.require('BorrowerWrappersScript');
+const TroveManagerScript = artifacts.require('TroveManagerScript');
+const StabilityPoolScript = artifacts.require('StabilityPoolScript');
+const TokenScript = artifacts.require('TokenScript');
+const LQTYStakingScript = artifacts.require('LQTYStakingScript');
 const {
   buildUserProxies,
   BorrowerOperationsProxy,
@@ -41,8 +45,8 @@ const {
   StabilityPoolProxy,
   SortedTrovesProxy,
   TokenProxy,
-  LQTYStakingProxy
-} = require("../utils/proxyHelpers.js");
+  LQTYStakingProxy,
+} = require('../utils/proxyHelpers.js');
 
 /* "Liquity core" consists of all contracts in the core Liquity system.
 
@@ -54,8 +58,8 @@ LQTY contracts consist of only those contracts related to the LQTY Token:
 -the CommunityIssuance contract 
 */
 
-const ZERO_ADDRESS = "0x" + "0".repeat(40);
-const maxBytes32 = "0x" + "f".repeat(64);
+const ZERO_ADDRESS = '0x' + '0'.repeat(40);
+const maxBytes32 = '0x' + 'f'.repeat(64);
 
 class DeploymentHelper {
   static async deployLiquityCore() {
@@ -63,22 +67,34 @@ class DeploymentHelper {
     const frameworkPath = cmdLineArgs[1];
     // console.log(`Framework used:  ${frameworkPath}`)
 
-    if (frameworkPath.includes("hardhat")) {
+    if (frameworkPath.includes('hardhat')) {
       return this.deployLiquityCoreHardhat();
-    } else if (frameworkPath.includes("truffle")) {
+    } else if (frameworkPath.includes('truffle')) {
       return this.deployLiquityCoreTruffle();
     }
   }
 
-  static async deployLQTYContracts(bountyAddress, lpRewardsAddress, multisigAddress) {
+  static async deployLQTYContracts(
+    bountyAddress,
+    lpRewardsAddress,
+    multisigAddress
+  ) {
     const cmdLineArgs = process.argv;
     const frameworkPath = cmdLineArgs[1];
     // console.log(`Framework used:  ${frameworkPath}`)
 
-    if (frameworkPath.includes("hardhat")) {
-      return this.deployLQTYContractsHardhat(bountyAddress, lpRewardsAddress, multisigAddress);
-    } else if (frameworkPath.includes("truffle")) {
-      return this.deployLQTYContractsTruffle(bountyAddress, lpRewardsAddress, multisigAddress);
+    if (frameworkPath.includes('hardhat')) {
+      return this.deployLQTYContractsHardhat(
+        bountyAddress,
+        lpRewardsAddress,
+        multisigAddress
+      );
+    } else if (frameworkPath.includes('truffle')) {
+      return this.deployLQTYContractsTruffle(
+        bountyAddress,
+        lpRewardsAddress,
+        multisigAddress
+      );
     }
   }
 
@@ -124,7 +140,7 @@ class DeploymentHelper {
       collSurplusPool,
       functionCaller,
       borrowerOperations,
-      hintHelpers
+      hintHelpers,
     };
     return coreContracts;
   }
@@ -155,7 +171,11 @@ class DeploymentHelper {
     return testerContracts;
   }
 
-  static async deployLQTYContractsHardhat(bountyAddress, lpRewardsAddress, multisigAddress) {
+  static async deployLQTYContractsHardhat(
+    bountyAddress,
+    lpRewardsAddress,
+    multisigAddress
+  ) {
     const lqtyStaking = await LQTYStaking.new();
     const lockupContractFactory = await LockupContractFactory.new();
     const communityIssuance = await CommunityIssuance.new();
@@ -179,12 +199,16 @@ class DeploymentHelper {
       lqtyStaking,
       lockupContractFactory,
       communityIssuance,
-      lqtyToken
+      lqtyToken,
     };
     return LQTYContracts;
   }
 
-  static async deployLQTYTesterContractsHardhat(bountyAddress, lpRewardsAddress, multisigAddress) {
+  static async deployLQTYTesterContractsHardhat(
+    bountyAddress,
+    lpRewardsAddress,
+    multisigAddress
+  ) {
     const lqtyStaking = await LQTYStaking.new();
     const lockupContractFactory = await LockupContractFactory.new();
     const communityIssuance = await CommunityIssuanceTester.new();
@@ -208,7 +232,7 @@ class DeploymentHelper {
       lqtyStaking,
       lockupContractFactory,
       communityIssuance,
-      lqtyToken
+      lqtyToken,
     };
     return LQTYContracts;
   }
@@ -242,12 +266,16 @@ class DeploymentHelper {
       collSurplusPool,
       functionCaller,
       borrowerOperations,
-      hintHelpers
+      hintHelpers,
     };
     return coreContracts;
   }
 
-  static async deployLQTYContractsTruffle(bountyAddress, lpRewardsAddress, multisigAddress) {
+  static async deployLQTYContractsTruffle(
+    bountyAddress,
+    lpRewardsAddress,
+    multisigAddress
+  ) {
     const lqtyStaking = await lqtyStaking.new();
     const lockupContractFactory = await LockupContractFactory.new();
     const communityIssuance = await CommunityIssuance.new();
@@ -267,7 +295,7 @@ class DeploymentHelper {
       lqtyStaking,
       lockupContractFactory,
       communityIssuance,
-      lqtyToken
+      lqtyToken,
     };
     return LQTYContracts;
   }
@@ -314,7 +342,9 @@ class DeploymentHelper {
       contracts.borrowerOperations
     );
 
-    const troveManagerScript = await TroveManagerScript.new(contracts.troveManager.address);
+    const troveManagerScript = await TroveManagerScript.new(
+      contracts.troveManager.address
+    );
     contracts.troveManager = new TroveManagerProxy(
       owner,
       proxies,
@@ -322,7 +352,9 @@ class DeploymentHelper {
       contracts.troveManager
     );
 
-    const stabilityPoolScript = await StabilityPoolScript.new(contracts.stabilityPool.address);
+    const stabilityPoolScript = await StabilityPoolScript.new(
+      contracts.stabilityPool.address
+    );
     contracts.stabilityPool = new StabilityPoolProxy(
       owner,
       proxies,
@@ -330,7 +362,11 @@ class DeploymentHelper {
       contracts.stabilityPool
     );
 
-    contracts.sortedTroves = new SortedTrovesProxy(owner, proxies, contracts.sortedTroves);
+    contracts.sortedTroves = new SortedTrovesProxy(
+      owner,
+      proxies,
+      contracts.sortedTroves
+    );
 
     const lusdTokenScript = await TokenScript.new(contracts.lusdToken.address);
     contracts.lusdToken = new TokenProxy(
@@ -340,7 +376,9 @@ class DeploymentHelper {
       contracts.lusdToken
     );
 
-    const lqtyTokenScript = await TokenScript.new(LQTYContracts.lqtyToken.address);
+    const lqtyTokenScript = await TokenScript.new(
+      LQTYContracts.lqtyToken.address
+    );
     LQTYContracts.lqtyToken = new TokenProxy(
       owner,
       proxies,
@@ -348,7 +386,9 @@ class DeploymentHelper {
       LQTYContracts.lqtyToken
     );
 
-    const lqtyStakingScript = await LQTYStakingScript.new(LQTYContracts.lqtyStaking.address);
+    const lqtyStakingScript = await LQTYStakingScript.new(
+      LQTYContracts.lqtyStaking.address
+    );
     LQTYContracts.lqtyStaking = new LQTYStakingProxy(
       owner,
       proxies,
@@ -367,8 +407,12 @@ class DeploymentHelper {
     );
 
     // set contract addresses in the FunctionCaller
-    await contracts.functionCaller.setTroveManagerAddress(contracts.troveManager.address);
-    await contracts.functionCaller.setSortedTrovesAddress(contracts.sortedTroves.address);
+    await contracts.functionCaller.setTroveManagerAddress(
+      contracts.troveManager.address
+    );
+    await contracts.functionCaller.setSortedTrovesAddress(
+      contracts.sortedTroves.address
+    );
 
     // set contracts in the Trove Manager
     await contracts.troveManager.setAddresses(
@@ -437,7 +481,9 @@ class DeploymentHelper {
 
   static async connectLQTYContracts(LQTYContracts) {
     // Set LQTYToken address in LCF
-    await LQTYContracts.lockupContractFactory.setLQTYTokenAddress(LQTYContracts.lqtyToken.address);
+    await LQTYContracts.lockupContractFactory.setLQTYTokenAddress(
+      LQTYContracts.lqtyToken.address
+    );
   }
 
   static async connectLQTYContractsToCore(LQTYContracts, coreContracts) {
@@ -455,8 +501,17 @@ class DeploymentHelper {
     );
   }
 
-  static async connectUnipool(uniPool, LQTYContracts, uniswapPairAddr, duration) {
-    await uniPool.setParams(LQTYContracts.lqtyToken.address, uniswapPairAddr, duration);
+  static async connectUnipool(
+    uniPool,
+    LQTYContracts,
+    uniswapPairAddr,
+    duration
+  ) {
+    await uniPool.setParams(
+      LQTYContracts.lqtyToken.address,
+      uniswapPairAddr,
+      duration
+    );
   }
 }
 module.exports = DeploymentHelper;

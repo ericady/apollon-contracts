@@ -10,9 +10,9 @@ Indicates that the transaction has succeeded.
 
 ```typescript
 export declare type SuccessfulReceipt<R = unknown, D = unknown> = {
-    status: "succeeded";
-    rawReceipt: R;
-    details: D;
+  status: 'succeeded';
+  rawReceipt: R;
+  details: D;
 };
 ```
 
@@ -23,4 +23,3 @@ The `rawReceipt` property is an implementation-specific transaction receipt obje
 The `details` property may contain more information about the transaction. See the return types of [TransactableLiquity](./lib-base.transactableliquity.md) functions for the exact contents of `details` for each type of Liquity transaction.
 
 Returned by [SentLiquityTransaction.getReceipt()](./lib-base.sentliquitytransaction.getreceipt.md) and [SentLiquityTransaction.waitForReceipt()](./lib-base.sentliquitytransaction.waitforreceipt.md)<!-- -->.
-

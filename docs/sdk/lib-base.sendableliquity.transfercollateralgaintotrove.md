@@ -11,6 +11,7 @@ Transfer [collateral gain](./lib-base.stabilitydeposit.collateralgain.md) from S
 ```typescript
 transferCollateralGainToTrove(): Promise<SentLiquityTransaction<S, LiquityReceipt<R, CollateralGainTransferDetails>>>;
 ```
+
 <b>Returns:</b>
 
 Promise&lt;[SentLiquityTransaction](./lib-base.sentliquitytransaction.md)<!-- -->&lt;S, [LiquityReceipt](./lib-base.liquityreceipt.md)<!-- -->&lt;R, [CollateralGainTransferDetails](./lib-base.collateralgaintransferdetails.md)<!-- -->&gt;&gt;&gt;
@@ -20,4 +21,3 @@ Promise&lt;[SentLiquityTransaction](./lib-base.sentliquitytransaction.md)<!-- --
 The collateral gain is transfered to the Trove as additional collateral.
 
 As a side-effect, the transaction will also pay out the Stability Deposit's [LQTY reward](./lib-base.stabilitydeposit.lqtyreward.md)<!-- -->.
-

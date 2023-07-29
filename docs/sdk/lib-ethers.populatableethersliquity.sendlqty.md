@@ -14,13 +14,12 @@ sendLQTY(toAddress: string, amount: Decimalish, overrides?: EthersTransactionOve
 
 ## Parameters
 
-|  Parameter | Type | Description |
-|  --- | --- | --- |
-|  toAddress | string | Address of receipient. |
-|  amount | [Decimalish](./lib-base.decimalish.md) | Amount of LQTY to send. |
-|  overrides | [EthersTransactionOverrides](./lib-ethers.etherstransactionoverrides.md) |  |
+| Parameter | Type                                                                     | Description             |
+| --------- | ------------------------------------------------------------------------ | ----------------------- |
+| toAddress | string                                                                   | Address of receipient.  |
+| amount    | [Decimalish](./lib-base.decimalish.md)                                   | Amount of LQTY to send. |
+| overrides | [EthersTransactionOverrides](./lib-ethers.etherstransactionoverrides.md) |                         |
 
 <b>Returns:</b>
 
 Promise&lt;[PopulatedEthersLiquityTransaction](./lib-ethers.populatedethersliquitytransaction.md)<!-- -->&lt;void&gt;&gt;
-

@@ -11,7 +11,7 @@ Withdraw [collateral gain](./lib-base.stabilitydeposit.collateralgain.md) and [L
 ```typescript
 withdrawGainsFromStabilityPool(): Promise<SentLiquityTransaction<S, LiquityReceipt<R, StabilityPoolGainsWithdrawalDetails>>>;
 ```
+
 <b>Returns:</b>
 
 Promise&lt;[SentLiquityTransaction](./lib-base.sentliquitytransaction.md)<!-- -->&lt;S, [LiquityReceipt](./lib-base.liquityreceipt.md)<!-- -->&lt;R, [StabilityPoolGainsWithdrawalDetails](./lib-base.stabilitypoolgainswithdrawaldetails.md)<!-- -->&gt;&gt;&gt;
-

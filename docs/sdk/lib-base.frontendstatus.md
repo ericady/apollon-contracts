@@ -9,13 +9,16 @@ Represents whether an address has been registered as a Liquity frontend.
 <b>Signature:</b>
 
 ```typescript
-export declare type FrontendStatus = {
-    status: "unregistered";
-} | {
-    status: "registered";
-    kickbackRate: Decimal;
-};
+export declare type FrontendStatus =
+  | {
+      status: 'unregistered';
+    }
+  | {
+      status: 'registered';
+      kickbackRate: Decimal;
+    };
 ```
+
 <b>References:</b> [Decimal](./lib-base.decimal.md)
 
 ## Remarks
@@ -23,4 +26,3 @@ export declare type FrontendStatus = {
 Returned by the [getFrontendStatus()](./lib-base.readableliquity.getfrontendstatus.md) function.
 
 When `status` is `"registered"`<!-- -->, `kickbackRate` gives the frontend's kickback rate as a [Decimal](./lib-base.decimal.md) between 0 and 1.
-

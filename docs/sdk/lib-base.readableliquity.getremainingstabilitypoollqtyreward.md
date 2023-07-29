@@ -11,7 +11,7 @@ Get the remaining LQTY that will be collectively rewarded to stability depositor
 ```typescript
 getRemainingStabilityPoolLQTYReward(): Promise<Decimal>;
 ```
+
 <b>Returns:</b>
 
 Promise&lt;[Decimal](./lib-base.decimal.md)<!-- -->&gt;
-

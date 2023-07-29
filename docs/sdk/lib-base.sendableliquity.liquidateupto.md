@@ -14,11 +14,10 @@ liquidateUpTo(maximumNumberOfTrovesToLiquidate: number): Promise<SentLiquityTran
 
 ## Parameters
 
-|  Parameter | Type | Description |
-|  --- | --- | --- |
-|  maximumNumberOfTrovesToLiquidate | number | Stop after liquidating this many Troves. |
+| Parameter                        | Type   | Description                              |
+| -------------------------------- | ------ | ---------------------------------------- |
+| maximumNumberOfTrovesToLiquidate | number | Stop after liquidating this many Troves. |
 
 <b>Returns:</b>
 
 Promise&lt;[SentLiquityTransaction](./lib-base.sentliquitytransaction.md)<!-- -->&lt;S, [LiquityReceipt](./lib-base.liquityreceipt.md)<!-- -->&lt;R, [LiquidationDetails](./lib-base.liquidationdetails.md)<!-- -->&gt;&gt;&gt;
-

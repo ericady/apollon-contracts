@@ -14,11 +14,10 @@ closeTrove(overrides?: EthersTransactionOverrides): Promise<SentEthersLiquityTra
 
 ## Parameters
 
-|  Parameter | Type | Description |
-|  --- | --- | --- |
-|  overrides | [EthersTransactionOverrides](./lib-ethers.etherstransactionoverrides.md) |  |
+| Parameter | Type                                                                     | Description |
+| --------- | ------------------------------------------------------------------------ | ----------- |
+| overrides | [EthersTransactionOverrides](./lib-ethers.etherstransactionoverrides.md) |             |
 
 <b>Returns:</b>
 
 Promise&lt;[SentEthersLiquityTransaction](./lib-ethers.sentethersliquitytransaction.md)<!-- -->&lt;[TroveClosureDetails](./lib-base.troveclosuredetails.md)<!-- -->&gt;&gt;
-

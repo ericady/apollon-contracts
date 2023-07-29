@@ -11,6 +11,7 @@ Start monitoring the blockchain for Liquity state changes.
 ```typescript
 start(): () => void;
 ```
+
 <b>Returns:</b>
 
 () =&gt; void
@@ -22,4 +23,3 @@ Function to stop the monitoring.
 The [onLoaded](./lib-base.liquitystore.onloaded.md) callback will be called after the state is fetched for the first time.
 
 Use the [subscribe()](./lib-base.liquitystore.subscribe.md) function to register listeners.
-

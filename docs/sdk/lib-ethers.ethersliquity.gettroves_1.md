@@ -14,14 +14,13 @@ getTroves(params: TroveListingParams, overrides?: EthersCallOverrides): Promise<
 
 ## Parameters
 
-|  Parameter | Type | Description |
-|  --- | --- | --- |
-|  params | [TroveListingParams](./lib-base.trovelistingparams.md) | Controls how the list is sorted, and where the slice begins and ends. |
-|  overrides | [EthersCallOverrides](./lib-ethers.etherscalloverrides.md) |  |
+| Parameter | Type                                                       | Description                                                           |
+| --------- | ---------------------------------------------------------- | --------------------------------------------------------------------- |
+| params    | [TroveListingParams](./lib-base.trovelistingparams.md)     | Controls how the list is sorted, and where the slice begins and ends. |
+| overrides | [EthersCallOverrides](./lib-ethers.etherscalloverrides.md) |                                                                       |
 
 <b>Returns:</b>
 
 Promise&lt;[UserTrove](./lib-base.usertrove.md)<!-- -->\[\]&gt;
 
 Pairs of owner addresses and their Troves.
-

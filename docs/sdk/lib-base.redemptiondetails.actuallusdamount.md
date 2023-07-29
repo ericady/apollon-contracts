@@ -15,4 +15,3 @@ actualLUSDAmount: Decimal;
 ## Remarks
 
 This can end up being lower than `attemptedLUSDAmount` due to interference from another transaction that modifies the list of Troves.
-

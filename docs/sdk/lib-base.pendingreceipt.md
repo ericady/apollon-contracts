@@ -10,11 +10,10 @@ Indicates that the transaction hasn't been mined yet.
 
 ```typescript
 export declare type PendingReceipt = {
-    status: "pending";
+  status: 'pending';
 };
 ```
 
 ## Remarks
 
 Returned by [SentLiquityTransaction.getReceipt()](./lib-base.sentliquitytransaction.getreceipt.md)<!-- -->.
-

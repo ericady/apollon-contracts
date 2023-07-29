@@ -10,4 +10,5 @@ module.exports = {
   bracketSpacing: true,
   bracketSameLine: false,
   quoteProps: 'as-needed',
+  plugins: ['prettier-plugin-solidity'],
 };

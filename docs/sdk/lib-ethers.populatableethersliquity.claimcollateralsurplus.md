@@ -14,9 +14,9 @@ claimCollateralSurplus(overrides?: EthersTransactionOverrides): Promise<Populate
 
 ## Parameters
 
-|  Parameter | Type | Description |
-|  --- | --- | --- |
-|  overrides | [EthersTransactionOverrides](./lib-ethers.etherstransactionoverrides.md) |  |
+| Parameter | Type                                                                     | Description |
+| --------- | ------------------------------------------------------------------------ | ----------- |
+| overrides | [EthersTransactionOverrides](./lib-ethers.etherstransactionoverrides.md) |             |
 
 <b>Returns:</b>
 
@@ -25,4 +25,3 @@ Promise&lt;[PopulatedEthersLiquityTransaction](./lib-ethers.populatedethersliqui
 ## Remarks
 
 Use [getCollateralSurplusBalance()](./lib-base.readableliquity.getcollateralsurplusbalance.md) to check the amount of collateral available for withdrawal.
-

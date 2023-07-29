@@ -11,7 +11,7 @@ Get the current price of the native currency (e.g. Ether) in USD.
 ```typescript
 getPrice(): Promise<Decimal>;
 ```
+
 <b>Returns:</b>
 
 Promise&lt;[Decimal](./lib-base.decimal.md)<!-- -->&gt;
-

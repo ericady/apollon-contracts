@@ -11,5 +11,5 @@ Types that can be converted into a Decimal.
 ```typescript
 export declare type Decimalish = Decimal | number | string;
 ```
-<b>References:</b> [Decimal](./lib-base.decimal.md)
 
+<b>References:</b> [Decimal](./lib-base.decimal.md)

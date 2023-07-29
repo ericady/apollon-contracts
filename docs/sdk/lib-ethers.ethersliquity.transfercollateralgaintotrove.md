@@ -14,9 +14,9 @@ transferCollateralGainToTrove(overrides?: EthersTransactionOverrides): Promise<C
 
 ## Parameters
 
-|  Parameter | Type | Description |
-|  --- | --- | --- |
-|  overrides | [EthersTransactionOverrides](./lib-ethers.etherstransactionoverrides.md) |  |
+| Parameter | Type                                                                     | Description |
+| --------- | ------------------------------------------------------------------------ | ----------- |
+| overrides | [EthersTransactionOverrides](./lib-ethers.etherstransactionoverrides.md) |             |
 
 <b>Returns:</b>
 
@@ -31,4 +31,3 @@ Throws [EthersTransactionFailedError](./lib-ethers.etherstransactionfailederror.
 The collateral gain is transfered to the Trove as additional collateral.
 
 As a side-effect, the transaction will also pay out the Stability Deposit's [LQTY reward](./lib-base.stabilitydeposit.lqtyreward.md)<!-- -->.
-

@@ -9,7 +9,7 @@ Abstract base class of Liquity data store implementations.
 <b>Signature:</b>
 
 ```typescript
-export declare abstract class LiquityStore<T = unknown> 
+export declare abstract class LiquityStore<T = unknown>
 ```
 
 ## Remarks
@@ -20,16 +20,15 @@ Implemented by [BlockPolledLiquityStore](./lib-ethers.blockpolledliquitystore.md
 
 ## Properties
 
-|  Property | Modifiers | Type | Description |
-|  --- | --- | --- | --- |
-|  [logging](./lib-base.liquitystore.logging.md) |  | boolean | Turn console logging on/off. |
-|  [onLoaded?](./lib-base.liquitystore.onloaded.md) |  | () =&gt; void | <i>(Optional)</i> Called after the state is fetched for the first time. |
-|  [state](./lib-base.liquitystore.state.md) |  | [LiquityStoreState](./lib-base.liquitystorestate.md)<!-- -->&lt;T&gt; | The current store state. |
+| Property                                         | Modifiers | Type                                                                  | Description                                                             |
+| ------------------------------------------------ | --------- | --------------------------------------------------------------------- | ----------------------------------------------------------------------- |
+| [logging](./lib-base.liquitystore.logging.md)    |           | boolean                                                               | Turn console logging on/off.                                            |
+| [onLoaded?](./lib-base.liquitystore.onloaded.md) |           | () =&gt; void                                                         | <i>(Optional)</i> Called after the state is fetched for the first time. |
+| [state](./lib-base.liquitystore.state.md)        |           | [LiquityStoreState](./lib-base.liquitystorestate.md)<!-- -->&lt;T&gt; | The current store state.                                                |
 
 ## Methods
 
-|  Method | Modifiers | Description |
-|  --- | --- | --- |
-|  [start()](./lib-base.liquitystore.start.md) |  | Start monitoring the blockchain for Liquity state changes. |
-|  [subscribe(listener)](./lib-base.liquitystore.subscribe.md) |  | Register a state change listener. |
-
+| Method                                                      | Modifiers | Description                                                |
+| ----------------------------------------------------------- | --------- | ---------------------------------------------------------- |
+| [start()](./lib-base.liquitystore.start.md)                 |           | Start monitoring the blockchain for Liquity state changes. |
+| [subscribe(listener)](./lib-base.liquitystore.subscribe.md) |           | Register a state change listener.                          |

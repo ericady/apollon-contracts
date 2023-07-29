@@ -1,10 +1,14 @@
-const Mutation = require("../mutation");
+const Mutation = require('../mutation');
 
 function ConditionalInversionMutator() {}
 
-ConditionalInversionMutator.prototype.name = "conditional-inversion";
+ConditionalInversionMutator.prototype.name = 'conditional-inversion';
 
-ConditionalInversionMutator.prototype.getMutations = function (file, source, visit) {
+ConditionalInversionMutator.prototype.getMutations = function (
+  file,
+  source,
+  visit
+) {
   const mutations = [];
 
   visit({
@@ -15,24 +19,24 @@ ConditionalInversionMutator.prototype.getMutations = function (file, source, vis
 
       let replacement;
 
-      if (node.operator === "<") {
-        replacement = text.replace("<", ">");
-      } else if (node.operator === ">") {
-        replacement = text.replace(">", "<");
-      } else if (node.operator === "<=") {
-        replacement = text.replace("<=", ">=");
-      } else if (node.operator === ">=") {
-        replacement = text.replace(">=", "<=");
-      } else if (node.operator === "==") {
-        replacement = text.replace("==", "!=");
-      } else if (node.operator === "!=") {
-        replacement = text.replace("!=", "==");
+      if (node.operator === '<') {
+        replacement = text.replace('<', '>');
+      } else if (node.operator === '>') {
+        replacement = text.replace('>', '<');
+      } else if (node.operator === '<=') {
+        replacement = text.replace('<=', '>=');
+      } else if (node.operator === '>=') {
+        replacement = text.replace('>=', '<=');
+      } else if (node.operator === '==') {
+        replacement = text.replace('==', '!=');
+      } else if (node.operator === '!=') {
+        replacement = text.replace('!=', '==');
       }
 
       if (replacement) {
         mutations.push(new Mutation(file, start, end, replacement));
       }
-    }
+    },
   });
 
   return mutations;

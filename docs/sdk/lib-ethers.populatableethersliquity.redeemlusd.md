@@ -14,11 +14,11 @@ redeemLUSD(amount: Decimalish, maxRedemptionRate?: Decimalish, overrides?: Ether
 
 ## Parameters
 
-|  Parameter | Type | Description |
-|  --- | --- | --- |
-|  amount | [Decimalish](./lib-base.decimalish.md) | Amount of LUSD to be redeemed. |
-|  maxRedemptionRate | [Decimalish](./lib-base.decimalish.md) | Maximum acceptable [redemption rate](./lib-base.fees.redemptionrate.md)<!-- -->. |
-|  overrides | [EthersTransactionOverrides](./lib-ethers.etherstransactionoverrides.md) |  |
+| Parameter         | Type                                                                     | Description                                                                      |
+| ----------------- | ------------------------------------------------------------------------ | -------------------------------------------------------------------------------- |
+| amount            | [Decimalish](./lib-base.decimalish.md)                                   | Amount of LUSD to be redeemed.                                                   |
+| maxRedemptionRate | [Decimalish](./lib-base.decimalish.md)                                   | Maximum acceptable [redemption rate](./lib-base.fees.redemptionrate.md)<!-- -->. |
+| overrides         | [EthersTransactionOverrides](./lib-ethers.etherstransactionoverrides.md) |                                                                                  |
 
 <b>Returns:</b>
 
@@ -27,4 +27,3 @@ Promise&lt;[PopulatedEthersRedemption](./lib-ethers.populatedethersredemption.md
 ## Remarks
 
 If `maxRedemptionRate` is omitted, the current redemption rate (based on `amount`<!-- -->) plus 0.1% is used as maximum acceptable rate.
-

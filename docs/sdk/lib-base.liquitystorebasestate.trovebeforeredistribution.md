@@ -15,4 +15,3 @@ troveBeforeRedistribution: TroveWithPendingRedistribution;
 ## Remarks
 
 The current state of the user's Trove can be found as [trove](./lib-base.liquitystorederivedstate.trove.md)<!-- -->.
-

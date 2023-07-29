@@ -11,6 +11,7 @@ Check whether the transaction has been mined, and whether it was successful.
 ```typescript
 getReceipt(): Promise<T>;
 ```
+
 <b>Returns:</b>
 
 Promise&lt;T&gt;
@@ -18,4 +19,3 @@ Promise&lt;T&gt;
 ## Remarks
 
 Unlike [waitForReceipt()](./lib-base.sentliquitytransaction.waitforreceipt.md)<!-- -->, this function doesn't wait for the transaction to be mined.
-

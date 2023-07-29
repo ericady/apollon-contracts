@@ -11,6 +11,7 @@ Withdraw [collateral gain](./lib-base.stabilitydeposit.collateralgain.md) and [L
 ```typescript
 withdrawGainsFromStabilityPool(): Promise<StabilityPoolGainsWithdrawalDetails>;
 ```
+
 <b>Returns:</b>
 
 Promise&lt;[StabilityPoolGainsWithdrawalDetails](./lib-base.stabilitypoolgainswithdrawaldetails.md)<!-- -->&gt;
@@ -18,4 +19,3 @@ Promise&lt;[StabilityPoolGainsWithdrawalDetails](./lib-base.stabilitypoolgainswi
 ## Exceptions
 
 Throws [TransactionFailedError](./lib-base.transactionfailederror.md) in case of transaction failure.
-

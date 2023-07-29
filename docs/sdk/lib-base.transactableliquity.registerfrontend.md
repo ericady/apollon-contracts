@@ -14,9 +14,9 @@ registerFrontend(kickbackRate: Decimalish): Promise<void>;
 
 ## Parameters
 
-|  Parameter | Type | Description |
-|  --- | --- | --- |
-|  kickbackRate | [Decimalish](./lib-base.decimalish.md) | The portion of LQTY rewards to pass onto users of the frontend (between 0 and 1). |
+| Parameter    | Type                                   | Description                                                                       |
+| ------------ | -------------------------------------- | --------------------------------------------------------------------------------- |
+| kickbackRate | [Decimalish](./lib-base.decimalish.md) | The portion of LQTY rewards to pass onto users of the frontend (between 0 and 1). |
 
 <b>Returns:</b>
 
@@ -25,4 +25,3 @@ Promise&lt;void&gt;
 ## Exceptions
 
 Throws [TransactionFailedError](./lib-base.transactionfailederror.md) in case of transaction failure.
-

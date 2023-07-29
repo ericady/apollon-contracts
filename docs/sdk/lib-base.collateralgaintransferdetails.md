@@ -9,13 +9,13 @@ Details of a [transferCollateralGainToTrove()](./lib-base.transactableliquity.tr
 <b>Signature:</b>
 
 ```typescript
-export interface CollateralGainTransferDetails extends StabilityPoolGainsWithdrawalDetails 
+export interface CollateralGainTransferDetails extends StabilityPoolGainsWithdrawalDetails
 ```
+
 <b>Extends:</b> [StabilityPoolGainsWithdrawalDetails](./lib-base.stabilitypoolgainswithdrawaldetails.md)
 
 ## Properties
 
-|  Property | Type | Description |
-|  --- | --- | --- |
-|  [newTrove](./lib-base.collateralgaintransferdetails.newtrove.md) | [Trove](./lib-base.trove.md) | New state of the depositor's Trove directly after the transaction. |
-
+| Property                                                         | Type                         | Description                                                        |
+| ---------------------------------------------------------------- | ---------------------------- | ------------------------------------------------------------------ |
+| [newTrove](./lib-base.collateralgaintransferdetails.newtrove.md) | [Trove](./lib-base.trove.md) | New state of the depositor's Trove directly after the transaction. |

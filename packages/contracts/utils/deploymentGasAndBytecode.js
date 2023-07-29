@@ -1,32 +1,38 @@
 // Hardhat script
-const SortedTroves = artifacts.require("./SortedTroves.sol");
-const TroveManager = artifacts.require("./TroveManager.sol");
-const PriceFeed = artifacts.require("./PriceFeed.sol");
-const LUSDToken = artifacts.require("./LUSDToken.sol");
-const ActivePool = artifacts.require("./ActivePool.sol");
-const DefaultPool = artifacts.require("./DefaultPool.sol");
-const StabilityPool = artifacts.require("./StabilityPool.sol");
-const FunctionCaller = artifacts.require("./FunctionCaller.sol");
-const BorrowerOperations = artifacts.require("./BorrowerOperations.sol");
+const SortedTroves = artifacts.require('./SortedTroves.sol');
+const TroveManager = artifacts.require('./TroveManager.sol');
+const PriceFeed = artifacts.require('./PriceFeed.sol');
+const LUSDToken = artifacts.require('./LUSDToken.sol');
+const ActivePool = artifacts.require('./ActivePool.sol');
+const DefaultPool = artifacts.require('./DefaultPool.sol');
+const StabilityPool = artifacts.require('./StabilityPool.sol');
+const FunctionCaller = artifacts.require('./FunctionCaller.sol');
+const BorrowerOperations = artifacts.require('./BorrowerOperations.sol');
 
-const LQTYStaking = artifacts.require("./LQTY/LQTYStaking.sol");
-const LQTYToken = artifacts.require("./LQTY/LQTYToken.sol");
-const LockupContractFactory = artifacts.require("./LQTY/LockupContractFactory.sol");
-const CommunityIssuance = artifacts.require("./LQTY/CommunityIssuance.sol");
-const HintHelpers = artifacts.require("./HintHelpers.sol");
+const LQTYStaking = artifacts.require('./LQTY/LQTYStaking.sol');
+const LQTYToken = artifacts.require('./LQTY/LQTYToken.sol');
+const LockupContractFactory = artifacts.require(
+  './LQTY/LockupContractFactory.sol'
+);
+const CommunityIssuance = artifacts.require('./LQTY/CommunityIssuance.sol');
+const HintHelpers = artifacts.require('./HintHelpers.sol');
 
-const CommunityIssuanceTester = artifacts.require("./LQTY/CommunityIssuanceTester.sol");
-const ActivePoolTester = artifacts.require("./ActivePoolTester.sol");
-const DefaultPoolTester = artifacts.require("./DefaultPoolTester.sol");
-const LiquityMathTester = artifacts.require("./LiquityMathTester.sol");
-const BorrowerOperationsTester = artifacts.require("./BorrowerOperationsTester.sol");
-const TroveManagerTester = artifacts.require("./TroveManagerTester.sol");
-const LUSDTokenTester = artifacts.require("./LUSDTokenTester.sol");
+const CommunityIssuanceTester = artifacts.require(
+  './LQTY/CommunityIssuanceTester.sol'
+);
+const ActivePoolTester = artifacts.require('./ActivePoolTester.sol');
+const DefaultPoolTester = artifacts.require('./DefaultPoolTester.sol');
+const LiquityMathTester = artifacts.require('./LiquityMathTester.sol');
+const BorrowerOperationsTester = artifacts.require(
+  './BorrowerOperationsTester.sol'
+);
+const TroveManagerTester = artifacts.require('./TroveManagerTester.sol');
+const LUSDTokenTester = artifacts.require('./LUSDTokenTester.sol');
 
-const { TestHelper: th } = require("../utils/testHelpers.js");
+const { TestHelper: th } = require('../utils/testHelpers.js');
 
-const dh = require("./deploymentHelpers.js");
-const ARBITRARY_ADDRESS = "0x5f4eC3Df9cbd43714FE2740f5E3616155c5b8419"; // placeholder for the LPrewards bounty addresses
+const dh = require('./deploymentHelpers.js');
+const ARBITRARY_ADDRESS = '0x5f4eC3Df9cbd43714FE2740f5E3616155c5b8419'; // placeholder for the LPrewards bounty addresses
 
 const coreContractABIs = [
   BorrowerOperations,
@@ -38,10 +44,15 @@ const coreContractABIs = [
   StabilityPool,
   DefaultPool,
   FunctionCaller,
-  HintHelpers
+  HintHelpers,
 ];
 
-const LQTYContractABIs = [LQTYStaking, LQTYToken, LockupContractFactory, CommunityIssuance];
+const LQTYContractABIs = [
+  LQTYStaking,
+  LQTYToken,
+  LockupContractFactory,
+  CommunityIssuance,
+];
 
 const TesterContractABIs = [
   CommunityIssuanceTester,
@@ -50,7 +61,7 @@ const TesterContractABIs = [
   LiquityMathTester,
   BorrowerOperationsTester,
   TroveManagerTester,
-  LUSDTokenTester
+  LUSDTokenTester,
 ];
 
 const getGasFromContractDeployment = async (contractObject, name) => {
@@ -69,7 +80,11 @@ const getBytecodeSize = contractABI => {
   // console.log(`${contractABI.contractName} deployed bytecode length: ${deployedBytecodeLength}`)
 };
 
-const getUSDCostFromGasCost = (deploymentGasTotal, gasPriceInGwei, ETHPrice) => {
+const getUSDCostFromGasCost = (
+  deploymentGasTotal,
+  gasPriceInGwei,
+  ETHPrice
+) => {
   const dollarCost = (deploymentGasTotal * gasPriceInGwei * ETHPrice) / 1e9;
   console.log(
     `At gas price ${gasPriceInGwei} GWei, and ETH Price $${ETHPrice} per ETH, the total cost of deployment in USD is: $${dollarCost}`
@@ -80,7 +95,10 @@ const logContractDeploymentCosts = async contracts => {
   console.log(`Gas costs for deployments: `);
   let totalGasCost = 0;
   for (contractName of Object.keys(contracts)) {
-    const gasCost = await getGasFromContractDeployment(contracts[contractName], contractName);
+    const gasCost = await getGasFromContractDeployment(
+      contracts[contractName],
+      contractName
+    );
     totalGasCost = totalGasCost + Number(gasCost);
   }
   console.log(`Total deployment gas costs: ${totalGasCost}`);
@@ -91,7 +109,10 @@ const logContractObjects = async contracts => {
   console.log(`Contract objects addresses:`);
   let totalGasCost = 0;
   for (contractName of Object.keys(contracts)) {
-    const gasCost = await getGasFromContractDeployment(contracts[contractName], contractName);
+    const gasCost = await getGasFromContractDeployment(
+      contracts[contractName],
+      contractName
+    );
     totalGasCost = totalGasCost + Number(gasCost);
   }
 };
@@ -106,7 +127,10 @@ const logContractBytecodeLengths = contractABIs => {
 // Run script: log deployment gas costs and bytecode lengths for all contracts
 async function main() {
   const coreContracts = await dh.deployLiquityCoreHardhat();
-  const LQTYContracts = await dh.deployLQTYContractsHardhat(ARBITRARY_ADDRESS, ARBITRARY_ADDRESS);
+  const LQTYContracts = await dh.deployLQTYContractsHardhat(
+    ARBITRARY_ADDRESS,
+    ARBITRARY_ADDRESS
+  );
   const testerContracts = await dh.deployTesterContractsHardhat();
 
   await dh.connectCoreContracts(coreContracts, LQTYContracts);

@@ -11,7 +11,7 @@ Get number of Troves that are currently open.
 ```typescript
 getNumberOfTroves(): Promise<number>;
 ```
+
 <b>Returns:</b>
 
 Promise&lt;number&gt;
-

@@ -9,13 +9,13 @@ Thrown by [EthersLiquity](./lib-ethers.ethersliquity.md) in case of transaction 
 <b>Signature:</b>
 
 ```typescript
-export declare class EthersTransactionFailedError extends TransactionFailedError<FailedReceipt<EthersTransactionReceipt>> 
+export declare class EthersTransactionFailedError extends TransactionFailedError<FailedReceipt<EthersTransactionReceipt>>
 ```
+
 <b>Extends:</b> [TransactionFailedError](./lib-base.transactionfailederror.md)<!-- -->&lt;[FailedReceipt](./lib-base.failedreceipt.md)<!-- -->&lt;[EthersTransactionReceipt](./lib-ethers.etherstransactionreceipt.md)<!-- -->&gt;&gt;
 
 ## Constructors
 
-|  Constructor | Modifiers | Description |
-|  --- | --- | --- |
-|  [(constructor)(message, failedReceipt)](./lib-ethers.etherstransactionfailederror._constructor_.md) |  | Constructs a new instance of the <code>EthersTransactionFailedError</code> class |
-
+| Constructor                                                                                         | Modifiers | Description                                                                      |
+| --------------------------------------------------------------------------------------------------- | --------- | -------------------------------------------------------------------------------- |
+| [(constructor)(message, failedReceipt)](./lib-ethers.etherstransactionfailederror._constructor_.md) |           | Constructs a new instance of the <code>EthersTransactionFailedError</code> class |

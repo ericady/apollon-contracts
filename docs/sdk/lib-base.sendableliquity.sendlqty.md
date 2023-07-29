@@ -14,12 +14,11 @@ sendLQTY(toAddress: string, amount: Decimalish): Promise<SentLiquityTransaction<
 
 ## Parameters
 
-|  Parameter | Type | Description |
-|  --- | --- | --- |
-|  toAddress | string | Address of receipient. |
-|  amount | [Decimalish](./lib-base.decimalish.md) | Amount of LQTY to send. |
+| Parameter | Type                                   | Description             |
+| --------- | -------------------------------------- | ----------------------- |
+| toAddress | string                                 | Address of receipient.  |
+| amount    | [Decimalish](./lib-base.decimalish.md) | Amount of LQTY to send. |
 
 <b>Returns:</b>
 
 Promise&lt;[SentLiquityTransaction](./lib-base.sentliquitytransaction.md)<!-- -->&lt;S, [LiquityReceipt](./lib-base.liquityreceipt.md)<!-- -->&lt;R, void&gt;&gt;&gt;
-

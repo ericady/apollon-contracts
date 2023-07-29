@@ -14,11 +14,10 @@ liquidate(address: string | string[]): Promise<SentLiquityTransaction<S, Liquity
 
 ## Parameters
 
-|  Parameter | Type | Description |
-|  --- | --- | --- |
-|  address | string \| string\[\] | Address or array of addresses whose Troves to liquidate. |
+| Parameter | Type                 | Description                                              |
+| --------- | -------------------- | -------------------------------------------------------- |
+| address   | string \| string\[\] | Address or array of addresses whose Troves to liquidate. |
 
 <b>Returns:</b>
 
 Promise&lt;[SentLiquityTransaction](./lib-base.sentliquitytransaction.md)<!-- -->&lt;S, [LiquityReceipt](./lib-base.liquityreceipt.md)<!-- -->&lt;R, [LiquidationDetails](./lib-base.liquidationdetails.md)<!-- -->&gt;&gt;&gt;
-

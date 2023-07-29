@@ -14,11 +14,10 @@ getLiquidityMiningStake(address?: string): Promise<Decimal>;
 
 ## Parameters
 
-|  Parameter | Type | Description |
-|  --- | --- | --- |
-|  address | string | Address whose LP stake should be retrieved. |
+| Parameter | Type   | Description                                 |
+| --------- | ------ | ------------------------------------------- |
+| address   | string | Address whose LP stake should be retrieved. |
 
 <b>Returns:</b>
 
 Promise&lt;[Decimal](./lib-base.decimal.md)<!-- -->&gt;
-

@@ -1,7 +1,7 @@
-const { TestHelper: th } = require("../utils/testHelpers.js");
+const { TestHelper: th } = require('../utils/testHelpers.js');
 
-const DSProxyFactory = artifacts.require("DSProxyFactory");
-const DSProxy = artifacts.require("DSProxy");
+const DSProxyFactory = artifacts.require('DSProxyFactory');
+const DSProxy = artifacts.require('DSProxy');
 
 const buildUserProxies = async users => {
   const proxies = {};
@@ -65,13 +65,23 @@ class Proxy {
   async forwardFunction(params, signature) {
     const proxy = this.getProxyFromParams(params);
     if (!proxy) {
-      return this.proxyFunction(signature.slice(0, signature.indexOf("(")), params);
+      return this.proxyFunction(
+        signature.slice(0, signature.indexOf('(')),
+        params
+      );
     }
     const optionalParams = this.getOptionalParams(params);
-    const calldata = th.getTransactionData(signature, this.getSlicedParams(params));
+    const calldata = th.getTransactionData(
+      signature,
+      this.getSlicedParams(params)
+    );
     // console.log('proxy: ', proxy.address)
     // console.log(this.scriptAddress, calldata, optionalParams)
-    return proxy.methods["execute(address,bytes)"](this.scriptAddress, calldata, optionalParams);
+    return proxy.methods['execute(address,bytes)'](
+      this.scriptAddress,
+      calldata,
+      optionalParams
+    );
   }
 
   async proxyFunctionWithUser(functionName, user) {
@@ -87,64 +97,81 @@ class Proxy {
 }
 
 class BorrowerOperationsProxy extends Proxy {
-  constructor(owner, proxies, borrowerOperationsScriptAddress, borrowerOperations) {
+  constructor(
+    owner,
+    proxies,
+    borrowerOperationsScriptAddress,
+    borrowerOperations
+  ) {
     super(owner, proxies, borrowerOperationsScriptAddress, borrowerOperations);
   }
 
   async openTrove(...params) {
-    return this.forwardFunction(params, "openTrove(uint256,uint256,address,address)");
+    return this.forwardFunction(
+      params,
+      'openTrove(uint256,uint256,address,address)'
+    );
   }
 
   async addColl(...params) {
-    return this.forwardFunction(params, "addColl(address,address)");
+    return this.forwardFunction(params, 'addColl(address,address)');
   }
 
   async withdrawColl(...params) {
-    return this.forwardFunction(params, "withdrawColl(uint256,address,address)");
+    return this.forwardFunction(
+      params,
+      'withdrawColl(uint256,address,address)'
+    );
   }
 
   async withdrawLUSD(...params) {
-    return this.forwardFunction(params, "withdrawLUSD(uint256,uint256,address,address)");
+    return this.forwardFunction(
+      params,
+      'withdrawLUSD(uint256,uint256,address,address)'
+    );
   }
 
   async repayLUSD(...params) {
-    return this.forwardFunction(params, "repayLUSD(uint256,address,address)");
+    return this.forwardFunction(params, 'repayLUSD(uint256,address,address)');
   }
 
   async closeTrove(...params) {
-    return this.forwardFunction(params, "closeTrove()");
+    return this.forwardFunction(params, 'closeTrove()');
   }
 
   async adjustTrove(...params) {
-    return this.forwardFunction(params, "adjustTrove(uint256,uint256,uint256,bool,address,address)");
+    return this.forwardFunction(
+      params,
+      'adjustTrove(uint256,uint256,uint256,bool,address,address)'
+    );
   }
 
   async claimRedeemedCollateral(...params) {
-    return this.forwardFunction(params, "claimRedeemedCollateral(address)");
+    return this.forwardFunction(params, 'claimRedeemedCollateral(address)');
   }
 
   async getNewTCRFromTroveChange(...params) {
-    return this.proxyFunction("getNewTCRFromTroveChange", params);
+    return this.proxyFunction('getNewTCRFromTroveChange', params);
   }
 
   async getNewICRFromTroveChange(...params) {
-    return this.proxyFunction("getNewICRFromTroveChange", params);
+    return this.proxyFunction('getNewICRFromTroveChange', params);
   }
 
   async getCompositeDebt(...params) {
-    return this.proxyFunction("getCompositeDebt", params);
+    return this.proxyFunction('getCompositeDebt', params);
   }
 
   async LUSD_GAS_COMPENSATION(...params) {
-    return this.proxyFunction("LUSD_GAS_COMPENSATION", params);
+    return this.proxyFunction('LUSD_GAS_COMPENSATION', params);
   }
 
   async MIN_NET_DEBT(...params) {
-    return this.proxyFunction("MIN_NET_DEBT", params);
+    return this.proxyFunction('MIN_NET_DEBT', params);
   }
 
   async BORROWING_FEE_FLOOR(...params) {
-    return this.proxyFunction("BORROWING_FEE_FLOOR", params);
+    return this.proxyFunction('BORROWING_FEE_FLOOR', params);
   }
 }
 
@@ -156,20 +183,26 @@ class BorrowerWrappersProxy extends Proxy {
   async claimCollateralAndOpenTrove(...params) {
     return this.forwardFunction(
       params,
-      "claimCollateralAndOpenTrove(uint256,uint256,address,address)"
+      'claimCollateralAndOpenTrove(uint256,uint256,address,address)'
     );
   }
 
   async claimSPRewardsAndRecycle(...params) {
-    return this.forwardFunction(params, "claimSPRewardsAndRecycle(uint256,address,address)");
+    return this.forwardFunction(
+      params,
+      'claimSPRewardsAndRecycle(uint256,address,address)'
+    );
   }
 
   async claimStakingGainsAndRecycle(...params) {
-    return this.forwardFunction(params, "claimStakingGainsAndRecycle(uint256,address,address)");
+    return this.forwardFunction(
+      params,
+      'claimStakingGainsAndRecycle(uint256,address,address)'
+    );
   }
 
   async transferETH(...params) {
-    return this.forwardFunction(params, "transferETH(address,uint256)");
+    return this.forwardFunction(params, 'transferETH(address,uint256)');
   }
 }
 
@@ -179,106 +212,109 @@ class TroveManagerProxy extends Proxy {
   }
 
   async Troves(user) {
-    return this.proxyFunctionWithUser("Troves", user);
+    return this.proxyFunctionWithUser('Troves', user);
   }
 
   async getTroveStatus(user) {
-    return this.proxyFunctionWithUser("getTroveStatus", user);
+    return this.proxyFunctionWithUser('getTroveStatus', user);
   }
 
   async getTroveDebt(user) {
-    return this.proxyFunctionWithUser("getTroveDebt", user);
+    return this.proxyFunctionWithUser('getTroveDebt', user);
   }
 
   async getTroveColl(user) {
-    return this.proxyFunctionWithUser("getTroveColl", user);
+    return this.proxyFunctionWithUser('getTroveColl', user);
   }
 
   async totalStakes() {
-    return this.proxyFunction("totalStakes", []);
+    return this.proxyFunction('totalStakes', []);
   }
 
   async getPendingETHReward(...params) {
-    return this.proxyFunction("getPendingETHReward", params);
+    return this.proxyFunction('getPendingETHReward', params);
   }
 
   async getPendingLUSDDebtReward(...params) {
-    return this.proxyFunction("getPendingLUSDDebtReward", params);
+    return this.proxyFunction('getPendingLUSDDebtReward', params);
   }
 
   async liquidate(user) {
-    return this.proxyFunctionWithUser("liquidate", user);
+    return this.proxyFunctionWithUser('liquidate', user);
   }
 
   async getTCR(...params) {
-    return this.proxyFunction("getTCR", params);
+    return this.proxyFunction('getTCR', params);
   }
 
   async getCurrentICR(user, price) {
-    return this.contract.getCurrentICR(this.getProxyAddressFromUser(user), price);
+    return this.contract.getCurrentICR(
+      this.getProxyAddressFromUser(user),
+      price
+    );
   }
 
   async checkRecoveryMode(...params) {
-    return this.proxyFunction("checkRecoveryMode", params);
+    return this.proxyFunction('checkRecoveryMode', params);
   }
 
   async getTroveOwnersCount() {
-    return this.proxyFunction("getTroveOwnersCount", []);
+    return this.proxyFunction('getTroveOwnersCount', []);
   }
 
   async baseRate() {
-    return this.proxyFunction("baseRate", []);
+    return this.proxyFunction('baseRate', []);
   }
 
   async L_ETH() {
-    return this.proxyFunction("L_ETH", []);
+    return this.proxyFunction('L_ETH', []);
   }
 
   async L_LUSDDebt() {
-    return this.proxyFunction("L_LUSDDebt", []);
+    return this.proxyFunction('L_LUSDDebt', []);
   }
 
   async rewardSnapshots(user) {
-    return this.proxyFunctionWithUser("rewardSnapshots", user);
+    return this.proxyFunctionWithUser('rewardSnapshots', user);
   }
 
   async lastFeeOperationTime() {
-    return this.proxyFunction("lastFeeOperationTime", []);
+    return this.proxyFunction('lastFeeOperationTime', []);
   }
 
   async redeemCollateral(...params) {
     return this.forwardFunction(
       params,
-      "redeemCollateral(uint256,address,address,address,uint256,uint256,uint256)"
+      'redeemCollateral(uint256,address,address,address,uint256,uint256,uint256)'
     );
   }
 
   async getActualDebtFromComposite(...params) {
-    return this.proxyFunction("getActualDebtFromComposite", params);
+    return this.proxyFunction('getActualDebtFromComposite', params);
   }
 
   async getRedemptionFeeWithDecay(...params) {
-    return this.proxyFunction("getRedemptionFeeWithDecay", params);
+    return this.proxyFunction('getRedemptionFeeWithDecay', params);
   }
 
   async getBorrowingRate() {
-    return this.proxyFunction("getBorrowingRate", []);
+    return this.proxyFunction('getBorrowingRate', []);
   }
 
   async getBorrowingRateWithDecay() {
-    return this.proxyFunction("getBorrowingRateWithDecay", []);
+    return this.proxyFunction('getBorrowingRateWithDecay', []);
   }
 
   async getBorrowingFee(...params) {
-    return this.proxyFunction("getBorrowingFee", params);
+    return this.proxyFunction('getBorrowingFee', params);
   }
 
   async getBorrowingFeeWithDecay(...params) {
-    return this.proxyFunction("getBorrowingFeeWithDecay", params);
+    return this.proxyFunction('getBorrowingFeeWithDecay', params);
   }
 
   async getEntireDebtAndColl(...params) {
-    return this.proxyFunction("getEntireDebtAndColl", params);
+    return this.proxyFunction('getEntireDebtAndColl', params);
   }
 }
 
@@ -288,19 +324,19 @@ class StabilityPoolProxy extends Proxy {
   }
 
   async provideToSP(...params) {
-    return this.forwardFunction(params, "provideToSP(uint256,address)");
+    return this.forwardFunction(params, 'provideToSP(uint256,address)');
   }
 
   async getCompoundedLUSDDeposit(user) {
-    return this.proxyFunctionWithUser("getCompoundedLUSDDeposit", user);
+    return this.proxyFunctionWithUser('getCompoundedLUSDDeposit', user);
   }
 
   async deposits(user) {
-    return this.proxyFunctionWithUser("deposits", user);
+    return this.proxyFunctionWithUser('deposits', user);
   }
 
   async getDepositorETHGain(user) {
-    return this.proxyFunctionWithUser("getDepositorETHGain", user);
+    return this.proxyFunctionWithUser('getDepositorETHGain', user);
   }
 }
 
@@ -310,15 +346,15 @@ class SortedTrovesProxy extends Proxy {
   }
 
   async contains(user) {
-    return this.proxyFunctionWithUser("contains", user);
+    return this.proxyFunctionWithUser('contains', user);
   }
 
   async isEmpty(user) {
-    return this.proxyFunctionWithUser("isEmpty", user);
+    return this.proxyFunctionWithUser('isEmpty', user);
   }
 
   async findInsertPosition(...params) {
-    return this.proxyFunction("findInsertPosition", params);
+    return this.proxyFunction('findInsertPosition', params);
   }
 }
 
@@ -330,40 +366,43 @@ class TokenProxy extends Proxy {
   async transfer(...params) {
     // switch destination to proxy if any
     params[0] = this.getProxyAddressFromUser(params[0]);
-    return this.forwardFunction(params, "transfer(address,uint256)");
+    return this.forwardFunction(params, 'transfer(address,uint256)');
   }
 
   async transferFrom(...params) {
     // switch to proxies if any
     params[0] = this.getProxyAddressFromUser(params[0]);
     params[1] = this.getProxyAddressFromUser(params[1]);
-    return this.forwardFunction(params, "transferFrom(address,address,uint256)");
+    return this.forwardFunction(
+      params,
+      'transferFrom(address,address,uint256)'
+    );
   }
 
   async approve(...params) {
     // switch destination to proxy if any
     params[0] = this.getProxyAddressFromUser(params[0]);
-    return this.forwardFunction(params, "approve(address,uint256)");
+    return this.forwardFunction(params, 'approve(address,uint256)');
   }
 
   async increaseAllowance(...params) {
     // switch destination to proxy if any
     params[0] = this.getProxyAddressFromUser(params[0]);
-    return this.forwardFunction(params, "increaseAllowance(address,uint256)");
+    return this.forwardFunction(params, 'increaseAllowance(address,uint256)');
   }
 
   async decreaseAllowance(...params) {
     // switch destination to proxy if any
     params[0] = this.getProxyAddressFromUser(params[0]);
-    return this.forwardFunction(params, "decreaseAllowance(address,uint256)");
+    return this.forwardFunction(params, 'decreaseAllowance(address,uint256)');
   }
 
   async totalSupply(...params) {
-    return this.proxyFunction("totalSupply", params);
+    return this.proxyFunction('totalSupply', params);
   }
 
   async balanceOf(user) {
-    return this.proxyFunctionWithUser("balanceOf", user);
+    return this.proxyFunctionWithUser('balanceOf', user);
   }
 
   async allowance(...params) {
@@ -371,19 +410,19 @@ class TokenProxy extends Proxy {
     const owner = this.getProxyAddressFromUser(params[0]);
     const spender = this.getProxyAddressFromUser(params[1]);
 
-    return this.proxyFunction("allowance", [owner, spender]);
+    return this.proxyFunction('allowance', [owner, spender]);
   }
 
   async name(...params) {
-    return this.proxyFunction("name", params);
+    return this.proxyFunction('name', params);
   }
 
   async symbol(...params) {
-    return this.proxyFunction("symbol", params);
+    return this.proxyFunction('symbol', params);
   }
 
   async decimals(...params) {
-    return this.proxyFunction("decimals", params);
+    return this.proxyFunction('decimals', params);
   }
 }
 
@@ -393,15 +432,15 @@ class LQTYStakingProxy extends Proxy {
   }
 
   async stake(...params) {
-    return this.forwardFunction(params, "stake(uint256)");
+    return this.forwardFunction(params, 'stake(uint256)');
   }
 
   async stakes(user) {
-    return this.proxyFunctionWithUser("stakes", user);
+    return this.proxyFunctionWithUser('stakes', user);
   }
 
   async F_LUSD(user) {
-    return this.proxyFunctionWithUser("F_LUSD", user);
+    return this.proxyFunctionWithUser('F_LUSD', user);
   }
 }
 
@@ -413,5 +452,5 @@ module.exports = {
   StabilityPoolProxy,
   SortedTrovesProxy,
   TokenProxy,
-  LQTYStakingProxy
+  LQTYStakingProxy,
 };

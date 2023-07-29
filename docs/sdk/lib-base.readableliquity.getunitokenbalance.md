@@ -14,11 +14,10 @@ getUniTokenBalance(address?: string): Promise<Decimal>;
 
 ## Parameters
 
-|  Parameter | Type | Description |
-|  --- | --- | --- |
-|  address | string | Address whose balance should be retrieved. |
+| Parameter | Type   | Description                                |
+| --------- | ------ | ------------------------------------------ |
+| address   | string | Address whose balance should be retrieved. |
 
 <b>Returns:</b>
 
 Promise&lt;[Decimal](./lib-base.decimal.md)<!-- -->&gt;
-

@@ -14,11 +14,10 @@ equals(that: LQTYStake): boolean;
 
 ## Parameters
 
-|  Parameter | Type | Description |
-|  --- | --- | --- |
-|  that | [LQTYStake](./lib-base.lqtystake.md) |  |
+| Parameter | Type                                 | Description |
+| --------- | ------------------------------------ | ----------- |
+| that      | [LQTYStake](./lib-base.lqtystake.md) |             |
 
 <b>Returns:</b>
 
 boolean
-

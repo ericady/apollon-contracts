@@ -14,9 +14,9 @@ borrowingRate(when?: Date): Decimal;
 
 ## Parameters
 
-|  Parameter | Type | Description |
-|  --- | --- | --- |
-|  when | Date | Optional timestamp that can be used to calculate what the borrowing rate would decay to at a point of time in the future. |
+| Parameter | Type | Description                                                                                                               |
+| --------- | ---- | ------------------------------------------------------------------------------------------------------------------------- |
+| when      | Date | Optional timestamp that can be used to calculate what the borrowing rate would decay to at a point of time in the future. |
 
 <b>Returns:</b>
 
@@ -30,13 +30,10 @@ To calculate the borrowing fee in LUSD, multiply the borrowed LUSD amount by the
 
 ## Example
 
-
 ```typescript
 const fees = await liquity.getFees();
 
 const borrowedLUSDAmount = 100;
 const borrowingRate = fees.borrowingRate();
 const borrowingFeeLUSD = borrowingRate.mul(borrowedLUSDAmount);
-
 ```
-

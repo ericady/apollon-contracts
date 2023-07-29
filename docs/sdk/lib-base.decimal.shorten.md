@@ -9,7 +9,7 @@
 ```typescript
 shorten(): string;
 ```
+
 <b>Returns:</b>
 
 string
-

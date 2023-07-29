@@ -12,11 +12,10 @@ static fromBigNumberString(bigNumberString: string): Decimal;
 
 ## Parameters
 
-|  Parameter | Type | Description |
-|  --- | --- | --- |
-|  bigNumberString | string |  |
+| Parameter       | Type   | Description |
+| --------------- | ------ | ----------- |
+| bigNumberString | string |             |
 
 <b>Returns:</b>
 
 [Decimal](./lib-base.decimal.md)
-

@@ -9,8 +9,9 @@ A transaction that has already been sent.
 <b>Signature:</b>
 
 ```typescript
-export declare class SentEthersLiquityTransaction<T = unknown> implements SentLiquityTransaction<EthersTransactionResponse, LiquityReceipt<EthersTransactionReceipt, T>> 
+export declare class SentEthersLiquityTransaction<T = unknown> implements SentLiquityTransaction<EthersTransactionResponse, LiquityReceipt<EthersTransactionReceipt, T>>
 ```
+
 <b>Implements:</b> [SentLiquityTransaction](./lib-base.sentliquitytransaction.md)<!-- -->&lt;[EthersTransactionResponse](./lib-ethers.etherstransactionresponse.md)<!-- -->, [LiquityReceipt](./lib-base.liquityreceipt.md)<!-- -->&lt;[EthersTransactionReceipt](./lib-ethers.etherstransactionreceipt.md)<!-- -->, T&gt;&gt;
 
 ## Remarks
@@ -21,14 +22,13 @@ The constructor for this class is marked as internal. Third-party code should no
 
 ## Properties
 
-|  Property | Modifiers | Type | Description |
-|  --- | --- | --- | --- |
-|  [rawSentTransaction](./lib-ethers.sentethersliquitytransaction.rawsenttransaction.md) |  | [EthersTransactionResponse](./lib-ethers.etherstransactionresponse.md) | Ethers' representation of a sent transaction. |
+| Property                                                                              | Modifiers | Type                                                                   | Description                                   |
+| ------------------------------------------------------------------------------------- | --------- | ---------------------------------------------------------------------- | --------------------------------------------- |
+| [rawSentTransaction](./lib-ethers.sentethersliquitytransaction.rawsenttransaction.md) |           | [EthersTransactionResponse](./lib-ethers.etherstransactionresponse.md) | Ethers' representation of a sent transaction. |
 
 ## Methods
 
-|  Method | Modifiers | Description |
-|  --- | --- | --- |
-|  [getReceipt()](./lib-ethers.sentethersliquitytransaction.getreceipt.md) |  | Check whether the transaction has been mined, and whether it was successful. |
-|  [waitForReceipt()](./lib-ethers.sentethersliquitytransaction.waitforreceipt.md) |  | Wait for the transaction to be mined, and check whether it was successful. |
-
+| Method                                                                          | Modifiers | Description                                                                  |
+| ------------------------------------------------------------------------------- | --------- | ---------------------------------------------------------------------------- |
+| [getReceipt()](./lib-ethers.sentethersliquitytransaction.getreceipt.md)         |           | Check whether the transaction has been mined, and whether it was successful. |
+| [waitForReceipt()](./lib-ethers.sentethersliquitytransaction.waitforreceipt.md) |           | Wait for the transaction to be mined, and check whether it was successful.   |

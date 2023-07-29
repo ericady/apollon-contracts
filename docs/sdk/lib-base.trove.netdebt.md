@@ -15,4 +15,3 @@ get netDebt(): Decimal;
 ## Remarks
 
 This doesn't include the liquidation reserve, which is refunded in case of normal closure.
-

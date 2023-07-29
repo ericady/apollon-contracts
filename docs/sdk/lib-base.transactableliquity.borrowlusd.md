@@ -14,10 +14,10 @@ borrowLUSD(amount: Decimalish, maxBorrowingRate?: Decimalish): Promise<TroveAdju
 
 ## Parameters
 
-|  Parameter | Type | Description |
-|  --- | --- | --- |
-|  amount | [Decimalish](./lib-base.decimalish.md) | The amount of LUSD to borrow. |
-|  maxBorrowingRate | [Decimalish](./lib-base.decimalish.md) | Maximum acceptable [borrowing rate](./lib-base.fees.borrowingrate.md)<!-- -->. |
+| Parameter        | Type                                   | Description                                                                    |
+| ---------------- | -------------------------------------- | ------------------------------------------------------------------------------ |
+| amount           | [Decimalish](./lib-base.decimalish.md) | The amount of LUSD to borrow.                                                  |
+| maxBorrowingRate | [Decimalish](./lib-base.decimalish.md) | Maximum acceptable [borrowing rate](./lib-base.fees.borrowingrate.md)<!-- -->. |
 
 <b>Returns:</b>
 
@@ -32,7 +32,5 @@ Throws [TransactionFailedError](./lib-base.transactionfailederror.md) in case of
 Equivalent to:
 
 ```typescript
-adjustTrove({ borrowLUSD: amount }, maxBorrowingRate)
-
+adjustTrove({ borrowLUSD: amount }, maxBorrowingRate);
 ```
-

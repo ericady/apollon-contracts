@@ -14,10 +14,10 @@ getTroveBeforeRedistribution(address?: string, overrides?: EthersCallOverrides):
 
 ## Parameters
 
-|  Parameter | Type | Description |
-|  --- | --- | --- |
-|  address | string | Address that owns the Trove. |
-|  overrides | [EthersCallOverrides](./lib-ethers.etherscalloverrides.md) |  |
+| Parameter | Type                                                       | Description                  |
+| --------- | ---------------------------------------------------------- | ---------------------------- |
+| address   | string                                                     | Address that owns the Trove. |
+| overrides | [EthersCallOverrides](./lib-ethers.etherscalloverrides.md) |                              |
 
 <b>Returns:</b>
 
@@ -26,4 +26,3 @@ Promise&lt;[TroveWithPendingRedistribution](./lib-base.trovewithpendingredistrib
 ## Remarks
 
 The current state of a Trove can be fetched using [getTrove()](./lib-base.readableliquity.gettrove.md)<!-- -->.
-

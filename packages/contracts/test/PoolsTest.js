@@ -1,15 +1,15 @@
-const StabilityPool = artifacts.require("./StabilityPool.sol");
-const ActivePool = artifacts.require("./ActivePool.sol");
-const DefaultPool = artifacts.require("./DefaultPool.sol");
-const NonPayable = artifacts.require("./NonPayable.sol");
+const StabilityPool = artifacts.require('./StabilityPool.sol');
+const ActivePool = artifacts.require('./ActivePool.sol');
+const DefaultPool = artifacts.require('./DefaultPool.sol');
+const NonPayable = artifacts.require('./NonPayable.sol');
 
-const testHelpers = require("../utils/testHelpers.js");
+const testHelpers = require('../utils/testHelpers.js');
 const th = testHelpers.TestHelper;
 const dec = th.dec;
 
-const _minus_1_Ether = web3.utils.toWei("-1", "ether");
+const _minus_1_Ether = web3.utils.toWei('-1', 'ether');
 
-contract("StabilityPool", async () => {
+contract('StabilityPool', async () => {
   /* mock* are EOA’s, temporarily used to call protected functions.
   TODO: Replace with mock contracts, and later complete transactions from EOA
   */

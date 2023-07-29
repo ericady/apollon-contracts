@@ -12,11 +12,10 @@ equals(that: UserTrove): boolean;
 
 ## Parameters
 
-|  Parameter | Type | Description |
-|  --- | --- | --- |
-|  that | [UserTrove](./lib-base.usertrove.md) |  |
+| Parameter | Type                                 | Description |
+| --------- | ------------------------------------ | ----------- |
+| that      | [UserTrove](./lib-base.usertrove.md) |             |
 
 <b>Returns:</b>
 
 boolean
-

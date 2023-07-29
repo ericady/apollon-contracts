@@ -9,19 +9,19 @@ Ethers-based [LiquityStore](./lib-base.liquitystore.md) that updates state whene
 <b>Signature:</b>
 
 ```typescript
-export declare class BlockPolledLiquityStore extends LiquityStore<BlockPolledLiquityStoreExtraState> 
+export declare class BlockPolledLiquityStore extends LiquityStore<BlockPolledLiquityStoreExtraState>
 ```
+
 <b>Extends:</b> [LiquityStore](./lib-base.liquitystore.md)<!-- -->&lt;[BlockPolledLiquityStoreExtraState](./lib-ethers.blockpolledliquitystoreextrastate.md)<!-- -->&gt;
 
 ## Constructors
 
-|  Constructor | Modifiers | Description |
-|  --- | --- | --- |
-|  [(constructor)(readable)](./lib-ethers.blockpolledliquitystore._constructor_.md) |  | Constructs a new instance of the <code>BlockPolledLiquityStore</code> class |
+| Constructor                                                                      | Modifiers | Description                                                                 |
+| -------------------------------------------------------------------------------- | --------- | --------------------------------------------------------------------------- |
+| [(constructor)(readable)](./lib-ethers.blockpolledliquitystore._constructor_.md) |           | Constructs a new instance of the <code>BlockPolledLiquityStore</code> class |
 
 ## Properties
 
-|  Property | Modifiers | Type | Description |
-|  --- | --- | --- | --- |
-|  [connection](./lib-ethers.blockpolledliquitystore.connection.md) |  | [EthersLiquityConnection](./lib-ethers.ethersliquityconnection.md) |  |
-
+| Property                                                         | Modifiers | Type                                                               | Description |
+| ---------------------------------------------------------------- | --------- | ------------------------------------------------------------------ | ----------- |
+| [connection](./lib-ethers.blockpolledliquitystore.connection.md) |           | [EthersLiquityConnection](./lib-ethers.ethersliquityconnection.md) |             |

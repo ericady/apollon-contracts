@@ -14,9 +14,9 @@ liquidateUpTo(maximumNumberOfTrovesToLiquidate: number): Promise<LiquidationDeta
 
 ## Parameters
 
-|  Parameter | Type | Description |
-|  --- | --- | --- |
-|  maximumNumberOfTrovesToLiquidate | number | Stop after liquidating this many Troves. |
+| Parameter                        | Type   | Description                              |
+| -------------------------------- | ------ | ---------------------------------------- |
+| maximumNumberOfTrovesToLiquidate | number | Stop after liquidating this many Troves. |
 
 <b>Returns:</b>
 
@@ -25,4 +25,3 @@ Promise&lt;[LiquidationDetails](./lib-base.liquidationdetails.md)<!-- -->&gt;
 ## Exceptions
 
 Throws [TransactionFailedError](./lib-base.transactionfailederror.md) in case of transaction failure.
-

@@ -14,9 +14,9 @@ getTroveBeforeRedistribution(address?: string): Promise<TroveWithPendingRedistri
 
 ## Parameters
 
-|  Parameter | Type | Description |
-|  --- | --- | --- |
-|  address | string | Address that owns the Trove. |
+| Parameter | Type   | Description                  |
+| --------- | ------ | ---------------------------- |
+| address   | string | Address that owns the Trove. |
 
 <b>Returns:</b>
 
@@ -25,4 +25,3 @@ Promise&lt;[TroveWithPendingRedistribution](./lib-base.trovewithpendingredistrib
 ## Remarks
 
 The current state of a Trove can be fetched using [getTrove()](./lib-base.readableliquity.gettrove.md)<!-- -->.
-

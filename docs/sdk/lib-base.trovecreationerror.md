@@ -9,7 +9,7 @@ Describes why a Trove could not be created.
 <b>Signature:</b>
 
 ```typescript
-export declare type TroveCreationError = "missingLiquidationReserve";
+export declare type TroveCreationError = 'missingLiquidationReserve';
 ```
 
 ## Remarks
@@ -27,4 +27,3 @@ See [TroveChange](./lib-base.trovechange.md)<!-- -->.
 </table>
 
 More errors may be added in the future.
-

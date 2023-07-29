@@ -1,14 +1,20 @@
-const fs = require("fs");
+const fs = require('fs');
 
-const network = process.argv[2] || "mainnet";
-const { addresses, startBlock } = require(`@liquity/lib-ethers/deployments/${network}.json`);
+const network = process.argv[2] || 'mainnet';
+const {
+  addresses,
+  startBlock,
+} = require(`@liquity/lib-ethers/deployments/${network}.json`);
 
 console.log(`Preparing subgraph manifest for network "${network}"`);
 
 const yaml = (strings, ...keys) =>
   strings
-    .flatMap((string, i) => [string, Array.isArray(keys[i]) ? keys[i].join("") : keys[i]])
-    .join("")
+    .flatMap((string, i) => [
+      string,
+      Array.isArray(keys[i]) ? keys[i].join('') : keys[i],
+    ])
+    .join('')
     .substring(1); // Skip initial newline
 
 const manifest = yaml`
@@ -187,8 +193,8 @@ dataSources:
         - event: StakingGainsWithdrawn(indexed address,uint256,uint256)
           handler: handleStakeGainsWithdrawn
 ${[
-  ["LUSDToken", addresses.lusdToken],
-  ["LQTYToken", addresses.lqtyToken]
+  ['LUSDToken', addresses.lusdToken],
+  ['LQTYToken', addresses.lqtyToken],
 ].map(
   ([name, address]) => yaml`
   - name: ${name}
@@ -219,4 +225,4 @@ ${[
 `
 )}`;
 
-fs.writeFileSync("subgraph.yaml", manifest);
+fs.writeFileSync('subgraph.yaml', manifest);

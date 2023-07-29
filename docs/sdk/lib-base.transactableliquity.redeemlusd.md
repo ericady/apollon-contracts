@@ -14,10 +14,10 @@ redeemLUSD(amount: Decimalish, maxRedemptionRate?: Decimalish): Promise<Redempti
 
 ## Parameters
 
-|  Parameter | Type | Description |
-|  --- | --- | --- |
-|  amount | [Decimalish](./lib-base.decimalish.md) | Amount of LUSD to be redeemed. |
-|  maxRedemptionRate | [Decimalish](./lib-base.decimalish.md) | Maximum acceptable [redemption rate](./lib-base.fees.redemptionrate.md)<!-- -->. |
+| Parameter         | Type                                   | Description                                                                      |
+| ----------------- | -------------------------------------- | -------------------------------------------------------------------------------- |
+| amount            | [Decimalish](./lib-base.decimalish.md) | Amount of LUSD to be redeemed.                                                   |
+| maxRedemptionRate | [Decimalish](./lib-base.decimalish.md) | Maximum acceptable [redemption rate](./lib-base.fees.redemptionrate.md)<!-- -->. |
 
 <b>Returns:</b>
 
@@ -30,4 +30,3 @@ Throws [TransactionFailedError](./lib-base.transactionfailederror.md) in case of
 ## Remarks
 
 If `maxRedemptionRate` is omitted, the current redemption rate (based on `amount`<!-- -->) plus 0.1% is used as maximum acceptable rate.
-

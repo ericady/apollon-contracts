@@ -11,6 +11,7 @@ Claim leftover collateral after a liquidation or redemption.
 ```typescript
 claimCollateralSurplus(): Promise<void>;
 ```
+
 <b>Returns:</b>
 
 Promise&lt;void&gt;
@@ -22,4 +23,3 @@ Throws [TransactionFailedError](./lib-base.transactionfailederror.md) in case of
 ## Remarks
 
 Use [getCollateralSurplusBalance()](./lib-base.readableliquity.getcollateralsurplusbalance.md) to check the amount of collateral available for withdrawal.
-

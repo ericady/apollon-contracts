@@ -12,11 +12,10 @@ applyRedistribution(totalRedistributed: Trove): UserTrove;
 
 ## Parameters
 
-|  Parameter | Type | Description |
-|  --- | --- | --- |
-|  totalRedistributed | [Trove](./lib-base.trove.md) |  |
+| Parameter          | Type                         | Description |
+| ------------------ | ---------------------------- | ----------- |
+| totalRedistributed | [Trove](./lib-base.trove.md) |             |
 
 <b>Returns:</b>
 
 [UserTrove](./lib-base.usertrove.md)
-

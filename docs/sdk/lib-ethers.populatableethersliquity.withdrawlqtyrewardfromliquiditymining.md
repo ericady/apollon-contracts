@@ -14,11 +14,10 @@ withdrawLQTYRewardFromLiquidityMining(overrides?: EthersTransactionOverrides): P
 
 ## Parameters
 
-|  Parameter | Type | Description |
-|  --- | --- | --- |
-|  overrides | [EthersTransactionOverrides](./lib-ethers.etherstransactionoverrides.md) |  |
+| Parameter | Type                                                                     | Description |
+| --------- | ------------------------------------------------------------------------ | ----------- |
+| overrides | [EthersTransactionOverrides](./lib-ethers.etherstransactionoverrides.md) |             |
 
 <b>Returns:</b>
 
 Promise&lt;[PopulatedEthersLiquityTransaction](./lib-ethers.populatedethersliquitytransaction.md)<!-- -->&lt;void&gt;&gt;
-

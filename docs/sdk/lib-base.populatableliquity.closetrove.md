@@ -11,7 +11,7 @@ Close existing Trove by repaying all debt and withdrawing all collateral.
 ```typescript
 closeTrove(): Promise<PopulatedLiquityTransaction<P, SentLiquityTransaction<S, LiquityReceipt<R, TroveClosureDetails>>>>;
 ```
+
 <b>Returns:</b>
 
 Promise&lt;[PopulatedLiquityTransaction](./lib-base.populatedliquitytransaction.md)<!-- -->&lt;P, [SentLiquityTransaction](./lib-base.sentliquitytransaction.md)<!-- -->&lt;S, [LiquityReceipt](./lib-base.liquityreceipt.md)<!-- -->&lt;R, [TroveClosureDetails](./lib-base.troveclosuredetails.md)<!-- -->&gt;&gt;&gt;&gt;
-

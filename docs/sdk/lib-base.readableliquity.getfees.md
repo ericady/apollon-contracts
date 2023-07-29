@@ -11,7 +11,7 @@ Get a calculator for current fees.
 ```typescript
 getFees(): Promise<Fees>;
 ```
+
 <b>Returns:</b>
 
 Promise&lt;[Fees](./lib-base.fees.md)<!-- -->&gt;
-

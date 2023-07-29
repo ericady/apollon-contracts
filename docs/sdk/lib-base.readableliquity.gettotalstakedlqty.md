@@ -11,7 +11,7 @@ Get the total amount of LQTY currently staked.
 ```typescript
 getTotalStakedLQTY(): Promise<Decimal>;
 ```
+
 <b>Returns:</b>
 
 Promise&lt;[Decimal](./lib-base.decimal.md)<!-- -->&gt;
-

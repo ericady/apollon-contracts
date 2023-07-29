@@ -11,6 +11,7 @@ Claim leftover collateral after a liquidation or redemption.
 ```typescript
 claimCollateralSurplus(): Promise<SentLiquityTransaction<S, LiquityReceipt<R, void>>>;
 ```
+
 <b>Returns:</b>
 
 Promise&lt;[SentLiquityTransaction](./lib-base.sentliquitytransaction.md)<!-- -->&lt;S, [LiquityReceipt](./lib-base.liquityreceipt.md)<!-- -->&lt;R, void&gt;&gt;&gt;
@@ -18,4 +19,3 @@ Promise&lt;[SentLiquityTransaction](./lib-base.sentliquitytransaction.md)<!-- --
 ## Remarks
 
 Use [getCollateralSurplusBalance()](./lib-base.readableliquity.getcollateralsurplusbalance.md) to check the amount of collateral available for withdrawal.
-

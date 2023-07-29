@@ -9,13 +9,13 @@ Variant of [EthersLiquity](./lib-ethers.ethersliquity.md) that exposes a [Liquit
 <b>Signature:</b>
 
 ```typescript
-export interface EthersLiquityWithStore<T extends LiquityStore = LiquityStore> extends EthersLiquity 
+export interface EthersLiquityWithStore<T extends LiquityStore = LiquityStore> extends EthersLiquity
 ```
+
 <b>Extends:</b> [EthersLiquity](./lib-ethers.ethersliquity.md)
 
 ## Properties
 
-|  Property | Type | Description |
-|  --- | --- | --- |
-|  [store](./lib-ethers.ethersliquitywithstore.store.md) | T | An object that implements LiquityStore. |
-
+| Property                                              | Type | Description                             |
+| ----------------------------------------------------- | ---- | --------------------------------------- |
+| [store](./lib-ethers.ethersliquitywithstore.store.md) | T    | An object that implements LiquityStore. |

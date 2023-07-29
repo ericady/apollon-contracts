@@ -15,4 +15,3 @@ onLoaded?: () => void;
 ## Remarks
 
 See [start()](./lib-base.liquitystore.start.md)<!-- -->.
-

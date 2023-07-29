@@ -10,8 +10,8 @@ Indicates that the transaction has been mined, but it failed.
 
 ```typescript
 export declare type FailedReceipt<R = unknown> = {
-    status: "failed";
-    rawReceipt: R;
+  status: 'failed';
+  rawReceipt: R;
 };
 ```
 
@@ -20,4 +20,3 @@ export declare type FailedReceipt<R = unknown> = {
 The `rawReceipt` property is an implementation-specific transaction receipt object.
 
 Returned by [SentLiquityTransaction.getReceipt()](./lib-base.sentliquitytransaction.getreceipt.md) and [SentLiquityTransaction.waitForReceipt()](./lib-base.sentliquitytransaction.waitforreceipt.md)<!-- -->.
-

@@ -14,9 +14,9 @@ withdrawCollateral(amount: Decimalish): Promise<TroveAdjustmentDetails>;
 
 ## Parameters
 
-|  Parameter | Type | Description |
-|  --- | --- | --- |
-|  amount | [Decimalish](./lib-base.decimalish.md) | The amount of collateral to withdraw from the Trove. |
+| Parameter | Type                                   | Description                                          |
+| --------- | -------------------------------------- | ---------------------------------------------------- |
+| amount    | [Decimalish](./lib-base.decimalish.md) | The amount of collateral to withdraw from the Trove. |
 
 <b>Returns:</b>
 
@@ -31,7 +31,5 @@ Throws [TransactionFailedError](./lib-base.transactionfailederror.md) in case of
 Equivalent to:
 
 ```typescript
-adjustTrove({ withdrawCollateral: amount })
-
+adjustTrove({ withdrawCollateral: amount });
 ```
-

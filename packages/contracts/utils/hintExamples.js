@@ -1,5 +1,5 @@
-const { TestHelper: th } = require("../utils/testHelpers.js");
-const dh = require("./deploymentHelpers.js");
+const { TestHelper: th } = require('../utils/testHelpers.js');
+const dh = require('./deploymentHelpers.js');
 
 // const [borrower, A, B, C] = (() => Array.from(Array(4), x => web3.eth.accounts.create().address))()
 
@@ -8,15 +8,20 @@ async function main() {
   const [borrower, A, B] = accounts;
 
   const coreContracts = await dh.deployLiquityCoreHardhat();
-  const ARBITRARY_ADDRESS = "0x5f4eC3Df9cbd43714FE2740f5E3616155c5b8419";
+  const ARBITRARY_ADDRESS = '0x5f4eC3Df9cbd43714FE2740f5E3616155c5b8419';
   const LQTYContracts = await dh.deployLQTYContractsHardhat(
     ARBITRARY_ADDRESS,
     ARBITRARY_ADDRESS,
     ARBITRARY_ADDRESS
   );
 
-  const { troveManager, borrowerOperations, hintHelpers, sortedTroves, priceFeedTestnet } =
-    coreContracts;
+  const {
+    troveManager,
+    borrowerOperations,
+    hintHelpers,
+    sortedTroves,
+    priceFeedTestnet,
+  } = coreContracts;
 
   await dh.connectCoreContracts(coreContracts, LQTYContracts);
   await dh.connectLQTYContracts(LQTYContracts);
@@ -27,11 +32,11 @@ async function main() {
   const toWei = web3.utils.toWei;
   const toBN = web3.utils.toBN;
 
-  const price = toBN(toWei("2500"));
-  await priceFeedTestnet.setPrice(toBN(toWei("2500")));
+  const price = toBN(toWei('2500'));
+  await priceFeedTestnet.setPrice(toBN(toWei('2500')));
 
-  const LUSDAmount = toBN(toWei("2500")); // borrower wants to withdraw 2500 LUSD
-  const ETHColl = toBN(toWei("5")); // borrower wants to lock 5 ETH collateral
+  const LUSDAmount = toBN(toWei('2500')); // borrower wants to withdraw 2500 LUSD
+  const ETHColl = toBN(toWei('5')); // borrower wants to lock 5 ETH collateral
 
   // Call deployed TroveManager contract to read the liquidation reserve and latest borrowing fee
   const liquidationReserve = await troveManager.LUSD_GAS_COMPENSATION();
@@ -41,13 +46,13 @@ async function main() {
   const expectedDebt = LUSDAmount.add(expectedFee).add(liquidationReserve);
 
   // Get the nominal NICR of the new trove
-  const _1e20 = toBN(toWei("100"));
+  const _1e20 = toBN(toWei('100'));
   let NICR = ETHColl.mul(_1e20).div(expectedDebt);
 
   // Get an approximate address hint from the deployed HintHelper contract. Use (15 * number of troves) trials
   // to get an approx. hint that is close to the right position.
   let numTroves = await sortedTroves.getSize();
-  let numTrials = numTroves.mul(toBN("15"));
+  let numTrials = numTroves.mul(toBN('15'));
   let { 0: approxHint } = await hintHelpers.getApproxHint(NICR, numTrials, 42); // random seed of 42
 
   // Use the approximate hint to get the exact upper and lower hints from the deployed SortedTroves contract
@@ -58,16 +63,20 @@ async function main() {
   );
 
   // Finally, call openTrove with the exact upperHint and lowerHint
-  const maxFee = "5".concat("0".repeat(16)); // Slippage protection: 5%
-  await borrowerOperations.openTrove(maxFee, LUSDAmount, upperHint, lowerHint, { value: ETHColl });
+  const maxFee = '5'.concat('0'.repeat(16)); // Slippage protection: 5%
+  await borrowerOperations.openTrove(maxFee, LUSDAmount, upperHint, lowerHint, {
+    value: ETHColl,
+  });
 
   // --- adjust trove ---
 
-  const collIncrease = toBN(toWei("1")); // borrower wants to add 1 ETH
-  const LUSDRepayment = toBN(toWei("230")); // borrower wants to repay 230 LUSD
+  const collIncrease = toBN(toWei('1')); // borrower wants to add 1 ETH
+  const LUSDRepayment = toBN(toWei('230')); // borrower wants to repay 230 LUSD
 
   // Get trove's current debt and coll
-  const { 0: debt, 1: coll } = await troveManager.getEntireDebtAndColl(borrower);
+  const { 0: debt, 1: coll } = await troveManager.getEntireDebtAndColl(
+    borrower
+  );
 
   const newDebt = debt.sub(LUSDRepayment);
   const newColl = coll.add(collIncrease);
@@ -77,7 +86,7 @@ async function main() {
   // Get an approximate address hint from the deployed HintHelper contract. Use (15 * number of troves) trials
   // to get an approx. hint that is close to the right position.
   numTroves = await sortedTroves.getSize();
-  numTrials = numTroves.mul(toBN("15"))(
+  numTrials = numTroves.mul(toBN('15'))(
     ({ 0: approxHint } = await hintHelpers.getApproxHint(NICR, numTrials, 42))
   )(
     // Use the approximate hint to get the exact upper and lower hints from the deployed SortedTroves contract
@@ -89,24 +98,40 @@ async function main() {
   );
 
   // Call adjustTrove with the exact upperHint and lowerHint
-  await borrowerOperations.adjustTrove(maxFee, 0, LUSDRepayment, false, upperHint, lowerHint, {
-    value: collIncrease
-  });
+  await borrowerOperations.adjustTrove(
+    maxFee,
+    0,
+    LUSDRepayment,
+    false,
+    upperHint,
+    lowerHint,
+    {
+      value: collIncrease,
+    }
+  );
 
   // --- RedeemCollateral ---
 
   // Get the redemptions hints from the deployed HintHelpers contract
-  const redemptionhint = await hintHelpers.getRedemptionHints(LUSDAmount, price, 50);
+  const redemptionhint = await hintHelpers.getRedemptionHints(
+    LUSDAmount,
+    price,
+    50
+  );
 
   const {
     0: firstRedemptionHint,
     1: partialRedemptionNewICR,
-    2: truncatedLUSDAmount
+    2: truncatedLUSDAmount,
   } = redemptionhint;
 
   // Get the approximate partial redemption hint
   const { hintAddress: approxPartialRedemptionHint, latestRandomSeed } =
-    await contracts.hintHelpers.getApproxHint(partialRedemptionNewICR, numTrials, 42);
+    await contracts.hintHelpers.getApproxHint(
+      partialRedemptionNewICR,
+      numTrials,
+      42
+    );
 
   /* Use the approximate partial redemption hint to get the exact partial redemption hint from the
    * deployed SortedTroves contract

@@ -14,12 +14,11 @@ getLiquidityMiningLQTYReward(address?: string, overrides?: EthersCallOverrides):
 
 ## Parameters
 
-|  Parameter | Type | Description |
-|  --- | --- | --- |
-|  address | string | Address whose LQTY reward should be retrieved. |
-|  overrides | [EthersCallOverrides](./lib-ethers.etherscalloverrides.md) |  |
+| Parameter | Type                                                       | Description                                    |
+| --------- | ---------------------------------------------------------- | ---------------------------------------------- |
+| address   | string                                                     | Address whose LQTY reward should be retrieved. |
+| overrides | [EthersCallOverrides](./lib-ethers.etherscalloverrides.md) |                                                |
 
 <b>Returns:</b>
 
 Promise&lt;[Decimal](./lib-base.decimal.md)<!-- -->&gt;
-

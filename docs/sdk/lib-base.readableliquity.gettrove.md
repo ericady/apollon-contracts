@@ -14,11 +14,10 @@ getTrove(address?: string): Promise<UserTrove>;
 
 ## Parameters
 
-|  Parameter | Type | Description |
-|  --- | --- | --- |
-|  address | string | Address that owns the Trove. |
+| Parameter | Type   | Description                  |
+| --------- | ------ | ---------------------------- |
+| address   | string | Address that owns the Trove. |
 
 <b>Returns:</b>
 
 Promise&lt;[UserTrove](./lib-base.usertrove.md)<!-- -->&gt;
-

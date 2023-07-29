@@ -1,4 +1,4 @@
-const fs = require("fs");
+const fs = require('fs');
 
 // Make accounts with 1 trillion Ether
 const makeAccount = () => {
@@ -7,14 +7,14 @@ const makeAccount = () => {
 };
 
 const randomHex = () => {
-  const hexChars = "abcdefABCDEF0123456789";
-  let hexCharArray = ["0x"];
+  const hexChars = 'abcdefABCDEF0123456789';
+  let hexCharArray = ['0x'];
 
   for (i = 0; i < 64; i++) {
     hexCharArray.push(randomChar(hexChars));
   }
   // console.log("hexarray is" + hexCharArray)
-  return hexCharArray.join("");
+  return hexCharArray.join('');
 };
 
 const randomChar = chars => {
@@ -46,7 +46,7 @@ const makeHardhatAccountsList = n => {
   }
 
   return `const accountsList = \n
-        [ ${accounts.join(",\n")} ]\n 
+        [ ${accounts.join(',\n')} ]\n 
           module.exports = {
           accountsList: accountsList
       };`;
@@ -56,6 +56,6 @@ const makeHardhatAccountsList = n => {
 const arrayList = makeHardhatAccountsList(80000);
 
 // console.log(arrayList)
-fs.appendFile("../accountsList.js", arrayList, err => {
+fs.appendFile('../accountsList.js', arrayList, err => {
   if (err) console.log(err);
 });

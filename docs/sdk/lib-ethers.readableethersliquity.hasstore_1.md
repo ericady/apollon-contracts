@@ -14,11 +14,10 @@ hasStore(store: "blockPolled"): this is ReadableEthersLiquityWithStore<BlockPoll
 
 ## Parameters
 
-|  Parameter | Type | Description |
-|  --- | --- | --- |
-|  store | "blockPolled" |  |
+| Parameter | Type          | Description |
+| --------- | ------------- | ----------- |
+| store     | "blockPolled" |             |
 
 <b>Returns:</b>
 
 this is [ReadableEthersLiquityWithStore](./lib-ethers.readableethersliquitywithstore.md)<!-- -->&lt;[BlockPolledLiquityStore](./lib-ethers.blockpolledliquitystore.md)<!-- -->&gt;
-

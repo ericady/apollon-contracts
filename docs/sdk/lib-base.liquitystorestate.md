@@ -9,8 +9,11 @@ Type of [LiquityStore](./lib-base.liquitystore.md)<!-- -->'s [state](./lib-base.
 <b>Signature:</b>
 
 ```typescript
-export declare type LiquityStoreState<T = unknown> = LiquityStoreBaseState & LiquityStoreDerivedState & T;
+export declare type LiquityStoreState<T = unknown> = LiquityStoreBaseState &
+  LiquityStoreDerivedState &
+  T;
 ```
+
 <b>References:</b> [LiquityStoreBaseState](./lib-base.liquitystorebasestate.md)<!-- -->, [LiquityStoreDerivedState](./lib-base.liquitystorederivedstate.md)
 
 ## Remarks
@@ -18,4 +21,3 @@ export declare type LiquityStoreState<T = unknown> = LiquityStoreBaseState & Liq
 It combines all properties of [LiquityStoreBaseState](./lib-base.liquitystorebasestate.md) and [LiquityStoreDerivedState](./lib-base.liquitystorederivedstate.md) with optional extra state added by the particular `LiquityStore` implementation.
 
 The type parameter `T` may be used to type the extra state.
-

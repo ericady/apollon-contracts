@@ -14,12 +14,11 @@ getStabilityDeposit(address?: string, overrides?: EthersCallOverrides): Promise<
 
 ## Parameters
 
-|  Parameter | Type | Description |
-|  --- | --- | --- |
-|  address | string | Address that owns the Stability Deposit. |
-|  overrides | [EthersCallOverrides](./lib-ethers.etherscalloverrides.md) |  |
+| Parameter | Type                                                       | Description                              |
+| --------- | ---------------------------------------------------------- | ---------------------------------------- |
+| address   | string                                                     | Address that owns the Stability Deposit. |
+| overrides | [EthersCallOverrides](./lib-ethers.etherscalloverrides.md) |                                          |
 
 <b>Returns:</b>
 
 Promise&lt;[StabilityDeposit](./lib-base.stabilitydeposit.md)<!-- -->&gt;
-

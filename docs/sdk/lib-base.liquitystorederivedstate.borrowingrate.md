@@ -19,4 +19,3 @@ A value between 0 and 1.
 ## Example
 
 For example a value of 0.01 amounts to a borrowing fee of 1% of the borrowed amount.
-

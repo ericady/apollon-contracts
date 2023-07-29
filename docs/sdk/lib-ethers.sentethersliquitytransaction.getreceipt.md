@@ -11,6 +11,7 @@ Check whether the transaction has been mined, and whether it was successful.
 ```typescript
 getReceipt(): Promise<LiquityReceipt<EthersTransactionReceipt, T>>;
 ```
+
 <b>Returns:</b>
 
 Promise&lt;[LiquityReceipt](./lib-base.liquityreceipt.md)<!-- -->&lt;[EthersTransactionReceipt](./lib-ethers.etherstransactionreceipt.md)<!-- -->, T&gt;&gt;
@@ -18,4 +19,3 @@ Promise&lt;[LiquityReceipt](./lib-base.liquityreceipt.md)<!-- -->&lt;[EthersTran
 ## Remarks
 
 Unlike [waitForReceipt()](./lib-base.sentliquitytransaction.waitforreceipt.md)<!-- -->, this function doesn't wait for the transaction to be mined.
-

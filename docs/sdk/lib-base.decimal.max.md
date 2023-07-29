@@ -12,12 +12,11 @@ static max(a: Decimalish, b: Decimalish): Decimal;
 
 ## Parameters
 
-|  Parameter | Type | Description |
-|  --- | --- | --- |
-|  a | [Decimalish](./lib-base.decimalish.md) |  |
-|  b | [Decimalish](./lib-base.decimalish.md) |  |
+| Parameter | Type                                   | Description |
+| --------- | -------------------------------------- | ----------- |
+| a         | [Decimalish](./lib-base.decimalish.md) |             |
+| b         | [Decimalish](./lib-base.decimalish.md) |             |
 
 <b>Returns:</b>
 
 [Decimal](./lib-base.decimal.md)
-

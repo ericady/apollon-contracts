@@ -1,12 +1,12 @@
-const deploymentHelper = require("../utils/deploymentHelpers.js");
-const testHelpers = require("../utils/testHelpers.js");
+const deploymentHelper = require('../utils/deploymentHelpers.js');
+const testHelpers = require('../utils/testHelpers.js');
 
-const { keccak256 } = require("@ethersproject/keccak256");
-const { defaultAbiCoder } = require("@ethersproject/abi");
-const { toUtf8Bytes } = require("@ethersproject/strings");
-const { pack } = require("@ethersproject/solidity");
-const { hexlify } = require("@ethersproject/bytes");
-const { ecsign } = require("ethereumjs-util");
+const { keccak256 } = require('@ethersproject/keccak256');
+const { defaultAbiCoder } = require('@ethersproject/abi');
+const { toUtf8Bytes } = require('@ethersproject/strings');
+const { pack } = require('@ethersproject/solidity');
+const { hexlify } = require('@ethersproject/bytes');
+const { ecsign } = require('ethereumjs-util');
 
 // the second account our hardhatenv creates (for EOA A)
 // from https://github.com/liquity/dev/blob/main/packages/contracts/hardhatAccountsList2k.js#L3
@@ -20,7 +20,7 @@ const timeValues = testHelpers.TimeValues;
 const ZERO_ADDRESS = th.ZERO_ADDRESS;
 const assertRevert = th.assertRevert;
 
-contract("LQTY Token", async accounts => {
+contract('LQTY Token', async accounts => {
   const [owner, A, B, C, D] = accounts;
 
   const [bountyAddress, lpRewardsAddress, multisig] = accounts.slice(997, 1000);
@@ -29,10 +29,11 @@ contract("LQTY Token", async accounts => {
   const approve = {
     owner: A,
     spender: B,
-    value: 1
+    value: 1,
   };
 
-  const A_PrivateKey = "0xeaa445c85f7b438dEd6e831d06a4eD0CEBDc2f8527f84Fcda6EBB5fCfAd4C0e9";
+  const A_PrivateKey =
+    '0xeaa445c85f7b438dEd6e831d06a4eD0CEBDc2f8527f84Fcda6EBB5fCfAd4C0e9';
 
   let contracts;
   let lqtyTokenTester;
@@ -44,28 +45,33 @@ contract("LQTY Token", async accounts => {
   let chainId;
 
   const sign = (digest, privateKey) => {
-    return ecsign(Buffer.from(digest.slice(2), "hex"), Buffer.from(privateKey.slice(2), "hex"));
+    return ecsign(
+      Buffer.from(digest.slice(2), 'hex'),
+      Buffer.from(privateKey.slice(2), 'hex')
+    );
   };
 
   const PERMIT_TYPEHASH = keccak256(
-    toUtf8Bytes("Permit(address owner,address spender,uint256 value,uint256 nonce,uint256 deadline)")
+    toUtf8Bytes(
+      'Permit(address owner,address spender,uint256 value,uint256 nonce,uint256 deadline)'
+    )
   );
 
   // Gets the EIP712 domain separator
   const getDomainSeparator = (name, contractAddress, chainId, version) => {
     return keccak256(
       defaultAbiCoder.encode(
-        ["bytes32", "bytes32", "bytes32", "uint256", "address"],
+        ['bytes32', 'bytes32', 'bytes32', 'uint256', 'address'],
         [
           keccak256(
             toUtf8Bytes(
-              "EIP712Domain(string name,string version,uint256 chainId,address verifyingContract)"
+              'EIP712Domain(string name,string version,uint256 chainId,address verifyingContract)'
             )
           ),
           keccak256(toUtf8Bytes(name)),
           keccak256(toUtf8Bytes(version)),
           parseInt(chainId),
-          contractAddress.toLowerCase()
+          contractAddress.toLowerCase(),
         ]
       )
     );
@@ -84,20 +90,32 @@ contract("LQTY Token", async accounts => {
     nonce,
     deadline
   ) => {
-    const DOMAIN_SEPARATOR = getDomainSeparator(name, address, chainId, version);
+    const DOMAIN_SEPARATOR = getDomainSeparator(
+      name,
+      address,
+      chainId,
+      version
+    );
     return keccak256(
       pack(
-        ["bytes1", "bytes1", "bytes32", "bytes32"],
+        ['bytes1', 'bytes1', 'bytes32', 'bytes32'],
         [
-          "0x19",
-          "0x01",
+          '0x19',
+          '0x01',
           DOMAIN_SEPARATOR,
           keccak256(
             defaultAbiCoder.encode(
-              ["bytes32", "address", "address", "uint256", "uint256", "uint256"],
+              [
+                'bytes32',
+                'address',
+                'address',
+                'uint256',
+                'uint256',
+                'uint256',
+              ],
               [PERMIT_TYPEHASH, owner, spender, value, nonce, deadline]
             )
-          )
+          ),
         ]
       )
     );
@@ -143,11 +161,12 @@ contract("LQTY Token", async accounts => {
 
   beforeEach(async () => {
     contracts = await deploymentHelper.deployLiquityCore();
-    const LQTYContracts = await deploymentHelper.deployLQTYTesterContractsHardhat(
-      bountyAddress,
-      lpRewardsAddress,
-      multisig
-    );
+    const LQTYContracts =
+      await deploymentHelper.deployLQTYTesterContractsHardhat(
+        bountyAddress,
+        lpRewardsAddress,
+        multisig
+      );
 
     lqtyStaking = LQTYContracts.lqtyStaking;
     lqtyTokenTester = LQTYContracts.lqtyToken;
@@ -162,7 +181,7 @@ contract("LQTY Token", async accounts => {
     await deploymentHelper.connectLQTYContractsToCore(LQTYContracts, contracts);
   });
 
-  it("balanceOf(): gets the balance of the account", async () => {
+  it('balanceOf(): gets the balance of the account', async () => {
     await mintToABC();
 
     const A_Balance = await lqtyTokenTester.balanceOf(A);
@@ -174,7 +193,7 @@ contract("LQTY Token", async accounts => {
     assert.equal(C_Balance, dec(50, 18));
   });
 
-  it("totalSupply(): gets the total supply", async () => {
+  it('totalSupply(): gets the total supply', async () => {
     const total = (await lqtyTokenTester.totalSupply()).toString();
 
     assert.equal(total, dec(100, 24));
@@ -182,22 +201,22 @@ contract("LQTY Token", async accounts => {
 
   it("name(): returns the token's name", async () => {
     const name = await lqtyTokenTester.name();
-    assert.equal(name, "LQTY");
+    assert.equal(name, 'LQTY');
   });
 
   it("symbol(): returns the token's symbol", async () => {
     const symbol = await lqtyTokenTester.symbol();
-    assert.equal(symbol, "LQTY");
+    assert.equal(symbol, 'LQTY');
   });
 
   it("version(): returns the token contract's version", async () => {
     const version = await lqtyTokenTester.version();
-    assert.equal(version, "1");
+    assert.equal(version, '1');
   });
 
-  it("decimal(): returns the number of decimal digits used", async () => {
+  it('decimal(): returns the number of decimal digits used', async () => {
     const decimals = await lqtyTokenTester.decimals();
-    assert.equal(decimals, "18");
+    assert.equal(decimals, '18');
   });
 
   it("allowance(): returns an account's spending allowance for another account's balance", async () => {
@@ -209,14 +228,14 @@ contract("LQTY Token", async accounts => {
     const allowance_D = await lqtyTokenTester.allowance(B, D);
 
     assert.equal(allowance_A, dec(100, 18));
-    assert.equal(allowance_D, "0");
+    assert.equal(allowance_D, '0');
   });
 
-  it("approve(): approves an account to spend the specified ammount", async () => {
+  it('approve(): approves an account to spend the specified ammount', async () => {
     await mintToABC();
 
     const allowance_A_before = await lqtyTokenTester.allowance(B, A);
-    assert.equal(allowance_A_before, "0");
+    assert.equal(allowance_A_before, '0');
 
     await lqtyTokenTester.approve(A, dec(100, 18), { from: B });
 
@@ -224,27 +243,34 @@ contract("LQTY Token", async accounts => {
     assert.equal(allowance_A_after, dec(100, 18));
   });
 
-  it("approve(): reverts when spender param is address(0)", async () => {
+  it('approve(): reverts when spender param is address(0)', async () => {
     await mintToABC();
 
-    const txPromise = lqtyTokenTester.approve(ZERO_ADDRESS, dec(100, 18), { from: B });
-    await assertRevert(txPromise);
-  });
-
-  it("approve(): reverts when owner param is address(0)", async () => {
-    await mintToABC();
-
-    const txPromise = lqtyTokenTester.callInternalApprove(ZERO_ADDRESS, A, dec(100, 18), {
-      from: B
+    const txPromise = lqtyTokenTester.approve(ZERO_ADDRESS, dec(100, 18), {
+      from: B,
     });
     await assertRevert(txPromise);
   });
 
-  it("transferFrom(): successfully transfers from an account which it is approved to transfer from", async () => {
+  it('approve(): reverts when owner param is address(0)', async () => {
+    await mintToABC();
+
+    const txPromise = lqtyTokenTester.callInternalApprove(
+      ZERO_ADDRESS,
+      A,
+      dec(100, 18),
+      {
+        from: B,
+      }
+    );
+    await assertRevert(txPromise);
+  });
+
+  it('transferFrom(): successfully transfers from an account which it is approved to transfer from', async () => {
     await mintToABC();
 
     const allowance_A_0 = await lqtyTokenTester.allowance(B, A);
-    assert.equal(allowance_A_0, "0");
+    assert.equal(allowance_A_0, '0');
 
     await lqtyTokenTester.approve(A, dec(50, 18), { from: B });
 
@@ -260,13 +286,15 @@ contract("LQTY Token", async accounts => {
 
     // Check A's allowance of B's funds has decreased
     const allowance_A_2 = await lqtyTokenTester.allowance(B, A);
-    assert.equal(allowance_A_2, "0");
+    assert.equal(allowance_A_2, '0');
 
     // Check B's balance has decreased
     assert.equal(await lqtyTokenTester.balanceOf(B), dec(50, 18));
 
     // A tries to transfer more tokens from B's account to C than she's allowed
-    const txPromise = lqtyTokenTester.transferFrom(B, C, dec(50, 18), { from: A });
+    const txPromise = lqtyTokenTester.transferFrom(B, C, dec(50, 18), {
+      from: A,
+    });
     await assertRevert(txPromise);
   });
 
@@ -289,31 +317,47 @@ contract("LQTY Token", async accounts => {
     await assertRevert(txPromise);
   });
 
-  it("transfer(): transfer to a blacklisted address reverts", async () => {
+  it('transfer(): transfer to a blacklisted address reverts', async () => {
     await mintToABC();
 
-    await assertRevert(lqtyTokenTester.transfer(lqtyTokenTester.address, 1, { from: A }));
+    await assertRevert(
+      lqtyTokenTester.transfer(lqtyTokenTester.address, 1, { from: A })
+    );
     await assertRevert(lqtyTokenTester.transfer(ZERO_ADDRESS, 1, { from: A }));
-    await assertRevert(lqtyTokenTester.transfer(communityIssuance.address, 1, { from: A }));
-    await assertRevert(lqtyTokenTester.transfer(lqtyStaking.address, 1, { from: A }));
+    await assertRevert(
+      lqtyTokenTester.transfer(communityIssuance.address, 1, { from: A })
+    );
+    await assertRevert(
+      lqtyTokenTester.transfer(lqtyStaking.address, 1, { from: A })
+    );
   });
 
-  it("transfer(): transfer to or from the zero-address reverts", async () => {
+  it('transfer(): transfer to or from the zero-address reverts', async () => {
     await mintToABC();
 
-    const txPromiseFromZero = lqtyTokenTester.callInternalTransfer(ZERO_ADDRESS, A, dec(100, 18), {
-      from: B
-    });
-    const txPromiseToZero = lqtyTokenTester.callInternalTransfer(A, ZERO_ADDRESS, dec(100, 18), {
-      from: B
-    });
+    const txPromiseFromZero = lqtyTokenTester.callInternalTransfer(
+      ZERO_ADDRESS,
+      A,
+      dec(100, 18),
+      {
+        from: B,
+      }
+    );
+    const txPromiseToZero = lqtyTokenTester.callInternalTransfer(
+      A,
+      ZERO_ADDRESS,
+      dec(100, 18),
+      {
+        from: B,
+      }
+    );
     await assertRevert(txPromiseFromZero);
     await assertRevert(txPromiseToZero);
   });
 
-  it("mint(): issues correct amount of tokens to the given address", async () => {
+  it('mint(): issues correct amount of tokens to the given address', async () => {
     const A_balanceBefore = await lqtyTokenTester.balanceOf(A);
-    assert.equal(A_balanceBefore, "0");
+    assert.equal(A_balanceBefore, '0');
 
     await lqtyTokenTester.unprotectedMint(A, dec(100, 18));
 
@@ -321,14 +365,14 @@ contract("LQTY Token", async accounts => {
     assert.equal(A_BalanceAfter, dec(100, 18));
   });
 
-  it("mint(): reverts when beneficiary is address(0)", async () => {
+  it('mint(): reverts when beneficiary is address(0)', async () => {
     const tx = lqtyTokenTester.unprotectedMint(ZERO_ADDRESS, 100);
     await assertRevert(tx);
   });
 
   it("increaseAllowance(): increases an account's allowance by the correct amount", async () => {
     const allowance_A_Before = await lqtyTokenTester.allowance(B, A);
-    assert.equal(allowance_A_Before, "0");
+    assert.equal(allowance_A_Before, '0');
 
     await lqtyTokenTester.increaseAllowance(A, dec(100, 18), { from: B });
 
@@ -345,46 +389,55 @@ contract("LQTY Token", async accounts => {
     await lqtyTokenTester.decreaseAllowance(A, dec(100, 18), { from: B });
 
     const A_allowanceAfterDecrease = await lqtyTokenTester.allowance(B, A);
-    assert.equal(A_allowanceAfterDecrease, "0");
+    assert.equal(A_allowanceAfterDecrease, '0');
   });
 
-  it("sendToLQTYStaking(): changes balances of LQTYStaking and calling account by the correct amounts", async () => {
+  it('sendToLQTYStaking(): changes balances of LQTYStaking and calling account by the correct amounts', async () => {
     // mint some tokens to A
     await lqtyTokenTester.unprotectedMint(A, dec(150, 18));
 
     // Check caller and LQTYStaking balance before
     const A_BalanceBefore = await lqtyTokenTester.balanceOf(A);
     assert.equal(A_BalanceBefore, dec(150, 18));
-    const lqtyStakingBalanceBefore = await lqtyTokenTester.balanceOf(lqtyStaking.address);
-    assert.equal(lqtyStakingBalanceBefore, "0");
+    const lqtyStakingBalanceBefore = await lqtyTokenTester.balanceOf(
+      lqtyStaking.address
+    );
+    assert.equal(lqtyStakingBalanceBefore, '0');
 
     await lqtyTokenTester.unprotectedSendToLQTYStaking(A, dec(37, 18));
 
     // Check caller and LQTYStaking balance before
     const A_BalanceAfter = await lqtyTokenTester.balanceOf(A);
     assert.equal(A_BalanceAfter, dec(113, 18));
-    const lqtyStakingBalanceAfter = await lqtyTokenTester.balanceOf(lqtyStaking.address);
+    const lqtyStakingBalanceAfter = await lqtyTokenTester.balanceOf(
+      lqtyStaking.address
+    );
     assert.equal(lqtyStakingBalanceAfter, dec(37, 18));
   });
 
   // EIP2612 tests
 
-  it("Initializes PERMIT_TYPEHASH correctly", async () => {
+  it('Initializes PERMIT_TYPEHASH correctly', async () => {
     assert.equal(await lqtyTokenTester.permitTypeHash(), PERMIT_TYPEHASH);
   });
 
-  it("Initializes DOMAIN_SEPARATOR correctly", async () => {
+  it('Initializes DOMAIN_SEPARATOR correctly', async () => {
     assert.equal(
       await lqtyTokenTester.domainSeparator(),
-      getDomainSeparator(tokenName, lqtyTokenTester.address, chainId, tokenVersion)
+      getDomainSeparator(
+        tokenName,
+        lqtyTokenTester.address,
+        chainId,
+        tokenVersion
+      )
     );
   });
 
-  it("Initial nonce for a given address is 0", async function () {
-    assert.equal(toBN(await lqtyTokenTester.nonces(A)).toString(), "0");
+  it('Initial nonce for a given address is 0', async function () {
+    assert.equal(toBN(await lqtyTokenTester.nonces(A)).toString(), '0');
   });
 
-  it("permit(): permits and emits an Approval event (replay protected)", async () => {
+  it('permit(): permits and emits an Approval event (replay protected)', async () => {
     const deadline = 100000000000000;
 
     // Approve it
@@ -393,39 +446,50 @@ contract("LQTY Token", async accounts => {
     const event = receipt.logs[0];
 
     // Check that approval was successful
-    assert.equal(event.event, "Approval");
+    assert.equal(event.event, 'Approval');
     assert.equal(await lqtyTokenTester.nonces(approve.owner), 1);
-    assert.equal(await lqtyTokenTester.allowance(approve.owner, approve.spender), approve.value);
+    assert.equal(
+      await lqtyTokenTester.allowance(approve.owner, approve.spender),
+      approve.value
+    );
 
     // Check that we can not use re-use the same signature, since the user's nonce has been incremented (replay protection)
     await assertRevert(
-      lqtyTokenTester.permit(approve.owner, approve.spender, approve.value, deadline, v, r, s),
-      "LQTY: invalid signature"
+      lqtyTokenTester.permit(
+        approve.owner,
+        approve.spender,
+        approve.value,
+        deadline,
+        v,
+        r,
+        s
+      ),
+      'LQTY: invalid signature'
     );
 
     // Check that the zero address fails
     await assertRevert(
       lqtyTokenTester.permit(
-        "0x0000000000000000000000000000000000000000",
+        '0x0000000000000000000000000000000000000000',
         approve.spender,
         approve.value,
         deadline,
-        "0x99",
+        '0x99',
         r,
         s
       ),
-      "LQTY: invalid signature"
+      'LQTY: invalid signature'
     );
   });
 
-  it("permit(): fails with expired deadline", async () => {
+  it('permit(): fails with expired deadline', async () => {
     const deadline = 1;
 
     const { v, r, s, tx } = await buildPermitTx(deadline);
-    await assertRevert(tx, "LQTY: expired deadline");
+    await assertRevert(tx, 'LQTY: expired deadline');
   });
 
-  it("permit(): fails with the wrong signature", async () => {
+  it('permit(): fails with the wrong signature', async () => {
     const deadline = 100000000000000;
 
     const { v, r, s } = await buildPermitTx(deadline);
@@ -440,6 +504,6 @@ contract("LQTY Token", async accounts => {
       hexlify(s)
     );
 
-    await assertRevert(tx, "LQTY: invalid signature");
+    await assertRevert(tx, 'LQTY: invalid signature');
   });
 });

@@ -14,12 +14,11 @@ getFrontendStatus(address?: string, overrides?: EthersCallOverrides): Promise<Fr
 
 ## Parameters
 
-|  Parameter | Type | Description |
-|  --- | --- | --- |
-|  address | string | Address to check. |
-|  overrides | [EthersCallOverrides](./lib-ethers.etherscalloverrides.md) |  |
+| Parameter | Type                                                       | Description       |
+| --------- | ---------------------------------------------------------- | ----------------- |
+| address   | string                                                     | Address to check. |
+| overrides | [EthersCallOverrides](./lib-ethers.etherscalloverrides.md) |                   |
 
 <b>Returns:</b>
 
 Promise&lt;[FrontendStatus](./lib-base.frontendstatus.md)<!-- -->&gt;
-

@@ -14,7 +14,6 @@ constructor(readable: ReadableEthersLiquity);
 
 ## Parameters
 
-|  Parameter | Type | Description |
-|  --- | --- | --- |
-|  readable | [ReadableEthersLiquity](./lib-ethers.readableethersliquity.md) |  |
-
+| Parameter | Type                                                           | Description |
+| --------- | -------------------------------------------------------------- | ----------- |
+| readable  | [ReadableEthersLiquity](./lib-ethers.readableethersliquity.md) |             |

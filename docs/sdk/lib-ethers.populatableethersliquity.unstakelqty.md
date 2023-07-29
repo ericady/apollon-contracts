@@ -14,10 +14,10 @@ unstakeLQTY(amount: Decimalish, overrides?: EthersTransactionOverrides): Promise
 
 ## Parameters
 
-|  Parameter | Type | Description |
-|  --- | --- | --- |
-|  amount | [Decimalish](./lib-base.decimalish.md) | Amount of LQTY to withdraw. |
-|  overrides | [EthersTransactionOverrides](./lib-ethers.etherstransactionoverrides.md) |  |
+| Parameter | Type                                                                     | Description                 |
+| --------- | ------------------------------------------------------------------------ | --------------------------- |
+| amount    | [Decimalish](./lib-base.decimalish.md)                                   | Amount of LQTY to withdraw. |
+| overrides | [EthersTransactionOverrides](./lib-ethers.etherstransactionoverrides.md) |                             |
 
 <b>Returns:</b>
 
@@ -26,4 +26,3 @@ Promise&lt;[PopulatedEthersLiquityTransaction](./lib-ethers.populatedethersliqui
 ## Remarks
 
 As a side-effect, the transaction will also pay out the LQTY stake's [collateral gain](./lib-base.lqtystake.collateralgain.md) and [LUSD gain](./lib-base.lqtystake.lusdgain.md)<!-- -->.
-

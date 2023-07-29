@@ -14,12 +14,11 @@ liquidateUpTo(maximumNumberOfTrovesToLiquidate: number, overrides?: EthersTransa
 
 ## Parameters
 
-|  Parameter | Type | Description |
-|  --- | --- | --- |
-|  maximumNumberOfTrovesToLiquidate | number | Stop after liquidating this many Troves. |
-|  overrides | [EthersTransactionOverrides](./lib-ethers.etherstransactionoverrides.md) |  |
+| Parameter                        | Type                                                                     | Description                              |
+| -------------------------------- | ------------------------------------------------------------------------ | ---------------------------------------- |
+| maximumNumberOfTrovesToLiquidate | number                                                                   | Stop after liquidating this many Troves. |
+| overrides                        | [EthersTransactionOverrides](./lib-ethers.etherstransactionoverrides.md) |                                          |
 
 <b>Returns:</b>
 
 Promise&lt;[PopulatedEthersLiquityTransaction](./lib-ethers.populatedethersliquitytransaction.md)<!-- -->&lt;[LiquidationDetails](./lib-base.liquidationdetails.md)<!-- -->&gt;&gt;
-

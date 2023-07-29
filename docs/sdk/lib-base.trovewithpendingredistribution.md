@@ -9,8 +9,9 @@ A Trove in its state after the last direct modification.
 <b>Signature:</b>
 
 ```typescript
-export declare class TroveWithPendingRedistribution extends UserTrove 
+export declare class TroveWithPendingRedistribution extends UserTrove
 ```
+
 <b>Extends:</b> [UserTrove](./lib-base.usertrove.md)
 
 ## Remarks
@@ -21,8 +22,7 @@ The constructor for this class is marked as internal. Third-party code should no
 
 ## Methods
 
-|  Method | Modifiers | Description |
-|  --- | --- | --- |
-|  [applyRedistribution(totalRedistributed)](./lib-base.trovewithpendingredistribution.applyredistribution.md) |  |  |
-|  [equals(that)](./lib-base.trovewithpendingredistribution.equals.md) |  |  |
-
+| Method                                                                                                      | Modifiers | Description |
+| ----------------------------------------------------------------------------------------------------------- | --------- | ----------- |
+| [applyRedistribution(totalRedistributed)](./lib-base.trovewithpendingredistribution.applyredistribution.md) |           |             |
+| [equals(that)](./lib-base.trovewithpendingredistribution.equals.md)                                         |           |             |

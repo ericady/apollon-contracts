@@ -1,9 +1,9 @@
-const Decimal = require("decimal.js");
-const deploymentHelper = require("../utils/deploymentHelpers.js");
-const { BNConverter } = require("../utils/BNConverter.js");
-const testHelpers = require("../utils/testHelpers.js");
-const TroveManagerTester = artifacts.require("./TroveManagerTester.sol");
-const LiquityMathTester = artifacts.require("./LiquityMathTester.sol");
+const Decimal = require('decimal.js');
+const deploymentHelper = require('../utils/deploymentHelpers.js');
+const { BNConverter } = require('../utils/BNConverter.js');
+const testHelpers = require('../utils/testHelpers.js');
+const TroveManagerTester = artifacts.require('./TroveManagerTester.sol');
+const LiquityMathTester = artifacts.require('./LiquityMathTester.sol');
 
 const th = testHelpers.TestHelper;
 const timeValues = testHelpers.TimeValues;
@@ -11,7 +11,7 @@ const dec = th.dec;
 const toBN = th.toBN;
 const getDifference = th.getDifference;
 
-contract("Fee arithmetic tests", async accounts => {
+contract('Fee arithmetic tests', async accounts => {
   let contracts;
   let troveManagerTester;
   let mathTester;
@@ -60,7 +60,7 @@ contract("Fee arithmetic tests", async accounts => {
     [9999999999, 166666666],
     [31535999000, 525599983],
     [31536000000, 525600000],
-    [50309080980, 838484683]
+    [50309080980, 838484683],
   ];
 
   /* Object holds arrays for seconds passed, and the corresponding expected decayed base rate, given an initial
@@ -106,39 +106,47 @@ contract("Fee arithmetic tests", async accounts => {
       9999999999,
       31535999000,
       31536000000, // 1000 years
-      50309080980
+      50309080980,
     ],
     0.01: [
-      10000000000000000, 10000000000000000, 10000000000000000, 10000000000000000, 9932837247526310,
-      9818748881063180, 9631506200700280, 9447834221836550, 9438743126816710, 8523066208268240,
-      7860961982890640, 7505973548021970, 7491535384382500, 3738562496681640, 3474795549604300,
-      2798062319068760, 2512062814236710, 2499999999998550, 5666601111155830, 2011175814816220,
-      615070415779, 610351562497, 245591068, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+      10000000000000000, 10000000000000000, 10000000000000000,
+      10000000000000000, 9932837247526310, 9818748881063180, 9631506200700280,
+      9447834221836550, 9438743126816710, 8523066208268240, 7860961982890640,
+      7505973548021970, 7491535384382500, 3738562496681640, 3474795549604300,
+      2798062319068760, 2512062814236710, 2499999999998550, 5666601111155830,
+      2011175814816220, 615070415779, 610351562497, 245591068, 0, 0, 0, 0, 0, 0,
+      0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
     ],
     0.1: [
-      100000000000000000, 100000000000000000, 100000000000000000, 100000000000000000,
-      99328372475263100, 98187488810631800, 96315062007002900, 94478342218365500, 94387431268167100,
-      85230662082682400, 78609619828906400, 75059735480219700, 74915353843825000, 37385624966816400,
-      34747955496043000, 27980623190687600, 25120628142367100, 24999999999985500, 56666011111558300,
-      20111758148162200, 6150704157794, 6103515624975, 2455910681, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-      0, 0, 0, 0, 0
+      100000000000000000, 100000000000000000, 100000000000000000,
+      100000000000000000, 99328372475263100, 98187488810631800,
+      96315062007002900, 94478342218365500, 94387431268167100,
+      85230662082682400, 78609619828906400, 75059735480219700,
+      74915353843825000, 37385624966816400, 34747955496043000,
+      27980623190687600, 25120628142367100, 24999999999985500,
+      56666011111558300, 20111758148162200, 6150704157794, 6103515624975,
+      2455910681, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
     ],
     0.34539284: [
-      345392840000000000, 345392840000000000, 345392840000000000, 345392840000000000,
-      343073086618089000, 339132556127723000, 332665328013748000, 326321429372932000,
-      326007429460170000, 294380604318180000, 271511998440263000, 259250952071618000,
-      258752268237236000, 129127271824636000, 120016950329719000, 96643069088014400,
-      86764850966761100, 86348209999949800, 195720345092927000, 69464572641868900, 21244091770604,
-      21081105956945, 8482539649, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+      345392840000000000, 345392840000000000, 345392840000000000,
+      345392840000000000, 343073086618089000, 339132556127723000,
+      332665328013748000, 326321429372932000, 326007429460170000,
+      294380604318180000, 271511998440263000, 259250952071618000,
+      258752268237236000, 129127271824636000, 120016950329719000,
+      96643069088014400, 86764850966761100, 86348209999949800,
+      195720345092927000, 69464572641868900, 21244091770604, 21081105956945,
+      8482539649, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
     ],
     0.9976: [
-      997600000000000000, 997600000000000000, 997600000000000000, 997600000000000000,
-      990899843813224000, 979518388374863000, 960839058581860000, 942515941970414000,
-      941609014331235000, 850261084936840000, 784209567413171000, 748795921150671000,
-      747355569945998000, 372958994668961000, 346645604028525000, 279134696950299000,
-      250603386348255000, 249399999999855000, 565300126848906000, 200634899286066000, 61359424678158,
-      60888671874752, 24500164955, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
-    ]
+      997600000000000000, 997600000000000000, 997600000000000000,
+      997600000000000000, 990899843813224000, 979518388374863000,
+      960839058581860000, 942515941970414000, 941609014331235000,
+      850261084936840000, 784209567413171000, 748795921150671000,
+      747355569945998000, 372958994668961000, 346645604028525000,
+      279134696950299000, 250603386348255000, 249399999999855000,
+      565300126848906000, 200634899286066000, 61359424678158, 60888671874752,
+      24500164955, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+    ],
   };
 
   // Exponent in range [2, 300]
@@ -193,7 +201,7 @@ contract("Fee arithmetic tests", async accounts => {
     [432669515365048000, 171, 0],
     [457498365370101000, 40, 26036],
     [487046034636363000, 12, 178172281758289],
-    [919877008002166000, 85, 826094891277916]
+    [919877008002166000, 85, 826094891277916],
   ];
 
   before(async () => {
@@ -217,14 +225,15 @@ contract("Fee arithmetic tests", async accounts => {
     await deploymentHelper.connectLQTYContractsToCore(LQTYContracts, contracts);
   });
 
-  it("minutesPassedSinceLastFeeOp(): returns minutes passed for no time increase", async () => {
+  it('minutesPassedSinceLastFeeOp(): returns minutes passed for no time increase', async () => {
     await troveManagerTester.setLastFeeOpTimeToNow();
-    const minutesPassed = await troveManagerTester.minutesPassedSinceLastFeeOp();
+    const minutesPassed =
+      await troveManagerTester.minutesPassedSinceLastFeeOp();
 
-    assert.equal(minutesPassed, "0");
+    assert.equal(minutesPassed, '0');
   });
 
-  it("minutesPassedSinceLastFeeOp(): returns minutes passed between time of last fee operation and current block.timestamp, rounded down to nearest minutes", async () => {
+  it('minutesPassedSinceLastFeeOp(): returns minutes passed between time of last fee operation and current block.timestamp, rounded down to nearest minutes', async () => {
     for (testPair of secondsToMinutesRoundedDown) {
       await troveManagerTester.setLastFeeOpTimeToNow();
 
@@ -233,13 +242,14 @@ contract("Fee arithmetic tests", async accounts => {
 
       await th.fastForwardTime(seconds, web3.currentProvider);
 
-      const minutesPassed = await troveManagerTester.minutesPassedSinceLastFeeOp();
+      const minutesPassed =
+        await troveManagerTester.minutesPassedSinceLastFeeOp();
 
       assert.equal(expectedHoursPassed.toString(), minutesPassed.toString());
     }
   });
 
-  it("decayBaseRateFromBorrowing(): returns the initial base rate for no time increase", async () => {
+  it('decayBaseRateFromBorrowing(): returns the initial base rate for no time increase', async () => {
     await troveManagerTester.setBaseRate(dec(5, 17));
     await troveManagerTester.setLastFeeOpTimeToNow();
 
@@ -252,7 +262,7 @@ contract("Fee arithmetic tests", async accounts => {
     assert.isTrue(baseRateBefore.eq(baseRateAfter));
   });
 
-  it("decayBaseRateFromBorrowing(): returns the initial base rate for less than one minute passed ", async () => {
+  it('decayBaseRateFromBorrowing(): returns the initial base rate for less than one minute passed ', async () => {
     await troveManagerTester.setBaseRate(dec(5, 17));
     await troveManagerTester.setLastFeeOpTimeToNow();
 
@@ -303,7 +313,7 @@ contract("Fee arithmetic tests", async accounts => {
     // (cant quite test up to 59 seconds, as execution of the final tx takes >1 second before the block is mined)
   });
 
-  it("decayBaseRateFromBorrowing(): returns correctly decayed base rate, for various durations. Initial baseRate = 0.01", async () => {
+  it('decayBaseRateFromBorrowing(): returns correctly decayed base rate, for various durations. Initial baseRate = 0.01', async () => {
     // baseRate = 0.01
     for (i = 0; i < decayBaseRateResults.seconds.length; i++) {
       // Set base rate to 0.01 in TroveManager
@@ -311,7 +321,7 @@ contract("Fee arithmetic tests", async accounts => {
       const contractBaseRate = await troveManagerTester.baseRate();
       assert.equal(contractBaseRate, dec(1, 16));
 
-      const startBaseRate = "0.01";
+      const startBaseRate = '0.01';
 
       const secondsPassed = decayBaseRateResults.seconds[i];
       const expectedDecayedBaseRate = decayBaseRateResults[startBaseRate][i];
@@ -334,13 +344,16 @@ contract("Fee arithmetic tests", async accounts => {
       //   error: ${error}`
       // )
       assert.isAtMost(
-        getDifference(expectedDecayedBaseRate.toString(), decayedBaseRate.toString()),
+        getDifference(
+          expectedDecayedBaseRate.toString(),
+          decayedBaseRate.toString()
+        ),
         100000
       ); // allow absolute error tolerance of 1e-13
     }
   });
 
-  it("decayBaseRateFromBorrowing(): returns correctly decayed base rate, for various durations. Initial baseRate = 0.1", async () => {
+  it('decayBaseRateFromBorrowing(): returns correctly decayed base rate, for various durations. Initial baseRate = 0.1', async () => {
     // baseRate = 0.1
     for (i = 0; i < decayBaseRateResults.seconds.length; i++) {
       // Set base rate to 0.1 in TroveManager
@@ -348,10 +361,10 @@ contract("Fee arithmetic tests", async accounts => {
       const contractBaseRate = await troveManagerTester.baseRate();
       assert.equal(contractBaseRate, dec(1, 17));
 
-      const startBaseRate = "0.1";
+      const startBaseRate = '0.1';
 
       const secondsPassed = decayBaseRateResults.seconds[i];
-      const expectedDecayedBaseRate = decayBaseRateResults["0.1"][i];
+      const expectedDecayedBaseRate = decayBaseRateResults['0.1'][i];
       await troveManagerTester.setLastFeeOpTimeToNow();
 
       // Progress time
@@ -371,21 +384,24 @@ contract("Fee arithmetic tests", async accounts => {
       //   error: ${error}`
       // )
       assert.isAtMost(
-        getDifference(expectedDecayedBaseRate.toString(), decayedBaseRate.toString()),
+        getDifference(
+          expectedDecayedBaseRate.toString(),
+          decayedBaseRate.toString()
+        ),
         1000000
       ); // allow absolute error tolerance of 1e-12
     }
   });
 
-  it("decayBaseRateFromBorrowing(): returns correctly decayed base rate, for various durations. Initial baseRate = 0.34539284", async () => {
+  it('decayBaseRateFromBorrowing(): returns correctly decayed base rate, for various durations. Initial baseRate = 0.34539284', async () => {
     // baseRate = 0.34539284
     for (i = 0; i < decayBaseRateResults.seconds.length; i++) {
       // Set base rate to 0.1 in TroveManager
-      await troveManagerTester.setBaseRate("345392840000000000");
+      await troveManagerTester.setBaseRate('345392840000000000');
       const contractBaseRate = await troveManagerTester.baseRate();
-      await troveManagerTester.setBaseRate("345392840000000000");
+      await troveManagerTester.setBaseRate('345392840000000000');
 
-      const startBaseRate = "0.34539284";
+      const startBaseRate = '0.34539284';
 
       const secondsPassed = decayBaseRateResults.seconds[i];
       const expectedDecayedBaseRate = decayBaseRateResults[startBaseRate][i];
@@ -409,20 +425,23 @@ contract("Fee arithmetic tests", async accounts => {
       // )
 
       assert.isAtMost(
-        getDifference(expectedDecayedBaseRate.toString(), decayedBaseRate.toString()),
+        getDifference(
+          expectedDecayedBaseRate.toString(),
+          decayedBaseRate.toString()
+        ),
         1000000
       ); // allow absolute error tolerance of 1e-12
     }
   });
 
-  it("decayBaseRateFromBorrowing(): returns correctly decayed base rate, for various durations. Initial baseRate = 0.9976", async () => {
+  it('decayBaseRateFromBorrowing(): returns correctly decayed base rate, for various durations. Initial baseRate = 0.9976', async () => {
     // baseRate = 0.9976
     for (i = 0; i < decayBaseRateResults.seconds.length; i++) {
       // Set base rate to 0.9976 in TroveManager
-      await troveManagerTester.setBaseRate("997600000000000000");
-      await troveManagerTester.setBaseRate("997600000000000000");
+      await troveManagerTester.setBaseRate('997600000000000000');
+      await troveManagerTester.setBaseRate('997600000000000000');
 
-      const startBaseRate = "0.9976";
+      const startBaseRate = '0.9976';
 
       const secondsPassed = decayBaseRateResults.seconds[i];
       const expectedDecayedBaseRate = decayBaseRateResults[startBaseRate][i];
@@ -447,7 +466,10 @@ contract("Fee arithmetic tests", async accounts => {
       // )
 
       assert.isAtMost(
-        getDifference(expectedDecayedBaseRate.toString(), decayedBaseRate.toString()),
+        getDifference(
+          expectedDecayedBaseRate.toString(),
+          decayedBaseRate.toString()
+        ),
         10000000
       ); // allow absolute error tolerance of 1e-11
     }
@@ -455,17 +477,17 @@ contract("Fee arithmetic tests", async accounts => {
 
   // --- Exponentiation tests ---
 
-  describe("Basic exponentiation", async accounts => {
+  describe('Basic exponentiation', async accounts => {
     // for exponent = 0, returns 1
-    it("decPow(): for exponent = 0, returns 1, regardless of base", async () => {
-      const a = "0";
-      const b = "1";
+    it('decPow(): for exponent = 0, returns 1, regardless of base', async () => {
+      const a = '0';
+      const b = '1';
       const c = dec(1, 18);
-      const d = "123244254546";
-      const e = "990000000000000000";
-      const f = "897890990909098978678609090";
+      const d = '123244254546';
+      const e = '990000000000000000';
+      const f = '897890990909098978678609090';
       const g = dec(8789789, 27);
-      const maxUint256 = toBN("2").pow(toBN("256")).sub(toBN("1"));
+      const maxUint256 = toBN('2').pow(toBN('256')).sub(toBN('1'));
 
       const res_a = await mathTester.callDecPow(a, 0);
       const res_b = await mathTester.callDecPow(b, 0);
@@ -487,16 +509,16 @@ contract("Fee arithmetic tests", async accounts => {
     });
 
     // for exponent = 1, returns base
-    it("decPow(): for exponent = 1, returns base, regardless of base", async () => {
-      const a = "0";
-      const b = "1";
+    it('decPow(): for exponent = 1, returns base, regardless of base', async () => {
+      const a = '0';
+      const b = '1';
       const c = dec(1, 18);
-      const d = "123244254546";
-      const e = "990000000000000000";
-      const f = "897890990909098978678609090";
+      const d = '123244254546';
+      const e = '990000000000000000';
+      const f = '897890990909098978678609090';
       const g = dec(8789789, 27);
-      const maxUint128 = toBN("2").pow(toBN("128")).sub(toBN("1"));
-      const maxUint192 = toBN("2").pow(toBN("192")).sub(toBN("1"));
+      const maxUint128 = toBN('2').pow(toBN('128')).sub(toBN('1'));
+      const maxUint192 = toBN('2').pow(toBN('192')).sub(toBN('1'));
 
       const res_a = await mathTester.callDecPow(a, 1);
       const res_b = await mathTester.callDecPow(b, 1);
@@ -520,7 +542,7 @@ contract("Fee arithmetic tests", async accounts => {
     });
 
     // for base = 0, returns 0 for any exponent other than 1
-    it("decPow(): for base = 0, returns 0 for any exponent other than 0", async () => {
+    it('decPow(): for base = 0, returns 0 for any exponent other than 0', async () => {
       const res_a = await mathTester.callDecPow(0, 1);
       const res_b = await mathTester.callDecPow(0, 3);
       const res_c = await mathTester.callDecPow(0, 17);
@@ -532,20 +554,20 @@ contract("Fee arithmetic tests", async accounts => {
       const res_i = await mathTester.callDecPow(0, dec(1, 12));
       const res_j = await mathTester.callDecPow(0, dec(1, 18));
 
-      assert.equal(res_a, "0");
-      assert.equal(res_b, "0");
-      assert.equal(res_c, "0");
-      assert.equal(res_d, "0");
-      assert.equal(res_e, "0");
-      assert.equal(res_f, "0");
-      assert.equal(res_g, "0");
-      assert.equal(res_h, "0");
-      assert.equal(res_i, "0");
-      assert.equal(res_j, "0");
+      assert.equal(res_a, '0');
+      assert.equal(res_b, '0');
+      assert.equal(res_c, '0');
+      assert.equal(res_d, '0');
+      assert.equal(res_e, '0');
+      assert.equal(res_f, '0');
+      assert.equal(res_g, '0');
+      assert.equal(res_h, '0');
+      assert.equal(res_i, '0');
+      assert.equal(res_j, '0');
     });
 
     // for base = 1, returns 1 for any exponent
-    it("decPow(): for base = 1, returns 1 for any exponent", async () => {
+    it('decPow(): for base = 1, returns 1 for any exponent', async () => {
       const ONE = dec(1, 18);
       const res_a = await mathTester.callDecPow(ONE, 1);
       const res_b = await mathTester.callDecPow(ONE, 3);
@@ -573,7 +595,7 @@ contract("Fee arithmetic tests", async accounts => {
     });
 
     // for exponent = 2, returns base**2
-    it("decPow(): for exponent = 2, returns the square of the base", async () => {
+    it('decPow(): for exponent = 2, returns the square of the base', async () => {
       const a = dec(1, 18); // 1
       const b = dec(15, 17); // 1.5
       const c = dec(5, 17); // 0.5
@@ -596,19 +618,19 @@ contract("Fee arithmetic tests", async accounts => {
       const res_i = await mathTester.callDecPow(i, 2);
       const res_j = await mathTester.callDecPow(j, 2);
 
-      assert.equal(res_a.toString(), "1000000000000000000");
-      assert.equal(res_b.toString(), "2250000000000000000");
-      assert.equal(res_c.toString(), "250000000000000000");
-      assert.equal(res_d.toString(), "103041000000000000");
-      assert.equal(res_e.toString(), "4000000000000000000");
-      assert.equal(res_f.toString(), "10000000000000000");
-      assert.equal(res_g.toString(), "100000000000000");
-      assert.equal(res_h.toString(), "980100000000000000");
-      assert.equal(res_i.toString(), "15733939225000000000000");
-      assert.equal(res_j.toString(), "9999800001000000000000000000");
+      assert.equal(res_a.toString(), '1000000000000000000');
+      assert.equal(res_b.toString(), '2250000000000000000');
+      assert.equal(res_c.toString(), '250000000000000000');
+      assert.equal(res_d.toString(), '103041000000000000');
+      assert.equal(res_e.toString(), '4000000000000000000');
+      assert.equal(res_f.toString(), '10000000000000000');
+      assert.equal(res_g.toString(), '100000000000000');
+      assert.equal(res_h.toString(), '980100000000000000');
+      assert.equal(res_i.toString(), '15733939225000000000000');
+      assert.equal(res_j.toString(), '9999800001000000000000000000');
     });
 
-    it("decPow(): correct output for various bases and exponents", async () => {
+    it('decPow(): correct output for various bases and exponents', async () => {
       for (list of exponentiationResults) {
         const base = list[0].toString();
         const exponent = list[1].toString();
@@ -616,11 +638,14 @@ contract("Fee arithmetic tests", async accounts => {
 
         const result = await mathTester.callDecPow(base, exponent);
 
-        assert.isAtMost(getDifference(expectedResult, result.toString()), 10000); // allow absolute error tolerance of 1e-14
+        assert.isAtMost(
+          getDifference(expectedResult, result.toString()),
+          10000
+        ); // allow absolute error tolerance of 1e-14
       }
     });
 
-    it("decPow(): abs. error < 1e-9 for exponent = 7776000 (seconds in three months)", async () => {
+    it('decPow(): abs. error < 1e-9 for exponent = 7776000 (seconds in three months)', async () => {
       for (let i = 1; i <= 200; i++) {
         const exponent = timeValues.SECONDS_IN_ONE_MONTH * 3;
 
@@ -648,7 +673,7 @@ contract("Fee arithmetic tests", async accounts => {
       }
     });
 
-    it("decPow(): abs. error < 1e-9 for exponent = 2592000 (seconds in one month)", async () => {
+    it('decPow(): abs. error < 1e-9 for exponent = 2592000 (seconds in one month)', async () => {
       for (let i = 1; i <= 200; i++) {
         const exponent = timeValues.SECONDS_IN_ONE_MONTH;
 
@@ -676,7 +701,7 @@ contract("Fee arithmetic tests", async accounts => {
       }
     });
 
-    it("decPow(): abs. error < 1e-9 for exponent = 43200 (minutes in one month)", async () => {
+    it('decPow(): abs. error < 1e-9 for exponent = 43200 (minutes in one month)', async () => {
       for (let i = 1; i <= 200; i++) {
         const exponent = timeValues.MINUTES_IN_ONE_MONTH;
 
@@ -704,7 +729,7 @@ contract("Fee arithmetic tests", async accounts => {
       }
     });
 
-    it("decPow(): abs. error < 1e-9 for exponent = 525600 (minutes in one year)", async () => {
+    it('decPow(): abs. error < 1e-9 for exponent = 525600 (minutes in one year)', async () => {
       for (let i = 1; i <= 200; i++) {
         const exponent = timeValues.MINUTES_IN_ONE_YEAR;
 
@@ -732,7 +757,7 @@ contract("Fee arithmetic tests", async accounts => {
       }
     });
 
-    it("decPow(): abs. error < 1e-9 for exponent = 2628000 (minutes in five years)", async () => {
+    it('decPow(): abs. error < 1e-9 for exponent = 2628000 (minutes in five years)', async () => {
       for (let i = 1; i <= 200; i++) {
         const exponent = timeValues.MINUTES_IN_ONE_YEAR * 5;
 
@@ -760,7 +785,7 @@ contract("Fee arithmetic tests", async accounts => {
       }
     });
 
-    it("decPow(): abs. error < 1e-9 for exponent = minutes in ten years", async () => {
+    it('decPow(): abs. error < 1e-9 for exponent = minutes in ten years', async () => {
       for (let i = 1; i <= 200; i++) {
         const exponent = timeValues.MINUTES_IN_ONE_YEAR * 10;
 
@@ -788,7 +813,7 @@ contract("Fee arithmetic tests", async accounts => {
       }
     });
 
-    it("decPow(): abs. error < 1e-9 for exponent = minutes in one hundred years", async () => {
+    it('decPow(): abs. error < 1e-9 for exponent = minutes in one hundred years', async () => {
       for (let i = 1; i <= 200; i++) {
         const exponent = timeValues.MINUTES_IN_ONE_YEAR * 100;
 
@@ -830,7 +855,10 @@ contract("Fee arithmetic tests", async accounts => {
 
       // test full range
       for (let i = 1; i <= 1000; i++) {
-        const base = th.randDecayFactor(0.000000000000000001, 0.999999999999999999);
+        const base = th.randDecayFactor(
+          0.000000000000000001,
+          0.999999999999999999
+        );
         const baseAsDecimal = BNConverter.makeDecimal(base, 18);
 
         // Calculate actual expected value
@@ -844,7 +872,9 @@ contract("Fee arithmetic tests", async accounts => {
 
         const error = expected.sub(result).abs();
 
-        console.log(`run: ${i}. base: ${base}, exp: ${exponent}, res: ${result}, error: ${error}`);
+        console.log(
+          `run: ${i}. base: ${base}, exp: ${exponent}, res: ${result}, error: ${error}`
+        );
       }
 
       // Use a high base to fully test high exponent, without prematurely decaying to 0
@@ -863,7 +893,9 @@ contract("Fee arithmetic tests", async accounts => {
 
         const error = expected.sub(result).abs();
 
-        console.log(`run: ${i}. base: ${base}, exp: ${exponent}, res: ${result}, error: ${error}`);
+        console.log(
+          `run: ${i}. base: ${base}, exp: ${exponent}, res: ${result}, error: ${error}`
+        );
       }
     });
   });

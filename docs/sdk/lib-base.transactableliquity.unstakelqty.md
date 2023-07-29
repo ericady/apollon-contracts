@@ -14,9 +14,9 @@ unstakeLQTY(amount: Decimalish): Promise<void>;
 
 ## Parameters
 
-|  Parameter | Type | Description |
-|  --- | --- | --- |
-|  amount | [Decimalish](./lib-base.decimalish.md) | Amount of LQTY to withdraw. |
+| Parameter | Type                                   | Description                 |
+| --------- | -------------------------------------- | --------------------------- |
+| amount    | [Decimalish](./lib-base.decimalish.md) | Amount of LQTY to withdraw. |
 
 <b>Returns:</b>
 
@@ -29,4 +29,3 @@ Throws [TransactionFailedError](./lib-base.transactionfailederror.md) in case of
 ## Remarks
 
 As a side-effect, the transaction will also pay out the LQTY stake's [collateral gain](./lib-base.lqtystake.collateralgain.md) and [LUSD gain](./lib-base.lqtystake.lusdgain.md)<!-- -->.
-

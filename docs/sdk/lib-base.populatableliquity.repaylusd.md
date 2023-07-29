@@ -14,9 +14,9 @@ repayLUSD(amount: Decimalish): Promise<PopulatedLiquityTransaction<P, SentLiquit
 
 ## Parameters
 
-|  Parameter | Type | Description |
-|  --- | --- | --- |
-|  amount | [Decimalish](./lib-base.decimalish.md) | The amount of LUSD to repay. |
+| Parameter | Type                                   | Description                  |
+| --------- | -------------------------------------- | ---------------------------- |
+| amount    | [Decimalish](./lib-base.decimalish.md) | The amount of LUSD to repay. |
 
 <b>Returns:</b>
 
@@ -27,7 +27,5 @@ Promise&lt;[PopulatedLiquityTransaction](./lib-base.populatedliquitytransaction.
 Equivalent to:
 
 ```typescript
-adjustTrove({ repayLUSD: amount })
-
+adjustTrove({ repayLUSD: amount });
 ```
-

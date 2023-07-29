@@ -11,7 +11,7 @@ Get the total amount of Uniswap ETH/LUSD LP tokens currently staked in liquidity
 ```typescript
 getTotalStakedUniTokens(): Promise<Decimal>;
 ```
+
 <b>Returns:</b>
 
 Promise&lt;[Decimal](./lib-base.decimal.md)<!-- -->&gt;
-

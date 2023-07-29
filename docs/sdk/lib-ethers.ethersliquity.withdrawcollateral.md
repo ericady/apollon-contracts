@@ -14,10 +14,10 @@ withdrawCollateral(amount: Decimalish, overrides?: EthersTransactionOverrides): 
 
 ## Parameters
 
-|  Parameter | Type | Description |
-|  --- | --- | --- |
-|  amount | [Decimalish](./lib-base.decimalish.md) | The amount of collateral to withdraw from the Trove. |
-|  overrides | [EthersTransactionOverrides](./lib-ethers.etherstransactionoverrides.md) |  |
+| Parameter | Type                                                                     | Description                                          |
+| --------- | ------------------------------------------------------------------------ | ---------------------------------------------------- |
+| amount    | [Decimalish](./lib-base.decimalish.md)                                   | The amount of collateral to withdraw from the Trove. |
+| overrides | [EthersTransactionOverrides](./lib-ethers.etherstransactionoverrides.md) |                                                      |
 
 <b>Returns:</b>
 
@@ -32,7 +32,5 @@ Throws [EthersTransactionFailedError](./lib-ethers.etherstransactionfailederror.
 Equivalent to:
 
 ```typescript
-adjustTrove({ withdrawCollateral: amount })
-
+adjustTrove({ withdrawCollateral: amount });
 ```
-

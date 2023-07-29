@@ -14,11 +14,10 @@ getLQTYStake(address?: string): Promise<LQTYStake>;
 
 ## Parameters
 
-|  Parameter | Type | Description |
-|  --- | --- | --- |
-|  address | string | Address that owns the LQTY Stake. |
+| Parameter | Type   | Description                       |
+| --------- | ------ | --------------------------------- |
+| address   | string | Address that owns the LQTY Stake. |
 
 <b>Returns:</b>
 
 Promise&lt;[LQTYStake](./lib-base.lqtystake.md)<!-- -->&gt;
-

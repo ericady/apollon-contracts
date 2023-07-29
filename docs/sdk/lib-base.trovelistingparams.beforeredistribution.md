@@ -15,4 +15,3 @@ readonly beforeRedistribution?: boolean;
 ## Remarks
 
 Changes the type of returned Troves to [TroveWithPendingRedistribution](./lib-base.trovewithpendingredistribution.md)<!-- -->.
-

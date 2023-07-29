@@ -14,9 +14,9 @@ withdrawLUSDFromStabilityPool(amount: Decimalish): Promise<PopulatedLiquityTrans
 
 ## Parameters
 
-|  Parameter | Type | Description |
-|  --- | --- | --- |
-|  amount | [Decimalish](./lib-base.decimalish.md) | Amount of LUSD to withdraw. |
+| Parameter | Type                                   | Description                 |
+| --------- | -------------------------------------- | --------------------------- |
+| amount    | [Decimalish](./lib-base.decimalish.md) | Amount of LUSD to withdraw. |
 
 <b>Returns:</b>
 
@@ -25,4 +25,3 @@ Promise&lt;[PopulatedLiquityTransaction](./lib-base.populatedliquitytransaction.
 ## Remarks
 
 As a side-effect, the transaction will also pay out the Stability Deposit's [collateral gain](./lib-base.stabilitydeposit.collateralgain.md) and [LQTY reward](./lib-base.stabilitydeposit.lqtyreward.md)<!-- -->.
-

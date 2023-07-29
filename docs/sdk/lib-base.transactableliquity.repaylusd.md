@@ -14,9 +14,9 @@ repayLUSD(amount: Decimalish): Promise<TroveAdjustmentDetails>;
 
 ## Parameters
 
-|  Parameter | Type | Description |
-|  --- | --- | --- |
-|  amount | [Decimalish](./lib-base.decimalish.md) | The amount of LUSD to repay. |
+| Parameter | Type                                   | Description                  |
+| --------- | -------------------------------------- | ---------------------------- |
+| amount    | [Decimalish](./lib-base.decimalish.md) | The amount of LUSD to repay. |
 
 <b>Returns:</b>
 
@@ -31,7 +31,5 @@ Throws [TransactionFailedError](./lib-base.transactionfailederror.md) in case of
 Equivalent to:
 
 ```typescript
-adjustTrove({ repayLUSD: amount })
-
+adjustTrove({ repayLUSD: amount });
 ```
-

@@ -2,48 +2,48 @@ const MainnetAggregatorABI = [
   {
     constant: true,
     inputs: [],
-    name: "latestCompletedAnswer",
+    name: 'latestCompletedAnswer',
     outputs: [
       {
-        internalType: "uint256",
-        name: "",
-        type: "uint256"
-      }
+        internalType: 'uint256',
+        name: '',
+        type: 'uint256',
+      },
     ],
     payable: false,
-    stateMutability: "view",
-    type: "function"
+    stateMutability: 'view',
+    type: 'function',
   },
   {
     constant: true,
     inputs: [],
-    name: "currentAnswer",
+    name: 'currentAnswer',
     outputs: [
       {
-        internalType: "int256",
-        name: "",
-        type: "int256"
-      }
+        internalType: 'int256',
+        name: '',
+        type: 'int256',
+      },
     ],
     payable: false,
-    stateMutability: "view",
-    type: "function"
+    stateMutability: 'view',
+    type: 'function',
   },
   {
     constant: true,
     inputs: [],
-    name: "updatedHeight",
+    name: 'updatedHeight',
     outputs: [
       {
-        internalType: "uint256",
-        name: "",
-        type: "uint256"
-      }
+        internalType: 'uint256',
+        name: '',
+        type: 'uint256',
+      },
     ],
     payable: false,
-    stateMutability: "view",
-    type: "function"
-  }
+    stateMutability: 'view',
+    type: 'function',
+  },
 ];
 const TestnetAggregatorABI = [
   {
@@ -51,322 +51,322 @@ const TestnetAggregatorABI = [
     inputs: [
       {
         indexed: true,
-        internalType: "int256",
-        name: "current",
-        type: "int256"
+        internalType: 'int256',
+        name: 'current',
+        type: 'int256',
       },
       {
         indexed: true,
-        internalType: "uint256",
-        name: "roundId",
-        type: "uint256"
+        internalType: 'uint256',
+        name: 'roundId',
+        type: 'uint256',
       },
       {
         indexed: false,
-        internalType: "uint256",
-        name: "timestamp",
-        type: "uint256"
-      }
+        internalType: 'uint256',
+        name: 'timestamp',
+        type: 'uint256',
+      },
     ],
-    name: "AnswerUpdated",
-    type: "event"
+    name: 'AnswerUpdated',
+    type: 'event',
   },
   {
     anonymous: false,
     inputs: [
       {
         indexed: true,
-        internalType: "uint256",
-        name: "roundId",
-        type: "uint256"
+        internalType: 'uint256',
+        name: 'roundId',
+        type: 'uint256',
       },
       {
         indexed: true,
-        internalType: "address",
-        name: "startedBy",
-        type: "address"
-      }
+        internalType: 'address',
+        name: 'startedBy',
+        type: 'address',
+      },
     ],
-    name: "NewRound",
-    type: "event"
+    name: 'NewRound',
+    type: 'event',
   },
   {
     constant: true,
     inputs: [],
-    name: "latestAnswer",
+    name: 'latestAnswer',
     outputs: [
       {
-        internalType: "int256",
-        name: "",
-        type: "int256"
-      }
+        internalType: 'int256',
+        name: '',
+        type: 'int256',
+      },
     ],
     payable: false,
-    stateMutability: "view",
-    type: "function"
+    stateMutability: 'view',
+    type: 'function',
   },
   {
     constant: true,
     inputs: [],
-    name: "latestTimestamp",
+    name: 'latestTimestamp',
     outputs: [
       {
-        internalType: "uint256",
-        name: "",
-        type: "uint256"
-      }
+        internalType: 'uint256',
+        name: '',
+        type: 'uint256',
+      },
     ],
     payable: false,
-    stateMutability: "view",
-    type: "function"
+    stateMutability: 'view',
+    type: 'function',
   },
   {
     constant: true,
     inputs: [],
-    name: "latestRound",
+    name: 'latestRound',
     outputs: [
       {
-        internalType: "uint256",
-        name: "",
-        type: "uint256"
-      }
+        internalType: 'uint256',
+        name: '',
+        type: 'uint256',
+      },
     ],
     payable: false,
-    stateMutability: "view",
-    type: "function"
+    stateMutability: 'view',
+    type: 'function',
   },
   {
     constant: true,
     inputs: [
       {
-        internalType: "uint256",
-        name: "roundId",
-        type: "uint256"
-      }
+        internalType: 'uint256',
+        name: 'roundId',
+        type: 'uint256',
+      },
     ],
-    name: "getAnswer",
+    name: 'getAnswer',
     outputs: [
       {
-        internalType: "int256",
-        name: "",
-        type: "int256"
-      }
+        internalType: 'int256',
+        name: '',
+        type: 'int256',
+      },
     ],
     payable: false,
-    stateMutability: "view",
-    type: "function"
+    stateMutability: 'view',
+    type: 'function',
   },
   {
     constant: true,
     inputs: [
       {
-        internalType: "uint256",
-        name: "roundId",
-        type: "uint256"
-      }
+        internalType: 'uint256',
+        name: 'roundId',
+        type: 'uint256',
+      },
     ],
-    name: "getTimestamp",
+    name: 'getTimestamp',
     outputs: [
       {
-        internalType: "uint256",
-        name: "",
-        type: "uint256"
-      }
+        internalType: 'uint256',
+        name: '',
+        type: 'uint256',
+      },
     ],
     payable: false,
-    stateMutability: "view",
-    type: "function"
-  }
+    stateMutability: 'view',
+    type: 'function',
+  },
 ];
 const MainnetPriceFeedABI = [
   {
     inputs: [
       {
-        internalType: "address",
-        name: "_priceAggregatorAddress",
-        type: "address"
-      }
+        internalType: 'address',
+        name: '_priceAggregatorAddress',
+        type: 'address',
+      },
     ],
     payable: false,
-    stateMutability: "nonpayable",
-    type: "constructor"
+    stateMutability: 'nonpayable',
+    type: 'constructor',
   },
   {
     anonymous: false,
     inputs: [
       {
         indexed: true,
-        internalType: "address",
-        name: "previousOwner",
-        type: "address"
+        internalType: 'address',
+        name: 'previousOwner',
+        type: 'address',
       },
       {
         indexed: true,
-        internalType: "address",
-        name: "newOwner",
-        type: "address"
-      }
+        internalType: 'address',
+        name: 'newOwner',
+        type: 'address',
+      },
     ],
-    name: "OwnershipTransferred",
-    type: "event"
+    name: 'OwnershipTransferred',
+    type: 'event',
   },
   {
     anonymous: false,
     inputs: [
       {
         indexed: false,
-        internalType: "uint256",
-        name: "_price",
-        type: "uint256"
-      }
+        internalType: 'uint256',
+        name: '_price',
+        type: 'uint256',
+      },
     ],
-    name: "PriceUpdated",
-    type: "event"
+    name: 'PriceUpdated',
+    type: 'event',
   },
   {
     constant: true,
     inputs: [],
-    name: "isOwner",
+    name: 'isOwner',
     outputs: [
       {
-        internalType: "bool",
-        name: "",
-        type: "bool"
-      }
+        internalType: 'bool',
+        name: '',
+        type: 'bool',
+      },
     ],
     payable: false,
-    stateMutability: "view",
-    type: "function"
+    stateMutability: 'view',
+    type: 'function',
   },
   {
     constant: true,
     inputs: [],
-    name: "owner",
+    name: 'owner',
     outputs: [
       {
-        internalType: "address",
-        name: "",
-        type: "address"
-      }
+        internalType: 'address',
+        name: '',
+        type: 'address',
+      },
     ],
     payable: false,
-    stateMutability: "view",
-    type: "function"
+    stateMutability: 'view',
+    type: 'function',
   },
   {
     constant: true,
     inputs: [],
-    name: "price",
+    name: 'price',
     outputs: [
       {
-        internalType: "uint256",
-        name: "",
-        type: "uint256"
-      }
+        internalType: 'uint256',
+        name: '',
+        type: 'uint256',
+      },
     ],
     payable: false,
-    stateMutability: "view",
-    type: "function"
+    stateMutability: 'view',
+    type: 'function',
   },
   {
     constant: true,
     inputs: [],
-    name: "priceAggregatorAddress",
+    name: 'priceAggregatorAddress',
     outputs: [
       {
-        internalType: "address",
-        name: "",
-        type: "address"
-      }
+        internalType: 'address',
+        name: '',
+        type: 'address',
+      },
     ],
     payable: false,
-    stateMutability: "view",
-    type: "function"
+    stateMutability: 'view',
+    type: 'function',
   },
   {
     constant: false,
     inputs: [],
-    name: "renounceOwnership",
+    name: 'renounceOwnership',
     outputs: [],
     payable: false,
-    stateMutability: "nonpayable",
-    type: "function"
+    stateMutability: 'nonpayable',
+    type: 'function',
   },
   {
     constant: false,
     inputs: [
       {
-        internalType: "address",
-        name: "newOwner",
-        type: "address"
-      }
+        internalType: 'address',
+        name: 'newOwner',
+        type: 'address',
+      },
     ],
-    name: "transferOwnership",
+    name: 'transferOwnership',
     outputs: [],
     payable: false,
-    stateMutability: "nonpayable",
-    type: "function"
+    stateMutability: 'nonpayable',
+    type: 'function',
   },
   {
     constant: false,
     inputs: [],
-    name: "updatePrice",
+    name: 'updatePrice',
     outputs: [
       {
-        internalType: "uint256",
-        name: "",
-        type: "uint256"
-      }
+        internalType: 'uint256',
+        name: '',
+        type: 'uint256',
+      },
     ],
     payable: false,
-    stateMutability: "nonpayable",
-    type: "function"
+    stateMutability: 'nonpayable',
+    type: 'function',
   },
   {
     constant: true,
     inputs: [],
-    name: "getLatestPrice",
+    name: 'getLatestPrice',
     outputs: [
       {
-        internalType: "uint256",
-        name: "",
-        type: "uint256"
-      }
+        internalType: 'uint256',
+        name: '',
+        type: 'uint256',
+      },
     ],
     payable: false,
-    stateMutability: "view",
-    type: "function"
+    stateMutability: 'view',
+    type: 'function',
   },
   {
     constant: true,
     inputs: [],
-    name: "getLatestAnswerID",
+    name: 'getLatestAnswerID',
     outputs: [
       {
-        internalType: "uint256",
-        name: "",
-        type: "uint256"
-      }
+        internalType: 'uint256',
+        name: '',
+        type: 'uint256',
+      },
     ],
     payable: false,
-    stateMutability: "view",
-    type: "function"
+    stateMutability: 'view',
+    type: 'function',
   },
   {
     constant: true,
     inputs: [],
-    name: "getLatestTimestamp",
+    name: 'getLatestTimestamp',
     outputs: [
       {
-        internalType: "uint256",
-        name: "",
-        type: "uint256"
-      }
+        internalType: 'uint256',
+        name: '',
+        type: 'uint256',
+      },
     ],
     payable: false,
-    stateMutability: "view",
-    type: "function"
-  }
+    stateMutability: 'view',
+    type: 'function',
+  },
 ];
 const TestnetPriceFeedABI = [
   {
@@ -374,393 +374,393 @@ const TestnetPriceFeedABI = [
     inputs: [
       {
         indexed: false,
-        internalType: "address",
-        name: "_troveManagerAddress",
-        type: "address"
-      }
+        internalType: 'address',
+        name: '_troveManagerAddress',
+        type: 'address',
+      },
     ],
-    name: "TroveManagerAddressChanged",
-    type: "event"
+    name: 'TroveManagerAddressChanged',
+    type: 'event',
   },
   {
     anonymous: false,
     inputs: [
       {
         indexed: true,
-        internalType: "address",
-        name: "previousOwner",
-        type: "address"
+        internalType: 'address',
+        name: 'previousOwner',
+        type: 'address',
       },
       {
         indexed: true,
-        internalType: "address",
-        name: "newOwner",
-        type: "address"
-      }
+        internalType: 'address',
+        name: 'newOwner',
+        type: 'address',
+      },
     ],
-    name: "OwnershipTransferred",
-    type: "event"
+    name: 'OwnershipTransferred',
+    type: 'event',
   },
   {
     anonymous: false,
     inputs: [
       {
         indexed: false,
-        internalType: "uint256",
-        name: "_newPrice",
-        type: "uint256"
-      }
+        internalType: 'uint256',
+        name: '_newPrice',
+        type: 'uint256',
+      },
     ],
-    name: "PriceUpdated",
-    type: "event"
+    name: 'PriceUpdated',
+    type: 'event',
   },
   {
     constant: true,
     inputs: [],
-    name: "troveManagerAddress",
+    name: 'troveManagerAddress',
     outputs: [
       {
-        internalType: "address",
-        name: "",
-        type: "address"
-      }
+        internalType: 'address',
+        name: '',
+        type: 'address',
+      },
     ],
     payable: false,
-    stateMutability: "view",
-    type: "function"
+    stateMutability: 'view',
+    type: 'function',
   },
   {
     constant: true,
     inputs: [],
-    name: "isOwner",
+    name: 'isOwner',
     outputs: [
       {
-        internalType: "bool",
-        name: "",
-        type: "bool"
-      }
+        internalType: 'bool',
+        name: '',
+        type: 'bool',
+      },
     ],
     payable: false,
-    stateMutability: "view",
-    type: "function"
+    stateMutability: 'view',
+    type: 'function',
   },
   {
     constant: true,
     inputs: [],
-    name: "owner",
+    name: 'owner',
     outputs: [
       {
-        internalType: "address",
-        name: "",
-        type: "address"
-      }
+        internalType: 'address',
+        name: '',
+        type: 'address',
+      },
     ],
     payable: false,
-    stateMutability: "view",
-    type: "function"
+    stateMutability: 'view',
+    type: 'function',
   },
   {
     constant: true,
     inputs: [],
-    name: "price",
+    name: 'price',
     outputs: [
       {
-        internalType: "uint256",
-        name: "",
-        type: "uint256"
-      }
+        internalType: 'uint256',
+        name: '',
+        type: 'uint256',
+      },
     ],
     payable: false,
-    stateMutability: "view",
-    type: "function"
+    stateMutability: 'view',
+    type: 'function',
   },
   {
     constant: true,
     inputs: [],
-    name: "priceAggregatorAddress",
+    name: 'priceAggregatorAddress',
     outputs: [
       {
-        internalType: "address",
-        name: "",
-        type: "address"
-      }
+        internalType: 'address',
+        name: '',
+        type: 'address',
+      },
     ],
     payable: false,
-    stateMutability: "view",
-    type: "function"
+    stateMutability: 'view',
+    type: 'function',
   },
   {
     constant: true,
     inputs: [],
-    name: "priceAggregatorAddress_Testnet",
+    name: 'priceAggregatorAddress_Testnet',
     outputs: [
       {
-        internalType: "address",
-        name: "",
-        type: "address"
-      }
+        internalType: 'address',
+        name: '',
+        type: 'address',
+      },
     ],
     payable: false,
-    stateMutability: "view",
-    type: "function"
+    stateMutability: 'view',
+    type: 'function',
   },
   {
     constant: false,
     inputs: [],
-    name: "renounceOwnership",
+    name: 'renounceOwnership',
     outputs: [],
     payable: false,
-    stateMutability: "nonpayable",
-    type: "function"
+    stateMutability: 'nonpayable',
+    type: 'function',
   },
   {
     constant: false,
     inputs: [
       {
-        internalType: "address",
-        name: "newOwner",
-        type: "address"
-      }
+        internalType: 'address',
+        name: 'newOwner',
+        type: 'address',
+      },
     ],
-    name: "transferOwnership",
+    name: 'transferOwnership',
     outputs: [],
     payable: false,
-    stateMutability: "nonpayable",
-    type: "function"
+    stateMutability: 'nonpayable',
+    type: 'function',
   },
   {
     constant: false,
     inputs: [
       {
-        internalType: "address",
-        name: "_troveManagerAddress",
-        type: "address"
-      }
+        internalType: 'address',
+        name: '_troveManagerAddress',
+        type: 'address',
+      },
     ],
-    name: "setTroveManagerAddress",
+    name: 'setTroveManagerAddress',
     outputs: [],
     payable: false,
-    stateMutability: "nonpayable",
-    type: "function"
+    stateMutability: 'nonpayable',
+    type: 'function',
   },
   {
     constant: false,
     inputs: [
       {
-        internalType: "address",
-        name: "_priceAggregatorAddress",
-        type: "address"
-      }
+        internalType: 'address',
+        name: '_priceAggregatorAddress',
+        type: 'address',
+      },
     ],
-    name: "setAggregator",
+    name: 'setAggregator',
     outputs: [],
     payable: false,
-    stateMutability: "nonpayable",
-    type: "function"
+    stateMutability: 'nonpayable',
+    type: 'function',
   },
   {
     constant: false,
     inputs: [
       {
-        internalType: "address",
-        name: "_priceAggregatorAddress",
-        type: "address"
-      }
+        internalType: 'address',
+        name: '_priceAggregatorAddress',
+        type: 'address',
+      },
     ],
-    name: "setAggregator_Testnet",
+    name: 'setAggregator_Testnet',
     outputs: [],
     payable: false,
-    stateMutability: "nonpayable",
-    type: "function"
+    stateMutability: 'nonpayable',
+    type: 'function',
   },
   {
     constant: true,
     inputs: [],
-    name: "getPrice",
+    name: 'getPrice',
     outputs: [
       {
-        internalType: "uint256",
-        name: "",
-        type: "uint256"
-      }
+        internalType: 'uint256',
+        name: '',
+        type: 'uint256',
+      },
     ],
     payable: false,
-    stateMutability: "view",
-    type: "function"
+    stateMutability: 'view',
+    type: 'function',
   },
   {
     constant: false,
     inputs: [
       {
-        internalType: "uint256",
-        name: "_price",
-        type: "uint256"
-      }
+        internalType: 'uint256',
+        name: '_price',
+        type: 'uint256',
+      },
     ],
-    name: "setPrice",
+    name: 'setPrice',
     outputs: [
       {
-        internalType: "bool",
-        name: "",
-        type: "bool"
-      }
+        internalType: 'bool',
+        name: '',
+        type: 'bool',
+      },
     ],
     payable: false,
-    stateMutability: "nonpayable",
-    type: "function"
+    stateMutability: 'nonpayable',
+    type: 'function',
   },
   {
     constant: false,
     inputs: [],
-    name: "updatePrice",
+    name: 'updatePrice',
     outputs: [
       {
-        internalType: "uint256",
-        name: "",
-        type: "uint256"
-      }
+        internalType: 'uint256',
+        name: '',
+        type: 'uint256',
+      },
     ],
     payable: false,
-    stateMutability: "nonpayable",
-    type: "function"
+    stateMutability: 'nonpayable',
+    type: 'function',
   },
   {
     constant: true,
     inputs: [],
-    name: "getLatestPrice",
+    name: 'getLatestPrice',
     outputs: [
       {
-        internalType: "uint256",
-        name: "",
-        type: "uint256"
-      }
+        internalType: 'uint256',
+        name: '',
+        type: 'uint256',
+      },
     ],
     payable: false,
-    stateMutability: "view",
-    type: "function"
+    stateMutability: 'view',
+    type: 'function',
   },
   {
     constant: true,
     inputs: [],
-    name: "getLatestAnswerID",
+    name: 'getLatestAnswerID',
     outputs: [
       {
-        internalType: "uint256",
-        name: "",
-        type: "uint256"
-      }
+        internalType: 'uint256',
+        name: '',
+        type: 'uint256',
+      },
     ],
     payable: false,
-    stateMutability: "view",
-    type: "function"
+    stateMutability: 'view',
+    type: 'function',
   },
   {
     constant: true,
     inputs: [],
-    name: "getLatestTimestamp",
+    name: 'getLatestTimestamp',
     outputs: [
       {
-        internalType: "uint256",
-        name: "",
-        type: "uint256"
-      }
+        internalType: 'uint256',
+        name: '',
+        type: 'uint256',
+      },
     ],
     payable: false,
-    stateMutability: "view",
-    type: "function"
+    stateMutability: 'view',
+    type: 'function',
   },
   {
     constant: false,
     inputs: [],
-    name: "updatePrice_Testnet",
+    name: 'updatePrice_Testnet',
     outputs: [
       {
-        internalType: "uint256",
-        name: "",
-        type: "uint256"
-      }
+        internalType: 'uint256',
+        name: '',
+        type: 'uint256',
+      },
     ],
     payable: false,
-    stateMutability: "nonpayable",
-    type: "function"
+    stateMutability: 'nonpayable',
+    type: 'function',
   },
   {
     constant: true,
     inputs: [],
-    name: "getLatestPrice_Testnet",
+    name: 'getLatestPrice_Testnet',
     outputs: [
       {
-        internalType: "uint256",
-        name: "",
-        type: "uint256"
-      }
+        internalType: 'uint256',
+        name: '',
+        type: 'uint256',
+      },
     ],
     payable: false,
-    stateMutability: "view",
-    type: "function"
+    stateMutability: 'view',
+    type: 'function',
   },
   {
     constant: true,
     inputs: [],
-    name: "getLatestTimestamp_Testnet",
+    name: 'getLatestTimestamp_Testnet',
     outputs: [
       {
-        internalType: "uint256",
-        name: "",
-        type: "uint256"
-      }
+        internalType: 'uint256',
+        name: '',
+        type: 'uint256',
+      },
     ],
     payable: false,
-    stateMutability: "view",
-    type: "function"
+    stateMutability: 'view',
+    type: 'function',
   },
   {
     constant: true,
     inputs: [
       {
-        internalType: "uint256",
-        name: "_n",
-        type: "uint256"
-      }
+        internalType: 'uint256',
+        name: '_n',
+        type: 'uint256',
+      },
     ],
-    name: "getPreviousPrice_Testnet",
+    name: 'getPreviousPrice_Testnet',
     outputs: [
       {
-        internalType: "uint256",
-        name: "",
-        type: "uint256"
-      }
+        internalType: 'uint256',
+        name: '',
+        type: 'uint256',
+      },
     ],
     payable: false,
-    stateMutability: "view",
-    type: "function"
+    stateMutability: 'view',
+    type: 'function',
   },
   {
     constant: true,
     inputs: [
       {
-        internalType: "uint256",
-        name: "_n",
-        type: "uint256"
-      }
+        internalType: 'uint256',
+        name: '_n',
+        type: 'uint256',
+      },
     ],
-    name: "getPreviousTimestamp_Testnet",
+    name: 'getPreviousTimestamp_Testnet',
     outputs: [
       {
-        internalType: "uint256",
-        name: "",
-        type: "uint256"
-      }
+        internalType: 'uint256',
+        name: '',
+        type: 'uint256',
+      },
     ],
     payable: false,
-    stateMutability: "view",
-    type: "function"
-  }
+    stateMutability: 'view',
+    type: 'function',
+  },
 ];
 
 module.exports = {
   MainnetAggregator: MainnetAggregatorABI,
   TestnetAggregator: TestnetAggregatorABI,
   MainnetPriceFeed: MainnetPriceFeedABI,
-  TestnetPriceFeed: TestnetPriceFeedABI
+  TestnetPriceFeed: TestnetPriceFeedABI,
 };

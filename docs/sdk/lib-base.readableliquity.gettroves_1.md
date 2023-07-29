@@ -14,13 +14,12 @@ getTroves(params: TroveListingParams): Promise<UserTrove[]>;
 
 ## Parameters
 
-|  Parameter | Type | Description |
-|  --- | --- | --- |
-|  params | [TroveListingParams](./lib-base.trovelistingparams.md) | Controls how the list is sorted, and where the slice begins and ends. |
+| Parameter | Type                                                   | Description                                                           |
+| --------- | ------------------------------------------------------ | --------------------------------------------------------------------- |
+| params    | [TroveListingParams](./lib-base.trovelistingparams.md) | Controls how the list is sorted, and where the slice begins and ends. |
 
 <b>Returns:</b>
 
 Promise&lt;[UserTrove](./lib-base.usertrove.md)<!-- -->\[\]&gt;
 
 Pairs of owner addresses and their Troves.
-

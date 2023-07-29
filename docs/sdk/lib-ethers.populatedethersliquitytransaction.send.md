@@ -11,9 +11,9 @@ Send the transaction.
 ```typescript
 send(): Promise<SentEthersLiquityTransaction<T>>;
 ```
+
 <b>Returns:</b>
 
 Promise&lt;[SentEthersLiquityTransaction](./lib-ethers.sentethersliquitytransaction.md)<!-- -->&lt;T&gt;&gt;
 
 An object that implements [SentLiquityTransaction](./lib-base.sentliquitytransaction.md)<!-- -->.
-

@@ -14,12 +14,11 @@ getUniTokenBalance(address?: string, overrides?: EthersCallOverrides): Promise<D
 
 ## Parameters
 
-|  Parameter | Type | Description |
-|  --- | --- | --- |
-|  address | string | Address whose balance should be retrieved. |
-|  overrides | [EthersCallOverrides](./lib-ethers.etherscalloverrides.md) |  |
+| Parameter | Type                                                       | Description                                |
+| --------- | ---------------------------------------------------------- | ------------------------------------------ |
+| address   | string                                                     | Address whose balance should be retrieved. |
+| overrides | [EthersCallOverrides](./lib-ethers.etherscalloverrides.md) |                                            |
 
 <b>Returns:</b>
 
 Promise&lt;[Decimal](./lib-base.decimal.md)<!-- -->&gt;
-

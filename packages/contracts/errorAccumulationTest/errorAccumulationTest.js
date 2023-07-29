@@ -1,5 +1,5 @@
-const deploymentHelper = require("../utils/deploymentHelpers.js");
-const testHelpers = require("../utils/testHelpers.js");
+const deploymentHelper = require('../utils/deploymentHelpers.js');
+const testHelpers = require('../utils/testHelpers.js');
 const th = testHelpers.TestHelper;
 const dec = th.dec;
 
@@ -8,7 +8,7 @@ const randAmountInWei = th.randAmountInWei;
 
 const ZERO_ADDRESS = th.ZERO_ADDRESS;
 
-contract("TroveManager", async accounts => {
+contract('TroveManager', async accounts => {
   const bountyAddress = accounts[998];
   const lpRewardsAddress = accounts[999];
 
@@ -48,17 +48,23 @@ contract("TroveManager", async accounts => {
 
   // --- Check accumulation from repeatedly applying rewards ---
 
-  it("11 accounts with random coll. 1 liquidation. 10 accounts do Trove operations (apply rewards)", async () => {
+  it('11 accounts with random coll. 1 liquidation. 10 accounts do Trove operations (apply rewards)', async () => {
     await borrowerOperations.openTrove(0, 0, accounts[99], {
       from: accounts[99],
-      value: dec(100, "ether")
+      value: dec(100, 'ether'),
     });
     await borrowerOperations.openTrove(0, dec(170, 18), accounts[0], {
       from: accounts[0],
-      value: dec(1, "ether")
+      value: dec(1, 'ether'),
     });
 
-    await th.openTrove_allAccounts_randomETH(1, 2, accounts.slice(1, 10), contracts, dec(170, 18));
+    await th.openTrove_allAccounts_randomETH(
+      1,
+      2,
+      accounts.slice(1, 10),
+      contracts,
+      dec(170, 18)
+    );
 
     await priceFeed.setPrice(dec(100, 18));
 
@@ -68,7 +74,10 @@ contract("TroveManager", async accounts => {
       borrowerOperations.addColl(account, account, { from: account, value: 1 });
     }
 
-    await borrowerOperations.addColl(accounts[99], accounts[99], { from: accounts[99], value: 1 });
+    await borrowerOperations.addColl(accounts[99], accounts[99], {
+      from: accounts[99],
+      value: 1,
+    });
 
     // check DefaultPool
     const ETH_DefaultPool = await defaultPool.getETH();
@@ -90,17 +99,23 @@ contract("TroveManager", async accounts => {
     LUSDDebt left in Default Pool is: 96
   */
 
-  it("101 accounts with random coll. 1 liquidation. 100 accounts do a Trove operation (apply rewards)", async () => {
+  it('101 accounts with random coll. 1 liquidation. 100 accounts do a Trove operation (apply rewards)', async () => {
     await borrowerOperations.openTrove(0, 0, accounts[999], {
       from: accounts[999],
-      value: dec(1000, "ether")
+      value: dec(1000, 'ether'),
     });
     await borrowerOperations.openTrove(0, dec(170, 18), accounts[0], {
       from: accounts[0],
-      value: dec(1, "ether")
+      value: dec(1, 'ether'),
     });
 
-    await th.openTrove_allAccounts_randomETH(1, 2, accounts.slice(1, 100), contracts, dec(170, 18));
+    await th.openTrove_allAccounts_randomETH(
+      1,
+      2,
+      accounts.slice(1, 100),
+      contracts,
+      dec(170, 18)
+    );
 
     await priceFeed.setPrice(dec(100, 18));
 
@@ -112,7 +127,7 @@ contract("TroveManager", async accounts => {
 
     await borrowerOperations.addColl(accounts[999], accounts[999], {
       from: accounts[999],
-      value: 1
+      value: 1,
     });
     // check DefaultPool
     const ETH_DefaultPool = await defaultPool.getETH();
@@ -133,13 +148,18 @@ contract("TroveManager", async accounts => {
     LUSDDebt left in Default Pool is: 653
   */
 
-  it("11 accounts. 1 liquidation. 10 accounts do Trove operations (apply rewards)", async () => {
+  it('11 accounts. 1 liquidation. 10 accounts do Trove operations (apply rewards)', async () => {
     await borrowerOperations.openTrove(0, 0, accounts[99], {
       from: accounts[99],
-      value: dec(100, "ether")
+      value: dec(100, 'ether'),
     });
 
-    await th.openTrove_allAccounts(accounts.slice(0, 10), contracts, dec(1, "ether"), dec(170, 18));
+    await th.openTrove_allAccounts(
+      accounts.slice(0, 10),
+      contracts,
+      dec(1, 'ether'),
+      dec(170, 18)
+    );
 
     await priceFeed.setPrice(dec(100, 18));
 
@@ -149,7 +169,10 @@ contract("TroveManager", async accounts => {
       borrowerOperations.addColl(account, account, { from: account, value: 1 });
     }
 
-    await borrowerOperations.addColl(accounts[99], accounts[99], { from: accounts[99], value: 1 });
+    await borrowerOperations.addColl(accounts[99], accounts[99], {
+      from: accounts[99],
+      value: 1,
+    });
     // check DefaultPool
     const ETH_DefaultPool = await defaultPool.getETH();
     const LUSDDebt_DefaultPool = await defaultPool.getLUSDDebt();
@@ -169,13 +192,18 @@ contract("TroveManager", async accounts => {
     LUSDDebt left in Default Pool is: 75
   */
 
-  it("101 accounts. 1 liquidation. 100 accounts do Trove operations (apply rewards)", async () => {
+  it('101 accounts. 1 liquidation. 100 accounts do Trove operations (apply rewards)', async () => {
     await borrowerOperations.openTrove(0, 0, accounts[99], {
       from: accounts[99],
-      value: dec(100, "ether")
+      value: dec(100, 'ether'),
     });
 
-    await th.openTrove_allAccounts(accounts.slice(0, 99), contracts, dec(1, "ether"), dec(170, 18));
+    await th.openTrove_allAccounts(
+      accounts.slice(0, 99),
+      contracts,
+      dec(1, 'ether'),
+      dec(170, 18)
+    );
 
     await priceFeed.setPrice(dec(100, 18));
 
@@ -184,7 +212,10 @@ contract("TroveManager", async accounts => {
     for (account of accounts.slice(1, 99)) {
       borrowerOperations.addColl(account, account, { from: account, value: 1 });
     }
-    await borrowerOperations.addColl(accounts[99], accounts[99], { from: accounts[99], value: 1 });
+    await borrowerOperations.addColl(accounts[99], accounts[99], {
+      from: accounts[99],
+      value: 1,
+    });
 
     // check DefaultPool
     const ETH_DefaultPool = await defaultPool.getETH();
@@ -205,13 +236,18 @@ contract("TroveManager", async accounts => {
     LUSDDebt left in Default Pool is: 180
   */
 
-  it("1001 accounts. 1 liquidation. 1000 accounts do Trove operations (apply rewards)", async () => {
+  it('1001 accounts. 1 liquidation. 1000 accounts do Trove operations (apply rewards)', async () => {
     await borrowerOperations.openTrove(0, 0, accounts[999], {
       from: accounts[999],
-      value: dec(1000, "ether")
+      value: dec(1000, 'ether'),
     });
 
-    await th.openTrove_allAccounts(accounts.slice(0, 999), contracts, dec(1, "ether"), dec(170, 18));
+    await th.openTrove_allAccounts(
+      accounts.slice(0, 999),
+      contracts,
+      dec(1, 'ether'),
+      dec(170, 18)
+    );
 
     await priceFeed.setPrice(dec(100, 18));
 
@@ -222,7 +258,7 @@ contract("TroveManager", async accounts => {
     }
     await borrowerOperations.addColl(accounts[999], accounts[999], {
       from: accounts[999],
-      value: 1
+      value: 1,
     });
 
     // check DefaultPool
@@ -252,13 +288,18 @@ contract("TroveManager", async accounts => {
   //  price drops
   //  loop: Troves are liquidated. Coll and debt difference between (activePool - defaultPool) is
 
-  it("11 accounts. 10 liquidations. Check (ActivePool - DefaultPool) differences", async () => {
+  it('11 accounts. 10 liquidations. Check (ActivePool - DefaultPool) differences', async () => {
     await borrowerOperations.openTrove(0, 0, accounts[99], {
       from: accounts[99],
-      value: dec(100, "ether")
+      value: dec(100, 'ether'),
     });
 
-    await th.openTrove_allAccounts(accounts.slice(0, 11), contracts, dec(1, "ether"), dec(170, 18));
+    await th.openTrove_allAccounts(
+      accounts.slice(0, 11),
+      contracts,
+      dec(1, 'ether'),
+      dec(170, 18)
+    );
 
     await priceFeed.setPrice(dec(100, 18));
 
@@ -278,7 +319,9 @@ contract("TroveManager", async accounts => {
       const defaultPoolLUSDDebt = await defaultPool.getLUSDDebt();
 
       totalETHPoolDifference.add(activePoolETH.sub(defaultPoolETH));
-      totalLUSDDebtPoolDifference.add(activePoolLUSDDebt.sub(defaultPoolLUSDDebt));
+      totalLUSDDebtPoolDifference.add(
+        activePoolLUSDDebt.sub(defaultPoolLUSDDebt)
+      );
     }
 
     console.log(
@@ -302,13 +345,18 @@ contract("TroveManager", async accounts => {
     Accumulated LUSDDebt difference between Active and Default Pools is: 0
   */
 
-  it("11 accounts. 10 liquidations. Check (DefaultPool - totalRewards) differences", async () => {
+  it('11 accounts. 10 liquidations. Check (DefaultPool - totalRewards) differences', async () => {
     await borrowerOperations.openTrove(0, 0, accounts[99], {
       from: accounts[99],
-      value: dec(100, "ether")
+      value: dec(100, 'ether'),
     });
 
-    await th.openTrove_allAccounts(accounts.slice(0, 11), contracts, dec(1, "ether"), dec(170, 18));
+    await th.openTrove_allAccounts(
+      accounts.slice(0, 11),
+      contracts,
+      dec(1, 'ether'),
+      dec(170, 18)
+    );
 
     await priceFeed.setPrice(dec(100, 18));
 
@@ -358,13 +406,18 @@ contract("TroveManager", async accounts => {
     LUSDDebt difference between total pending rewards and DefaultPool: 0
   */
 
-  it("101 accounts. 100 liquidations. Check (DefaultPool - totalRewards) differences", async () => {
+  it('101 accounts. 100 liquidations. Check (DefaultPool - totalRewards) differences', async () => {
     await borrowerOperations.openTrove(0, 0, accounts[999], {
       from: accounts[999],
-      value: dec(1000, "ether")
+      value: dec(1000, 'ether'),
     });
 
-    await th.openTrove_allAccounts(accounts.slice(0, 101), contracts, dec(1, "ether"), dec(170, 18));
+    await th.openTrove_allAccounts(
+      accounts.slice(0, 101),
+      contracts,
+      dec(1, 'ether'),
+      dec(170, 18)
+    );
 
     await priceFeed.setPrice(dec(100, 18));
 
@@ -414,10 +467,10 @@ contract("TroveManager", async accounts => {
     LUSDDebt difference between total pending rewards and DefaultPool: 0
   */
 
-  it("11 accounts with random ETH and proportional LUSD (180:1). 10 liquidations. Check (DefaultPool - totalRewards) differences", async () => {
+  it('11 accounts with random ETH and proportional LUSD (180:1). 10 liquidations. Check (DefaultPool - totalRewards) differences', async () => {
     await borrowerOperations.openTrove(0, 0, accounts[999], {
       from: accounts[999],
-      value: dec(100, "ether")
+      value: dec(100, 'ether'),
     });
 
     await th.openTrove_allAccounts_randomETH_ProportionalLUSD(
@@ -475,10 +528,10 @@ contract("TroveManager", async accounts => {
     LUSDDebt difference between total pending rewards and DefaultPool: 100
   */
 
-  it("101 accounts with random ETH and proportional LUSD (180:1). 100 liquidations. Check 1) (DefaultPool - totalDistributionRewards) difference, and 2) ", async () => {
+  it('101 accounts with random ETH and proportional LUSD (180:1). 100 liquidations. Check 1) (DefaultPool - totalDistributionRewards) difference, and 2) ', async () => {
     await borrowerOperations.openTrove(0, 0, accounts[999], {
       from: accounts[999],
-      value: dec(1000, "ether")
+      value: dec(1000, 'ether'),
     });
 
     await th.openTrove_allAccounts_randomETH_ProportionalLUSD(
@@ -540,22 +593,31 @@ contract("TroveManager", async accounts => {
 
   // --- Error accumulation from repeated Liquidations - SP Pool, partial offsets  ---
 
-  it("11 accounts. 10 liquidations, partial offsets. Check (DefaultPool - totalRewards) differences", async () => {
+  it('11 accounts. 10 liquidations, partial offsets. Check (DefaultPool - totalRewards) differences', async () => {
     // Acct 99 opens trove with 100 LUSD
     await borrowerOperations.openTrove(0, 0, accounts[99], {
       from: accounts[99],
-      value: dec(100, "ether")
+      value: dec(100, 'ether'),
     });
-    await borrowerOperations.withdrawLUSD(0, dec(100, 18), accounts[99], { from: accounts[99] });
+    await borrowerOperations.withdrawLUSD(0, dec(100, 18), accounts[99], {
+      from: accounts[99],
+    });
 
-    await th.openTrove_allAccounts(accounts.slice(0, 11), contracts, dec(1, "ether"), dec(170, 18));
+    await th.openTrove_allAccounts(
+      accounts.slice(0, 11),
+      contracts,
+      dec(1, 'ether'),
+      dec(170, 18)
+    );
 
     await priceFeed.setPrice(dec(100, 18));
     await troveManager.liquidate(accounts[0]);
 
     // On loop: Account[99] adds 10 LUSD to pool -> a trove gets liquidated and partially offset against SP, emptying the SP
     for (account of accounts.slice(1, 11)) {
-      await stabilityPool.provideToSP(dec(10, 18), ZERO_ADDRESS, { from: account[99] });
+      await stabilityPool.provideToSP(dec(10, 18), ZERO_ADDRESS, {
+        from: account[99],
+      });
       await troveManager.liquidate(account);
     }
     // check (DefaultPool - totalRewards from distribution)
@@ -566,13 +628,19 @@ contract("TroveManager", async accounts => {
 
     const _1e18_BN = web3.utils.toBN(dec(1, 18));
     const totalETHRewards_Distribution = totalColl.mul(L_ETH).div(_1e18_BN);
-    const totalLUSDRewards_Distribution = totalColl.mul(L_LUSDDebt).div(_1e18_BN);
+    const totalLUSDRewards_Distribution = totalColl
+      .mul(L_LUSDDebt)
+      .div(_1e18_BN);
 
     const defaultPoolETH = await defaultPool.getETH();
     const defaultPoolLUSDDebt = await defaultPool.getLUSDDebt();
 
-    const ETHRewardDifference = defaultPoolETH.sub(totalETHRewards_Distribution);
-    const LUSDDebtRewardDifference = defaultPoolLUSDDebt.sub(totalLUSDRewards_Distribution);
+    const ETHRewardDifference = defaultPoolETH.sub(
+      totalETHRewards_Distribution
+    );
+    const LUSDDebtRewardDifference = defaultPoolLUSDDebt.sub(
+      totalLUSDRewards_Distribution
+    );
 
     console.log(
       `ETH difference between total pending distribution rewards and DefaultPool: ${ETHRewardDifference} `
@@ -595,22 +663,31 @@ contract("TroveManager", async accounts => {
     LUSDDebt difference between total pending distribution rewards and DefaultPool: 0
   */
 
-  it("101 accounts. 100 liquidations, partial offsets. Check (DefaultPool - totalRewards) differences", async () => {
+  it('101 accounts. 100 liquidations, partial offsets. Check (DefaultPool - totalRewards) differences', async () => {
     // Acct 99 opens trove with 100 LUSD
     await borrowerOperations.openTrove(0, 0, accounts[999], {
       from: accounts[999],
-      value: dec(100, "ether")
+      value: dec(100, 'ether'),
     });
-    await borrowerOperations.withdrawLUSD(0, dec(100, 18), accounts[999], { from: accounts[999] });
+    await borrowerOperations.withdrawLUSD(0, dec(100, 18), accounts[999], {
+      from: accounts[999],
+    });
 
-    await th.openTrove_allAccounts(accounts.slice(0, 101), contracts, dec(1, "ether"), dec(170, 18));
+    await th.openTrove_allAccounts(
+      accounts.slice(0, 101),
+      contracts,
+      dec(1, 'ether'),
+      dec(170, 18)
+    );
 
     await priceFeed.setPrice(dec(100, 18));
     await troveManager.liquidate(accounts[0]);
 
     // On loop: Account[99] adds 10 LUSD to pool -> a trove gets liquidated and partially offset against SP, emptying the SP
     for (account of accounts.slice(1, 101)) {
-      await stabilityPool.provideToSP(dec(10, 18), ZERO_ADDRESS, { from: account[99] });
+      await stabilityPool.provideToSP(dec(10, 18), ZERO_ADDRESS, {
+        from: account[99],
+      });
       await troveManager.liquidate(account);
     }
     // check (DefaultPool - totalRewards from distribution)
@@ -621,13 +698,19 @@ contract("TroveManager", async accounts => {
 
     const _1e18_BN = web3.utils.toBN(dec(1, 18));
     const totalETHRewards_Distribution = totalColl.mul(L_ETH).div(_1e18_BN);
-    const totalLUSDRewards_Distribution = totalColl.mul(L_LUSDDebt).div(_1e18_BN);
+    const totalLUSDRewards_Distribution = totalColl
+      .mul(L_LUSDDebt)
+      .div(_1e18_BN);
 
     const defaultPoolETH = await defaultPool.getETH();
     const defaultPoolLUSDDebt = await defaultPool.getLUSDDebt();
 
-    const ETHRewardDifference = defaultPoolETH.sub(totalETHRewards_Distribution);
-    const LUSDDebtRewardDifference = defaultPoolLUSDDebt.sub(totalLUSDRewards_Distribution);
+    const ETHRewardDifference = defaultPoolETH.sub(
+      totalETHRewards_Distribution
+    );
+    const LUSDDebtRewardDifference = defaultPoolLUSDDebt.sub(
+      totalLUSDRewards_Distribution
+    );
 
     console.log(
       `ETH difference between total pending distribution rewards and DefaultPool: ${ETHRewardDifference} `
@@ -652,23 +735,34 @@ contract("TroveManager", async accounts => {
 
   // --- Error accumulation from SP withdrawals ---
 
-  it("11 accounts. 10 Borrowers add to SP. 1 liquidation, 10 Borrowers withdraw all their SP funds", async () => {
+  it('11 accounts. 10 Borrowers add to SP. 1 liquidation, 10 Borrowers withdraw all their SP funds', async () => {
     // Acct 99 opens trove with 100 LUSD
     await borrowerOperations.openTrove(0, 0, accounts[999], {
       from: accounts[999],
-      value: dec(100, "ether")
+      value: dec(100, 'ether'),
     });
-    await borrowerOperations.withdrawLUSD(0, dec(100, 18), accounts[999], { from: accounts[999] });
+    await borrowerOperations.withdrawLUSD(0, dec(100, 18), accounts[999], {
+      from: accounts[999],
+    });
 
     // Account 0 (to be liquidated) opens a trove
     await borrowerOperations.openTrove(0, dec(100, 18), accounts[0], {
       from: accounts[0],
-      value: dec(1, "ether")
+      value: dec(1, 'ether'),
     });
 
     // 9 Accounts open troves and provide to SP
-    await th.openTrove_allAccounts(accounts.slice(1, 11), contracts, dec(1, "ether"), dec(100, 18));
-    await th.provideToSP_allAccounts(accounts.slice(1, 11), stabilityPool, dec(50, 18));
+    await th.openTrove_allAccounts(
+      accounts.slice(1, 11),
+      contracts,
+      dec(1, 'ether'),
+      dec(100, 18)
+    );
+    await th.provideToSP_allAccounts(
+      accounts.slice(1, 11),
+      stabilityPool,
+      dec(50, 18)
+    );
 
     await priceFeed.setPrice(dec(100, 18));
     await troveManager.liquidate(accounts[0]);
@@ -681,7 +775,9 @@ contract("TroveManager", async accounts => {
     /* Sometimes, the error causes the last LUSD withdrawal from SP to underflow and fail. 
     So provideToSP from the whale, so that the last 'rewarded' depositor, account[1] can withdraw */
     const whaleSPDeposit = dec(100, 18);
-    await stabilityPool.provideToSP(whaleSPDeposit, ZERO_ADDRESS, { from: accounts[999] });
+    await stabilityPool.provideToSP(whaleSPDeposit, ZERO_ADDRESS, {
+      from: accounts[999],
+    });
 
     await stabilityPool.withdrawFromSP(dec(50, 18), { from: accounts[1] });
     const SP_ETH = await stabilityPool.getETH();
@@ -691,7 +787,9 @@ contract("TroveManager", async accounts => {
 
     // check Stability Pool
     console.log(`Surplus ETH left in in Stability Pool is ${SP_ETH}`);
-    console.log(`LUSD insufficiency in Stability Pool is ${SP_LUSD_Insufficiency}`);
+    console.log(
+      `LUSD insufficiency in Stability Pool is ${SP_LUSD_Insufficiency}`
+    );
   });
 
   /* ABDK64, no error correction
@@ -711,23 +809,34 @@ contract("TroveManager", async accounts => {
       LUSD insufficiency in Stability Pool is 0
     */
 
-  it("101 accounts. 100 Borrowers add to SP. 1 liquidation, 100 Borrowers withdraw all their SP funds", async () => {
+  it('101 accounts. 100 Borrowers add to SP. 1 liquidation, 100 Borrowers withdraw all their SP funds', async () => {
     // Acct 99 opens trove with 100 LUSD
     await borrowerOperations.openTrove(0, 0, accounts[999], {
       from: accounts[999],
-      value: dec(100, "ether")
+      value: dec(100, 'ether'),
     });
-    await borrowerOperations.withdrawLUSD(0, dec(100, 18), accounts[999], { from: accounts[999] });
+    await borrowerOperations.withdrawLUSD(0, dec(100, 18), accounts[999], {
+      from: accounts[999],
+    });
 
     // Account 0 (to be liquidated) opens a trove
     await borrowerOperations.openTrove(0, dec(100, 18), accounts[0], {
       from: accounts[0],
-      value: dec(1, "ether")
+      value: dec(1, 'ether'),
     });
 
     // 10 Accounts open troves and provide to SP
-    await th.openTrove_allAccounts(accounts.slice(1, 101), contracts, dec(1, "ether"), dec(100, 18));
-    await th.provideToSP_allAccounts(accounts.slice(1, 101), stabilityPool, dec(50, 18));
+    await th.openTrove_allAccounts(
+      accounts.slice(1, 101),
+      contracts,
+      dec(1, 'ether'),
+      dec(100, 18)
+    );
+    await th.provideToSP_allAccounts(
+      accounts.slice(1, 101),
+      stabilityPool,
+      dec(50, 18)
+    );
 
     await priceFeed.setPrice(dec(100, 18));
     await troveManager.liquidate(accounts[0]);
@@ -740,7 +849,9 @@ contract("TroveManager", async accounts => {
     /* Sometimes, the error causes the last LUSD withdrawal from SP to underflow and fail. 
     So provideToSP from the whale, so that the last 'rewarded' depositor, account[1] can withdraw */
     const whaleSPDeposit = dec(100, 18);
-    await stabilityPool.provideToSP(whaleSPDeposit, ZERO_ADDRESS, { from: accounts[999] });
+    await stabilityPool.provideToSP(whaleSPDeposit, ZERO_ADDRESS, {
+      from: accounts[999],
+    });
 
     await stabilityPool.withdrawFromSP(dec(50, 18), { from: accounts[1] });
     const SP_ETH = await stabilityPool.getETH();
@@ -750,7 +861,9 @@ contract("TroveManager", async accounts => {
 
     // check Stability Pool
     console.log(`Surplus ETH left in in Stability Pool is ${SP_ETH}`);
-    console.log(`LUSD insufficiency in Stability Pool is ${SP_LUSD_Insufficiency}`);
+    console.log(
+      `LUSD insufficiency in Stability Pool is ${SP_LUSD_Insufficiency}`
+    );
   });
 
   /* ABDK64, no error correction
@@ -766,26 +879,40 @@ contract("TroveManager", async accounts => {
     LUSD insufficiency in Stability Pool is 0
    */
 
-  it("11 accounts. 10 Borrowers add to SP, random LUSD amounts. 1 liquidation, 10 Borrowers withdraw all their SP funds", async () => {
+  it('11 accounts. 10 Borrowers add to SP, random LUSD amounts. 1 liquidation, 10 Borrowers withdraw all their SP funds', async () => {
     // Acct 99 opens trove with 100 LUSD
     await borrowerOperations.openTrove(0, 0, accounts[999], {
       from: accounts[999],
-      value: dec(100, "ether")
+      value: dec(100, 'ether'),
     });
-    await borrowerOperations.withdrawLUSD(0, dec(100, 18), accounts[999], { from: accounts[999] });
+    await borrowerOperations.withdrawLUSD(0, dec(100, 18), accounts[999], {
+      from: accounts[999],
+    });
 
     // Account 0 (to be liquidated) opens a trove
     await borrowerOperations.openTrove(0, dec(100, 18), accounts[0], {
       from: accounts[0],
-      value: dec(1, "ether")
+      value: dec(1, 'ether'),
     });
 
     // 10 Accounts open troves and provide to SP
-    await th.openTrove_allAccounts(accounts.slice(1, 11), contracts, dec(1, "ether"), dec(100, 18));
-    await th.th.provideToSP_allAccounts_randomAmount(10, 90, accounts.slice(2, 11), stabilityPool);
+    await th.openTrove_allAccounts(
+      accounts.slice(1, 11),
+      contracts,
+      dec(1, 'ether'),
+      dec(100, 18)
+    );
+    await th.th.provideToSP_allAccounts_randomAmount(
+      10,
+      90,
+      accounts.slice(2, 11),
+      stabilityPool
+    );
 
     const account1SPDeposit = dec(50, 18);
-    await stabilityPool.provideToSP(account1SPDeposit, ZERO_ADDRESS, { from: accounts[1] });
+    await stabilityPool.provideToSP(account1SPDeposit, ZERO_ADDRESS, {
+      from: accounts[1],
+    });
 
     await priceFeed.setPrice(dec(100, 18));
     await troveManager.liquidate(accounts[0]);
@@ -799,9 +926,13 @@ contract("TroveManager", async accounts => {
     /* Sometimes, the error causes the last LUSD withdrawal from SP to underflow and fail. 
     So provideToSP from the whale, so that the last 'rewarded' depositor, account[1] can withdraw */
     const whaleSPDeposit = dec(100, 18);
-    await stabilityPool.provideToSP(whaleSPDeposit, ZERO_ADDRESS, { from: accounts[999] });
+    await stabilityPool.provideToSP(whaleSPDeposit, ZERO_ADDRESS, {
+      from: accounts[999],
+    });
 
-    await stabilityPool.withdrawFromSP(account1SPDeposit, { from: accounts[1] });
+    await stabilityPool.withdrawFromSP(account1SPDeposit, {
+      from: accounts[1],
+    });
     const SP_ETH = await stabilityPool.getETH();
     const SP_LUSD = await stabilityPool.getTotalLUSDDeposits();
 
@@ -809,7 +940,9 @@ contract("TroveManager", async accounts => {
 
     // check Stability Pool
     console.log(`Surplus ETH left in in Stability Pool is ${SP_ETH}`);
-    console.log(`LUSD insufficiency in Stability Pool is ${SP_LUSD_Insufficiency}`);
+    console.log(
+      `LUSD insufficiency in Stability Pool is ${SP_LUSD_Insufficiency}`
+    );
   });
 
   /* ABDK64, no error correction
@@ -832,26 +965,40 @@ contract("TroveManager", async accounts => {
       LUSD insufficiency in Stability Pool is 507
     */
 
-  it("101 accounts. 100 Borrowers add to SP, random LUSD amounts. 1 liquidation, 100 Borrowers withdraw all their SP funds", async () => {
+  it('101 accounts. 100 Borrowers add to SP, random LUSD amounts. 1 liquidation, 100 Borrowers withdraw all their SP funds', async () => {
     // Acct 99 opens trove with 100 LUSD
     await borrowerOperations.openTrove(0, 0, accounts[999], {
       from: accounts[999],
-      value: dec(100, "ether")
+      value: dec(100, 'ether'),
     });
-    await borrowerOperations.withdrawLUSD(0, dec(100, 18), accounts[999], { from: accounts[999] });
+    await borrowerOperations.withdrawLUSD(0, dec(100, 18), accounts[999], {
+      from: accounts[999],
+    });
 
     // Account 0 (to be liquidated) opens a trove
     await borrowerOperations.openTrove(0, dec(100, 18), accounts[0], {
       from: accounts[0],
-      value: dec(1, "ether")
+      value: dec(1, 'ether'),
     });
 
     // 100 Accounts open troves and provide to SP
-    await th.openTrove_allAccounts(accounts.slice(1, 101), contracts, dec(1, "ether"), dec(100, 18));
-    await th.th.provideToSP_allAccounts_randomAmount(10, 90, accounts.slice(2, 101), stabilityPool);
+    await th.openTrove_allAccounts(
+      accounts.slice(1, 101),
+      contracts,
+      dec(1, 'ether'),
+      dec(100, 18)
+    );
+    await th.th.provideToSP_allAccounts_randomAmount(
+      10,
+      90,
+      accounts.slice(2, 101),
+      stabilityPool
+    );
 
     const account1SPDeposit = dec(50, 18);
-    await stabilityPool.provideToSP(account1SPDeposit, ZERO_ADDRESS, { from: accounts[1] });
+    await stabilityPool.provideToSP(account1SPDeposit, ZERO_ADDRESS, {
+      from: accounts[1],
+    });
 
     await priceFeed.setPrice(dec(100, 18));
     await troveManager.liquidate(accounts[0]);
@@ -864,9 +1011,13 @@ contract("TroveManager", async accounts => {
     /* Sometimes, the error causes the last LUSD withdrawal from SP to underflow and fail. 
     So provideToSP from the whale, so that the last 'rewarded' depositor, account[1] can withdraw */
     const whaleSPDeposit = dec(100, 18);
-    await stabilityPool.provideToSP(whaleSPDeposit, ZERO_ADDRESS, { from: accounts[999] });
+    await stabilityPool.provideToSP(whaleSPDeposit, ZERO_ADDRESS, {
+      from: accounts[999],
+    });
 
-    await stabilityPool.withdrawFromSP(account1SPDeposit, { from: accounts[1] });
+    await stabilityPool.withdrawFromSP(account1SPDeposit, {
+      from: accounts[1],
+    });
 
     const SP_ETH = await stabilityPool.getETH();
     const SP_LUSD = await stabilityPool.getTotalLUSDDeposits();
@@ -875,7 +1026,9 @@ contract("TroveManager", async accounts => {
 
     // check Stability Pool
     console.log(`Surplus ETH left in in Stability Pool is ${SP_ETH}`);
-    console.log(`LUSD insufficiency in Stability Pool is ${SP_LUSD_Insufficiency}`);
+    console.log(
+      `LUSD insufficiency in Stability Pool is ${SP_LUSD_Insufficiency}`
+    );
   });
 
   /* ABDK64, no error correction
@@ -895,26 +1048,40 @@ contract("TroveManager", async accounts => {
     LUSD insufficiency in Stability Pool is 452
   */
 
-  it("501 accounts. 500 Borrowers add to SP, random LUSD amounts. 1 liquidation, 500 Borrowers withdraw all their SP funds", async () => {
+  it('501 accounts. 500 Borrowers add to SP, random LUSD amounts. 1 liquidation, 500 Borrowers withdraw all their SP funds', async () => {
     // Acct 99 opens trove with 100 LUSD
     await borrowerOperations.openTrove(0, 0, accounts[999], {
       from: accounts[999],
-      value: dec(100, "ether")
+      value: dec(100, 'ether'),
     });
-    await borrowerOperations.withdrawLUSD(0, dec(100, 18), accounts[999], { from: accounts[999] });
+    await borrowerOperations.withdrawLUSD(0, dec(100, 18), accounts[999], {
+      from: accounts[999],
+    });
 
     // Account 0 (to be liquidated) opens a trove
     await borrowerOperations.openTrove(0, dec(100, 18), accounts[0], {
       from: accounts[0],
-      value: dec(1, "ether")
+      value: dec(1, 'ether'),
     });
 
     // 500 Accounts open troves and provide to SP
-    await th.openTrove_allAccounts(accounts.slice(1, 501), contracts, dec(1, "ether"), dec(100, 18));
-    await th.th.provideToSP_allAccounts_randomAmount(10, 90, accounts.slice(2, 501), stabilityPool);
+    await th.openTrove_allAccounts(
+      accounts.slice(1, 501),
+      contracts,
+      dec(1, 'ether'),
+      dec(100, 18)
+    );
+    await th.th.provideToSP_allAccounts_randomAmount(
+      10,
+      90,
+      accounts.slice(2, 501),
+      stabilityPool
+    );
 
     const account1SPDeposit = dec(50, 18);
-    await stabilityPool.provideToSP(account1SPDeposit, ZERO_ADDRESS, { from: accounts[1] });
+    await stabilityPool.provideToSP(account1SPDeposit, ZERO_ADDRESS, {
+      from: accounts[1],
+    });
 
     await priceFeed.setPrice(dec(100, 18));
     await troveManager.liquidate(accounts[0]);
@@ -927,9 +1094,13 @@ contract("TroveManager", async accounts => {
     /* Sometimes, the error causes the last LUSD withdrawal from SP to underflow and fail. 
   So provideToSP from the whale, so that the last 'rewarded' depositor, account[1] can withdraw */
     const whaleSPDeposit = dec(100, 18);
-    await stabilityPool.provideToSP(whaleSPDeposit, ZERO_ADDRESS, { from: accounts[999] });
+    await stabilityPool.provideToSP(whaleSPDeposit, ZERO_ADDRESS, {
+      from: accounts[999],
+    });
 
-    await stabilityPool.withdrawFromSP(account1SPDeposit, { from: accounts[1] });
+    await stabilityPool.withdrawFromSP(account1SPDeposit, {
+      from: accounts[1],
+    });
 
     const SP_ETH = await stabilityPool.getETH();
     const SP_LUSD = await stabilityPool.getTotalLUSDDeposits();
@@ -938,7 +1109,9 @@ contract("TroveManager", async accounts => {
 
     // check Stability Pool
     console.log(`Surplus ETH left in in Stability Pool is ${SP_ETH}`);
-    console.log(`LUSD insufficiency in Stability Pool is ${SP_LUSD_Insufficiency}`);
+    console.log(
+      `LUSD insufficiency in Stability Pool is ${SP_LUSD_Insufficiency}`
+    );
   });
 
   /* ABDK64, no error correction:
@@ -955,12 +1128,17 @@ contract("TroveManager", async accounts => {
     LUSD insufficiency in Stability Pool is 6037
   */
 
-  it("10 accounts. 10x liquidate -> addColl. Check stake and totalStakes (On-chain data vs off-chain simulation)", async () => {
+  it('10 accounts. 10x liquidate -> addColl. Check stake and totalStakes (On-chain data vs off-chain simulation)', async () => {
     await borrowerOperations.openTrove(0, 0, accounts[999], {
       from: accounts[999],
-      value: dec(1000, "ether")
+      value: dec(1000, 'ether'),
     });
-    await th.openTrove_allAccounts(accounts.slice(1, 11), contracts, dec(1, "ether"), dec(170, 18));
+    await th.openTrove_allAccounts(
+      accounts.slice(1, 11),
+      contracts,
+      dec(1, 'ether'),
+      dec(170, 18)
+    );
 
     await priceFeed.setPrice(dec(100, 18));
 
@@ -973,7 +1151,9 @@ contract("TroveManager", async accounts => {
 
     // Loop over account range, alternately liquidating a Trove and opening a new trove
     for (i = 1; i < 10; i++) {
-      const stakeOfTroveToLiquidate = (await troveManager.Troves(accounts[i]))[2];
+      const stakeOfTroveToLiquidate = (
+        await troveManager.Troves(accounts[i])
+      )[2];
 
       const newEntrantColl = web3.utils.toBN(dec(2, 18));
 
@@ -982,7 +1162,9 @@ contract("TroveManager", async accounts => {
       offchainTotalStakes = offchainTotalStakes.sub(stakeOfTroveToLiquidate);
       offchainTotalColl = offchainTotalColl;
       // New trove opening creates a new stake, then adds
-      offchainStake = newEntrantColl.mul(offchainTotalStakes).div(offchainTotalColl);
+      offchainStake = newEntrantColl
+        .mul(offchainTotalStakes)
+        .div(offchainTotalColl);
       offchainTotalStakes = offchainTotalStakes.add(offchainStake);
       offchainTotalColl = offchainTotalColl.add(newEntrantColl);
 
@@ -990,7 +1172,7 @@ contract("TroveManager", async accounts => {
       await troveManager.liquidate(accounts[i], { from: accounts[0] });
       await borrowerOperations.addColl(accounts[999 - i], accounts[999 - i], {
         from: accounts[999 - i],
-        value: newEntrantColl
+        value: newEntrantColl,
       });
 
       // Grab new stake and totalStakes on-chain
@@ -1021,12 +1203,17 @@ contract("TroveManager", async accounts => {
   Final difference in the last totalStakes value, between on-chain and actual: 0
 */
 
-  it("10 accounts. 10x liquidate -> addColl. Random coll. Check stake and totalStakes (On-chain data vs off-chain simulation)", async () => {
+  it('10 accounts. 10x liquidate -> addColl. Random coll. Check stake and totalStakes (On-chain data vs off-chain simulation)', async () => {
     await borrowerOperations.openTrove(0, 0, accounts[999], {
       from: accounts[999],
-      value: dec(1000, "ether")
+      value: dec(1000, 'ether'),
     });
-    await th.openTrove_allAccounts(accounts.slice(1, 11), contracts, dec(1, "ether"), dec(170, 18));
+    await th.openTrove_allAccounts(
+      accounts.slice(1, 11),
+      contracts,
+      dec(1, 'ether'),
+      dec(170, 18)
+    );
 
     await priceFeed.setPrice(dec(100, 18));
 
@@ -1039,7 +1226,9 @@ contract("TroveManager", async accounts => {
 
     // Loop over account range, alternately liquidating a Trove and opening a new trove
     for (i = 1; i < 10; i++) {
-      const stakeOfTroveToLiquidate = (await troveManager.Troves(accounts[i]))[2];
+      const stakeOfTroveToLiquidate = (
+        await troveManager.Troves(accounts[i])
+      )[2];
 
       const newEntrantColl = web3.utils.toBN(randAmountInWei(1, 100));
 
@@ -1048,7 +1237,9 @@ contract("TroveManager", async accounts => {
       offchainTotalStakes = offchainTotalStakes.sub(stakeOfTroveToLiquidate);
       offchainTotalColl = offchainTotalColl;
       // New trove opening creates a new stake, then adds
-      offchainStake = newEntrantColl.mul(offchainTotalStakes).div(offchainTotalColl);
+      offchainStake = newEntrantColl
+        .mul(offchainTotalStakes)
+        .div(offchainTotalColl);
       offchainTotalStakes = offchainTotalStakes.add(offchainStake);
       offchainTotalColl = offchainTotalColl.add(newEntrantColl);
 
@@ -1056,7 +1247,7 @@ contract("TroveManager", async accounts => {
       await troveManager.liquidate(accounts[i], { from: accounts[0] });
       await borrowerOperations.addColl(accounts[999 - i], accounts[999 - i], {
         from: accounts[999 - i],
-        value: newEntrantColl
+        value: newEntrantColl,
       });
 
       // Grab new stake and totalStakes on-chain
@@ -1088,12 +1279,17 @@ contract("TroveManager", async accounts => {
   Final difference in the last totalStakes value, between on-chain and actual: 0
 */
 
-  it("100 accounts. 100x liquidate -> addColl. Random coll. Check stake and totalStakes (On-chain data vs off-chain simulation)", async () => {
+  it('100 accounts. 100x liquidate -> addColl. Random coll. Check stake and totalStakes (On-chain data vs off-chain simulation)', async () => {
     await borrowerOperations.openTrove(0, 0, accounts[999], {
       from: accounts[999],
-      value: dec(1000, "ether")
+      value: dec(1000, 'ether'),
     });
-    await th.openTrove_allAccounts(accounts.slice(1, 101), contracts, dec(1, "ether"), dec(170, 18));
+    await th.openTrove_allAccounts(
+      accounts.slice(1, 101),
+      contracts,
+      dec(1, 'ether'),
+      dec(170, 18)
+    );
 
     await priceFeed.setPrice(dec(100, 18));
 
@@ -1106,7 +1302,9 @@ contract("TroveManager", async accounts => {
 
     // Loop over account range, alternately liquidating a Trove and opening a new trove
     for (i = 1; i < 100; i++) {
-      const stakeOfTroveToLiquidate = (await troveManager.Troves(accounts[i]))[2];
+      const stakeOfTroveToLiquidate = (
+        await troveManager.Troves(accounts[i])
+      )[2];
 
       const newEntrantColl = web3.utils.toBN(randAmountInWei(12, 73422));
 
@@ -1115,7 +1313,9 @@ contract("TroveManager", async accounts => {
       offchainTotalStakes = offchainTotalStakes.sub(stakeOfTroveToLiquidate);
       offchainTotalColl = offchainTotalColl;
       // New trove opening creates a new stake, then adds
-      offchainStake = newEntrantColl.mul(offchainTotalStakes).div(offchainTotalColl);
+      offchainStake = newEntrantColl
+        .mul(offchainTotalStakes)
+        .div(offchainTotalColl);
       offchainTotalStakes = offchainTotalStakes.add(offchainStake);
       offchainTotalColl = offchainTotalColl.add(newEntrantColl);
 
@@ -1123,7 +1323,7 @@ contract("TroveManager", async accounts => {
       await troveManager.liquidate(accounts[i], { from: accounts[0] });
       await borrowerOperations.addColl(accounts[999 - i], accounts[999 - i], {
         from: accounts[999 - i],
-        value: newEntrantColl
+        value: newEntrantColl,
       });
 
       // Grab new stake and totalStakes on-chain
@@ -1157,14 +1357,14 @@ contract("TroveManager", async accounts => {
 
   // --- Applied rewards, large coll and debt ---
 
-  it("11 accounts with random large coll, magnitude ~1e8 ether. 1 liquidation. 10 accounts do Trove operations (apply rewards)", async () => {
+  it('11 accounts with random large coll, magnitude ~1e8 ether. 1 liquidation. 10 accounts do Trove operations (apply rewards)', async () => {
     await borrowerOperations.openTrove(0, 0, accounts[99], {
       from: accounts[99],
-      value: dec(100, "ether")
+      value: dec(100, 'ether'),
     });
     await borrowerOperations.openTrove(0, dec(170, 18), accounts[0], {
       from: accounts[0],
-      value: dec(1, "ether")
+      value: dec(1, 'ether'),
     });
 
     // Troves open with 100-200 million ether
@@ -1185,7 +1385,10 @@ contract("TroveManager", async accounts => {
       borrowerOperations.addColl(account, account, { from: account, value: 1 });
     }
 
-    await borrowerOperations.addColl(accounts[99], accounts[99], { from: accounts[99], value: 1 });
+    await borrowerOperations.addColl(accounts[99], accounts[99], {
+      from: accounts[99],
+      value: 1,
+    });
     // check DefaultPool
     const ETH_DefaultPool = await defaultPool.getETH();
     const LUSDDebt_DefaultPool = await defaultPool.getLUSDDebt();
@@ -1206,14 +1409,14 @@ contract("TroveManager", async accounts => {
   LUSDDebt left in Default Pool is: 535042995
 */
 
-  it("101 accounts with random large coll, magnitude ~1e8 ether. 1 liquidation. 500 accounts do a Trove operation (apply rewards)", async () => {
+  it('101 accounts with random large coll, magnitude ~1e8 ether. 1 liquidation. 500 accounts do a Trove operation (apply rewards)', async () => {
     await borrowerOperations.openTrove(0, 0, accounts[999], {
       from: accounts[999],
-      value: dec(1000, "ether")
+      value: dec(1000, 'ether'),
     });
     await borrowerOperations.openTrove(0, dec(170, 18), accounts[0], {
       from: accounts[0],
-      value: dec(1, "ether")
+      value: dec(1, 'ether'),
     });
 
     // Troves open with 100-200 million ether
@@ -1236,7 +1439,7 @@ contract("TroveManager", async accounts => {
 
     await borrowerOperations.addColl(accounts[999], accounts[999], {
       from: accounts[999],
-      value: 1
+      value: 1,
     });
     // check DefaultPool
     const ETH_DefaultPool = await defaultPool.getETH();
@@ -1257,10 +1460,10 @@ contract("TroveManager", async accounts => {
 
   // --- Liquidations, large coll and debt ---
 
-  it("11 accounts with random ETH and proportional LUSD (180:1). 10 liquidations. Check (DefaultPool - totalRewards) differences", async () => {
+  it('11 accounts with random ETH and proportional LUSD (180:1). 10 liquidations. Check (DefaultPool - totalRewards) differences', async () => {
     await borrowerOperations.openTrove(0, 0, accounts[999], {
       from: accounts[999],
-      value: dec(1, 27)
+      value: dec(1, 27),
     });
 
     // Troves open with 100-200 million ether and proportional LUSD Debt
@@ -1313,10 +1516,10 @@ contract("TroveManager", async accounts => {
   LUSDDebt difference between total pending rewards and DefaultPool: 1000000000
   */
 
-  it("101 accounts with random ETH and proportional LUSD (180:1). 100 liquidations. Check 1) (DefaultPool - totalDistributionRewards) difference, and 2) ", async () => {
+  it('101 accounts with random ETH and proportional LUSD (180:1). 100 liquidations. Check 1) (DefaultPool - totalDistributionRewards) difference, and 2) ', async () => {
     await borrowerOperations.openTrove(0, 0, accounts[999], {
       from: accounts[999],
-      value: dec(1, 28)
+      value: dec(1, 28),
     });
 
     // Troves open with 100-200 million ether and proportional LUSD Debt

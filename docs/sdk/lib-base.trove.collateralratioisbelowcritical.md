@@ -4,7 +4,7 @@
 
 ## Trove.collateralRatioIsBelowCritical() method
 
-Whether the collateralization ratio is less than the [CRITICAL\_COLLATERAL\_RATIO](./lib-base.critical_collateral_ratio.md) at a given price.
+Whether the collateralization ratio is less than the [CRITICAL_COLLATERAL_RATIO](./lib-base.critical_collateral_ratio.md) at a given price.
 
 <b>Signature:</b>
 
@@ -14,9 +14,9 @@ collateralRatioIsBelowCritical(price: Decimalish): boolean;
 
 ## Parameters
 
-|  Parameter | Type | Description |
-|  --- | --- | --- |
-|  price | [Decimalish](./lib-base.decimalish.md) |  |
+| Parameter | Type                                   | Description |
+| --------- | -------------------------------------- | ----------- |
+| price     | [Decimalish](./lib-base.decimalish.md) |             |
 
 <b>Returns:</b>
 
@@ -33,6 +33,4 @@ const price = await liquity.getPrice();
 if (total.collateralRatioIsBelowCritical(price)) {
   // Recovery mode is active
 }
-
 ```
-

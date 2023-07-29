@@ -14,11 +14,10 @@ getTotal(overrides?: EthersCallOverrides): Promise<Trove>;
 
 ## Parameters
 
-|  Parameter | Type | Description |
-|  --- | --- | --- |
-|  overrides | [EthersCallOverrides](./lib-ethers.etherscalloverrides.md) |  |
+| Parameter | Type                                                       | Description |
+| --------- | ---------------------------------------------------------- | ----------- |
+| overrides | [EthersCallOverrides](./lib-ethers.etherscalloverrides.md) |             |
 
 <b>Returns:</b>
 
 Promise&lt;[Trove](./lib-base.trove.md)<!-- -->&gt;
-

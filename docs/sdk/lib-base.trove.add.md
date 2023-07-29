@@ -12,11 +12,10 @@ add(that: Trove): Trove;
 
 ## Parameters
 
-|  Parameter | Type | Description |
-|  --- | --- | --- |
-|  that | [Trove](./lib-base.trove.md) |  |
+| Parameter | Type                         | Description |
+| --------- | ---------------------------- | ----------- |
+| that      | [Trove](./lib-base.trove.md) |             |
 
 <b>Returns:</b>
 
 [Trove](./lib-base.trove.md)
-

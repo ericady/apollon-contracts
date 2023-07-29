@@ -11,6 +11,7 @@ Get the total collateral and debt per stake that has been liquidated through red
 ```typescript
 getTotalRedistributed(): Promise<Trove>;
 ```
+
 <b>Returns:</b>
 
 Promise&lt;[Trove](./lib-base.trove.md)<!-- -->&gt;
@@ -18,4 +19,3 @@ Promise&lt;[Trove](./lib-base.trove.md)<!-- -->&gt;
 ## Remarks
 
 Needed when dealing with instances of [TroveWithPendingRedistribution](./lib-base.trovewithpendingredistribution.md)<!-- -->.
-

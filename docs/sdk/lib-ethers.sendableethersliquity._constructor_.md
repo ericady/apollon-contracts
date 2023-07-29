@@ -14,7 +14,6 @@ constructor(populatable: PopulatableEthersLiquity);
 
 ## Parameters
 
-|  Parameter | Type | Description |
-|  --- | --- | --- |
-|  populatable | [PopulatableEthersLiquity](./lib-ethers.populatableethersliquity.md) |  |
-
+| Parameter   | Type                                                                 | Description |
+| ----------- | -------------------------------------------------------------------- | ----------- |
+| populatable | [PopulatableEthersLiquity](./lib-ethers.populatableethersliquity.md) |             |

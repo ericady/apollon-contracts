@@ -14,10 +14,10 @@ repayLUSD(amount: Decimalish, overrides?: EthersTransactionOverrides): Promise<T
 
 ## Parameters
 
-|  Parameter | Type | Description |
-|  --- | --- | --- |
-|  amount | [Decimalish](./lib-base.decimalish.md) | The amount of LUSD to repay. |
-|  overrides | [EthersTransactionOverrides](./lib-ethers.etherstransactionoverrides.md) |  |
+| Parameter | Type                                                                     | Description                  |
+| --------- | ------------------------------------------------------------------------ | ---------------------------- |
+| amount    | [Decimalish](./lib-base.decimalish.md)                                   | The amount of LUSD to repay. |
+| overrides | [EthersTransactionOverrides](./lib-ethers.etherstransactionoverrides.md) |                              |
 
 <b>Returns:</b>
 
@@ -32,7 +32,5 @@ Throws [EthersTransactionFailedError](./lib-ethers.etherstransactionfailederror.
 Equivalent to:
 
 ```typescript
-adjustTrove({ repayLUSD: amount })
-
+adjustTrove({ repayLUSD: amount });
 ```
-

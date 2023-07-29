@@ -14,13 +14,12 @@ whatChanged(thatLUSD: Decimalish): StabilityDepositChange<Decimal> | undefined;
 
 ## Parameters
 
-|  Parameter | Type | Description |
-|  --- | --- | --- |
-|  thatLUSD | [Decimalish](./lib-base.decimalish.md) |  |
+| Parameter | Type                                   | Description |
+| --------- | -------------------------------------- | ----------- |
+| thatLUSD  | [Decimalish](./lib-base.decimalish.md) |             |
 
 <b>Returns:</b>
 
 [StabilityDepositChange](./lib-base.stabilitydepositchange.md)<!-- -->&lt;[Decimal](./lib-base.decimal.md)<!-- -->&gt; \| undefined
 
 An object representing the change, or `undefined` if the deposited amounts are equal.
-

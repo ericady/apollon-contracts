@@ -1,25 +1,34 @@
-const { red, blue, green, yellow, dim, bold } = require("chalk");
-const { Wallet, providers } = require("ethers");
-const { Decimal, UserTrove, LUSD_LIQUIDATION_RESERVE } = require("@liquity/lib-base");
-const { EthersLiquity, EthersLiquityWithStore } = require("@liquity/lib-ethers");
+const { red, blue, green, yellow, dim, bold } = require('chalk');
+const { Wallet, providers } = require('ethers');
+const {
+  Decimal,
+  UserTrove,
+  LUSD_LIQUIDATION_RESERVE,
+} = require('@liquity/lib-base');
+const {
+  EthersLiquity,
+  EthersLiquityWithStore,
+} = require('@liquity/lib-ethers');
 
 function log(message) {
   console.log(`${dim(`[${new Date().toLocaleTimeString()}]`)} ${message}`);
 }
 
-const info = message => log(`${blue("ℹ")} ${message}`);
-const warn = message => log(`${yellow("‼")} ${message}`);
-const error = message => log(`${red("✖")} ${message}`);
-const success = message => log(`${green("✔")} ${message}`);
+const info = message => log(`${blue('ℹ')} ${message}`);
+const warn = message => log(`${yellow('‼')} ${message}`);
+const error = message => log(`${red('✖')} ${message}`);
+const success = message => log(`${green('✔')} ${message}`);
 
 async function main() {
   // Replace URL if not using a local node
-  const provider = new providers.JsonRpcProvider("http://localhost:8545");
+  const provider = new providers.JsonRpcProvider('http://localhost:8545');
   const wallet = new Wallet(process.env.PRIVATE_KEY).connect(provider);
-  const liquity = await EthersLiquity.connect(wallet, { useStore: "blockPolled" });
+  const liquity = await EthersLiquity.connect(wallet, {
+    useStore: 'blockPolled',
+  });
 
   liquity.store.onLoaded = () => {
-    info("Waiting for price drops...");
+    info('Waiting for price drops...');
     tryToLiquidate(liquity);
   };
 
@@ -37,7 +46,8 @@ async function main() {
  * @param {Decimal} [price]
  * @returns {(trove: UserTrove) => boolean}
  */
-const underCollateralized = price => trove => trove.collateralRatioIsBelowMinimum(price);
+const underCollateralized = price => trove =>
+  trove.collateralRatioIsBelowMinimum(price);
 
 /**
  * @param {UserTrove}
@@ -59,8 +69,8 @@ async function tryToLiquidate(liquity) {
 
     liquity.getTroves({
       first: 1000,
-      sortedBy: "ascendingCollateralRatio"
-    })
+      sortedBy: 'ascendingCollateralRatio',
+    }),
   ]);
 
   const troves = riskiestTroves
@@ -76,7 +86,9 @@ async function tryToLiquidate(liquity) {
   const addresses = troves.map(trove => trove.ownerAddress);
 
   try {
-    const liquidation = await liquity.populate.liquidate(addresses, { gasPrice: gasPrice.hex });
+    const liquidation = await liquity.populate.liquidate(addresses, {
+      gasPrice: gasPrice.hex,
+    });
     const gasLimit = liquidation.rawPopulatedTransaction.gasLimit.toNumber();
     const expectedCost = gasPrice.mul(gasLimit).mul(store.state.price);
 
@@ -90,8 +102,10 @@ async function tryToLiquidate(liquity) {
       // In reality, the TX cost will be lower than this thanks to storage refunds, but let's be
       // on the safe side.
       warn(
-        "Skipping liquidation due to high TX cost " +
-          `($${expectedCost.toString(2)} > $${expectedCompensation.toString(2)}).`
+        'Skipping liquidation due to high TX cost ' +
+          `($${expectedCost.toString(2)} > $${expectedCompensation.toString(
+            2
+          )}).`
       );
       return;
     }
@@ -101,13 +115,19 @@ async function tryToLiquidate(liquity) {
     const tx = await liquidation.send();
     const receipt = await tx.waitForReceipt();
 
-    if (receipt.status === "failed") {
+    if (receipt.status === 'failed') {
       error(`TX ${receipt.rawReceipt.transactionHash} failed.`);
       return;
     }
 
-    const { collateralGasCompensation, lusdGasCompensation, liquidatedAddresses } = receipt.details;
-    const gasCost = gasPrice.mul(receipt.rawReceipt.gasUsed.toNumber()).mul(store.state.price);
+    const {
+      collateralGasCompensation,
+      lusdGasCompensation,
+      liquidatedAddresses,
+    } = receipt.details;
+    const gasCost = gasPrice
+      .mul(receipt.rawReceipt.gasUsed.toNumber())
+      .mul(store.state.price);
     const totalCompensation = collateralGasCompensation
       .mul(store.state.price)
       .add(lusdGasCompensation);
@@ -121,7 +141,7 @@ async function tryToLiquidate(liquity) {
         `) for liquidating ${liquidatedAddresses.length} Trove(s).`
     );
   } catch (err) {
-    error("Unexpected error:");
+    error('Unexpected error:');
     console.error(err);
   }
 }

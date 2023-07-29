@@ -14,10 +14,10 @@ redemptionRate(redeemedFractionOfSupply?: Decimalish, when?: Date): Decimal;
 
 ## Parameters
 
-|  Parameter | Type | Description |
-|  --- | --- | --- |
-|  redeemedFractionOfSupply | [Decimalish](./lib-base.decimalish.md) | The amount of LUSD being redeemed divided by the total supply. |
-|  when | Date | Optional timestamp that can be used to calculate what the redemption rate would decay to at a point of time in the future. |
+| Parameter                | Type                                   | Description                                                                                                                |
+| ------------------------ | -------------------------------------- | -------------------------------------------------------------------------------------------------------------------------- |
+| redeemedFractionOfSupply | [Decimalish](./lib-base.decimalish.md) | The amount of LUSD being redeemed divided by the total supply.                                                             |
+| when                     | Date                                   | Optional timestamp that can be used to calculate what the redemption rate would decay to at a point of time in the future. |
 
 <b>Returns:</b>
 
@@ -33,7 +33,6 @@ To calculate the redemption fee in LUSD, multiply the redeemed LUSD amount with 
 
 ## Example
 
-
 ```typescript
 const fees = await liquity.getFees();
 const total = await liquity.getTotal();
@@ -42,6 +41,4 @@ const redeemedLUSDAmount = Decimal.from(100);
 const redeemedFractionOfSupply = redeemedLUSDAmount.div(total.debt);
 const redemptionRate = fees.redemptionRate(redeemedFractionOfSupply);
 const redemptionFeeLUSD = redemptionRate.mul(redeemedLUSDAmount);
-
 ```
-

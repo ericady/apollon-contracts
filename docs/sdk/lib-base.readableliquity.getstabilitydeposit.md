@@ -14,11 +14,10 @@ getStabilityDeposit(address?: string): Promise<StabilityDeposit>;
 
 ## Parameters
 
-|  Parameter | Type | Description |
-|  --- | --- | --- |
-|  address | string | Address that owns the Stability Deposit. |
+| Parameter | Type   | Description                              |
+| --------- | ------ | ---------------------------------------- |
+| address   | string | Address that owns the Stability Deposit. |
 
 <b>Returns:</b>
 
 Promise&lt;[StabilityDeposit](./lib-base.stabilitydeposit.md)<!-- -->&gt;
-

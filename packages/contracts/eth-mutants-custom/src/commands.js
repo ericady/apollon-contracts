@@ -1,19 +1,21 @@
-const childProcess = require("child_process");
-const copy = require("recursive-copy");
-const fs = require("fs");
-const glob = require("glob");
-const mkdirp = require("mkdirp");
-const parser = require("solidity-parser-antlr");
-const mutators = require("./mutators");
-const config = require("./config");
-const Reporter = require("./reporter");
+const childProcess = require('child_process');
+const copy = require('recursive-copy');
+const fs = require('fs');
+const glob = require('glob');
+const mkdirp = require('mkdirp');
+const parser = require('solidity-parser-antlr');
+const mutators = require('./mutators');
+const config = require('./config');
+const Reporter = require('./reporter');
 
 const baselineDir = config.baselineDir;
 const contractsDir = config.contractsDir;
 const defaultContractsGlob = config.defaultContractsGlob;
 
 function prepare(callback) {
-  mkdirp(baselineDir, () => copy(contractsDir, baselineDir, { dot: true }, callback));
+  mkdirp(baselineDir, () =>
+    copy(contractsDir, baselineDir, { dot: true }, callback)
+  );
 }
 
 function generateAllMutations(files) {
@@ -24,11 +26,11 @@ function generateAllMutations(files) {
     new mutators.ConditionalInversionMutator(),
     new mutators.BooleanMutator(),
     new mutators.NumberIncreaseMutator(),
-    new mutators.NumberDecreaseMutator()
+    new mutators.NumberDecreaseMutator(),
   ]);
 
   for (const file of files) {
-    const source = fs.readFileSync(file, "utf8");
+    const source = fs.readFileSync(file, 'utf8');
     const ast = parser.parse(source, { range: true });
 
     const visit = parser.visit.bind(parser, ast);
@@ -40,12 +42,12 @@ function generateAllMutations(files) {
 }
 
 function runTests(mutation, testFilePaths) {
-  const args = ["test"].concat(testFilePaths);
-  console.log("args are:");
+  const args = ['test'].concat(testFilePaths);
+  console.log('args are:');
   for (const arg of args) {
     console.log(arg);
   }
-  const proc = childProcess.spawnSync("npm.cmd", args);
+  const proc = childProcess.spawnSync('npm.cmd', args);
   return proc.status === 0;
 }
 
@@ -94,11 +96,11 @@ function preflight(argv) {
     glob(contractsDir + contractsGlob, (err, files) => {
       const mutations = generateAllMutations(files);
 
-      console.log(mutations.length + " possible mutations found.");
-      console.log("---");
+      console.log(mutations.length + ' possible mutations found.');
+      console.log('---');
 
       for (const mutation of mutations) {
-        console.log(mutation.file + ":" + mutation.hash() + ":");
+        console.log(mutation.file + ':' + mutation.hash() + ':');
         process.stdout.write(mutation.diff());
       }
     });
@@ -109,9 +111,9 @@ function preflight(argv) {
 
 function getContractsGlob() {
   const contractName = process.argv[3];
-  let contractsGlob = "/";
+  let contractsGlob = '/';
 
-  if (typeof contractName === "string" && contractName.length !== 0) {
+  if (typeof contractName === 'string' && contractName.length !== 0) {
     contractsGlob = contractsGlob.concat(contractName);
   } else {
     contractsGlob = contractsGlob.concat(defaultContractsGlob);
@@ -124,12 +126,12 @@ function getTestFilePaths() {
   const args = process.argv;
   const paths = [];
   for (i = 0; i < args.length; i++) {
-    if (args[i].includes("Test") && args[i].includes(".js")) {
-      const path = "./test/" + args[i];
+    if (args[i].includes('Test') && args[i].includes('.js')) {
+      const path = './test/' + args[i];
       paths.push(path);
     }
   }
-  console.log("paths are:");
+  console.log('paths are:');
   for (path of paths) {
     console.log(path);
   }

@@ -11,6 +11,7 @@ Close existing Trove by repaying all debt and withdrawing all collateral.
 ```typescript
 closeTrove(): Promise<TroveClosureDetails>;
 ```
+
 <b>Returns:</b>
 
 Promise&lt;[TroveClosureDetails](./lib-base.troveclosuredetails.md)<!-- -->&gt;
@@ -18,4 +19,3 @@ Promise&lt;[TroveClosureDetails](./lib-base.troveclosuredetails.md)<!-- -->&gt;
 ## Exceptions
 
 Throws [TransactionFailedError](./lib-base.transactionfailederror.md) in case of transaction failure.
-

@@ -14,9 +14,9 @@ liquidate(address: string | string[]): Promise<LiquidationDetails>;
 
 ## Parameters
 
-|  Parameter | Type | Description |
-|  --- | --- | --- |
-|  address | string \| string\[\] | Address or array of addresses whose Troves to liquidate. |
+| Parameter | Type                 | Description                                              |
+| --------- | -------------------- | -------------------------------------------------------- |
+| address   | string \| string\[\] | Address or array of addresses whose Troves to liquidate. |
 
 <b>Returns:</b>
 
@@ -25,4 +25,3 @@ Promise&lt;[LiquidationDetails](./lib-base.liquidationdetails.md)<!-- -->&gt;
 ## Exceptions
 
 Throws [TransactionFailedError](./lib-base.transactionfailederror.md) in case of transaction failure.
-

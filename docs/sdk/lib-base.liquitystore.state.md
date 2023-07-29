@@ -17,4 +17,3 @@ get state(): LiquityStoreState<T>;
 Should not be accessed before the store is loaded. Assign a function to [onLoaded](./lib-base.liquitystore.onloaded.md) to get a callback when this happens.
 
 See [LiquityStoreState](./lib-base.liquitystorestate.md) for the list of properties returned.
-

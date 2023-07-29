@@ -14,10 +14,10 @@ sendLUSD(toAddress: string, amount: Decimalish): Promise<void>;
 
 ## Parameters
 
-|  Parameter | Type | Description |
-|  --- | --- | --- |
-|  toAddress | string | Address of receipient. |
-|  amount | [Decimalish](./lib-base.decimalish.md) | Amount of LUSD to send. |
+| Parameter | Type                                   | Description             |
+| --------- | -------------------------------------- | ----------------------- |
+| toAddress | string                                 | Address of receipient.  |
+| amount    | [Decimalish](./lib-base.decimalish.md) | Amount of LUSD to send. |
 
 <b>Returns:</b>
 
@@ -26,4 +26,3 @@ Promise&lt;void&gt;
 ## Exceptions
 
 Throws [TransactionFailedError](./lib-base.transactionfailederror.md) in case of transaction failure.
-

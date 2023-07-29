@@ -9,12 +9,14 @@ Represents the change between two states of an LQTY Stake.
 <b>Signature:</b>
 
 ```typescript
-export declare type LQTYStakeChange<T> = {
-    stakeLQTY: T;
-    unstakeLQTY?: undefined;
-} | {
-    stakeLQTY?: undefined;
-    unstakeLQTY: T;
-    unstakeAllLQTY: boolean;
-};
+export declare type LQTYStakeChange<T> =
+  | {
+      stakeLQTY: T;
+      unstakeLQTY?: undefined;
+    }
+  | {
+      stakeLQTY?: undefined;
+      unstakeLQTY: T;
+      unstakeAllLQTY: boolean;
+    };
 ```

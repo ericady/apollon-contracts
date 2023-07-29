@@ -2,72 +2,72 @@
 
 pragma solidity ^0.8.9;
 
-import "./IBase.sol";
+import './IBase.sol';
 
 // Common interface for the SortedTroves Doubly Linked List.
 interface ISortedTroves is IBase {
-    // --- Events ---
+  // --- Events ---
 
-    event TroveManagerAddressChanged(address _troveManagerAddress);
-    event BorrowerOperationsAddressChanged(address _borrowerOperationsAddress);
-    event NodeAdded(address _id, uint _NICR);
-    event NodeRemoved(address _id);
+  event TroveManagerAddressChanged(address _troveManagerAddress);
+  event BorrowerOperationsAddressChanged(address _borrowerOperationsAddress);
+  event NodeAdded(address _id, uint _NICR);
+  event NodeRemoved(address _id);
 
-    // --- Functions ---
+  // --- Functions ---
 
-    function setParams(
-        uint256 _size,
-        address _TroveManagerAddress,
-        address _borrowerOperationsAddress
-    ) external;
+  function setParams(
+    uint256 _size,
+    address _TroveManagerAddress,
+    address _borrowerOperationsAddress
+  ) external;
 
-    function insert(
-        PriceCache memory _priceCache,
-        address _id,
-        uint256 _ICR,
-        address _prevId,
-        address _nextId
-    ) external;
+  function insert(
+    PriceCache memory _priceCache,
+    address _id,
+    uint256 _ICR,
+    address _prevId,
+    address _nextId
+  ) external;
 
-    function remove(address _id) external;
+  function remove(address _id) external;
 
-    function reInsert(
-        PriceCache memory _priceCache,
-        address _id,
-        uint256 _newICR,
-        address _prevId,
-        address _nextId
-    ) external;
+  function reInsert(
+    PriceCache memory _priceCache,
+    address _id,
+    uint256 _newICR,
+    address _prevId,
+    address _nextId
+  ) external;
 
-    function contains(address _id) external view returns (bool);
+  function contains(address _id) external view returns (bool);
 
-    function isFull() external view returns (bool);
+  function isFull() external view returns (bool);
 
-    function isEmpty() external view returns (bool);
+  function isEmpty() external view returns (bool);
 
-    function getSize() external view returns (uint256);
+  function getSize() external view returns (uint256);
 
-    function getMaxSize() external view returns (uint256);
+  function getMaxSize() external view returns (uint256);
 
-    function getFirst() external view returns (address);
+  function getFirst() external view returns (address);
 
-    function getLast() external view returns (address);
+  function getLast() external view returns (address);
 
-    function getNext(address _id) external view returns (address);
+  function getNext(address _id) external view returns (address);
 
-    function getPrev(address _id) external view returns (address);
+  function getPrev(address _id) external view returns (address);
 
-    function findInsertPosition(
-        PriceCache memory _priceCache,
-        uint256 _ICR,
-        address _prevId,
-        address _nextId
-    ) external returns (address, address);
+  function findInsertPosition(
+    PriceCache memory _priceCache,
+    uint256 _ICR,
+    address _prevId,
+    address _nextId
+  ) external returns (address, address);
 
-    function validInsertPosition(
-        PriceCache memory _priceCache,
-        uint256 _NICR,
-        address _prevId,
-        address _nextId
-    ) external returns (bool);
+  function validInsertPosition(
+    PriceCache memory _priceCache,
+    uint256 _NICR,
+    address _prevId,
+    address _nextId
+  ) external returns (bool);
 }

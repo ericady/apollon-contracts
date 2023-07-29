@@ -14,11 +14,10 @@ collateralRatio(price: Decimalish): Decimal;
 
 ## Parameters
 
-|  Parameter | Type | Description |
-|  --- | --- | --- |
-|  price | [Decimalish](./lib-base.decimalish.md) |  |
+| Parameter | Type                                   | Description |
+| --------- | -------------------------------------- | ----------- |
+| price     | [Decimalish](./lib-base.decimalish.md) |             |
 
 <b>Returns:</b>
 
 [Decimal](./lib-base.decimal.md)
-

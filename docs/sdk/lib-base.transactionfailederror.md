@@ -9,8 +9,9 @@ Thrown by [TransactableLiquity](./lib-base.transactableliquity.md) functions in 
 <b>Signature:</b>
 
 ```typescript
-export declare class TransactionFailedError<T extends FailedReceipt = FailedReceipt> extends Error 
+export declare class TransactionFailedError<T extends FailedReceipt = FailedReceipt> extends Error
 ```
+
 <b>Extends:</b> Error
 
 ## Remarks
@@ -19,7 +20,6 @@ The constructor for this class is marked as internal. Third-party code should no
 
 ## Properties
 
-|  Property | Modifiers | Type | Description |
-|  --- | --- | --- | --- |
-|  [failedReceipt](./lib-base.transactionfailederror.failedreceipt.md) |  | T |  |
-
+| Property                                                            | Modifiers | Type | Description |
+| ------------------------------------------------------------------- | --------- | ---- | ----------- |
+| [failedReceipt](./lib-base.transactionfailederror.failedreceipt.md) |           | T    |             |

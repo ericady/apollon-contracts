@@ -9,7 +9,9 @@ One of either a [PendingReceipt](./lib-base.pendingreceipt.md)<!-- -->, a [Faile
 <b>Signature:</b>
 
 ```typescript
-export declare type LiquityReceipt<R = unknown, D = unknown> = PendingReceipt | MinedReceipt<R, D>;
+export declare type LiquityReceipt<R = unknown, D = unknown> =
+  | PendingReceipt
+  | MinedReceipt<R, D>;
 ```
-<b>References:</b> [PendingReceipt](./lib-base.pendingreceipt.md)<!-- -->, [MinedReceipt](./lib-base.minedreceipt.md)
 
+<b>References:</b> [PendingReceipt](./lib-base.pendingreceipt.md)<!-- -->, [MinedReceipt](./lib-base.minedreceipt.md)

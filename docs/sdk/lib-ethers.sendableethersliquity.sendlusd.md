@@ -14,13 +14,12 @@ sendLUSD(toAddress: string, amount: Decimalish, overrides?: EthersTransactionOve
 
 ## Parameters
 
-|  Parameter | Type | Description |
-|  --- | --- | --- |
-|  toAddress | string | Address of receipient. |
-|  amount | [Decimalish](./lib-base.decimalish.md) | Amount of LUSD to send. |
-|  overrides | [EthersTransactionOverrides](./lib-ethers.etherstransactionoverrides.md) |  |
+| Parameter | Type                                                                     | Description             |
+| --------- | ------------------------------------------------------------------------ | ----------------------- |
+| toAddress | string                                                                   | Address of receipient.  |
+| amount    | [Decimalish](./lib-base.decimalish.md)                                   | Amount of LUSD to send. |
+| overrides | [EthersTransactionOverrides](./lib-ethers.etherstransactionoverrides.md) |                         |
 
 <b>Returns:</b>
 
 Promise&lt;[SentEthersLiquityTransaction](./lib-ethers.sentethersliquitytransaction.md)<!-- -->&lt;void&gt;&gt;
-

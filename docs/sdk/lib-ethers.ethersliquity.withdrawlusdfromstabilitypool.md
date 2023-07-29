@@ -14,10 +14,10 @@ withdrawLUSDFromStabilityPool(amount: Decimalish, overrides?: EthersTransactionO
 
 ## Parameters
 
-|  Parameter | Type | Description |
-|  --- | --- | --- |
-|  amount | [Decimalish](./lib-base.decimalish.md) | Amount of LUSD to withdraw. |
-|  overrides | [EthersTransactionOverrides](./lib-ethers.etherstransactionoverrides.md) |  |
+| Parameter | Type                                                                     | Description                 |
+| --------- | ------------------------------------------------------------------------ | --------------------------- |
+| amount    | [Decimalish](./lib-base.decimalish.md)                                   | Amount of LUSD to withdraw. |
+| overrides | [EthersTransactionOverrides](./lib-ethers.etherstransactionoverrides.md) |                             |
 
 <b>Returns:</b>
 
@@ -30,4 +30,3 @@ Throws [EthersTransactionFailedError](./lib-ethers.etherstransactionfailederror.
 ## Remarks
 
 As a side-effect, the transaction will also pay out the Stability Deposit's [collateral gain](./lib-base.stabilitydeposit.collateralgain.md) and [LQTY reward](./lib-base.stabilitydeposit.lqtyreward.md)<!-- -->.
-

@@ -1,10 +1,14 @@
-const Mutation = require("../mutation");
+const Mutation = require('../mutation');
 
 function ConditionalBoundaryMutator() {}
 
-ConditionalBoundaryMutator.prototype.name = "conditional-boundary";
+ConditionalBoundaryMutator.prototype.name = 'conditional-boundary';
 
-ConditionalBoundaryMutator.prototype.getMutations = function (file, source, visit) {
+ConditionalBoundaryMutator.prototype.getMutations = function (
+  file,
+  source,
+  visit
+) {
   const mutations = [];
 
   visit({
@@ -15,20 +19,20 @@ ConditionalBoundaryMutator.prototype.getMutations = function (file, source, visi
 
       let replacement;
 
-      if (node.operator === "<") {
-        replacement = text.replace(/<[^=]/, "<= ");
-      } else if (node.operator === ">") {
-        replacement = text.replace(/>[^=]/, ">= ");
-      } else if (node.operator === "<=") {
-        replacement = text.replace("<=", "<");
-      } else if (node.operator === ">=") {
-        replacement = text.replace(">=", ">");
+      if (node.operator === '<') {
+        replacement = text.replace(/<[^=]/, '<= ');
+      } else if (node.operator === '>') {
+        replacement = text.replace(/>[^=]/, '>= ');
+      } else if (node.operator === '<=') {
+        replacement = text.replace('<=', '<');
+      } else if (node.operator === '>=') {
+        replacement = text.replace('>=', '>');
       }
 
       if (replacement) {
         mutations.push(new Mutation(file, start, end, replacement));
       }
-    }
+    },
   });
 
   return mutations;

@@ -14,11 +14,10 @@ getUniTokenAllowance(address?: string): Promise<Decimal>;
 
 ## Parameters
 
-|  Parameter | Type | Description |
-|  --- | --- | --- |
-|  address | string | Address holding the Uniswap ETH/LUSD LP tokens. |
+| Parameter | Type   | Description                                     |
+| --------- | ------ | ----------------------------------------------- |
+| address   | string | Address holding the Uniswap ETH/LUSD LP tokens. |
 
 <b>Returns:</b>
 
 Promise&lt;[Decimal](./lib-base.decimal.md)<!-- -->&gt;
-

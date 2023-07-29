@@ -11,6 +11,7 @@ Wait for the transaction to be mined, and check whether it was successful.
 ```typescript
 waitForReceipt(): Promise<MinedReceipt<EthersTransactionReceipt, T>>;
 ```
+
 <b>Returns:</b>
 
 Promise&lt;[MinedReceipt](./lib-base.minedreceipt.md)<!-- -->&lt;[EthersTransactionReceipt](./lib-ethers.etherstransactionreceipt.md)<!-- -->, T&gt;&gt;
@@ -20,4 +21,3 @@ Either a [FailedReceipt](./lib-base.failedreceipt.md) or a [SuccessfulReceipt](.
 ## Exceptions
 
 Throws [EthersTransactionCancelledError](./lib-ethers.etherstransactioncancellederror.md) if the transaction is cancelled or replaced.
-

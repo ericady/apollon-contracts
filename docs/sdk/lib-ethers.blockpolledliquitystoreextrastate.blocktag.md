@@ -15,4 +15,3 @@ blockTag?: number;
 ## Remarks
 
 May be undefined when the store state is fetched for the first time.
-

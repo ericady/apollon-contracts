@@ -9,15 +9,14 @@ Optional parameters taken by [EthersLiquity](./lib-ethers.ethersliquity.md) tran
 <b>Signature:</b>
 
 ```typescript
-export interface EthersTransactionOverrides 
+export interface EthersTransactionOverrides
 ```
 
 ## Properties
 
-|  Property | Type | Description |
-|  --- | --- | --- |
-|  [from?](./lib-ethers.etherstransactionoverrides.from.md) | string | <i>(Optional)</i> |
-|  [gasLimit?](./lib-ethers.etherstransactionoverrides.gaslimit.md) | BigNumberish | <i>(Optional)</i> |
-|  [gasPrice?](./lib-ethers.etherstransactionoverrides.gasprice.md) | BigNumberish | <i>(Optional)</i> |
-|  [nonce?](./lib-ethers.etherstransactionoverrides.nonce.md) | BigNumberish | <i>(Optional)</i> |
-
+| Property                                                         | Type         | Description       |
+| ---------------------------------------------------------------- | ------------ | ----------------- |
+| [from?](./lib-ethers.etherstransactionoverrides.from.md)         | string       | <i>(Optional)</i> |
+| [gasLimit?](./lib-ethers.etherstransactionoverrides.gaslimit.md) | BigNumberish | <i>(Optional)</i> |
+| [gasPrice?](./lib-ethers.etherstransactionoverrides.gasprice.md) | BigNumberish | <i>(Optional)</i> |
+| [nonce?](./lib-ethers.etherstransactionoverrides.nonce.md)       | BigNumberish | <i>(Optional)</i> |

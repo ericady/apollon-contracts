@@ -9,13 +9,12 @@ Optional parameters of a transaction that borrows LUSD.
 <b>Signature:</b>
 
 ```typescript
-export interface BorrowingOperationOptionalParams 
+export interface BorrowingOperationOptionalParams
 ```
 
 ## Properties
 
-|  Property | Type | Description |
-|  --- | --- | --- |
-|  [borrowingFeeDecayToleranceMinutes?](./lib-ethers.borrowingoperationoptionalparams.borrowingfeedecaytoleranceminutes.md) | number | <i>(Optional)</i> Control the amount of extra gas included attached to the transaction. |
-|  [maxBorrowingRate?](./lib-ethers.borrowingoperationoptionalparams.maxborrowingrate.md) | [Decimalish](./lib-base.decimalish.md) | <i>(Optional)</i> Maximum acceptable [borrowing rate](./lib-base.fees.borrowingrate.md) (default: current borrowing rate plus 0.5%). |
-
+| Property                                                                                                                 | Type                                   | Description                                                                                                                          |
+| ------------------------------------------------------------------------------------------------------------------------ | -------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------ |
+| [borrowingFeeDecayToleranceMinutes?](./lib-ethers.borrowingoperationoptionalparams.borrowingfeedecaytoleranceminutes.md) | number                                 | <i>(Optional)</i> Control the amount of extra gas included attached to the transaction.                                              |
+| [maxBorrowingRate?](./lib-ethers.borrowingoperationoptionalparams.maxborrowingrate.md)                                   | [Decimalish](./lib-base.decimalish.md) | <i>(Optional)</i> Maximum acceptable [borrowing rate](./lib-base.fees.borrowingrate.md) (default: current borrowing rate plus 0.5%). |
