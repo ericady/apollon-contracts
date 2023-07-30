@@ -78,6 +78,13 @@ contract BorrowerOperations is
     uint entireSystemDebt;
   }
 
+  struct LocalVariables_closeTrove {
+    bool isInRecoveryMode;
+    uint newTCR;
+    uint entireSystemColl;
+    uint entireSystemDebt;
+  }
+
   struct ContractsCache {
     ITroveManager troveManager;
     IStoragePool storagePool;
@@ -505,8 +512,7 @@ contract BorrowerOperations is
     contractsCache.troveManager.applyPendingRewards(_borrower); // from redistributions
 
     // fetching old/current debts and colls including prices + calc ICR
-    DebtTokenAmount memory stableCoinAmount;
-    (vars.debts, stableCoinAmount) = _getDebtTokenAmountsWithFetchedPrices(
+    (vars.debts, ) = _getDebtTokenAmountsWithFetchedPrices(
       contractsCache.debtTokenManager,
       priceCache,
       contractsCache.troveManager.getTroveDebt(_borrower)
@@ -580,45 +586,62 @@ contract BorrowerOperations is
   }
 
   function closeTrove() external override {
-    //        ITroveManager troveManagerCached = troveManager;
-    //        IStoragePool activePoolCached = storagePool;
-    ////        ILUSDToken lusdTokenCached = lusdToken;
-    //
-    //        _requireTroveisActive(troveManagerCached, msg.sender);
-    //        uint price = priceFeed.fetchPrice();
-    //        _requireNotInRecoveryMode(price);
-    //
-    //        troveManagerCached.applyPendingRewards(msg.sender);
-    //
-    //        uint coll = troveManagerCached.getTroveColl(msg.sender);
-    //        uint debt = troveManagerCached.getTroveDebt(msg.sender);
-    //
-    ////        _requireSufficientLUSDBalance(lusdTokenCached, msg.sender, debt.sub(STABLE_COIN_GAS_COMPENSATION));
-    //
-    //        uint newTCR = _getNewTCRFromTroveChange(coll, false, debt, false, price);
-    //        _requireNewTCRisAboveCCR(newTCR);
-    //
-    //        troveManagerCached.removeStake(msg.sender);
-    //        troveManagerCached.closeTrove(msg.sender);
-    //
-    //        emit TroveUpdated(msg.sender, 0, 0, 0, BorrowerOperation.closeTrove);
-    //
-    //        // todo
-    ////        // Burn the repaid LUSD from the user's balance and the gas compensation from the Gas Pool
-    ////        _repayLUSD(activePoolCached, lusdTokenCached, msg.sender, debt.sub(STABLE_COIN_GAS_COMPENSATION));
-    ////        _repayLUSD(activePoolCached, lusdTokenCached, gasPoolAddress, STABLE_COIN_GAS_COMPENSATION);
-    //
-    //        // Send the collateral back to the user
-    //        activePoolCached.sendETH(msg.sender, coll);
-  }
+    (
+      ContractsCache memory contractsCache,
+      LocalVariables_adjustTrove memory vars,
+      PriceCache memory priceCache
+    ) = _prepareTroveAdjustment(msg.sender);
 
-  /**
-   * Claim remaining collateral from a redemption or from a liquidation with ICR > MCR in Recovery Mode
-   */
-  function claimCollateral() external override {
-    // send ETH from CollSurplus Pool to owner
-    // todo...
-    //        collSurplusPool.claimColl(msg.sender);
+    DebtTokenAmount memory remainingStableCoinDebt = vars.debts[0];
+    require(
+      vars.debts.length == 1 &&
+        remainingStableCoinDebt.debtToken.isStableCoin() &&
+        remainingStableCoinDebt.netDebt <= STABLE_COIN_GAS_COMPENSATION,
+      'TroveManager: Trove must have only gas compensation debt'
+    ); // works because there are no borrowing fees for the gas compensation
+
+    uint newTCR = _getNewTCRFromTroveChange(
+      vars.oldCompositeCollInStable,
+      false,
+      vars.oldCompositeDebtInStable,
+      false,
+      vars.entireSystemColl,
+      vars.entireSystemDebt
+    );
+    _requireNewTCRisAboveCCR(newTCR);
+
+    contractsCache.troveManager.removeStake(msg.sender);
+    contractsCache.troveManager.closeTrove(msg.sender);
+
+    // todo
+    // emit TroveUpdated(msg.sender, 0, 0, 0, BorrowerOperation.closeTrove);
+
+    // burn the gas compensation
+    contractsCache.storagePool.subtractValue(
+      address(remainingStableCoinDebt.debtToken),
+      false,
+      PoolType.GasCompensation,
+      remainingStableCoinDebt.netDebt
+    );
+    remainingStableCoinDebt.debtToken.burn(
+      address(contractsCache.storagePool),
+      remainingStableCoinDebt.netDebt
+    );
+
+    // Send the collateral back to the user
+    for (uint i = 0; i < vars.colls.length; i++) {
+      PriceTokenAmount memory collTokenAmount = vars.colls[i];
+
+      _poolSubtractColl(
+        msg.sender,
+        contractsCache.storagePool,
+        collTokenAmount.tokenAddress,
+        collTokenAmount.coll,
+        PoolType.Active
+      );
+    }
+
+    // todo the trove still needs to be updated?!
   }
 
   // --- Helper functions ---
@@ -743,6 +766,13 @@ contract BorrowerOperations is
   ) internal view {
     uint status = _troveManager.getTroveStatus(_borrower);
     require(status == 1, 'BorrowerOps: Trove does not exist or is closed');
+  }
+
+  function _requireNotInRecoveryMode(bool _isInRecoveryMode) internal pure {
+    require(
+      !_isInRecoveryMode,
+      'BorrowerOps: Operation not allowed during Recovery Mode'
+    );
   }
 
   function _requireTroveIsNotActive(

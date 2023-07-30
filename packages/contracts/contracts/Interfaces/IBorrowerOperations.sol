@@ -46,8 +46,6 @@ interface IBorrowerOperations is IBBase {
 
   function closeTrove() external;
 
-  function claimCollateral() external;
-
   function getCompositeDebt(
     DebtTokenAmount[] memory _debts
   ) external pure returns (uint);
