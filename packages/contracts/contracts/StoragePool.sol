@@ -179,19 +179,22 @@ contract StoragePool is LiquityBase, Ownable, CheckContract, IStoragePool {
     return entireSystemDebt;
   }
 
-  function getTCR(PriceCache memory _priceCache) public returns (uint TCR) {
-    uint entireSystemColl = this.getEntireSystemColl(_priceCache);
-    uint entireSystemDebt = this.getEntireSystemDebt(_priceCache);
-
-    TCR = LiquityMath._computeCR(entireSystemColl, entireSystemDebt);
-    return TCR;
-  }
-
   function checkRecoveryMode(
     PriceCache memory _priceCache
-  ) external override returns (bool) {
-    uint TCR = getTCR(_priceCache);
-    return TCR < CCR;
+  )
+    external
+    override
+    returns (
+      bool isInRecoveryMode,
+      uint TCR,
+      uint entireSystemColl,
+      uint entireSystemDebt
+    )
+  {
+    entireSystemColl = this.getEntireSystemColl(_priceCache);
+    entireSystemDebt = this.getEntireSystemDebt(_priceCache);
+    TCR = LiquityMath._computeCR(entireSystemColl, entireSystemDebt);
+    isInRecoveryMode = TCR < CCR;
   }
 
   // --- 'require' functions ---

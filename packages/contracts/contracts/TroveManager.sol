@@ -69,12 +69,13 @@ contract TroveManager is LiquityBase, Ownable, CheckContract, ITroveManager {
   struct Trove {
     Status status;
     uint128 arrayIndex;
+    //
     IDebtToken[] debtTokens;
     mapping(IDebtToken => uint) debts;
+    //
     address[] collTokens;
     mapping(address => uint) colls;
-    // his (troves) stake of the entire system, relative to coll token, total trove stake need to be calculated on runtime using token prices
-    mapping(address => uint) stakes;
+    mapping(address => uint) stakes; // his (troves) stake of the entire system, relative to coll token, total trove stake need to be calculated on runtime using token prices
   }
   mapping(address => Trove) public Troves;
 
@@ -601,9 +602,9 @@ contract TroveManager is LiquityBase, Ownable, CheckContract, ITroveManager {
     LocalVariables_OuterLiquidationFunction memory vars;
     vars.storagePoolCached = storagePool;
     vars.stabilityPoolManagerCached = stabilityPoolManager;
-    vars.recoveryModeAtStart = vars.storagePoolCached.checkRecoveryMode(
-      vars.priceCache
-    );
+    (vars.recoveryModeAtStart, , , ) = vars.storagePoolCached.checkRecoveryMode( // todo how to ignore the last 3 return values?
+        vars.priceCache
+      );
     vars.remainingStabilities = vars
       .stabilityPoolManagerCached
       .getRemainingStability(collTokenAddresses);
@@ -1275,7 +1276,7 @@ contract TroveManager is LiquityBase, Ownable, CheckContract, ITroveManager {
       totalStakes[tokenAddress] = totalStakes[tokenAddress].sub(oldStake).add(
         newStake
       );
-      //            emit TotalStakesUpdated(tokenAddress, totalStakes); todo
+      // todo emit TotalStakesUpdated(tokenAddress, totalStakes);
     }
   }
 
@@ -1710,18 +1711,34 @@ contract TroveManager is LiquityBase, Ownable, CheckContract, ITroveManager {
 
   function getTroveDebt(
     address _borrower
-  ) external view override returns (uint) {
-    // todo
-    return 1;
-    //        return Troves[_borrower].debt;
+  ) external view override returns (TokenAmount[] memory) {
+    Trove storage trove = Troves[_borrower];
+    if (trove.status != Status.active) return new TokenAmount[](0);
+
+    TokenAmount[] memory debts = new TokenAmount[](trove.debtTokens.length);
+    for (uint i = 0; i < debts.length; i++)
+      debts[i] = TokenAmount(
+        address(trove.debtTokens[i]),
+        trove.debts[trove.debtTokens[i]]
+      );
+
+    return debts;
   }
 
   function getTroveColl(
     address _borrower
-  ) external view override returns (uint) {
-    // todo
-    return 1;
-    //        return Troves[_borrower].coll;
+  ) external view override returns (TokenAmount[] memory) {
+    Trove storage trove = Troves[_borrower];
+    if (trove.status != Status.active) return new TokenAmount[](0);
+
+    TokenAmount[] memory colls = new TokenAmount[](trove.collTokens.length);
+    for (uint i = 0; i < colls.length; i++)
+      colls[i] = TokenAmount(
+        trove.collTokens[i],
+        trove.colls[trove.collTokens[i]]
+      );
+
+    return colls;
   }
 
   // --- Trove property setters, called by BorrowerOperations ---
@@ -1733,7 +1750,7 @@ contract TroveManager is LiquityBase, Ownable, CheckContract, ITroveManager {
 
   function increaseTroveColl(
     address _borrower,
-    CollTokenAmount[] memory _collTokenAmounts
+    PriceTokenAmount[] memory _collTokenAmounts
   ) external override {
     _requireCallerIsBorrowerOperations();
 
@@ -1748,7 +1765,7 @@ contract TroveManager is LiquityBase, Ownable, CheckContract, ITroveManager {
 
   function decreaseTroveColl(
     address _borrower,
-    CollTokenAmount[] memory _collTokenAmounts
+    PriceTokenAmount[] memory _collTokenAmounts
   ) external override {
     _requireCallerIsBorrowerOperations();
 

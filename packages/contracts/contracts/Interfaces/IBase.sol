@@ -31,10 +31,10 @@ interface IBase {
     uint amount;
   }
 
-  struct CollTokenAmount {
+  struct PriceTokenAmount {
     address tokenAddress;
     uint price;
-    uint coll;
+    uint coll; // todo rename to amount....
   }
 
   struct PriceCache {

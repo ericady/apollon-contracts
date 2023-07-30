@@ -27,12 +27,22 @@ interface IBorrowerOperations is IBBase {
   // --- Functions ---
 
   function openTrove(
-    //    uint _maxFeePercentage,
     TokenAmount[] memory _colls,
-    //    TokenAmount[] memory _debts,
     address _upperHint,
     address _lowerHint
-  ) external payable;
+  ) external;
+
+  function addColl(
+    TokenAmount[] memory _colls,
+    address _upperHint,
+    address _lowerHint
+  ) external;
+
+  function withdrawColl(
+    TokenAmount[] memory _colls,
+    address _upperHint,
+    address _lowerHint
+  ) external;
 
   function closeTrove() external;
 

@@ -59,5 +59,12 @@ interface IStoragePool is IBase {
 
   function checkRecoveryMode(
     PriceCache memory _priceCache
-  ) external returns (bool);
+  )
+    external
+    returns (
+      bool isInRecoveryMode,
+      uint TCR,
+      uint entireSystemColl,
+      uint entireSystemDebt
+    );
 }
