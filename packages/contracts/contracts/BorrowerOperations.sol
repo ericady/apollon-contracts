@@ -285,6 +285,7 @@ contract BorrowerOperations is
       );
     }
 
+    // todo required checks should not be needed, new collateral should be always fine...
     _finaliseTrove(
       false,
       false,
@@ -885,11 +886,7 @@ contract BorrowerOperations is
      */
     if (_vars.isInRecoveryMode) {
       _requireNoCollWithdrawal(!_isCollWithdrawal);
-
-      if (_isDebtIncrease) {
-        _requireICRisAboveCCR(_vars.newICR);
-        _requireNewICRisAboveOldICR(_vars.newICR, _vars.oldICR);
-      }
+      if (_isDebtIncrease) _requireICRisAboveCCR(_vars.newICR);
     } else {
       // if Normal Mode
       _requireICRisAboveMCR(_vars.newICR);
