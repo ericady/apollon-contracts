@@ -109,43 +109,32 @@ contract('Fee arithmetic tests', async accounts => {
       50309080980,
     ],
     0.01: [
-      10000000000000000, 10000000000000000, 10000000000000000,
-      10000000000000000, 9932837247526310, 9818748881063180, 9631506200700280,
-      9447834221836550, 9438743126816710, 8523066208268240, 7860961982890640,
-      7505973548021970, 7491535384382500, 3738562496681640, 3474795549604300,
-      2798062319068760, 2512062814236710, 2499999999998550, 5666601111155830,
-      2011175814816220, 615070415779, 610351562497, 245591068, 0, 0, 0, 0, 0, 0,
-      0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+      10000000000000000, 10000000000000000, 10000000000000000, 10000000000000000, 9932837247526310, 9818748881063180,
+      9631506200700280, 9447834221836550, 9438743126816710, 8523066208268240, 7860961982890640, 7505973548021970,
+      7491535384382500, 3738562496681640, 3474795549604300, 2798062319068760, 2512062814236710, 2499999999998550,
+      5666601111155830, 2011175814816220, 615070415779, 610351562497, 245591068, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+      0, 0, 0,
     ],
     0.1: [
-      100000000000000000, 100000000000000000, 100000000000000000,
-      100000000000000000, 99328372475263100, 98187488810631800,
-      96315062007002900, 94478342218365500, 94387431268167100,
-      85230662082682400, 78609619828906400, 75059735480219700,
-      74915353843825000, 37385624966816400, 34747955496043000,
-      27980623190687600, 25120628142367100, 24999999999985500,
-      56666011111558300, 20111758148162200, 6150704157794, 6103515624975,
-      2455910681, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+      100000000000000000, 100000000000000000, 100000000000000000, 100000000000000000, 99328372475263100,
+      98187488810631800, 96315062007002900, 94478342218365500, 94387431268167100, 85230662082682400, 78609619828906400,
+      75059735480219700, 74915353843825000, 37385624966816400, 34747955496043000, 27980623190687600, 25120628142367100,
+      24999999999985500, 56666011111558300, 20111758148162200, 6150704157794, 6103515624975, 2455910681, 0, 0, 0, 0, 0,
+      0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
     ],
     0.34539284: [
-      345392840000000000, 345392840000000000, 345392840000000000,
-      345392840000000000, 343073086618089000, 339132556127723000,
-      332665328013748000, 326321429372932000, 326007429460170000,
-      294380604318180000, 271511998440263000, 259250952071618000,
-      258752268237236000, 129127271824636000, 120016950329719000,
-      96643069088014400, 86764850966761100, 86348209999949800,
-      195720345092927000, 69464572641868900, 21244091770604, 21081105956945,
-      8482539649, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+      345392840000000000, 345392840000000000, 345392840000000000, 345392840000000000, 343073086618089000,
+      339132556127723000, 332665328013748000, 326321429372932000, 326007429460170000, 294380604318180000,
+      271511998440263000, 259250952071618000, 258752268237236000, 129127271824636000, 120016950329719000,
+      96643069088014400, 86764850966761100, 86348209999949800, 195720345092927000, 69464572641868900, 21244091770604,
+      21081105956945, 8482539649, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
     ],
     0.9976: [
-      997600000000000000, 997600000000000000, 997600000000000000,
-      997600000000000000, 990899843813224000, 979518388374863000,
-      960839058581860000, 942515941970414000, 941609014331235000,
-      850261084936840000, 784209567413171000, 748795921150671000,
-      747355569945998000, 372958994668961000, 346645604028525000,
-      279134696950299000, 250603386348255000, 249399999999855000,
-      565300126848906000, 200634899286066000, 61359424678158, 60888671874752,
-      24500164955, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+      997600000000000000, 997600000000000000, 997600000000000000, 997600000000000000, 990899843813224000,
+      979518388374863000, 960839058581860000, 942515941970414000, 941609014331235000, 850261084936840000,
+      784209567413171000, 748795921150671000, 747355569945998000, 372958994668961000, 346645604028525000,
+      279134696950299000, 250603386348255000, 249399999999855000, 565300126848906000, 200634899286066000,
+      61359424678158, 60888671874752, 24500164955, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
     ],
   };
 
@@ -214,11 +203,7 @@ contract('Fee arithmetic tests', async accounts => {
 
   beforeEach(async () => {
     contracts = await deploymentHelper.deployLiquityCore();
-    const LQTYContracts = await deploymentHelper.deployLQTYContracts(
-      bountyAddress,
-      lpRewardsAddress,
-      multisig
-    );
+    const LQTYContracts = await deploymentHelper.deployLQTYContracts(bountyAddress, lpRewardsAddress, multisig);
 
     await deploymentHelper.connectLQTYContracts(LQTYContracts);
     await deploymentHelper.connectCoreContracts(contracts, LQTYContracts);
@@ -227,8 +212,7 @@ contract('Fee arithmetic tests', async accounts => {
 
   it('minutesPassedSinceLastFeeOp(): returns minutes passed for no time increase', async () => {
     await troveManagerTester.setLastFeeOpTimeToNow();
-    const minutesPassed =
-      await troveManagerTester.minutesPassedSinceLastFeeOp();
+    const minutesPassed = await troveManagerTester.minutesPassedSinceLastFeeOp();
 
     assert.equal(minutesPassed, '0');
   });
@@ -242,8 +226,7 @@ contract('Fee arithmetic tests', async accounts => {
 
       await th.fastForwardTime(seconds, web3.currentProvider);
 
-      const minutesPassed =
-        await troveManagerTester.minutesPassedSinceLastFeeOp();
+      const minutesPassed = await troveManagerTester.minutesPassedSinceLastFeeOp();
 
       assert.equal(expectedHoursPassed.toString(), minutesPassed.toString());
     }
@@ -343,13 +326,7 @@ contract('Fee arithmetic tests', async accounts => {
       //   decayedBaseRate: ${decayedBaseRate},
       //   error: ${error}`
       // )
-      assert.isAtMost(
-        getDifference(
-          expectedDecayedBaseRate.toString(),
-          decayedBaseRate.toString()
-        ),
-        100000
-      ); // allow absolute error tolerance of 1e-13
+      assert.isAtMost(getDifference(expectedDecayedBaseRate.toString(), decayedBaseRate.toString()), 100000); // allow absolute error tolerance of 1e-13
     }
   });
 
@@ -383,13 +360,7 @@ contract('Fee arithmetic tests', async accounts => {
       //   decayedBaseRate: ${decayedBaseRate},
       //   error: ${error}`
       // )
-      assert.isAtMost(
-        getDifference(
-          expectedDecayedBaseRate.toString(),
-          decayedBaseRate.toString()
-        ),
-        1000000
-      ); // allow absolute error tolerance of 1e-12
+      assert.isAtMost(getDifference(expectedDecayedBaseRate.toString(), decayedBaseRate.toString()), 1000000); // allow absolute error tolerance of 1e-12
     }
   });
 
@@ -424,13 +395,7 @@ contract('Fee arithmetic tests', async accounts => {
       //   error: ${error}`
       // )
 
-      assert.isAtMost(
-        getDifference(
-          expectedDecayedBaseRate.toString(),
-          decayedBaseRate.toString()
-        ),
-        1000000
-      ); // allow absolute error tolerance of 1e-12
+      assert.isAtMost(getDifference(expectedDecayedBaseRate.toString(), decayedBaseRate.toString()), 1000000); // allow absolute error tolerance of 1e-12
     }
   });
 
@@ -465,13 +430,7 @@ contract('Fee arithmetic tests', async accounts => {
       //   error: ${error}`
       // )
 
-      assert.isAtMost(
-        getDifference(
-          expectedDecayedBaseRate.toString(),
-          decayedBaseRate.toString()
-        ),
-        10000000
-      ); // allow absolute error tolerance of 1e-11
+      assert.isAtMost(getDifference(expectedDecayedBaseRate.toString(), decayedBaseRate.toString()), 10000000); // allow absolute error tolerance of 1e-11
     }
   });
 
@@ -638,10 +597,7 @@ contract('Fee arithmetic tests', async accounts => {
 
         const result = await mathTester.callDecPow(base, exponent);
 
-        assert.isAtMost(
-          getDifference(expectedResult, result.toString()),
-          10000
-        ); // allow absolute error tolerance of 1e-14
+        assert.isAtMost(getDifference(expectedResult, result.toString()), 10000); // allow absolute error tolerance of 1e-14
       }
     });
 
@@ -855,10 +811,7 @@ contract('Fee arithmetic tests', async accounts => {
 
       // test full range
       for (let i = 1; i <= 1000; i++) {
-        const base = th.randDecayFactor(
-          0.000000000000000001,
-          0.999999999999999999
-        );
+        const base = th.randDecayFactor(0.000000000000000001, 0.999999999999999999);
         const baseAsDecimal = BNConverter.makeDecimal(base, 18);
 
         // Calculate actual expected value
@@ -872,9 +825,7 @@ contract('Fee arithmetic tests', async accounts => {
 
         const error = expected.sub(result).abs();
 
-        console.log(
-          `run: ${i}. base: ${base}, exp: ${exponent}, res: ${result}, error: ${error}`
-        );
+        console.log(`run: ${i}. base: ${base}, exp: ${exponent}, res: ${result}, error: ${error}`);
       }
 
       // Use a high base to fully test high exponent, without prematurely decaying to 0
@@ -893,9 +844,7 @@ contract('Fee arithmetic tests', async accounts => {
 
         const error = expected.sub(result).abs();
 
-        console.log(
-          `run: ${i}. base: ${base}, exp: ${exponent}, res: ${result}, error: ${error}`
-        );
+        console.log(`run: ${i}. base: ${base}, exp: ${exponent}, res: ${result}, error: ${error}`);
       }
     });
   });

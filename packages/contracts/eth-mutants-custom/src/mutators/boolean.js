@@ -10,13 +10,9 @@ BooleanMutator.prototype.getMutations = function (file, source, visit) {
   visit({
     BooleanLiteral: node => {
       if (node.value) {
-        mutations.push(
-          new Mutation(file, node.range[0], node.range[1] + 1, 'false')
-        );
+        mutations.push(new Mutation(file, node.range[0], node.range[1] + 1, 'false'));
       } else {
-        mutations.push(
-          new Mutation(file, node.range[0], node.range[1] + 1, 'true')
-        );
+        mutations.push(new Mutation(file, node.range[0], node.range[1] + 1, 'true'));
       }
     },
   });

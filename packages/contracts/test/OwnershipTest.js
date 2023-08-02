@@ -2,9 +2,7 @@ const deploymentHelper = require('../utils/deploymentHelpers.js');
 const { TestHelper: th, MoneyValues: mv } = require('../utils/testHelpers.js');
 
 const GasPool = artifacts.require('./GasPool.sol');
-const BorrowerOperationsTester = artifacts.require(
-  './BorrowerOperationsTester.sol'
-);
+const BorrowerOperationsTester = artifacts.require('./BorrowerOperationsTester.sol');
 
 contract('All Liquity functions with onlyOwner modifier', async accounts => {
   const [owner, alice, bob] = accounts;
@@ -29,11 +27,7 @@ contract('All Liquity functions with onlyOwner modifier', async accounts => {
     contracts = await deploymentHelper.deployLiquityCore();
     contracts.borrowerOperations = await BorrowerOperationsTester.new();
     contracts = await deploymentHelper.deployLUSDToken(contracts);
-    const LQTYContracts = await deploymentHelper.deployLQTYContracts(
-      bountyAddress,
-      lpRewardsAddress,
-      multisig
-    );
+    const LQTYContracts = await deploymentHelper.deployLQTYContracts(bountyAddress, lpRewardsAddress, multisig);
 
     lusdToken = contracts.lusdToken;
     sortedTroves = contracts.sortedTroves;
@@ -49,51 +43,17 @@ contract('All Liquity functions with onlyOwner modifier', async accounts => {
     lockupContractFactory = LQTYContracts.lockupContractFactory;
   });
 
-  const testZeroAddress = async (
-    contract,
-    params,
-    method = 'setAddresses',
-    skip = 0
-  ) => {
-    await testWrongAddress(
-      contract,
-      params,
-      th.ZERO_ADDRESS,
-      method,
-      skip,
-      'Account cannot be zero address'
-    );
+  const testZeroAddress = async (contract, params, method = 'setAddresses', skip = 0) => {
+    await testWrongAddress(contract, params, th.ZERO_ADDRESS, method, skip, 'Account cannot be zero address');
   };
-  const testNonContractAddress = async (
-    contract,
-    params,
-    method = 'setAddresses',
-    skip = 0
-  ) => {
-    await testWrongAddress(
-      contract,
-      params,
-      bob,
-      method,
-      skip,
-      'Account code size cannot be zero'
-    );
+  const testNonContractAddress = async (contract, params, method = 'setAddresses', skip = 0) => {
+    await testWrongAddress(contract, params, bob, method, skip, 'Account code size cannot be zero');
   };
-  const testWrongAddress = async (
-    contract,
-    params,
-    address,
-    method,
-    skip,
-    message
-  ) => {
+  const testWrongAddress = async (contract, params, address, method, skip, message) => {
     for (let i = skip; i < params.length; i++) {
       const newParams = [...params];
       newParams[i] = address;
-      await th.assertRevert(
-        contract[method](...newParams, { from: owner }),
-        message
-      );
+      await th.assertRevert(contract[method](...newParams, { from: owner }), message);
     }
   };
 
@@ -171,9 +131,7 @@ contract('All Liquity functions with onlyOwner modifier', async accounts => {
   describe('CommunityIssuance', async accounts => {
     it('setAddresses(): reverts when called by non-owner, with wrong addresses, or twice', async () => {
       const params = [lqtyToken.address, stabilityPool.address];
-      await th.assertRevert(
-        communityIssuance.setAddresses(...params, { from: alice })
-      );
+      await th.assertRevert(communityIssuance.setAddresses(...params, { from: alice }));
 
       // Attempt to use zero address
       await testZeroAddress(communityIssuance, params);
@@ -187,9 +145,7 @@ contract('All Liquity functions with onlyOwner modifier', async accounts => {
 
       assert.isTrue(txOwner.receipt.status);
       // fails if called twice
-      await th.assertRevert(
-        communityIssuance.setAddresses(...params, { from: owner })
-      );
+      await th.assertRevert(communityIssuance.setAddresses(...params, { from: owner }));
     });
   });
 
@@ -210,25 +166,14 @@ contract('All Liquity functions with onlyOwner modifier', async accounts => {
       const params = [lqtyToken.address];
 
       // Attempt to use zero address
-      await testZeroAddress(
-        lockupContractFactory,
-        params,
-        'setLQTYTokenAddress'
-      );
+      await testZeroAddress(lockupContractFactory, params, 'setLQTYTokenAddress');
       // Attempt to use non contract
-      await testNonContractAddress(
-        lockupContractFactory,
-        params,
-        'setLQTYTokenAddress'
-      );
+      await testNonContractAddress(lockupContractFactory, params, 'setLQTYTokenAddress');
 
       // Owner can successfully set any address
-      const txOwner = await lockupContractFactory.setLQTYTokenAddress(
-        lqtyToken.address,
-        {
-          from: owner,
-        }
-      );
+      const txOwner = await lockupContractFactory.setLQTYTokenAddress(lqtyToken.address, {
+        from: owner,
+      });
 
       assert.isTrue(txOwner.receipt.status);
       // fails if called twice

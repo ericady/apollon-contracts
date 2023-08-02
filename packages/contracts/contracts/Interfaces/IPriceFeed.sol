@@ -18,10 +18,7 @@ interface IPriceFeed is IBase {
   event PriceFeedStatusChanged(Status newStatus);
 
   // --- Function ---
-  function getPrice(
-    PriceCache memory _priceCache,
-    address _tokenAddress
-  ) external returns (uint price);
+  function getPrice(PriceCache memory _priceCache, address _tokenAddress) external returns (uint price);
 
   function fetchPrice() external returns (uint);
 }

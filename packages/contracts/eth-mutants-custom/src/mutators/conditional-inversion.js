@@ -4,11 +4,7 @@ function ConditionalInversionMutator() {}
 
 ConditionalInversionMutator.prototype.name = 'conditional-inversion';
 
-ConditionalInversionMutator.prototype.getMutations = function (
-  file,
-  source,
-  visit
-) {
+ConditionalInversionMutator.prototype.getMutations = function (file, source, visit) {
   const mutations = [];
 
   visit({

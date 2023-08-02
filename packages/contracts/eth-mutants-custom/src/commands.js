@@ -13,9 +13,7 @@ const contractsDir = config.contractsDir;
 const defaultContractsGlob = config.defaultContractsGlob;
 
 function prepare(callback) {
-  mkdirp(baselineDir, () =>
-    copy(contractsDir, baselineDir, { dot: true }, callback)
-  );
+  mkdirp(baselineDir, () => copy(contractsDir, baselineDir, { dot: true }, callback));
 }
 
 function generateAllMutations(files) {

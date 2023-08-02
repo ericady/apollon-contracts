@@ -89,17 +89,11 @@ library LiquityMath {
     return decMul(x, y);
   }
 
-  function _getAbsoluteDifference(
-    uint _a,
-    uint _b
-  ) internal pure returns (uint) {
+  function _getAbsoluteDifference(uint _a, uint _b) internal pure returns (uint) {
     return (_a >= _b) ? _a.sub(_b) : _b.sub(_a);
   }
 
-  function _computeNominalCR(
-    uint _coll,
-    uint _debt
-  ) internal pure returns (uint) {
+  function _computeNominalCR(uint _coll, uint _debt) internal pure returns (uint) {
     if (_debt > 0) {
       return _coll.mul(NICR_PRECISION).div(_debt);
     }

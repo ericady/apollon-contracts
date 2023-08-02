@@ -11,12 +11,7 @@ contract SortedTrovesTester {
     sortedTroves = ISortedTroves(_sortedTrovesAddress);
   }
 
-  function insert(
-    address _id,
-    uint256 _NICR,
-    address _prevId,
-    address _nextId
-  ) external {
+  function insert(address _id, uint256 _NICR, address _prevId, address _nextId) external {
     sortedTroves.insert(_id, _NICR, _prevId, _nextId);
   }
 
@@ -24,12 +19,7 @@ contract SortedTrovesTester {
     sortedTroves.remove(_id);
   }
 
-  function reInsert(
-    address _id,
-    uint256 _newNICR,
-    address _prevId,
-    address _nextId
-  ) external {
+  function reInsert(address _id, uint256 _newNICR, address _prevId, address _nextId) external {
     sortedTroves.reInsert(_id, _newNICR, _prevId, _nextId);
   }
 

@@ -16,12 +16,7 @@ import './Interfaces/IStoragePool.sol';
 import './Interfaces/IPriceFeed.sol';
 import './Interfaces/IBBase.sol';
 
-contract BorrowerOperations is
-  LiquityBase,
-  Ownable,
-  CheckContract,
-  IBorrowerOperations
-{
+contract BorrowerOperations is LiquityBase, Ownable, CheckContract, IBorrowerOperations {
   using SafeMath for uint256;
   string public constant NAME = 'BorrowerOperations';
 
@@ -141,17 +136,8 @@ contract BorrowerOperations is
 
   // --- Borrower Trove Operations ---
 
-  function openTrove(
-    TokenAmount[] memory _colls,
-    address _upperHint,
-    address _lowerHint
-  ) external override {
-    ContractsCache memory contractsCache = ContractsCache(
-      troveManager,
-      storagePool,
-      debtTokenManager,
-      sortedTroves
-    );
+  function openTrove(TokenAmount[] memory _colls, address _upperHint, address _lowerHint) external override {
+    ContractsCache memory contractsCache = ContractsCache(troveManager, storagePool, debtTokenManager, sortedTroves);
     LocalVariables_openTrove memory vars;
     PriceCache memory priceCache;
 
@@ -172,22 +158,13 @@ contract BorrowerOperations is
     vars.colls = _getCollTokenAmountsWithFetchedPrices(priceCache, _colls);
     vars.compositeCollInStable = _getCompositeColl(vars.colls);
 
-    vars.ICR = LiquityMath._computeCR(
-      vars.compositeCollInStable,
-      vars.compositeDebtInStable
-    );
-    vars.NICR = LiquityMath._computeNominalCR(
-      vars.compositeCollInStable,
-      vars.compositeDebtInStable
-    );
+    vars.ICR = LiquityMath._computeCR(vars.compositeCollInStable, vars.compositeDebtInStable);
+    vars.NICR = LiquityMath._computeNominalCR(vars.compositeCollInStable, vars.compositeDebtInStable);
 
     // checking collateral ratios
-    (
-      vars.isInRecoveryMode,
-      vars.TCR,
-      vars.entireSystemColl,
-      vars.entireSystemDebt
-    ) = contractsCache.storagePool.checkRecoveryMode(priceCache);
+    (vars.isInRecoveryMode, vars.TCR, vars.entireSystemColl, vars.entireSystemDebt) = contractsCache
+      .storagePool
+      .checkRecoveryMode(priceCache);
     if (vars.isInRecoveryMode) {
       _requireICRisAboveCCR(vars.ICR); // > 150 %
     } else {
@@ -211,18 +188,10 @@ contract BorrowerOperations is
     contractsCache.troveManager.updateTroveRewardSnapshots(msg.sender);
     contractsCache.troveManager.updateStakeAndTotalStakes(msg.sender);
 
-    vars.arrayIndex = contractsCache.troveManager.addTroveOwnerToArray(
-      msg.sender
-    );
+    vars.arrayIndex = contractsCache.troveManager.addTroveOwnerToArray(msg.sender);
     emit TroveCreated(msg.sender, vars.arrayIndex);
 
-    contractsCache.sortedTroves.insert(
-      priceCache,
-      msg.sender,
-      vars.NICR,
-      _upperHint,
-      _lowerHint
-    );
+    contractsCache.sortedTroves.insert(priceCache, msg.sender, vars.NICR, _upperHint, _lowerHint);
 
     // Move the coll to the active pool
     for (uint i = 0; i < vars.colls.length; i++) {
@@ -243,21 +212,14 @@ contract BorrowerOperations is
       PoolType.GasCompensation,
       stableCoinAmount.netDebt
     );
-    stableCoinAmount.debtToken.mint(
-      address(contractsCache.storagePool),
-      stableCoinAmount.netDebt
-    );
+    stableCoinAmount.debtToken.mint(address(contractsCache.storagePool), stableCoinAmount.netDebt);
 
     //        emit TroveUpdated(msg.sender, vars.compositeDebtInStable, vars.compositeCollInStable, vars.stake, BorrowerOperation.openTrove);
     //    emit LUSDBorrowingFeePaid(msg.sender, borrowingFeesPaid);
   }
 
   // Send collateral to a trove
-  function addColl(
-    TokenAmount[] memory _colls,
-    address _upperHint,
-    address _lowerHint
-  ) external override {
+  function addColl(TokenAmount[] memory _colls, address _upperHint, address _lowerHint) external override {
     address borrower = msg.sender;
     (
       ContractsCache memory contractsCache,
@@ -265,11 +227,7 @@ contract BorrowerOperations is
       PriceCache memory priceCache
     ) = _prepareTroveAdjustment(borrower);
 
-    PriceTokenAmount[]
-      memory addedColls = _getCollTokenAmountsWithFetchedPrices(
-        priceCache,
-        _colls
-      );
+    PriceTokenAmount[] memory addedColls = _getCollTokenAmountsWithFetchedPrices(priceCache, _colls);
     vars.newCompositeCollInStable += _getCompositeColl(addedColls);
 
     contractsCache.troveManager.increaseTroveColl(borrower, addedColls);
@@ -286,24 +244,11 @@ contract BorrowerOperations is
     }
 
     // todo required checks should not be needed, new collateral should be always fine...
-    _finaliseTrove(
-      false,
-      false,
-      contractsCache,
-      vars,
-      priceCache,
-      borrower,
-      _upperHint,
-      _lowerHint
-    );
+    _finaliseTrove(false, false, contractsCache, vars, priceCache, borrower, _upperHint, _lowerHint);
   }
 
   // Withdraw collateral from a trove
-  function withdrawColl(
-    TokenAmount[] memory _colls,
-    address _upperHint,
-    address _lowerHint
-  ) external override {
+  function withdrawColl(TokenAmount[] memory _colls, address _upperHint, address _lowerHint) external override {
     address borrower = msg.sender;
     (
       ContractsCache memory contractsCache,
@@ -311,11 +256,7 @@ contract BorrowerOperations is
       PriceCache memory priceCache
     ) = _prepareTroveAdjustment(borrower);
 
-    PriceTokenAmount[]
-      memory removedColls = _getCollTokenAmountsWithFetchedPrices(
-        priceCache,
-        _colls
-      );
+    PriceTokenAmount[] memory removedColls = _getCollTokenAmountsWithFetchedPrices(priceCache, _colls);
     vars.newCompositeCollInStable -= _getCompositeColl(removedColls);
 
     contractsCache.troveManager.decreaseTroveColl(borrower, removedColls);
@@ -326,8 +267,7 @@ contract BorrowerOperations is
       // checking is the trove has enough coll for the withdrawal
       PriceTokenAmount memory existingColl;
       for (uint ii = 0; ii < vars.colls.length; ii++) {
-        if (vars.colls[ii].tokenAddress != collTokenAmount.tokenAddress)
-          continue;
+        if (vars.colls[ii].tokenAddress != collTokenAmount.tokenAddress) continue;
         existingColl = vars.colls[ii];
         break;
       }
@@ -342,16 +282,7 @@ contract BorrowerOperations is
       );
     }
 
-    _finaliseTrove(
-      true,
-      false,
-      contractsCache,
-      vars,
-      priceCache,
-      borrower,
-      _upperHint,
-      _lowerHint
-    );
+    _finaliseTrove(true, false, contractsCache, vars, priceCache, borrower, _upperHint, _lowerHint);
   }
 
   // todo will be wrapped into the long/short farms
@@ -379,8 +310,7 @@ contract BorrowerOperations is
     );
 
     // checking if new debt is above the minimum
-    for (uint i = 0; i < addedDebts.length; i++)
-      _requireAtLeastMinNetDebt(addedDebts[i].netDebt);
+    for (uint i = 0; i < addedDebts.length; i++) _requireAtLeastMinNetDebt(addedDebts[i].netDebt);
 
     // adding the borrowing fee to the net debt
     uint borrowingFeesPaid = 0; // todo only used for an event emit
@@ -407,16 +337,7 @@ contract BorrowerOperations is
       );
     }
 
-    _finaliseTrove(
-      false,
-      true,
-      contractsCache,
-      vars,
-      priceCache,
-      msg.sender,
-      _upperHint,
-      _lowerHint
-    );
+    _finaliseTrove(false, true, contractsCache, vars, priceCache, msg.sender, _upperHint, _lowerHint);
   }
 
   // todo will be wrapped into the long/short farms
@@ -456,14 +377,9 @@ contract BorrowerOperations is
         existingDebt = vars.debts[ii];
         break;
       }
-      _requireAtLeastMinNetDebt(
-        existingDebt.netDebt.sub(debtTokenAmount.netDebt)
-      );
+      _requireAtLeastMinNetDebt(existingDebt.netDebt.sub(debtTokenAmount.netDebt));
       if (debtTokenAmount.debtToken.isStableCoin())
-        _requireValidStableCoinRepayment(
-          existingDebt.netDebt,
-          debtTokenAmount.netDebt
-        );
+        _requireValidStableCoinRepayment(existingDebt.netDebt, debtTokenAmount.netDebt);
 
       _poolRepayDebt(
         borrower,
@@ -473,41 +389,20 @@ contract BorrowerOperations is
       );
     }
 
-    _finaliseTrove(
-      false,
-      false,
-      contractsCache,
-      vars,
-      priceCache,
-      borrower,
-      _upperHint,
-      _lowerHint
-    );
+    _finaliseTrove(false, false, contractsCache, vars, priceCache, borrower, _upperHint, _lowerHint);
   }
 
   function _prepareTroveAdjustment(
     address _borrower
   )
     internal
-    returns (
-      ContractsCache memory contractsCache,
-      LocalVariables_adjustTrove memory vars,
-      PriceCache memory priceCache
-    )
+    returns (ContractsCache memory contractsCache, LocalVariables_adjustTrove memory vars, PriceCache memory priceCache)
   {
-    contractsCache = ContractsCache(
-      troveManager,
-      storagePool,
-      debtTokenManager,
-      sortedTroves
-    );
+    contractsCache = ContractsCache(troveManager, storagePool, debtTokenManager, sortedTroves);
 
-    (
-      vars.isInRecoveryMode,
-      vars.TCR,
-      vars.entireSystemColl,
-      vars.entireSystemDebt
-    ) = contractsCache.storagePool.checkRecoveryMode(priceCache);
+    (vars.isInRecoveryMode, vars.TCR, vars.entireSystemColl, vars.entireSystemDebt) = contractsCache
+      .storagePool
+      .checkRecoveryMode(priceCache);
 
     _requireTroveisActive(contractsCache.troveManager, _borrower);
     contractsCache.troveManager.applyPendingRewards(_borrower); // from redistributions
@@ -521,17 +416,11 @@ contract BorrowerOperations is
     vars.oldCompositeDebtInStable = _getCompositeDebt(vars.debts);
     vars.newCompositeDebtInStable = vars.oldCompositeDebtInStable;
 
-    vars.colls = _getCollTokenAmountsWithFetchedPrices(
-      priceCache,
-      contractsCache.troveManager.getTroveColl(_borrower)
-    );
+    vars.colls = _getCollTokenAmountsWithFetchedPrices(priceCache, contractsCache.troveManager.getTroveColl(_borrower));
     vars.oldCompositeCollInStable = _getCompositeColl(vars.colls);
     vars.newCompositeCollInStable = vars.oldCompositeCollInStable;
 
-    vars.oldICR = LiquityMath._computeCR(
-      vars.oldCompositeCollInStable,
-      vars.oldCompositeDebtInStable
-    );
+    vars.oldICR = LiquityMath._computeCR(vars.oldCompositeCollInStable, vars.oldCompositeDebtInStable);
 
     return (contractsCache, vars, priceCache);
   }
@@ -547,33 +436,17 @@ contract BorrowerOperations is
     address _lowerHint
   ) internal {
     // calculate the new ICR
-    vars.newICR = LiquityMath._computeCR(
-      vars.newCompositeCollInStable,
-      vars.newCompositeDebtInStable
-    );
-    vars.newNCR = LiquityMath._computeNominalCR(
-      vars.newCompositeCollInStable,
-      vars.newCompositeDebtInStable
-    );
+    vars.newICR = LiquityMath._computeCR(vars.newCompositeCollInStable, vars.newCompositeDebtInStable);
+    vars.newNCR = LiquityMath._computeNominalCR(vars.newCompositeCollInStable, vars.newCompositeDebtInStable);
 
     // Check the adjustment satisfies all conditions for the current system mode
-    _requireValidAdjustmentInCurrentMode(
-      _isCollWithdrawal,
-      _isDebtIncrease,
-      vars
-    );
+    _requireValidAdjustmentInCurrentMode(_isCollWithdrawal, _isDebtIncrease, vars);
 
     // update troves stake
     contractsCache.troveManager.updateStakeAndTotalStakes(_borrower);
 
     // Re-insert trove in to the sorted list
-    sortedTroves.reInsert(
-      priceCache,
-      _borrower,
-      vars.newNCR,
-      _upperHint,
-      _lowerHint
-    );
+    sortedTroves.reInsert(priceCache, _borrower, vars.newNCR, _upperHint, _lowerHint);
 
     // todo...
     //    emit TroveUpdated(
@@ -624,10 +497,7 @@ contract BorrowerOperations is
       PoolType.GasCompensation,
       remainingStableCoinDebt.netDebt
     );
-    remainingStableCoinDebt.debtToken.burn(
-      address(contractsCache.storagePool),
-      remainingStableCoinDebt.netDebt
-    );
+    remainingStableCoinDebt.debtToken.burn(address(contractsCache.storagePool), remainingStableCoinDebt.netDebt);
 
     // Send the collateral back to the user
     for (uint i = 0; i < vars.colls.length; i++) {
@@ -655,12 +525,8 @@ contract BorrowerOperations is
     uint entireSystemColl,
     uint entireSystemDebt
   ) internal view returns (uint) {
-    uint totalColl = _isCollIncrease
-      ? entireSystemColl.add(_collChange)
-      : entireSystemColl.sub(_collChange);
-    uint totalDebt = _isDebtIncrease
-      ? entireSystemDebt.add(_debtChange)
-      : entireSystemDebt.sub(_debtChange);
+    uint totalColl = _isCollIncrease ? entireSystemColl.add(_collChange) : entireSystemColl.sub(_collChange);
+    uint totalDebt = _isDebtIncrease ? entireSystemDebt.add(_debtChange) : entireSystemDebt.sub(_debtChange);
 
     uint newTCR = LiquityMath._computeCR(totalColl, totalDebt);
     return newTCR;
@@ -676,11 +542,7 @@ contract BorrowerOperations is
 
     _troveManager.decayBaseRateFromBorrowing(); // decay the baseRate state variable
     borrowingFee = _troveManager.getBorrowingFee(compositeDebtInStable);
-    _requireUserAcceptsFee(
-      borrowingFee,
-      compositeDebtInStable,
-      _maxFeePercentage
-    );
+    _requireUserAcceptsFee(borrowingFee, compositeDebtInStable, _maxFeePercentage);
 
     // todo...
     // Send fee to staking contract
@@ -728,12 +590,7 @@ contract BorrowerOperations is
     uint _netDebtIncrease,
     uint _mintAmount
   ) internal {
-    _storagePool.addValue(
-      address(_debtToken),
-      false,
-      PoolType.Active,
-      _netDebtIncrease
-    );
+    _storagePool.addValue(address(_debtToken), false, PoolType.Active, _netDebtIncrease);
     if (_mintAmount > 0) _debtToken.mint(_borrower, _mintAmount);
   }
 
@@ -743,43 +600,26 @@ contract BorrowerOperations is
     IDebtToken _debtToken,
     uint _repayAmount
   ) internal {
-    _storagePool.subtractValue(
-      address(_debtToken),
-      false,
-      PoolType.Active,
-      _repayAmount
-    );
+    _storagePool.subtractValue(address(_debtToken), false, PoolType.Active, _repayAmount);
     _debtToken.burn(_borrower, _repayAmount);
   }
 
   // --- 'Require' wrapper functions ---
 
   function _requireCallerIsBorrower(address _borrower) internal view {
-    require(
-      msg.sender == _borrower,
-      'BorrowerOps: Caller must be the borrower for a withdrawal'
-    );
+    require(msg.sender == _borrower, 'BorrowerOps: Caller must be the borrower for a withdrawal');
   }
 
-  function _requireTroveisActive(
-    ITroveManager _troveManager,
-    address _borrower
-  ) internal view {
+  function _requireTroveisActive(ITroveManager _troveManager, address _borrower) internal view {
     uint status = _troveManager.getTroveStatus(_borrower);
     require(status == 1, 'BorrowerOps: Trove does not exist or is closed');
   }
 
   function _requireNotInRecoveryMode(bool _isInRecoveryMode) internal pure {
-    require(
-      !_isInRecoveryMode,
-      'BorrowerOps: Operation not allowed during Recovery Mode'
-    );
+    require(!_isInRecoveryMode, 'BorrowerOps: Operation not allowed during Recovery Mode');
   }
 
-  function _requireTroveIsNotActive(
-    ITroveManager _troveManager,
-    address _borrower
-  ) internal view {
+  function _requireTroveIsNotActive(ITroveManager _troveManager, address _borrower) internal view {
     uint status = _troveManager.getTroveStatus(_borrower);
     require(status != 1, 'BorrowerOps: Trove is active');
   }
@@ -789,13 +629,7 @@ contract BorrowerOperations is
     IDebtTokenManager _dTokenManager,
     PriceCache memory _priceCache,
     TokenAmount[] memory _debts
-  )
-    internal
-    returns (
-      DebtTokenAmount[] memory debtTokenAmounts,
-      DebtTokenAmount memory stableCoinEntry
-    )
-  {
+  ) internal returns (DebtTokenAmount[] memory debtTokenAmounts, DebtTokenAmount memory stableCoinEntry) {
     address stableCoinAddress = address(_dTokenManager.getStableCoin());
 
     bool stableCoinIncluded = false;
@@ -806,30 +640,21 @@ contract BorrowerOperations is
       break;
     }
 
-    if (stableCoinIncluded)
-      debtTokenAmounts = new DebtTokenAmount[](_debts.length);
+    if (stableCoinIncluded) debtTokenAmounts = new DebtTokenAmount[](_debts.length);
     else debtTokenAmounts = new DebtTokenAmount[](_debts.length + 1);
 
     for (uint i = 0; i < _debts.length; i++) {
-      debtTokenAmounts[i].debtToken = _dTokenManager.getDebtToken(
-        _debts[i].tokenAddress
-      );
+      debtTokenAmounts[i].debtToken = _dTokenManager.getDebtToken(_debts[i].tokenAddress);
       debtTokenAmounts[i].netDebt = _debts[i].amount;
-      debtTokenAmounts[i].price = debtTokenAmounts[i].debtToken.getPrice(
-        _priceCache
-      );
+      debtTokenAmounts[i].price = debtTokenAmounts[i].debtToken.getPrice(_priceCache);
 
-      if (stableCoinIncluded && _debts[i].tokenAddress == stableCoinAddress)
-        stableCoinEntry = debtTokenAmounts[i];
+      if (stableCoinIncluded && _debts[i].tokenAddress == stableCoinAddress) stableCoinEntry = debtTokenAmounts[i];
     }
 
     if (!stableCoinIncluded) {
-      debtTokenAmounts[_debts.length].debtToken = _dTokenManager
-        .getStableCoin();
+      debtTokenAmounts[_debts.length].debtToken = _dTokenManager.getStableCoin();
       debtTokenAmounts[_debts.length].netDebt = 0;
-      debtTokenAmounts[_debts.length].price = debtTokenAmounts[_debts.length]
-        .debtToken
-        .getPrice(_priceCache);
+      debtTokenAmounts[_debts.length].price = debtTokenAmounts[_debts.length].debtToken.getPrice(_priceCache);
       stableCoinEntry = debtTokenAmounts[_debts.length];
     }
 
@@ -844,19 +669,13 @@ contract BorrowerOperations is
     for (uint i = 0; i < _colls.length; i++) {
       collTokenAmounts[i].tokenAddress = _colls[i].tokenAddress;
       collTokenAmounts[i].coll = _colls[i].amount;
-      collTokenAmounts[i].price = priceFeed.getPrice(
-        _priceCache,
-        _colls[i].tokenAddress
-      );
+      collTokenAmounts[i].price = priceFeed.getPrice(_priceCache, _colls[i].tokenAddress);
     }
     return collTokenAmounts;
   }
 
   function _requireNonZeroDebtChange(uint _LUSDChange) internal pure {
-    require(
-      _LUSDChange > 0,
-      'BorrowerOps: Debt increase requires non-zero debtChange'
-    );
+    require(_LUSDChange > 0, 'BorrowerOps: Debt increase requires non-zero debtChange');
   }
 
   //  function _requireNotInRecoveryMode(PriceCache memory _priceCache) internal {
@@ -904,54 +723,30 @@ contract BorrowerOperations is
   }
 
   function _requireNoCollWithdrawal(bool _isCollWithdrawal) internal pure {
-    require(
-      !_isCollWithdrawal,
-      'BorrowerOps: Collateral withdrawal not permitted Recovery Mode'
-    );
+    require(!_isCollWithdrawal, 'BorrowerOps: Collateral withdrawal not permitted Recovery Mode');
   }
 
   function _requireICRisAboveMCR(uint _newICR) internal pure {
-    require(
-      _newICR >= MCR,
-      'BorrowerOps: An operation that would result in ICR < MCR is not permitted'
-    );
+    require(_newICR >= MCR, 'BorrowerOps: An operation that would result in ICR < MCR is not permitted');
   }
 
   function _requireICRisAboveCCR(uint _newICR) internal pure {
-    require(
-      _newICR >= CCR,
-      'BorrowerOps: Operation must leave trove with ICR >= CCR'
-    );
+    require(_newICR >= CCR, 'BorrowerOps: Operation must leave trove with ICR >= CCR');
   }
 
-  function _requireNewICRisAboveOldICR(
-    uint _newICR,
-    uint _oldICR
-  ) internal pure {
-    require(
-      _newICR >= _oldICR,
-      "BorrowerOps: Cannot decrease your Trove's ICR in Recovery Mode"
-    );
+  function _requireNewICRisAboveOldICR(uint _newICR, uint _oldICR) internal pure {
+    require(_newICR >= _oldICR, "BorrowerOps: Cannot decrease your Trove's ICR in Recovery Mode");
   }
 
   function _requireNewTCRisAboveCCR(uint _newTCR) internal pure {
-    require(
-      _newTCR >= CCR,
-      'BorrowerOps: An operation that would result in TCR < CCR is not permitted'
-    );
+    require(_newTCR >= CCR, 'BorrowerOps: An operation that would result in TCR < CCR is not permitted');
   }
 
   function _requireAtLeastMinNetDebt(uint _netDebt) internal pure {
-    require(
-      _netDebt >= 0,
-      "BorrowerOps: Trove's net debt must be greater than minimum"
-    );
+    require(_netDebt >= 0, "BorrowerOps: Trove's net debt must be greater than minimum");
   }
 
-  function _requireValidStableCoinRepayment(
-    uint _currentDebt,
-    uint _debtRepayment
-  ) internal pure {
+  function _requireValidStableCoinRepayment(uint _currentDebt, uint _debtRepayment) internal pure {
     require(
       _debtRepayment <= _currentDebt.sub(STABLE_COIN_GAS_COMPENSATION),
       "BorrowerOps: Amount repaid must not be larger than the Trove's debt"
@@ -959,25 +754,15 @@ contract BorrowerOperations is
   }
 
   function _requireCallerIsStabilityPool() internal view {
-    require(
-      msg.sender == stabilityPoolAddress,
-      'BorrowerOps: Caller is not Stability Pool'
-    );
+    require(msg.sender == stabilityPoolAddress, 'BorrowerOps: Caller is not Stability Pool');
   }
 
-  function _requireValidMaxFeePercentage(
-    uint _maxFeePercentage,
-    bool _isInRecoveryMode
-  ) internal pure {
+  function _requireValidMaxFeePercentage(uint _maxFeePercentage, bool _isInRecoveryMode) internal pure {
     if (_isInRecoveryMode) {
-      require(
-        _maxFeePercentage <= DECIMAL_PRECISION,
-        'Max fee percentage must less than or equal to 100%'
-      );
+      require(_maxFeePercentage <= DECIMAL_PRECISION, 'Max fee percentage must less than or equal to 100%');
     } else {
       require(
-        _maxFeePercentage >= BORROWING_FEE_FLOOR &&
-          _maxFeePercentage <= DECIMAL_PRECISION,
+        _maxFeePercentage >= BORROWING_FEE_FLOOR && _maxFeePercentage <= DECIMAL_PRECISION,
         'Max fee percentage must be between 0.5% and 100%'
       );
     }
@@ -985,34 +770,26 @@ contract BorrowerOperations is
 
   // --- ICR and TCR getters ---
 
-  function getCompositeDebt(
-    DebtTokenAmount[] memory _debts
-  ) external pure override returns (uint) {
+  function getCompositeDebt(DebtTokenAmount[] memory _debts) external pure override returns (uint) {
     return _getCompositeDebt(_debts);
   }
 
   // Returns the composite debt (drawn debt + gas compensation) of a trove, for the purpose of ICR calculation
-  function _getCompositeDebt(
-    DebtTokenAmount[] memory _debts
-  ) internal pure returns (uint debtInStable) {
+  function _getCompositeDebt(DebtTokenAmount[] memory _debts) internal pure returns (uint debtInStable) {
     for (uint i = 0; i < _debts.length; i++) {
       debtInStable.add(_debts[i].netDebt.mul(_debts[i].price));
     }
     return debtInStable;
   }
 
-  function _getCompositeColl(
-    PriceTokenAmount[] memory _colls
-  ) internal pure returns (uint collInStable) {
+  function _getCompositeColl(PriceTokenAmount[] memory _colls) internal pure returns (uint collInStable) {
     for (uint i = 0; i < _colls.length; i++) {
       collInStable.add(_colls[i].coll.mul(_colls[i].price));
     }
     return collInStable;
   }
 
-  function _getNetDebt(
-    DebtTokenAmount[] memory _newDebts
-  ) internal pure returns (uint debtInStable) {
+  function _getNetDebt(DebtTokenAmount[] memory _newDebts) internal pure returns (uint debtInStable) {
     for (uint i = 0; i < _newDebts.length; i++) {
       DebtTokenAmount memory debtTokenAmount = _newDebts[i];
       debtInStable.add(debtTokenAmount.netDebt.mul(debtTokenAmount.price));

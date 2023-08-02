@@ -27,9 +27,7 @@ const ABDKOperations = async () => {
   // perform mul operation in 64.64
   const res3 = await functionCaller.abdkMath_mul_view(res1, res2);
   const res4 = await functionCaller.abdkMath_toUInt_view(res3);
-  console.log(
-    `result of 5 * 6, performed in 64.64, converted back to uint64: ${res4}`
-  );
+  console.log(`result of 5 * 6, performed in 64.64, converted back to uint64: ${res4}`);
 
   // 500 * 600
   // convert each uint to 64.64
@@ -41,9 +39,7 @@ const ABDKOperations = async () => {
   // perform mul operation in 64.64
   const res7 = await functionCaller.abdkMath_mul_view(res5, res6);
   const res8 = await functionCaller.abdkMath_toUInt_view(res7);
-  console.log(
-    `result of 500 * 600, performed in 64.64, converted back to uint64: ${res4}`
-  );
+  console.log(`result of 500 * 600, performed in 64.64, converted back to uint64: ${res4}`);
 
   // // 0.5 * 6
   // get 0.5 as 64.64dec
@@ -56,9 +52,7 @@ const ABDKOperations = async () => {
   // perform mul operation in 64.64
   const res11 = await functionCaller.abdkMath_mul_view(res9, res10);
   const res12 = await functionCaller.abdkMath_toUInt_view(res11);
-  console.log(
-    `result of 0.5 * 6, performed in 64.64, converted back to uint64: ${res12}`
-  );
+  console.log(`result of 0.5 * 6, performed in 64.64, converted back to uint64: ${res12}`);
 
   // Example computaton: LUSD -> Ether price conversion
 
@@ -71,14 +65,8 @@ const ABDKOperations = async () => {
   // 1)
   const storedPrice = '20012345678';
   // convert price to 64.64dec fraction
-  const price = await functionCaller.abdkMath_divu_view(
-    storedPrice,
-    '100000000'
-  );
-  const etherVal = await functionCaller.abdkMath_divu_view(
-    '6123456700909123456789123456789',
-    price
-  );
+  const price = await functionCaller.abdkMath_divu_view(storedPrice, '100000000');
+  const etherVal = await functionCaller.abdkMath_divu_view('6123456700909123456789123456789', price);
   console.log(`ether val is ${etherVal}`);
 
   // returns 30598395607571232843814242587
@@ -104,10 +92,7 @@ const ABDKOperations = async () => {
   let stake = '65032123456789123456789';
   let rewardPerUnitStaked = '1976309053096420';
 
-  let fraction = await functionCaller.abdkMath_divu_view(
-    rewardPerUnitStaked,
-    '1000000000000000000'
-  );
+  let fraction = await functionCaller.abdkMath_divu_view(rewardPerUnitStaked, '1000000000000000000');
   let reward = await functionCaller.abdkMath_mulu_view(fraction, stake);
   console.log(`${reward}`);
 
@@ -128,10 +113,7 @@ const ABDKOperations = async () => {
   stake = '5555565032123456789123456789';
   rewardPerUnitStaked = '1976309053096420';
 
-  fraction = await functionCaller.abdkMath_divu_view(
-    rewardPerUnitStaked,
-    '1000000000000000000'
-  );
+  fraction = await functionCaller.abdkMath_divu_view(rewardPerUnitStaked, '1000000000000000000');
   reward = await functionCaller.abdkMath_mulu_view(fraction, stake);
   console.log(`${reward}`);
 
@@ -147,9 +129,7 @@ const ABDKOperations = async () => {
 
   // multiply the 64.64dec ratio by the uint, and convert result back to uint
   const res14 = await functionCaller.abdkMath_mulu_view(res13, 6);
-  console.log(
-    `result of 0.5 * 6, performed in 64.64, converted back to uint256: ${res14}`
-  );
+  console.log(`result of 0.5 * 6, performed in 64.64, converted back to uint256: ${res14}`);
   //
 
   // //--- Division ---
@@ -161,22 +141,10 @@ const ABDKOperations = async () => {
   const res18 = await functionCaller.abdkMath_mulu_view(res7, 1000000);
   const res19 = await functionCaller.abdkMath_mulu_view(res7, 1000000000);
   const res20 = await functionCaller.abdkMath_mulu_view(res7, '1000000000000');
-  const res21 = await functionCaller.abdkMath_mulu_view(
-    res7,
-    '1000000000000000'
-  );
-  const res22 = await functionCaller.abdkMath_mulu_view(
-    res7,
-    '1000000000000000000'
-  );
-  const res23 = await functionCaller.abdkMath_mulu_view(
-    res7,
-    '1000000000000000000000'
-  );
-  const res24 = await functionCaller.abdkMath_mulu_view(
-    res7,
-    '100000000000000000000000000000000000000000000000'
-  );
+  const res21 = await functionCaller.abdkMath_mulu_view(res7, '1000000000000000');
+  const res22 = await functionCaller.abdkMath_mulu_view(res7, '1000000000000000000');
+  const res23 = await functionCaller.abdkMath_mulu_view(res7, '1000000000000000000000');
+  const res24 = await functionCaller.abdkMath_mulu_view(res7, '100000000000000000000000000000000000000000000000');
   console.log(`log fraction to increasing precision`);
   console.log(`${res17}`);
   console.log(`${res18}`);
@@ -245,13 +213,9 @@ const checkGasFromInternalCall = async () => {
   const gasUsed2 = tx2.receipt.gasUsed - 21000;
   const diff = gasUsed1 - gasUsed2;
 
-  console.log(
-    `Gas cost from internal function call inside public function: ${gasUsed1}`
-  );
+  console.log(`Gas cost from internal function call inside public function: ${gasUsed1}`);
   console.log(`Gas cost from raw code inside public function: ${gasUsed2}`);
-  console.log(
-    `Gas cost difference between an internal call and raw code: ${diff}`
-  );
+  console.log(`Gas cost difference between an internal call and raw code: ${diff}`);
 };
 
 async function main() {

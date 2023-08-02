@@ -48,11 +48,7 @@ contract EchidnaTester {
     defaultPool = new DefaultPool();
     stabilityPool = new StabilityPool();
     gasPool = new GasPool();
-    lusdToken = new LUSDToken(
-      address(troveManager),
-      address(stabilityPool),
-      address(borrowerOperations)
-    );
+    lusdToken = new LUSDToken(address(troveManager), address(stabilityPool), address(borrowerOperations));
 
     collSurplusPool = new CollSurplusPool();
     priceFeedTestnet = new PriceFeedTestnet();
@@ -105,28 +101,13 @@ contract EchidnaTester {
       address(0)
     );
 
-    collSurplusPool.setAddresses(
-      address(borrowerOperations),
-      address(troveManager),
-      address(activePool)
-    );
+    collSurplusPool.setAddresses(address(borrowerOperations), address(troveManager), address(activePool));
 
-    sortedTroves.setParams(
-      1e18,
-      address(troveManager),
-      address(borrowerOperations)
-    );
+    sortedTroves.setParams(1e18, address(troveManager), address(borrowerOperations));
 
     for (uint i = 0; i < NUMBER_OF_ACTORS; i++) {
-      echidnaProxies[i] = new EchidnaProxy(
-        troveManager,
-        borrowerOperations,
-        stabilityPool,
-        lusdToken
-      );
-      (bool success, ) = address(echidnaProxies[i]).call{
-        value: INITIAL_BALANCE
-      }('');
+      echidnaProxies[i] = new EchidnaProxy(troveManager, borrowerOperations, stabilityPool, lusdToken);
+      (bool success, ) = address(echidnaProxies[i]).call{ value: INITIAL_BALANCE }('');
       require(success);
     }
 
@@ -152,10 +133,7 @@ contract EchidnaTester {
     echidnaProxies[actor].liquidateTrovesPrx(_n);
   }
 
-  function batchLiquidateTrovesExt(
-    uint _i,
-    address[] calldata _troveArray
-  ) external {
+  function batchLiquidateTrovesExt(uint _i, address[] calldata _troveArray) external {
     uint actor = _i % NUMBER_OF_ACTORS;
     echidnaProxies[actor].batchLiquidateTrovesPrx(_troveArray);
   }
@@ -182,11 +160,7 @@ contract EchidnaTester {
 
   // Borrower Operations
 
-  function getAdjustedETH(
-    uint actorBalance,
-    uint _ETH,
-    uint ratio
-  ) internal view returns (uint) {
+  function getAdjustedETH(uint actorBalance, uint _ETH, uint ratio) internal view returns (uint) {
     uint price = priceFeedTestnet.getPrice();
     require(price > 0);
     uint minETH = ratio.mul(LUSD_GAS_COMPENSATION).div(price);
@@ -195,11 +169,7 @@ contract EchidnaTester {
     return ETH;
   }
 
-  function getAdjustedLUSD(
-    uint ETH,
-    uint _LUSDAmount,
-    uint ratio
-  ) internal view returns (uint) {
+  function getAdjustedLUSD(uint ETH, uint _LUSDAmount, uint ratio) internal view returns (uint) {
     uint price = priceFeedTestnet.getPrice();
     uint LUSDAmount = _LUSDAmount;
     uint compositeDebt = LUSDAmount.add(LUSD_GAS_COMPENSATION);
@@ -240,13 +210,7 @@ contract EchidnaTester {
     uint _maxFee
   ) public payable {
     uint actor = _i % NUMBER_OF_ACTORS;
-    echidnaProxies[actor].openTrovePrx(
-      _ETH,
-      _LUSDAmount,
-      _upperHint,
-      _lowerHint,
-      _maxFee
-    );
+    echidnaProxies[actor].openTrovePrx(_ETH, _LUSDAmount, _upperHint, _lowerHint, _maxFee);
   }
 
   function addCollExt(uint _i, uint _ETH) external payable {
@@ -259,48 +223,22 @@ contract EchidnaTester {
     echidnaProxy.addCollPrx(ETH, address(0), address(0));
   }
 
-  function addCollRawExt(
-    uint _i,
-    uint _ETH,
-    address _upperHint,
-    address _lowerHint
-  ) external payable {
+  function addCollRawExt(uint _i, uint _ETH, address _upperHint, address _lowerHint) external payable {
     uint actor = _i % NUMBER_OF_ACTORS;
     echidnaProxies[actor].addCollPrx(_ETH, _upperHint, _lowerHint);
   }
 
-  function withdrawCollExt(
-    uint _i,
-    uint _amount,
-    address _upperHint,
-    address _lowerHint
-  ) external {
+  function withdrawCollExt(uint _i, uint _amount, address _upperHint, address _lowerHint) external {
     uint actor = _i % NUMBER_OF_ACTORS;
     echidnaProxies[actor].withdrawCollPrx(_amount, _upperHint, _lowerHint);
   }
 
-  function withdrawLUSDExt(
-    uint _i,
-    uint _amount,
-    address _upperHint,
-    address _lowerHint,
-    uint _maxFee
-  ) external {
+  function withdrawLUSDExt(uint _i, uint _amount, address _upperHint, address _lowerHint, uint _maxFee) external {
     uint actor = _i % NUMBER_OF_ACTORS;
-    echidnaProxies[actor].withdrawLUSDPrx(
-      _amount,
-      _upperHint,
-      _lowerHint,
-      _maxFee
-    );
+    echidnaProxies[actor].withdrawLUSDPrx(_amount, _upperHint, _lowerHint, _maxFee);
   }
 
-  function repayLUSDExt(
-    uint _i,
-    uint _amount,
-    address _upperHint,
-    address _lowerHint
-  ) external {
+  function repayLUSDExt(uint _i, uint _amount, address _upperHint, address _lowerHint) external {
     uint actor = _i % NUMBER_OF_ACTORS;
     echidnaProxies[actor].repayLUSDPrx(_amount, _upperHint, _lowerHint);
   }
@@ -328,15 +266,7 @@ contract EchidnaTester {
       debtChange = getAdjustedLUSD(ETH, uint(_debtChange), MCR);
     }
     // TODO: collWithdrawal, debtChange
-    echidnaProxy.adjustTrovePrx(
-      ETH,
-      _collWithdrawal,
-      debtChange,
-      _isDebtIncrease,
-      address(0),
-      address(0),
-      0
-    );
+    echidnaProxy.adjustTrovePrx(ETH, _collWithdrawal, debtChange, _isDebtIncrease, address(0), address(0), 0);
   }
 
   function adjustTroveRawExt(
@@ -363,11 +293,7 @@ contract EchidnaTester {
 
   // Pool Manager
 
-  function provideToSPExt(
-    uint _i,
-    uint _amount,
-    address _frontEndTag
-  ) external {
+  function provideToSPExt(uint _i, uint _amount, address _frontEndTag) external {
     uint actor = _i % NUMBER_OF_ACTORS;
     echidnaProxies[actor].provideToSPPrx(_amount, _frontEndTag);
   }
@@ -379,48 +305,27 @@ contract EchidnaTester {
 
   // LUSD Token
 
-  function transferExt(
-    uint _i,
-    address recipient,
-    uint256 amount
-  ) external returns (bool) {
+  function transferExt(uint _i, address recipient, uint256 amount) external returns (bool) {
     uint actor = _i % NUMBER_OF_ACTORS;
     echidnaProxies[actor].transferPrx(recipient, amount);
   }
 
-  function approveExt(
-    uint _i,
-    address spender,
-    uint256 amount
-  ) external returns (bool) {
+  function approveExt(uint _i, address spender, uint256 amount) external returns (bool) {
     uint actor = _i % NUMBER_OF_ACTORS;
     echidnaProxies[actor].approvePrx(spender, amount);
   }
 
-  function transferFromExt(
-    uint _i,
-    address sender,
-    address recipient,
-    uint256 amount
-  ) external returns (bool) {
+  function transferFromExt(uint _i, address sender, address recipient, uint256 amount) external returns (bool) {
     uint actor = _i % NUMBER_OF_ACTORS;
     echidnaProxies[actor].transferFromPrx(sender, recipient, amount);
   }
 
-  function increaseAllowanceExt(
-    uint _i,
-    address spender,
-    uint256 addedValue
-  ) external returns (bool) {
+  function increaseAllowanceExt(uint _i, address spender, uint256 addedValue) external returns (bool) {
     uint actor = _i % NUMBER_OF_ACTORS;
     echidnaProxies[actor].increaseAllowancePrx(spender, addedValue);
   }
 
-  function decreaseAllowanceExt(
-    uint _i,
-    address spender,
-    uint256 subtractedValue
-  ) external returns (bool) {
+  function decreaseAllowanceExt(uint _i, address spender, uint256 subtractedValue) external returns (bool) {
     uint actor = _i % NUMBER_OF_ACTORS;
     echidnaProxies[actor].decreaseAllowancePrx(spender, subtractedValue);
   }
@@ -456,10 +361,7 @@ contract EchidnaTester {
     address nextTrove = sortedTroves.getNext(currentTrove);
 
     while (currentTrove != address(0) && nextTrove != address(0)) {
-      if (
-        troveManager.getNominalICR(nextTrove) >
-        troveManager.getNominalICR(currentTrove)
-      ) {
+      if (troveManager.getNominalICR(nextTrove) > troveManager.getNominalICR(currentTrove)) {
         return false;
       }
       // Uncomment to check that the condition is meaningful
@@ -481,10 +383,7 @@ contract EchidnaTester {
     address currentTrove = sortedTroves.getFirst();
     while (currentTrove != address(0)) {
       // Status
-      if (
-        TroveManager.Status(troveManager.getTroveStatus(currentTrove)) !=
-        TroveManager.Status.active
-      ) {
+      if (TroveManager.Status(troveManager.getTroveStatus(currentTrove)) != TroveManager.Status.active) {
         return false;
       }
       // Uncomment to check that the condition is meaningful

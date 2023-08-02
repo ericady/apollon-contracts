@@ -57,9 +57,7 @@ contract DebtTokenManager is Ownable, CheckContract, IDebtTokenManager {
     return stableCoin;
   }
 
-  function getDebtToken(
-    address _address
-  ) external view override returns (IDebtToken debtToken) {
+  function getDebtToken(address _address) external view override returns (IDebtToken debtToken) {
     debtToken = debtTokens[_address];
     require(address(debtToken) != address(0), 'debtToken does not exist');
     return debtToken;
@@ -74,14 +72,10 @@ contract DebtTokenManager is Ownable, CheckContract, IDebtTokenManager {
     string memory _version,
     bool _isStableCoin
   ) external override onlyOwner returns (bool) {
-    if (_isStableCoin)
-      require(address(stableCoin) == address(0), 'stableCoin already exists');
+    if (_isStableCoin) require(address(stableCoin) == address(0), 'stableCoin already exists');
 
     for (uint i = 0; i < debtTokensArray.length; i++) {
-      if (
-        keccak256(bytes(debtTokensArray[i].symbol())) !=
-        keccak256(bytes(_symbol))
-      ) continue;
+      if (keccak256(bytes(debtTokensArray[i].symbol())) != keccak256(bytes(_symbol))) continue;
       require(false, 'symbol already exists');
     }
 

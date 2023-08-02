@@ -12,9 +12,7 @@ This script converts gas left to gas used per step, accounting for and removing 
 
 const fs = require('fs');
 
-data = fs
-  .readFileSync('./gasTest/outputs/gasTestOutput.txt', 'utf8')
-  .split('\n');
+data = fs.readFileSync('./gasTest/outputs/gasTestOutput.txt', 'utf8').split('\n');
 
 // Grab the step numbers and gas left at each step
 const gasUsed = [];

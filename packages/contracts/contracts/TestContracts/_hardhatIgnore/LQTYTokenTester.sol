@@ -30,10 +30,7 @@ contract LQTYTokenTester is LQTYToken {
     _mint(account, amount);
   }
 
-  function unprotectedSendToLQTYStaking(
-    address _sender,
-    uint256 _amount
-  ) external {
+  function unprotectedSendToLQTYStaking(address _sender, uint256 _amount) external {
     // No check for the caller here
 
     if (_isFirstYear()) {
@@ -42,19 +39,11 @@ contract LQTYTokenTester is LQTYToken {
     _transfer(_sender, lqtyStakingAddress, _amount);
   }
 
-  function callInternalApprove(
-    address owner,
-    address spender,
-    uint256 amount
-  ) external returns (bool) {
+  function callInternalApprove(address owner, address spender, uint256 amount) external returns (bool) {
     _approve(owner, spender, amount);
   }
 
-  function callInternalTransfer(
-    address sender,
-    address recipient,
-    uint256 amount
-  ) external returns (bool) {
+  function callInternalTransfer(address sender, address recipient, uint256 amount) external returns (bool) {
     _transfer(sender, recipient, amount);
   }
 

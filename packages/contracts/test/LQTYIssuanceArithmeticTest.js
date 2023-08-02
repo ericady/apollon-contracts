@@ -16,11 +16,7 @@ const logLQTYBalanceAndError = (LQTYBalance_A, expectedLQTYBalance_A) => {
   );
 };
 
-const repeatedlyIssueLQTY = async (
-  stabilityPool,
-  timeBetweenIssuances,
-  duration
-) => {
+const repeatedlyIssueLQTY = async (stabilityPool, timeBetweenIssuances, duration) => {
   const startTimestamp = th.toBN(await th.getLatestBlockTimestamp(web3));
   let timePassed = 0;
 
@@ -50,12 +46,11 @@ contract('LQTY community issuance arithmetic tests', async accounts => {
 
   beforeEach(async () => {
     contracts = await deploymentHelper.deployLiquityCore();
-    const LQTYContracts =
-      await deploymentHelper.deployLQTYTesterContractsHardhat(
-        bountyAddress,
-        lpRewardsAddress,
-        multisig
-      );
+    const LQTYContracts = await deploymentHelper.deployLQTYTesterContractsHardhat(
+      bountyAddress,
+      lpRewardsAddress,
+      multisig
+    );
     contracts.stabilityPool = await StabilityPool.new();
     contracts = await deploymentHelper.deployLUSDToken(contracts);
 
@@ -73,26 +68,19 @@ contract('LQTY community issuance arithmetic tests', async accounts => {
   // Accuracy tests
   it("getCumulativeIssuanceFraction(): fraction doesn't increase if less than a minute has passed", async () => {
     // progress time 1 week
-    await th.fastForwardTime(
-      timeValues.MINUTES_IN_ONE_WEEK,
-      web3.currentProvider
-    );
+    await th.fastForwardTime(timeValues.MINUTES_IN_ONE_WEEK, web3.currentProvider);
 
     await communityIssuanceTester.unprotectedIssueLQTY();
 
-    const issuanceFractionBefore =
-      await communityIssuanceTester.getCumulativeIssuanceFraction();
+    const issuanceFractionBefore = await communityIssuanceTester.getCumulativeIssuanceFraction();
     assert.isTrue(issuanceFractionBefore.gt(th.toBN('0')));
     console.log(`issuance fraction before: ${issuanceFractionBefore}`);
-    const blockTimestampBefore = th.toBN(
-      await th.getLatestBlockTimestamp(web3)
-    );
+    const blockTimestampBefore = th.toBN(await th.getLatestBlockTimestamp(web3));
 
     // progress time 10 seconds
     await th.fastForwardTime(10, web3.currentProvider);
 
-    const issuanceFractionAfter =
-      await communityIssuanceTester.getCumulativeIssuanceFraction();
+    const issuanceFractionAfter = await communityIssuanceTester.getCumulativeIssuanceFraction();
     const blockTimestampAfter = th.toBN(await th.getLatestBlockTimestamp(web3));
 
     const timestampDiff = blockTimestampAfter.sub(blockTimestampBefore);
@@ -113,14 +101,9 @@ contract('LQTY community issuance arithmetic tests', async accounts => {
 
   // using the result of this to advance time by the desired amount from the deployment time, whether or not some extra time has passed in the meanwhile
   const getDuration = async expectedDuration => {
-    const deploymentTime = (
-      await communityIssuanceTester.deploymentTime()
-    ).toNumber();
+    const deploymentTime = (await communityIssuanceTester.deploymentTime()).toNumber();
     const currentTime = await th.getLatestBlockTimestamp(web3);
-    const duration = Math.max(
-      expectedDuration - (currentTime - deploymentTime),
-      0
-    );
+    const duration = Math.max(expectedDuration - (currentTime - deploymentTime), 0);
 
     return duration;
   };
@@ -128,8 +111,7 @@ contract('LQTY community issuance arithmetic tests', async accounts => {
   it('Cumulative issuance fraction is 0.0000013 after a minute', async () => {
     // console.log(`supply cap: ${await communityIssuanceTester.LQTYSupplyCap()}`)
 
-    const initialIssuanceFraction =
-      await communityIssuanceTester.getCumulativeIssuanceFraction();
+    const initialIssuanceFraction = await communityIssuanceTester.getCumulativeIssuanceFraction();
     assert.equal(initialIssuanceFraction, 0);
 
     const duration = await getDuration(timeValues.SECONDS_IN_ONE_MINUTE);
@@ -137,8 +119,7 @@ contract('LQTY community issuance arithmetic tests', async accounts => {
     // Fast forward time
     await th.fastForwardTime(duration, web3.currentProvider);
 
-    const issuanceFraction =
-      await communityIssuanceTester.getCumulativeIssuanceFraction();
+    const issuanceFraction = await communityIssuanceTester.getCumulativeIssuanceFraction();
     const expectedIssuanceFraction = '1318772305025';
 
     const absError = th.toBN(expectedIssuanceFraction).sub(issuanceFraction);
@@ -149,23 +130,18 @@ contract('LQTY community issuance arithmetic tests', async accounts => {
     //    abs. error: ${absError}`
     // )
 
-    assert.isAtMost(
-      th.getDifference(issuanceFraction, expectedIssuanceFraction),
-      100000000
-    );
+    assert.isAtMost(th.getDifference(issuanceFraction, expectedIssuanceFraction), 100000000);
   });
 
   it('Cumulative issuance fraction is 0.000079 after an hour', async () => {
-    const initialIssuanceFraction =
-      await communityIssuanceTester.getCumulativeIssuanceFraction();
+    const initialIssuanceFraction = await communityIssuanceTester.getCumulativeIssuanceFraction();
     assert.equal(initialIssuanceFraction, 0);
 
     const duration = await getDuration(timeValues.SECONDS_IN_ONE_HOUR);
     // Fast forward time
     await th.fastForwardTime(duration, web3.currentProvider);
 
-    const issuanceFraction =
-      await communityIssuanceTester.getCumulativeIssuanceFraction();
+    const issuanceFraction = await communityIssuanceTester.getCumulativeIssuanceFraction();
     const expectedIssuanceFraction = '79123260066094';
 
     const absError = th.toBN(expectedIssuanceFraction).sub(issuanceFraction);
@@ -176,23 +152,18 @@ contract('LQTY community issuance arithmetic tests', async accounts => {
     //    abs. error: ${absError}`
     // )
 
-    assert.isAtMost(
-      th.getDifference(issuanceFraction, expectedIssuanceFraction),
-      1000000000
-    );
+    assert.isAtMost(th.getDifference(issuanceFraction, expectedIssuanceFraction), 1000000000);
   });
 
   it('Cumulative issuance fraction is 0.0019 after a day', async () => {
-    const initialIssuanceFraction =
-      await communityIssuanceTester.getCumulativeIssuanceFraction();
+    const initialIssuanceFraction = await communityIssuanceTester.getCumulativeIssuanceFraction();
     assert.equal(initialIssuanceFraction, 0);
 
     const duration = await getDuration(timeValues.SECONDS_IN_ONE_DAY);
     // Fast forward time
     await th.fastForwardTime(duration, web3.currentProvider);
 
-    const issuanceFraction =
-      await communityIssuanceTester.getCumulativeIssuanceFraction();
+    const issuanceFraction = await communityIssuanceTester.getCumulativeIssuanceFraction();
     const expectedIssuanceFraction = '1897231348441660';
 
     const absError = th.toBN(expectedIssuanceFraction).sub(issuanceFraction);
@@ -203,23 +174,18 @@ contract('LQTY community issuance arithmetic tests', async accounts => {
     //    abs. error: ${absError}`
     // )
 
-    assert.isAtMost(
-      th.getDifference(issuanceFraction, expectedIssuanceFraction),
-      1000000000
-    );
+    assert.isAtMost(th.getDifference(issuanceFraction, expectedIssuanceFraction), 1000000000);
   });
 
   it('Cumulative issuance fraction is 0.013 after a week', async () => {
-    const initialIssuanceFraction =
-      await communityIssuanceTester.getCumulativeIssuanceFraction();
+    const initialIssuanceFraction = await communityIssuanceTester.getCumulativeIssuanceFraction();
     assert.equal(initialIssuanceFraction, 0);
 
     const duration = await getDuration(timeValues.SECONDS_IN_ONE_WEEK);
     // Fast forward time
     await th.fastForwardTime(duration, web3.currentProvider);
 
-    const issuanceFraction =
-      await communityIssuanceTester.getCumulativeIssuanceFraction();
+    const issuanceFraction = await communityIssuanceTester.getCumulativeIssuanceFraction();
     const expectedIssuanceFraction = '13205268780628400';
 
     const absError = th.toBN(expectedIssuanceFraction).sub(issuanceFraction);
@@ -230,23 +196,18 @@ contract('LQTY community issuance arithmetic tests', async accounts => {
     //    abs. error: ${absError}`
     // )
 
-    assert.isAtMost(
-      th.getDifference(issuanceFraction, expectedIssuanceFraction),
-      1000000000
-    );
+    assert.isAtMost(th.getDifference(issuanceFraction, expectedIssuanceFraction), 1000000000);
   });
 
   it('Cumulative issuance fraction is 0.055 after a month', async () => {
-    const initialIssuanceFraction =
-      await communityIssuanceTester.getCumulativeIssuanceFraction();
+    const initialIssuanceFraction = await communityIssuanceTester.getCumulativeIssuanceFraction();
     assert.equal(initialIssuanceFraction, 0);
 
     const duration = await getDuration(timeValues.SECONDS_IN_ONE_MONTH);
     // Fast forward time
     await th.fastForwardTime(duration, web3.currentProvider);
 
-    const issuanceFraction =
-      await communityIssuanceTester.getCumulativeIssuanceFraction();
+    const issuanceFraction = await communityIssuanceTester.getCumulativeIssuanceFraction();
     const expectedIssuanceFraction = '55378538087966600';
 
     const absError = th.toBN(expectedIssuanceFraction).sub(issuanceFraction);
@@ -257,23 +218,18 @@ contract('LQTY community issuance arithmetic tests', async accounts => {
     //    abs. error: ${absError}`
     // )
 
-    assert.isAtMost(
-      th.getDifference(issuanceFraction, expectedIssuanceFraction),
-      1000000000
-    );
+    assert.isAtMost(th.getDifference(issuanceFraction, expectedIssuanceFraction), 1000000000);
   });
 
   it('Cumulative issuance fraction is 0.16 after 3 months', async () => {
-    const initialIssuanceFraction =
-      await communityIssuanceTester.getCumulativeIssuanceFraction();
+    const initialIssuanceFraction = await communityIssuanceTester.getCumulativeIssuanceFraction();
     assert.equal(initialIssuanceFraction, 0);
 
     const duration = await getDuration(timeValues.SECONDS_IN_ONE_MONTH * 3);
     // Fast forward time
     await th.fastForwardTime(duration, web3.currentProvider);
 
-    const issuanceFraction =
-      await communityIssuanceTester.getCumulativeIssuanceFraction();
+    const issuanceFraction = await communityIssuanceTester.getCumulativeIssuanceFraction();
     const expectedIssuanceFraction = '157105100752037000';
 
     const absError = th.toBN(expectedIssuanceFraction).sub(issuanceFraction);
@@ -284,23 +240,18 @@ contract('LQTY community issuance arithmetic tests', async accounts => {
     //    abs. error: ${absError}`
     // )
 
-    assert.isAtMost(
-      th.getDifference(issuanceFraction, expectedIssuanceFraction),
-      1000000000
-    );
+    assert.isAtMost(th.getDifference(issuanceFraction, expectedIssuanceFraction), 1000000000);
   });
 
   it('Cumulative issuance fraction is 0.29 after 6 months', async () => {
-    const initialIssuanceFraction =
-      await communityIssuanceTester.getCumulativeIssuanceFraction();
+    const initialIssuanceFraction = await communityIssuanceTester.getCumulativeIssuanceFraction();
     assert.equal(initialIssuanceFraction, 0);
 
     const duration = await getDuration(timeValues.SECONDS_IN_ONE_MONTH * 6);
     // Fast forward time
     await th.fastForwardTime(duration, web3.currentProvider);
 
-    const issuanceFraction =
-      await communityIssuanceTester.getCumulativeIssuanceFraction();
+    const issuanceFraction = await communityIssuanceTester.getCumulativeIssuanceFraction();
     const expectedIssuanceFraction = 289528188821766000;
 
     const absError = th.toBN(expectedIssuanceFraction).sub(issuanceFraction);
@@ -311,23 +262,18 @@ contract('LQTY community issuance arithmetic tests', async accounts => {
     //    abs. error: ${absError}`
     // )
 
-    assert.isAtMost(
-      th.getDifference(issuanceFraction, expectedIssuanceFraction),
-      1000000000
-    );
+    assert.isAtMost(th.getDifference(issuanceFraction, expectedIssuanceFraction), 1000000000);
   });
 
   it('Cumulative issuance fraction is 0.5 after a year', async () => {
-    const initialIssuanceFraction =
-      await communityIssuanceTester.getCumulativeIssuanceFraction();
+    const initialIssuanceFraction = await communityIssuanceTester.getCumulativeIssuanceFraction();
     assert.equal(initialIssuanceFraction, 0);
 
     const duration = await getDuration(timeValues.SECONDS_IN_ONE_YEAR);
     // Fast forward time
     await th.fastForwardTime(duration, web3.currentProvider);
 
-    const issuanceFraction =
-      await communityIssuanceTester.getCumulativeIssuanceFraction();
+    const issuanceFraction = await communityIssuanceTester.getCumulativeIssuanceFraction();
     const expectedIssuanceFraction = dec(5, 17);
 
     const absError = th.toBN(expectedIssuanceFraction).sub(issuanceFraction);
@@ -338,23 +284,18 @@ contract('LQTY community issuance arithmetic tests', async accounts => {
     //    abs. error: ${absError}`
     // )
 
-    assert.isAtMost(
-      th.getDifference(issuanceFraction, expectedIssuanceFraction),
-      1000000000
-    );
+    assert.isAtMost(th.getDifference(issuanceFraction, expectedIssuanceFraction), 1000000000);
   });
 
   it('Cumulative issuance fraction is 0.75 after 2 years', async () => {
-    const initialIssuanceFraction =
-      await communityIssuanceTester.getCumulativeIssuanceFraction();
+    const initialIssuanceFraction = await communityIssuanceTester.getCumulativeIssuanceFraction();
     assert.equal(initialIssuanceFraction, 0);
 
     const duration = await getDuration(timeValues.SECONDS_IN_ONE_YEAR * 2);
     // Fast forward time
     await th.fastForwardTime(duration, web3.currentProvider);
 
-    const issuanceFraction =
-      await communityIssuanceTester.getCumulativeIssuanceFraction();
+    const issuanceFraction = await communityIssuanceTester.getCumulativeIssuanceFraction();
     const expectedIssuanceFraction = dec(75, 16);
 
     const absError = th.toBN(expectedIssuanceFraction).sub(issuanceFraction);
@@ -365,23 +306,18 @@ contract('LQTY community issuance arithmetic tests', async accounts => {
     //    abs. error: ${absError}`
     // )
 
-    assert.isAtMost(
-      th.getDifference(issuanceFraction, expectedIssuanceFraction),
-      1000000000
-    );
+    assert.isAtMost(th.getDifference(issuanceFraction, expectedIssuanceFraction), 1000000000);
   });
 
   it('Cumulative issuance fraction is 0.875 after 3 years', async () => {
-    const initialIssuanceFraction =
-      await communityIssuanceTester.getCumulativeIssuanceFraction();
+    const initialIssuanceFraction = await communityIssuanceTester.getCumulativeIssuanceFraction();
     assert.equal(initialIssuanceFraction, 0);
 
     const duration = await getDuration(timeValues.SECONDS_IN_ONE_YEAR * 3);
     // Fast forward time
     await th.fastForwardTime(duration, web3.currentProvider);
 
-    const issuanceFraction =
-      await communityIssuanceTester.getCumulativeIssuanceFraction();
+    const issuanceFraction = await communityIssuanceTester.getCumulativeIssuanceFraction();
     const expectedIssuanceFraction = dec(875, 15);
 
     const absError = th.toBN(expectedIssuanceFraction).sub(issuanceFraction);
@@ -392,23 +328,18 @@ contract('LQTY community issuance arithmetic tests', async accounts => {
     //    abs. error: ${absError}`
     // )
 
-    assert.isAtMost(
-      th.getDifference(issuanceFraction, expectedIssuanceFraction),
-      1000000000
-    );
+    assert.isAtMost(th.getDifference(issuanceFraction, expectedIssuanceFraction), 1000000000);
   });
 
   it('Cumulative issuance fraction is 0.9375 after 4 years', async () => {
-    const initialIssuanceFraction =
-      await communityIssuanceTester.getCumulativeIssuanceFraction();
+    const initialIssuanceFraction = await communityIssuanceTester.getCumulativeIssuanceFraction();
     assert.equal(initialIssuanceFraction, 0);
 
     const duration = await getDuration(timeValues.SECONDS_IN_ONE_YEAR * 4);
     // Fast forward time
     await th.fastForwardTime(duration, web3.currentProvider);
 
-    const issuanceFraction =
-      await communityIssuanceTester.getCumulativeIssuanceFraction();
+    const issuanceFraction = await communityIssuanceTester.getCumulativeIssuanceFraction();
     const expectedIssuanceFraction = '937500000000000000';
 
     const absError = th.toBN(expectedIssuanceFraction).sub(issuanceFraction);
@@ -419,23 +350,18 @@ contract('LQTY community issuance arithmetic tests', async accounts => {
     //    abs. error: ${absError}`
     // )
 
-    assert.isAtMost(
-      th.getDifference(issuanceFraction, expectedIssuanceFraction),
-      1000000000
-    );
+    assert.isAtMost(th.getDifference(issuanceFraction, expectedIssuanceFraction), 1000000000);
   });
 
   it('Cumulative issuance fraction is 0.999 after 10 years', async () => {
-    const initialIssuanceFraction =
-      await communityIssuanceTester.getCumulativeIssuanceFraction();
+    const initialIssuanceFraction = await communityIssuanceTester.getCumulativeIssuanceFraction();
     assert.equal(initialIssuanceFraction, 0);
 
     const duration = await getDuration(timeValues.SECONDS_IN_ONE_YEAR * 10);
     // Fast forward time
     await th.fastForwardTime(duration, web3.currentProvider);
 
-    const issuanceFraction =
-      await communityIssuanceTester.getCumulativeIssuanceFraction();
+    const issuanceFraction = await communityIssuanceTester.getCumulativeIssuanceFraction();
     const expectedIssuanceFraction = '999023437500000000';
 
     const absError = th.toBN(expectedIssuanceFraction).sub(issuanceFraction);
@@ -446,23 +372,18 @@ contract('LQTY community issuance arithmetic tests', async accounts => {
     //    abs. error: ${absError}`
     // )
 
-    assert.isAtMost(
-      th.getDifference(issuanceFraction, expectedIssuanceFraction),
-      1000000000
-    );
+    assert.isAtMost(th.getDifference(issuanceFraction, expectedIssuanceFraction), 1000000000);
   });
 
   it('Cumulative issuance fraction is 0.999999 after 20 years', async () => {
-    const initialIssuanceFraction =
-      await communityIssuanceTester.getCumulativeIssuanceFraction();
+    const initialIssuanceFraction = await communityIssuanceTester.getCumulativeIssuanceFraction();
     assert.equal(initialIssuanceFraction, 0);
 
     const duration = await getDuration(timeValues.SECONDS_IN_ONE_YEAR * 20);
     // Fast forward time
     await th.fastForwardTime(duration, web3.currentProvider);
 
-    const issuanceFraction =
-      await communityIssuanceTester.getCumulativeIssuanceFraction();
+    const issuanceFraction = await communityIssuanceTester.getCumulativeIssuanceFraction();
     const expectedIssuanceFraction = '999999046325684000';
 
     const absError = th.toBN(expectedIssuanceFraction).sub(issuanceFraction);
@@ -473,23 +394,18 @@ contract('LQTY community issuance arithmetic tests', async accounts => {
     //    abs. error: ${absError}`
     // )
 
-    assert.isAtMost(
-      th.getDifference(issuanceFraction, expectedIssuanceFraction),
-      1000000000
-    );
+    assert.isAtMost(th.getDifference(issuanceFraction, expectedIssuanceFraction), 1000000000);
   });
 
   it('Cumulative issuance fraction is 0.999999999 after 30 years', async () => {
-    const initialIssuanceFraction =
-      await communityIssuanceTester.getCumulativeIssuanceFraction();
+    const initialIssuanceFraction = await communityIssuanceTester.getCumulativeIssuanceFraction();
     assert.equal(initialIssuanceFraction, 0);
 
     const duration = await getDuration(timeValues.SECONDS_IN_ONE_YEAR * 30);
     // Fast forward time
     await th.fastForwardTime(duration, web3.currentProvider);
 
-    const issuanceFraction =
-      await communityIssuanceTester.getCumulativeIssuanceFraction();
+    const issuanceFraction = await communityIssuanceTester.getCumulativeIssuanceFraction();
     const expectedIssuanceFraction = '999999999068677000';
 
     const absError = th.toBN(expectedIssuanceFraction).sub(issuanceFraction);
@@ -500,10 +416,7 @@ contract('LQTY community issuance arithmetic tests', async accounts => {
     //    abs. error: ${absError}`
     // )
 
-    assert.isAtMost(
-      th.getDifference(issuanceFraction, expectedIssuanceFraction),
-      1000000000
-    );
+    assert.isAtMost(th.getDifference(issuanceFraction, expectedIssuanceFraction), 1000000000);
   });
 
   // --- Token issuance for yearly halving ---
@@ -531,10 +444,7 @@ contract('LQTY community issuance arithmetic tests', async accounts => {
     //    abs. error: ${absError}`
     // )
 
-    assert.isAtMost(
-      th.getDifference(totalLQTYIssued, expectedTotalLQTYIssued),
-      1000000000000000
-    );
+    assert.isAtMost(th.getDifference(totalLQTYIssued, expectedTotalLQTYIssued), 1000000000000000);
   });
 
   it('Total LQTY tokens issued is 2,531.94 after an hour', async () => {
@@ -558,10 +468,7 @@ contract('LQTY community issuance arithmetic tests', async accounts => {
     //    abs. error: ${absError}`
     // )
 
-    assert.isAtMost(
-      th.getDifference(totalLQTYIssued, expectedTotalLQTYIssued),
-      1000000000000000
-    );
+    assert.isAtMost(th.getDifference(totalLQTYIssued, expectedTotalLQTYIssued), 1000000000000000);
   });
 
   it('Total LQTY tokens issued is 60,711.40 after a day', async () => {
@@ -585,10 +492,7 @@ contract('LQTY community issuance arithmetic tests', async accounts => {
     //    abs. error: ${absError}`
     // )
 
-    assert.isAtMost(
-      th.getDifference(totalLQTYIssued, expectedTotalLQTYIssued),
-      1000000000000000
-    );
+    assert.isAtMost(th.getDifference(totalLQTYIssued, expectedTotalLQTYIssued), 1000000000000000);
   });
 
   it('Total LQTY tokens issued is 422,568.60 after a week', async () => {
@@ -612,10 +516,7 @@ contract('LQTY community issuance arithmetic tests', async accounts => {
     //    abs. error: ${absError}`
     // )
 
-    assert.isAtMost(
-      th.getDifference(totalLQTYIssued, expectedTotalLQTYIssued),
-      1000000000000000
-    );
+    assert.isAtMost(th.getDifference(totalLQTYIssued, expectedTotalLQTYIssued), 1000000000000000);
   });
 
   it('Total LQTY tokens issued is 1,772,113.21 after a month', async () => {
@@ -639,10 +540,7 @@ contract('LQTY community issuance arithmetic tests', async accounts => {
     //    abs. error: ${absError}`
     // )
 
-    assert.isAtMost(
-      th.getDifference(totalLQTYIssued, expectedTotalLQTYIssued),
-      1000000000000000
-    );
+    assert.isAtMost(th.getDifference(totalLQTYIssued, expectedTotalLQTYIssued), 1000000000000000);
   });
 
   it('Total LQTY tokens issued is 5,027,363.22 after 3 months', async () => {
@@ -666,10 +564,7 @@ contract('LQTY community issuance arithmetic tests', async accounts => {
     //    abs. error: ${absError}`
     // )
 
-    assert.isAtMost(
-      th.getDifference(totalLQTYIssued, expectedTotalLQTYIssued),
-      1000000000000000
-    );
+    assert.isAtMost(th.getDifference(totalLQTYIssued, expectedTotalLQTYIssued), 1000000000000000);
   });
 
   it('Total LQTY tokens issued is 9,264,902.04 after 6 months', async () => {
@@ -693,10 +588,7 @@ contract('LQTY community issuance arithmetic tests', async accounts => {
     //    abs. error: ${absError}`
     // )
 
-    assert.isAtMost(
-      th.getDifference(totalLQTYIssued, expectedTotalLQTYIssued),
-      1000000000000000
-    );
+    assert.isAtMost(th.getDifference(totalLQTYIssued, expectedTotalLQTYIssued), 1000000000000000);
   });
 
   it('Total LQTY tokens issued is 16,000,000 after a year', async () => {
@@ -720,10 +612,7 @@ contract('LQTY community issuance arithmetic tests', async accounts => {
     //    abs. error: ${absError}`
     // )
 
-    assert.isAtMost(
-      th.getDifference(totalLQTYIssued, expectedTotalLQTYIssued),
-      1000000000000000
-    );
+    assert.isAtMost(th.getDifference(totalLQTYIssued, expectedTotalLQTYIssued), 1000000000000000);
   });
 
   it('Total LQTY tokens issued is 24,000,000 after 2 years', async () => {
@@ -747,10 +636,7 @@ contract('LQTY community issuance arithmetic tests', async accounts => {
     //    abs. error: ${absError}`
     // )
 
-    assert.isAtMost(
-      th.getDifference(totalLQTYIssued, expectedTotalLQTYIssued),
-      1000000000000000
-    );
+    assert.isAtMost(th.getDifference(totalLQTYIssued, expectedTotalLQTYIssued), 1000000000000000);
   });
 
   it('Total LQTY tokens issued is 28,000,000 after 3 years', async () => {
@@ -774,10 +660,7 @@ contract('LQTY community issuance arithmetic tests', async accounts => {
     //    abs. error: ${absError}`
     // )
 
-    assert.isAtMost(
-      th.getDifference(totalLQTYIssued, expectedTotalLQTYIssued),
-      1000000000000000
-    );
+    assert.isAtMost(th.getDifference(totalLQTYIssued, expectedTotalLQTYIssued), 1000000000000000);
   });
 
   it('Total LQTY tokens issued is 30,000,000 after 4 years', async () => {
@@ -801,10 +684,7 @@ contract('LQTY community issuance arithmetic tests', async accounts => {
     //    abs. error: ${absError}`
     // )
 
-    assert.isAtMost(
-      th.getDifference(totalLQTYIssued, expectedTotalLQTYIssued),
-      1000000000000000
-    );
+    assert.isAtMost(th.getDifference(totalLQTYIssued, expectedTotalLQTYIssued), 1000000000000000);
   });
 
   it('Total LQTY tokens issued is 31,968,750 after 10 years', async () => {
@@ -828,10 +708,7 @@ contract('LQTY community issuance arithmetic tests', async accounts => {
     //    abs. error: ${absError}`
     // )
 
-    assert.isAtMost(
-      th.getDifference(totalLQTYIssued, expectedTotalLQTYIssued),
-      1000000000000000
-    );
+    assert.isAtMost(th.getDifference(totalLQTYIssued, expectedTotalLQTYIssued), 1000000000000000);
   });
 
   it('Total LQTY tokens issued is 31,999,969.48 after 20 years', async () => {
@@ -855,10 +732,7 @@ contract('LQTY community issuance arithmetic tests', async accounts => {
     //    abs. error: ${absError}`
     // )
 
-    assert.isAtMost(
-      th.getDifference(totalLQTYIssued, expectedTotalLQTYIssued),
-      1000000000000000
-    );
+    assert.isAtMost(th.getDifference(totalLQTYIssued, expectedTotalLQTYIssued), 1000000000000000);
   });
 
   it('Total LQTY tokens issued is 31,999,999.97 after 30 years', async () => {
@@ -882,10 +756,7 @@ contract('LQTY community issuance arithmetic tests', async accounts => {
     //    abs. error: ${absError}`
     // )
 
-    assert.isAtMost(
-      th.getDifference(totalLQTYIssued, expectedTotalLQTYIssued),
-      1000000000000000
-    );
+    assert.isAtMost(th.getDifference(totalLQTYIssued, expectedTotalLQTYIssued), 1000000000000000);
   });
 
   /* ---  

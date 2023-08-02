@@ -1,21 +1,14 @@
 // Test with:
 // GAS_PRICE=0 BLOCK_NUMBER=12612689 npx hardhat run mainnetDeployment/balancerPoolDeployment.js --config hardhat.config.mainnet-fork.js
 
-const {
-  WeightedPool2TokensFactory,
-} = require('./ABIs/WeightedPool2TokensFactory.js');
+const { WeightedPool2TokensFactory } = require('./ABIs/WeightedPool2TokensFactory.js');
 const { WeightedPool2Tokens } = require('./ABIs/WeightedPool2Tokens.js');
 const { IVault } = require('./ABIs/IVault.js');
 const { ERC20 } = require('./ABIs/ERC20.js');
 const { WETH: WETH_ABI } = require('./ABIs/WETH.js');
-const {
-  ChainlinkAggregatorV3Interface,
-} = require('./ABIs/ChainlinkAggregatorV3Interface.js');
+const { ChainlinkAggregatorV3Interface } = require('./ABIs/ChainlinkAggregatorV3Interface.js');
 const toBigNum = ethers.BigNumber.from;
-const {
-  TestHelper: th,
-  TimeValues: timeVals,
-} = require('../utils/testHelpers.js');
+const { TestHelper: th, TimeValues: timeVals } = require('../utils/testHelpers.js');
 const { dec } = th;
 // Addresses are the same on all networks
 
@@ -59,18 +52,10 @@ async function main() {
   const deployerWalletAddress = deployerWallet.address;
   console.log('Deployer: ', deployerWalletAddress);
 
-  const factory = new ethers.Contract(
-    ORACLE_POOL_FACTORY,
-    WeightedPool2TokensFactory.abi,
-    deployerWallet
-  );
+  const factory = new ethers.Contract(ORACLE_POOL_FACTORY, WeightedPool2TokensFactory.abi, deployerWallet);
   const vault = new ethers.Contract(VAULT, IVault.abi, deployerWallet);
 
-  const chainlinkProxy = new ethers.Contract(
-    CHAINLINK_ETHUSD_PROXY,
-    ChainlinkAggregatorV3Interface,
-    deployerWallet
-  );
+  const chainlinkProxy = new ethers.Contract(CHAINLINK_ETHUSD_PROXY, ChainlinkAggregatorV3Interface, deployerWallet);
 
   let poolAddress;
   let receipt1;
@@ -82,15 +67,7 @@ async function main() {
     // DELEGATE_OWNER grants permission to governance for dynamic fee management
     // Any other address lets that address directly set the fees
     const oracleEnabled = true;
-    const tx1 = await factory.create(
-      NAME,
-      SYMBOL,
-      tokens,
-      weights,
-      swapFeePercentage,
-      oracleEnabled,
-      DELEGATE_OWNER
-    );
+    const tx1 = await factory.create(NAME, SYMBOL, tokens, weights, swapFeePercentage, oracleEnabled, DELEGATE_OWNER);
     receipt1 = await tx1.wait();
     console.log('Create Pool gas: ', receipt1.gasUsed.toString());
 
@@ -102,11 +79,7 @@ async function main() {
   console.log('Pool Address: ', poolAddress);
 
   // We're going to need the PoolId later, so ask the contract for it
-  const pool = new ethers.Contract(
-    poolAddress,
-    WeightedPool2Tokens.abi,
-    deployerWallet
-  );
+  const pool = new ethers.Contract(poolAddress, WeightedPool2Tokens.abi, deployerWallet);
   const poolId = await pool.getPoolId();
 
   // Get latest price
@@ -117,9 +90,7 @@ async function main() {
   // Tokens must be in the same order
   // Values must be decimal-normalized!
   const weth_balance = INITIAL_FUNDING.mul(weights[1]).div(eth_price);
-  const lusd_balance = INITIAL_FUNDING.mul(weights[0]).div(
-    toBigNum(dec(1, 18))
-  );
+  const lusd_balance = INITIAL_FUNDING.mul(weights[0]).div(toBigNum(dec(1, 18)));
   const initialBalances = [lusd_balance, weth_balance];
   th.logBN('Initial LUSD', lusd_balance);
   th.logBN('Initial WETH', weth_balance);
@@ -127,10 +98,7 @@ async function main() {
   const JOIN_KIND_INIT = 0;
 
   // Construct magic userData
-  const initUserData = ethers.utils.defaultAbiCoder.encode(
-    ['uint256', 'uint256[]'],
-    [JOIN_KIND_INIT, initialBalances]
-  );
+  const initUserData = ethers.utils.defaultAbiCoder.encode(['uint256', 'uint256[]'], [JOIN_KIND_INIT, initialBalances]);
   const joinPoolRequest = {
     assets: tokens,
     maxAmountsIn: initialBalances,
@@ -168,12 +136,7 @@ async function main() {
   console.log('Approve LUSD gas: ', approveLusdReceipt.gasUsed.toString());
 
   // joins and exits are done on the Vault, not the pool
-  const tx2 = await vault.joinPool(
-    poolId,
-    deployerWalletAddress,
-    deployerWalletAddress,
-    joinPoolRequest
-  );
+  const tx2 = await vault.joinPool(poolId, deployerWalletAddress, deployerWalletAddress, joinPoolRequest);
   // You can wait for it like this, or just print the tx hash and monitor
   const receipt2 = await tx2.wait();
   console.log('Final tx status:', receipt2.status);

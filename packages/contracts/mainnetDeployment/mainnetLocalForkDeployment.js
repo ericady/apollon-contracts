@@ -18,9 +18,7 @@ async function main() {
   // Get the ETH whale signer
   const whale = await ethers.provider.getSigner(ETH_WHALE);
   console.log(`whale addr : ${await whale.getAddress()}`);
-  console.log(
-    `whale ETH balance: ${await ethers.provider.getBalance(whale.getAddress())}`
-  );
+  console.log(`whale ETH balance: ${await ethers.provider.getBalance(whale.getAddress())}`);
 
   // Send ETH to the deployer's address
   await whale.sendTransaction({

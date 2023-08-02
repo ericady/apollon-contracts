@@ -24,52 +24,25 @@ interface IDebtToken is IERC20, IERC2612, IBase {
 
   function burn(address _account, uint256 _amount) external;
 
-  function sendToPool(
-    address _sender,
-    address _poolAddress,
-    uint256 _amount
-  ) external;
+  function sendToPool(address _sender, address _poolAddress, uint256 _amount) external;
 
-  function returnFromPool(
-    address _poolAddress,
-    address _receiver,
-    uint256 _amount
-  ) external;
+  function returnFromPool(address _poolAddress, address _receiver, uint256 _amount) external;
 
   function totalSupply() external view override returns (uint256);
 
   function balanceOf(address account) external view override returns (uint256);
 
-  function transfer(
-    address recipient,
-    uint256 amount
-  ) external override returns (bool);
+  function transfer(address recipient, uint256 amount) external override returns (bool);
 
-  function allowance(
-    address owner,
-    address spender
-  ) external view override returns (uint256);
+  function allowance(address owner, address spender) external view override returns (uint256);
 
-  function approve(
-    address spender,
-    uint256 amount
-  ) external override returns (bool);
+  function approve(address spender, uint256 amount) external override returns (bool);
 
-  function transferFrom(
-    address sender,
-    address recipient,
-    uint256 amount
-  ) external override returns (bool);
+  function transferFrom(address sender, address recipient, uint256 amount) external override returns (bool);
 
-  function increaseAllowance(
-    address spender,
-    uint256 addedValue
-  ) external override returns (bool);
+  function increaseAllowance(address spender, uint256 addedValue) external override returns (bool);
 
-  function decreaseAllowance(
-    address spender,
-    uint256 subtractedValue
-  ) external override returns (bool);
+  function decreaseAllowance(address spender, uint256 subtractedValue) external override returns (bool);
 
   function domainSeparator() external view override returns (bytes32);
 

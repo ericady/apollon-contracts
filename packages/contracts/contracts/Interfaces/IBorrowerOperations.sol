@@ -16,37 +16,18 @@ interface IBorrowerOperations is IBBase {
   event DebtTokenManagerAddressChanged(address _debtTokenManagerAddress);
 
   event TroveCreated(address indexed _borrower, uint arrayIndex);
-  event TroveUpdated(
-    address indexed _borrower,
-    uint _debt,
-    uint _coll,
-    uint stake
-  );
+  event TroveUpdated(address indexed _borrower, uint _debt, uint _coll, uint stake);
   event LUSDBorrowingFeePaid(address indexed _borrower, uint _LUSDFee);
 
   // --- Functions ---
 
-  function openTrove(
-    TokenAmount[] memory _colls,
-    address _upperHint,
-    address _lowerHint
-  ) external;
+  function openTrove(TokenAmount[] memory _colls, address _upperHint, address _lowerHint) external;
 
-  function addColl(
-    TokenAmount[] memory _colls,
-    address _upperHint,
-    address _lowerHint
-  ) external;
+  function addColl(TokenAmount[] memory _colls, address _upperHint, address _lowerHint) external;
 
-  function withdrawColl(
-    TokenAmount[] memory _colls,
-    address _upperHint,
-    address _lowerHint
-  ) external;
+  function withdrawColl(TokenAmount[] memory _colls, address _upperHint, address _lowerHint) external;
 
   function closeTrove() external;
 
-  function getCompositeDebt(
-    DebtTokenAmount[] memory _debts
-  ) external pure returns (uint);
+  function getCompositeDebt(DebtTokenAmount[] memory _debts) external pure returns (uint);
 }

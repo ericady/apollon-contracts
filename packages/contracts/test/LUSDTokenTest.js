@@ -8,20 +8,14 @@ const { pack } = require('@ethersproject/solidity');
 const { hexlify } = require('@ethersproject/bytes');
 const { ecsign } = require('ethereumjs-util');
 
-const { toBN, assertRevert, assertAssert, dec, ZERO_ADDRESS } =
-  testHelpers.TestHelper;
+const { toBN, assertRevert, assertAssert, dec, ZERO_ADDRESS } = testHelpers.TestHelper;
 
 const sign = (digest, privateKey) => {
-  return ecsign(
-    Buffer.from(digest.slice(2), 'hex'),
-    Buffer.from(privateKey.slice(2), 'hex')
-  );
+  return ecsign(Buffer.from(digest.slice(2), 'hex'), Buffer.from(privateKey.slice(2), 'hex'));
 };
 
 const PERMIT_TYPEHASH = keccak256(
-  toUtf8Bytes(
-    'Permit(address owner,address spender,uint256 value,uint256 nonce,uint256 deadline)'
-  )
+  toUtf8Bytes('Permit(address owner,address spender,uint256 value,uint256 nonce,uint256 deadline)')
 );
 
 // Gets the EIP712 domain separator
@@ -30,11 +24,7 @@ const getDomainSeparator = (name, contractAddress, chainId, version) => {
     defaultAbiCoder.encode(
       ['bytes32', 'bytes32', 'bytes32', 'uint256', 'address'],
       [
-        keccak256(
-          toUtf8Bytes(
-            'EIP712Domain(string name,string version,uint256 chainId,address verifyingContract)'
-          )
-        ),
+        keccak256(toUtf8Bytes('EIP712Domain(string name,string version,uint256 chainId,address verifyingContract)')),
         keccak256(toUtf8Bytes(name)),
         keccak256(toUtf8Bytes(version)),
         parseInt(chainId),
@@ -46,17 +36,7 @@ const getDomainSeparator = (name, contractAddress, chainId, version) => {
 
 // Returns the EIP712 hash which should be signed by the user
 // in order to make a call to `permit`
-const getPermitDigest = (
-  name,
-  address,
-  chainId,
-  version,
-  owner,
-  spender,
-  value,
-  nonce,
-  deadline
-) => {
+const getPermitDigest = (name, address, chainId, version, owner, spender, value, nonce, deadline) => {
   const DOMAIN_SEPARATOR = getDomainSeparator(name, address, chainId, version);
   return keccak256(
     pack(
@@ -83,8 +63,7 @@ contract('LUSDToken', async accounts => {
 
   // the second account our hardhatenv creates (for Alice)
   // from https://github.com/liquity/dev/blob/main/packages/contracts/hardhatAccountsList2k.js#L3
-  const alicePrivateKey =
-    '0xeaa445c85f7b438dEd6e831d06a4eD0CEBDc2f8527f84Fcda6EBB5fCfAd4C0e9';
+  const alicePrivateKey = '0xeaa445c85f7b438dEd6e831d06a4eD0CEBDc2f8527f84Fcda6EBB5fCfAd4C0e9';
 
   let chainId;
   let lusdTokenOriginal;
@@ -100,28 +79,16 @@ contract('LUSDToken', async accounts => {
     beforeEach(async () => {
       const contracts = await deploymentHelper.deployTesterContractsHardhat();
 
-      const LQTYContracts = await deploymentHelper.deployLQTYContracts(
-        bountyAddress,
-        lpRewardsAddress,
-        multisig
-      );
+      const LQTYContracts = await deploymentHelper.deployLQTYContracts(bountyAddress, lpRewardsAddress, multisig);
 
       await deploymentHelper.connectCoreContracts(contracts, LQTYContracts);
       await deploymentHelper.connectLQTYContracts(LQTYContracts);
-      await deploymentHelper.connectLQTYContractsToCore(
-        LQTYContracts,
-        contracts
-      );
+      await deploymentHelper.connectLQTYContractsToCore(LQTYContracts, contracts);
 
       lusdTokenOriginal = contracts.lusdToken;
       if (withProxy) {
         const users = [alice, bob, carol, dennis];
-        await deploymentHelper.deployProxyScripts(
-          contracts,
-          LQTYContracts,
-          owner,
-          users
-        );
+        await deploymentHelper.deployProxyScripts(contracts, LQTYContracts, owner, users);
       }
 
       lusdTokenTester = contracts.lusdToken;
@@ -138,18 +105,9 @@ contract('LUSDToken', async accounts => {
 
       // mint some tokens
       if (withProxy) {
-        await lusdTokenOriginal.unprotectedMint(
-          lusdTokenTester.getProxyAddressFromUser(alice),
-          150
-        );
-        await lusdTokenOriginal.unprotectedMint(
-          lusdTokenTester.getProxyAddressFromUser(bob),
-          100
-        );
-        await lusdTokenOriginal.unprotectedMint(
-          lusdTokenTester.getProxyAddressFromUser(carol),
-          50
-        );
+        await lusdTokenOriginal.unprotectedMint(lusdTokenTester.getProxyAddressFromUser(alice), 150);
+        await lusdTokenOriginal.unprotectedMint(lusdTokenTester.getProxyAddressFromUser(bob), 100);
+        await lusdTokenOriginal.unprotectedMint(lusdTokenTester.getProxyAddressFromUser(carol), 50);
       } else {
         await lusdTokenOriginal.unprotectedMint(alice, 150);
         await lusdTokenOriginal.unprotectedMint(bob, 100);
@@ -216,14 +174,9 @@ contract('LUSDToken', async accounts => {
       });
 
       it('approve(): reverts when owner param is address(0)', async () => {
-        const txPromise = lusdTokenTester.callInternalApprove(
-          ZERO_ADDRESS,
-          alice,
-          dec(1000, 18),
-          {
-            from: bob,
-          }
-        );
+        const txPromise = lusdTokenTester.callInternalApprove(ZERO_ADDRESS, alice, dec(1000, 18), {
+          from: bob,
+        });
         await assertAssert(txPromise);
       });
     }
@@ -274,21 +227,11 @@ contract('LUSDToken', async accounts => {
     });
 
     it('transfer(): transferring to a blacklisted address reverts', async () => {
-      await assertRevert(
-        lusdTokenTester.transfer(lusdTokenTester.address, 1, { from: alice })
-      );
-      await assertRevert(
-        lusdTokenTester.transfer(ZERO_ADDRESS, 1, { from: alice })
-      );
-      await assertRevert(
-        lusdTokenTester.transfer(troveManager.address, 1, { from: alice })
-      );
-      await assertRevert(
-        lusdTokenTester.transfer(stabilityPool.address, 1, { from: alice })
-      );
-      await assertRevert(
-        lusdTokenTester.transfer(borrowerOperations.address, 1, { from: alice })
-      );
+      await assertRevert(lusdTokenTester.transfer(lusdTokenTester.address, 1, { from: alice }));
+      await assertRevert(lusdTokenTester.transfer(ZERO_ADDRESS, 1, { from: alice }));
+      await assertRevert(lusdTokenTester.transfer(troveManager.address, 1, { from: alice }));
+      await assertRevert(lusdTokenTester.transfer(stabilityPool.address, 1, { from: alice }));
+      await assertRevert(lusdTokenTester.transfer(borrowerOperations.address, 1, { from: alice }));
     });
 
     it("increaseAllowance(): increases an account's allowance by the correct amount", async () => {
@@ -324,22 +267,14 @@ contract('LUSDToken', async accounts => {
 
       // TODO: Rewrite this test - it should check the actual lusdTokenTester's balance.
       it('sendToPool(): changes balances of Stability pool and user by the correct amounts', async () => {
-        const stabilityPool_BalanceBefore = await lusdTokenTester.balanceOf(
-          stabilityPool.address
-        );
+        const stabilityPool_BalanceBefore = await lusdTokenTester.balanceOf(stabilityPool.address);
         const bob_BalanceBefore = await lusdTokenTester.balanceOf(bob);
         assert.equal(stabilityPool_BalanceBefore, 0);
         assert.equal(bob_BalanceBefore, 100);
 
-        await lusdTokenTester.unprotectedSendToPool(
-          bob,
-          stabilityPool.address,
-          75
-        );
+        await lusdTokenTester.unprotectedSendToPool(bob, stabilityPool.address, 75);
 
-        const stabilityPool_BalanceAfter = await lusdTokenTester.balanceOf(
-          stabilityPool.address
-        );
+        const stabilityPool_BalanceAfter = await lusdTokenTester.balanceOf(stabilityPool.address);
         const bob_BalanceAfter = await lusdTokenTester.balanceOf(bob);
         assert.equal(stabilityPool_BalanceAfter, 75);
         assert.equal(bob_BalanceAfter, 25);
@@ -350,22 +285,14 @@ contract('LUSDToken', async accounts => {
         await lusdTokenTester.unprotectedMint(stabilityPool.address, 100);
 
         /// --- TEST ---
-        const stabilityPool_BalanceBefore = await lusdTokenTester.balanceOf(
-          stabilityPool.address
-        );
+        const stabilityPool_BalanceBefore = await lusdTokenTester.balanceOf(stabilityPool.address);
         const bob_BalanceBefore = await lusdTokenTester.balanceOf(bob);
         assert.equal(stabilityPool_BalanceBefore, 100);
         assert.equal(bob_BalanceBefore, 100);
 
-        await lusdTokenTester.unprotectedReturnFromPool(
-          stabilityPool.address,
-          bob,
-          75
-        );
+        await lusdTokenTester.unprotectedReturnFromPool(stabilityPool.address, bob, 75);
 
-        const stabilityPool_BalanceAfter = await lusdTokenTester.balanceOf(
-          stabilityPool.address
-        );
+        const stabilityPool_BalanceAfter = await lusdTokenTester.balanceOf(stabilityPool.address);
         const bob_BalanceAfter = await lusdTokenTester.balanceOf(bob);
         assert.equal(stabilityPool_BalanceAfter, 25);
         assert.equal(bob_BalanceAfter, 175);
@@ -373,50 +300,28 @@ contract('LUSDToken', async accounts => {
     }
 
     it('transfer(): transferring to a blacklisted address reverts', async () => {
-      await assertRevert(
-        lusdTokenTester.transfer(lusdTokenTester.address, 1, { from: alice })
-      );
-      await assertRevert(
-        lusdTokenTester.transfer(ZERO_ADDRESS, 1, { from: alice })
-      );
-      await assertRevert(
-        lusdTokenTester.transfer(troveManager.address, 1, { from: alice })
-      );
-      await assertRevert(
-        lusdTokenTester.transfer(stabilityPool.address, 1, { from: alice })
-      );
-      await assertRevert(
-        lusdTokenTester.transfer(borrowerOperations.address, 1, { from: alice })
-      );
+      await assertRevert(lusdTokenTester.transfer(lusdTokenTester.address, 1, { from: alice }));
+      await assertRevert(lusdTokenTester.transfer(ZERO_ADDRESS, 1, { from: alice }));
+      await assertRevert(lusdTokenTester.transfer(troveManager.address, 1, { from: alice }));
+      await assertRevert(lusdTokenTester.transfer(stabilityPool.address, 1, { from: alice }));
+      await assertRevert(lusdTokenTester.transfer(borrowerOperations.address, 1, { from: alice }));
     });
 
     it('decreaseAllowance(): decreases allowance by the expected amount', async () => {
       await lusdTokenTester.approve(bob, dec(3, 18), { from: alice });
-      assert.equal(
-        (await lusdTokenTester.allowance(alice, bob)).toString(),
-        dec(3, 18)
-      );
+      assert.equal((await lusdTokenTester.allowance(alice, bob)).toString(), dec(3, 18));
       await lusdTokenTester.decreaseAllowance(bob, dec(1, 18), { from: alice });
-      assert.equal(
-        (await lusdTokenTester.allowance(alice, bob)).toString(),
-        dec(2, 18)
-      );
+      assert.equal((await lusdTokenTester.allowance(alice, bob)).toString(), dec(2, 18));
     });
 
     it('decreaseAllowance(): fails trying to decrease more than previously allowed', async () => {
       await lusdTokenTester.approve(bob, dec(3, 18), { from: alice });
-      assert.equal(
-        (await lusdTokenTester.allowance(alice, bob)).toString(),
-        dec(3, 18)
-      );
+      assert.equal((await lusdTokenTester.allowance(alice, bob)).toString(), dec(3, 18));
       await assertRevert(
         lusdTokenTester.decreaseAllowance(bob, dec(4, 18), { from: alice }),
         'ERC20: decreased allowance below zero'
       );
-      assert.equal(
-        (await lusdTokenTester.allowance(alice, bob)).toString(),
-        dec(3, 18)
-      );
+      assert.equal((await lusdTokenTester.allowance(alice, bob)).toString(), dec(3, 18));
     });
 
     // EIP2612 tests
@@ -434,12 +339,7 @@ contract('LUSDToken', async accounts => {
       it('Initializes DOMAIN_SEPARATOR correctly', async () => {
         assert.equal(
           await lusdTokenTester.domainSeparator(),
-          getDomainSeparator(
-            tokenName,
-            lusdTokenTester.address,
-            chainId,
-            tokenVersion
-          )
+          getDomainSeparator(tokenName, lusdTokenTester.address, chainId, tokenVersion)
         );
       });
 
@@ -496,22 +396,11 @@ contract('LUSDToken', async accounts => {
         // Check that approval was successful
         assert.equal(event.event, 'Approval');
         assert.equal(await lusdTokenTester.nonces(approve.owner), 1);
-        assert.equal(
-          await lusdTokenTester.allowance(approve.owner, approve.spender),
-          approve.value
-        );
+        assert.equal(await lusdTokenTester.allowance(approve.owner, approve.spender), approve.value);
 
         // Check that we can not use re-use the same signature, since the user's nonce has been incremented (replay protection)
         await assertRevert(
-          lusdTokenTester.permit(
-            approve.owner,
-            approve.spender,
-            approve.value,
-            deadline,
-            v,
-            r,
-            s
-          ),
+          lusdTokenTester.permit(approve.owner, approve.spender, approve.value, deadline, v, r, s),
           'LUSD: invalid signature'
         );
 
@@ -541,15 +430,7 @@ contract('LUSDToken', async accounts => {
 
         const { v, r, s } = await buildPermitTx(deadline);
 
-        const tx = lusdTokenTester.permit(
-          carol,
-          approve.spender,
-          approve.value,
-          deadline,
-          v,
-          hexlify(r),
-          hexlify(s)
-        );
+        const tx = lusdTokenTester.permit(carol, approve.spender, approve.value, deadline, v, hexlify(r), hexlify(s));
 
         await assertRevert(tx, 'LUSD: invalid signature');
       });

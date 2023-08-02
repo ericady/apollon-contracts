@@ -73,11 +73,7 @@ contract('After the initial lockup period has passed', async accounts => {
 
   beforeEach(async () => {
     // Deploy all contracts from the first account
-    LQTYContracts = await deploymentHelper.deployLQTYTesterContractsHardhat(
-      bountyAddress,
-      lpRewardsAddress,
-      multisig
-    );
+    LQTYContracts = await deploymentHelper.deployLQTYTesterContractsHardhat(bountyAddress, lpRewardsAddress, multisig);
     coreContracts = await deploymentHelper.deployLiquityCore();
 
     lqtyStaking = LQTYContracts.lqtyStaking;
@@ -87,36 +83,15 @@ contract('After the initial lockup period has passed', async accounts => {
 
     await deploymentHelper.connectLQTYContracts(LQTYContracts);
     await deploymentHelper.connectCoreContracts(coreContracts, LQTYContracts);
-    await deploymentHelper.connectLQTYContractsToCore(
-      LQTYContracts,
-      coreContracts
-    );
+    await deploymentHelper.connectLQTYContractsToCore(LQTYContracts, coreContracts);
 
-    oneYearFromSystemDeployment = await th.getTimeFromSystemDeployment(
-      lqtyToken,
-      web3,
-      timeValues.SECONDS_IN_ONE_YEAR
-    );
-    justOverOneYearFromSystemDeployment = oneYearFromSystemDeployment.add(
-      toBN('1')
-    );
+    oneYearFromSystemDeployment = await th.getTimeFromSystemDeployment(lqtyToken, web3, timeValues.SECONDS_IN_ONE_YEAR);
+    justOverOneYearFromSystemDeployment = oneYearFromSystemDeployment.add(toBN('1'));
 
-    const secondsInTwoYears = toBN(timeValues.SECONDS_IN_ONE_YEAR).mul(
-      toBN('2')
-    );
-    const secondsIn18Months = toBN(timeValues.SECONDS_IN_ONE_MONTH).mul(
-      toBN('18')
-    );
-    twoYearsFromSystemDeployment = await th.getTimeFromSystemDeployment(
-      lqtyToken,
-      web3,
-      secondsInTwoYears
-    );
-    _18monthsFromSystemDeployment = await th.getTimeFromSystemDeployment(
-      lqtyToken,
-      web3,
-      secondsIn18Months
-    );
+    const secondsInTwoYears = toBN(timeValues.SECONDS_IN_ONE_YEAR).mul(toBN('2'));
+    const secondsIn18Months = toBN(timeValues.SECONDS_IN_ONE_MONTH).mul(toBN('18'));
+    twoYearsFromSystemDeployment = await th.getTimeFromSystemDeployment(lqtyToken, web3, secondsInTwoYears);
+    _18monthsFromSystemDeployment = await th.getTimeFromSystemDeployment(lqtyToken, web3, secondsIn18Months);
 
     // Deploy 3 LCs for team members on vesting schedules
     const deployedLCtx_T1 = await lockupContractFactory.deployLockupContract(
@@ -135,21 +110,15 @@ contract('After the initial lockup period has passed', async accounts => {
       { from: liquityAG }
     );
 
-    const deployedLCtx_I1 = await lockupContractFactory.deployLockupContract(
-      investor_1,
-      oneYearFromSystemDeployment,
-      { from: liquityAG }
-    );
-    const deployedLCtx_I2 = await lockupContractFactory.deployLockupContract(
-      investor_2,
-      oneYearFromSystemDeployment,
-      { from: liquityAG }
-    );
-    const deployedLCtx_I3 = await lockupContractFactory.deployLockupContract(
-      investor_3,
-      oneYearFromSystemDeployment,
-      { from: liquityAG }
-    );
+    const deployedLCtx_I1 = await lockupContractFactory.deployLockupContract(investor_1, oneYearFromSystemDeployment, {
+      from: liquityAG,
+    });
+    const deployedLCtx_I2 = await lockupContractFactory.deployLockupContract(investor_2, oneYearFromSystemDeployment, {
+      from: liquityAG,
+    });
+    const deployedLCtx_I3 = await lockupContractFactory.deployLockupContract(investor_3, oneYearFromSystemDeployment, {
+      from: liquityAG,
+    });
 
     // LCs for team members on vesting schedules
     LC_T1 = await th.getLCFromDeploymentTx(deployedLCtx_T1);
@@ -218,16 +187,12 @@ contract('After the initial lockup period has passed', async accounts => {
         justOverOneYearFromSystemDeployment,
         { from: liquityAG }
       );
-      const LCDeploymentTx_B = await lockupContractFactory.deployLockupContract(
-        B,
-        oneYearFromSystemDeployment,
-        { from: liquityAG }
-      );
-      const LCDeploymentTx_C = await lockupContractFactory.deployLockupContract(
-        C,
-        '9595995999999900000023423234',
-        { from: liquityAG }
-      );
+      const LCDeploymentTx_B = await lockupContractFactory.deployLockupContract(B, oneYearFromSystemDeployment, {
+        from: liquityAG,
+      });
+      const LCDeploymentTx_C = await lockupContractFactory.deployLockupContract(C, '9595995999999900000023423234', {
+        from: liquityAG,
+      });
 
       assert.isTrue(LCDeploymentTx_A.receipt.status);
       assert.isTrue(LCDeploymentTx_B.receipt.status);
@@ -241,11 +206,9 @@ contract('After the initial lockup period has passed', async accounts => {
         justOverOneYearFromSystemDeployment,
         { from: teamMember_1 }
       );
-      const LCDeploymentTx_2 = await lockupContractFactory.deployLockupContract(
-        C,
-        oneYearFromSystemDeployment,
-        { from: investor_2 }
-      );
+      const LCDeploymentTx_2 = await lockupContractFactory.deployLockupContract(C, oneYearFromSystemDeployment, {
+        from: investor_2,
+      });
       const LCDeploymentTx_3 = await lockupContractFactory.deployLockupContract(
         liquityAG,
         '9595995999999900000023423234',
@@ -258,26 +221,19 @@ contract('After the initial lockup period has passed', async accounts => {
     });
 
     it('Anyone can deploy new LCs with unlockTime in the past', async () => {
-      await th.fastForwardTime(
-        timeValues.SECONDS_IN_ONE_YEAR,
-        web3.currentProvider
-      );
+      await th.fastForwardTime(timeValues.SECONDS_IN_ONE_YEAR, web3.currentProvider);
       // Various EOAs deploy LCs
       const LCDeploymentTx_1 = await lockupContractFactory.deployLockupContract(
         A,
         justOverOneYearFromSystemDeployment,
         { from: teamMember_1 }
       );
-      const LCDeploymentTx_2 = await lockupContractFactory.deployLockupContract(
-        B,
-        oneYearFromSystemDeployment,
-        { from: E }
-      );
-      const LCDeploymentTx_3 = await lockupContractFactory.deployLockupContract(
-        C,
-        _18monthsFromSystemDeployment,
-        { from: multisig }
-      );
+      const LCDeploymentTx_2 = await lockupContractFactory.deployLockupContract(B, oneYearFromSystemDeployment, {
+        from: E,
+      });
+      const LCDeploymentTx_3 = await lockupContractFactory.deployLockupContract(C, _18monthsFromSystemDeployment, {
+        from: multisig,
+      });
 
       const LC_1 = await th.getLCFromDeploymentTx(LCDeploymentTx_1);
       const LC_2 = await th.getLCFromDeploymentTx(LCDeploymentTx_2);
@@ -301,16 +257,12 @@ contract('After the initial lockup period has passed', async accounts => {
 
     it('Anyone can deploy new LCs with unlockTime in the future', async () => {
       // Various EOAs deploy LCs
-      const LCDeploymentTx_1 = await lockupContractFactory.deployLockupContract(
-        A,
-        twoYearsFromSystemDeployment,
-        { from: teamMember_1 }
-      );
-      const LCDeploymentTx_2 = await lockupContractFactory.deployLockupContract(
-        B,
-        _18monthsFromSystemDeployment,
-        { from: E }
-      );
+      const LCDeploymentTx_1 = await lockupContractFactory.deployLockupContract(A, twoYearsFromSystemDeployment, {
+        from: teamMember_1,
+      });
+      const LCDeploymentTx_2 = await lockupContractFactory.deployLockupContract(B, _18monthsFromSystemDeployment, {
+        from: E,
+      });
 
       const LC_1 = await th.getLCFromDeploymentTx(LCDeploymentTx_1);
       const LC_2 = await th.getLCFromDeploymentTx(LCDeploymentTx_2);
@@ -332,18 +284,9 @@ contract('After the initial lockup period has passed', async accounts => {
   describe('Beneficiary withdrawal from initial LC', async accounts => {
     it('A beneficiary can withdraw their full entitlement from their LC', async () => {
       // Check LQTY balances of investors' LCs are equal to their initial entitlements
-      assert.equal(
-        await lqtyToken.balanceOf(LC_I1.address),
-        investorInitialEntitlement_1
-      );
-      assert.equal(
-        await lqtyToken.balanceOf(LC_I2.address),
-        investorInitialEntitlement_2
-      );
-      assert.equal(
-        await lqtyToken.balanceOf(LC_I3.address),
-        investorInitialEntitlement_3
-      );
+      assert.equal(await lqtyToken.balanceOf(LC_I1.address), investorInitialEntitlement_1);
+      assert.equal(await lqtyToken.balanceOf(LC_I2.address), investorInitialEntitlement_2);
+      assert.equal(await lqtyToken.balanceOf(LC_I3.address), investorInitialEntitlement_3);
 
       // Check LQTY balances of investors are 0
       assert.equal(await lqtyToken.balanceOf(investor_1), '0');
@@ -356,18 +299,9 @@ contract('After the initial lockup period has passed', async accounts => {
       await LC_I3.withdrawLQTY({ from: investor_3 });
 
       // Check LQTY balances of investors now equal their entitlements
-      assert.equal(
-        await lqtyToken.balanceOf(investor_1),
-        investorInitialEntitlement_1
-      );
-      assert.equal(
-        await lqtyToken.balanceOf(investor_2),
-        investorInitialEntitlement_2
-      );
-      assert.equal(
-        await lqtyToken.balanceOf(investor_3),
-        investorInitialEntitlement_3
-      );
+      assert.equal(await lqtyToken.balanceOf(investor_1), investorInitialEntitlement_1);
+      assert.equal(await lqtyToken.balanceOf(investor_2), investorInitialEntitlement_2);
+      assert.equal(await lqtyToken.balanceOf(investor_3), investorInitialEntitlement_3);
 
       // Check LQTY balances of investors' LCs are now 0
       assert.equal(await lqtyToken.balanceOf(LC_I1.address), '0');
@@ -377,26 +311,14 @@ contract('After the initial lockup period has passed', async accounts => {
 
     it('A beneficiary on a vesting schedule can withdraw their total vested amount from their LC', async () => {
       // Get LQTY balances of LCs for beneficiaries (team members) on vesting schedules
-      const LQTYBalanceOfLC_T1_Before = await lqtyToken.balanceOf(
-        LC_T1.address
-      );
-      const LQTYBalanceOfLC_T2_Before = await lqtyToken.balanceOf(
-        LC_T2.address
-      );
-      const LQTYBalanceOfLC_T3_Before = await lqtyToken.balanceOf(
-        LC_T3.address
-      );
+      const LQTYBalanceOfLC_T1_Before = await lqtyToken.balanceOf(LC_T1.address);
+      const LQTYBalanceOfLC_T2_Before = await lqtyToken.balanceOf(LC_T2.address);
+      const LQTYBalanceOfLC_T3_Before = await lqtyToken.balanceOf(LC_T3.address);
 
       // Check LQTY balances of vesting beneficiaries' LCs are greater than their initial entitlements
-      assert.isTrue(
-        LQTYBalanceOfLC_T1_Before.gt(th.toBN(teamMemberInitialEntitlement_1))
-      );
-      assert.isTrue(
-        LQTYBalanceOfLC_T2_Before.gt(th.toBN(teamMemberInitialEntitlement_2))
-      );
-      assert.isTrue(
-        LQTYBalanceOfLC_T3_Before.gt(th.toBN(teamMemberInitialEntitlement_3))
-      );
+      assert.isTrue(LQTYBalanceOfLC_T1_Before.gt(th.toBN(teamMemberInitialEntitlement_1)));
+      assert.isTrue(LQTYBalanceOfLC_T2_Before.gt(th.toBN(teamMemberInitialEntitlement_2)));
+      assert.isTrue(LQTYBalanceOfLC_T3_Before.gt(th.toBN(teamMemberInitialEntitlement_3)));
 
       // Check LQTY balances of beneficiaries are 0
       assert.equal(await lqtyToken.balanceOf(teamMember_1), '0');
@@ -409,15 +331,9 @@ contract('After the initial lockup period has passed', async accounts => {
       await LC_T3.withdrawLQTY({ from: teamMember_3 });
 
       // Check beneficiaries' LQTY balances now equal their accumulated vested entitlements
-      assert.isTrue(
-        (await lqtyToken.balanceOf(teamMember_1)).eq(LQTYBalanceOfLC_T1_Before)
-      );
-      assert.isTrue(
-        (await lqtyToken.balanceOf(teamMember_2)).eq(LQTYBalanceOfLC_T2_Before)
-      );
-      assert.isTrue(
-        (await lqtyToken.balanceOf(teamMember_3)).eq(LQTYBalanceOfLC_T3_Before)
-      );
+      assert.isTrue((await lqtyToken.balanceOf(teamMember_1)).eq(LQTYBalanceOfLC_T1_Before));
+      assert.isTrue((await lqtyToken.balanceOf(teamMember_2)).eq(LQTYBalanceOfLC_T2_Before));
+      assert.isTrue((await lqtyToken.balanceOf(teamMember_3)).eq(LQTYBalanceOfLC_T3_Before));
 
       // Check LQTY balances of beneficiaries' LCs are now 0
       assert.equal(await lqtyToken.balanceOf(LC_T1.address), '0');
@@ -427,18 +343,9 @@ contract('After the initial lockup period has passed', async accounts => {
 
     it('Beneficiaries can withraw full LQTY balance of LC if it has increased since lockup period ended', async () => {
       // Check LQTY balances of investors' LCs are equal to their initial entitlements
-      assert.equal(
-        await lqtyToken.balanceOf(LC_I1.address),
-        investorInitialEntitlement_1
-      );
-      assert.equal(
-        await lqtyToken.balanceOf(LC_I2.address),
-        investorInitialEntitlement_2
-      );
-      assert.equal(
-        await lqtyToken.balanceOf(LC_I3.address),
-        investorInitialEntitlement_3
-      );
+      assert.equal(await lqtyToken.balanceOf(LC_I1.address), investorInitialEntitlement_1);
+      assert.equal(await lqtyToken.balanceOf(LC_I2.address), investorInitialEntitlement_2);
+      assert.equal(await lqtyToken.balanceOf(LC_I3.address), investorInitialEntitlement_3);
 
       // Check LQTY balances of investors are 0
       assert.equal(await lqtyToken.balanceOf(investor_1), '0');
@@ -459,26 +366,14 @@ contract('After the initial lockup period has passed', async accounts => {
       await lqtyToken.transfer(LC_I3.address, dec(1, 24), { from: multisig });
 
       // Get LQTY balances of LCs for investors
-      const LQTYBalanceOfLC_I1_Before = await lqtyToken.balanceOf(
-        LC_I1.address
-      );
-      const LQTYBalanceOfLC_I2_Before = await lqtyToken.balanceOf(
-        LC_I2.address
-      );
-      const LQTYBalanceOfLC_I3_Before = await lqtyToken.balanceOf(
-        LC_I3.address
-      );
+      const LQTYBalanceOfLC_I1_Before = await lqtyToken.balanceOf(LC_I1.address);
+      const LQTYBalanceOfLC_I2_Before = await lqtyToken.balanceOf(LC_I2.address);
+      const LQTYBalanceOfLC_I3_Before = await lqtyToken.balanceOf(LC_I3.address);
 
       // Check LQTY balances of investors' LCs are greater than their initial entitlements
-      assert.isTrue(
-        LQTYBalanceOfLC_I1_Before.gt(th.toBN(investorInitialEntitlement_1))
-      );
-      assert.isTrue(
-        LQTYBalanceOfLC_I2_Before.gt(th.toBN(investorInitialEntitlement_2))
-      );
-      assert.isTrue(
-        LQTYBalanceOfLC_I3_Before.gt(th.toBN(investorInitialEntitlement_3))
-      );
+      assert.isTrue(LQTYBalanceOfLC_I1_Before.gt(th.toBN(investorInitialEntitlement_1)));
+      assert.isTrue(LQTYBalanceOfLC_I2_Before.gt(th.toBN(investorInitialEntitlement_2)));
+      assert.isTrue(LQTYBalanceOfLC_I3_Before.gt(th.toBN(investorInitialEntitlement_3)));
 
       // All investors withdraw from their respective LCs
       await LC_I1.withdrawLQTY({ from: investor_1 });
@@ -486,15 +381,9 @@ contract('After the initial lockup period has passed', async accounts => {
       await LC_I3.withdrawLQTY({ from: investor_3 });
 
       // Check LQTY balances of investors now equal their LC balances prior to withdrawal
-      assert.isTrue(
-        (await lqtyToken.balanceOf(investor_1)).eq(LQTYBalanceOfLC_I1_Before)
-      );
-      assert.isTrue(
-        (await lqtyToken.balanceOf(investor_2)).eq(LQTYBalanceOfLC_I2_Before)
-      );
-      assert.isTrue(
-        (await lqtyToken.balanceOf(investor_3)).eq(LQTYBalanceOfLC_I3_Before)
-      );
+      assert.isTrue((await lqtyToken.balanceOf(investor_1)).eq(LQTYBalanceOfLC_I1_Before));
+      assert.isTrue((await lqtyToken.balanceOf(investor_2)).eq(LQTYBalanceOfLC_I2_Before));
+      assert.isTrue((await lqtyToken.balanceOf(investor_3)).eq(LQTYBalanceOfLC_I3_Before));
 
       // Check LQTY balances of investors' LCs are now 0
       assert.equal(await lqtyToken.balanceOf(LC_I1.address), '0');
@@ -509,20 +398,15 @@ contract('After the initial lockup period has passed', async accounts => {
         const withdrawalAttempt = await LC_T1.withdrawLQTY({ from: multisig });
         assert.isFalse(withdrawalAttempt.receipt.status);
       } catch (error) {
-        assert.include(
-          error.message,
-          'LockupContract: caller is not the beneficiary'
-        );
+        assert.include(error.message, 'LockupContract: caller is not the beneficiary');
       }
     });
 
     it("LQTY Multisig can't withdraw from a LC that someone else deployed", async () => {
       // Account D deploys a new LC via the Factory
-      const deployedLCtx_B = await lockupContractFactory.deployLockupContract(
-        B,
-        oneYearFromSystemDeployment,
-        { from: D }
-      );
+      const deployedLCtx_B = await lockupContractFactory.deployLockupContract(B, oneYearFromSystemDeployment, {
+        from: D,
+      });
       const LC_B = await th.getLCFromDeploymentTx(deployedLCtx_B);
 
       //LQTY multisig fund the newly deployed LCs
@@ -533,27 +417,12 @@ contract('After the initial lockup period has passed', async accounts => {
         const withdrawalAttempt_B = await LC_B.withdrawLQTY({ from: multisig });
         assert.isFalse(withdrawalAttempt_B.receipt.status);
       } catch (error) {
-        assert.include(
-          error.message,
-          'LockupContract: caller is not the beneficiary'
-        );
+        assert.include(error.message, 'LockupContract: caller is not the beneficiary');
       }
     });
 
     it('Non-beneficiaries cannot withdraw from a LC', async () => {
-      const variousEOAs = [
-        teamMember_1,
-        teamMember_3,
-        liquityAG,
-        investor_1,
-        investor_2,
-        investor_3,
-        A,
-        B,
-        C,
-        D,
-        E,
-      ];
+      const variousEOAs = [teamMember_1, teamMember_3, liquityAG, investor_1, investor_2, investor_3, A, B, C, D, E];
 
       // Several EOAs attempt to withdraw from the LC that has teamMember_2 as beneficiary
       for (account of variousEOAs) {
@@ -561,10 +430,7 @@ contract('After the initial lockup period has passed', async accounts => {
           const withdrawalAttempt = await LC_T2.withdrawLQTY({ from: account });
           assert.isFalse(withdrawalAttempt.receipt.status);
         } catch (error) {
-          assert.include(
-            error.message,
-            'LockupContract: caller is not the beneficiary'
-          );
+          assert.include(error.message, 'LockupContract: caller is not the beneficiary');
         }
       }
     });
@@ -572,15 +438,9 @@ contract('After the initial lockup period has passed', async accounts => {
 
   describe('Transferring LQTY', async accounts => {
     it('LQTY multisig can transfer LQTY to LCs they deployed', async () => {
-      const initialLQTYBalanceOfLC_T1 = await lqtyToken.balanceOf(
-        LC_T1.address
-      );
-      const initialLQTYBalanceOfLC_T2 = await lqtyToken.balanceOf(
-        LC_T2.address
-      );
-      const initialLQTYBalanceOfLC_T3 = await lqtyToken.balanceOf(
-        LC_T3.address
-      );
+      const initialLQTYBalanceOfLC_T1 = await lqtyToken.balanceOf(LC_T1.address);
+      const initialLQTYBalanceOfLC_T2 = await lqtyToken.balanceOf(LC_T2.address);
+      const initialLQTYBalanceOfLC_T3 = await lqtyToken.balanceOf(LC_T3.address);
 
       // One month passes
       await th.fastForwardTime(SECONDS_IN_ONE_MONTH, web3.currentProvider);
@@ -596,21 +456,9 @@ contract('After the initial lockup period has passed', async accounts => {
       const LQTYBalanceOfLC_T3_1 = await lqtyToken.balanceOf(LC_T3.address);
 
       // // Check team member LC balances have increased
-      assert.isTrue(
-        LQTYBalanceOfLC_T1_1.eq(
-          th.toBN(initialLQTYBalanceOfLC_T1).add(th.toBN(dec(1, 24)))
-        )
-      );
-      assert.isTrue(
-        LQTYBalanceOfLC_T2_1.eq(
-          th.toBN(initialLQTYBalanceOfLC_T2).add(th.toBN(dec(1, 24)))
-        )
-      );
-      assert.isTrue(
-        LQTYBalanceOfLC_T3_1.eq(
-          th.toBN(initialLQTYBalanceOfLC_T3).add(th.toBN(dec(1, 24)))
-        )
-      );
+      assert.isTrue(LQTYBalanceOfLC_T1_1.eq(th.toBN(initialLQTYBalanceOfLC_T1).add(th.toBN(dec(1, 24)))));
+      assert.isTrue(LQTYBalanceOfLC_T2_1.eq(th.toBN(initialLQTYBalanceOfLC_T2).add(th.toBN(dec(1, 24)))));
+      assert.isTrue(LQTYBalanceOfLC_T3_1.eq(th.toBN(initialLQTYBalanceOfLC_T3).add(th.toBN(dec(1, 24)))));
 
       // Another month passes
       await th.fastForwardTime(SECONDS_IN_ONE_MONTH, web3.currentProvider);
@@ -626,34 +474,22 @@ contract('After the initial lockup period has passed', async accounts => {
       const LQTYBalanceOfLC_T3_2 = await lqtyToken.balanceOf(LC_T3.address);
 
       // Check team member LC balances have increased again
-      assert.isTrue(
-        LQTYBalanceOfLC_T1_2.eq(LQTYBalanceOfLC_T1_1.add(th.toBN(dec(1, 24))))
-      );
-      assert.isTrue(
-        LQTYBalanceOfLC_T2_2.eq(LQTYBalanceOfLC_T2_1.add(th.toBN(dec(1, 24))))
-      );
-      assert.isTrue(
-        LQTYBalanceOfLC_T3_2.eq(LQTYBalanceOfLC_T3_1.add(th.toBN(dec(1, 24))))
-      );
+      assert.isTrue(LQTYBalanceOfLC_T1_2.eq(LQTYBalanceOfLC_T1_1.add(th.toBN(dec(1, 24)))));
+      assert.isTrue(LQTYBalanceOfLC_T2_2.eq(LQTYBalanceOfLC_T2_1.add(th.toBN(dec(1, 24)))));
+      assert.isTrue(LQTYBalanceOfLC_T3_2.eq(LQTYBalanceOfLC_T3_1.add(th.toBN(dec(1, 24)))));
     });
 
     it('LQTY multisig can transfer tokens to LCs deployed by anyone', async () => {
       // A, B, C each deploy a lockup contract ith themself as beneficiary
-      const deployedLCtx_A = await lockupContractFactory.deployLockupContract(
-        A,
-        oneYearFromSystemDeployment,
-        { from: A }
-      );
-      const deployedLCtx_B = await lockupContractFactory.deployLockupContract(
-        B,
-        justOverOneYearFromSystemDeployment,
-        { from: B }
-      );
-      const deployedLCtx_C = await lockupContractFactory.deployLockupContract(
-        C,
-        twoYearsFromSystemDeployment,
-        { from: C }
-      );
+      const deployedLCtx_A = await lockupContractFactory.deployLockupContract(A, oneYearFromSystemDeployment, {
+        from: A,
+      });
+      const deployedLCtx_B = await lockupContractFactory.deployLockupContract(B, justOverOneYearFromSystemDeployment, {
+        from: B,
+      });
+      const deployedLCtx_C = await lockupContractFactory.deployLockupContract(C, twoYearsFromSystemDeployment, {
+        from: C,
+      });
 
       const LC_A = await th.getLCFromDeploymentTx(deployedLCtx_A);
       const LC_B = await th.getLCFromDeploymentTx(deployedLCtx_B);
@@ -702,21 +538,15 @@ contract('After the initial lockup period has passed', async accounts => {
       await lqtyToken.transfer(F, dec(3, 24), { from: multisig });
 
       // H, I, J deploy lockup contracts with A, B, C as beneficiaries, respectively
-      const deployedLCtx_A = await lockupContractFactory.deployLockupContract(
-        A,
-        oneYearFromSystemDeployment,
-        { from: H }
-      );
-      const deployedLCtx_B = await lockupContractFactory.deployLockupContract(
-        B,
-        justOverOneYearFromSystemDeployment,
-        { from: I }
-      );
-      const deployedLCtx_C = await lockupContractFactory.deployLockupContract(
-        C,
-        twoYearsFromSystemDeployment,
-        { from: J }
-      );
+      const deployedLCtx_A = await lockupContractFactory.deployLockupContract(A, oneYearFromSystemDeployment, {
+        from: H,
+      });
+      const deployedLCtx_B = await lockupContractFactory.deployLockupContract(B, justOverOneYearFromSystemDeployment, {
+        from: I,
+      });
+      const deployedLCtx_C = await lockupContractFactory.deployLockupContract(C, twoYearsFromSystemDeployment, {
+        from: J,
+      });
 
       // Grab contract addresses from deployment tx events
       const LCAddress_A = await th.getLCAddressFromDeploymentTx(deployedLCtx_A);
@@ -784,68 +614,48 @@ contract('After the initial lockup period has passed', async accounts => {
 
     it('Anyone can increaseAllowance for any EOA or Liquity contract', async () => {
       // Anyone can increaseAllowance of EOAs to spend LQTY
-      const LQTYIncreaseAllowanceTx_1 = await lqtyToken.increaseAllowance(
-        A,
-        dec(1, 18),
-        {
-          from: multisig,
-        }
-      );
-      const LQTYIncreaseAllowanceTx_2 = await lqtyToken.increaseAllowance(
-        B,
-        dec(1, 18),
-        {
-          from: G,
-        }
-      );
-      const LQTYIncreaseAllowanceTx_3 = await lqtyToken.increaseAllowance(
-        multisig,
-        dec(1, 18),
-        {
-          from: F,
-        }
-      );
+      const LQTYIncreaseAllowanceTx_1 = await lqtyToken.increaseAllowance(A, dec(1, 18), {
+        from: multisig,
+      });
+      const LQTYIncreaseAllowanceTx_2 = await lqtyToken.increaseAllowance(B, dec(1, 18), {
+        from: G,
+      });
+      const LQTYIncreaseAllowanceTx_3 = await lqtyToken.increaseAllowance(multisig, dec(1, 18), {
+        from: F,
+      });
       await assert.isTrue(LQTYIncreaseAllowanceTx_1.receipt.status);
       await assert.isTrue(LQTYIncreaseAllowanceTx_2.receipt.status);
       await assert.isTrue(LQTYIncreaseAllowanceTx_3.receipt.status);
 
       // Increase allowance of Liquity contracts from F
       for (const contract of Object.keys(coreContracts)) {
-        const LQTYIncreaseAllowanceTx = await lqtyToken.increaseAllowance(
-          coreContracts[contract].address,
-          dec(1, 18),
-          { from: F }
-        );
+        const LQTYIncreaseAllowanceTx = await lqtyToken.increaseAllowance(coreContracts[contract].address, dec(1, 18), {
+          from: F,
+        });
         await assert.isTrue(LQTYIncreaseAllowanceTx.receipt.status);
       }
 
       // Increase allowance of Liquity contracts from multisig
       for (const contract of Object.keys(coreContracts)) {
-        const LQTYIncreaseAllowanceTx = await lqtyToken.increaseAllowance(
-          coreContracts[contract].address,
-          dec(1, 18),
-          { from: multisig }
-        );
+        const LQTYIncreaseAllowanceTx = await lqtyToken.increaseAllowance(coreContracts[contract].address, dec(1, 18), {
+          from: multisig,
+        });
         await assert.isTrue(LQTYIncreaseAllowanceTx.receipt.status);
       }
 
       // Increase allowance of LQTY contracts from F
       for (const contract of Object.keys(LQTYContracts)) {
-        const LQTYIncreaseAllowanceTx = await lqtyToken.increaseAllowance(
-          LQTYContracts[contract].address,
-          dec(1, 18),
-          { from: F }
-        );
+        const LQTYIncreaseAllowanceTx = await lqtyToken.increaseAllowance(LQTYContracts[contract].address, dec(1, 18), {
+          from: F,
+        });
         await assert.isTrue(LQTYIncreaseAllowanceTx.receipt.status);
       }
 
       // Increase allowance of LQT contracts from multisig
       for (const contract of Object.keys(LQTYContracts)) {
-        const LQTYIncreaseAllowanceTx = await lqtyToken.increaseAllowance(
-          LQTYContracts[contract].address,
-          dec(1, 18),
-          { from: multisig }
-        );
+        const LQTYIncreaseAllowanceTx = await lqtyToken.increaseAllowance(LQTYContracts[contract].address, dec(1, 18), {
+          from: multisig,
+        });
         await assert.isTrue(LQTYIncreaseAllowanceTx.receipt.status);
       }
     });
@@ -869,109 +679,81 @@ contract('After the initial lockup period has passed', async accounts => {
 
       // IncreaseAllowance of core contracts, from F
       for (const contract of Object.keys(coreContracts)) {
-        const LQTYtransferTx = await lqtyToken.increaseAllowance(
-          coreContracts[contract].address,
-          dec(1, 18),
-          { from: F }
-        );
+        const LQTYtransferTx = await lqtyToken.increaseAllowance(coreContracts[contract].address, dec(1, 18), {
+          from: F,
+        });
         await assert.isTrue(LQTYtransferTx.receipt.status);
       }
 
       // IncreaseAllowance of core contracts, from multisig
       for (const contract of Object.keys(coreContracts)) {
-        const LQTYtransferTx = await lqtyToken.increaseAllowance(
-          coreContracts[contract].address,
-          dec(1, 18),
-          { from: multisig }
-        );
+        const LQTYtransferTx = await lqtyToken.increaseAllowance(coreContracts[contract].address, dec(1, 18), {
+          from: multisig,
+        });
         await assert.isTrue(LQTYtransferTx.receipt.status);
       }
 
       // Increase allowance of LQTY contracts from F
       for (const contract of Object.keys(LQTYContracts)) {
-        const LQTYIncreaseAllowanceTx = await lqtyToken.increaseAllowance(
-          LQTYContracts[contract].address,
-          dec(1, 18),
-          { from: F }
-        );
+        const LQTYIncreaseAllowanceTx = await lqtyToken.increaseAllowance(LQTYContracts[contract].address, dec(1, 18), {
+          from: F,
+        });
         await assert.isTrue(LQTYIncreaseAllowanceTx.receipt.status);
       }
 
       // Increase allowance of LQTT contracts from multisig
       for (const contract of Object.keys(LQTYContracts)) {
-        const LQTYIncreaseAllowanceTx = await lqtyToken.increaseAllowance(
-          LQTYContracts[contract].address,
-          dec(1, 18),
-          { from: multisig }
-        );
+        const LQTYIncreaseAllowanceTx = await lqtyToken.increaseAllowance(LQTYContracts[contract].address, dec(1, 18), {
+          from: multisig,
+        });
         await assert.isTrue(LQTYIncreaseAllowanceTx.receipt.status);
       }
 
       // --- TEST ---
 
       // Decrease allowance of A, B, multisig
-      const LQTYDecreaseAllowanceTx_1 = await lqtyToken.decreaseAllowance(
-        A,
-        dec(1, 18),
-        {
-          from: multisig,
-        }
-      );
-      const LQTYDecreaseAllowanceTx_2 = await lqtyToken.decreaseAllowance(
-        B,
-        dec(1, 18),
-        {
-          from: G,
-        }
-      );
-      const LQTYDecreaseAllowanceTx_3 = await lqtyToken.decreaseAllowance(
-        multisig,
-        dec(1, 18),
-        {
-          from: F,
-        }
-      );
+      const LQTYDecreaseAllowanceTx_1 = await lqtyToken.decreaseAllowance(A, dec(1, 18), {
+        from: multisig,
+      });
+      const LQTYDecreaseAllowanceTx_2 = await lqtyToken.decreaseAllowance(B, dec(1, 18), {
+        from: G,
+      });
+      const LQTYDecreaseAllowanceTx_3 = await lqtyToken.decreaseAllowance(multisig, dec(1, 18), {
+        from: F,
+      });
       await assert.isTrue(LQTYDecreaseAllowanceTx_1.receipt.status);
       await assert.isTrue(LQTYDecreaseAllowanceTx_2.receipt.status);
       await assert.isTrue(LQTYDecreaseAllowanceTx_3.receipt.status);
 
       // Decrease allowance of core contracts, from F
       for (const contract of Object.keys(coreContracts)) {
-        const LQTYDecreaseAllowanceTx = await lqtyToken.decreaseAllowance(
-          coreContracts[contract].address,
-          dec(1, 18),
-          { from: F }
-        );
+        const LQTYDecreaseAllowanceTx = await lqtyToken.decreaseAllowance(coreContracts[contract].address, dec(1, 18), {
+          from: F,
+        });
         await assert.isTrue(LQTYDecreaseAllowanceTx.receipt.status);
       }
 
       // Decrease allowance of core contracts from multisig
       for (const contract of Object.keys(coreContracts)) {
-        const LQTYDecreaseAllowanceTx = await lqtyToken.decreaseAllowance(
-          coreContracts[contract].address,
-          dec(1, 18),
-          { from: multisig }
-        );
+        const LQTYDecreaseAllowanceTx = await lqtyToken.decreaseAllowance(coreContracts[contract].address, dec(1, 18), {
+          from: multisig,
+        });
         await assert.isTrue(LQTYDecreaseAllowanceTx.receipt.status);
       }
 
       // Decrease allowance of LQTY contracts from F
       for (const contract of Object.keys(LQTYContracts)) {
-        const LQTYIncreaseAllowanceTx = await lqtyToken.decreaseAllowance(
-          LQTYContracts[contract].address,
-          dec(1, 18),
-          { from: F }
-        );
+        const LQTYIncreaseAllowanceTx = await lqtyToken.decreaseAllowance(LQTYContracts[contract].address, dec(1, 18), {
+          from: F,
+        });
         await assert.isTrue(LQTYIncreaseAllowanceTx.receipt.status);
       }
 
       // Decrease allowance of LQTY contracts from multisig
       for (const contract of Object.keys(LQTYContracts)) {
-        const LQTYIncreaseAllowanceTx = await lqtyToken.decreaseAllowance(
-          LQTYContracts[contract].address,
-          dec(1, 18),
-          { from: multisig }
-        );
+        const LQTYIncreaseAllowanceTx = await lqtyToken.decreaseAllowance(LQTYContracts[contract].address, dec(1, 18), {
+          from: multisig,
+        });
         await assert.isTrue(LQTYIncreaseAllowanceTx.receipt.status);
       }
     });
@@ -987,30 +769,15 @@ contract('After the initial lockup period has passed', async accounts => {
       await lqtyToken.approve(multisig, dec(1, 18), { from: C });
 
       // Approved addresses transfer from the address they're approved for
-      const LQTYtransferFromTx_1 = await lqtyToken.transferFrom(
-        multisig,
-        F,
-        dec(1, 18),
-        {
-          from: F,
-        }
-      );
-      const LQTYtransferFromTx_2 = await lqtyToken.transferFrom(
-        B,
-        multisig,
-        dec(1, 18),
-        {
-          from: G,
-        }
-      );
-      const LQTYtransferFromTx_3 = await lqtyToken.transferFrom(
-        C,
-        A,
-        dec(1, 18),
-        {
-          from: multisig,
-        }
-      );
+      const LQTYtransferFromTx_1 = await lqtyToken.transferFrom(multisig, F, dec(1, 18), {
+        from: F,
+      });
+      const LQTYtransferFromTx_2 = await lqtyToken.transferFrom(B, multisig, dec(1, 18), {
+        from: G,
+      });
+      const LQTYtransferFromTx_3 = await lqtyToken.transferFrom(C, A, dec(1, 18), {
+        from: multisig,
+      });
       await assert.isTrue(LQTYtransferFromTx_1.receipt.status);
       await assert.isTrue(LQTYtransferFromTx_2.receipt.status);
       await assert.isTrue(LQTYtransferFromTx_3.receipt.status);
@@ -1031,11 +798,9 @@ contract('After the initial lockup period has passed', async accounts => {
 
   describe('Withdrawal Attempts on new LCs before unlockTime has passed', async accounts => {
     it("LQTY Deployer can't withdraw from a funded LC they deployed for another beneficiary through the Factory, before the unlockTime", async () => {
-      const deployedLCtx_B = await lockupContractFactory.deployLockupContract(
-        B,
-        _18monthsFromSystemDeployment,
-        { from: D }
-      );
+      const deployedLCtx_B = await lockupContractFactory.deployLockupContract(B, _18monthsFromSystemDeployment, {
+        from: D,
+      });
       const LC_B = await th.getLCFromDeploymentTx(deployedLCtx_B);
 
       // Check currentTime < unlockTime
@@ -1048,20 +813,15 @@ contract('After the initial lockup period has passed', async accounts => {
         const withdrawalAttempt = await LC_B.withdrawLQTY({ from: multisig });
         assert.isFalse(withdrawalAttempt.receipt.status);
       } catch (error) {
-        assert.include(
-          error.message,
-          'LockupContract: caller is not the beneficiary'
-        );
+        assert.include(error.message, 'LockupContract: caller is not the beneficiary');
       }
     });
 
     it("LQTY Deployer can't withdraw from a funded LC that someone else deployed, before the unlockTime", async () => {
       // Account D deploys a new LC via the Factory
-      const deployedLCtx_B = await lockupContractFactory.deployLockupContract(
-        B,
-        _18monthsFromSystemDeployment,
-        { from: D }
-      );
+      const deployedLCtx_B = await lockupContractFactory.deployLockupContract(B, _18monthsFromSystemDeployment, {
+        from: D,
+      });
       const LC_B = await th.getLCFromDeploymentTx(deployedLCtx_B);
 
       //LQTY multisig fund the newly deployed LCs
@@ -1077,20 +837,15 @@ contract('After the initial lockup period has passed', async accounts => {
         const withdrawalAttempt_B = await LC_B.withdrawLQTY({ from: multisig });
         assert.isFalse(withdrawalAttempt_B.receipt.status);
       } catch (error) {
-        assert.include(
-          error.message,
-          'LockupContract: caller is not the beneficiary'
-        );
+        assert.include(error.message, 'LockupContract: caller is not the beneficiary');
       }
     });
 
     it("Beneficiary can't withdraw from their funded LC, before the unlockTime", async () => {
       // Account D deploys a new LC via the Factory
-      const deployedLCtx_B = await lockupContractFactory.deployLockupContract(
-        B,
-        _18monthsFromSystemDeployment,
-        { from: D }
-      );
+      const deployedLCtx_B = await lockupContractFactory.deployLockupContract(B, _18monthsFromSystemDeployment, {
+        from: D,
+      });
       const LC_B = await th.getLCFromDeploymentTx(deployedLCtx_B);
 
       // LQTY multisig funds contracts
@@ -1108,20 +863,15 @@ contract('After the initial lockup period has passed', async accounts => {
         });
         assert.isFalse(withdrawalAttempt.receipt.status);
       } catch (error) {
-        assert.include(
-          error.message,
-          'LockupContract: The lockup duration must have passed'
-        );
+        assert.include(error.message, 'LockupContract: The lockup duration must have passed');
       }
     });
 
     it("No one can withdraw from a beneficiary's funded LC, before the unlockTime", async () => {
       // Account D deploys a new LC via the Factory
-      const deployedLCtx_B = await lockupContractFactory.deployLockupContract(
-        B,
-        _18monthsFromSystemDeployment,
-        { from: D }
-      );
+      const deployedLCtx_B = await lockupContractFactory.deployLockupContract(B, _18monthsFromSystemDeployment, {
+        from: D,
+      });
       const LC_B = await th.getLCFromDeploymentTx(deployedLCtx_B);
 
       // LQTY multisig funds contracts
@@ -1140,10 +890,7 @@ contract('After the initial lockup period has passed', async accounts => {
           const withdrawalAttempt = await LC_B.withdrawLQTY({ from: account });
           assert.isFalse(withdrawalAttempt.receipt.status);
         } catch (error) {
-          assert.include(
-            error.message,
-            'LockupContract: caller is not the beneficiary'
-          );
+          assert.include(error.message, 'LockupContract: caller is not the beneficiary');
         }
       }
     });
@@ -1151,17 +898,12 @@ contract('After the initial lockup period has passed', async accounts => {
 
   describe('Withdrawals from new LCs after unlockTime has passed', async accounts => {
     it("LQTY Deployer can't withdraw from a funded LC they deployed for another beneficiary through the Factory, after the unlockTime", async () => {
-      const deployedLCtx_B = await lockupContractFactory.deployLockupContract(
-        B,
-        _18monthsFromSystemDeployment,
-        { from: D }
-      );
+      const deployedLCtx_B = await lockupContractFactory.deployLockupContract(B, _18monthsFromSystemDeployment, {
+        from: D,
+      });
       const LC_B = await th.getLCFromDeploymentTx(deployedLCtx_B);
 
-      await th.fastForwardTime(
-        timeValues.SECONDS_IN_ONE_YEAR,
-        web3.currentProvider
-      );
+      await th.fastForwardTime(timeValues.SECONDS_IN_ONE_YEAR, web3.currentProvider);
 
       // Check currentTime > unlockTime
       const currentTime = toBN(await th.getLatestBlockTimestamp(web3));
@@ -1173,29 +915,21 @@ contract('After the initial lockup period has passed', async accounts => {
         const withdrawalAttempt = await LC_B.withdrawLQTY({ from: multisig });
         assert.isFalse(withdrawalAttempt.receipt.status);
       } catch (error) {
-        assert.include(
-          error.message,
-          'LockupContract: caller is not the beneficiary'
-        );
+        assert.include(error.message, 'LockupContract: caller is not the beneficiary');
       }
     });
 
     it("LQTY multisig can't withdraw from a funded LC when they are not the beneficiary, after the unlockTime", async () => {
       // Account D deploys a new LC via the Factory
-      const deployedLCtx_B = await lockupContractFactory.deployLockupContract(
-        B,
-        _18monthsFromSystemDeployment,
-        { from: D }
-      );
+      const deployedLCtx_B = await lockupContractFactory.deployLockupContract(B, _18monthsFromSystemDeployment, {
+        from: D,
+      });
       const LC_B = await th.getLCFromDeploymentTx(deployedLCtx_B);
 
       //LQTY multisig fund the newly deployed LC
       await lqtyToken.transfer(LC_B.address, dec(2, 18), { from: multisig });
 
-      await th.fastForwardTime(
-        timeValues.SECONDS_IN_ONE_YEAR,
-        web3.currentProvider
-      );
+      await th.fastForwardTime(timeValues.SECONDS_IN_ONE_YEAR, web3.currentProvider);
 
       // Check currentTime > unlockTime
       const currentTime = toBN(await th.getLatestBlockTimestamp(web3));
@@ -1207,29 +941,21 @@ contract('After the initial lockup period has passed', async accounts => {
         const withdrawalAttempt_B = await LC_B.withdrawLQTY({ from: multisig });
         assert.isFalse(withdrawalAttempt_B.receipt.status);
       } catch (error) {
-        assert.include(
-          error.message,
-          'LockupContract: caller is not the beneficiary'
-        );
+        assert.include(error.message, 'LockupContract: caller is not the beneficiary');
       }
     });
 
     it('Beneficiary can withdraw from their funded LC, after the unlockTime', async () => {
       // Account D deploys a new LC via the Factory
-      const deployedLCtx_B = await lockupContractFactory.deployLockupContract(
-        B,
-        _18monthsFromSystemDeployment,
-        { from: D }
-      );
+      const deployedLCtx_B = await lockupContractFactory.deployLockupContract(B, _18monthsFromSystemDeployment, {
+        from: D,
+      });
       const LC_B = await th.getLCFromDeploymentTx(deployedLCtx_B);
 
       // LQTY multisig funds contract
       await lqtyToken.transfer(LC_B.address, dec(2, 18), { from: multisig });
 
-      await th.fastForwardTime(
-        timeValues.SECONDS_IN_ONE_YEAR,
-        web3.currentProvider
-      );
+      await th.fastForwardTime(timeValues.SECONDS_IN_ONE_YEAR, web3.currentProvider);
 
       // Check currentTime > unlockTime
       const currentTime = toBN(await th.getLatestBlockTimestamp(web3));
@@ -1253,20 +979,15 @@ contract('After the initial lockup period has passed', async accounts => {
 
     it("Non-beneficiaries can't withdraw from a beneficiary's funded LC, after the unlockTime", async () => {
       // Account D deploys a new LC via the Factory
-      const deployedLCtx_B = await lockupContractFactory.deployLockupContract(
-        B,
-        _18monthsFromSystemDeployment,
-        { from: D }
-      );
+      const deployedLCtx_B = await lockupContractFactory.deployLockupContract(B, _18monthsFromSystemDeployment, {
+        from: D,
+      });
       const LC_B = await th.getLCFromDeploymentTx(deployedLCtx_B);
 
       // LQTY multisig funds contracts
       await lqtyToken.transfer(LC_B.address, dec(2, 18), { from: multisig });
 
-      await th.fastForwardTime(
-        timeValues.SECONDS_IN_ONE_YEAR,
-        web3.currentProvider
-      );
+      await th.fastForwardTime(timeValues.SECONDS_IN_ONE_YEAR, web3.currentProvider);
 
       // Check currentTime > unlockTime
       const currentTime = toBN(await th.getLatestBlockTimestamp(web3));
@@ -1281,10 +1002,7 @@ contract('After the initial lockup period has passed', async accounts => {
           const withdrawalAttempt = await LC_B.withdrawLQTY({ from: account });
           assert.isFalse(withdrawalAttempt.receipt.status);
         } catch (error) {
-          assert.include(
-            error.message,
-            'LockupContract: caller is not the beneficiary'
-          );
+          assert.include(error.message, 'LockupContract: caller is not the beneficiary');
         }
       }
     });

@@ -21,17 +21,12 @@ contract('SortedTroves', async accounts => {
       const prevTrove = await contracts.sortedTroves.getPrev(trove);
 
       const troveICR = await contracts.troveManager.getCurrentICR(trove, price);
-      const prevTroveICR = await contracts.troveManager.getCurrentICR(
-        prevTrove,
-        price
-      );
+      const prevTroveICR = await contracts.troveManager.getCurrentICR(prevTrove, price);
 
       assert.isTrue(prevTroveICR.gte(troveICR));
 
       const troveNICR = await contracts.troveManager.getNominalICR(trove);
-      const prevTroveNICR = await contracts.troveManager.getNominalICR(
-        prevTrove
-      );
+      const prevTroveNICR = await contracts.troveManager.getNominalICR(prevTrove);
 
       assert.isTrue(prevTroveNICR.gte(troveNICR));
 
@@ -78,8 +73,7 @@ contract('SortedTroves', async accounts => {
 
   let contracts;
 
-  const getOpenTroveLUSDAmount = async totalDebt =>
-    th.getOpenTroveLUSDAmount(contracts, totalDebt);
+  const getOpenTroveLUSDAmount = async totalDebt => th.getOpenTroveLUSDAmount(contracts, totalDebt);
   const openTrove = async params => th.openTrove(contracts, params);
 
   describe('SortedTroves', () => {
@@ -91,11 +85,7 @@ contract('SortedTroves', async accounts => {
         contracts.stabilityPool.address,
         contracts.borrowerOperations.address
       );
-      const LQTYContracts = await deploymentHelper.deployLQTYContracts(
-        bountyAddress,
-        lpRewardsAddress,
-        multisig
-      );
+      const LQTYContracts = await deploymentHelper.deployLQTYContracts(bountyAddress, lpRewardsAddress, multisig);
 
       priceFeed = contracts.priceFeedTestnet;
       sortedTroves = contracts.sortedTroves;
@@ -105,10 +95,7 @@ contract('SortedTroves', async accounts => {
 
       await deploymentHelper.connectLQTYContracts(LQTYContracts);
       await deploymentHelper.connectCoreContracts(contracts, LQTYContracts);
-      await deploymentHelper.connectLQTYContractsToCore(
-        LQTYContracts,
-        contracts
-      );
+      await deploymentHelper.connectLQTYContractsToCore(LQTYContracts, contracts);
     });
 
     it('contains(): returns true for addresses that have opened troves', async () => {
@@ -370,16 +357,10 @@ contract('SortedTroves', async accounts => {
       // Check troves are ordered
       await assertSortedListIsOrdered(contracts);
 
-      await borrowerOperations.openTrove(
-        th._100pct,
-        dec(100, 18),
-        defaulter_1,
-        defaulter_1,
-        {
-          from: defaulter_1,
-          value: dec(1, 'ether'),
-        }
-      );
+      await borrowerOperations.openTrove(th._100pct, dec(100, 18), defaulter_1, defaulter_1, {
+        from: defaulter_1,
+        value: dec(1, 'ether'),
+      });
       assert.isTrue(await sortedTroves.contains(defaulter_1));
 
       // Price drops
@@ -408,11 +389,7 @@ contract('SortedTroves', async accounts => {
     context('when params are wrongly set', () => {
       it('setParams(): reverts if size is zero', async () => {
         await th.assertRevert(
-          sortedTroves.setParams(
-            0,
-            sortedTrovesTester.address,
-            sortedTrovesTester.address
-          ),
+          sortedTroves.setParams(0, sortedTrovesTester.address, sortedTrovesTester.address),
           'SortedTroves: Size can’t be zero'
         );
       });
@@ -420,20 +397,13 @@ contract('SortedTroves', async accounts => {
 
     context('when params are properly set', () => {
       beforeEach('set params', async () => {
-        await sortedTroves.setParams(
-          2,
-          sortedTrovesTester.address,
-          sortedTrovesTester.address
-        );
+        await sortedTroves.setParams(2, sortedTrovesTester.address, sortedTrovesTester.address);
       });
 
       it('insert(): fails if list is full', async () => {
         await sortedTrovesTester.insert(alice, 1, alice, alice);
         await sortedTrovesTester.insert(bob, 1, alice, alice);
-        await th.assertRevert(
-          sortedTrovesTester.insert(carol, 1, alice, alice),
-          'SortedTroves: List is full'
-        );
+        await th.assertRevert(sortedTrovesTester.insert(carol, 1, alice, alice), 'SortedTroves: List is full');
       });
 
       it('insert(): fails if list already contains the node', async () => {
@@ -452,17 +422,11 @@ contract('SortedTroves', async accounts => {
       });
 
       it('insert(): fails if NICR is zero', async () => {
-        await th.assertRevert(
-          sortedTrovesTester.insert(alice, 0, alice, alice),
-          'SortedTroves: NICR must be positive'
-        );
+        await th.assertRevert(sortedTrovesTester.insert(alice, 0, alice, alice), 'SortedTroves: NICR must be positive');
       });
 
       it('remove(): fails if id is not in the list', async () => {
-        await th.assertRevert(
-          sortedTrovesTester.remove(alice),
-          'SortedTroves: List does not contain the id'
-        );
+        await th.assertRevert(sortedTrovesTester.remove(alice), 'SortedTroves: List does not contain the id');
       });
 
       it('reInsert(): fails if list doesn’t contain the node', async () => {
@@ -474,27 +438,17 @@ contract('SortedTroves', async accounts => {
 
       it('reInsert(): fails if new NICR is zero', async () => {
         await sortedTrovesTester.insert(alice, 1, alice, alice);
-        assert.isTrue(
-          await sortedTroves.contains(alice),
-          'list should contain element'
-        );
+        assert.isTrue(await sortedTroves.contains(alice), 'list should contain element');
         await th.assertRevert(
           sortedTrovesTester.reInsert(alice, 0, alice, alice),
           'SortedTroves: NICR must be positive'
         );
-        assert.isTrue(
-          await sortedTroves.contains(alice),
-          'list should contain element'
-        );
+        assert.isTrue(await sortedTroves.contains(alice), 'list should contain element');
       });
 
       it('findInsertPosition(): No prevId for hint - ascend list starting from nextId, result is after the tail', async () => {
         await sortedTrovesTester.insert(alice, 1, alice, alice);
-        const pos = await sortedTroves.findInsertPosition(
-          1,
-          th.ZERO_ADDRESS,
-          alice
-        );
+        const pos = await sortedTroves.findInsertPosition(1, th.ZERO_ADDRESS, alice);
         assert.equal(pos[0], alice, 'prevId result should be nextId param');
         assert.equal(pos[1], th.ZERO_ADDRESS, 'nextId result should be zero');
       });

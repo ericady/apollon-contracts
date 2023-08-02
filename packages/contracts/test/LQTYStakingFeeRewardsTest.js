@@ -50,12 +50,11 @@ contract('LQTYStaking revenue share tests', async accounts => {
     contracts = await deploymentHelper.deployLiquityCore();
     contracts.troveManager = await TroveManagerTester.new();
     contracts = await deploymentHelper.deployLUSDTokenTester(contracts);
-    const LQTYContracts =
-      await deploymentHelper.deployLQTYTesterContractsHardhat(
-        bountyAddress,
-        lpRewardsAddress,
-        multisig
-      );
+    const LQTYContracts = await deploymentHelper.deployLQTYTesterContractsHardhat(
+      bountyAddress,
+      lpRewardsAddress,
+      multisig
+    );
 
     await deploymentHelper.connectLQTYContracts(LQTYContracts);
     await deploymentHelper.connectCoreContracts(contracts, LQTYContracts);
@@ -78,10 +77,7 @@ contract('LQTYStaking revenue share tests', async accounts => {
 
   it('stake(): reverts if amount is zero', async () => {
     // FF time one year so owner can transfer LQTY
-    await th.fastForwardTime(
-      timeValues.SECONDS_IN_ONE_YEAR,
-      web3.currentProvider
-    );
+    await th.fastForwardTime(timeValues.SECONDS_IN_ONE_YEAR, web3.currentProvider);
 
     // multisig transfers LQTY to staker A
     await lqtyToken.transfer(A, dec(100, 18), { from: multisig });
@@ -90,10 +86,7 @@ contract('LQTYStaking revenue share tests', async accounts => {
 
     // A makes stake
     await lqtyToken.approve(lqtyStaking.address, dec(100, 18), { from: A });
-    await assertRevert(
-      lqtyStaking.stake(0, { from: A }),
-      'LQTYStaking: Amount must be non-zero'
-    );
+    await assertRevert(lqtyStaking.stake(0, { from: A }), 'LQTYStaking: Amount must be non-zero');
   });
 
   it('ETH fee per LQTY staked increases when a redemption fee is triggered and totalStakes > 0', async () => {
@@ -119,10 +112,7 @@ contract('LQTYStaking revenue share tests', async accounts => {
     });
 
     // FF time one year so owner can transfer LQTY
-    await th.fastForwardTime(
-      timeValues.SECONDS_IN_ONE_YEAR,
-      web3.currentProvider
-    );
+    await th.fastForwardTime(timeValues.SECONDS_IN_ONE_YEAR, web3.currentProvider);
 
     // multisig transfers LQTY to staker A
     await lqtyToken.transfer(A, dec(100, 18), {
@@ -142,20 +132,13 @@ contract('LQTYStaking revenue share tests', async accounts => {
 
     const B_BalBeforeREdemption = await lusdToken.balanceOf(B);
     // B redeems
-    const redemptionTx = await th.redeemCollateralAndGetTxObject(
-      B,
-      contracts,
-      dec(100, 18),
-      GAS_PRICE
-    );
+    const redemptionTx = await th.redeemCollateralAndGetTxObject(B, contracts, dec(100, 18), GAS_PRICE);
 
     const B_BalAfterRedemption = await lusdToken.balanceOf(B);
     assert.isTrue(B_BalAfterRedemption.lt(B_BalBeforeREdemption));
 
     // check ETH fee emitted in event is non-zero
-    const emittedETHFee = toBN(
-      (await th.getEmittedRedemptionValues(redemptionTx))[3]
-    );
+    const emittedETHFee = toBN((await th.getEmittedRedemptionValues(redemptionTx))[3]);
     assert.isTrue(emittedETHFee.gt(toBN('0')));
 
     // Check ETH fee per unit staked has increased by correct amount
@@ -195,10 +178,7 @@ contract('LQTYStaking revenue share tests', async accounts => {
     });
 
     // FF time one year so owner can transfer LQTY
-    await th.fastForwardTime(
-      timeValues.SECONDS_IN_ONE_YEAR,
-      web3.currentProvider
-    );
+    await th.fastForwardTime(timeValues.SECONDS_IN_ONE_YEAR, web3.currentProvider);
 
     // multisig transfers LQTY to staker A
     await lqtyToken.transfer(A, dec(100, 18), {
@@ -212,20 +192,13 @@ contract('LQTYStaking revenue share tests', async accounts => {
 
     const B_BalBeforeREdemption = await lusdToken.balanceOf(B);
     // B redeems
-    const redemptionTx = await th.redeemCollateralAndGetTxObject(
-      B,
-      contracts,
-      dec(100, 18),
-      GAS_PRICE
-    );
+    const redemptionTx = await th.redeemCollateralAndGetTxObject(B, contracts, dec(100, 18), GAS_PRICE);
 
     const B_BalAfterRedemption = await lusdToken.balanceOf(B);
     assert.isTrue(B_BalAfterRedemption.lt(B_BalBeforeREdemption));
 
     // check ETH fee emitted in event is non-zero
-    const emittedETHFee = toBN(
-      (await th.getEmittedRedemptionValues(redemptionTx))[3]
-    );
+    const emittedETHFee = toBN((await th.getEmittedRedemptionValues(redemptionTx))[3]);
     assert.isTrue(emittedETHFee.gt(toBN('0')));
 
     // Check ETH fee per unit staked has not increased
@@ -261,10 +234,7 @@ contract('LQTYStaking revenue share tests', async accounts => {
     });
 
     // FF time one year so owner can transfer LQTY
-    await th.fastForwardTime(
-      timeValues.SECONDS_IN_ONE_YEAR,
-      web3.currentProvider
-    );
+    await th.fastForwardTime(timeValues.SECONDS_IN_ONE_YEAR, web3.currentProvider);
 
     // multisig transfers LQTY to staker A
     await lqtyToken.transfer(A, dec(100, 18), { from: multisig });
@@ -279,12 +249,7 @@ contract('LQTYStaking revenue share tests', async accounts => {
 
     const B_BalBeforeREdemption = await lusdToken.balanceOf(B);
     // B redeems
-    const redemptionTx = await th.redeemCollateralAndGetTxObject(
-      B,
-      contracts,
-      dec(100, 18),
-      (gasPrice = GAS_PRICE)
-    );
+    const redemptionTx = await th.redeemCollateralAndGetTxObject(B, contracts, dec(100, 18), (gasPrice = GAS_PRICE));
 
     const B_BalAfterRedemption = await lusdToken.balanceOf(B);
     assert.isTrue(B_BalAfterRedemption.lt(B_BalBeforeREdemption));
@@ -294,13 +259,7 @@ contract('LQTYStaking revenue share tests', async accounts => {
     assert.isTrue(baseRate.gt(toBN('0')));
 
     // D draws debt
-    const tx = await borrowerOperations.withdrawLUSD(
-      th._100pct,
-      dec(27, 18),
-      D,
-      D,
-      { from: D }
-    );
+    const tx = await borrowerOperations.withdrawLUSD(th._100pct, dec(27, 18), D, D, { from: D });
 
     // Check LUSD fee value in event is non-zero
     const emittedLUSDFee = toBN(th.getLUSDFeeFromLUSDBorrowingEvent(tx));
@@ -343,10 +302,7 @@ contract('LQTYStaking revenue share tests', async accounts => {
     });
 
     // FF time one year so owner can transfer LQTY
-    await th.fastForwardTime(
-      timeValues.SECONDS_IN_ONE_YEAR,
-      web3.currentProvider
-    );
+    await th.fastForwardTime(timeValues.SECONDS_IN_ONE_YEAR, web3.currentProvider);
 
     // multisig transfers LQTY to staker A
     await lqtyToken.transfer(A, dec(100, 18), { from: multisig });
@@ -357,12 +313,7 @@ contract('LQTYStaking revenue share tests', async accounts => {
 
     const B_BalBeforeREdemption = await lusdToken.balanceOf(B);
     // B redeems
-    const redemptionTx = await th.redeemCollateralAndGetTxObject(
-      B,
-      contracts,
-      dec(100, 18),
-      (gasPrice = GAS_PRICE)
-    );
+    const redemptionTx = await th.redeemCollateralAndGetTxObject(B, contracts, dec(100, 18), (gasPrice = GAS_PRICE));
 
     const B_BalAfterRedemption = await lusdToken.balanceOf(B);
     assert.isTrue(B_BalAfterRedemption.lt(B_BalBeforeREdemption));
@@ -372,13 +323,7 @@ contract('LQTYStaking revenue share tests', async accounts => {
     assert.isTrue(baseRate.gt(toBN('0')));
 
     // D draws debt
-    const tx = await borrowerOperations.withdrawLUSD(
-      th._100pct,
-      dec(27, 18),
-      D,
-      D,
-      { from: D }
-    );
+    const tx = await borrowerOperations.withdrawLUSD(th._100pct, dec(27, 18), D, D, { from: D });
 
     // Check LUSD fee value in event is non-zero
     const emittedLUSDFee = toBN(th.getLUSDFeeFromLUSDBorrowingEvent(tx));
@@ -417,10 +362,7 @@ contract('LQTYStaking revenue share tests', async accounts => {
     });
 
     // FF time one year so owner can transfer LQTY
-    await th.fastForwardTime(
-      timeValues.SECONDS_IN_ONE_YEAR,
-      web3.currentProvider
-    );
+    await th.fastForwardTime(timeValues.SECONDS_IN_ONE_YEAR, web3.currentProvider);
 
     // multisig transfers LQTY to staker A
     await lqtyToken.transfer(A, dec(100, 18), { from: multisig });
@@ -431,72 +373,42 @@ contract('LQTYStaking revenue share tests', async accounts => {
 
     const B_BalBeforeREdemption = await lusdToken.balanceOf(B);
     // B redeems
-    const redemptionTx_1 = await th.redeemCollateralAndGetTxObject(
-      B,
-      contracts,
-      dec(100, 18),
-      (gasPrice = GAS_PRICE)
-    );
+    const redemptionTx_1 = await th.redeemCollateralAndGetTxObject(B, contracts, dec(100, 18), (gasPrice = GAS_PRICE));
 
     const B_BalAfterRedemption = await lusdToken.balanceOf(B);
     assert.isTrue(B_BalAfterRedemption.lt(B_BalBeforeREdemption));
 
     // check ETH fee 1 emitted in event is non-zero
-    const emittedETHFee_1 = toBN(
-      (await th.getEmittedRedemptionValues(redemptionTx_1))[3]
-    );
+    const emittedETHFee_1 = toBN((await th.getEmittedRedemptionValues(redemptionTx_1))[3]);
     assert.isTrue(emittedETHFee_1.gt(toBN('0')));
 
     const C_BalBeforeREdemption = await lusdToken.balanceOf(C);
     // C redeems
-    const redemptionTx_2 = await th.redeemCollateralAndGetTxObject(
-      C,
-      contracts,
-      dec(100, 18),
-      (gasPrice = GAS_PRICE)
-    );
+    const redemptionTx_2 = await th.redeemCollateralAndGetTxObject(C, contracts, dec(100, 18), (gasPrice = GAS_PRICE));
 
     const C_BalAfterRedemption = await lusdToken.balanceOf(C);
     assert.isTrue(C_BalAfterRedemption.lt(C_BalBeforeREdemption));
 
     // check ETH fee 2 emitted in event is non-zero
-    const emittedETHFee_2 = toBN(
-      (await th.getEmittedRedemptionValues(redemptionTx_2))[3]
-    );
+    const emittedETHFee_2 = toBN((await th.getEmittedRedemptionValues(redemptionTx_2))[3]);
     assert.isTrue(emittedETHFee_2.gt(toBN('0')));
 
     // D draws debt
-    const borrowingTx_1 = await borrowerOperations.withdrawLUSD(
-      th._100pct,
-      dec(104, 18),
-      D,
-      D,
-      {
-        from: D,
-      }
-    );
+    const borrowingTx_1 = await borrowerOperations.withdrawLUSD(th._100pct, dec(104, 18), D, D, {
+      from: D,
+    });
 
     // Check LUSD fee value in event is non-zero
-    const emittedLUSDFee_1 = toBN(
-      th.getLUSDFeeFromLUSDBorrowingEvent(borrowingTx_1)
-    );
+    const emittedLUSDFee_1 = toBN(th.getLUSDFeeFromLUSDBorrowingEvent(borrowingTx_1));
     assert.isTrue(emittedLUSDFee_1.gt(toBN('0')));
 
     // B draws debt
-    const borrowingTx_2 = await borrowerOperations.withdrawLUSD(
-      th._100pct,
-      dec(17, 18),
-      B,
-      B,
-      {
-        from: B,
-      }
-    );
+    const borrowingTx_2 = await borrowerOperations.withdrawLUSD(th._100pct, dec(17, 18), B, B, {
+      from: B,
+    });
 
     // Check LUSD fee value in event is non-zero
-    const emittedLUSDFee_2 = toBN(
-      th.getLUSDFeeFromLUSDBorrowingEvent(borrowingTx_2)
-    );
+    const emittedLUSDFee_2 = toBN(th.getLUSDFeeFromLUSDBorrowingEvent(borrowingTx_2));
     assert.isTrue(emittedLUSDFee_2.gt(toBN('0')));
 
     const expectedTotalETHGain = emittedETHFee_1.add(emittedETHFee_2);
@@ -506,16 +418,12 @@ contract('LQTYStaking revenue share tests', async accounts => {
     const A_LUSDBalance_Before = toBN(await lusdToken.balanceOf(A));
 
     // A un-stakes
-    const GAS_Used = th.gasUsed(
-      await lqtyStaking.unstake(dec(100, 18), { from: A, gasPrice: GAS_PRICE })
-    );
+    const GAS_Used = th.gasUsed(await lqtyStaking.unstake(dec(100, 18), { from: A, gasPrice: GAS_PRICE }));
 
     const A_ETHBalance_After = toBN(await web3.eth.getBalance(A));
     const A_LUSDBalance_After = toBN(await lusdToken.balanceOf(A));
 
-    const A_ETHGain = A_ETHBalance_After.sub(A_ETHBalance_Before).add(
-      toBN(GAS_Used * GAS_PRICE)
-    );
+    const A_ETHGain = A_ETHBalance_After.sub(A_ETHBalance_Before).add(toBN(GAS_Used * GAS_PRICE));
     const A_LUSDGain = A_LUSDBalance_After.sub(A_LUSDBalance_Before);
 
     assert.isAtMost(th.getDifference(expectedTotalETHGain, A_ETHGain), 1000);
@@ -550,10 +458,7 @@ contract('LQTYStaking revenue share tests', async accounts => {
     });
 
     // FF time one year so owner can transfer LQTY
-    await th.fastForwardTime(
-      timeValues.SECONDS_IN_ONE_YEAR,
-      web3.currentProvider
-    );
+    await th.fastForwardTime(timeValues.SECONDS_IN_ONE_YEAR, web3.currentProvider);
 
     // multisig transfers LQTY to staker A
     await lqtyToken.transfer(A, dec(100, 18), { from: multisig });
@@ -564,72 +469,42 @@ contract('LQTYStaking revenue share tests', async accounts => {
 
     const B_BalBeforeREdemption = await lusdToken.balanceOf(B);
     // B redeems
-    const redemptionTx_1 = await th.redeemCollateralAndGetTxObject(
-      B,
-      contracts,
-      dec(100, 18),
-      (gasPrice = GAS_PRICE)
-    );
+    const redemptionTx_1 = await th.redeemCollateralAndGetTxObject(B, contracts, dec(100, 18), (gasPrice = GAS_PRICE));
 
     const B_BalAfterRedemption = await lusdToken.balanceOf(B);
     assert.isTrue(B_BalAfterRedemption.lt(B_BalBeforeREdemption));
 
     // check ETH fee 1 emitted in event is non-zero
-    const emittedETHFee_1 = toBN(
-      (await th.getEmittedRedemptionValues(redemptionTx_1))[3]
-    );
+    const emittedETHFee_1 = toBN((await th.getEmittedRedemptionValues(redemptionTx_1))[3]);
     assert.isTrue(emittedETHFee_1.gt(toBN('0')));
 
     const C_BalBeforeREdemption = await lusdToken.balanceOf(C);
     // C redeems
-    const redemptionTx_2 = await th.redeemCollateralAndGetTxObject(
-      C,
-      contracts,
-      dec(100, 18),
-      (gasPrice = GAS_PRICE)
-    );
+    const redemptionTx_2 = await th.redeemCollateralAndGetTxObject(C, contracts, dec(100, 18), (gasPrice = GAS_PRICE));
 
     const C_BalAfterRedemption = await lusdToken.balanceOf(C);
     assert.isTrue(C_BalAfterRedemption.lt(C_BalBeforeREdemption));
 
     // check ETH fee 2 emitted in event is non-zero
-    const emittedETHFee_2 = toBN(
-      (await th.getEmittedRedemptionValues(redemptionTx_2))[3]
-    );
+    const emittedETHFee_2 = toBN((await th.getEmittedRedemptionValues(redemptionTx_2))[3]);
     assert.isTrue(emittedETHFee_2.gt(toBN('0')));
 
     // D draws debt
-    const borrowingTx_1 = await borrowerOperations.withdrawLUSD(
-      th._100pct,
-      dec(104, 18),
-      D,
-      D,
-      {
-        from: D,
-      }
-    );
+    const borrowingTx_1 = await borrowerOperations.withdrawLUSD(th._100pct, dec(104, 18), D, D, {
+      from: D,
+    });
 
     // Check LUSD fee value in event is non-zero
-    const emittedLUSDFee_1 = toBN(
-      th.getLUSDFeeFromLUSDBorrowingEvent(borrowingTx_1)
-    );
+    const emittedLUSDFee_1 = toBN(th.getLUSDFeeFromLUSDBorrowingEvent(borrowingTx_1));
     assert.isTrue(emittedLUSDFee_1.gt(toBN('0')));
 
     // B draws debt
-    const borrowingTx_2 = await borrowerOperations.withdrawLUSD(
-      th._100pct,
-      dec(17, 18),
-      B,
-      B,
-      {
-        from: B,
-      }
-    );
+    const borrowingTx_2 = await borrowerOperations.withdrawLUSD(th._100pct, dec(17, 18), B, B, {
+      from: B,
+    });
 
     // Check LUSD fee value in event is non-zero
-    const emittedLUSDFee_2 = toBN(
-      th.getLUSDFeeFromLUSDBorrowingEvent(borrowingTx_2)
-    );
+    const emittedLUSDFee_2 = toBN(th.getLUSDFeeFromLUSDBorrowingEvent(borrowingTx_2));
     assert.isTrue(emittedLUSDFee_2.gt(toBN('0')));
 
     const expectedTotalETHGain = emittedETHFee_1.add(emittedETHFee_2);
@@ -639,16 +514,12 @@ contract('LQTYStaking revenue share tests', async accounts => {
     const A_LUSDBalance_Before = toBN(await lusdToken.balanceOf(A));
 
     // A tops up
-    const GAS_Used = th.gasUsed(
-      await lqtyStaking.stake(dec(50, 18), { from: A, gasPrice: GAS_PRICE })
-    );
+    const GAS_Used = th.gasUsed(await lqtyStaking.stake(dec(50, 18), { from: A, gasPrice: GAS_PRICE }));
 
     const A_ETHBalance_After = toBN(await web3.eth.getBalance(A));
     const A_LUSDBalance_After = toBN(await lusdToken.balanceOf(A));
 
-    const A_ETHGain = A_ETHBalance_After.sub(A_ETHBalance_Before).add(
-      toBN(GAS_Used * GAS_PRICE)
-    );
+    const A_ETHGain = A_ETHBalance_After.sub(A_ETHBalance_Before).add(toBN(GAS_Used * GAS_PRICE));
     const A_LUSDGain = A_LUSDBalance_After.sub(A_LUSDBalance_Before);
 
     assert.isAtMost(th.getDifference(expectedTotalETHGain, A_ETHGain), 1000);
@@ -683,10 +554,7 @@ contract('LQTYStaking revenue share tests', async accounts => {
     });
 
     // FF time one year so owner can transfer LQTY
-    await th.fastForwardTime(
-      timeValues.SECONDS_IN_ONE_YEAR,
-      web3.currentProvider
-    );
+    await th.fastForwardTime(timeValues.SECONDS_IN_ONE_YEAR, web3.currentProvider);
 
     // multisig transfers LQTY to staker A
     await lqtyToken.transfer(A, dec(100, 18), { from: multisig });
@@ -697,38 +565,24 @@ contract('LQTYStaking revenue share tests', async accounts => {
 
     const B_BalBeforeREdemption = await lusdToken.balanceOf(B);
     // B redeems
-    const redemptionTx_1 = await th.redeemCollateralAndGetTxObject(
-      B,
-      contracts,
-      dec(100, 18),
-      (gasPrice = GAS_PRICE)
-    );
+    const redemptionTx_1 = await th.redeemCollateralAndGetTxObject(B, contracts, dec(100, 18), (gasPrice = GAS_PRICE));
 
     const B_BalAfterRedemption = await lusdToken.balanceOf(B);
     assert.isTrue(B_BalAfterRedemption.lt(B_BalBeforeREdemption));
 
     // check ETH fee 1 emitted in event is non-zero
-    const emittedETHFee_1 = toBN(
-      (await th.getEmittedRedemptionValues(redemptionTx_1))[3]
-    );
+    const emittedETHFee_1 = toBN((await th.getEmittedRedemptionValues(redemptionTx_1))[3]);
     assert.isTrue(emittedETHFee_1.gt(toBN('0')));
 
     const C_BalBeforeREdemption = await lusdToken.balanceOf(C);
     // C redeems
-    const redemptionTx_2 = await th.redeemCollateralAndGetTxObject(
-      C,
-      contracts,
-      dec(100, 18),
-      (gasPrice = GAS_PRICE)
-    );
+    const redemptionTx_2 = await th.redeemCollateralAndGetTxObject(C, contracts, dec(100, 18), (gasPrice = GAS_PRICE));
 
     const C_BalAfterRedemption = await lusdToken.balanceOf(C);
     assert.isTrue(C_BalAfterRedemption.lt(C_BalBeforeREdemption));
 
     // check ETH fee 2 emitted in event is non-zero
-    const emittedETHFee_2 = toBN(
-      (await th.getEmittedRedemptionValues(redemptionTx_2))[3]
-    );
+    const emittedETHFee_2 = toBN((await th.getEmittedRedemptionValues(redemptionTx_2))[3]);
     assert.isTrue(emittedETHFee_2.gt(toBN('0')));
 
     const expectedTotalETHGain = emittedETHFee_1.add(emittedETHFee_2);
@@ -766,10 +620,7 @@ contract('LQTYStaking revenue share tests', async accounts => {
     });
 
     // FF time one year so owner can transfer LQTY
-    await th.fastForwardTime(
-      timeValues.SECONDS_IN_ONE_YEAR,
-      web3.currentProvider
-    );
+    await th.fastForwardTime(timeValues.SECONDS_IN_ONE_YEAR, web3.currentProvider);
 
     // multisig transfers LQTY to staker A
     await lqtyToken.transfer(A, dec(100, 18), { from: multisig });
@@ -780,72 +631,42 @@ contract('LQTYStaking revenue share tests', async accounts => {
 
     const B_BalBeforeREdemption = await lusdToken.balanceOf(B);
     // B redeems
-    const redemptionTx_1 = await th.redeemCollateralAndGetTxObject(
-      B,
-      contracts,
-      dec(100, 18),
-      (gasPrice = GAS_PRICE)
-    );
+    const redemptionTx_1 = await th.redeemCollateralAndGetTxObject(B, contracts, dec(100, 18), (gasPrice = GAS_PRICE));
 
     const B_BalAfterRedemption = await lusdToken.balanceOf(B);
     assert.isTrue(B_BalAfterRedemption.lt(B_BalBeforeREdemption));
 
     // check ETH fee 1 emitted in event is non-zero
-    const emittedETHFee_1 = toBN(
-      (await th.getEmittedRedemptionValues(redemptionTx_1))[3]
-    );
+    const emittedETHFee_1 = toBN((await th.getEmittedRedemptionValues(redemptionTx_1))[3]);
     assert.isTrue(emittedETHFee_1.gt(toBN('0')));
 
     const C_BalBeforeREdemption = await lusdToken.balanceOf(C);
     // C redeems
-    const redemptionTx_2 = await th.redeemCollateralAndGetTxObject(
-      C,
-      contracts,
-      dec(100, 18),
-      (gasPrice = GAS_PRICE)
-    );
+    const redemptionTx_2 = await th.redeemCollateralAndGetTxObject(C, contracts, dec(100, 18), (gasPrice = GAS_PRICE));
 
     const C_BalAfterRedemption = await lusdToken.balanceOf(C);
     assert.isTrue(C_BalAfterRedemption.lt(C_BalBeforeREdemption));
 
     // check ETH fee 2 emitted in event is non-zero
-    const emittedETHFee_2 = toBN(
-      (await th.getEmittedRedemptionValues(redemptionTx_2))[3]
-    );
+    const emittedETHFee_2 = toBN((await th.getEmittedRedemptionValues(redemptionTx_2))[3]);
     assert.isTrue(emittedETHFee_2.gt(toBN('0')));
 
     // D draws debt
-    const borrowingTx_1 = await borrowerOperations.withdrawLUSD(
-      th._100pct,
-      dec(104, 18),
-      D,
-      D,
-      {
-        from: D,
-      }
-    );
+    const borrowingTx_1 = await borrowerOperations.withdrawLUSD(th._100pct, dec(104, 18), D, D, {
+      from: D,
+    });
 
     // Check LUSD fee value in event is non-zero
-    const emittedLUSDFee_1 = toBN(
-      th.getLUSDFeeFromLUSDBorrowingEvent(borrowingTx_1)
-    );
+    const emittedLUSDFee_1 = toBN(th.getLUSDFeeFromLUSDBorrowingEvent(borrowingTx_1));
     assert.isTrue(emittedLUSDFee_1.gt(toBN('0')));
 
     // B draws debt
-    const borrowingTx_2 = await borrowerOperations.withdrawLUSD(
-      th._100pct,
-      dec(17, 18),
-      B,
-      B,
-      {
-        from: B,
-      }
-    );
+    const borrowingTx_2 = await borrowerOperations.withdrawLUSD(th._100pct, dec(17, 18), B, B, {
+      from: B,
+    });
 
     // Check LUSD fee value in event is non-zero
-    const emittedLUSDFee_2 = toBN(
-      th.getLUSDFeeFromLUSDBorrowingEvent(borrowingTx_2)
-    );
+    const emittedLUSDFee_2 = toBN(th.getLUSDFeeFromLUSDBorrowingEvent(borrowingTx_2));
     assert.isTrue(emittedLUSDFee_2.gt(toBN('0')));
 
     const expectedTotalLUSDGain = emittedLUSDFee_1.add(emittedLUSDFee_2);
@@ -898,10 +719,7 @@ contract('LQTYStaking revenue share tests', async accounts => {
     });
 
     // FF time one year so owner can transfer LQTY
-    await th.fastForwardTime(
-      timeValues.SECONDS_IN_ONE_YEAR,
-      web3.currentProvider
-    );
+    await th.fastForwardTime(timeValues.SECONDS_IN_ONE_YEAR, web3.currentProvider);
 
     // multisig transfers LQTY to staker A, B, C
     await lqtyToken.transfer(A, dec(100, 18), { from: multisig });
@@ -922,57 +740,27 @@ contract('LQTYStaking revenue share tests', async accounts => {
     assert.equal(await lqtyStaking.totalLQTYStaked(), dec(600, 18));
 
     // F redeems
-    const redemptionTx_1 = await th.redeemCollateralAndGetTxObject(
-      F,
-      contracts,
-      dec(45, 18),
-      (gasPrice = GAS_PRICE)
-    );
-    const emittedETHFee_1 = toBN(
-      (await th.getEmittedRedemptionValues(redemptionTx_1))[3]
-    );
+    const redemptionTx_1 = await th.redeemCollateralAndGetTxObject(F, contracts, dec(45, 18), (gasPrice = GAS_PRICE));
+    const emittedETHFee_1 = toBN((await th.getEmittedRedemptionValues(redemptionTx_1))[3]);
     assert.isTrue(emittedETHFee_1.gt(toBN('0')));
 
     // G redeems
-    const redemptionTx_2 = await th.redeemCollateralAndGetTxObject(
-      G,
-      contracts,
-      dec(197, 18),
-      (gasPrice = GAS_PRICE)
-    );
-    const emittedETHFee_2 = toBN(
-      (await th.getEmittedRedemptionValues(redemptionTx_2))[3]
-    );
+    const redemptionTx_2 = await th.redeemCollateralAndGetTxObject(G, contracts, dec(197, 18), (gasPrice = GAS_PRICE));
+    const emittedETHFee_2 = toBN((await th.getEmittedRedemptionValues(redemptionTx_2))[3]);
     assert.isTrue(emittedETHFee_2.gt(toBN('0')));
 
     // F draws debt
-    const borrowingTx_1 = await borrowerOperations.withdrawLUSD(
-      th._100pct,
-      dec(104, 18),
-      F,
-      F,
-      {
-        from: F,
-      }
-    );
-    const emittedLUSDFee_1 = toBN(
-      th.getLUSDFeeFromLUSDBorrowingEvent(borrowingTx_1)
-    );
+    const borrowingTx_1 = await borrowerOperations.withdrawLUSD(th._100pct, dec(104, 18), F, F, {
+      from: F,
+    });
+    const emittedLUSDFee_1 = toBN(th.getLUSDFeeFromLUSDBorrowingEvent(borrowingTx_1));
     assert.isTrue(emittedLUSDFee_1.gt(toBN('0')));
 
     // G draws debt
-    const borrowingTx_2 = await borrowerOperations.withdrawLUSD(
-      th._100pct,
-      dec(17, 18),
-      G,
-      G,
-      {
-        from: G,
-      }
-    );
-    const emittedLUSDFee_2 = toBN(
-      th.getLUSDFeeFromLUSDBorrowingEvent(borrowingTx_2)
-    );
+    const borrowingTx_2 = await borrowerOperations.withdrawLUSD(th._100pct, dec(17, 18), G, G, {
+      from: G,
+    });
+    const emittedLUSDFee_2 = toBN(th.getLUSDFeeFromLUSDBorrowingEvent(borrowingTx_2));
     assert.isTrue(emittedLUSDFee_2.gt(toBN('0')));
 
     // D obtains LQTY from owner and makes a stake
@@ -985,30 +773,15 @@ contract('LQTYStaking revenue share tests', async accounts => {
     assert.equal(await lqtyStaking.totalLQTYStaked(), dec(650, 18));
 
     // G redeems
-    const redemptionTx_3 = await th.redeemCollateralAndGetTxObject(
-      C,
-      contracts,
-      dec(197, 18),
-      (gasPrice = GAS_PRICE)
-    );
-    const emittedETHFee_3 = toBN(
-      (await th.getEmittedRedemptionValues(redemptionTx_3))[3]
-    );
+    const redemptionTx_3 = await th.redeemCollateralAndGetTxObject(C, contracts, dec(197, 18), (gasPrice = GAS_PRICE));
+    const emittedETHFee_3 = toBN((await th.getEmittedRedemptionValues(redemptionTx_3))[3]);
     assert.isTrue(emittedETHFee_3.gt(toBN('0')));
 
     // G draws debt
-    const borrowingTx_3 = await borrowerOperations.withdrawLUSD(
-      th._100pct,
-      dec(17, 18),
-      G,
-      G,
-      {
-        from: G,
-      }
-    );
-    const emittedLUSDFee_3 = toBN(
-      th.getLUSDFeeFromLUSDBorrowingEvent(borrowingTx_3)
-    );
+    const borrowingTx_3 = await borrowerOperations.withdrawLUSD(th._100pct, dec(17, 18), G, G, {
+      from: G,
+    });
+    const emittedLUSDFee_3 = toBN(th.getLUSDFeeFromLUSDBorrowingEvent(borrowingTx_3));
     assert.isTrue(emittedLUSDFee_3.gt(toBN('0')));
 
     /*  
@@ -1065,9 +838,7 @@ contract('LQTYStaking revenue share tests', async accounts => {
       .add(toBN('300').mul(emittedLUSDFee_2).div(toBN('600')))
       .add(toBN('300').mul(emittedLUSDFee_3).div(toBN('650')));
 
-    const expectedLUSDGain_D = toBN('50')
-      .mul(emittedLUSDFee_3)
-      .div(toBN('650'));
+    const expectedLUSDGain_D = toBN('50').mul(emittedLUSDFee_3).div(toBN('650'));
 
     const A_ETHBalance_Before = toBN(await web3.eth.getBalance(A));
     const A_LUSDBalance_Before = toBN(await lusdToken.balanceOf(A));
@@ -1079,18 +850,10 @@ contract('LQTYStaking revenue share tests', async accounts => {
     const D_LUSDBalance_Before = toBN(await lusdToken.balanceOf(D));
 
     // A-D un-stake
-    const A_GAS_Used = th.gasUsed(
-      await lqtyStaking.unstake(dec(100, 18), { from: A, gasPrice: GAS_PRICE })
-    );
-    const B_GAS_Used = th.gasUsed(
-      await lqtyStaking.unstake(dec(200, 18), { from: B, gasPrice: GAS_PRICE })
-    );
-    const C_GAS_Used = th.gasUsed(
-      await lqtyStaking.unstake(dec(400, 18), { from: C, gasPrice: GAS_PRICE })
-    );
-    const D_GAS_Used = th.gasUsed(
-      await lqtyStaking.unstake(dec(50, 18), { from: D, gasPrice: GAS_PRICE })
-    );
+    const A_GAS_Used = th.gasUsed(await lqtyStaking.unstake(dec(100, 18), { from: A, gasPrice: GAS_PRICE }));
+    const B_GAS_Used = th.gasUsed(await lqtyStaking.unstake(dec(200, 18), { from: B, gasPrice: GAS_PRICE }));
+    const C_GAS_Used = th.gasUsed(await lqtyStaking.unstake(dec(400, 18), { from: C, gasPrice: GAS_PRICE }));
+    const D_GAS_Used = th.gasUsed(await lqtyStaking.unstake(dec(50, 18), { from: D, gasPrice: GAS_PRICE }));
 
     // Confirm all depositors could withdraw
 
@@ -1109,21 +872,13 @@ contract('LQTYStaking revenue share tests', async accounts => {
     const D_LUSDBalance_After = toBN(await lusdToken.balanceOf(D));
 
     // Get ETH and LUSD gains
-    const A_ETHGain = A_ETHBalance_After.sub(A_ETHBalance_Before).add(
-      toBN(A_GAS_Used * GAS_PRICE)
-    );
+    const A_ETHGain = A_ETHBalance_After.sub(A_ETHBalance_Before).add(toBN(A_GAS_Used * GAS_PRICE));
     const A_LUSDGain = A_LUSDBalance_After.sub(A_LUSDBalance_Before);
-    const B_ETHGain = B_ETHBalance_After.sub(B_ETHBalance_Before).add(
-      toBN(B_GAS_Used * GAS_PRICE)
-    );
+    const B_ETHGain = B_ETHBalance_After.sub(B_ETHBalance_Before).add(toBN(B_GAS_Used * GAS_PRICE));
     const B_LUSDGain = B_LUSDBalance_After.sub(B_LUSDBalance_Before);
-    const C_ETHGain = C_ETHBalance_After.sub(C_ETHBalance_Before).add(
-      toBN(C_GAS_Used * GAS_PRICE)
-    );
+    const C_ETHGain = C_ETHBalance_After.sub(C_ETHBalance_Before).add(toBN(C_GAS_Used * GAS_PRICE));
     const C_LUSDGain = C_LUSDBalance_After.sub(C_LUSDBalance_Before);
-    const D_ETHGain = D_ETHBalance_After.sub(D_ETHBalance_Before).add(
-      toBN(D_GAS_Used * GAS_PRICE)
-    );
+    const D_ETHGain = D_ETHBalance_After.sub(D_ETHBalance_Before).add(toBN(D_GAS_Used * GAS_PRICE));
     const D_LUSDGain = D_LUSDBalance_After.sub(D_LUSDBalance_Before);
 
     // Check gains match expected amounts
@@ -1164,10 +919,7 @@ contract('LQTYStaking revenue share tests', async accounts => {
       extraParams: { from: D },
     });
 
-    await th.fastForwardTime(
-      timeValues.SECONDS_IN_ONE_YEAR,
-      web3.currentProvider
-    );
+    await th.fastForwardTime(timeValues.SECONDS_IN_ONE_YEAR, web3.currentProvider);
 
     // multisig transfers LQTY to staker A and the non-payable proxy
     await lqtyToken.transfer(A, dec(100, 18), { from: multisig });
@@ -1180,38 +932,23 @@ contract('LQTYStaking revenue share tests', async accounts => {
     assert.isTrue(A_stakeTx.receipt.status);
 
     //  A tells proxy to make a stake
-    const proxystakeTxData = await th.getTransactionData('stake(uint256)', [
-      '0x56bc75e2d63100000',
-    ]); // proxy stakes 100 LQTY
+    const proxystakeTxData = await th.getTransactionData('stake(uint256)', ['0x56bc75e2d63100000']); // proxy stakes 100 LQTY
     await nonPayable.forward(lqtyStaking.address, proxystakeTxData, {
       from: A,
     });
 
     // B makes a redemption, creating ETH gain for proxy
-    const redemptionTx_1 = await th.redeemCollateralAndGetTxObject(
-      B,
-      contracts,
-      dec(45, 18),
-      (gasPrice = GAS_PRICE)
-    );
+    const redemptionTx_1 = await th.redeemCollateralAndGetTxObject(B, contracts, dec(45, 18), (gasPrice = GAS_PRICE));
 
-    const proxy_ETHGain = await lqtyStaking.getPendingETHGain(
-      nonPayable.address
-    );
+    const proxy_ETHGain = await lqtyStaking.getPendingETHGain(nonPayable.address);
     assert.isTrue(proxy_ETHGain.gt(toBN('0')));
 
     // Expect this tx to revert: stake() tries to send nonPayable proxy's accumulated ETH gain (albeit 0),
     //  A tells proxy to unstake
-    const proxyUnStakeTxData = await th.getTransactionData('unstake(uint256)', [
-      '0x56bc75e2d63100000',
-    ]); // proxy stakes 100 LQTY
-    const proxyUnstakeTxPromise = nonPayable.forward(
-      lqtyStaking.address,
-      proxyUnStakeTxData,
-      {
-        from: A,
-      }
-    );
+    const proxyUnStakeTxData = await th.getTransactionData('unstake(uint256)', ['0x56bc75e2d63100000']); // proxy stakes 100 LQTY
+    const proxyUnstakeTxPromise = nonPayable.forward(lqtyStaking.address, proxyUnStakeTxData, {
+      from: A,
+    });
 
     // but nonPayable proxy can not accept ETH - therefore stake() reverts.
     await assertRevert(proxyUnstakeTxPromise);
@@ -1243,9 +980,6 @@ contract('LQTYStaking revenue share tests', async accounts => {
 
   it('Test requireCallerIsTroveManager', async () => {
     const lqtyStakingTester = await LQTYStakingTester.new();
-    await assertRevert(
-      lqtyStakingTester.requireCallerIsTroveManager(),
-      'LQTYStaking: caller is not TroveM'
-    );
+    await assertRevert(lqtyStakingTester.requireCallerIsTroveManager(), 'LQTYStaking: caller is not TroveM');
   });
 });

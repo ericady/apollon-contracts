@@ -31,10 +31,7 @@ contract MockTellor {
 
   // --- Mock data reporting functions ---
 
-  function getTimestampbyRequestIDandIndex(
-    uint,
-    uint
-  ) external view returns (uint) {
+  function getTimestampbyRequestIDandIndex(uint, uint) external view returns (uint) {
     return updateTime;
   }
 

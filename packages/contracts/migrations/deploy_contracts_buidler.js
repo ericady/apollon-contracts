@@ -24,11 +24,7 @@ module.exports = async () => {
   const stabilityPool = await StabilityPool.new();
   const defaultPool = await DefaultPool.new();
   const functionCaller = await FunctionCaller.new();
-  const lusdToken = await LUSDToken.new(
-    troveManager.address,
-    stabilityPool.address,
-    borrowerOperations.address
-  );
+  const lusdToken = await LUSDToken.new(troveManager.address, stabilityPool.address, borrowerOperations.address);
   BorrowerOperations.setAsDeployed(borrowerOperations);
   PriceFeed.setAsDeployed(priceFeed);
   SortedTroves.setAsDeployed(sortedTroves);

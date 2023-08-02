@@ -19,28 +19,17 @@ Reporter.prototype.beginMutant = function (mutant) {
 
 Reporter.prototype.mutantSurvived = function (mutant) {
   this.survived.push(mutant);
-  console.log(
-    ' 👾 Mutant ' + this._formatMutant(mutant) + ' survived testing.'
-  );
+  console.log(' 👾 Mutant ' + this._formatMutant(mutant) + ' survived testing.');
 };
 
 Reporter.prototype.mutantKilled = function (mutant) {
   this.killed.push(mutant);
-  console.log(
-    ' 💪 Mutant ' + this._formatMutant(mutant) + ' was killed by tests.'
-  );
+  console.log(' 💪 Mutant ' + this._formatMutant(mutant) + ' was killed by tests.');
 };
 
 Reporter.prototype.summary = function () {
-  console.log(
-    this.survived.length +
-      ' mutants survived testing, ' +
-      this.killed.length +
-      ' mutants killed.'
-  );
-  console.log(
-    'Survivors: ' + this.survived.map(m => this._formatMutant(m)).join(', ')
-  );
+  console.log(this.survived.length + ' mutants survived testing, ' + this.killed.length + ' mutants killed.');
+  console.log('Survivors: ' + this.survived.map(m => this._formatMutant(m)).join(', '));
 };
 
 module.exports = Reporter;

@@ -22,21 +22,12 @@ contract LiquityBase is IBase {
   uint public constant BORROWING_FEE_FLOOR = (DECIMAL_PRECISION / 1000) * 5; // 0.5%
 
   // Return the coll amount of to be drawn from a trove's collateral and sent as gas compensation.
-  function _getCollGasCompensation(
-    uint _collAmount
-  ) internal pure returns (uint) {
+  function _getCollGasCompensation(uint _collAmount) internal pure returns (uint) {
     return _collAmount / PERCENT_DIVISOR;
   }
 
-  function _requireUserAcceptsFee(
-    uint _fee,
-    uint _amount,
-    uint _maxFeePercentage
-  ) internal pure {
+  function _requireUserAcceptsFee(uint _fee, uint _amount, uint _maxFeePercentage) internal pure {
     uint feePercentage = _fee.mul(DECIMAL_PRECISION).div(_amount);
-    require(
-      feePercentage <= _maxFeePercentage,
-      'Fee exceeded provided maximum'
-    );
+    require(feePercentage <= _maxFeePercentage, 'Fee exceeded provided maximum');
   }
 }

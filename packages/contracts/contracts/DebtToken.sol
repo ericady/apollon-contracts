@@ -39,11 +39,9 @@ contract DebtToken is CheckContract, IDebtToken {
   // --- Data for EIP2612 ---
 
   // keccak256("Permit(address owner,address spender,uint256 value,uint256 nonce,uint256 deadline)");
-  bytes32 private constant _PERMIT_TYPEHASH =
-    0x6e71edae12b1b97f4d1f60370fef10105fa2faae0126114a169c64845d6126c9;
+  bytes32 private constant _PERMIT_TYPEHASH = 0x6e71edae12b1b97f4d1f60370fef10105fa2faae0126114a169c64845d6126c9;
   // keccak256("EIP712Domain(string name,string version,uint256 chainId,address verifyingContract)");
-  bytes32 private constant _TYPE_HASH =
-    0x8b73c3c69bb8fe3d512ecc4cf759cc79239f7b179b0ffacaa9a75d522b39400f;
+  bytes32 private constant _TYPE_HASH = 0x8b73c3c69bb8fe3d512ecc4cf759cc79239f7b179b0ffacaa9a75d522b39400f;
 
   // Cache the domain separator as an immutable value, but also store the chain id that it corresponds to, in order to
   // invalidate the cached domain separator if the chain id changes.
@@ -103,11 +101,7 @@ contract DebtToken is CheckContract, IDebtToken {
     _HASHED_NAME = hashedName;
     _HASHED_VERSION = hashedVersion;
     _CACHED_CHAIN_ID = _chainID();
-    _CACHED_DOMAIN_SEPARATOR = _buildDomainSeparator(
-      _TYPE_HASH,
-      hashedName,
-      hashedVersion
-    );
+    _CACHED_DOMAIN_SEPARATOR = _buildDomainSeparator(_TYPE_HASH, hashedName, hashedVersion);
   }
 
   // --- Functions for intra-Liquity calls ---
@@ -116,9 +110,7 @@ contract DebtToken is CheckContract, IDebtToken {
     return _IS_STABLE_COIN;
   }
 
-  function getPrice(
-    PriceCache memory _priceCache
-  ) external override returns (uint) {
+  function getPrice(PriceCache memory _priceCache) external override returns (uint) {
     return priceFeed.getPrice(_priceCache, address(this));
   }
 
@@ -132,20 +124,12 @@ contract DebtToken is CheckContract, IDebtToken {
     _burn(_account, _amount);
   }
 
-  function sendToPool(
-    address _sender,
-    address _poolAddress,
-    uint256 _amount
-  ) external override {
+  function sendToPool(address _sender, address _poolAddress, uint256 _amount) external override {
     _requireCallerIsStabilityPool();
     _transfer(_sender, _poolAddress, _amount);
   }
 
-  function returnFromPool(
-    address _poolAddress,
-    address _receiver,
-    uint256 _amount
-  ) external override {
+  function returnFromPool(address _poolAddress, address _receiver, uint256 _amount) external override {
     _requireCallerIsTroveMorSP();
     _transfer(_poolAddress, _receiver, _amount);
   }
@@ -160,71 +144,42 @@ contract DebtToken is CheckContract, IDebtToken {
     return _balances[account];
   }
 
-  function transfer(
-    address recipient,
-    uint256 amount
-  ) external override returns (bool) {
+  function transfer(address recipient, uint256 amount) external override returns (bool) {
     _requireValidRecipient(recipient);
     _transfer(msg.sender, recipient, amount);
     return true;
   }
 
-  function allowance(
-    address owner,
-    address spender
-  ) external view override returns (uint256) {
+  function allowance(address owner, address spender) external view override returns (uint256) {
     return _allowances[owner][spender];
   }
 
-  function approve(
-    address spender,
-    uint256 amount
-  ) external override returns (bool) {
+  function approve(address spender, uint256 amount) external override returns (bool) {
     _approve(msg.sender, spender, amount);
     return true;
   }
 
-  function transferFrom(
-    address sender,
-    address recipient,
-    uint256 amount
-  ) external override returns (bool) {
+  function transferFrom(address sender, address recipient, uint256 amount) external override returns (bool) {
     _requireValidRecipient(recipient);
     _transfer(sender, recipient, amount);
     _approve(
       sender,
       msg.sender,
-      _allowances[sender][msg.sender].sub(
-        amount,
-        'ERC20: transfer amount exceeds allowance'
-      )
+      _allowances[sender][msg.sender].sub(amount, 'ERC20: transfer amount exceeds allowance')
     );
     return true;
   }
 
-  function increaseAllowance(
-    address spender,
-    uint256 addedValue
-  ) external override returns (bool) {
-    _approve(
-      msg.sender,
-      spender,
-      _allowances[msg.sender][spender].add(addedValue)
-    );
+  function increaseAllowance(address spender, uint256 addedValue) external override returns (bool) {
+    _approve(msg.sender, spender, _allowances[msg.sender][spender].add(addedValue));
     return true;
   }
 
-  function decreaseAllowance(
-    address spender,
-    uint256 subtractedValue
-  ) external override returns (bool) {
+  function decreaseAllowance(address spender, uint256 subtractedValue) external override returns (bool) {
     _approve(
       msg.sender,
       spender,
-      _allowances[msg.sender][spender].sub(
-        subtractedValue,
-        'ERC20: decreased allowance below zero'
-      )
+      _allowances[msg.sender][spender].sub(subtractedValue, 'ERC20: decreased allowance below zero')
     );
     return true;
   }
@@ -253,16 +208,7 @@ contract DebtToken is CheckContract, IDebtToken {
       abi.encodePacked(
         '\x19\x01',
         this.domainSeparator(),
-        keccak256(
-          abi.encode(
-            _PERMIT_TYPEHASH,
-            owner,
-            spender,
-            amount,
-            _nonces[owner]++,
-            deadline
-          )
-        )
+        keccak256(abi.encode(_PERMIT_TYPEHASH, owner, spender, amount, _nonces[owner]++, deadline))
       )
     );
     address recoveredAddress = ecrecover(digest, v, r, s);
@@ -283,30 +229,18 @@ contract DebtToken is CheckContract, IDebtToken {
     }
   }
 
-  function _buildDomainSeparator(
-    bytes32 typeHash,
-    bytes32 name,
-    bytes32 version
-  ) private view returns (bytes32) {
-    return
-      keccak256(abi.encode(typeHash, name, version, _chainID(), address(this)));
+  function _buildDomainSeparator(bytes32 typeHash, bytes32 name, bytes32 version) private view returns (bytes32) {
+    return keccak256(abi.encode(typeHash, name, version, _chainID(), address(this)));
   }
 
   // --- Internal operations ---
   // Warning: sanity checks (for sender and recipient) should have been done before calling these internal functions
 
-  function _transfer(
-    address sender,
-    address recipient,
-    uint256 amount
-  ) internal {
+  function _transfer(address sender, address recipient, uint256 amount) internal {
     assert(sender != address(0));
     assert(recipient != address(0));
 
-    _balances[sender] = _balances[sender].sub(
-      amount,
-      'ERC20: transfer amount exceeds balance'
-    );
+    _balances[sender] = _balances[sender].sub(amount, 'ERC20: transfer amount exceeds balance');
     _balances[recipient] = _balances[recipient].add(amount);
     emit Transfer(sender, recipient, amount);
   }
@@ -322,10 +256,7 @@ contract DebtToken is CheckContract, IDebtToken {
   function _burn(address account, uint256 amount) internal {
     assert(account != address(0));
 
-    _balances[account] = _balances[account].sub(
-      amount,
-      'ERC20: burn amount exceeds balance'
-    );
+    _balances[account] = _balances[account].sub(amount, 'ERC20: burn amount exceeds balance');
     _totalSupply = _totalSupply.sub(amount);
     emit Transfer(account, address(0), amount);
   }
@@ -354,10 +285,7 @@ contract DebtToken is CheckContract, IDebtToken {
   }
 
   function _requireCallerIsBorrowerOperations() internal view {
-    require(
-      msg.sender == borrowerOperationsAddress,
-      'dToken: Caller is not BorrowerOperations'
-    );
+    require(msg.sender == borrowerOperationsAddress, 'dToken: Caller is not BorrowerOperations');
   }
 
   function _requireCallerIsBOorTroveMorSP() internal view {
@@ -370,10 +298,7 @@ contract DebtToken is CheckContract, IDebtToken {
   }
 
   function _requireCallerIsStabilityPool() internal view {
-    require(
-      msg.sender == stabilityPoolAddress,
-      'dToken: Caller is not the StabilityPool'
-    );
+    require(msg.sender == stabilityPoolAddress, 'dToken: Caller is not the StabilityPool');
   }
 
   function _requireCallerIsTroveMorSP() internal view {

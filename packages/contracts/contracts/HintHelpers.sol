@@ -21,10 +21,7 @@ contract HintHelpers is LiquityBase, Ownable, CheckContract {
 
   // --- Dependency setters ---
 
-  function setAddresses(
-    address _sortedTrovesAddress,
-    address _troveManagerAddress
-  ) external onlyOwner {
+  function setAddresses(address _sortedTrovesAddress, address _troveManagerAddress) external onlyOwner {
     checkContract(_sortedTrovesAddress);
     checkContract(_troveManagerAddress);
 
@@ -60,15 +57,7 @@ contract HintHelpers is LiquityBase, Ownable, CheckContract {
     uint _LUSDamount,
     uint _price,
     uint _maxIterations
-  )
-    external
-    view
-    returns (
-      address firstRedemptionHint,
-      uint partialRedemptionHintNICR,
-      uint truncatedLUSDamount
-    )
-  {
+  ) external view returns (address firstRedemptionHint, uint partialRedemptionHintNICR, uint truncatedLUSDamount) {
     // todo...
     //        ISortedTroves sortedTrovesCached = sortedTroves;
     //
@@ -137,10 +126,7 @@ contract HintHelpers is LiquityBase, Ownable, CheckContract {
     }
 
     hintAddress = sortedTroves.getLast();
-    diff = LiquityMath._getAbsoluteDifference(
-      _CR,
-      troveManager.getNominalICR(hintAddress, priceCache)
-    );
+    diff = LiquityMath._getAbsoluteDifference(_CR, troveManager.getNominalICR(hintAddress, priceCache));
     latestRandomSeed = _inputRandomSeed;
 
     uint i = 1;
@@ -149,9 +135,7 @@ contract HintHelpers is LiquityBase, Ownable, CheckContract {
       latestRandomSeed = uint(keccak256(abi.encodePacked(latestRandomSeed)));
 
       uint arrayIndex = latestRandomSeed % arrayLength;
-      address currentAddress = troveManager.getTroveFromTroveOwnersArray(
-        arrayIndex
-      );
+      address currentAddress = troveManager.getTroveFromTroveOwnersArray(arrayIndex);
       uint currentNICR = troveManager.getNominalICR(currentAddress, priceCache);
 
       // check if abs(current - CR) > abs(closest - CR), and update closest if current is closer
@@ -165,10 +149,7 @@ contract HintHelpers is LiquityBase, Ownable, CheckContract {
     }
   }
 
-  function computeNominalCR(
-    uint _coll,
-    uint _debt
-  ) external pure returns (uint) {
+  function computeNominalCR(uint _coll, uint _debt) external pure returns (uint) {
     return LiquityMath._computeNominalCR(_coll, _debt);
   }
 

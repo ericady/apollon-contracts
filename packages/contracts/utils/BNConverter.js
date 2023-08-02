@@ -23,9 +23,7 @@ class BNConverter {
     const fractionPart = strNum.includes('.') ? strNum.split('.')[1] : '';
 
     if (fractionPart.length > precision) {
-      throw new Error(
-        `MakeBN: argument must have <= ${precision} decimal places`
-      );
+      throw new Error(`MakeBN: argument must have <= ${precision} decimal places`);
     }
 
     const trailingZeros = '0'.repeat(precision - fractionPart.length);
@@ -37,9 +35,7 @@ class BNConverter {
     try {
       let num = new Decimal(input);
     } catch (err) {
-      throw new Error(
-        `MakeBN: input must be number or string-ified number, no non-numeric characters`
-      );
+      throw new Error(`MakeBN: input must be number or string-ified number, no non-numeric characters`);
     }
   }
 

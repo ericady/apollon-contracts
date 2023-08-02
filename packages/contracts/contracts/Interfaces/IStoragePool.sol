@@ -8,12 +8,7 @@ import './IBase.sol';
 interface IStoragePool is IBase {
   // --- Events ---
 
-  event PoolValueUpdated(
-    address _tokenAddress,
-    bool _isColl,
-    PoolType _poolType,
-    uint _updatedAmount
-  );
+  event PoolValueUpdated(address _tokenAddress, bool _isColl, PoolType _poolType, uint _updatedAmount);
   event BorrowerOperationsAddressChanged(address _newBorrowerOperationsAddress);
   event TroveManagerAddressChanged(address _newTroveManagerAddress);
   event StabilityPoolAddressChanged(address _newStabilityPoolAddress);
@@ -21,25 +16,11 @@ interface IStoragePool is IBase {
 
   // --- Functions ---
 
-  function getValue(
-    address _tokenAddress,
-    bool _isColl,
-    PoolType _poolType
-  ) external view returns (uint);
+  function getValue(address _tokenAddress, bool _isColl, PoolType _poolType) external view returns (uint);
 
-  function addValue(
-    address _tokenAddress,
-    bool _isColl,
-    PoolType _poolType,
-    uint _amount
-  ) external;
+  function addValue(address _tokenAddress, bool _isColl, PoolType _poolType, uint _amount) external;
 
-  function subtractValue(
-    address _tokenAddress,
-    bool _isColl,
-    PoolType _poolType,
-    uint _amount
-  ) external;
+  function subtractValue(address _tokenAddress, bool _isColl, PoolType _poolType, uint _amount) external;
 
   function transferBetweenTypes(
     address _tokenAddress,
@@ -49,22 +30,11 @@ interface IStoragePool is IBase {
     uint _amount
   ) external;
 
-  function getEntireSystemColl(
-    PriceCache memory _priceCache
-  ) external returns (uint entireSystemColl);
+  function getEntireSystemColl(PriceCache memory _priceCache) external returns (uint entireSystemColl);
 
-  function getEntireSystemDebt(
-    PriceCache memory _priceCache
-  ) external returns (uint entireSystemDebt);
+  function getEntireSystemDebt(PriceCache memory _priceCache) external returns (uint entireSystemDebt);
 
   function checkRecoveryMode(
     PriceCache memory _priceCache
-  )
-    external
-    returns (
-      bool isInRecoveryMode,
-      uint TCR,
-      uint entireSystemColl,
-      uint entireSystemDebt
-    );
+  ) external returns (bool isInRecoveryMode, uint TCR, uint entireSystemColl, uint entireSystemDebt);
 }

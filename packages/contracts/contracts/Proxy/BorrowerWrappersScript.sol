@@ -27,10 +27,7 @@ contract BorrowerWrappersScript is BorrowerOperationsScript, ETHTransferScript {
   constructor(
     address _borrowerOperationsAddress,
     address _troveManagerAddress
-  )
-    public
-    BorrowerOperationsScript(IBorrowerOperations(_borrowerOperationsAddress))
-  {
+  ) public BorrowerOperationsScript(IBorrowerOperations(_borrowerOperationsAddress)) {
     checkContract(_troveManagerAddress);
     ITroveManager troveManagerCached = ITroveManager(_troveManagerAddress);
     troveManager = troveManagerCached;
@@ -71,19 +68,10 @@ contract BorrowerWrappersScript is BorrowerOperationsScript, ETHTransferScript {
     uint totalCollateral = balanceAfter.sub(balanceBefore).add(msg.value);
 
     // Open trove with obtained collateral, plus collateral sent by user
-    borrowerOperations.openTrove{ value: totalCollateral }(
-      _maxFee,
-      _LUSDAmount,
-      _upperHint,
-      _lowerHint
-    );
+    borrowerOperations.openTrove{ value: totalCollateral }(_maxFee, _LUSDAmount, _upperHint, _lowerHint);
   }
 
-  function claimSPRewardsAndRecycle(
-    uint _maxFee,
-    address _upperHint,
-    address _lowerHint
-  ) external {
+  function claimSPRewardsAndRecycle(uint _maxFee, address _upperHint, address _lowerHint) external {
     uint collBalanceBefore = address(this).balance;
     uint lqtyBalanceBefore = lqtyToken.balanceOf(address(this));
 
@@ -98,14 +86,7 @@ contract BorrowerWrappersScript is BorrowerOperationsScript, ETHTransferScript {
     if (claimedCollateral > 0) {
       _requireUserHasTrove(address(this));
       uint LUSDAmount = _getNetLUSDAmount(claimedCollateral);
-      borrowerOperations.adjustTrove{ value: claimedCollateral }(
-        _maxFee,
-        0,
-        LUSDAmount,
-        true,
-        _upperHint,
-        _lowerHint
-      );
+      borrowerOperations.adjustTrove{ value: claimedCollateral }(_maxFee, 0, LUSDAmount, true, _upperHint, _lowerHint);
       // Provide withdrawn LUSD to Stability Pool
       if (LUSDAmount > 0) {
         stabilityPool.provideToSP(LUSDAmount, address(0));
@@ -119,11 +100,7 @@ contract BorrowerWrappersScript is BorrowerOperationsScript, ETHTransferScript {
     //        }
   }
 
-  function claimStakingGainsAndRecycle(
-    uint _maxFee,
-    address _upperHint,
-    address _lowerHint
-  ) external {
+  function claimStakingGainsAndRecycle(uint _maxFee, address _upperHint, address _lowerHint) external {
     uint collBalanceBefore = address(this).balance;
     uint lusdBalanceBefore = lusdToken.balanceOf(address(this));
     uint lqtyBalanceBefore = lqtyToken.balanceOf(address(this));
@@ -168,17 +145,12 @@ contract BorrowerWrappersScript is BorrowerOperationsScript, ETHTransferScript {
 
     uint LUSDAmount = _collateral.mul(price).div(ICR);
     uint borrowingRate = troveManager.getBorrowingRateWithDecay();
-    uint netDebt = LUSDAmount.mul(LiquityMath.DECIMAL_PRECISION).div(
-      LiquityMath.DECIMAL_PRECISION.add(borrowingRate)
-    );
+    uint netDebt = LUSDAmount.mul(LiquityMath.DECIMAL_PRECISION).div(LiquityMath.DECIMAL_PRECISION.add(borrowingRate));
 
     return netDebt;
   }
 
   function _requireUserHasTrove(address _depositor) internal view {
-    require(
-      troveManager.getTroveStatus(_depositor) == 1,
-      'BorrowerWrappersScript: caller must have an active trove'
-    );
+    require(troveManager.getTroveStatus(_depositor) == 1, 'BorrowerWrappersScript: caller must have an active trove');
   }
 }

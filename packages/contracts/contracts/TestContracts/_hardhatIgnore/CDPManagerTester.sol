@@ -8,11 +8,7 @@ import '../TroveManager.sol';
 for testing the parent's internal functions. */
 
 contract TroveManagerTester is TroveManager {
-  function computeICR(
-    uint _coll,
-    uint _debt,
-    uint _price
-  ) external pure returns (uint) {
+  function computeICR(uint _coll, uint _debt, uint _price) external pure returns (uint) {
     return LiquityMath._computeCR(_coll, _debt, _price);
   }
 
@@ -52,9 +48,7 @@ contract TroveManagerTester is TroveManager {
     _getRedemptionFee(_ETHDrawn);
   }
 
-  function getActualDebtFromComposite(
-    uint _debtVal
-  ) external pure returns (uint) {
+  function getActualDebtFromComposite(uint _debtVal) external pure returns (uint) {
     return _getNetDebt(_debtVal);
   }
 

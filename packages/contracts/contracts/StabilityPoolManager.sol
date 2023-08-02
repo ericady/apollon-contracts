@@ -26,9 +26,7 @@ contract StabilityPoolManager is Ownable, CheckContract, IStabilityPoolManager {
 
   // --- Getters ---
 
-  function getStabilityPool(
-    IDebtToken _debtToken
-  ) external view returns (IStabilityPool) {
+  function getStabilityPool(IDebtToken _debtToken) external view returns (IStabilityPool) {
     IStabilityPool stabilityPool = stabilityPools[_debtToken];
     require(address(stabilityPool) != address(0), 'pool does not exist');
     return stabilityPool;
@@ -41,13 +39,9 @@ contract StabilityPoolManager is Ownable, CheckContract, IStabilityPoolManager {
   function getRemainingStability(
     address[] memory collTokenAddresses
   ) external view override returns (RemainingStability[] memory) {
-    RemainingStability[] memory remainingStability = new RemainingStability[](
-      stabilityPoolsArray.length
-    );
+    RemainingStability[] memory remainingStability = new RemainingStability[](stabilityPoolsArray.length);
     for (uint i = 0; i < stabilityPoolsArray.length; i++) {
-      TokenAmount[] memory collGained = new TokenAmount[](
-        collTokenAddresses.length
-      );
+      TokenAmount[] memory collGained = new TokenAmount[](collTokenAddresses.length);
       for (uint a = 0; a < collTokenAddresses.length; a++) {
         collGained[a] = TokenAmount(collTokenAddresses[a], 0);
       }

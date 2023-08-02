@@ -18,10 +18,7 @@ contract('DefaultPool', async accounts => {
     nonPayable = await NonPayable.new();
     mockTroveManager = await NonPayable.new();
     mockActivePool = await NonPayable.new();
-    await defaultPool.setAddresses(
-      mockTroveManager.address,
-      mockActivePool.address
-    );
+    await defaultPool.setAddresses(mockTroveManager.address, mockActivePool.address);
   });
 
   it('sendETHToActivePool(): fails if receiver cannot receive ETH', async () => {
@@ -37,9 +34,7 @@ contract('DefaultPool', async accounts => {
 
     // try to send ether from pool to non-payable
     //await th.assertRevert(defaultPool.sendETHToActivePool(amount, { from: owner }), 'DefaultPool: sending ETH failed')
-    const sendETHData = th.getTransactionData('sendETHToActivePool(uint256)', [
-      web3.utils.toHex(amount),
-    ]);
+    const sendETHData = th.getTransactionData('sendETHToActivePool(uint256)', [web3.utils.toHex(amount)]);
     await th.assertRevert(
       mockTroveManager.forward(defaultPool.address, sendETHData, {
         from: owner,

@@ -33,24 +33,15 @@ class MainnetDeploymentHelper {
 
   async sendAndWaitForTransaction(txPromise) {
     const tx = await txPromise;
-    const minedTx = await ethers.provider.waitForTransaction(
-      tx.hash,
-      this.configParams.TX_CONFIRMATIONS
-    );
+    const minedTx = await ethers.provider.waitForTransaction(tx.hash, this.configParams.TX_CONFIRMATIONS);
 
     return minedTx;
   }
 
   async loadOrDeploy(factory, name, deploymentState, params = []) {
     if (deploymentState[name] && deploymentState[name].address) {
-      console.log(
-        `Using previously deployed ${name} contract at address ${deploymentState[name].address}`
-      );
-      return new ethers.Contract(
-        deploymentState[name].address,
-        factory.interface,
-        this.deployerWallet
-      );
+      console.log(`Using previously deployed ${name} contract at address ${deploymentState[name].address}`);
+      return new ethers.Contract(deploymentState[name].address, factory.interface, this.deployerWallet);
     }
 
     const contract = await factory.deploy(...params, {
@@ -81,82 +72,32 @@ class MainnetDeploymentHelper {
     const gasPoolFactory = await this.getFactory('GasPool');
     const defaultPoolFactory = await this.getFactory('DefaultPool');
     const collSurplusPoolFactory = await this.getFactory('CollSurplusPool');
-    const borrowerOperationsFactory = await this.getFactory(
-      'BorrowerOperations'
-    );
+    const borrowerOperationsFactory = await this.getFactory('BorrowerOperations');
     const hintHelpersFactory = await this.getFactory('HintHelpers');
     const lusdTokenFactory = await this.getFactory('LUSDToken');
     const tellorCallerFactory = await this.getFactory('TellorCaller');
 
     // Deploy txs
-    const priceFeed = await this.loadOrDeploy(
-      priceFeedFactory,
-      'priceFeed',
-      deploymentState
-    );
-    const sortedTroves = await this.loadOrDeploy(
-      sortedTrovesFactory,
-      'sortedTroves',
-      deploymentState
-    );
-    const troveManager = await this.loadOrDeploy(
-      troveManagerFactory,
-      'troveManager',
-      deploymentState
-    );
-    const activePool = await this.loadOrDeploy(
-      activePoolFactory,
-      'activePool',
-      deploymentState
-    );
-    const stabilityPool = await this.loadOrDeploy(
-      stabilityPoolFactory,
-      'stabilityPool',
-      deploymentState
-    );
-    const gasPool = await this.loadOrDeploy(
-      gasPoolFactory,
-      'gasPool',
-      deploymentState
-    );
-    const defaultPool = await this.loadOrDeploy(
-      defaultPoolFactory,
-      'defaultPool',
-      deploymentState
-    );
-    const collSurplusPool = await this.loadOrDeploy(
-      collSurplusPoolFactory,
-      'collSurplusPool',
-      deploymentState
-    );
+    const priceFeed = await this.loadOrDeploy(priceFeedFactory, 'priceFeed', deploymentState);
+    const sortedTroves = await this.loadOrDeploy(sortedTrovesFactory, 'sortedTroves', deploymentState);
+    const troveManager = await this.loadOrDeploy(troveManagerFactory, 'troveManager', deploymentState);
+    const activePool = await this.loadOrDeploy(activePoolFactory, 'activePool', deploymentState);
+    const stabilityPool = await this.loadOrDeploy(stabilityPoolFactory, 'stabilityPool', deploymentState);
+    const gasPool = await this.loadOrDeploy(gasPoolFactory, 'gasPool', deploymentState);
+    const defaultPool = await this.loadOrDeploy(defaultPoolFactory, 'defaultPool', deploymentState);
+    const collSurplusPool = await this.loadOrDeploy(collSurplusPoolFactory, 'collSurplusPool', deploymentState);
     const borrowerOperations = await this.loadOrDeploy(
       borrowerOperationsFactory,
       'borrowerOperations',
       deploymentState
     );
-    const hintHelpers = await this.loadOrDeploy(
-      hintHelpersFactory,
-      'hintHelpers',
-      deploymentState
-    );
-    const tellorCaller = await this.loadOrDeploy(
-      tellorCallerFactory,
-      'tellorCaller',
-      deploymentState,
-      [tellorMasterAddr]
-    );
+    const hintHelpers = await this.loadOrDeploy(hintHelpersFactory, 'hintHelpers', deploymentState);
+    const tellorCaller = await this.loadOrDeploy(tellorCallerFactory, 'tellorCaller', deploymentState, [
+      tellorMasterAddr,
+    ]);
 
-    const lusdTokenParams = [
-      troveManager.address,
-      stabilityPool.address,
-      borrowerOperations.address,
-    ];
-    const lusdToken = await this.loadOrDeploy(
-      lusdTokenFactory,
-      'lusdToken',
-      deploymentState,
-      lusdTokenParams
-    );
+    const lusdTokenParams = [troveManager.address, stabilityPool.address, borrowerOperations.address];
+    const lusdToken = await this.loadOrDeploy(lusdTokenFactory, 'lusdToken', deploymentState, lusdTokenParams);
 
     if (!this.configParams.ETHERSCAN_BASE_URL) {
       console.log('No Etherscan Url defined, skipping verification');
@@ -171,9 +112,7 @@ class MainnetDeploymentHelper {
       await this.verifyContract('collSurplusPool', deploymentState);
       await this.verifyContract('borrowerOperations', deploymentState);
       await this.verifyContract('hintHelpers', deploymentState);
-      await this.verifyContract('tellorCaller', deploymentState, [
-        tellorMasterAddr,
-      ]);
+      await this.verifyContract('tellorCaller', deploymentState, [tellorMasterAddr]);
       await this.verifyContract('lusdToken', deploymentState, lusdTokenParams);
     }
 
@@ -194,34 +133,19 @@ class MainnetDeploymentHelper {
     return coreContracts;
   }
 
-  async deployLQTYContractsMainnet(
-    bountyAddress,
-    lpRewardsAddress,
-    multisigAddress,
-    deploymentState
-  ) {
+  async deployLQTYContractsMainnet(bountyAddress, lpRewardsAddress, multisigAddress, deploymentState) {
     const lqtyStakingFactory = await this.getFactory('LQTYStaking');
-    const lockupContractFactory_Factory = await this.getFactory(
-      'LockupContractFactory'
-    );
+    const lockupContractFactory_Factory = await this.getFactory('LockupContractFactory');
     const communityIssuanceFactory = await this.getFactory('CommunityIssuance');
     const lqtyTokenFactory = await this.getFactory('LQTYToken');
 
-    const lqtyStaking = await this.loadOrDeploy(
-      lqtyStakingFactory,
-      'lqtyStaking',
-      deploymentState
-    );
+    const lqtyStaking = await this.loadOrDeploy(lqtyStakingFactory, 'lqtyStaking', deploymentState);
     const lockupContractFactory = await this.loadOrDeploy(
       lockupContractFactory_Factory,
       'lockupContractFactory',
       deploymentState
     );
-    const communityIssuance = await this.loadOrDeploy(
-      communityIssuanceFactory,
-      'communityIssuance',
-      deploymentState
-    );
+    const communityIssuance = await this.loadOrDeploy(communityIssuanceFactory, 'communityIssuance', deploymentState);
 
     // Deploy LQTY Token, passing Community Issuance and Factory addresses to the constructor
     const lqtyTokenParams = [
@@ -232,12 +156,7 @@ class MainnetDeploymentHelper {
       lpRewardsAddress,
       multisigAddress,
     ];
-    const lqtyToken = await this.loadOrDeploy(
-      lqtyTokenFactory,
-      'lqtyToken',
-      deploymentState,
-      lqtyTokenParams
-    );
+    const lqtyToken = await this.loadOrDeploy(lqtyTokenFactory, 'lqtyToken', deploymentState, lqtyTokenParams);
 
     if (!this.configParams.ETHERSCAN_BASE_URL) {
       console.log('No Etherscan Url defined, skipping verification');
@@ -259,11 +178,7 @@ class MainnetDeploymentHelper {
 
   async deployUnipoolMainnet(deploymentState) {
     const unipoolFactory = await this.getFactory('Unipool');
-    const unipool = await this.loadOrDeploy(
-      unipoolFactory,
-      'unipool',
-      deploymentState
-    );
+    const unipool = await this.loadOrDeploy(unipoolFactory, 'unipool', deploymentState);
 
     if (!this.configParams.ETHERSCAN_BASE_URL) {
       console.log('No Etherscan Url defined, skipping verification');
@@ -276,10 +191,7 @@ class MainnetDeploymentHelper {
 
   async deployMultiTroveGetterMainnet(liquityCore, deploymentState) {
     const multiTroveGetterFactory = await this.getFactory('MultiTroveGetter');
-    const multiTroveGetterParams = [
-      liquityCore.troveManager.address,
-      liquityCore.sortedTroves.address,
-    ];
+    const multiTroveGetterParams = [liquityCore.troveManager.address, liquityCore.sortedTroves.address];
     const multiTroveGetter = await this.loadOrDeploy(
       multiTroveGetterFactory,
       'multiTroveGetter',
@@ -290,11 +202,7 @@ class MainnetDeploymentHelper {
     if (!this.configParams.ETHERSCAN_BASE_URL) {
       console.log('No Etherscan Url defined, skipping verification');
     } else {
-      await this.verifyContract(
-        'multiTroveGetter',
-        deploymentState,
-        multiTroveGetterParams
-      );
+      await this.verifyContract('multiTroveGetter', deploymentState, multiTroveGetterParams);
     }
 
     return multiTroveGetter;
@@ -306,22 +214,14 @@ class MainnetDeploymentHelper {
     return owner == ZERO_ADDRESS;
   }
   // Connect contracts to their dependencies
-  async connectCoreContractsMainnet(
-    contracts,
-    LQTYContracts,
-    chainlinkProxyAddress
-  ) {
+  async connectCoreContractsMainnet(contracts, LQTYContracts, chainlinkProxyAddress) {
     const gasPrice = this.configParams.GAS_PRICE;
     // Set ChainlinkAggregatorProxy and TellorCaller in the PriceFeed
     (await this.isOwnershipRenounced(contracts.priceFeed)) ||
       (await this.sendAndWaitForTransaction(
-        contracts.priceFeed.setAddresses(
-          chainlinkProxyAddress,
-          contracts.tellorCaller.address,
-          {
-            gasPrice,
-          }
-        )
+        contracts.priceFeed.setAddresses(chainlinkProxyAddress, contracts.tellorCaller.address, {
+          gasPrice,
+        })
       ));
 
     // set TroveManager addr in SortedTroves
@@ -400,11 +300,7 @@ class MainnetDeploymentHelper {
 
     (await this.isOwnershipRenounced(contracts.defaultPool)) ||
       (await this.sendAndWaitForTransaction(
-        contracts.defaultPool.setAddresses(
-          contracts.troveManager.address,
-          contracts.activePool.address,
-          { gasPrice }
-        )
+        contracts.defaultPool.setAddresses(contracts.troveManager.address, contracts.activePool.address, { gasPrice })
       ));
 
     (await this.isOwnershipRenounced(contracts.collSurplusPool)) ||
@@ -420,11 +316,7 @@ class MainnetDeploymentHelper {
     // set contracts in HintHelpers
     (await this.isOwnershipRenounced(contracts.hintHelpers)) ||
       (await this.sendAndWaitForTransaction(
-        contracts.hintHelpers.setAddresses(
-          contracts.sortedTroves.address,
-          contracts.troveManager.address,
-          { gasPrice }
-        )
+        contracts.hintHelpers.setAddresses(contracts.sortedTroves.address, contracts.troveManager.address, { gasPrice })
       ));
   }
 
@@ -433,12 +325,9 @@ class MainnetDeploymentHelper {
     // Set LQTYToken address in LCF
     (await this.isOwnershipRenounced(LQTYContracts.lqtyStaking)) ||
       (await this.sendAndWaitForTransaction(
-        LQTYContracts.lockupContractFactory.setLQTYTokenAddress(
-          LQTYContracts.lqtyToken.address,
-          {
-            gasPrice,
-          }
-        )
+        LQTYContracts.lockupContractFactory.setLQTYTokenAddress(LQTYContracts.lqtyToken.address, {
+          gasPrice,
+        })
       ));
   }
 
@@ -466,21 +355,11 @@ class MainnetDeploymentHelper {
       ));
   }
 
-  async connectUnipoolMainnet(
-    uniPool,
-    LQTYContracts,
-    LUSDWETHPairAddr,
-    duration
-  ) {
+  async connectUnipoolMainnet(uniPool, LQTYContracts, LUSDWETHPairAddr, duration) {
     const gasPrice = this.configParams.GAS_PRICE;
     (await this.isOwnershipRenounced(uniPool)) ||
       (await this.sendAndWaitForTransaction(
-        uniPool.setParams(
-          LQTYContracts.lqtyToken.address,
-          LUSDWETHPairAddr,
-          duration,
-          { gasPrice }
-        )
+        uniPool.setParams(LQTYContracts.lqtyToken.address, LUSDWETHPairAddr, duration, { gasPrice })
       ));
   }
 

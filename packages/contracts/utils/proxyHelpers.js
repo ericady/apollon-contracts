@@ -65,23 +65,13 @@ class Proxy {
   async forwardFunction(params, signature) {
     const proxy = this.getProxyFromParams(params);
     if (!proxy) {
-      return this.proxyFunction(
-        signature.slice(0, signature.indexOf('(')),
-        params
-      );
+      return this.proxyFunction(signature.slice(0, signature.indexOf('(')), params);
     }
     const optionalParams = this.getOptionalParams(params);
-    const calldata = th.getTransactionData(
-      signature,
-      this.getSlicedParams(params)
-    );
+    const calldata = th.getTransactionData(signature, this.getSlicedParams(params));
     // console.log('proxy: ', proxy.address)
     // console.log(this.scriptAddress, calldata, optionalParams)
-    return proxy.methods['execute(address,bytes)'](
-      this.scriptAddress,
-      calldata,
-      optionalParams
-    );
+    return proxy.methods['execute(address,bytes)'](this.scriptAddress, calldata, optionalParams);
   }
 
   async proxyFunctionWithUser(functionName, user) {
@@ -97,20 +87,12 @@ class Proxy {
 }
 
 class BorrowerOperationsProxy extends Proxy {
-  constructor(
-    owner,
-    proxies,
-    borrowerOperationsScriptAddress,
-    borrowerOperations
-  ) {
+  constructor(owner, proxies, borrowerOperationsScriptAddress, borrowerOperations) {
     super(owner, proxies, borrowerOperationsScriptAddress, borrowerOperations);
   }
 
   async openTrove(...params) {
-    return this.forwardFunction(
-      params,
-      'openTrove(uint256,uint256,address,address)'
-    );
+    return this.forwardFunction(params, 'openTrove(uint256,uint256,address,address)');
   }
 
   async addColl(...params) {
@@ -118,17 +100,11 @@ class BorrowerOperationsProxy extends Proxy {
   }
 
   async withdrawColl(...params) {
-    return this.forwardFunction(
-      params,
-      'withdrawColl(uint256,address,address)'
-    );
+    return this.forwardFunction(params, 'withdrawColl(uint256,address,address)');
   }
 
   async withdrawLUSD(...params) {
-    return this.forwardFunction(
-      params,
-      'withdrawLUSD(uint256,uint256,address,address)'
-    );
+    return this.forwardFunction(params, 'withdrawLUSD(uint256,uint256,address,address)');
   }
 
   async repayLUSD(...params) {
@@ -140,10 +116,7 @@ class BorrowerOperationsProxy extends Proxy {
   }
 
   async adjustTrove(...params) {
-    return this.forwardFunction(
-      params,
-      'adjustTrove(uint256,uint256,uint256,bool,address,address)'
-    );
+    return this.forwardFunction(params, 'adjustTrove(uint256,uint256,uint256,bool,address,address)');
   }
 
   async claimRedeemedCollateral(...params) {
@@ -181,24 +154,15 @@ class BorrowerWrappersProxy extends Proxy {
   }
 
   async claimCollateralAndOpenTrove(...params) {
-    return this.forwardFunction(
-      params,
-      'claimCollateralAndOpenTrove(uint256,uint256,address,address)'
-    );
+    return this.forwardFunction(params, 'claimCollateralAndOpenTrove(uint256,uint256,address,address)');
   }
 
   async claimSPRewardsAndRecycle(...params) {
-    return this.forwardFunction(
-      params,
-      'claimSPRewardsAndRecycle(uint256,address,address)'
-    );
+    return this.forwardFunction(params, 'claimSPRewardsAndRecycle(uint256,address,address)');
   }
 
   async claimStakingGainsAndRecycle(...params) {
-    return this.forwardFunction(
-      params,
-      'claimStakingGainsAndRecycle(uint256,address,address)'
-    );
+    return this.forwardFunction(params, 'claimStakingGainsAndRecycle(uint256,address,address)');
   }
 
   async transferETH(...params) {
@@ -248,10 +212,7 @@ class TroveManagerProxy extends Proxy {
   }
 
   async getCurrentICR(user, price) {
-    return this.contract.getCurrentICR(
-      this.getProxyAddressFromUser(user),
-      price
-    );
+    return this.contract.getCurrentICR(this.getProxyAddressFromUser(user), price);
   }
 
   async checkRecoveryMode(...params) {
@@ -283,10 +244,7 @@ class TroveManagerProxy extends Proxy {
   }
 
   async redeemCollateral(...params) {
-    return this.forwardFunction(
-      params,
-      'redeemCollateral(uint256,address,address,address,uint256,uint256,uint256)'
-    );
+    return this.forwardFunction(params, 'redeemCollateral(uint256,address,address,address,uint256,uint256,uint256)');
   }
 
   async getActualDebtFromComposite(...params) {
@@ -373,10 +331,7 @@ class TokenProxy extends Proxy {
     // switch to proxies if any
     params[0] = this.getProxyAddressFromUser(params[0]);
     params[1] = this.getProxyAddressFromUser(params[1]);
-    return this.forwardFunction(
-      params,
-      'transferFrom(address,address,uint256)'
-    );
+    return this.forwardFunction(params, 'transferFrom(address,address,uint256)');
   }
 
   async approve(...params) {

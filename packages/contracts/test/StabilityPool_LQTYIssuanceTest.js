@@ -58,8 +58,7 @@ contract('StabilityPool - LQTY Rewards', async accounts => {
 
   const ZERO_ADDRESS = th.ZERO_ADDRESS;
 
-  const getOpenTroveLUSDAmount = async totalDebt =>
-    th.getOpenTroveLUSDAmount(contracts, totalDebt);
+  const getOpenTroveLUSDAmount = async totalDebt => th.getOpenTroveLUSDAmount(contracts, totalDebt);
 
   const openTrove = async params => th.openTrove(contracts, params);
   describe('LQTY Rewards', async () => {
@@ -71,12 +70,11 @@ contract('StabilityPool - LQTY Rewards', async accounts => {
         contracts.stabilityPool.address,
         contracts.borrowerOperations.address
       );
-      const LQTYContracts =
-        await deploymentHelper.deployLQTYTesterContractsHardhat(
-          bountyAddress,
-          lpRewardsAddress,
-          multisig
-        );
+      const LQTYContracts = await deploymentHelper.deployLQTYTesterContractsHardhat(
+        bountyAddress,
+        lpRewardsAddress,
+        multisig
+      );
 
       priceFeed = contracts.priceFeedTestnet;
       lusdToken = contracts.lusdToken;
@@ -91,19 +89,11 @@ contract('StabilityPool - LQTY Rewards', async accounts => {
 
       await deploymentHelper.connectLQTYContracts(LQTYContracts);
       await deploymentHelper.connectCoreContracts(contracts, LQTYContracts);
-      await deploymentHelper.connectLQTYContractsToCore(
-        LQTYContracts,
-        contracts
-      );
+      await deploymentHelper.connectLQTYContractsToCore(LQTYContracts, contracts);
 
       // Check community issuance starts with 32 million LQTY
-      communityLQTYSupply = toBN(
-        await lqtyToken.balanceOf(communityIssuanceTester.address)
-      );
-      assert.isAtMost(
-        getDifference(communityLQTYSupply, '32000000000000000000000000'),
-        1000
-      );
+      communityLQTYSupply = toBN(await lqtyToken.balanceOf(communityIssuanceTester.address));
+      assert.isAtMost(getDifference(communityLQTYSupply, '32000000000000000000000000'), 1000);
 
       /* Monthly LQTY issuance
   
@@ -156,10 +146,7 @@ contract('StabilityPool - LQTY Rewards', async accounts => {
       });
       await stabilityPool.provideToSP(dec(5000, 18), ZERO_ADDRESS, { from: B });
 
-      await th.fastForwardTime(
-        timeValues.MINUTES_IN_ONE_WEEK,
-        web3.currentProvider
-      );
+      await th.fastForwardTime(timeValues.MINUTES_IN_ONE_WEEK, web3.currentProvider);
 
       await priceFeed.setPrice(dec(105, 18));
 
@@ -221,10 +208,7 @@ contract('StabilityPool - LQTY Rewards', async accounts => {
       // ETH drops
       await priceFeed.setPrice(dec(100, 18));
 
-      await th.fastForwardTime(
-        timeValues.MINUTES_IN_ONE_WEEK,
-        web3.currentProvider
-      );
+      await th.fastForwardTime(timeValues.MINUTES_IN_ONE_WEEK, web3.currentProvider);
 
       // Liquidate d1. Triggers issuance.
       await troveManager.liquidate(defaulter_1);
@@ -251,14 +235,9 @@ contract('StabilityPool - LQTY Rewards', async accounts => {
 
     // using the result of this to advance time by the desired amount from the deployment time, whether or not some extra time has passed in the meanwhile
     const getDuration = async expectedDuration => {
-      const deploymentTime = (
-        await communityIssuanceTester.deploymentTime()
-      ).toNumber();
+      const deploymentTime = (await communityIssuanceTester.deploymentTime()).toNumber();
       const currentTime = await th.getLatestBlockTimestamp(web3);
-      const duration = Math.max(
-        expectedDuration - (currentTime - deploymentTime),
-        0
-      );
+      const duration = Math.max(expectedDuration - (currentTime - deploymentTime), 0);
 
       return duration;
     };
@@ -269,16 +248,10 @@ contract('StabilityPool - LQTY Rewards', async accounts => {
       assert.equal(initialIssuance, 0);
 
       // Whale opens Trove with 10k ETH
-      await borrowerOperations.openTrove(
-        th._100pct,
-        dec(10000, 18),
-        whale,
-        whale,
-        {
-          from: whale,
-          value: dec(10000, 'ether'),
-        }
-      );
+      await borrowerOperations.openTrove(th._100pct, dec(10000, 18), whale, whale, {
+        from: whale,
+        value: dec(10000, 'ether'),
+      });
 
       await borrowerOperations.openTrove(th._100pct, dec(1, 22), A, A, {
         from: A,
@@ -308,19 +281,14 @@ contract('StabilityPool - LQTY Rewards', async accounts => {
       await stabilityPool.provideToSP(dec(1, 22), ZERO_ADDRESS, { from: C });
 
       // One year passes
-      await th.fastForwardTime(
-        await getDuration(timeValues.SECONDS_IN_ONE_YEAR),
-        web3.currentProvider
-      );
+      await th.fastForwardTime(await getDuration(timeValues.SECONDS_IN_ONE_YEAR), web3.currentProvider);
 
       // D deposits, triggering LQTY gains for A,B,C. Withdraws immediately after
       await stabilityPool.provideToSP(dec(1, 18), ZERO_ADDRESS, { from: D });
       await stabilityPool.withdrawFromSP(dec(1, 18), { from: D });
 
       // Expected gains for each depositor after 1 year (50% total issued).  Each deposit gets 1/3 of issuance.
-      const expectedLQTYGain_1yr = communityLQTYSupply
-        .div(toBN('2'))
-        .div(toBN('3'));
+      const expectedLQTYGain_1yr = communityLQTYSupply.div(toBN('2')).div(toBN('3'));
 
       // Check LQTY gain
       const A_LQTYGain_1yr = await stabilityPool.getDepositorLQTYGain(A);
@@ -329,34 +297,19 @@ contract('StabilityPool - LQTY Rewards', async accounts => {
 
       // Check gains are correct, error tolerance = 1e-6 of a token
 
-      assert.isAtMost(
-        getDifference(A_LQTYGain_1yr, expectedLQTYGain_1yr),
-        1e12
-      );
-      assert.isAtMost(
-        getDifference(B_LQTYGain_1yr, expectedLQTYGain_1yr),
-        1e12
-      );
-      assert.isAtMost(
-        getDifference(C_LQTYGain_1yr, expectedLQTYGain_1yr),
-        1e12
-      );
+      assert.isAtMost(getDifference(A_LQTYGain_1yr, expectedLQTYGain_1yr), 1e12);
+      assert.isAtMost(getDifference(B_LQTYGain_1yr, expectedLQTYGain_1yr), 1e12);
+      assert.isAtMost(getDifference(C_LQTYGain_1yr, expectedLQTYGain_1yr), 1e12);
 
       // Another year passes
-      await th.fastForwardTime(
-        timeValues.SECONDS_IN_ONE_YEAR,
-        web3.currentProvider
-      );
+      await th.fastForwardTime(timeValues.SECONDS_IN_ONE_YEAR, web3.currentProvider);
 
       // D deposits, triggering LQTY gains for A,B,C. Withdraws immediately after
       await stabilityPool.provideToSP(dec(1, 18), ZERO_ADDRESS, { from: D });
       await stabilityPool.withdrawFromSP(dec(1, 18), { from: D });
 
       // Expected gains for each depositor after 2 years (75% total issued).  Each deposit gets 1/3 of issuance.
-      const expectedLQTYGain_2yr = communityLQTYSupply
-        .mul(toBN('3'))
-        .div(toBN('4'))
-        .div(toBN('3'));
+      const expectedLQTYGain_2yr = communityLQTYSupply.mul(toBN('3')).div(toBN('4')).div(toBN('3'));
 
       // Check LQTY gain
       const A_LQTYGain_2yr = await stabilityPool.getDepositorLQTYGain(A);
@@ -364,18 +317,9 @@ contract('StabilityPool - LQTY Rewards', async accounts => {
       const C_LQTYGain_2yr = await stabilityPool.getDepositorLQTYGain(C);
 
       // Check gains are correct, error tolerance = 1e-6 of a token
-      assert.isAtMost(
-        getDifference(A_LQTYGain_2yr, expectedLQTYGain_2yr),
-        1e12
-      );
-      assert.isAtMost(
-        getDifference(B_LQTYGain_2yr, expectedLQTYGain_2yr),
-        1e12
-      );
-      assert.isAtMost(
-        getDifference(C_LQTYGain_2yr, expectedLQTYGain_2yr),
-        1e12
-      );
+      assert.isAtMost(getDifference(A_LQTYGain_2yr, expectedLQTYGain_2yr), 1e12);
+      assert.isAtMost(getDifference(B_LQTYGain_2yr, expectedLQTYGain_2yr), 1e12);
+      assert.isAtMost(getDifference(C_LQTYGain_2yr, expectedLQTYGain_2yr), 1e12);
 
       // Each depositor fully withdraws
       await stabilityPool.withdrawFromSP(dec(100, 18), { from: A });
@@ -383,18 +327,9 @@ contract('StabilityPool - LQTY Rewards', async accounts => {
       await stabilityPool.withdrawFromSP(dec(100, 18), { from: C });
 
       // Check LQTY balances increase by correct amount
-      assert.isAtMost(
-        getDifference(await lqtyToken.balanceOf(A), expectedLQTYGain_2yr),
-        1e12
-      );
-      assert.isAtMost(
-        getDifference(await lqtyToken.balanceOf(B), expectedLQTYGain_2yr),
-        1e12
-      );
-      assert.isAtMost(
-        getDifference(await lqtyToken.balanceOf(C), expectedLQTYGain_2yr),
-        1e12
-      );
+      assert.isAtMost(getDifference(await lqtyToken.balanceOf(A), expectedLQTYGain_2yr), 1e12);
+      assert.isAtMost(getDifference(await lqtyToken.balanceOf(B), expectedLQTYGain_2yr), 1e12);
+      assert.isAtMost(getDifference(await lqtyToken.balanceOf(C), expectedLQTYGain_2yr), 1e12);
     });
 
     // 3 depositors, varied stake. No liquidations. No front-end.
@@ -403,13 +338,10 @@ contract('StabilityPool - LQTY Rewards', async accounts => {
       assert.equal(initialIssuance, 0);
 
       // Whale opens Trove with 10k ETH
-      await borrowerOperations.openTrove(
-        th._100pct,
-        await getOpenTroveLUSDAmount(dec(10000, 18)),
-        whale,
-        whale,
-        { from: whale, value: dec(10000, 'ether') }
-      );
+      await borrowerOperations.openTrove(th._100pct, await getOpenTroveLUSDAmount(dec(10000, 18)), whale, whale, {
+        from: whale,
+        value: dec(10000, 'ether'),
+      });
 
       await borrowerOperations.openTrove(th._100pct, dec(10000, 18), A, A, {
         from: A,
@@ -445,10 +377,7 @@ contract('StabilityPool - LQTY Rewards', async accounts => {
       });
 
       // One year passes
-      await th.fastForwardTime(
-        await getDuration(timeValues.SECONDS_IN_ONE_YEAR),
-        web3.currentProvider
-      );
+      await th.fastForwardTime(await getDuration(timeValues.SECONDS_IN_ONE_YEAR), web3.currentProvider);
 
       // D deposits, triggering LQTY gains for A,B,C. Withdraws immediately after
       await stabilityPool.provideToSP(dec(1, 18), ZERO_ADDRESS, { from: D });
@@ -473,24 +402,12 @@ contract('StabilityPool - LQTY Rewards', async accounts => {
       const C_LQTYGain_1yr = await stabilityPool.getDepositorLQTYGain(C);
 
       // Check gains are correct, error tolerance = 1e-6 of a toke
-      assert.isAtMost(
-        getDifference(A_LQTYGain_1yr, A_expectedLQTYGain_1yr),
-        1e12
-      );
-      assert.isAtMost(
-        getDifference(B_LQTYGain_1yr, B_expectedLQTYGain_1yr),
-        1e12
-      );
-      assert.isAtMost(
-        getDifference(C_LQTYGain_1yr, C_expectedLQTYGain_1yr),
-        1e12
-      );
+      assert.isAtMost(getDifference(A_LQTYGain_1yr, A_expectedLQTYGain_1yr), 1e12);
+      assert.isAtMost(getDifference(B_LQTYGain_1yr, B_expectedLQTYGain_1yr), 1e12);
+      assert.isAtMost(getDifference(C_LQTYGain_1yr, C_expectedLQTYGain_1yr), 1e12);
 
       // Another year passes
-      await th.fastForwardTime(
-        timeValues.SECONDS_IN_ONE_YEAR,
-        web3.currentProvider
-      );
+      await th.fastForwardTime(timeValues.SECONDS_IN_ONE_YEAR, web3.currentProvider);
 
       // D deposits, triggering LQTY gains for A,B,C. Withdraws immediately after
       await stabilityPool.provideToSP(dec(1, 18), ZERO_ADDRESS, { from: D });
@@ -518,18 +435,9 @@ contract('StabilityPool - LQTY Rewards', async accounts => {
       const C_LQTYGain_2yr = await stabilityPool.getDepositorLQTYGain(C);
 
       // Check gains are correct, error tolerance = 1e-6 of a token
-      assert.isAtMost(
-        getDifference(A_LQTYGain_2yr, A_expectedLQTYGain_2yr),
-        1e12
-      );
-      assert.isAtMost(
-        getDifference(B_LQTYGain_2yr, B_expectedLQTYGain_2yr),
-        1e12
-      );
-      assert.isAtMost(
-        getDifference(C_LQTYGain_2yr, C_expectedLQTYGain_2yr),
-        1e12
-      );
+      assert.isAtMost(getDifference(A_LQTYGain_2yr, A_expectedLQTYGain_2yr), 1e12);
+      assert.isAtMost(getDifference(B_LQTYGain_2yr, B_expectedLQTYGain_2yr), 1e12);
+      assert.isAtMost(getDifference(C_LQTYGain_2yr, C_expectedLQTYGain_2yr), 1e12);
 
       // Each depositor fully withdraws
       await stabilityPool.withdrawFromSP(dec(10000, 18), { from: A });
@@ -537,18 +445,9 @@ contract('StabilityPool - LQTY Rewards', async accounts => {
       await stabilityPool.withdrawFromSP(dec(10000, 18), { from: C });
 
       // Check LQTY balances increase by correct amount
-      assert.isAtMost(
-        getDifference(await lqtyToken.balanceOf(A), A_expectedLQTYGain_2yr),
-        1e12
-      );
-      assert.isAtMost(
-        getDifference(await lqtyToken.balanceOf(B), B_expectedLQTYGain_2yr),
-        1e12
-      );
-      assert.isAtMost(
-        getDifference(await lqtyToken.balanceOf(C), C_expectedLQTYGain_2yr),
-        1e12
-      );
+      assert.isAtMost(getDifference(await lqtyToken.balanceOf(A), A_expectedLQTYGain_2yr), 1e12);
+      assert.isAtMost(getDifference(await lqtyToken.balanceOf(B), B_expectedLQTYGain_2yr), 1e12);
+      assert.isAtMost(getDifference(await lqtyToken.balanceOf(C), C_expectedLQTYGain_2yr), 1e12);
     });
 
     // A, B, C deposit. Varied stake. 1 Liquidation. D joins.
@@ -557,16 +456,10 @@ contract('StabilityPool - LQTY Rewards', async accounts => {
       assert.equal(initialIssuance, 0);
 
       // Whale opens Trove with 10k ETH
-      await borrowerOperations.openTrove(
-        th._100pct,
-        dec(10000, 18),
-        whale,
-        whale,
-        {
-          from: whale,
-          value: dec(10000, 'ether'),
-        }
-      );
+      await borrowerOperations.openTrove(th._100pct, dec(10000, 18), whale, whale, {
+        from: whale,
+        value: dec(10000, 'ether'),
+      });
 
       await borrowerOperations.openTrove(th._100pct, dec(10000, 18), A, A, {
         from: A,
@@ -615,10 +508,7 @@ contract('StabilityPool - LQTY Rewards', async accounts => {
       });
 
       // Year 1 passes
-      await th.fastForwardTime(
-        await getDuration(timeValues.SECONDS_IN_ONE_YEAR),
-        web3.currentProvider
-      );
+      await th.fastForwardTime(await getDuration(timeValues.SECONDS_IN_ONE_YEAR), web3.currentProvider);
 
       assert.equal(await stabilityPool.getTotalLUSDDeposits(), dec(60000, 18));
 
@@ -629,13 +519,7 @@ contract('StabilityPool - LQTY Rewards', async accounts => {
       assert.isFalse(await sortedTroves.contains(defaulter_1));
 
       // Confirm SP dropped from 60k to 30k
-      assert.isAtMost(
-        getDifference(
-          await stabilityPool.getTotalLUSDDeposits(),
-          dec(30000, 18)
-        ),
-        1000
-      );
+      assert.isAtMost(getDifference(await stabilityPool.getTotalLUSDDeposits(), dec(30000, 18)), 1000);
 
       // Expected gains for each depositor after 1 year (50% total issued)
       const A_expectedLQTYGain_Y1 = communityLQTYSupply
@@ -656,18 +540,9 @@ contract('StabilityPool - LQTY Rewards', async accounts => {
       const C_LQTYGain_Y1 = await stabilityPool.getDepositorLQTYGain(C);
 
       // Check gains are correct, error tolerance = 1e-6 of a toke
-      assert.isAtMost(
-        getDifference(A_LQTYGain_Y1, A_expectedLQTYGain_Y1),
-        1e12
-      );
-      assert.isAtMost(
-        getDifference(B_LQTYGain_Y1, B_expectedLQTYGain_Y1),
-        1e12
-      );
-      assert.isAtMost(
-        getDifference(C_LQTYGain_Y1, C_expectedLQTYGain_Y1),
-        1e12
-      );
+      assert.isAtMost(getDifference(A_LQTYGain_Y1, A_expectedLQTYGain_Y1), 1e12);
+      assert.isAtMost(getDifference(B_LQTYGain_Y1, B_expectedLQTYGain_Y1), 1e12);
+      assert.isAtMost(getDifference(C_LQTYGain_Y1, C_expectedLQTYGain_Y1), 1e12);
 
       // D deposits 40k
       await stabilityPool.provideToSP(dec(40000, 18), ZERO_ADDRESS, {
@@ -675,10 +550,7 @@ contract('StabilityPool - LQTY Rewards', async accounts => {
       });
 
       // Year 2 passes
-      await th.fastForwardTime(
-        timeValues.SECONDS_IN_ONE_YEAR,
-        web3.currentProvider
-      );
+      await th.fastForwardTime(timeValues.SECONDS_IN_ONE_YEAR, web3.currentProvider);
 
       // E deposits and withdraws, creating LQTY issuance
       await stabilityPool.provideToSP(dec(1, 18), ZERO_ADDRESS, { from: E });
@@ -709,34 +581,16 @@ contract('StabilityPool - LQTY Rewards', async accounts => {
       const C_LQTYGain_AfterY2 = await stabilityPool.getDepositorLQTYGain(C);
       const D_LQTYGain_AfterY2 = await stabilityPool.getDepositorLQTYGain(D);
 
-      const A_expectedTotalGain = A_expectedLQTYGain_Y1.add(
-        A_expectedLQTYGain_Y2
-      );
-      const B_expectedTotalGain = B_expectedLQTYGain_Y1.add(
-        B_expectedLQTYGain_Y2
-      );
-      const C_expectedTotalGain = C_expectedLQTYGain_Y1.add(
-        C_expectedLQTYGain_Y2
-      );
+      const A_expectedTotalGain = A_expectedLQTYGain_Y1.add(A_expectedLQTYGain_Y2);
+      const B_expectedTotalGain = B_expectedLQTYGain_Y1.add(B_expectedLQTYGain_Y2);
+      const C_expectedTotalGain = C_expectedLQTYGain_Y1.add(C_expectedLQTYGain_Y2);
       const D_expectedTotalGain = D_expectedLQTYGain_Y2;
 
       // Check gains are correct, error tolerance = 1e-6 of a token
-      assert.isAtMost(
-        getDifference(A_LQTYGain_AfterY2, A_expectedTotalGain),
-        1e12
-      );
-      assert.isAtMost(
-        getDifference(B_LQTYGain_AfterY2, B_expectedTotalGain),
-        1e12
-      );
-      assert.isAtMost(
-        getDifference(C_LQTYGain_AfterY2, C_expectedTotalGain),
-        1e12
-      );
-      assert.isAtMost(
-        getDifference(D_LQTYGain_AfterY2, D_expectedTotalGain),
-        1e12
-      );
+      assert.isAtMost(getDifference(A_LQTYGain_AfterY2, A_expectedTotalGain), 1e12);
+      assert.isAtMost(getDifference(B_LQTYGain_AfterY2, B_expectedTotalGain), 1e12);
+      assert.isAtMost(getDifference(C_LQTYGain_AfterY2, C_expectedTotalGain), 1e12);
+      assert.isAtMost(getDifference(D_LQTYGain_AfterY2, D_expectedTotalGain), 1e12);
 
       // Each depositor fully withdraws
       await stabilityPool.withdrawFromSP(dec(10000, 18), { from: A });
@@ -745,22 +599,10 @@ contract('StabilityPool - LQTY Rewards', async accounts => {
       await stabilityPool.withdrawFromSP(dec(40000, 18), { from: D });
 
       // Check LQTY balances increase by correct amount
-      assert.isAtMost(
-        getDifference(await lqtyToken.balanceOf(A), A_expectedTotalGain),
-        1e12
-      );
-      assert.isAtMost(
-        getDifference(await lqtyToken.balanceOf(B), B_expectedTotalGain),
-        1e12
-      );
-      assert.isAtMost(
-        getDifference(await lqtyToken.balanceOf(C), C_expectedTotalGain),
-        1e12
-      );
-      assert.isAtMost(
-        getDifference(await lqtyToken.balanceOf(D), D_expectedTotalGain),
-        1e12
-      );
+      assert.isAtMost(getDifference(await lqtyToken.balanceOf(A), A_expectedTotalGain), 1e12);
+      assert.isAtMost(getDifference(await lqtyToken.balanceOf(B), B_expectedTotalGain), 1e12);
+      assert.isAtMost(getDifference(await lqtyToken.balanceOf(C), C_expectedTotalGain), 1e12);
+      assert.isAtMost(getDifference(await lqtyToken.balanceOf(D), D_expectedTotalGain), 1e12);
     });
 
     //--- Serial pool-emptying liquidations ---
@@ -780,13 +622,10 @@ contract('StabilityPool - LQTY Rewards', async accounts => {
       assert.equal(initialIssuance, 0);
 
       // Whale opens Trove with 10k ETH
-      await borrowerOperations.openTrove(
-        th._100pct,
-        await getOpenTroveLUSDAmount(dec(10000, 18)),
-        whale,
-        whale,
-        { from: whale, value: dec(10000, 'ether') }
-      );
+      await borrowerOperations.openTrove(th._100pct, await getOpenTroveLUSDAmount(dec(10000, 18)), whale, whale, {
+        from: whale,
+        value: dec(10000, 'ether'),
+      });
 
       const allDepositors = [A, B, C, D, E, F, G, H];
       // 4 Defaulters open trove with 200LUSD debt, and 200% ICR
@@ -830,26 +669,17 @@ contract('StabilityPool - LQTY Rewards', async accounts => {
       // A, B each deposit 10k LUSD
       const depositors_1 = [A, B];
       for (account of depositors_1) {
-        await borrowerOperations.openTrove(
-          th._100pct,
-          dec(10000, 18),
-          account,
-          account,
-          {
-            from: account,
-            value: dec(200, 'ether'),
-          }
-        );
+        await borrowerOperations.openTrove(th._100pct, dec(10000, 18), account, account, {
+          from: account,
+          value: dec(200, 'ether'),
+        });
         await stabilityPool.provideToSP(dec(10000, 18), ZERO_ADDRESS, {
           from: account,
         });
       }
 
       // 1 month passes
-      await th.fastForwardTime(
-        await getDuration(timeValues.SECONDS_IN_ONE_MONTH),
-        web3.currentProvider
-      );
+      await th.fastForwardTime(await getDuration(timeValues.SECONDS_IN_ONE_MONTH), web3.currentProvider);
 
       // Defaulter 1 liquidated. 20k LUSD fully offset with pool.
       await troveManager.liquidate(defaulter_1, { from: owner });
@@ -857,26 +687,17 @@ contract('StabilityPool - LQTY Rewards', async accounts => {
       // C, D each deposit 10k LUSD
       const depositors_2 = [C, D];
       for (account of depositors_2) {
-        await borrowerOperations.openTrove(
-          th._100pct,
-          dec(10000, 18),
-          account,
-          account,
-          {
-            from: account,
-            value: dec(200, 'ether'),
-          }
-        );
+        await borrowerOperations.openTrove(th._100pct, dec(10000, 18), account, account, {
+          from: account,
+          value: dec(200, 'ether'),
+        });
         await stabilityPool.provideToSP(dec(10000, 18), ZERO_ADDRESS, {
           from: account,
         });
       }
 
       // 1 month passes
-      await th.fastForwardTime(
-        timeValues.SECONDS_IN_ONE_MONTH,
-        web3.currentProvider
-      );
+      await th.fastForwardTime(timeValues.SECONDS_IN_ONE_MONTH, web3.currentProvider);
 
       // Defaulter 2 liquidated. 10k LUSD offset
       await troveManager.liquidate(defaulter_2, { from: owner });
@@ -884,26 +705,17 @@ contract('StabilityPool - LQTY Rewards', async accounts => {
       // Erin, Flyn each deposit 100 LUSD
       const depositors_3 = [E, F];
       for (account of depositors_3) {
-        await borrowerOperations.openTrove(
-          th._100pct,
-          dec(10000, 18),
-          account,
-          account,
-          {
-            from: account,
-            value: dec(200, 'ether'),
-          }
-        );
+        await borrowerOperations.openTrove(th._100pct, dec(10000, 18), account, account, {
+          from: account,
+          value: dec(200, 'ether'),
+        });
         await stabilityPool.provideToSP(dec(10000, 18), ZERO_ADDRESS, {
           from: account,
         });
       }
 
       // 1 month passes
-      await th.fastForwardTime(
-        timeValues.SECONDS_IN_ONE_MONTH,
-        web3.currentProvider
-      );
+      await th.fastForwardTime(timeValues.SECONDS_IN_ONE_MONTH, web3.currentProvider);
 
       // Defaulter 3 liquidated. 100 LUSD offset
       await troveManager.liquidate(defaulter_3, { from: owner });
@@ -911,26 +723,17 @@ contract('StabilityPool - LQTY Rewards', async accounts => {
       // Graham, Harriet each deposit 10k LUSD
       const depositors_4 = [G, H];
       for (account of depositors_4) {
-        await borrowerOperations.openTrove(
-          th._100pct,
-          dec(10000, 18),
-          account,
-          account,
-          {
-            from: account,
-            value: dec(200, 'ether'),
-          }
-        );
+        await borrowerOperations.openTrove(th._100pct, dec(10000, 18), account, account, {
+          from: account,
+          value: dec(200, 'ether'),
+        });
         await stabilityPool.provideToSP(dec(10000, 18), ZERO_ADDRESS, {
           from: account,
         });
       }
 
       // 1 month passes
-      await th.fastForwardTime(
-        timeValues.SECONDS_IN_ONE_MONTH,
-        web3.currentProvider
-      );
+      await th.fastForwardTime(timeValues.SECONDS_IN_ONE_MONTH, web3.currentProvider);
 
       // Defaulter 4 liquidated. 100 LUSD offset
       await troveManager.liquidate(defaulter_4, { from: owner });
@@ -976,9 +779,7 @@ contract('StabilityPool - LQTY Rewards', async accounts => {
     });
 
     it('LQTY issuance for a given period is not obtainable if the SP was empty during the period', async () => {
-      const CIBalanceBefore = await lqtyToken.balanceOf(
-        communityIssuanceTester.address
-      );
+      const CIBalanceBefore = await lqtyToken.balanceOf(communityIssuanceTester.address);
 
       await borrowerOperations.openTrove(th._100pct, dec(16000, 18), A, A, {
         from: A,
@@ -993,17 +794,13 @@ contract('StabilityPool - LQTY Rewards', async accounts => {
         value: dec(200, 'ether'),
       });
 
-      const totalLQTYissuance_0 =
-        await communityIssuanceTester.totalLQTYIssued();
+      const totalLQTYissuance_0 = await communityIssuanceTester.totalLQTYIssued();
       const G_0 = await stabilityPool.epochToScaleToG(0, 0); // epochs and scales will not change in this test: no liquidations
       assert.equal(totalLQTYissuance_0, '0');
       assert.equal(G_0, '0');
 
       // 1 month passes (M1)
-      await th.fastForwardTime(
-        await getDuration(timeValues.SECONDS_IN_ONE_MONTH),
-        web3.currentProvider
-      );
+      await th.fastForwardTime(await getDuration(timeValues.SECONDS_IN_ONE_MONTH), web3.currentProvider);
 
       // LQTY issuance event triggered: A deposits
       await stabilityPool.provideToSP(dec(10000, 18), ZERO_ADDRESS, {
@@ -1015,15 +812,11 @@ contract('StabilityPool - LQTY Rewards', async accounts => {
       assert.isTrue(G_1.eq(G_0));
 
       // Check total LQTY issued is updated
-      const totalLQTYissuance_1 =
-        await communityIssuanceTester.totalLQTYIssued();
+      const totalLQTYissuance_1 = await communityIssuanceTester.totalLQTYIssued();
       assert.isTrue(totalLQTYissuance_1.gt(totalLQTYissuance_0));
 
       // 1 month passes (M2)
-      await th.fastForwardTime(
-        timeValues.SECONDS_IN_ONE_MONTH,
-        web3.currentProvider
-      );
+      await th.fastForwardTime(timeValues.SECONDS_IN_ONE_MONTH, web3.currentProvider);
 
       //LQTY issuance event triggered: A withdraws.
       await stabilityPool.withdrawFromSP(dec(10000, 18), { from: A });
@@ -1033,15 +826,11 @@ contract('StabilityPool - LQTY Rewards', async accounts => {
       assert.isTrue(G_2.gt(G_1));
 
       // Check total LQTY issued is updated
-      const totalLQTYissuance_2 =
-        await communityIssuanceTester.totalLQTYIssued();
+      const totalLQTYissuance_2 = await communityIssuanceTester.totalLQTYIssued();
       assert.isTrue(totalLQTYissuance_2.gt(totalLQTYissuance_1));
 
       // 1 month passes (M3)
-      await th.fastForwardTime(
-        timeValues.SECONDS_IN_ONE_MONTH,
-        web3.currentProvider
-      );
+      await th.fastForwardTime(timeValues.SECONDS_IN_ONE_MONTH, web3.currentProvider);
 
       // LQTY issuance event triggered: C deposits
       await stabilityPool.provideToSP(dec(10000, 18), ZERO_ADDRESS, {
@@ -1053,15 +842,11 @@ contract('StabilityPool - LQTY Rewards', async accounts => {
       assert.isTrue(G_3.eq(G_2));
 
       // Check total LQTY issued is updated
-      const totalLQTYissuance_3 =
-        await communityIssuanceTester.totalLQTYIssued();
+      const totalLQTYissuance_3 = await communityIssuanceTester.totalLQTYIssued();
       assert.isTrue(totalLQTYissuance_3.gt(totalLQTYissuance_2));
 
       // 1 month passes (M4)
-      await th.fastForwardTime(
-        timeValues.SECONDS_IN_ONE_MONTH,
-        web3.currentProvider
-      );
+      await th.fastForwardTime(timeValues.SECONDS_IN_ONE_MONTH, web3.currentProvider);
 
       // C withdraws
       await stabilityPool.withdrawFromSP(dec(10000, 18), { from: C });
@@ -1071,8 +856,7 @@ contract('StabilityPool - LQTY Rewards', async accounts => {
       assert.isTrue(G_4.gt(G_3));
 
       // Check total LQTY issued is increased
-      const totalLQTYissuance_4 =
-        await communityIssuanceTester.totalLQTYIssued();
+      const totalLQTYissuance_4 = await communityIssuanceTester.totalLQTYIssued();
       assert.isTrue(totalLQTYissuance_4.gt(totalLQTYissuance_3));
 
       // Get LQTY Gains
@@ -1086,25 +870,14 @@ contract('StabilityPool - LQTY Rewards', async accounts => {
       assert.isAtMost(getDifference(C_LQTYGain, issuance_M4), 1e15);
 
       // Check totalLQTYIssued = M1 + M2 + M3 + M4.  1e-3 error tolerance.
-      const expectedIssuance4Months = issuance_M1
-        .add(issuance_M2)
-        .add(issuance_M3)
-        .add(issuance_M4);
-      assert.isAtMost(
-        getDifference(expectedIssuance4Months, totalLQTYissuance_4),
-        1e15
-      );
+      const expectedIssuance4Months = issuance_M1.add(issuance_M2).add(issuance_M3).add(issuance_M4);
+      assert.isAtMost(getDifference(expectedIssuance4Months, totalLQTYissuance_4), 1e15);
 
       // Check CI has only transferred out tokens for M2 + M4.  1e-3 error tolerance.
       const expectedLQTYSentOutFromCI = issuance_M2.add(issuance_M4);
-      const CIBalanceAfter = await lqtyToken.balanceOf(
-        communityIssuanceTester.address
-      );
+      const CIBalanceAfter = await lqtyToken.balanceOf(communityIssuanceTester.address);
       const CIBalanceDifference = CIBalanceBefore.sub(CIBalanceAfter);
-      assert.isAtMost(
-        getDifference(CIBalanceDifference, expectedLQTYSentOutFromCI),
-        1e15
-      );
+      assert.isAtMost(getDifference(CIBalanceDifference, expectedLQTYSentOutFromCI), 1e15);
     });
 
     // --- Scale factor changes ---
@@ -1128,82 +901,37 @@ contract('StabilityPool - LQTY Rewards', async accounts => {
     expect A, B, C, D each withdraw ~1 month's worth of LQTY */
     it('withdrawFromSP(): Several deposits of 100 LUSD span one scale factor change. Depositors withdraw correct LQTY gains', async () => {
       // Whale opens Trove with 100 ETH
-      await borrowerOperations.openTrove(
-        th._100pct,
-        await getOpenTroveLUSDAmount(dec(10000, 18)),
-        whale,
-        whale,
-        { from: whale, value: dec(100, 'ether') }
-      );
+      await borrowerOperations.openTrove(th._100pct, await getOpenTroveLUSDAmount(dec(10000, 18)), whale, whale, {
+        from: whale,
+        value: dec(100, 'ether'),
+      });
 
-      const fiveDefaulters = [
-        defaulter_1,
-        defaulter_2,
-        defaulter_3,
-        defaulter_4,
-        defaulter_5,
-      ];
+      const fiveDefaulters = [defaulter_1, defaulter_2, defaulter_3, defaulter_4, defaulter_5];
 
-      await borrowerOperations.openTrove(
-        th._100pct,
-        dec(10000, 18),
-        ZERO_ADDRESS,
-        ZERO_ADDRESS,
-        {
-          from: A,
-          value: dec(10000, 'ether'),
-        }
-      );
-      await borrowerOperations.openTrove(
-        th._100pct,
-        dec(10000, 18),
-        ZERO_ADDRESS,
-        ZERO_ADDRESS,
-        {
-          from: B,
-          value: dec(10000, 'ether'),
-        }
-      );
-      await borrowerOperations.openTrove(
-        th._100pct,
-        dec(10000, 18),
-        ZERO_ADDRESS,
-        ZERO_ADDRESS,
-        {
-          from: C,
-          value: dec(10000, 'ether'),
-        }
-      );
-      await borrowerOperations.openTrove(
-        th._100pct,
-        dec(10000, 18),
-        ZERO_ADDRESS,
-        ZERO_ADDRESS,
-        {
-          from: D,
-          value: dec(10000, 'ether'),
-        }
-      );
-      await borrowerOperations.openTrove(
-        th._100pct,
-        dec(10000, 18),
-        ZERO_ADDRESS,
-        ZERO_ADDRESS,
-        {
-          from: E,
-          value: dec(10000, 'ether'),
-        }
-      );
-      await borrowerOperations.openTrove(
-        th._100pct,
-        dec(10000, 18),
-        ZERO_ADDRESS,
-        ZERO_ADDRESS,
-        {
-          from: F,
-          value: dec(10000, 'ether'),
-        }
-      );
+      await borrowerOperations.openTrove(th._100pct, dec(10000, 18), ZERO_ADDRESS, ZERO_ADDRESS, {
+        from: A,
+        value: dec(10000, 'ether'),
+      });
+      await borrowerOperations.openTrove(th._100pct, dec(10000, 18), ZERO_ADDRESS, ZERO_ADDRESS, {
+        from: B,
+        value: dec(10000, 'ether'),
+      });
+      await borrowerOperations.openTrove(th._100pct, dec(10000, 18), ZERO_ADDRESS, ZERO_ADDRESS, {
+        from: C,
+        value: dec(10000, 'ether'),
+      });
+      await borrowerOperations.openTrove(th._100pct, dec(10000, 18), ZERO_ADDRESS, ZERO_ADDRESS, {
+        from: D,
+        value: dec(10000, 'ether'),
+      });
+      await borrowerOperations.openTrove(th._100pct, dec(10000, 18), ZERO_ADDRESS, ZERO_ADDRESS, {
+        from: E,
+        value: dec(10000, 'ether'),
+      });
+      await borrowerOperations.openTrove(th._100pct, dec(10000, 18), ZERO_ADDRESS, ZERO_ADDRESS, {
+        from: F,
+        value: dec(10000, 'ether'),
+      });
 
       for (const defaulter of fiveDefaulters) {
         // Defaulters 1-5 each withdraw to 9999.9 debt (including gas comp)
@@ -1241,10 +969,7 @@ contract('StabilityPool - LQTY Rewards', async accounts => {
       });
 
       // 1 month passes
-      await th.fastForwardTime(
-        await getDuration(timeValues.SECONDS_IN_ONE_MONTH),
-        web3.currentProvider
-      );
+      await th.fastForwardTime(await getDuration(timeValues.SECONDS_IN_ONE_MONTH), web3.currentProvider);
 
       // Defaulter 1 liquidated.  Value of P updated to  to 1e-5
       const txL1 = await troveManager.liquidate(defaulter_1, { from: owner });
@@ -1261,10 +986,7 @@ contract('StabilityPool - LQTY Rewards', async accounts => {
       });
 
       // 1 month passes
-      await th.fastForwardTime(
-        timeValues.SECONDS_IN_ONE_MONTH,
-        web3.currentProvider
-      );
+      await th.fastForwardTime(timeValues.SECONDS_IN_ONE_MONTH, web3.currentProvider);
 
       // Defaulter 2 liquidated
       const txL2 = await troveManager.liquidate(defaulter_2, { from: owner });
@@ -1281,10 +1003,7 @@ contract('StabilityPool - LQTY Rewards', async accounts => {
       });
 
       // 1 month passes
-      await th.fastForwardTime(
-        timeValues.SECONDS_IN_ONE_MONTH,
-        web3.currentProvider
-      );
+      await th.fastForwardTime(timeValues.SECONDS_IN_ONE_MONTH, web3.currentProvider);
 
       // Defaulter 3 liquidated
       const txL3 = await troveManager.liquidate(defaulter_3, { from: owner });
@@ -1301,10 +1020,7 @@ contract('StabilityPool - LQTY Rewards', async accounts => {
       });
 
       // 1 month passes
-      await th.fastForwardTime(
-        timeValues.SECONDS_IN_ONE_MONTH,
-        web3.currentProvider
-      );
+      await th.fastForwardTime(timeValues.SECONDS_IN_ONE_MONTH, web3.currentProvider);
 
       // Defaulter 4 liquidated
       const txL4 = await troveManager.liquidate(defaulter_4, { from: owner });
@@ -1321,10 +1037,7 @@ contract('StabilityPool - LQTY Rewards', async accounts => {
       });
 
       // 1 month passes
-      await th.fastForwardTime(
-        timeValues.SECONDS_IN_ONE_MONTH,
-        web3.currentProvider
-      );
+      await th.fastForwardTime(timeValues.SECONDS_IN_ONE_MONTH, web3.currentProvider);
 
       // Defaulter 5 liquidated
       const txL5 = await troveManager.liquidate(defaulter_5, { from: owner });
@@ -1341,10 +1054,7 @@ contract('StabilityPool - LQTY Rewards', async accounts => {
       });
 
       // 1 month passes
-      await th.fastForwardTime(
-        timeValues.SECONDS_IN_ONE_MONTH,
-        web3.currentProvider
-      );
+      await th.fastForwardTime(timeValues.SECONDS_IN_ONE_MONTH, web3.currentProvider);
 
       assert.equal(await stabilityPool.currentEpoch(), '0');
 
@@ -1424,16 +1134,10 @@ contract('StabilityPool - LQTY Rewards', async accounts => {
       assert.equal(initialIssuance, 0);
 
       // Whale opens Trove with 10k ETH
-      await borrowerOperations.openTrove(
-        th._100pct,
-        dec(10000, 18),
-        whale,
-        whale,
-        {
-          from: whale,
-          value: dec(10000, 'ether'),
-        }
-      );
+      await borrowerOperations.openTrove(th._100pct, dec(10000, 18), whale, whale, {
+        from: whale,
+        value: dec(10000, 'ether'),
+      });
 
       await borrowerOperations.openTrove(th._100pct, dec(10000, 18), A, A, {
         from: A,
@@ -1480,10 +1184,7 @@ contract('StabilityPool - LQTY Rewards', async accounts => {
       assert.equal(F2_stake, dec(20000, 18));
 
       // One year passes
-      await th.fastForwardTime(
-        await getDuration(timeValues.SECONDS_IN_ONE_YEAR),
-        web3.currentProvider
-      );
+      await th.fastForwardTime(await getDuration(timeValues.SECONDS_IN_ONE_YEAR), web3.currentProvider);
 
       // E deposits, triggering LQTY gains for A,B,C,D,F1,F2. Withdraws immediately after
       await stabilityPool.provideToSP(dec(1, 18), ZERO_ADDRESS, { from: E });
@@ -1497,12 +1198,8 @@ contract('StabilityPool - LQTY Rewards', async accounts => {
       const B_LQTYGain_Y1 = await stabilityPool.getDepositorLQTYGain(B);
       const C_LQTYGain_Y1 = await stabilityPool.getDepositorLQTYGain(C);
       const D_LQTYGain_Y1 = await stabilityPool.getDepositorLQTYGain(D);
-      const F1_LQTYGain_Y1 = await stabilityPool.getFrontEndLQTYGain(
-        frontEnd_1
-      );
-      const F2_LQTYGain_Y1 = await stabilityPool.getFrontEndLQTYGain(
-        frontEnd_2
-      );
+      const F1_LQTYGain_Y1 = await stabilityPool.getFrontEndLQTYGain(frontEnd_1);
+      const F2_LQTYGain_Y1 = await stabilityPool.getFrontEndLQTYGain(frontEnd_2);
 
       // Expected depositor and front-end gains
       const A_expectedGain_Y1 = kickbackRate_F1
@@ -1541,10 +1238,7 @@ contract('StabilityPool - LQTY Rewards', async accounts => {
       assert.isAtMost(getDifference(F2_LQTYGain_Y1, F2_expectedGain_Y1), 1e12);
 
       // Another year passes
-      await th.fastForwardTime(
-        timeValues.SECONDS_IN_ONE_YEAR,
-        web3.currentProvider
-      );
+      await th.fastForwardTime(timeValues.SECONDS_IN_ONE_YEAR, web3.currentProvider);
 
       // E deposits, triggering LQTY gains for A,B,CD,F1, F2. Withdraws immediately after
       await stabilityPool.provideToSP(dec(1, 18), ZERO_ADDRESS, { from: E });
@@ -1553,8 +1247,7 @@ contract('StabilityPool - LQTY Rewards', async accounts => {
       // Expected gains for each depositor in Y2(25% total issued).  .
       const expectedIssuance_Y2 = communityLQTYSupply.div(toBN('4'));
 
-      const expectedFinalIssuance =
-        expectedIssuance_Y1.add(expectedIssuance_Y2);
+      const expectedFinalIssuance = expectedIssuance_Y1.add(expectedIssuance_Y2);
 
       // Expected final gains
       const A_expectedFinalGain = kickbackRate_F1
@@ -1592,36 +1285,12 @@ contract('StabilityPool - LQTY Rewards', async accounts => {
       await stabilityPool.withdrawFromSP(dec(10000, 18), { from: D });
 
       // Check LQTY balances increase by correct amount
-      assert.isAtMost(
-        getDifference(await lqtyToken.balanceOf(A), A_expectedFinalGain),
-        1e12
-      );
-      assert.isAtMost(
-        getDifference(await lqtyToken.balanceOf(B), B_expectedFinalGain),
-        1e12
-      );
-      assert.isAtMost(
-        getDifference(await lqtyToken.balanceOf(C), C_expectedFinalGain),
-        1e12
-      );
-      assert.isAtMost(
-        getDifference(await lqtyToken.balanceOf(D), D_expectedFinalGain),
-        1e12
-      );
-      assert.isAtMost(
-        getDifference(
-          await lqtyToken.balanceOf(frontEnd_1),
-          F1_expectedFinalGain
-        ),
-        1e12
-      );
-      assert.isAtMost(
-        getDifference(
-          await lqtyToken.balanceOf(frontEnd_2),
-          F2_expectedFinalGain
-        ),
-        1e12
-      );
+      assert.isAtMost(getDifference(await lqtyToken.balanceOf(A), A_expectedFinalGain), 1e12);
+      assert.isAtMost(getDifference(await lqtyToken.balanceOf(B), B_expectedFinalGain), 1e12);
+      assert.isAtMost(getDifference(await lqtyToken.balanceOf(C), C_expectedFinalGain), 1e12);
+      assert.isAtMost(getDifference(await lqtyToken.balanceOf(D), D_expectedFinalGain), 1e12);
+      assert.isAtMost(getDifference(await lqtyToken.balanceOf(frontEnd_1), F1_expectedFinalGain), 1e12);
+      assert.isAtMost(getDifference(await lqtyToken.balanceOf(frontEnd_2), F2_expectedFinalGain), 1e12);
     });
 
     // A, B, C, D deposit 10k,20k,30k,40k.
@@ -1659,16 +1328,10 @@ contract('StabilityPool - LQTY Rewards', async accounts => {
       assert.equal(initialIssuance, 0);
 
       // Whale opens Trove with 10k ETH
-      await borrowerOperations.openTrove(
-        th._100pct,
-        dec(10000, 18),
-        whale,
-        whale,
-        {
-          from: whale,
-          value: dec(10000, 'ether'),
-        }
-      );
+      await borrowerOperations.openTrove(th._100pct, dec(10000, 18), whale, whale, {
+        from: whale,
+        value: dec(10000, 'ether'),
+      });
 
       await borrowerOperations.openTrove(th._100pct, dec(10000, 18), A, A, {
         from: A,
@@ -1743,10 +1406,7 @@ contract('StabilityPool - LQTY Rewards', async accounts => {
       assert.equal(F2_stake, dec(50000, 18));
 
       // Month 1 passes
-      await th.fastForwardTime(
-        await getDuration(timeValues.SECONDS_IN_ONE_MONTH),
-        web3.currentProvider
-      );
+      await th.fastForwardTime(await getDuration(timeValues.SECONDS_IN_ONE_MONTH), web3.currentProvider);
 
       assert.equal(await stabilityPool.getTotalLUSDDeposits(), dec(100000, 18)); // total 100k
 
@@ -1754,29 +1414,20 @@ contract('StabilityPool - LQTY Rewards', async accounts => {
       await troveManager.liquidate(defaulter_1);
       assert.isFalse(await sortedTroves.contains(defaulter_1));
 
-      th.assertIsApproximatelyEqual(
-        await stabilityPool.getTotalLUSDDeposits(),
-        dec(50000, 18)
-      ); // 50k
+      th.assertIsApproximatelyEqual(await stabilityPool.getTotalLUSDDeposits(), dec(50000, 18)); // 50k
 
       // --- CHECK GAINS AFTER L1 ---
 
       // During month 1, deposit sizes are: A:10000, B:20000, C:30000, D:40000.  Total: 100000
       // Expected gains for each depositor after month 1
       const A_share_M1 = issuance_M1.mul(toBN('10000')).div(toBN('100000'));
-      const A_expectedLQTYGain_M1 = F1_kickbackRate.mul(A_share_M1).div(
-        toBN(dec(1, 18))
-      );
+      const A_expectedLQTYGain_M1 = F1_kickbackRate.mul(A_share_M1).div(toBN(dec(1, 18)));
 
       const B_share_M1 = issuance_M1.mul(toBN('20000')).div(toBN('100000'));
-      const B_expectedLQTYGain_M1 = F2_kickbackRate.mul(B_share_M1).div(
-        toBN(dec(1, 18))
-      );
+      const B_expectedLQTYGain_M1 = F2_kickbackRate.mul(B_share_M1).div(toBN(dec(1, 18)));
 
       const C_share_M1 = issuance_M1.mul(toBN('30000')).div(toBN('100000'));
-      const C_expectedLQTYGain_M1 = F2_kickbackRate.mul(C_share_M1).div(
-        toBN(dec(1, 18))
-      );
+      const C_expectedLQTYGain_M1 = F2_kickbackRate.mul(C_share_M1).div(toBN(dec(1, 18)));
 
       const D_share_M1 = issuance_M1.mul(toBN('40000')).div(toBN('100000'));
       const D_expectedLQTYGain_M1 = D_share_M1;
@@ -1798,61 +1449,30 @@ contract('StabilityPool - LQTY Rewards', async accounts => {
       const B_LQTYGain_M1 = await stabilityPool.getDepositorLQTYGain(B);
       const C_LQTYGain_M1 = await stabilityPool.getDepositorLQTYGain(C);
       const D_LQTYGain_M1 = await stabilityPool.getDepositorLQTYGain(D);
-      const F1_LQTYGain_M1 = await stabilityPool.getFrontEndLQTYGain(
-        frontEnd_1
-      );
-      const F2_LQTYGain_M1 = await stabilityPool.getFrontEndLQTYGain(
-        frontEnd_2
-      );
+      const F1_LQTYGain_M1 = await stabilityPool.getFrontEndLQTYGain(frontEnd_1);
+      const F2_LQTYGain_M1 = await stabilityPool.getFrontEndLQTYGain(frontEnd_2);
 
       // Check gains are correct, error tolerance = 1e-3 of a token
-      assert.isAtMost(
-        getDifference(A_LQTYGain_M1, A_expectedLQTYGain_M1),
-        1e15
-      );
-      assert.isAtMost(
-        getDifference(B_LQTYGain_M1, B_expectedLQTYGain_M1),
-        1e15
-      );
-      assert.isAtMost(
-        getDifference(C_LQTYGain_M1, C_expectedLQTYGain_M1),
-        1e15
-      );
-      assert.isAtMost(
-        getDifference(D_LQTYGain_M1, D_expectedLQTYGain_M1),
-        1e15
-      );
-      assert.isAtMost(
-        getDifference(F1_LQTYGain_M1, F1_expectedLQTYGain_M1),
-        1e15
-      );
-      assert.isAtMost(
-        getDifference(F2_LQTYGain_M1, F2_expectedLQTYGain_M1),
-        1e15
-      );
+      assert.isAtMost(getDifference(A_LQTYGain_M1, A_expectedLQTYGain_M1), 1e15);
+      assert.isAtMost(getDifference(B_LQTYGain_M1, B_expectedLQTYGain_M1), 1e15);
+      assert.isAtMost(getDifference(C_LQTYGain_M1, C_expectedLQTYGain_M1), 1e15);
+      assert.isAtMost(getDifference(D_LQTYGain_M1, D_expectedLQTYGain_M1), 1e15);
+      assert.isAtMost(getDifference(F1_LQTYGain_M1, F1_expectedLQTYGain_M1), 1e15);
+      assert.isAtMost(getDifference(F2_LQTYGain_M1, F2_expectedLQTYGain_M1), 1e15);
 
       // E deposits 30k via F1
       await stabilityPool.provideToSP(dec(30000, 18), frontEnd_1, { from: E });
 
-      th.assertIsApproximatelyEqual(
-        await stabilityPool.getTotalLUSDDeposits(),
-        dec(80000, 18)
-      );
+      th.assertIsApproximatelyEqual(await stabilityPool.getTotalLUSDDeposits(), dec(80000, 18));
 
       // Month 2 passes
-      await th.fastForwardTime(
-        timeValues.SECONDS_IN_ONE_MONTH,
-        web3.currentProvider
-      );
+      await th.fastForwardTime(timeValues.SECONDS_IN_ONE_MONTH, web3.currentProvider);
 
       // LIQUIDATION 2
       await troveManager.liquidate(defaulter_2);
       assert.isFalse(await sortedTroves.contains(defaulter_2));
 
-      th.assertIsApproximatelyEqual(
-        await stabilityPool.getTotalLUSDDeposits(),
-        dec(60000, 18)
-      );
+      th.assertIsApproximatelyEqual(await stabilityPool.getTotalLUSDDeposits(), dec(60000, 18));
 
       const startTime = await communityIssuanceTester.deploymentTime();
       const currentTime = await th.getLatestBlockTimestamp(web3);
@@ -1864,27 +1484,19 @@ contract('StabilityPool - LQTY Rewards', async accounts => {
 
       // Expected gains for each depositor after month 2
       const A_share_M2 = issuance_M2.mul(toBN('5000')).div(toBN('80000'));
-      const A_expectedLQTYGain_M2 = F1_kickbackRate.mul(A_share_M2).div(
-        toBN(dec(1, 18))
-      );
+      const A_expectedLQTYGain_M2 = F1_kickbackRate.mul(A_share_M2).div(toBN(dec(1, 18)));
 
       const B_share_M2 = issuance_M2.mul(toBN('10000')).div(toBN('80000'));
-      const B_expectedLQTYGain_M2 = F2_kickbackRate.mul(B_share_M2).div(
-        toBN(dec(1, 18))
-      );
+      const B_expectedLQTYGain_M2 = F2_kickbackRate.mul(B_share_M2).div(toBN(dec(1, 18)));
 
       const C_share_M2 = issuance_M2.mul(toBN('15000')).div(toBN('80000'));
-      const C_expectedLQTYGain_M2 = F2_kickbackRate.mul(C_share_M2).div(
-        toBN(dec(1, 18))
-      );
+      const C_expectedLQTYGain_M2 = F2_kickbackRate.mul(C_share_M2).div(toBN(dec(1, 18)));
 
       const D_share_M2 = issuance_M2.mul(toBN('20000')).div(toBN('80000'));
       const D_expectedLQTYGain_M2 = D_share_M2;
 
       const E_share_M2 = issuance_M2.mul(toBN('30000')).div(toBN('80000'));
-      const E_expectedLQTYGain_M2 = F1_kickbackRate.mul(E_share_M2).div(
-        toBN(dec(1, 18))
-      );
+      const E_expectedLQTYGain_M2 = F1_kickbackRate.mul(E_share_M2).div(toBN(dec(1, 18)));
 
       // F1's stake = A + E
       const F1_expectedLQTYGain_M2 = toBN(dec(1, 18))
@@ -1904,90 +1516,38 @@ contract('StabilityPool - LQTY Rewards', async accounts => {
       const C_LQTYGain_After_M2 = await stabilityPool.getDepositorLQTYGain(C);
       const D_LQTYGain_After_M2 = await stabilityPool.getDepositorLQTYGain(D);
       const E_LQTYGain_After_M2 = await stabilityPool.getDepositorLQTYGain(E);
-      const F1_LQTYGain_After_M2 = await stabilityPool.getFrontEndLQTYGain(
-        frontEnd_1
-      );
-      const F2_LQTYGain_After_M2 = await stabilityPool.getFrontEndLQTYGain(
-        frontEnd_2
-      );
+      const F1_LQTYGain_After_M2 = await stabilityPool.getFrontEndLQTYGain(frontEnd_1);
+      const F2_LQTYGain_After_M2 = await stabilityPool.getFrontEndLQTYGain(frontEnd_2);
 
-      assert.isAtMost(
-        getDifference(
-          A_LQTYGain_After_M2,
-          A_expectedLQTYGain_M2.add(A_expectedLQTYGain_M1)
-        ),
-        1e15
-      );
-      assert.isAtMost(
-        getDifference(
-          B_LQTYGain_After_M2,
-          B_expectedLQTYGain_M2.add(B_expectedLQTYGain_M1)
-        ),
-        1e15
-      );
-      assert.isAtMost(
-        getDifference(
-          C_LQTYGain_After_M2,
-          C_expectedLQTYGain_M2.add(C_expectedLQTYGain_M1)
-        ),
-        1e15
-      );
-      assert.isAtMost(
-        getDifference(
-          D_LQTYGain_After_M2,
-          D_expectedLQTYGain_M2.add(D_expectedLQTYGain_M1)
-        ),
-        1e15
-      );
-      assert.isAtMost(
-        getDifference(E_LQTYGain_After_M2, E_expectedLQTYGain_M2),
-        1e15
-      );
+      assert.isAtMost(getDifference(A_LQTYGain_After_M2, A_expectedLQTYGain_M2.add(A_expectedLQTYGain_M1)), 1e15);
+      assert.isAtMost(getDifference(B_LQTYGain_After_M2, B_expectedLQTYGain_M2.add(B_expectedLQTYGain_M1)), 1e15);
+      assert.isAtMost(getDifference(C_LQTYGain_After_M2, C_expectedLQTYGain_M2.add(C_expectedLQTYGain_M1)), 1e15);
+      assert.isAtMost(getDifference(D_LQTYGain_After_M2, D_expectedLQTYGain_M2.add(D_expectedLQTYGain_M1)), 1e15);
+      assert.isAtMost(getDifference(E_LQTYGain_After_M2, E_expectedLQTYGain_M2), 1e15);
 
       // Check F1 balance is his M1 gain (it was paid out when E joined through F1)
       const F1_LQTYBalance_After_M2 = await lqtyToken.balanceOf(frontEnd_1);
-      assert.isAtMost(
-        getDifference(F1_LQTYBalance_After_M2, F1_expectedLQTYGain_M1),
-        1e15
-      );
+      assert.isAtMost(getDifference(F1_LQTYBalance_After_M2, F1_expectedLQTYGain_M1), 1e15);
 
       // Check F1's LQTY gain in system after M2: Just their gain due to M2
-      assert.isAtMost(
-        getDifference(F1_LQTYGain_After_M2, F1_expectedLQTYGain_M2),
-        1e15
-      );
+      assert.isAtMost(getDifference(F1_LQTYGain_After_M2, F1_expectedLQTYGain_M2), 1e15);
 
       // Check F2 LQTY gain in system after M2: the sum of their gains from M1 + M2
-      assert.isAtMost(
-        getDifference(
-          F2_LQTYGain_After_M2,
-          F2_expectedLQTYGain_M2.add(F2_expectedLQTYGain_M1)
-        ),
-        1e15
-      );
+      assert.isAtMost(getDifference(F2_LQTYGain_After_M2, F2_expectedLQTYGain_M2.add(F2_expectedLQTYGain_M1)), 1e15);
 
       // B tops up 40k via F2
       await stabilityPool.provideToSP(dec(40000, 18), frontEnd_2, { from: B });
 
-      th.assertIsApproximatelyEqual(
-        await stabilityPool.getTotalLUSDDeposits(),
-        dec(100000, 18)
-      );
+      th.assertIsApproximatelyEqual(await stabilityPool.getTotalLUSDDeposits(), dec(100000, 18));
 
       // Month 3 passes
-      await th.fastForwardTime(
-        timeValues.SECONDS_IN_ONE_MONTH,
-        web3.currentProvider
-      );
+      await th.fastForwardTime(timeValues.SECONDS_IN_ONE_MONTH, web3.currentProvider);
 
       // LIQUIDATION 3
       await troveManager.liquidate(defaulter_3);
       assert.isFalse(await sortedTroves.contains(defaulter_3));
 
-      th.assertIsApproximatelyEqual(
-        await stabilityPool.getTotalLUSDDeposits(),
-        dec(90000, 18)
-      );
+      th.assertIsApproximatelyEqual(await stabilityPool.getTotalLUSDDeposits(), dec(90000, 18));
 
       // --- CHECK GAINS AFTER L3 ---
 
@@ -1995,27 +1555,19 @@ contract('StabilityPool - LQTY Rewards', async accounts => {
 
       // Expected gains for each depositor after month 3
       const A_share_M3 = issuance_M3.mul(toBN('3750')).div(toBN('100000'));
-      const A_expectedLQTYGain_M3 = F1_kickbackRate.mul(A_share_M3).div(
-        toBN(dec(1, 18))
-      );
+      const A_expectedLQTYGain_M3 = F1_kickbackRate.mul(A_share_M3).div(toBN(dec(1, 18)));
 
       const B_share_M3 = issuance_M3.mul(toBN('47500')).div(toBN('100000'));
-      const B_expectedLQTYGain_M3 = F2_kickbackRate.mul(B_share_M3).div(
-        toBN(dec(1, 18))
-      );
+      const B_expectedLQTYGain_M3 = F2_kickbackRate.mul(B_share_M3).div(toBN(dec(1, 18)));
 
       const C_share_M3 = issuance_M3.mul(toBN('11250')).div(toBN('100000'));
-      const C_expectedLQTYGain_M3 = F2_kickbackRate.mul(C_share_M3).div(
-        toBN(dec(1, 18))
-      );
+      const C_expectedLQTYGain_M3 = F2_kickbackRate.mul(C_share_M3).div(toBN(dec(1, 18)));
 
       const D_share_M3 = issuance_M3.mul(toBN('15000')).div(toBN('100000'));
       const D_expectedLQTYGain_M3 = D_share_M3;
 
       const E_share_M3 = issuance_M3.mul(toBN('22500')).div(toBN('100000'));
-      const E_expectedLQTYGain_M3 = F1_kickbackRate.mul(E_share_M3).div(
-        toBN(dec(1, 18))
-      );
+      const E_expectedLQTYGain_M3 = F1_kickbackRate.mul(E_share_M3).div(toBN(dec(1, 18)));
 
       // F1's stake = A + E
       const F1_expectedLQTYGain_M3 = toBN(dec(1, 18))
@@ -2035,134 +1587,68 @@ contract('StabilityPool - LQTY Rewards', async accounts => {
       const C_LQTYGain_After_M3 = await stabilityPool.getDepositorLQTYGain(C);
       const D_LQTYGain_After_M3 = await stabilityPool.getDepositorLQTYGain(D);
       const E_LQTYGain_After_M3 = await stabilityPool.getDepositorLQTYGain(E);
-      const F1_LQTYGain_After_M3 = await stabilityPool.getFrontEndLQTYGain(
-        frontEnd_1
-      );
-      const F2_LQTYGain_After_M3 = await stabilityPool.getFrontEndLQTYGain(
-        frontEnd_2
-      );
+      const F1_LQTYGain_After_M3 = await stabilityPool.getFrontEndLQTYGain(frontEnd_1);
+      const F2_LQTYGain_After_M3 = await stabilityPool.getFrontEndLQTYGain(frontEnd_2);
 
       // Expect A, C, D LQTY system gains to equal their gains from (M1 + M2 + M3)
       assert.isAtMost(
-        getDifference(
-          A_LQTYGain_After_M3,
-          A_expectedLQTYGain_M3.add(A_expectedLQTYGain_M2).add(
-            A_expectedLQTYGain_M1
-          )
-        ),
+        getDifference(A_LQTYGain_After_M3, A_expectedLQTYGain_M3.add(A_expectedLQTYGain_M2).add(A_expectedLQTYGain_M1)),
         1e15
       );
       assert.isAtMost(
-        getDifference(
-          C_LQTYGain_After_M3,
-          C_expectedLQTYGain_M3.add(C_expectedLQTYGain_M2).add(
-            C_expectedLQTYGain_M1
-          )
-        ),
+        getDifference(C_LQTYGain_After_M3, C_expectedLQTYGain_M3.add(C_expectedLQTYGain_M2).add(C_expectedLQTYGain_M1)),
         1e15
       );
       assert.isAtMost(
-        getDifference(
-          D_LQTYGain_After_M3,
-          D_expectedLQTYGain_M3.add(D_expectedLQTYGain_M2).add(
-            D_expectedLQTYGain_M1
-          )
-        ),
+        getDifference(D_LQTYGain_After_M3, D_expectedLQTYGain_M3.add(D_expectedLQTYGain_M2).add(D_expectedLQTYGain_M1)),
         1e15
       );
 
       // Expect E's LQTY system gain to equal their gains from (M2 + M3)
-      assert.isAtMost(
-        getDifference(
-          E_LQTYGain_After_M3,
-          E_expectedLQTYGain_M3.add(E_expectedLQTYGain_M2)
-        ),
-        1e15
-      );
+      assert.isAtMost(getDifference(E_LQTYGain_After_M3, E_expectedLQTYGain_M3.add(E_expectedLQTYGain_M2)), 1e15);
 
       // Expect B LQTY system gains to equal gains just from M3 (his topup paid out his gains from M1 + M2)
-      assert.isAtMost(
-        getDifference(B_LQTYGain_After_M3, B_expectedLQTYGain_M3),
-        1e15
-      );
+      assert.isAtMost(getDifference(B_LQTYGain_After_M3, B_expectedLQTYGain_M3), 1e15);
 
       // Expect B LQTY balance to equal gains from (M1 + M2)
       const B_LQTYBalance_After_M3 = await await lqtyToken.balanceOf(B);
-      assert.isAtMost(
-        getDifference(
-          B_LQTYBalance_After_M3,
-          B_expectedLQTYGain_M2.add(B_expectedLQTYGain_M1)
-        ),
-        1e15
-      );
+      assert.isAtMost(getDifference(B_LQTYBalance_After_M3, B_expectedLQTYGain_M2.add(B_expectedLQTYGain_M1)), 1e15);
 
       // Expect F1 LQTY system gains to equal their gain from (M2 + M3)
-      assert.isAtMost(
-        getDifference(
-          F1_LQTYGain_After_M3,
-          F1_expectedLQTYGain_M3.add(F1_expectedLQTYGain_M2)
-        ),
-        1e15
-      );
+      assert.isAtMost(getDifference(F1_LQTYGain_After_M3, F1_expectedLQTYGain_M3.add(F1_expectedLQTYGain_M2)), 1e15);
 
       // Expect F1 LQTY balance to equal their M1 gain
       const F1_LQTYBalance_After_M3 = await lqtyToken.balanceOf(frontEnd_1);
-      assert.isAtMost(
-        getDifference(F1_LQTYBalance_After_M3, F1_expectedLQTYGain_M1),
-        1e15
-      );
+      assert.isAtMost(getDifference(F1_LQTYBalance_After_M3, F1_expectedLQTYGain_M1), 1e15);
 
       // Expect F2 LQTY system gains to equal their gain from M3
-      assert.isAtMost(
-        getDifference(F2_LQTYGain_After_M3, F2_expectedLQTYGain_M3),
-        1e15
-      );
+      assert.isAtMost(getDifference(F2_LQTYGain_After_M3, F2_expectedLQTYGain_M3), 1e15);
 
       // Expect F2 LQTY balance to equal their gain from M1 + M2
       const F2_LQTYBalance_After_M3 = await lqtyToken.balanceOf(frontEnd_2);
-      assert.isAtMost(
-        getDifference(
-          F2_LQTYBalance_After_M3,
-          F2_expectedLQTYGain_M2.add(F2_expectedLQTYGain_M1)
-        ),
-        1e15
-      );
+      assert.isAtMost(getDifference(F2_LQTYBalance_After_M3, F2_expectedLQTYGain_M2.add(F2_expectedLQTYGain_M1)), 1e15);
 
       // Expect deposit C now to be 10125 LUSD
-      const C_compoundedLUSDDeposit =
-        await stabilityPool.getCompoundedLUSDDeposit(C);
-      assert.isAtMost(
-        getDifference(C_compoundedLUSDDeposit, dec(10125, 18)),
-        1000
-      );
+      const C_compoundedLUSDDeposit = await stabilityPool.getCompoundedLUSDDeposit(C);
+      assert.isAtMost(getDifference(C_compoundedLUSDDeposit, dec(10125, 18)), 1000);
 
       // --- C withdraws ---
 
-      th.assertIsApproximatelyEqual(
-        await stabilityPool.getTotalLUSDDeposits(),
-        dec(90000, 18)
-      );
+      th.assertIsApproximatelyEqual(await stabilityPool.getTotalLUSDDeposits(), dec(90000, 18));
 
       await stabilityPool.withdrawFromSP(dec(10000, 18), { from: C });
 
-      th.assertIsApproximatelyEqual(
-        await stabilityPool.getTotalLUSDDeposits(),
-        dec(80000, 18)
-      );
+      th.assertIsApproximatelyEqual(await stabilityPool.getTotalLUSDDeposits(), dec(80000, 18));
 
       // Month 4 passes
-      await th.fastForwardTime(
-        timeValues.SECONDS_IN_ONE_MONTH,
-        web3.currentProvider
-      );
+      await th.fastForwardTime(timeValues.SECONDS_IN_ONE_MONTH, web3.currentProvider);
 
       // All depositors fully withdraw
       for (depositor of [A, B, C, D, E]) {
         await stabilityPool.withdrawFromSP(dec(100000, 18), {
           from: depositor,
         });
-        const compoundedLUSDDeposit =
-          await stabilityPool.getCompoundedLUSDDeposit(depositor);
+        const compoundedLUSDDeposit = await stabilityPool.getCompoundedLUSDDeposit(depositor);
         assert.equal(compoundedLUSDDeposit, '0');
       }
 
@@ -2170,27 +1656,19 @@ contract('StabilityPool - LQTY Rewards', async accounts => {
 
       // Expected gains for each depositor after month 4
       const A_share_M4 = issuance_M4.mul(toBN('3375')).div(toBN('80000')); // 3375/800
-      const A_expectedLQTYGain_M4 = F1_kickbackRate.mul(A_share_M4).div(
-        toBN(dec(1, 18))
-      );
+      const A_expectedLQTYGain_M4 = F1_kickbackRate.mul(A_share_M4).div(toBN(dec(1, 18)));
 
       const B_share_M4 = issuance_M4.mul(toBN('42750')).div(toBN('80000')); // 42750/80000
-      const B_expectedLQTYGain_M4 = F2_kickbackRate.mul(B_share_M4).div(
-        toBN(dec(1, 18))
-      );
+      const B_expectedLQTYGain_M4 = F2_kickbackRate.mul(B_share_M4).div(toBN(dec(1, 18)));
 
       const C_share_M4 = issuance_M4.mul(toBN('125')).div(toBN('80000')); // 125/80000
-      const C_expectedLQTYGain_M4 = F2_kickbackRate.mul(C_share_M4).div(
-        toBN(dec(1, 18))
-      );
+      const C_expectedLQTYGain_M4 = F2_kickbackRate.mul(C_share_M4).div(toBN(dec(1, 18)));
 
       const D_share_M4 = issuance_M4.mul(toBN('13500')).div(toBN('80000'));
       const D_expectedLQTYGain_M4 = D_share_M4;
 
       const E_share_M4 = issuance_M4.mul(toBN('20250')).div(toBN('80000')); // 2025/80000
-      const E_expectedLQTYGain_M4 = F1_kickbackRate.mul(E_share_M4).div(
-        toBN(dec(1, 18))
-      );
+      const E_expectedLQTYGain_M4 = F1_kickbackRate.mul(E_share_M4).div(toBN(dec(1, 18)));
 
       // F1's stake = A + E
       const F1_expectedLQTYGain_M4 = toBN(dec(1, 18))
@@ -2213,74 +1691,39 @@ contract('StabilityPool - LQTY Rewards', async accounts => {
       const F1_FinalLQTYBalance = await lqtyToken.balanceOf(frontEnd_1);
       const F2_FinalLQTYBalance = await lqtyToken.balanceOf(frontEnd_2);
 
-      const A_expectedFinalLQTYBalance = A_expectedLQTYGain_M1.add(
-        A_expectedLQTYGain_M2
-      )
+      const A_expectedFinalLQTYBalance = A_expectedLQTYGain_M1.add(A_expectedLQTYGain_M2)
         .add(A_expectedLQTYGain_M3)
         .add(A_expectedLQTYGain_M4);
 
-      const B_expectedFinalLQTYBalance = B_expectedLQTYGain_M1.add(
-        B_expectedLQTYGain_M2
-      )
+      const B_expectedFinalLQTYBalance = B_expectedLQTYGain_M1.add(B_expectedLQTYGain_M2)
         .add(B_expectedLQTYGain_M3)
         .add(B_expectedLQTYGain_M4);
 
-      const C_expectedFinalLQTYBalance = C_expectedLQTYGain_M1.add(
-        C_expectedLQTYGain_M2
-      )
+      const C_expectedFinalLQTYBalance = C_expectedLQTYGain_M1.add(C_expectedLQTYGain_M2)
         .add(C_expectedLQTYGain_M3)
         .add(C_expectedLQTYGain_M4);
 
-      const D_expectedFinalLQTYBalance = D_expectedLQTYGain_M1.add(
-        D_expectedLQTYGain_M2
-      )
+      const D_expectedFinalLQTYBalance = D_expectedLQTYGain_M1.add(D_expectedLQTYGain_M2)
         .add(D_expectedLQTYGain_M3)
         .add(D_expectedLQTYGain_M4);
 
-      const E_expectedFinalLQTYBalance = E_expectedLQTYGain_M2.add(
-        E_expectedLQTYGain_M3
-      ).add(E_expectedLQTYGain_M4);
+      const E_expectedFinalLQTYBalance = E_expectedLQTYGain_M2.add(E_expectedLQTYGain_M3).add(E_expectedLQTYGain_M4);
 
-      const F1_expectedFinalLQTYBalance = F1_expectedLQTYGain_M1.add(
-        F1_expectedLQTYGain_M2
-      )
+      const F1_expectedFinalLQTYBalance = F1_expectedLQTYGain_M1.add(F1_expectedLQTYGain_M2)
         .add(F1_expectedLQTYGain_M3)
         .add(F1_expectedLQTYGain_M4);
 
-      const F2_expectedFinalLQTYBalance = F2_expectedLQTYGain_M1.add(
-        F2_expectedLQTYGain_M2
-      )
+      const F2_expectedFinalLQTYBalance = F2_expectedLQTYGain_M1.add(F2_expectedLQTYGain_M2)
         .add(F2_expectedLQTYGain_M3)
         .add(F2_expectedLQTYGain_M4);
 
-      assert.isAtMost(
-        getDifference(A_FinalLQTYBalance, A_expectedFinalLQTYBalance),
-        1e15
-      );
-      assert.isAtMost(
-        getDifference(B_FinalLQTYBalance, B_expectedFinalLQTYBalance),
-        1e15
-      );
-      assert.isAtMost(
-        getDifference(C_FinalLQTYBalance, C_expectedFinalLQTYBalance),
-        1e15
-      );
-      assert.isAtMost(
-        getDifference(D_FinalLQTYBalance, D_expectedFinalLQTYBalance),
-        1e15
-      );
-      assert.isAtMost(
-        getDifference(E_FinalLQTYBalance, E_expectedFinalLQTYBalance),
-        1e15
-      );
-      assert.isAtMost(
-        getDifference(F1_FinalLQTYBalance, F1_expectedFinalLQTYBalance),
-        1e15
-      );
-      assert.isAtMost(
-        getDifference(F2_FinalLQTYBalance, F2_expectedFinalLQTYBalance),
-        1e15
-      );
+      assert.isAtMost(getDifference(A_FinalLQTYBalance, A_expectedFinalLQTYBalance), 1e15);
+      assert.isAtMost(getDifference(B_FinalLQTYBalance, B_expectedFinalLQTYBalance), 1e15);
+      assert.isAtMost(getDifference(C_FinalLQTYBalance, C_expectedFinalLQTYBalance), 1e15);
+      assert.isAtMost(getDifference(D_FinalLQTYBalance, D_expectedFinalLQTYBalance), 1e15);
+      assert.isAtMost(getDifference(E_FinalLQTYBalance, E_expectedFinalLQTYBalance), 1e15);
+      assert.isAtMost(getDifference(F1_FinalLQTYBalance, F1_expectedFinalLQTYBalance), 1e15);
+      assert.isAtMost(getDifference(F2_FinalLQTYBalance, F2_expectedFinalLQTYBalance), 1e15);
     });
 
     /* Serial scale changes, with one front end
@@ -2305,23 +1748,12 @@ contract('StabilityPool - LQTY Rewards', async accounts => {
       await stabilityPool.registerFrontEnd(kickbackRate, { from: frontEnd_1 });
 
       // Whale opens Trove with 10k ETH
-      await borrowerOperations.openTrove(
-        th._100pct,
-        dec(10000, 18),
-        whale,
-        whale,
-        {
-          from: whale,
-          value: dec(10000, 'ether'),
-        }
-      );
+      await borrowerOperations.openTrove(th._100pct, dec(10000, 18), whale, whale, {
+        from: whale,
+        value: dec(10000, 'ether'),
+      });
 
-      const _4_Defaulters = [
-        defaulter_1,
-        defaulter_2,
-        defaulter_3,
-        defaulter_4,
-      ];
+      const _4_Defaulters = [defaulter_1, defaulter_2, defaulter_3, defaulter_4];
 
       for (const defaulter of _4_Defaulters) {
         // Defaulters 1-4 each withdraw to 9999.9 debt (including gas comp)
@@ -2359,10 +1791,7 @@ contract('StabilityPool - LQTY Rewards', async accounts => {
       await stabilityPool.provideToSP(dec(5000, 18), frontEnd_1, { from: B });
 
       // 1 month passes (M1)
-      await th.fastForwardTime(
-        await getDuration(timeValues.SECONDS_IN_ONE_MONTH),
-        web3.currentProvider
-      );
+      await th.fastForwardTime(await getDuration(timeValues.SECONDS_IN_ONE_MONTH), web3.currentProvider);
 
       // Defaulter 1 liquidated.  Value of P updated to  to 9999999, i.e. in decimal, ~1e-10
       const txL1 = await troveManager.liquidate(defaulter_1, { from: owner });
@@ -2380,10 +1809,7 @@ contract('StabilityPool - LQTY Rewards', async accounts => {
       await stabilityPool.provideToSP(dec(99999, 17), frontEnd_1, { from: C });
 
       // 1 month passes (M2)
-      await th.fastForwardTime(
-        timeValues.SECONDS_IN_ONE_MONTH,
-        web3.currentProvider
-      );
+      await th.fastForwardTime(timeValues.SECONDS_IN_ONE_MONTH, web3.currentProvider);
 
       // Defaulter 2 liquidated
       const txL2 = await troveManager.liquidate(defaulter_2, { from: owner });
@@ -2401,10 +1827,7 @@ contract('StabilityPool - LQTY Rewards', async accounts => {
       await stabilityPool.provideToSP(dec(99999, 17), frontEnd_1, { from: D });
 
       // 1 month passes (M3)
-      await th.fastForwardTime(
-        timeValues.SECONDS_IN_ONE_MONTH,
-        web3.currentProvider
-      );
+      await th.fastForwardTime(timeValues.SECONDS_IN_ONE_MONTH, web3.currentProvider);
 
       // Defaulter 3 liquidated
       const txL3 = await troveManager.liquidate(defaulter_3, { from: owner });
@@ -2422,10 +1845,7 @@ contract('StabilityPool - LQTY Rewards', async accounts => {
       await stabilityPool.provideToSP(dec(99999, 17), frontEnd_1, { from: E });
 
       // 1 month passes (M4)
-      await th.fastForwardTime(
-        timeValues.SECONDS_IN_ONE_MONTH,
-        web3.currentProvider
-      );
+      await th.fastForwardTime(timeValues.SECONDS_IN_ONE_MONTH, web3.currentProvider);
 
       // Defaulter 4 liquidated
       const txL4 = await troveManager.liquidate(defaulter_4, { from: owner });
@@ -2504,23 +1924,14 @@ contract('StabilityPool - LQTY Rewards', async accounts => {
         .mul(toBN('99999'))
         .div(toBN('100000')); // Scale by 9999.9/10000
 
-      const issuance1st4Months = issuance_M1
-        .add(issuance_M2)
-        .add(issuance_M3)
-        .add(issuance_M4);
+      const issuance1st4Months = issuance_M1.add(issuance_M2).add(issuance_M3).add(issuance_M4);
       const expectedLQTYGain_F1 = toBN(dec(1, 18))
         .sub(kickbackRate)
         .mul(issuance1st4Months)
         .div(toBN(dec(1, 18)));
 
-      assert.isAtMost(
-        getDifference(expectedLQTYGain_A_and_B, LQTYGain_A),
-        1e15
-      );
-      assert.isAtMost(
-        getDifference(expectedLQTYGain_A_and_B, LQTYGain_B),
-        1e15
-      );
+      assert.isAtMost(getDifference(expectedLQTYGain_A_and_B, LQTYGain_A), 1e15);
+      assert.isAtMost(getDifference(expectedLQTYGain_A_and_B, LQTYGain_B), 1e15);
       assert.isAtMost(getDifference(expectedLQTYGain_C, LQTYGain_C), 1e15);
       assert.isAtMost(getDifference(expectedLQTYGain_D, LQTYGain_D), 1e15);
       assert.isAtMost(getDifference(expectedLQTYGain_E, LQTYGain_E), 1e15);

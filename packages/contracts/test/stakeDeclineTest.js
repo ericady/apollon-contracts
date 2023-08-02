@@ -36,8 +36,7 @@ contract('TroveManager', async accounts => {
 
   let contracts;
 
-  const getOpenTroveLUSDAmount = async totalDebt =>
-    th.getOpenTroveLUSDAmount(contracts, totalDebt);
+  const getOpenTroveLUSDAmount = async totalDebt => th.getOpenTroveLUSDAmount(contracts, totalDebt);
 
   const getSnapshotsRatio = async () => {
     const ratio = (await troveManager.totalStakesSnapshot())
@@ -55,11 +54,7 @@ contract('TroveManager', async accounts => {
       contracts.stabilityPool.address,
       contracts.borrowerOperations.address
     );
-    const LQTYContracts = await deploymentHelper.deployLQTYContracts(
-      bountyAddress,
-      lpRewardsAddress,
-      multisig
-    );
+    const LQTYContracts = await deploymentHelper.deployLQTYContracts(bountyAddress, lpRewardsAddress, multisig);
 
     priceFeed = contracts.priceFeedTestnet;
     lusdToken = contracts.lusdToken;
@@ -145,37 +140,19 @@ contract('TroveManager', async accounts => {
 
     // liquidate 1 trove at ~50% total system collateral
     await priceFeed.setPrice(dec(50, 18));
-    assert.isTrue(
-      await troveManager.checkRecoveryMode(await priceFeed.getPrice())
-    );
+    assert.isTrue(await troveManager.checkRecoveryMode(await priceFeed.getPrice()));
     await troveManager.liquidate(A);
 
-    console.log(
-      `totalStakesSnapshot after L1: ${await troveManager.totalStakesSnapshot()}`
-    );
-    console.log(
-      `totalCollateralSnapshot after L1: ${await troveManager.totalCollateralSnapshot()}`
-    );
+    console.log(`totalStakesSnapshot after L1: ${await troveManager.totalStakesSnapshot()}`);
+    console.log(`totalCollateralSnapshot after L1: ${await troveManager.totalCollateralSnapshot()}`);
     console.log(`Snapshots ratio after L1: ${await getSnapshotsRatio()}`);
-    console.log(
-      `B pending ETH reward after L1: ${await troveManager.getPendingETHReward(
-        B
-      )}`
-    );
+    console.log(`B pending ETH reward after L1: ${await troveManager.getPendingETHReward(B)}`);
     console.log(`B stake after L1: ${(await troveManager.Troves(B))[2]}`);
 
     // adjust trove B 1 wei: apply rewards
-    await borrowerOperations.adjustTrove(
-      th._100pct,
-      0,
-      1,
-      false,
-      ZERO_ADDRESS,
-      ZERO_ADDRESS,
-      {
-        from: B,
-      }
-    ); // B repays 1 wei
+    await borrowerOperations.adjustTrove(th._100pct, 0, 1, false, ZERO_ADDRESS, ZERO_ADDRESS, {
+      from: B,
+    }); // B repays 1 wei
     console.log(`B stake after A1: ${(await troveManager.Troves(B))[2]}`);
     console.log(`Snapshots ratio after A1: ${await getSnapshotsRatio()}`);
 
@@ -184,26 +161,12 @@ contract('TroveManager', async accounts => {
     // - Adjust B's collateral by 1 wei
     for (let [idx, trove] of tinyTroves.entries()) {
       await troveManager.liquidate(trove);
-      console.log(
-        `B stake after L${idx + 2}: ${(await troveManager.Troves(B))[2]}`
-      );
-      console.log(
-        `Snapshots ratio after L${idx + 2}: ${await getSnapshotsRatio()}`
-      );
-      await borrowerOperations.adjustTrove(
-        th._100pct,
-        0,
-        1,
-        false,
-        ZERO_ADDRESS,
-        ZERO_ADDRESS,
-        {
-          from: B,
-        }
-      ); // A repays 1 wei
-      console.log(
-        `B stake after A${idx + 2}: ${(await troveManager.Troves(B))[2]}`
-      );
+      console.log(`B stake after L${idx + 2}: ${(await troveManager.Troves(B))[2]}`);
+      console.log(`Snapshots ratio after L${idx + 2}: ${await getSnapshotsRatio()}`);
+      await borrowerOperations.adjustTrove(th._100pct, 0, 1, false, ZERO_ADDRESS, ZERO_ADDRESS, {
+        from: B,
+      }); // A repays 1 wei
+      console.log(`B stake after A${idx + 2}: ${(await troveManager.Troves(B))[2]}`);
     }
   });
 

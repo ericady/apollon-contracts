@@ -27,10 +27,7 @@ contract('Gas costs for math functions', async accounts => {
 
   beforeEach(async () => {
     contracts = await deploymentHelper.deployLiquityCore();
-    const LQTYContracts = await deploymentHelper.deployLQTYContracts(
-      bountyAddress,
-      lpRewardsAddress
-    );
+    const LQTYContracts = await deploymentHelper.deployLQTYContracts(bountyAddress, lpRewardsAddress);
 
     priceFeed = contracts.priceFeedTestnet;
     lusdToken = contracts.lusdToken;
@@ -53,13 +50,7 @@ contract('Gas costs for math functions', async accounts => {
   });
 
   // performs n runs of exponentiation on a random base
-  const exponentiate = async (
-    mathTester,
-    baseMin,
-    baseMax = undefined,
-    exponent,
-    runs
-  ) => {
+  const exponentiate = async (mathTester, baseMin, baseMax = undefined, exponent, runs) => {
     const gasCostList = [];
 
     for (let i = 0; i < runs; i++) {
@@ -75,9 +66,7 @@ contract('Gas costs for math functions', async accounts => {
       }
 
       const gasUsed = th.gasUsed(tx) - 21000;
-      console.log(
-        `run: ${i}. base: ${base}, exp: ${exponent}, res: ${res}, gasUsed: ${gasUsed}`
-      );
+      console.log(`run: ${i}. base: ${base}, exp: ${exponent}, res: ${res}, gasUsed: ${gasUsed}`);
 
       gasCostList.push(gasUsed);
     }
@@ -124,13 +113,7 @@ contract('Gas costs for math functions', async accounts => {
     const n = 2592000; // Seconds in 1 month
     const runs = 100;
     const message = `exponentiation: n = ${n}, runs = ${runs}`;
-    const gasResults = await exponentiate(
-      mathTester,
-      0.9999999999,
-      0.999999999999999999,
-      n,
-      runs
-    );
+    const gasResults = await exponentiate(mathTester, 0.9999999999, 0.999999999999999999, n, runs);
 
     th.logGasMetrics(gasResults, message);
     th.logAllGasCosts(gasResults);
@@ -140,13 +123,7 @@ contract('Gas costs for math functions', async accounts => {
     const n = 43200; // Minutes in 1 month
     const runs = 100;
     const message = `exponentiation: n = ${n}, runs = ${runs}`;
-    const gasResults = await exponentiate(
-      mathTester,
-      0.9999999999,
-      0.999999999999999999,
-      n,
-      runs
-    );
+    const gasResults = await exponentiate(mathTester, 0.9999999999, 0.999999999999999999, n, runs);
 
     th.logGasMetrics(gasResults, message);
     th.logAllGasCosts(gasResults);
@@ -158,20 +135,12 @@ contract('Gas costs for math functions', async accounts => {
 
   it('', async () => {
     let dataOneMonth = [];
-    dataOneMonth.push(
-      `exponentiation: exponent in units of seconds, max exponent is one month \n`
-    );
+    dataOneMonth.push(`exponentiation: exponent in units of seconds, max exponent is one month \n`);
 
     for (let n = 2; n <= timeValues.SECONDS_IN_ONE_MONTH; n += 100) {
       const runs = 1;
       const message = `exponentiation: seconds n = ${n}, runs = ${runs}`;
-      const gasResults = await exponentiate(
-        mathTester,
-        0.9999999999,
-        0.999999999999999999,
-        n,
-        runs
-      );
+      const gasResults = await exponentiate(mathTester, 0.9999999999, 0.999999999999999999, n, runs);
 
       th.logGasMetrics(gasResults, message);
       th.logAllGasCosts(gasResults);
@@ -181,19 +150,13 @@ contract('Gas costs for math functions', async accounts => {
 
     // console.log(data)
 
-    fs.writeFile(
-      'gasTest/outputs/exponentiationCostsOneMonth.csv',
-      dataOneMonth,
-      err => {
-        if (err) {
-          console.log(err);
-        } else {
-          console.log(
-            'Gas test data written to gasTest/outputs/exponentiationCostsOneMonth.csv'
-          );
-        }
+    fs.writeFile('gasTest/outputs/exponentiationCostsOneMonth.csv', dataOneMonth, err => {
+      if (err) {
+        console.log(err);
+      } else {
+        console.log('Gas test data written to gasTest/outputs/exponentiationCostsOneMonth.csv');
       }
-    );
+    });
   });
 
   // --- Using the issuance factor (base) that corresponds to 50% issuance in year 1:  0.999998681227695000 ----
@@ -202,24 +165,13 @@ contract('Gas costs for math functions', async accounts => {
     let data50Years = [];
     const issuanceFactor = '999998681227695000';
 
-    data50Years.push(
-      `exponentiation: exponent vs gas cost: exponent in units of minutes, max exponent is 50 years \n`
-    );
+    data50Years.push(`exponentiation: exponent vs gas cost: exponent in units of minutes, max exponent is 50 years \n`);
 
-    for (
-      let n = 2;
-      n <= timeValues.MINUTES_IN_ONE_YEAR * 50;
-      n += timeValues.MINUTES_IN_ONE_WEEK
-    ) {
+    for (let n = 2; n <= timeValues.MINUTES_IN_ONE_YEAR * 50; n += timeValues.MINUTES_IN_ONE_WEEK) {
       console.log(`n: ${n}`);
       const runs = 1;
       const message = `exponentiation: minutes n = ${n}, runs = ${runs}`;
-      const gasResults = await exponentiate(
-        mathTester,
-        n,
-        runs,
-        issuanceFactor
-      );
+      const gasResults = await exponentiate(mathTester, n, runs, issuanceFactor);
 
       th.logGasMetrics(gasResults, message);
       th.logAllGasCosts(gasResults);
@@ -227,18 +179,12 @@ contract('Gas costs for math functions', async accounts => {
       data50Years.push(n + ',' + gasResults.medianGas + '\n');
     }
 
-    fs.writeFile(
-      'gasTest/outputs/exponentiationCosts30Years.csv',
-      data50Years,
-      err => {
-        if (err) {
-          console.log(err);
-        } else {
-          console.log(
-            'Gas test data written to gasTest/outputs/exponentiationCosts30Years.csv'
-          );
-        }
+    fs.writeFile('gasTest/outputs/exponentiationCosts30Years.csv', data50Years, err => {
+      if (err) {
+        console.log(err);
+      } else {
+        console.log('Gas test data written to gasTest/outputs/exponentiationCosts30Years.csv');
       }
-    );
+    });
   });
 });

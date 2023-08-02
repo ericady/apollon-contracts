@@ -11,21 +11,15 @@ const BorrowerOperations = artifacts.require('./BorrowerOperations.sol');
 
 const LQTYStaking = artifacts.require('./LQTY/LQTYStaking.sol');
 const LQTYToken = artifacts.require('./LQTY/LQTYToken.sol');
-const LockupContractFactory = artifacts.require(
-  './LQTY/LockupContractFactory.sol'
-);
+const LockupContractFactory = artifacts.require('./LQTY/LockupContractFactory.sol');
 const CommunityIssuance = artifacts.require('./LQTY/CommunityIssuance.sol');
 const HintHelpers = artifacts.require('./HintHelpers.sol');
 
-const CommunityIssuanceTester = artifacts.require(
-  './LQTY/CommunityIssuanceTester.sol'
-);
+const CommunityIssuanceTester = artifacts.require('./LQTY/CommunityIssuanceTester.sol');
 const ActivePoolTester = artifacts.require('./ActivePoolTester.sol');
 const DefaultPoolTester = artifacts.require('./DefaultPoolTester.sol');
 const LiquityMathTester = artifacts.require('./LiquityMathTester.sol');
-const BorrowerOperationsTester = artifacts.require(
-  './BorrowerOperationsTester.sol'
-);
+const BorrowerOperationsTester = artifacts.require('./BorrowerOperationsTester.sol');
 const TroveManagerTester = artifacts.require('./TroveManagerTester.sol');
 const LUSDTokenTester = artifacts.require('./LUSDTokenTester.sol');
 
@@ -47,12 +41,7 @@ const coreContractABIs = [
   HintHelpers,
 ];
 
-const LQTYContractABIs = [
-  LQTYStaking,
-  LQTYToken,
-  LockupContractFactory,
-  CommunityIssuance,
-];
+const LQTYContractABIs = [LQTYStaking, LQTYToken, LockupContractFactory, CommunityIssuance];
 
 const TesterContractABIs = [
   CommunityIssuanceTester,
@@ -80,11 +69,7 @@ const getBytecodeSize = contractABI => {
   // console.log(`${contractABI.contractName} deployed bytecode length: ${deployedBytecodeLength}`)
 };
 
-const getUSDCostFromGasCost = (
-  deploymentGasTotal,
-  gasPriceInGwei,
-  ETHPrice
-) => {
+const getUSDCostFromGasCost = (deploymentGasTotal, gasPriceInGwei, ETHPrice) => {
   const dollarCost = (deploymentGasTotal * gasPriceInGwei * ETHPrice) / 1e9;
   console.log(
     `At gas price ${gasPriceInGwei} GWei, and ETH Price $${ETHPrice} per ETH, the total cost of deployment in USD is: $${dollarCost}`
@@ -95,10 +80,7 @@ const logContractDeploymentCosts = async contracts => {
   console.log(`Gas costs for deployments: `);
   let totalGasCost = 0;
   for (contractName of Object.keys(contracts)) {
-    const gasCost = await getGasFromContractDeployment(
-      contracts[contractName],
-      contractName
-    );
+    const gasCost = await getGasFromContractDeployment(contracts[contractName], contractName);
     totalGasCost = totalGasCost + Number(gasCost);
   }
   console.log(`Total deployment gas costs: ${totalGasCost}`);
@@ -109,10 +91,7 @@ const logContractObjects = async contracts => {
   console.log(`Contract objects addresses:`);
   let totalGasCost = 0;
   for (contractName of Object.keys(contracts)) {
-    const gasCost = await getGasFromContractDeployment(
-      contracts[contractName],
-      contractName
-    );
+    const gasCost = await getGasFromContractDeployment(contracts[contractName], contractName);
     totalGasCost = totalGasCost + Number(gasCost);
   }
 };
@@ -127,10 +106,7 @@ const logContractBytecodeLengths = contractABIs => {
 // Run script: log deployment gas costs and bytecode lengths for all contracts
 async function main() {
   const coreContracts = await dh.deployLiquityCoreHardhat();
-  const LQTYContracts = await dh.deployLQTYContractsHardhat(
-    ARBITRARY_ADDRESS,
-    ARBITRARY_ADDRESS
-  );
+  const LQTYContracts = await dh.deployLQTYContractsHardhat(ARBITRARY_ADDRESS, ARBITRARY_ADDRESS);
   const testerContracts = await dh.deployTesterContractsHardhat();
 
   await dh.connectCoreContracts(coreContracts, LQTYContracts);

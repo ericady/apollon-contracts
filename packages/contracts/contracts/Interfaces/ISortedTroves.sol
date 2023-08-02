@@ -15,19 +15,9 @@ interface ISortedTroves is IBase {
 
   // --- Functions ---
 
-  function setParams(
-    uint256 _size,
-    address _TroveManagerAddress,
-    address _borrowerOperationsAddress
-  ) external;
+  function setParams(uint256 _size, address _TroveManagerAddress, address _borrowerOperationsAddress) external;
 
-  function insert(
-    PriceCache memory _priceCache,
-    address _id,
-    uint256 _ICR,
-    address _prevId,
-    address _nextId
-  ) external;
+  function insert(PriceCache memory _priceCache, address _id, uint256 _ICR, address _prevId, address _nextId) external;
 
   function remove(address _id) external;
 

@@ -4,11 +4,7 @@ function ConditionalBoundaryMutator() {}
 
 ConditionalBoundaryMutator.prototype.name = 'conditional-boundary';
 
-ConditionalBoundaryMutator.prototype.getMutations = function (
-  file,
-  source,
-  visit
-) {
+ConditionalBoundaryMutator.prototype.getMutations = function (file, source, visit) {
   const mutations = [];
 
   visit({

@@ -23,11 +23,7 @@
 pragma solidity ^0.8.9;
 
 contract DSAuthority {
-  function canCall(
-    address src,
-    address dst,
-    bytes4 sig
-  ) public view returns (bool);
+  function canCall(address src, address dst, bytes4 sig) public view returns (bool);
 }
 
 contract DSAuthEvents {
@@ -112,10 +108,7 @@ contract DSProxy is DSAuth, DSNote {
   function() public payable {}
 
   // use the proxy to execute calldata _data on contract _code
-  function execute(
-    bytes _code,
-    bytes _data
-  ) public payable returns (address target, bytes32 response) {
+  function execute(bytes _code, bytes _data) public payable returns (address target, bytes32 response) {
     target = cache.read(_code);
     if (target == 0x0) {
       // deploy contract & store its address in cache
@@ -125,22 +118,12 @@ contract DSProxy is DSAuth, DSNote {
     response = execute(target, _data);
   }
 
-  function execute(
-    address _target,
-    bytes _data
-  ) public payable auth note returns (bytes32 response) {
+  function execute(address _target, bytes _data) public payable auth note returns (bytes32 response) {
     require(_target != 0x0);
 
     // call contract in current context
     assembly {
-      let succeeded := delegatecall(
-        sub(gas, 5000),
-        _target,
-        add(_data, 0x20),
-        mload(_data),
-        0,
-        32
-      )
+      let succeeded := delegatecall(sub(gas, 5000), _target, add(_data, 0x20), mload(_data), 0, 32)
       response := mload(0) // load delegatecall output
       switch iszero(succeeded)
       case 1 {
@@ -162,12 +145,7 @@ contract DSProxy is DSAuth, DSNote {
 // This factory deploys new proxy instances through build()
 // Deployed proxy addresses are logged
 contract DSProxyFactory {
-  event Created(
-    address indexed sender,
-    address indexed owner,
-    address proxy,
-    address cache
-  );
+  event Created(address indexed sender, address indexed owner, address proxy, address cache);
   mapping(address => bool) public isProxy;
   DSProxyCache public cache = new DSProxyCache();
 

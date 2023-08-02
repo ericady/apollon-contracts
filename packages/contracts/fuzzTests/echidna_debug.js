@@ -48,30 +48,16 @@ contract('Echidna debugger', async accounts => {
     console.log(trove1);
     const trove2 = await echidnaTester.echidnaProxies(1);
 
-    const icr1_before = await troveManager.getCurrentICR(
-      trove1,
-      '1000000000000000000'
-    );
-    const icr2_before = await troveManager.getCurrentICR(
-      trove2,
-      '1000000000000000000'
-    );
+    const icr1_before = await troveManager.getCurrentICR(trove1, '1000000000000000000');
+    const icr2_before = await troveManager.getCurrentICR(trove2, '1000000000000000000');
     console.log('Trove 1', icr1_before, icr1_before.toString());
     console.log('Trove 2', icr2_before, icr2_before.toString());
 
     await echidnaTester.openTroveExt('0', '0', '30540440604590048251848424');
     await echidnaTester.openTroveExt('1', '0', '0');
-    await echidnaTester.setPriceExt(
-      '78051143795343077331468494330613608802436946862454908477491916'
-    );
-    const icr1_after = await troveManager.getCurrentICR(
-      trove1,
-      '1000000000000000000'
-    );
-    const icr2_after = await troveManager.getCurrentICR(
-      trove2,
-      '1000000000000000000'
-    );
+    await echidnaTester.setPriceExt('78051143795343077331468494330613608802436946862454908477491916');
+    const icr1_after = await troveManager.getCurrentICR(trove1, '1000000000000000000');
+    const icr2_after = await troveManager.getCurrentICR(trove2, '1000000000000000000');
     console.log('Trove 1', icr1_after, icr1_after.toString());
     console.log('Trove 2', icr2_after, icr2_after.toString());
 
@@ -88,11 +74,7 @@ contract('Echidna debugger', async accounts => {
   });
 
   it.only('LUSD balance', async () => {
-    await echidnaTester.openTroveExt(
-      '0',
-      '0',
-      '4210965169908805439447313562489173090'
-    );
+    await echidnaTester.openTroveExt('0', '0', '4210965169908805439447313562489173090');
 
     const totalSupply = await lusdToken.totalSupply();
     const gasPoolBalance = await lusdToken.balanceOf(GAS_POOL_ADDRESS);

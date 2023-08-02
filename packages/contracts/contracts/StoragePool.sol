@@ -68,22 +68,13 @@ contract StoragePool is LiquityBase, Ownable, CheckContract, IStoragePool {
 
   // --- Getters for public variables. Required by IPool interface ---
 
-  function getValue(
-    address _tokenAddress,
-    bool _isColl,
-    PoolType _poolType
-  ) external view override returns (uint) {
+  function getValue(address _tokenAddress, bool _isColl, PoolType _poolType) external view override returns (uint) {
     return poolEntries[_tokenAddress][_isColl].poolTypes[_poolType];
   }
 
   // --- Pool functionality ---
 
-  function addValue(
-    address _tokenAddress,
-    bool _isColl,
-    PoolType _poolType,
-    uint _amount
-  ) external override {
+  function addValue(address _tokenAddress, bool _isColl, PoolType _poolType, uint _amount) external override {
     _requireCallerIsBOorTroveMorSP();
 
     PoolEntry storage entry = poolEntries[_tokenAddress][_isColl];
@@ -96,32 +87,17 @@ contract StoragePool is LiquityBase, Ownable, CheckContract, IStoragePool {
     }
 
     entry.poolTypes[_poolType] = entry.poolTypes[_poolType].add(_amount);
-    emit PoolValueUpdated(
-      _tokenAddress,
-      _isColl,
-      _poolType,
-      entry.poolTypes[_poolType]
-    );
+    emit PoolValueUpdated(_tokenAddress, _isColl, _poolType, entry.poolTypes[_poolType]);
   }
 
-  function subtractValue(
-    address _tokenAddress,
-    bool _isColl,
-    PoolType _poolType,
-    uint _amount
-  ) external override {
+  function subtractValue(address _tokenAddress, bool _isColl, PoolType _poolType, uint _amount) external override {
     _requireCallerIsBOorTroveMorSP();
 
     PoolEntry storage entry = poolEntries[_tokenAddress][_isColl];
     require(entry.exists, 'StoragePool: PoolEntry does not exist');
 
     entry.poolTypes[_poolType] = entry.poolTypes[_poolType].sub(_amount);
-    emit PoolValueUpdated(
-      _tokenAddress,
-      _isColl,
-      _poolType,
-      entry.poolTypes[_poolType]
-    );
+    emit PoolValueUpdated(_tokenAddress, _isColl, _poolType, entry.poolTypes[_poolType]);
   }
 
   function transferBetweenTypes(
@@ -137,60 +113,33 @@ contract StoragePool is LiquityBase, Ownable, CheckContract, IStoragePool {
     PoolEntry storage entry = poolEntries[_tokenAddress][_isCool];
 
     entry.poolTypes[_fromType] = entry.poolTypes[_fromType].sub(_amount);
-    emit PoolValueUpdated(
-      _tokenAddress,
-      _isCool,
-      _fromType,
-      entry.poolTypes[_fromType]
-    );
+    emit PoolValueUpdated(_tokenAddress, _isCool, _fromType, entry.poolTypes[_fromType]);
 
     entry.poolTypes[_toType] = entry.poolTypes[_toType].add(_amount);
-    emit PoolValueUpdated(
-      _tokenAddress,
-      _isCool,
-      _toType,
-      entry.poolTypes[_toType]
-    );
+    emit PoolValueUpdated(_tokenAddress, _isCool, _toType, entry.poolTypes[_toType]);
   }
 
-  function getEntireSystemColl(
-    PriceCache memory _priceCache
-  ) external override returns (uint entireSystemColl) {
+  function getEntireSystemColl(PriceCache memory _priceCache) external override returns (uint entireSystemColl) {
     IPriceFeed priceFeedCached = priceFeed;
     for (uint i = 0; i < collTokenAddresses.length; i++) {
       uint price = priceFeedCached.getPrice(_priceCache, collTokenAddresses[i]);
-      entireSystemColl.add(
-        poolEntries[collTokenAddresses[i]][true].totalAmount.mul(price)
-      ); // todo should surplus or gas be excluded?
+      entireSystemColl.add(poolEntries[collTokenAddresses[i]][true].totalAmount.mul(price)); // todo should surplus or gas be excluded?
     }
     return entireSystemColl;
   }
 
-  function getEntireSystemDebt(
-    PriceCache memory _priceCache
-  ) external override returns (uint entireSystemDebt) {
+  function getEntireSystemDebt(PriceCache memory _priceCache) external override returns (uint entireSystemDebt) {
     IPriceFeed priceFeedCached = priceFeed;
     for (uint i = 0; i < debtTokenAddresses.length; i++) {
       uint price = priceFeedCached.getPrice(_priceCache, debtTokenAddresses[i]);
-      entireSystemDebt.add(
-        poolEntries[debtTokenAddresses[i]][false].totalAmount.mul(price)
-      ); // todo should surplus or gas be excluded?
+      entireSystemDebt.add(poolEntries[debtTokenAddresses[i]][false].totalAmount.mul(price)); // todo should surplus or gas be excluded?
     }
     return entireSystemDebt;
   }
 
   function checkRecoveryMode(
     PriceCache memory _priceCache
-  )
-    external
-    override
-    returns (
-      bool isInRecoveryMode,
-      uint TCR,
-      uint entireSystemColl,
-      uint entireSystemDebt
-    )
-  {
+  ) external override returns (bool isInRecoveryMode, uint TCR, uint entireSystemColl, uint entireSystemDebt) {
     entireSystemColl = this.getEntireSystemColl(_priceCache);
     entireSystemDebt = this.getEntireSystemDebt(_priceCache);
     TCR = LiquityMath._computeCR(entireSystemColl, entireSystemDebt);

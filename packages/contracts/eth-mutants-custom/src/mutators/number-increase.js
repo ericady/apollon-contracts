@@ -14,15 +14,11 @@ NumberIncreaseMutator.prototype.getMutations = function (file, source, visit) {
       }
 
       if (node.number === '1e18') {
-        mutations.push(
-          new Mutation(file, node.range[0], node.range[1] + 1, '1e19')
-        );
+        mutations.push(new Mutation(file, node.range[0], node.range[1] + 1, '1e19'));
       } else {
         let num = parseInt(node.number);
         num = isNaN(num) ? '1' : (num + 1).toString();
-        mutations.push(
-          new Mutation(file, node.range[0], node.range[1] + 1, num)
-        );
+        mutations.push(new Mutation(file, node.range[0], node.range[1] + 1, num));
       }
     },
   });

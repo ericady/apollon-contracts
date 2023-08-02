@@ -71,44 +71,22 @@ contract EchidnaProxy {
     address _lowerHint,
     uint _maxFee
   ) external payable {
-    borrowerOperations.openTrove{ value: _ETH }(
-      _maxFee,
-      _LUSDAmount,
-      _upperHint,
-      _lowerHint
-    );
+    borrowerOperations.openTrove{ value: _ETH }(_maxFee, _LUSDAmount, _upperHint, _lowerHint);
   }
 
-  function addCollPrx(
-    uint _ETH,
-    address _upperHint,
-    address _lowerHint
-  ) external payable {
+  function addCollPrx(uint _ETH, address _upperHint, address _lowerHint) external payable {
     borrowerOperations.addColl{ value: _ETH }(_upperHint, _lowerHint);
   }
 
-  function withdrawCollPrx(
-    uint _amount,
-    address _upperHint,
-    address _lowerHint
-  ) external {
+  function withdrawCollPrx(uint _amount, address _upperHint, address _lowerHint) external {
     borrowerOperations.withdrawColl(_amount, _upperHint, _lowerHint);
   }
 
-  function withdrawLUSDPrx(
-    uint _amount,
-    address _upperHint,
-    address _lowerHint,
-    uint _maxFee
-  ) external {
+  function withdrawLUSDPrx(uint _amount, address _upperHint, address _lowerHint, uint _maxFee) external {
     borrowerOperations.withdrawLUSD(_maxFee, _amount, _upperHint, _lowerHint);
   }
 
-  function repayLUSDPrx(
-    uint _amount,
-    address _upperHint,
-    address _lowerHint
-  ) external {
+  function repayLUSDPrx(uint _amount, address _upperHint, address _lowerHint) external {
     borrowerOperations.repayLUSD(_amount, _upperHint, _lowerHint);
   }
 
@@ -146,10 +124,7 @@ contract EchidnaProxy {
 
   // LUSD Token
 
-  function transferPrx(
-    address recipient,
-    uint256 amount
-  ) external returns (bool) {
+  function transferPrx(address recipient, uint256 amount) external returns (bool) {
     return lusdToken.transfer(recipient, amount);
   }
 
@@ -157,25 +132,15 @@ contract EchidnaProxy {
     return lusdToken.approve(spender, amount);
   }
 
-  function transferFromPrx(
-    address sender,
-    address recipient,
-    uint256 amount
-  ) external returns (bool) {
+  function transferFromPrx(address sender, address recipient, uint256 amount) external returns (bool) {
     return lusdToken.transferFrom(sender, recipient, amount);
   }
 
-  function increaseAllowancePrx(
-    address spender,
-    uint256 addedValue
-  ) external returns (bool) {
+  function increaseAllowancePrx(address spender, uint256 addedValue) external returns (bool) {
     return lusdToken.increaseAllowance(spender, addedValue);
   }
 
-  function decreaseAllowancePrx(
-    address spender,
-    uint256 subtractedValue
-  ) external returns (bool) {
+  function decreaseAllowancePrx(address spender, uint256 subtractedValue) external returns (bool) {
     return lusdToken.decreaseAllowance(spender, subtractedValue);
   }
 }

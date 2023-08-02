@@ -16,16 +16,7 @@ contract BorrowerOperationsTester is BorrowerOperations {
     bool isDebtIncrease,
     uint _price
   ) external pure returns (uint) {
-    return
-      _getNewICRFromTroveChange(
-        _coll,
-        _debt,
-        _collChange,
-        isCollIncrease,
-        _debtChange,
-        isDebtIncrease,
-        _price
-      );
+    return _getNewICRFromTroveChange(_coll, _debt, _collChange, isCollIncrease, _debtChange, isDebtIncrease, _price);
   }
 
   function getNewTCRFromTroveChange(
@@ -35,14 +26,7 @@ contract BorrowerOperationsTester is BorrowerOperations {
     bool isDebtIncrease,
     uint _price
   ) external view returns (uint) {
-    return
-      _getNewTCRFromTroveChange(
-        _collChange,
-        isCollIncrease,
-        _debtChange,
-        isDebtIncrease,
-        _price
-      );
+    return _getNewTCRFromTroveChange(_collChange, isCollIncrease, _debtChange, isDebtIncrease, _price);
   }
 
   function getUSDValue(uint _coll, uint _price) external pure returns (uint) {
@@ -57,15 +41,7 @@ contract BorrowerOperationsTester is BorrowerOperations {
     address _upperHint,
     address _lowerHint
   ) external {
-    _adjustTrove(
-      _borrower,
-      _collWithdrawal,
-      _debtChange,
-      _isDebtIncrease,
-      _upperHint,
-      _lowerHint,
-      0
-    );
+    _adjustTrove(_borrower, _collWithdrawal, _debtChange, _isDebtIncrease, _upperHint, _lowerHint, 0);
   }
 
   // Payable fallback function

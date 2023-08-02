@@ -32,8 +32,7 @@ contract('LQTY Token', async accounts => {
     value: 1,
   };
 
-  const A_PrivateKey =
-    '0xeaa445c85f7b438dEd6e831d06a4eD0CEBDc2f8527f84Fcda6EBB5fCfAd4C0e9';
+  const A_PrivateKey = '0xeaa445c85f7b438dEd6e831d06a4eD0CEBDc2f8527f84Fcda6EBB5fCfAd4C0e9';
 
   let contracts;
   let lqtyTokenTester;
@@ -45,16 +44,11 @@ contract('LQTY Token', async accounts => {
   let chainId;
 
   const sign = (digest, privateKey) => {
-    return ecsign(
-      Buffer.from(digest.slice(2), 'hex'),
-      Buffer.from(privateKey.slice(2), 'hex')
-    );
+    return ecsign(Buffer.from(digest.slice(2), 'hex'), Buffer.from(privateKey.slice(2), 'hex'));
   };
 
   const PERMIT_TYPEHASH = keccak256(
-    toUtf8Bytes(
-      'Permit(address owner,address spender,uint256 value,uint256 nonce,uint256 deadline)'
-    )
+    toUtf8Bytes('Permit(address owner,address spender,uint256 value,uint256 nonce,uint256 deadline)')
   );
 
   // Gets the EIP712 domain separator
@@ -63,11 +57,7 @@ contract('LQTY Token', async accounts => {
       defaultAbiCoder.encode(
         ['bytes32', 'bytes32', 'bytes32', 'uint256', 'address'],
         [
-          keccak256(
-            toUtf8Bytes(
-              'EIP712Domain(string name,string version,uint256 chainId,address verifyingContract)'
-            )
-          ),
+          keccak256(toUtf8Bytes('EIP712Domain(string name,string version,uint256 chainId,address verifyingContract)')),
           keccak256(toUtf8Bytes(name)),
           keccak256(toUtf8Bytes(version)),
           parseInt(chainId),
@@ -79,23 +69,8 @@ contract('LQTY Token', async accounts => {
 
   // Returns the EIP712 hash which should be signed by the user
   // in order to make a call to `permit`
-  const getPermitDigest = (
-    name,
-    address,
-    chainId,
-    version,
-    owner,
-    spender,
-    value,
-    nonce,
-    deadline
-  ) => {
-    const DOMAIN_SEPARATOR = getDomainSeparator(
-      name,
-      address,
-      chainId,
-      version
-    );
+  const getPermitDigest = (name, address, chainId, version, owner, spender, value, nonce, deadline) => {
+    const DOMAIN_SEPARATOR = getDomainSeparator(name, address, chainId, version);
     return keccak256(
       pack(
         ['bytes1', 'bytes1', 'bytes32', 'bytes32'],
@@ -105,14 +80,7 @@ contract('LQTY Token', async accounts => {
           DOMAIN_SEPARATOR,
           keccak256(
             defaultAbiCoder.encode(
-              [
-                'bytes32',
-                'address',
-                'address',
-                'uint256',
-                'uint256',
-                'uint256',
-              ],
+              ['bytes32', 'address', 'address', 'uint256', 'uint256', 'uint256'],
               [PERMIT_TYPEHASH, owner, spender, value, nonce, deadline]
             )
           ),
@@ -161,12 +129,11 @@ contract('LQTY Token', async accounts => {
 
   beforeEach(async () => {
     contracts = await deploymentHelper.deployLiquityCore();
-    const LQTYContracts =
-      await deploymentHelper.deployLQTYTesterContractsHardhat(
-        bountyAddress,
-        lpRewardsAddress,
-        multisig
-      );
+    const LQTYContracts = await deploymentHelper.deployLQTYTesterContractsHardhat(
+      bountyAddress,
+      lpRewardsAddress,
+      multisig
+    );
 
     lqtyStaking = LQTYContracts.lqtyStaking;
     lqtyTokenTester = LQTYContracts.lqtyToken;
@@ -255,14 +222,9 @@ contract('LQTY Token', async accounts => {
   it('approve(): reverts when owner param is address(0)', async () => {
     await mintToABC();
 
-    const txPromise = lqtyTokenTester.callInternalApprove(
-      ZERO_ADDRESS,
-      A,
-      dec(100, 18),
-      {
-        from: B,
-      }
-    );
+    const txPromise = lqtyTokenTester.callInternalApprove(ZERO_ADDRESS, A, dec(100, 18), {
+      from: B,
+    });
     await assertRevert(txPromise);
   });
 
@@ -320,37 +282,21 @@ contract('LQTY Token', async accounts => {
   it('transfer(): transfer to a blacklisted address reverts', async () => {
     await mintToABC();
 
-    await assertRevert(
-      lqtyTokenTester.transfer(lqtyTokenTester.address, 1, { from: A })
-    );
+    await assertRevert(lqtyTokenTester.transfer(lqtyTokenTester.address, 1, { from: A }));
     await assertRevert(lqtyTokenTester.transfer(ZERO_ADDRESS, 1, { from: A }));
-    await assertRevert(
-      lqtyTokenTester.transfer(communityIssuance.address, 1, { from: A })
-    );
-    await assertRevert(
-      lqtyTokenTester.transfer(lqtyStaking.address, 1, { from: A })
-    );
+    await assertRevert(lqtyTokenTester.transfer(communityIssuance.address, 1, { from: A }));
+    await assertRevert(lqtyTokenTester.transfer(lqtyStaking.address, 1, { from: A }));
   });
 
   it('transfer(): transfer to or from the zero-address reverts', async () => {
     await mintToABC();
 
-    const txPromiseFromZero = lqtyTokenTester.callInternalTransfer(
-      ZERO_ADDRESS,
-      A,
-      dec(100, 18),
-      {
-        from: B,
-      }
-    );
-    const txPromiseToZero = lqtyTokenTester.callInternalTransfer(
-      A,
-      ZERO_ADDRESS,
-      dec(100, 18),
-      {
-        from: B,
-      }
-    );
+    const txPromiseFromZero = lqtyTokenTester.callInternalTransfer(ZERO_ADDRESS, A, dec(100, 18), {
+      from: B,
+    });
+    const txPromiseToZero = lqtyTokenTester.callInternalTransfer(A, ZERO_ADDRESS, dec(100, 18), {
+      from: B,
+    });
     await assertRevert(txPromiseFromZero);
     await assertRevert(txPromiseToZero);
   });
@@ -399,9 +345,7 @@ contract('LQTY Token', async accounts => {
     // Check caller and LQTYStaking balance before
     const A_BalanceBefore = await lqtyTokenTester.balanceOf(A);
     assert.equal(A_BalanceBefore, dec(150, 18));
-    const lqtyStakingBalanceBefore = await lqtyTokenTester.balanceOf(
-      lqtyStaking.address
-    );
+    const lqtyStakingBalanceBefore = await lqtyTokenTester.balanceOf(lqtyStaking.address);
     assert.equal(lqtyStakingBalanceBefore, '0');
 
     await lqtyTokenTester.unprotectedSendToLQTYStaking(A, dec(37, 18));
@@ -409,9 +353,7 @@ contract('LQTY Token', async accounts => {
     // Check caller and LQTYStaking balance before
     const A_BalanceAfter = await lqtyTokenTester.balanceOf(A);
     assert.equal(A_BalanceAfter, dec(113, 18));
-    const lqtyStakingBalanceAfter = await lqtyTokenTester.balanceOf(
-      lqtyStaking.address
-    );
+    const lqtyStakingBalanceAfter = await lqtyTokenTester.balanceOf(lqtyStaking.address);
     assert.equal(lqtyStakingBalanceAfter, dec(37, 18));
   });
 
@@ -424,12 +366,7 @@ contract('LQTY Token', async accounts => {
   it('Initializes DOMAIN_SEPARATOR correctly', async () => {
     assert.equal(
       await lqtyTokenTester.domainSeparator(),
-      getDomainSeparator(
-        tokenName,
-        lqtyTokenTester.address,
-        chainId,
-        tokenVersion
-      )
+      getDomainSeparator(tokenName, lqtyTokenTester.address, chainId, tokenVersion)
     );
   });
 
@@ -448,22 +385,11 @@ contract('LQTY Token', async accounts => {
     // Check that approval was successful
     assert.equal(event.event, 'Approval');
     assert.equal(await lqtyTokenTester.nonces(approve.owner), 1);
-    assert.equal(
-      await lqtyTokenTester.allowance(approve.owner, approve.spender),
-      approve.value
-    );
+    assert.equal(await lqtyTokenTester.allowance(approve.owner, approve.spender), approve.value);
 
     // Check that we can not use re-use the same signature, since the user's nonce has been incremented (replay protection)
     await assertRevert(
-      lqtyTokenTester.permit(
-        approve.owner,
-        approve.spender,
-        approve.value,
-        deadline,
-        v,
-        r,
-        s
-      ),
+      lqtyTokenTester.permit(approve.owner, approve.spender, approve.value, deadline, v, r, s),
       'LQTY: invalid signature'
     );
 
