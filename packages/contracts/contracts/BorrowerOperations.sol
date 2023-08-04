@@ -466,7 +466,8 @@ contract BorrowerOperations is LiquityBase, Ownable, CheckContract, IBorrowerOpe
       PriceCache memory priceCache
     ) = _prepareTroveAdjustment(msg.sender);
 
-    DebtTokenAmount memory remainingStableCoinDebt = vars.debts[0];
+    // todo this does not work, pending rewards gets applied, for there can be more debts then only the gas compensation, even if all postions are closed
+    DebtTokenAmount memory remainingStableCoinDebt = vars.debts[0]; // works because we check in the following line if only stable coin debt is left...
     require(
       vars.debts.length == 1 &&
         remainingStableCoinDebt.debtToken.isStableCoin() &&

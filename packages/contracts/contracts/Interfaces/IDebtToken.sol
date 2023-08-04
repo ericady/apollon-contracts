@@ -18,7 +18,7 @@ interface IDebtToken is IERC20, IERC2612, IBase {
 
   function isStableCoin() external view returns (bool);
 
-  function getPrice(PriceCache memory _priceCache) external returns (uint);
+  function getPrice(PriceCache memory _priceCache) external view returns (uint);
 
   function mint(address _account, uint256 _amount) external;
 

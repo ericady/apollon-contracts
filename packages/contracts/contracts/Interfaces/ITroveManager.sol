@@ -5,6 +5,7 @@ pragma solidity ^0.8.9;
 import './IStabilityPool.sol';
 import './IDebtToken.sol';
 import './IBBase.sol';
+import './IPriceFeed.sol';
 
 // Common interface for the Trove Manager.
 interface ITroveManager is IBBase {
@@ -73,7 +74,11 @@ interface ITroveManager is IBBase {
 
   function hasPendingRewards(address _borrower) external view returns (bool);
 
-  function getEntireDebtAndColl(address _borrower) external view returns (RAmount[] memory amounts);
+  function getEntireDebtAndColl(
+    IPriceFeed _priceFeed,
+    PriceCache memory _priceCache,
+    address _borrower
+  ) external view returns (RAmount[] memory amounts, uint troveCollInStable, uint troveDebtInStable);
 
   function closeTrove(address _borrower) external;
 

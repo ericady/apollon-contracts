@@ -110,7 +110,7 @@ contract DebtToken is CheckContract, IDebtToken {
     return _IS_STABLE_COIN;
   }
 
-  function getPrice(PriceCache memory _priceCache) external override returns (uint) {
+  function getPrice(PriceCache memory _priceCache) external view override returns (uint) {
     return priceFeed.getPrice(_priceCache, address(this));
   }
 
