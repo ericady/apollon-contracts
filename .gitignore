@@ -27,6 +27,7 @@ cache
 ngrok.config.yml
 
 # Yarn
+yarn-error.log
 .pnp.*
 /.yarn/*
 !/.yarn/patches
