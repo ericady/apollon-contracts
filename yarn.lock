@@ -3862,7 +3862,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@playwright/test@npm:1.36.2":
+"@playwright/test@npm:1.36.2, @playwright/test@npm:^1.36.2":
   version: 1.36.2
   resolution: "@playwright/test@npm:1.36.2"
   dependencies:
@@ -9802,6 +9802,7 @@ __metadata:
   resolution: "client@workspace:packages/client"
   dependencies:
     "@playwright/experimental-ct-react": ^1.36.2
+    "@playwright/test": ^1.36.2
     "@testing-library/jest-dom": ^5.17.0
     "@testing-library/react": ^14.0.0
     "@types/node": 20.4.8

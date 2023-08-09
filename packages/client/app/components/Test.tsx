@@ -1,9 +1,5 @@
-import React from 'react'
-
 function Test() {
-  return (
-    <div>Learn React</div>
-  )
+  return <div data-test-id="test">Learn React</div>;
 }
 
-export default Test
+export default Test;
