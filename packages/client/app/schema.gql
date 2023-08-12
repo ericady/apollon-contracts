@@ -1,0 +1,263 @@
+# TRADING PAIRS
+
+type TradingPair {
+  _id: ID!
+  symbol: String!
+  currentPriceFiat: Float!
+  currentPriceJUSD: Float!
+  priceFiat24hAgo: Float!
+  last24hFiatTradingVolume: Float!
+  isFavorite: Boolean!
+}
+
+type TradingPairPage {
+  edges: [TradingPairEdge!]!
+  pageInfo: PageInfo!
+}
+
+type TradingPairEdge {
+  cursor: String!
+  node: TradingPair!
+}
+
+# General meta info for pagination
+type PageInfo {
+  hasNextPage: Boolean!
+  endCursor: String!
+}
+
+type Query {
+  # Any kind of FILTER or SORTING are not reflected in the API yet but can easily be added
+  getTradingPairs(limit: Int = 10, cursor: String): TradingPairPage!
+}
+
+
+type Mutation {
+  toggleFavorite(tradingPairId: ID!): TradingPair!
+}
+
+
+# SWAP
+
+type SwapEstimate {
+  perUnitPriceJUSD: Float!
+  protocolSwapFee: Float!
+  resultingPoolSlippage: Float!
+}
+
+enum SwapDirection {
+  TRADINGPAIR_TO_JUSD
+  JUSD_TO_TRADINGPAIR
+}
+
+type Query {
+  getSwapEstimate(
+    tradingPairId: ID!
+    # Can either specify Fiat or dToken amount depending on the trading direction
+    amount: Float!
+    direction: SwapDirection!
+    slippagePercent: Float = 0.01
+  ): SwapEstimate!
+}
+
+
+type Mutation {
+  swapTokens(
+    tradingPairId: ID!
+    amount: Float!
+    direction: SwapDirection!
+    slippagePercent: Float = 0.01
+    # We have not modeled the users wallet. So a simple Boolean is all we can return.
+    # TODO: If the swaps are persisted maybe return the Transaction then instead.
+  ): Boolean!
+}
+
+# LONG/SHORT
+
+type LongShortEstimate {
+  # Can either specify Fiat or dToken amount depending on the trading direction
+  amount: Float!
+  direction: LongShortDirection!
+  protocolFeeJUSD: Float!
+  resultingSlippagePercent: Float!
+  newVaultRatioPercent: Float!
+}
+
+enum LongShortDirection {
+  LONG
+  SHORT
+}
+
+type Query {
+  getLongShortEstimate(
+    tradingPairId: ID!
+    amount: Float!
+    direction: LongShortDirection!
+    slippagePercent: Float = 0.01
+  ): LongShortEstimate!
+}
+
+type Mutation {
+  openLongShortPosition(
+    tradingPairId: ID!
+    amount: Float!
+    direction: LongShortDirection!
+    slippagePercent: Float = 0.01
+  ): Position!
+  closeLongShortPosition(openPositionId: ID!): Position!
+}
+
+# VAULT
+
+type TokenCollateral {
+  _id: ID!
+  amount: Float!
+  totalValueFiat: Float!
+}
+
+type VaultOverview {
+  collateral: [TokenCollateral!]!
+  totalValueFiat: Float!
+  totalDebtFiat: Float!
+  collateralRatioPercent: Float!
+}
+
+type Query {
+  getVaultOverview: VaultOverview!
+}
+
+type Mutation {
+  depositCollateral(
+    tradingPairId: ID!
+    amount: Float!
+  ): VaultOverview!
+  withdrawCollateral(
+    tokenCollateralId: ID!
+    amount: Float!
+  ): VaultOverview!
+}
+
+# POSITIONS
+
+type Position {
+  _id: ID!
+  tradingPair: TradingPair!
+  direction: LongShortDirection!
+  amount: Float!
+  totalPaidJUSD: Float!
+  priceDifferenceJUSD: Float!
+  priceDifferencePercent: Float!
+  profitOrLossJUSD: Float!
+  openedAt: String!
+  closedAt: String
+}
+
+type PositionEdge {
+  cursor: String!
+  node: Position!
+}
+
+type PositionPage {
+  edges: [PositionEdge!]!
+  pageInfo: PageInfo!
+}
+
+type Query {
+  getOpenPositions(cursor: String, limit: Int = 10): PositionPage!
+  getClosedPositions(cursor: String, limit: Int = 10): PositionPage!
+}
+
+# Stability Pool
+
+type TradingPairDeposit {
+  _id: ID!
+  tradingPair: TradingPair!
+  amount: Float!
+  totalValueFiat: Float!
+  # All timestamps and dates are in ISO 8601 format
+  timestamp: String!
+}
+
+type TradingPairExchange {
+  _id: ID!
+  tradingPair: TradingPair!
+  amount: Float!
+  totalValueJUSD: Float!
+  timestamp: String!
+}
+
+type StabilityRewardWithdrawal {
+  _id: ID!
+  amount: Float!
+  timestamp: String!
+}
+
+union StabilityEvent = TradingPairDeposit | TradingPairExchange | StabilityRewardWithdrawal
+
+type TradingPairDepositPage {
+  edges: [TradingPairDepositEdge!]!
+  pageInfo: PageInfo!
+}
+
+type TradingPairDepositEdge {
+  cursor: String!
+  node: TradingPairDeposit!
+}
+
+# For the simple global charts. We just need a simple timeseries.
+type PoolDataPoint {
+  value: Float!
+  timestamp: String!
+}
+
+# both global and user deposits must be retrieved together because they should be sorted by the users deposit and should be updated together
+type StabilityPool {
+  # We need pagination here because the list is potentially very long
+  globalPoolDeposits(limit: Int = 10, cursor: String): [TradingPairDepositPage!]!
+  # no pagination required here
+  userPoolDeposits: [TradingPairDeposit!]!
+  # simple global chart
+  chartData: [PoolDataPoint!]!
+}
+
+type Query {
+  getStabilityPool(limit: Int = 10, cursor: String): StabilityPool
+  getUserStabilityReward: Float!
+  # TODO: Potentially very long. Pagination might be required even when user based.
+  getUserStabilityEvents: [StabilityEvent!]!
+}
+
+type Mutation {
+  withdrawStabilityReward(amount: Float!): Float!
+  depositStability(
+    tradingPairId: ID!
+    amount: Float!
+  ): StabilityPool!
+}
+
+# RESERVE POOL
+
+type Query {
+  # simple global chart
+  getReservePoolChartData: [PoolDataPoint!]!
+  getReserveDeposits(limit: Int = 10, cursor: String): [TradingPairDepositPage!]!
+}
+
+# LIQUIDITY POOL
+
+type LiquidityPoolPosition {
+  _id: ID!
+  tradingPair: TradingPair!
+  amount: Float!
+  totalValueJUSD: Float!
+  # TODO: What exactly is meant here? 24h of the token, of the token in the pool or of the token from the user specifically? 
+  last24hTradingVolumeFiat: Float!
+  timestamp: String!
+}
+
+type Query {
+  getUserLiquidityPoolPositions: [LiquidityPoolPosition!]!
+  # simple global chart
+  getLiquidityPoolChartData: [PoolDataPoint!]!
+}
+
