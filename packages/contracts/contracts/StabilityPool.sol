@@ -294,7 +294,11 @@ contract StabilityPool is LiquityBase, Ownable, CheckContract, IStabilityPool {
    * - If _amount > userDeposit, the user withdraws all of their compounded deposit.
    */
   function withdrawFromSP(uint debtToWithdrawal) external override {
-    if (debtToWithdrawal != 0) _requireNoUnderCollateralizedTroves();
+    // todo removed this check, because we do not know about potential under collateralized loans
+    // (sorted troves is not anymore sorted by runtime cr, its the cr on creation time)
+    // this check is not required for any security reasons
+    // but it prevented users from withdrawing their deposit out of the stability pool in case of an <100% CR trove (to avoid the loss)
+    //    if (debtToWithdrawal != 0) _requireNoUnderCollateralizedTroves();
 
     uint initialDeposit = deposits[msg.sender];
     _requireUserHasDeposit(initialDeposit);
@@ -746,14 +750,6 @@ contract StabilityPool is LiquityBase, Ownable, CheckContract, IStabilityPool {
 
   function _requireCallerIsTroveManager() internal view {
     require(msg.sender == address(troveManager), 'StabilityPool: Caller is not TroveManager');
-  }
-
-  function _requireNoUnderCollateralizedTroves() internal {
-    // todo das ist ein Problem, weil wir nicht einfach den ersten trove nehmen, können. durch die Preise spielt die Reihenfolge hier keine rolle...
-    //        uint price = priceFeed.fetchPrice();
-    //        address lowestTrove = sortedTroves.getLast();
-    //        uint ICR = troveManager.getCurrentICR(lowestTrove, price);
-    //        require(ICR >= MCR, "StabilityPool: Cannot withdraw while there are troves with ICR < MCR");
   }
 
   function _requireUserHasDeposit(uint _initialDeposit) internal pure {
