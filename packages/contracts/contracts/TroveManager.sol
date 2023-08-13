@@ -79,7 +79,8 @@ contract TroveManager is LiquityBase, Ownable, CheckContract, ITroveManager {
   }
   mapping(address => Trove) public Troves;
 
-  address[] public collTokenAddresses; // todo need to be manged
+  // todo need to be manged
+  address[] public collTokenAddresses;
   address[] public tokenAddresses; // for tracking used tokens in the maps (coll and debts) // todo need to be manged
 
   // stakes gets stored relative to the coll token, total stake needs to be calculated on runtime using token prices
@@ -843,8 +844,7 @@ contract TroveManager is LiquityBase, Ownable, CheckContract, ITroveManager {
     _requireAmountGreaterThanZero(vars.remainingStableToRedeem);
     _requireValidMaxFeePercentage(_maxFeePercentage);
     _requireDebtTokenBalanceCoversRedemption(vars.stableCoinCached, msg.sender, vars.remainingStableToRedeem);
-
-    // todo check system TCR _requireTCRoverMCR(vars.price);
+    _requireTCRoverMCR(vars.storagePoolCached, vars.priceCache);
 
     vars.totalStableSupplyAtStart = vars
       .storagePoolCached
@@ -1050,7 +1050,7 @@ contract TroveManager is LiquityBase, Ownable, CheckContract, ITroveManager {
 
   // Return the nominal collateral ratio (ICR) of a given Trove, without the price. Takes a trove's pending coll and debt rewards from redistributions into account.
   function getNominalICR(address _borrower, PriceCache memory _priceCache) public override returns (uint) {
-    (uint currentCollInStable, uint currentDebtInStable) = _getCurrentTroveAmounts(_borrower, _priceCache);
+    (uint currentCollInStable, uint currentDebtInStable) = _getCurrentTrovesFaceValues(_borrower, _priceCache);
     uint NICR = LiquityMath._computeNominalCR(currentCollInStable, currentDebtInStable);
     return NICR;
   }
@@ -1061,34 +1061,31 @@ contract TroveManager is LiquityBase, Ownable, CheckContract, ITroveManager {
     PriceCache memory _priceCache
   ) external view override returns (uint ICR, uint currentDebtInStable) {
     uint currentCollInStable;
-    (currentCollInStable, currentDebtInStable) = _getCurrentTroveAmounts(_borrower, _priceCache);
+    (currentCollInStable, currentDebtInStable) = _getCurrentTrovesFaceValues(_borrower, _priceCache);
     ICR = LiquityMath._computeCR(currentCollInStable, currentDebtInStable);
     return (ICR, currentDebtInStable);
   }
 
-  // todo try to remove this function
-  function _getCurrentTroveAmounts(
+  function _getCurrentTrovesFaceValues(
     address _borrower,
     PriceCache memory _priceCache
   ) internal view returns (uint currentCollInStable, uint currentDebtInStable) {
     Trove storage _trove = Troves[_borrower];
 
     for (uint i = 0; i < _trove.collTokens.length; i++) {
-      uint tokenPrice = priceFeed.getPrice(_priceCache, _trove.collTokens[i]);
-      //            currentCollInStable = currentCollInStable.add(
-      //                _trove.colls[_trove.collTokens[i]].add(
-      //            uint pendingETHReward = getPendingETHReward(_borrower); // todo...
-      //                ).mul(tokenPrice)
-      //            );
+      address token = _trove.collTokens[i];
+
+      uint tokenPrice = priceFeed.getPrice(_priceCache, token);
+      uint pendingRewards = getPendingReward(_borrower, token);
+      currentCollInStable = currentCollInStable.add(_trove.colls[token].add(pendingRewards).mul(tokenPrice));
     }
 
     for (uint i = 0; i < _trove.debtTokens.length; i++) {
-      uint tokenPrice = _trove.debtTokens[i].getPrice(_priceCache);
-      //            currentDebtInStable = currentDebtInStable.add(
-      //                _trove.debts[_trove.debtTokens[i]].add(
-      //            uint pendingLUSDDebtReward = getPendingLUSDDebtReward(_borrower); // todo...
-      //                ).mul(tokenPrice)
-      //            );
+      IDebtToken token = _trove.debtTokens[i];
+
+      uint tokenPrice = token.getPrice(_priceCache);
+      uint pendingRewards = getPendingReward(_borrower, address(token));
+      currentDebtInStable = currentDebtInStable.add(_trove.debts[token].add(pendingRewards).mul(tokenPrice));
     }
 
     return (currentCollInStable, currentDebtInStable);
@@ -1102,29 +1099,37 @@ contract TroveManager is LiquityBase, Ownable, CheckContract, ITroveManager {
   function _applyPendingRewards(IStoragePool storagePoolCached, address _borrower) internal {
     _requireTroveIsActive(_borrower);
 
-    //    // todo...
-    //
-    //    // Compute pending rewards
-    //    uint pendingETHReward = getPendingETHReward(_borrower);
-    //    uint pendingLUSDDebtReward = getPendingLUSDDebtReward(_borrower);
-    //
-    //    // Apply pending rewards to trove's state
-    //    Troves[_borrower].coll = Troves[_borrower].coll.add(pendingETHReward);
-    //    Troves[_borrower].debt = Troves[_borrower].debt.add(pendingLUSDDebtReward);
-    //
-    //    _updateTroveRewardSnapshots(_borrower);
-    //
-    //    // Transfer from DefaultPool to ActivePool
-    //    _movePendingTroveRewardsToActivePool(storagePoolCached, pendingLUSDDebtReward, pendingETHReward);
-    //
-    //    // todo
-    //    //    emit TroveUpdated(
-    //    //      _borrower,
-    //    //      Troves[_borrower].debt,
-    //    //      Troves[_borrower].coll,
-    //    //      Troves[_borrower].stake,
-    //    //      TroveManagerOperation.applyPendingRewards
-    //    //    );
+    Trove storage _trove = Troves[_borrower];
+
+    for (uint i = 0; i < _trove.collTokens.length; i++) {
+      address token = _trove.collTokens[i];
+
+      uint pendingRewards = getPendingReward(_borrower, token);
+      if (pendingRewards == 0) continue;
+
+      _trove.colls[token] = _trove.colls[token].add(pendingRewards);
+      storagePoolCached.transferBetweenTypes(token, true, PoolType.Default, PoolType.Active, pendingRewards);
+    }
+
+    for (uint i = 0; i < _trove.debtTokens.length; i++) {
+      IDebtToken token = _trove.debtTokens[i];
+      address tokenAddress = address(token);
+
+      uint pendingRewards = getPendingReward(_borrower, tokenAddress);
+      if (pendingRewards == 0) continue;
+
+      _trove.debts[token] = _trove.debts[token].add(pendingRewards);
+      storagePoolCached.transferBetweenTypes(tokenAddress, true, PoolType.Default, PoolType.Active, pendingRewards);
+    }
+
+    // todo
+    //    emit TroveUpdated(
+    //      _borrower,
+    //      Troves[_borrower].debt,
+    //      Troves[_borrower].coll,
+    //      Troves[_borrower].stake,
+    //      TroveManagerOperation.applyPendingRewards
+    //    );
   }
 
   // Update borrower's snapshots of L_ETH and L_LUSDDebt to reflect the current values
@@ -1133,13 +1138,18 @@ contract TroveManager is LiquityBase, Ownable, CheckContract, ITroveManager {
     return _updateTroveRewardSnapshots(_borrower);
   }
 
-  // todo...
   function _updateTroveRewardSnapshots(address _borrower) internal {
-    //        for (uint i = 0; i < _TokensArray.length; i++) {
-    //            rewardSnapshots[_borrower][L_TokensArray[i]] = L_Tokens[L_TokensArray[i]];
-    //        }
-    //        emit TroveSnapshotsUpdated(L_ETH, L_LUSDDebt);
+    for (uint i = 0; i < tokenAddresses.length; i++) {
+      address token = tokenAddresses[i];
+      rewardSnapshots[_borrower][token] = liquidatedTokens[token];
+    }
+
+    //todo
+    //   emit TroveSnapshotsUpdated(L_ETH, L_LUSDDebt);
   }
+
+  // todo cant work like that, there are stable coin debt and (!) coll rewards
+  // jUSD (stable coin)  can exists as debt and coll, so the isColl bool need to be included into the rewards
 
   // Get the borrower's pending accumulated rewards, earned by their stake through their redistribution
   function getPendingReward(address _borrower, address _tokenAddress) public view returns (uint pendingReward) {
@@ -1604,14 +1614,10 @@ contract TroveManager is LiquityBase, Ownable, CheckContract, ITroveManager {
     require(_amount > 0, 'TroveManager: Amount must be greater than zero');
   }
 
-  //    function _requireTCRoverMCR(uint _price) internal view {
-  //        require(storagePool.getTCR(_price) >= MCR, "TroveManager: Cannot redeem when TCR < MCR");
-  //    }
-
-  //    function _requireAfterBootstrapPeriod() internal view {
-  //        uint systemDeploymentTime = lqtyToken.getDeploymentStartTime();
-  //        require(block.timestamp >= systemDeploymentTime.add(BOOTSTRAP_PERIOD), "TroveManager: Redemptions are not allowed during bootstrap phase");
-  //    }
+  function _requireTCRoverMCR(IStoragePool _storagePool, PriceCache memory priceCache) internal view {
+    (, uint TCR, , ) = _storagePool.checkRecoveryMode(priceCache);
+    require(TCR >= MCR, 'TroveManager: Cannot redeem when TCR < MCR');
+  }
 
   function _requireValidMaxFeePercentage(uint _maxFeePercentage) internal pure {
     require(

@@ -119,7 +119,7 @@ contract StoragePool is LiquityBase, Ownable, CheckContract, IStoragePool {
     emit PoolValueUpdated(_tokenAddress, _isCool, _toType, entry.poolTypes[_toType]);
   }
 
-  function getEntireSystemColl(PriceCache memory _priceCache) external override returns (uint entireSystemColl) {
+  function getEntireSystemColl(PriceCache memory _priceCache) external view override returns (uint entireSystemColl) {
     IPriceFeed priceFeedCached = priceFeed;
     for (uint i = 0; i < collTokenAddresses.length; i++) {
       uint price = priceFeedCached.getPrice(_priceCache, collTokenAddresses[i]);
@@ -128,7 +128,7 @@ contract StoragePool is LiquityBase, Ownable, CheckContract, IStoragePool {
     return entireSystemColl;
   }
 
-  function getEntireSystemDebt(PriceCache memory _priceCache) external override returns (uint entireSystemDebt) {
+  function getEntireSystemDebt(PriceCache memory _priceCache) external view override returns (uint entireSystemDebt) {
     IPriceFeed priceFeedCached = priceFeed;
     for (uint i = 0; i < debtTokenAddresses.length; i++) {
       uint price = priceFeedCached.getPrice(_priceCache, debtTokenAddresses[i]);
@@ -139,7 +139,7 @@ contract StoragePool is LiquityBase, Ownable, CheckContract, IStoragePool {
 
   function checkRecoveryMode(
     PriceCache memory _priceCache
-  ) external override returns (bool isInRecoveryMode, uint TCR, uint entireSystemColl, uint entireSystemDebt) {
+  ) external view override returns (bool isInRecoveryMode, uint TCR, uint entireSystemColl, uint entireSystemDebt) {
     entireSystemColl = this.getEntireSystemColl(_priceCache);
     entireSystemDebt = this.getEntireSystemDebt(_priceCache);
     TCR = LiquityMath._computeCR(entireSystemColl, entireSystemDebt);

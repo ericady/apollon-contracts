@@ -30,11 +30,11 @@ interface IStoragePool is IBase {
     uint _amount
   ) external;
 
-  function getEntireSystemColl(PriceCache memory _priceCache) external returns (uint entireSystemColl);
+  function getEntireSystemColl(PriceCache memory _priceCache) external view returns (uint entireSystemColl);
 
-  function getEntireSystemDebt(PriceCache memory _priceCache) external returns (uint entireSystemDebt);
+  function getEntireSystemDebt(PriceCache memory _priceCache) external view returns (uint entireSystemDebt);
 
   function checkRecoveryMode(
     PriceCache memory _priceCache
-  ) external returns (bool isInRecoveryMode, uint TCR, uint entireSystemColl, uint entireSystemDebt);
+  ) external view returns (bool isInRecoveryMode, uint TCR, uint entireSystemColl, uint entireSystemDebt);
 }
