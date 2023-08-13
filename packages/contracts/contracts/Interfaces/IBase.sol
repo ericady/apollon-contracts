@@ -11,7 +11,7 @@ interface IBase {
 
   struct RAmount {
     address tokenAddress;
-    uint price; // todo not defined yet
+    uint price;
     bool isColl; // coll or debt token
     uint amount; // initial value in trove
     uint pendingReward; // gained rewards since deposit
@@ -35,7 +35,7 @@ interface IBase {
   struct PriceTokenAmount {
     address tokenAddress;
     uint price;
-    uint coll; // todo rename to amount....
+    uint amount;
   }
 
   struct PriceCache {

@@ -200,7 +200,7 @@ contract BorrowerOperations is LiquityBase, Ownable, CheckContract, IBorrowerOpe
         msg.sender,
         contractsCache.storagePool,
         collTokenAmount.tokenAddress,
-        collTokenAmount.coll,
+        collTokenAmount.amount,
         PoolType.Active
       );
     }
@@ -238,7 +238,7 @@ contract BorrowerOperations is LiquityBase, Ownable, CheckContract, IBorrowerOpe
         borrower,
         contractsCache.storagePool,
         collTokenAmount.tokenAddress,
-        collTokenAmount.coll,
+        collTokenAmount.amount,
         PoolType.Active
       );
     }
@@ -271,13 +271,13 @@ contract BorrowerOperations is LiquityBase, Ownable, CheckContract, IBorrowerOpe
         existingColl = vars.colls[ii];
         break;
       }
-      assert(existingColl.coll >= collTokenAmount.coll);
+      assert(existingColl.amount >= collTokenAmount.amount);
 
       _poolSubtractColl(
         borrower,
         contractsCache.storagePool,
         collTokenAmount.tokenAddress,
-        collTokenAmount.coll,
+        collTokenAmount.amount,
         PoolType.Active
       );
     }
@@ -508,7 +508,7 @@ contract BorrowerOperations is LiquityBase, Ownable, CheckContract, IBorrowerOpe
         msg.sender,
         contractsCache.storagePool,
         collTokenAmount.tokenAddress,
-        collTokenAmount.coll,
+        collTokenAmount.amount,
         PoolType.Active
       );
     }
@@ -669,7 +669,7 @@ contract BorrowerOperations is LiquityBase, Ownable, CheckContract, IBorrowerOpe
     collTokenAmounts = new PriceTokenAmount[](_colls.length);
     for (uint i = 0; i < _colls.length; i++) {
       collTokenAmounts[i].tokenAddress = _colls[i].tokenAddress;
-      collTokenAmounts[i].coll = _colls[i].amount;
+      collTokenAmounts[i].amount = _colls[i].amount;
       collTokenAmounts[i].price = priceFeed.getPrice(_priceCache, _colls[i].tokenAddress);
     }
     return collTokenAmounts;
@@ -785,7 +785,7 @@ contract BorrowerOperations is LiquityBase, Ownable, CheckContract, IBorrowerOpe
 
   function _getCompositeColl(PriceTokenAmount[] memory _colls) internal pure returns (uint collInStable) {
     for (uint i = 0; i < _colls.length; i++) {
-      collInStable.add(_colls[i].coll.mul(_colls[i].price));
+      collInStable.add(_colls[i].amount.mul(_colls[i].price));
     }
     return collInStable;
   }

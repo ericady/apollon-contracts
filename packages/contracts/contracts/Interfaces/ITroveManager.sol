@@ -48,7 +48,7 @@ interface ITroveManager is IBBase {
   function getCurrentICR(
     address _borrower,
     PriceCache memory _priceCache
-  ) external returns (uint ICR, uint currentDebtInStable);
+  ) external view returns (uint ICR, uint currentDebtInStable);
 
   function liquidate(address _borrower) external;
 
@@ -56,15 +56,16 @@ interface ITroveManager is IBBase {
 
   function batchLiquidateTroves(address[] calldata _troveArray) external;
 
-  //    function redeemCollateral(
-  //        uint _LUSDAmount,
-  //        address _firstRedemptionHint,
-  //        address _upperPartialRedemptionHint,
-  //        address _lowerPartialRedemptionHint,
-  //        uint _partialRedemptionHintNICR,
-  //        uint _maxIterations,
-  //        uint _maxFee
-  //    ) external;
+  function redeemCollateral(
+    uint _stableCoinAmount,
+    address _firstRedemptionHint,
+    address _upperPartialRedemptionHint,
+    address _lowerPartialRedemptionHint,
+    uint _partialRedemptionHintNICR,
+    uint _maxIterations,
+    uint _maxFee
+  ) external;
+
   function updateStakeAndTotalStakes(address _borrower) external;
 
   function updateTroveRewardSnapshots(address _borrower) external;
@@ -72,8 +73,6 @@ interface ITroveManager is IBBase {
   function addTroveOwnerToArray(address _borrower) external returns (uint index);
 
   function applyPendingRewards(address _borrower) external;
-
-  function hasPendingRewards(address _borrower) external view returns (bool);
 
   function getEntireDebtAndColl(
     IPriceFeed _priceFeed,

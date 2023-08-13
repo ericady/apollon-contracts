@@ -141,28 +141,39 @@ contract TroveManager is LiquityBase, Ownable, CheckContract, ITroveManager {
     bool backToNormalMode;
   }
 
-  struct ContractsCache {
-    IStoragePool activePool;
-    IDebtTokenManager dTokenManager;
-    ISortedTroves sortedTroves;
-    address gasPoolAddress;
-  }
-
-  struct RedemptionTotals {
-    uint remainingLUSD;
-    uint totalLUSDToRedeem;
+  struct RedemptionVariables {
+    IStoragePool storagePoolCached;
+    ISortedTroves sortedTrovesCached;
+    IDebtToken stableCoinCached;
+    IPriceFeed priceFeedCached;
+    PriceCache priceCache;
+    //
+    uint totalStableSupplyAtStart;
+    uint remainingStableToRedeem;
+    uint totalRedeemedStable;
+    RedemptionCollAmount[] totalCollDrawn;
+    //
     uint totalETHDrawn;
     uint ETHFee;
     uint ETHToSendToRedeemer;
     uint decayedBaseRate;
-    uint price;
-    uint totalLUSDSupplyAtStart;
   }
 
-  struct SingleRedemptionValues {
-    uint LUSDLot;
-    uint ETHLot;
+  struct RedemptionCollAmount {
+    address tokenAddress;
+    uint drawn;
+    uint redemptionFee;
+    uint sendToRedeemer;
+  }
+
+  struct SingleRedemptionVariables {
+    uint stableCoinLot;
+    PriceTokenAmount[] collLots;
     bool cancelledPartial;
+    //
+    PriceTokenAmount stableCoinEntry;
+    uint troveCollInStable;
+    uint troveDebtInStable;
   }
 
   // --- Dependency setter ---
@@ -795,216 +806,245 @@ contract TroveManager is LiquityBase, Ownable, CheckContract, ITroveManager {
 
   // --- Redemption functions ---
 
-  //    // Redeem as much collateral as possible from _borrower's Trove in exchange for LUSD up to _maxLUSDamount
-  //    function _redeemCollateralFromTrove(
-  //        ContractsCache memory _contractsCache,
-  //        address _borrower,
-  //        uint _maxLUSDamount,
-  //        uint _price,
-  //        address _upperPartialRedemptionHint,
-  //        address _lowerPartialRedemptionHint,
-  //        uint _partialRedemptionHintNICR
-  //    )
-  //        internal returns (SingleRedemptionValues memory singleRedemption)
-  //    {
-  //        // Determine the remaining amount (lot) to be redeemed, capped by the entire debt of the Trove minus the liquidation reserve
-  //        singleRedemption.LUSDLot = LiquityMath._min(_maxLUSDamount, Troves[_borrower].debt.sub(STABLE_COIN_GAS_COMPENSATION));
-  //
-  //        // Get the ETHLot of equivalent value in USD
-  //        singleRedemption.ETHLot = singleRedemption.LUSDLot.mul(DECIMAL_PRECISION).div(_price);
-  //
-  //        // Decrease the debt and collateral of the current Trove according to the LUSD lot and corresponding ETH to send
-  //        uint newDebt = (Troves[_borrower].debt).sub(singleRedemption.LUSDLot);
-  //        uint newColl = (Troves[_borrower].coll).sub(singleRedemption.ETHLot);
-  //
-  //        if (newDebt == STABLE_COIN_GAS_COMPENSATION) {
-  //            // No debt left in the Trove (except for the liquidation reserve), therefore the trove gets closed
-  //            _removeStake(_borrower);
-  //            _closeTrove(_borrower, Status.closedByRedemption);
-  //            _redeemCloseTrove(_contractsCache, _borrower, STABLE_COIN_GAS_COMPENSATION, newColl);
-  //            emit TroveUpdated(_borrower, 0, 0, 0, TroveManagerOperation.redeemCollateral);
-  //
-  //        } else {
-  //            uint newNICR = LiquityMath._computeNominalCR(newColl, newDebt);
-  //
-  //            /*
-  //            * If the provided hint is out of date, we bail since trying to reinsert without a good hint will almost
-  //            * certainly result in running out of gas.
-  //            *
-  //            * If the resultant net debt of the partial is less than the minimum, net debt we bail.
-  //            */
-  //            if (newNICR != _partialRedemptionHintNICR || _getNetDebt(newDebt) < MIN_NET_DEBT) {
-  //                singleRedemption.cancelledPartial = true;
-  //                return singleRedemption;
-  //            }
-  //
-  //            _contractsCache.sortedTroves.reInsert(_borrower, newNICR, _upperPartialRedemptionHint, _lowerPartialRedemptionHint);
-  //
-  //            Troves[_borrower].debt = newDebt;
-  //            Troves[_borrower].coll = newColl;
-  //            _updateStakeAndTotalStakes(_borrower);
-  //
-  //            emit TroveUpdated(
-  //                _borrower,
-  //                newDebt, newColl,
-  //                Troves[_borrower].stake,
-  //                TroveManagerOperation.redeemCollateral
-  //            );
-  //        }
-  //
-  //        return singleRedemption;
-  //    }
+  /* Send stable coin to the system and redeem the corresponding amount of collateral from as many Troves as are needed to fill the redemption
+   * request.  Applies pending rewards to a Trove before reducing its debt and coll.
+   *
+   * Note that if _amount is very large, this function can run out of gas, specially if traversed troves are small. This can be easily avoided by
+   * splitting the total _amount in appropriate chunks and calling the function multiple times.
+   *
+   * Param `_maxIterations` can also be provided, so the loop through Troves is capped (if it’s zero, it will be ignored).This makes it easier to
+   * avoid OOG for the frontend, as only knowing approximately the average cost of an iteration is enough, without needing to know the “topology”
+   * of the trove list. It also avoids the need to set the cap in stone in the contract, nor doing gas calculations, as both gas price and opcode
+   * costs can vary.
+   *
+   * All Troves that are redeemed from, will end up with no stable coin debt left.
+   *
+   * If another transaction modifies the list between calling getRedemptionHints() and passing the hints to redeemCollateral(), it
+   * is very likely that the last (partially) redeemed Trove would end up with a different ICR than what the hint is for. In this case the
+   * redemption will stop after the last completely redeemed Trove and the sender will keep the remaining stable amount, which they can attempt
+   * to redeem later.
+   */
+  function redeemCollateral(
+    uint _stableCoinAmount,
+    address _firstRedemptionHint,
+    address _upperPartialRedemptionHint,
+    address _lowerPartialRedemptionHint,
+    uint _partialRedemptionHintNICR,
+    uint _maxIterations,
+    uint _maxFeePercentage
+  ) external override {
+    RedemptionVariables memory vars;
+    vars.storagePoolCached = storagePool;
+    vars.stableCoinCached = debtTokenManager.getStableCoin();
+    vars.sortedTrovesCached = sortedTroves;
+    vars.remainingStableToRedeem = _stableCoinAmount;
+    vars.priceFeedCached = priceFeed;
 
-  //    /*
-  //    * Called when a full redemption occurs, and closes the trove.
-  //    * The redeemer swaps (debt - liquidation reserve) LUSD for (debt - liquidation reserve) worth of ETH, so the LUSD liquidation reserve left corresponds to the remaining debt.
-  //    * In order to close the trove, the LUSD liquidation reserve is burned, and the corresponding debt is removed from the active pool.
-  //    * The debt recorded on the trove's struct is zero'd elswhere, in _closeTrove.
-  //    * Any surplus ETH left in the trove, is sent to the Coll surplus pool, and can be later claimed by the borrower.
-  //    */
-  //    function _redeemCloseTrove(ContractsCache memory _contractsCache, address _borrower, uint _LUSD, uint _ETH) internal {
-  //        _contractsCache.lusdToken.burn(gasPoolAddress, _LUSD);
-  //        // Update Active Pool LUSD, and send ETH to account
-  //        _contractsCache.activePool.decreaseLUSDDebt(_LUSD);
-  //
-  //        // send ETH from Active Pool to CollSurplus Pool
-  //        _contractsCache.collSurplusPool.accountSurplus(_borrower, _ETH);
-  //        _contractsCache.activePool.sendETH(address(_contractsCache.collSurplusPool), _ETH);
-  //    }
-  //
-  //    function _isValidFirstRedemptionHint(ISortedTroves _sortedTroves, address _firstRedemptionHint, uint _price) internal view returns (bool) {
-  //        if (_firstRedemptionHint == address(0) ||
-  //            !_sortedTroves.contains(_firstRedemptionHint) ||
-  //            getCurrentICR(_firstRedemptionHint, _price) < MCR
-  //        ) {
-  //            return false;
-  //        }
-  //
-  //        address nextTrove = _sortedTroves.getNext(_firstRedemptionHint);
-  //        return nextTrove == address(0) || getCurrentICR(nextTrove, _price) < MCR;
-  //    }
+    _requireAmountGreaterThanZero(vars.remainingStableToRedeem);
+    _requireValidMaxFeePercentage(_maxFeePercentage);
+    _requireDebtTokenBalanceCoversRedemption(vars.stableCoinCached, msg.sender, vars.remainingStableToRedeem);
 
-  //    /* Send _LUSDamount LUSD to the system and redeem the corresponding amount of collateral from as many Troves as are needed to fill the redemption
-  //    * request.  Applies pending rewards to a Trove before reducing its debt and coll.
-  //    *
-  //    * Note that if _amount is very large, this function can run out of gas, specially if traversed troves are small. This can be easily avoided by
-  //    * splitting the total _amount in appropriate chunks and calling the function multiple times.
-  //    *
-  //    * Param `_maxIterations` can also be provided, so the loop through Troves is capped (if it’s zero, it will be ignored).This makes it easier to
-  //    * avoid OOG for the frontend, as only knowing approximately the average cost of an iteration is enough, without needing to know the “topology”
-  //    * of the trove list. It also avoids the need to set the cap in stone in the contract, nor doing gas calculations, as both gas price and opcode
-  //    * costs can vary.
-  //    *
-  //    * All Troves that are redeemed from -- with the likely exception of the last one -- will end up with no debt left, therefore they will be closed.
-  //    * If the last Trove does have some remaining debt, it has a finite ICR, and the reinsertion could be anywhere in the list, therefore it requires a hint.
-  //    * A frontend should use getRedemptionHints() to calculate what the ICR of this Trove will be after redemption, and pass a hint for its position
-  //    * in the sortedTroves list along with the ICR value that the hint was found for.
-  //    *
-  //    * If another transaction modifies the list between calling getRedemptionHints() and passing the hints to redeemCollateral(), it
-  //    * is very likely that the last (partially) redeemed Trove would end up with a different ICR than what the hint is for. In this case the
-  //    * redemption will stop after the last completely redeemed Trove and the sender will keep the remaining LUSD amount, which they can attempt
-  //    * to redeem later.
-  //    */
-  //    function redeemCollateral(
-  //        uint _LUSDamount,
-  //        address _firstRedemptionHint,
-  //        address _upperPartialRedemptionHint,
-  //        address _lowerPartialRedemptionHint,
-  //        uint _partialRedemptionHintNICR,
-  //        uint _maxIterations,
-  //        uint _maxFeePercentage
-  //    )
-  //        external
-  //        override
-  //    {
-  //        ContractsCache memory contractsCache = ContractsCache(
-  //        storagePool,
-  //            activePool,
-  //            defaultPool,
-  //            lusdToken,
-  //            lqtyStaking,
-  //            sortedTroves,
-  //            collSurplusPool,
-  //            gasPoolAddress
-  //        );
-  //        RedemptionTotals memory totals;
-  //
-  //        _requireValidMaxFeePercentage(_maxFeePercentage);
-  //        _requireAfterBootstrapPeriod();
-  //        totals.price = priceFeed.fetchPrice();
-  //        _requireTCRoverMCR(totals.price);
-  //        _requireAmountGreaterThanZero(_LUSDamount);
-  //        _requireDebtTokenBalanceCoversRedemption(contractsCache.lusdToken, msg.sender, _LUSDamount);
-  //
-  //        totals.totalLUSDSupplyAtStart = contractsCache.storagePool.getEntireSystemDebt();
-  //        // Confirm redeemer's balance is less than total LUSD supply
-  //        assert(contractsCache.lusdToken.balanceOf(msg.sender) <= totals.totalLUSDSupplyAtStart);
-  //
-  //        totals.remainingLUSD = _LUSDamount;
-  //        address currentBorrower;
-  //
-  //        if (_isValidFirstRedemptionHint(contractsCache.sortedTroves, _firstRedemptionHint, totals.price)) {
-  //            currentBorrower = _firstRedemptionHint;
-  //        } else {
-  //            currentBorrower = contractsCache.sortedTroves.getLast();
-  //            // Find the first trove with ICR >= MCR
-  //            while (currentBorrower != address(0) && getCurrentICR(currentBorrower, totals.price) < MCR) {
-  //                currentBorrower = contractsCache.sortedTroves.getPrev(currentBorrower);
-  //            }
-  //        }
-  //
-  //        // Loop through the Troves starting from the one with lowest collateral ratio until _amount of LUSD is exchanged for collateral
-  //        if (_maxIterations == 0) { _maxIterations = uint(-1); }
-  //        while (currentBorrower != address(0) && totals.remainingLUSD > 0 && _maxIterations > 0) {
-  //            _maxIterations--;
-  //            // Save the address of the Trove preceding the current one, before potentially modifying the list
-  //            address nextUserToCheck = contractsCache.sortedTroves.getPrev(currentBorrower);
-  //
-  //            _applyPendingRewards(contractsCache.activePool, contractsCache.defaultPool, currentBorrower);
-  //
-  //            SingleRedemptionValues memory singleRedemption = _redeemCollateralFromTrove(
-  //                contractsCache,
-  //                currentBorrower,
-  //                totals.remainingLUSD,
-  //                totals.price,
-  //                _upperPartialRedemptionHint,
-  //                _lowerPartialRedemptionHint,
-  //                _partialRedemptionHintNICR
-  //            );
-  //
-  //            if (singleRedemption.cancelledPartial) break; // Partial redemption was cancelled (out-of-date hint, or new net debt < minimum), therefore we could not redeem from the last Trove
-  //
-  //            totals.totalLUSDToRedeem  = totals.totalLUSDToRedeem.add(singleRedemption.LUSDLot);
-  //            totals.totalETHDrawn = totals.totalETHDrawn.add(singleRedemption.ETHLot);
-  //
-  //            totals.remainingLUSD = totals.remainingLUSD.sub(singleRedemption.LUSDLot);
-  //            currentBorrower = nextUserToCheck;
-  //        }
-  //        require(totals.totalETHDrawn > 0, "TroveManager: Unable to redeem any amount");
-  //
-  //        // Decay the baseRate due to time passed, and then increase it according to the size of this redemption.
-  //        // Use the saved total LUSD supply value, from before it was reduced by the redemption.
-  //        _updateBaseRateFromRedemption(totals.totalETHDrawn, totals.price, totals.totalLUSDSupplyAtStart);
-  //
-  //        // Calculate the ETH fee
-  //        totals.ETHFee = _getRedemptionFee(totals.totalETHDrawn);
-  //
-  //        _requireUserAcceptsFee(totals.ETHFee, totals.totalETHDrawn, _maxFeePercentage);
-  //
-  //        // Send the ETH fee to the LQTY staking contract
-  //        contractsCache.activePool.sendETH(address(contractsCache.lqtyStaking), totals.ETHFee);
-  //        contractsCache.lqtyStaking.increaseF_ETH(totals.ETHFee);
-  //
-  //        totals.ETHToSendToRedeemer = totals.totalETHDrawn.sub(totals.ETHFee);
-  //
-  //        emit Redemption(_LUSDamount, totals.totalLUSDToRedeem, totals.totalETHDrawn, totals.ETHFee);
-  //
-  //        // Burn the total LUSD that is cancelled with debt, and send the redeemed ETH to msg.sender
-  //        contractsCache.lusdToken.burn(msg.sender, totals.totalLUSDToRedeem);
-  //        // Update Active Pool LUSD, and send ETH to account
-  //        contractsCache.activePool.decreaseLUSDDebt(totals.totalLUSDToRedeem);
-  //        contractsCache.activePool.sendETH(msg.sender, totals.ETHToSendToRedeemer);
-  //    }
+    // todo check system TCR _requireTCRoverMCR(vars.price);
+
+    vars.totalStableSupplyAtStart = vars
+      .storagePoolCached
+      .getValue(address(vars.stableCoinCached), false, PoolType.Active)
+      .add(vars.storagePoolCached.getValue(address(vars.stableCoinCached), false, PoolType.Default));
+
+    // Confirm redeemer's balance is less than total stable coin supply
+    assert(vars.stableCoinCached.balanceOf(msg.sender) <= vars.totalStableSupplyAtStart);
+
+    // seed drawn coll
+    vars.totalCollDrawn = new RedemptionCollAmount[](collTokenAddresses.length);
+    for (uint i = 0; i < collTokenAddresses.length; i++) vars.totalCollDrawn[i].tokenAddress = collTokenAddresses[i];
+
+    // big todo: we should only loop throw troves, which minted stable coin
+    // -> currently way to inefficient because it can be, that we are not even able to find a trove with stable coin before gas runs out
+    // -> just storing troves with stable coin into the sorted troves list?
+    // -> which other feature also needs the sorted troves? -> check that...
+
+    address currentBorrower;
+    if (_isValidFirstRedemptionHint(vars.sortedTrovesCached, vars.priceCache, _firstRedemptionHint)) {
+      currentBorrower = _firstRedemptionHint;
+    } else {
+      // Find the first trove with ICR >= MCR
+      currentBorrower = vars.sortedTrovesCached.getLast();
+      (uint icr, ) = this.getCurrentICR(currentBorrower, vars.priceCache);
+      while (currentBorrower != address(0) && icr < MCR)
+        currentBorrower = vars.sortedTrovesCached.getPrev(currentBorrower);
+    }
+
+    // Loop through the Troves starting from the one with lowest collateral ratio
+    if (_maxIterations == 0) _maxIterations = type(uint256).max;
+    while (currentBorrower != address(0) && vars.remainingStableToRedeem > 0 && _maxIterations > 0) {
+      // Save the address of the Trove preceding the current one, before potentially modifying the list
+      address nextUserToCheck = vars.sortedTrovesCached.getPrev(currentBorrower);
+      _maxIterations--;
+
+      SingleRedemptionVariables memory singleRedemption = _redeemCollateralFromTrove(
+        vars,
+        currentBorrower,
+        vars.remainingStableToRedeem,
+        _upperPartialRedemptionHint,
+        _lowerPartialRedemptionHint,
+        _partialRedemptionHintNICR
+      );
+      if (singleRedemption.cancelledPartial) break; // Partial redemption was cancelled (out-of-date hint, or new net debt < minimum), therefore we could not redeem from the last Trove
+
+      // sum up redeemed stable and drawn collateral
+      vars.totalRedeemedStable = vars.totalRedeemedStable.add(singleRedemption.stableCoinLot);
+      vars.remainingStableToRedeem = vars.remainingStableToRedeem.sub(singleRedemption.stableCoinLot);
+      for (uint a = 0; a < singleRedemption.collLots.length; a++) {
+        for (uint b = 0; b < vars.totalCollDrawn.length; b++) {
+          if (singleRedemption.collLots[a].tokenAddress != vars.totalCollDrawn[b].tokenAddress) continue;
+
+          vars.totalCollDrawn[b].drawn.add(singleRedemption.collLots[a].amount);
+          break;
+        }
+      }
+
+      currentBorrower = nextUserToCheck;
+    }
+    require(vars.totalRedeemedStable > 0, 'TroveManager: Unable to redeem any amount');
+
+    // Decay the baseRate due to time passed, and then increase it according to the size of this redemption.
+    // Use the saved total LUSD supply value, from before it was reduced by the redemption.
+    _updateBaseRateFromRedemption(vars.totalRedeemedStable, vars.totalStableSupplyAtStart);
+
+    // Calculate the redemption fee
+    for (uint i = 0; i < vars.totalCollDrawn.length; i++) {
+      RedemptionCollAmount memory collEntry = vars.totalCollDrawn[i];
+      collEntry.redemptionFee = _getRedemptionFee(collEntry.drawn);
+      collEntry.sendToRedeemer = collEntry.drawn.sub(collEntry.redemptionFee);
+      _requireUserAcceptsFee(collEntry.redemptionFee, collEntry.drawn, _maxFeePercentage);
+    }
+
+    // todo
+    //    emit Redemption(_LUSDamount, vars.totalLUSDToRedeem, vars.totalETHDrawn, vars.ETHFee);
+
+    // Burn the total stable coin that is cancelled with debt, and send the redeemed coll to msg.sender
+    vars.storagePoolCached.subtractValue(
+      address(vars.stableCoinCached),
+      false,
+      PoolType.Active,
+      vars.totalRedeemedStable
+    );
+    vars.stableCoinCached.burn(msg.sender, vars.totalRedeemedStable);
+
+    // transfer the drawn collateral to account
+    for (uint i = 0; i < vars.totalCollDrawn.length; i++) {
+      RedemptionCollAmount memory collEntry = vars.totalCollDrawn[i];
+      if (collEntry.sendToRedeemer == 0) continue;
+
+      vars.storagePoolCached.subtractValue(collEntry.tokenAddress, true, PoolType.Active, collEntry.drawn);
+      IERC20(collEntry.tokenAddress).transferFrom(
+        address(vars.storagePoolCached),
+        msg.sender,
+        collEntry.sendToRedeemer
+      );
+
+      // todo jelly handover
+      //    // Send the fee to the gov token staking contract
+      //    contractsCache.activePool.sendETH(address(contractsCache.lqtyStaking), vars.ETHFee);
+    }
+  }
+
+  // Redeem as much collateral as possible from _borrower's Trove in exchange for stable coin up to _redeemMaxAmount
+  function _redeemCollateralFromTrove(
+    RedemptionVariables memory outerVars,
+    address _borrower,
+    uint _redeemMaxAmount,
+    address _upperPartialRedemptionHint,
+    address _lowerPartialRedemptionHint,
+    uint _partialRedemptionHintNICR
+  ) internal returns (SingleRedemptionVariables memory vars) {
+    _applyPendingRewards(outerVars.storagePoolCached, _borrower);
+
+    (vars.collLots, vars.stableCoinEntry, vars.troveCollInStable, vars.troveDebtInStable) = _prepareTroveRedemption(
+      outerVars.priceFeedCached,
+      outerVars.priceCache,
+      _borrower
+    );
+
+    // Determine the remaining amount (lot) to be redeemed, capped by the entire debt of the Trove minus the liquidation reserve
+    vars.stableCoinLot = LiquityMath._min(
+      _redeemMaxAmount,
+      vars.stableCoinEntry.amount.sub(STABLE_COIN_GAS_COMPENSATION)
+    );
+
+    // todo we should skip this trove, or even better: try to avoid it in the beginning
+    //    if (vars.stableCoinLot == 0)
+
+    // calculate the coll lot
+    uint newCollInStable = vars.troveCollInStable;
+    for (uint i = 0; i < vars.collLots.length; i++) {
+      PriceTokenAmount memory collEntry = vars.collLots[i];
+
+      uint collPercent = collEntry.amount.mul(collEntry.price).div(vars.troveCollInStable);
+      uint collToRedeemInStable = vars.stableCoinLot.mul(collPercent);
+      collEntry.amount = collToRedeemInStable.div(collEntry.price);
+      newCollInStable = newCollInStable.sub(collToRedeemInStable);
+    }
+
+    /*
+     * If the provided hint is out of date, we bail since trying to reinsert without a good hint will almost
+     * certainly result in running out of gas.
+     *
+     * If the resultant net debt of the partial is less than the minimum, net debt we bail.
+     */
+    uint newNICR = LiquityMath._computeNominalCR(
+      newCollInStable,
+      vars.troveDebtInStable.sub(vars.stableCoinLot.mul(vars.stableCoinEntry.price))
+    );
+    if (newNICR != _partialRedemptionHintNICR) {
+      vars.cancelledPartial = true;
+      return vars;
+    }
+    outerVars.sortedTrovesCached.reInsert(
+      outerVars.priceCache,
+      _borrower,
+      newNICR,
+      _upperPartialRedemptionHint,
+      _lowerPartialRedemptionHint
+    );
+
+    // updating the troves coll and debt
+    Troves[_borrower].debts[outerVars.stableCoinCached] = (Troves[_borrower].debts[outerVars.stableCoinCached]).sub(
+      vars.stableCoinLot
+    );
+    for (uint i = 0; i < vars.collLots.length; i++) {
+      PriceTokenAmount memory collAmount = vars.collLots[i];
+      Troves[_borrower].colls[collAmount.tokenAddress] = Troves[_borrower].colls[collAmount.tokenAddress].sub(
+        collAmount.amount
+      );
+    }
+
+    _updateStakeAndTotalStakes(_borrower);
+
+    // todo
+    //    emit TroveUpdated(
+    //      _borrower,
+    //      newStableDebt,
+    //      newColl,
+    //      Troves[_borrower].stake,
+    //      TroveManagerOperation.redeemCollateral
+    //    );
+
+    return vars;
+  }
+
+  function _isValidFirstRedemptionHint(
+    ISortedTroves _sortedTroves,
+    PriceCache memory _priceCache,
+    address _firstRedemptionHint
+  ) internal view returns (bool) {
+    (uint icr, ) = this.getCurrentICR(_firstRedemptionHint, _priceCache);
+    if (_firstRedemptionHint == address(0) || !_sortedTroves.contains(_firstRedemptionHint) || icr < MCR) return false;
+
+    address nextTrove = _sortedTroves.getNext(_firstRedemptionHint);
+    (uint nextICR, ) = this.getCurrentICR(nextTrove, _priceCache);
+    return nextTrove == address(0) || nextICR < MCR;
+  }
 
   // --- Helper functions ---
 
@@ -1019,7 +1059,7 @@ contract TroveManager is LiquityBase, Ownable, CheckContract, ITroveManager {
   function getCurrentICR(
     address _borrower,
     PriceCache memory _priceCache
-  ) external override returns (uint ICR, uint currentDebtInStable) {
+  ) external view override returns (uint ICR, uint currentDebtInStable) {
     uint currentCollInStable;
     (currentCollInStable, currentDebtInStable) = _getCurrentTroveAmounts(_borrower, _priceCache);
     ICR = LiquityMath._computeCR(currentCollInStable, currentDebtInStable);
@@ -1030,7 +1070,7 @@ contract TroveManager is LiquityBase, Ownable, CheckContract, ITroveManager {
   function _getCurrentTroveAmounts(
     address _borrower,
     PriceCache memory _priceCache
-  ) internal returns (uint currentCollInStable, uint currentDebtInStable) {
+  ) internal view returns (uint currentCollInStable, uint currentDebtInStable) {
     Trove storage _trove = Troves[_borrower];
 
     for (uint i = 0; i < _trove.collTokens.length; i++) {
@@ -1056,36 +1096,35 @@ contract TroveManager is LiquityBase, Ownable, CheckContract, ITroveManager {
 
   function applyPendingRewards(address _borrower) external override {
     _requireCallerIsBorrowerOperations();
-    return _applyPendingRewards(storagePool, _borrower);
+    _applyPendingRewards(storagePool, _borrower);
   }
 
-  //todo...
-  // Add the borrowers's coll and debt rewards earned from redistributions, to their Trove
-  function _applyPendingRewards(IStoragePool _storagePool, address _borrower) internal {
-    //        if (hasPendingRewards(_borrower)) {
-    //            _requireTroveIsActive(_borrower);
+  function _applyPendingRewards(IStoragePool storagePoolCached, address _borrower) internal {
+    _requireTroveIsActive(_borrower);
+
+    //    // todo...
     //
-    //            // Compute pending rewards
-    //            uint pendingETHReward = getPendingETHReward(_borrower);
-    //            uint pendingLUSDDebtReward = getPendingLUSDDebtReward(_borrower);
+    //    // Compute pending rewards
+    //    uint pendingETHReward = getPendingETHReward(_borrower);
+    //    uint pendingLUSDDebtReward = getPendingLUSDDebtReward(_borrower);
     //
-    //            // Apply pending rewards to trove's state
-    //            Troves[_borrower].coll = Troves[_borrower].coll.add(pendingETHReward);
-    //            Troves[_borrower].debt = Troves[_borrower].debt.add(pendingLUSDDebtReward);
+    //    // Apply pending rewards to trove's state
+    //    Troves[_borrower].coll = Troves[_borrower].coll.add(pendingETHReward);
+    //    Troves[_borrower].debt = Troves[_borrower].debt.add(pendingLUSDDebtReward);
     //
-    //            _updateTroveRewardSnapshots(_borrower);
+    //    _updateTroveRewardSnapshots(_borrower);
     //
-    //            // Transfer from DefaultPool to ActivePool
-    //            _movePendingTroveRewardsToActivePool(_storagePool, pendingLUSDDebtReward, pendingETHReward);
+    //    // Transfer from DefaultPool to ActivePool
+    //    _movePendingTroveRewardsToActivePool(storagePoolCached, pendingLUSDDebtReward, pendingETHReward);
     //
-    //            emit TroveUpdated(
-    //                _borrower,
-    //                Troves[_borrower].debt,
-    //                Troves[_borrower].coll,
-    //                Troves[_borrower].stake,
-    //                TroveManagerOperation.applyPendingRewards
-    //            );
-    //        }
+    //    // todo
+    //    //    emit TroveUpdated(
+    //    //      _borrower,
+    //    //      Troves[_borrower].debt,
+    //    //      Troves[_borrower].coll,
+    //    //      Troves[_borrower].stake,
+    //    //      TroveManagerOperation.applyPendingRewards
+    //    //    );
   }
 
   // Update borrower's snapshots of L_ETH and L_LUSDDebt to reflect the current values
@@ -1112,18 +1151,6 @@ contract TroveManager is LiquityBase, Ownable, CheckContract, ITroveManager {
 
     uint stake = Troves[_borrower].stakes[_tokenAddress];
     pendingReward = stake.mul(rewardPerUnitStaked).div(DECIMAL_PRECISION);
-  }
-
-  // todo
-  function hasPendingRewards(address _borrower) external view override returns (bool) {
-    //        /*
-    //        * A Trove has pending rewards if its snapshot is less than the current rewards per-unit-staked sum:
-    //        * this indicates that rewards have occured since the snapshot was made, and the user therefore has
-    //        * pending rewards
-    //        */
-    //        if (Troves[_borrower].status != Status.active) return false;
-    //        return (rewardSnapshots[_borrower].ETH < L_ETH);
-    return false;
   }
 
   // Return the Troves entire debt and coll, including pending rewards from redistributions.
@@ -1178,6 +1205,45 @@ contract TroveManager is LiquityBase, Ownable, CheckContract, ITroveManager {
     }
 
     return (amounts, troveCollInStable, troveDebtInStable);
+  }
+
+  function _prepareTroveRedemption(
+    IPriceFeed _priceFeed,
+    PriceCache memory _priceCache,
+    address _borrower
+  )
+    internal
+    returns (
+      PriceTokenAmount[] memory amounts,
+      PriceTokenAmount memory stableCoinEntry,
+      uint troveCollInStable,
+      uint troveDebtInStable
+    )
+  {
+    Trove storage trove = Troves[_borrower];
+
+    // stable coin debt should always exists because of the gas comp
+    for (uint i = 0; i < trove.debtTokens.length; i++) {
+      IDebtToken debtToken = trove.debtTokens[i];
+      uint amount = trove.debts[debtToken];
+      uint price = debtToken.getPrice(_priceCache);
+
+      if (debtToken.isStableCoin()) stableCoinEntry = PriceTokenAmount(address(debtToken), price, amount);
+      troveDebtInStable.add(amount.mul(price));
+    }
+
+    amounts = new PriceTokenAmount[](trove.collTokens.length);
+    for (uint i = 0; i < trove.collTokens.length; i++) {
+      address tokenAddress = address(trove.collTokens[i]);
+      amounts[i] = PriceTokenAmount(
+        tokenAddress,
+        _priceFeed.getPrice(_priceCache, tokenAddress),
+        trove.colls[trove.collTokens[i]]
+      );
+      troveCollInStable.add(amounts[i].amount.mul(amounts[i].price));
+    }
+
+    return (amounts, stableCoinEntry, troveCollInStable, troveDebtInStable);
   }
 
   function removeStake(address _borrower) external override {
@@ -1389,16 +1455,19 @@ contract TroveManager is LiquityBase, Ownable, CheckContract, ITroveManager {
 
   /*
    * This function has two impacts on the baseRate state variable:
-   * 1) decays the baseRate based on time passed since last redemption or LUSD borrowing operation.
+   * 1) decays the baseRate based on time passed since last redemption or stable coin borrowing operation.
    * then,
    * 2) increases the baseRate based on the amount redeemed, as a proportion of total supply
    */
-  function _updateBaseRateFromRedemption(uint _ETHDrawn, uint _price, uint _totalLUSDSupply) internal returns (uint) {
+  function _updateBaseRateFromRedemption(
+    uint _totalRedeemedStable,
+    uint _totalStableCoinSupply
+  ) internal returns (uint) {
     uint decayedBaseRate = _calcDecayedBaseRate();
 
-    /* Convert the drawn ETH back to LUSD at face value rate (1 LUSD:1 USD), in order to get
+    /* Convert the drawn coll back to LUSD at face value rate, in order to get
      * the fraction of total supply that was redeemed at face value. */
-    uint redeemedLUSDFraction = _ETHDrawn.mul(_price).div(_totalLUSDSupply);
+    uint redeemedLUSDFraction = _totalRedeemedStable.div(_totalStableCoinSupply);
 
     uint newBaseRate = decayedBaseRate.add(redeemedLUSDFraction.div(BETA));
     newBaseRate = LiquityMath._min(newBaseRate, DECIMAL_PRECISION); // cap baseRate at a maximum of 100%
@@ -1438,9 +1507,9 @@ contract TroveManager is LiquityBase, Ownable, CheckContract, ITroveManager {
     return _calcRedemptionFee(getRedemptionRateWithDecay(), _ETHDrawn);
   }
 
-  function _calcRedemptionFee(uint _redemptionRate, uint _ETHDrawn) internal pure returns (uint) {
-    uint redemptionFee = _redemptionRate.mul(_ETHDrawn).div(DECIMAL_PRECISION);
-    require(redemptionFee < _ETHDrawn, 'TroveManager: Fee would eat up all returned collateral');
+  function _calcRedemptionFee(uint _redemptionRate, uint _collDrawn) internal pure returns (uint) {
+    uint redemptionFee = _redemptionRate.mul(_collDrawn).div(DECIMAL_PRECISION);
+    require(redemptionFee < _collDrawn, 'TroveManager: Fee would eat up all returned collateral');
     return redemptionFee;
   }
 
@@ -1597,7 +1666,7 @@ contract TroveManager is LiquityBase, Ownable, CheckContract, ITroveManager {
 
     Trove storage trove = Troves[_borrower];
     for (uint i = 0; i < _collTokenAmounts.length; i++) {
-      uint newColl = trove.colls[_collTokenAmounts[i].tokenAddress].add(_collTokenAmounts[i].coll);
+      uint newColl = trove.colls[_collTokenAmounts[i].tokenAddress].add(_collTokenAmounts[i].amount);
       trove.colls[_collTokenAmounts[i].tokenAddress] = newColl;
     }
   }
@@ -1607,7 +1676,7 @@ contract TroveManager is LiquityBase, Ownable, CheckContract, ITroveManager {
 
     Trove storage trove = Troves[_borrower];
     for (uint i = 0; i < _collTokenAmounts.length; i++) {
-      uint newColl = trove.colls[_collTokenAmounts[i].tokenAddress].sub(_collTokenAmounts[i].coll);
+      uint newColl = trove.colls[_collTokenAmounts[i].tokenAddress].sub(_collTokenAmounts[i].amount);
       trove.colls[_collTokenAmounts[i].tokenAddress] = newColl;
     }
   }
