@@ -1,0 +1,2 @@
+# fails in pipeline only, dont really care about it since its generated
+public/mockServiceWorker.js

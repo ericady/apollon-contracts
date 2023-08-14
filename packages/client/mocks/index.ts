@@ -1,8 +1,9 @@
 export default async function initMocks() {
   // This mock is for the server side of next. It is probably not needed any time soon (maybe SSG) but we still do the correct setup now.
   if (typeof window === 'undefined') {
-    const { server } = await import('./server');
-    server.listen({ onUnhandledRequest: 'bypass' });
+    // TODO: Transpile problem in playwright tests. Not needed now anyways, call it conditionally in dev later.
+    // const { server } = await import('./server');
+    // server.listen({ onUnhandledRequest: 'bypass' });
   } else {
     // Mocks all client side request via the service worker
     const { worker } = await import('./browser');
