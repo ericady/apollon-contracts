@@ -17,7 +17,6 @@ type TradingPair {
   tokenB: Token!
   # Gives the trade ratio between 2 tokens. 5.5 => 5.5 tokenA = 1 tokenB
   ratioAtoB: Float!
-  isFavorite: Boolean!
 }
 
 type TradingPairPage {
@@ -39,10 +38,6 @@ type PageInfo {
 type Query {
   # Any kind of FILTER or SORTING are not reflected in the API yet but can easily be added
   getTradingPairs(limit: Int = 10, cursor: String): TradingPairPage!
-}
-
-type Mutation {
-  toggleFavorite(tradingPairId: ID!): TradingPair!
 }
 
 # SWAP
