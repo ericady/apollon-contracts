@@ -1,12 +1,22 @@
 # TRADING PAIRS
 
-type TradingPair {
+type Token {
   _id: ID!
   symbol: String!
-  currentPriceFiat: Float!
-  currentPriceJUSD: Float!
-  priceFiat24hAgo: Float!
-  last24hFiatTradingVolume: Float!
+  createdAt: String!
+  burnedAmount: Float!
+  mintedAmount: Float!
+  currentPriceUSD: Float!
+  priceUSD24hAgo: Float!
+  last24hTradingVolumeUSD: Float!
+}
+
+type TradingPair {
+  _id: ID!
+  tokenA: Token!
+  tokenB: Token!
+  # Gives the trade ratio between 2 tokens. 5.5 => 5.5 tokenA = 1 tokenB
+  ratioAtoB: Float!
   isFavorite: Boolean!
 }
 
@@ -31,54 +41,51 @@ type Query {
   getTradingPairs(limit: Int = 10, cursor: String): TradingPairPage!
 }
 
-
 type Mutation {
   toggleFavorite(tradingPairId: ID!): TradingPair!
 }
 
-
 # SWAP
 
 type SwapEstimate {
-  perUnitPriceJUSD: Float!
+  perUnitPriceStableCoin: Float!
   protocolSwapFee: Float!
   resultingPoolSlippage: Float!
 }
 
 enum SwapDirection {
-  TRADINGPAIR_TO_JUSD
-  JUSD_TO_TRADINGPAIR
+  TRADINGPAIR_TO_SC
+  SC_TO_TRADINGPAIR
 }
 
 type Query {
   getSwapEstimate(
     tradingPairId: ID!
-    # Can either specify Fiat or dToken amount depending on the trading direction
+    # Can either specify USD or dToken amount depending on the trading direction
     amount: Float!
     direction: SwapDirection!
     slippagePercent: Float = 0.01
   ): SwapEstimate!
 }
 
-
 type Mutation {
+  # on Chain
   swapTokens(
     tradingPairId: ID!
     amount: Float!
     direction: SwapDirection!
-    slippagePercent: Float = 0.01
-    # We have not modeled the users wallet. So a simple Boolean is all we can return.
-    # TODO: If the swaps are persisted maybe return the Transaction then instead.
-  ): Boolean!
+    slippagePercent: Float = 0.01 # We have not modeled the users wallet. So a simple Boolean is all we can return.
+  ): # TODO: If the swaps are persisted maybe return the Transaction then instead.
+  Boolean!
 }
 
 # LONG/SHORT
 
 type LongShortEstimate {
-  # Can either specify Fiat or dToken amount depending on the trading direction
+  # Can either specify USD or dToken amount depending on the trading direction
   amount: Float!
   direction: LongShortDirection!
-  protocolFeeJUSD: Float!
+  protocolFeeStableCoin: Float!
   resultingSlippagePercent: Float!
   newVaultRatioPercent: Float!
 }
@@ -98,12 +105,14 @@ type Query {
 }
 
 type Mutation {
+  # on Chain
   openLongShortPosition(
     tradingPairId: ID!
     amount: Float!
     direction: LongShortDirection!
     slippagePercent: Float = 0.01
   ): Position!
+  # on Chain
   closeLongShortPosition(openPositionId: ID!): Position!
 }
 
@@ -112,13 +121,13 @@ type Mutation {
 type TokenCollateral {
   _id: ID!
   amount: Float!
-  totalValueFiat: Float!
+  totalValueUSD: Float!
 }
 
 type VaultOverview {
   collateral: [TokenCollateral!]!
-  totalValueFiat: Float!
-  totalDebtFiat: Float!
+  totalValueUSD: Float!
+  totalDebtUSD: Float!
   collateralRatioPercent: Float!
 }
 
@@ -127,14 +136,10 @@ type Query {
 }
 
 type Mutation {
-  depositCollateral(
-    tradingPairId: ID!
-    amount: Float!
-  ): VaultOverview!
-  withdrawCollateral(
-    tokenCollateralId: ID!
-    amount: Float!
-  ): VaultOverview!
+  # on Chain
+  depositCollateral(tradingPairId: ID!, amount: Float!): VaultOverview!
+  # on Chain
+  withdrawCollateral(tokenCollateralId: ID!, amount: Float!): VaultOverview!
 }
 
 # POSITIONS
@@ -144,10 +149,10 @@ type Position {
   tradingPair: TradingPair!
   direction: LongShortDirection!
   amount: Float!
-  totalPaidJUSD: Float!
-  priceDifferenceJUSD: Float!
+  totalPaidStableCoin: Float!
+  priceDifferenceStableCoin: Float!
   priceDifferencePercent: Float!
-  profitOrLossJUSD: Float!
+  profitOrLossStableCoin: Float!
   openedAt: String!
   closedAt: String
 }
@@ -173,7 +178,7 @@ type TradingPairDeposit {
   _id: ID!
   tradingPair: TradingPair!
   amount: Float!
-  totalValueFiat: Float!
+  totalValueUSD: Float!
   # All timestamps and dates are in ISO 8601 format
   timestamp: String!
 }
@@ -182,7 +187,7 @@ type TradingPairExchange {
   _id: ID!
   tradingPair: TradingPair!
   amount: Float!
-  totalValueJUSD: Float!
+  totalValueStableCoin: Float!
   timestamp: String!
 }
 
@@ -228,11 +233,10 @@ type Query {
 }
 
 type Mutation {
+  # on Chain
   withdrawStabilityReward(amount: Float!): Float!
-  depositStability(
-    tradingPairId: ID!
-    amount: Float!
-  ): StabilityPool!
+  # on Chain
+  depositStability(tradingPairId: ID!, amount: Float!): StabilityPool!
 }
 
 # RESERVE POOL
@@ -249,9 +253,9 @@ type LiquidityPoolPosition {
   _id: ID!
   tradingPair: TradingPair!
   amount: Float!
-  totalValueJUSD: Float!
-  # TODO: What exactly is meant here? 24h of the token, of the token in the pool or of the token from the user specifically? 
-  last24hTradingVolumeFiat: Float!
+  totalValueStableCoin: Float!
+  # TODO: What exactly is meant here? 24h of the token, of the token in the pool or of the token from the user specifically?
+  last24hTradingVolumeUSD: Float!
   timestamp: String!
 }
 
@@ -260,4 +264,3 @@ type Query {
   # simple global chart
   getLiquidityPoolChartData: [PoolDataPoint!]!
 }
-
