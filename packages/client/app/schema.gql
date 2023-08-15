@@ -1,261 +1,70 @@
-# TRADING PAIRS
-
 type Token {
-  _id: ID!
+  address: String! # contract address, used as id
   symbol: String!
   createdAt: String!
-  burnedAmount: Float!
-  mintedAmount: Float!
-  currentPriceUSD: Float!
+  #
+  priceUSD: Float!
   priceUSD24hAgo: Float!
-  last24hTradingVolumeUSD: Float!
+  #
+  isDebt: Boolean!
+  totalSupplyUSD: Float! # minted - burned (only for debt tokens)
+  totalSupplyUSD24hAgo: Float!
+  #
+  isColl: Boolean!
+  totalValueLockedUSD: Float! # (only for coll tokens)
+  totalValueLockedUSD24hAgo: Float!
 }
 
-type TradingPair {
-  _id: ID!
-  tokenA: Token!
-  tokenB: Token!
-  # Gives the trade ratio between 2 tokens. 5.5 => 5.5 tokenA = 1 tokenB
-  ratioAtoB: Float!
+enum TokenType {
+  DEBT
+  COLL
 }
 
-type TradingPairPage {
-  edges: [TradingPairEdge!]!
-  pageInfo: PageInfo!
-}
-
-type TradingPairEdge {
-  cursor: String!
-  node: TradingPair!
-}
-
-# General meta info for pagination
-type PageInfo {
-  hasNextPage: Boolean!
-  endCursor: String!
-}
-
-type Query {
-  # Any kind of FILTER or SORTING are not reflected in the API yet but can easily be added
-  getTradingPairs(limit: Int = 10, cursor: String): TradingPairPage!
-}
-
-# SWAP
-
-type SwapEstimate {
-  perUnitPriceStableCoin: Float!
-  protocolSwapFee: Float!
-  resultingPoolSlippage: Float!
-}
-
-enum SwapDirection {
-  TRADINGPAIR_TO_SC
-  SC_TO_TRADINGPAIR
+type TokenAmount {
+  token: Token!
+  usedAs: TokenType! # there are tokens, which can be used as debt and collateral
+  # borrower specific
+  troveAmount: Float # minted (as debt), locked (as coll)
+  walletAmount: Float
+  stabilityAmount: Float # lost deposit (as debt), gained collateral (as coll)
+  # global
+  totalDepositedStability: Float # (only for debt tokens)
+  totalReserve: Float # (only for debt tokens)
+  totalReserve24hAgo: Float # (only for debt tokens)
 }
 
 type Query {
-  getSwapEstimate(
-    tradingPairId: ID!
-    # Can either specify USD or dToken amount depending on the trading direction
-    amount: Float!
-    direction: SwapDirection!
-    slippagePercent: Float = 0.01
-  ): SwapEstimate!
+  # without borrower address troveAmount and walletAmount are always undefined
+  # every token is returned, even if it is not used by the borrower (troveAmount, walletAmount = 0)
+  # the same token can be returned twice, if it is used as debt and collateral
+  getTokens(borrower: String): [TokenAmount!]!
 }
 
-type Mutation {
-  # on Chain
-  swapTokens(
-    tradingPairId: ID!
-    amount: Float!
-    direction: SwapDirection!
-    slippagePercent: Float = 0.01 # We have not modeled the users wallet. So a simple Boolean is all we can return.
-  ): # TODO: If the swaps are persisted maybe return the Transaction then instead.
-  Boolean!
+type PoolTokenLiquidity {
+  token: Token!
+  isLiquidity: Boolean! # if false, the token is only used for rewards (not relevant for the swap)
+  # only when isLiquidity
+  totalLiquidity: Float
+  borrowerLiquidity: Float
+  #
+  borrowerRewards: Float # unclaimed
 }
 
-# LONG/SHORT
-
-type LongShortEstimate {
-  # Can either specify USD or dToken amount depending on the trading direction
-  amount: Float!
-  direction: LongShortDirection!
-  protocolFeeStableCoin: Float!
-  resultingSlippagePercent: Float!
-  newVaultRatioPercent: Float!
-}
-
-enum LongShortDirection {
-  LONG
-  SHORT
+type Pool {
+  id: String!
+  tokens: [PoolTokenLiquidity!]!
+  volume24hUSD: Float!
+  volume24hUSD24hAgo: Float!
 }
 
 type Query {
-  getLongShortEstimate(
-    tradingPairId: ID!
-    amount: Float!
-    direction: LongShortDirection!
-    slippagePercent: Float = 0.01
-  ): LongShortEstimate!
-}
-
-type Mutation {
-  # on Chain
-  openLongShortPosition(
-    tradingPairId: ID!
-    amount: Float!
-    direction: LongShortDirection!
-    slippagePercent: Float = 0.01
-  ): Position!
-  # on Chain
-  closeLongShortPosition(openPositionId: ID!): Position!
-}
-
-# VAULT
-
-type TokenCollateral {
-  _id: ID!
-  amount: Float!
-  totalValueUSD: Float!
-}
-
-type VaultOverview {
-  collateral: [TokenCollateral!]!
-  totalValueUSD: Float!
-  totalDebtUSD: Float!
-  collateralRatioPercent: Float!
-}
-
-type Query {
-  getVaultOverview: VaultOverview!
-}
-
-type Mutation {
-  # on Chain
-  depositCollateral(tradingPairId: ID!, amount: Float!): VaultOverview!
-  # on Chain
-  withdrawCollateral(tokenCollateralId: ID!, amount: Float!): VaultOverview!
-}
-
-# POSITIONS
-
-type Position {
-  _id: ID!
-  tradingPair: TradingPair!
-  direction: LongShortDirection!
-  amount: Float!
-  totalPaidStableCoin: Float!
-  priceDifferenceStableCoin: Float!
-  priceDifferencePercent: Float!
-  profitOrLossStableCoin: Float!
-  openedAt: String!
-  closedAt: String
-}
-
-type PositionEdge {
-  cursor: String!
-  node: Position!
-}
-
-type PositionPage {
-  edges: [PositionEdge!]!
-  pageInfo: PageInfo!
-}
-
-type Query {
-  getOpenPositions(cursor: String, limit: Int = 10): PositionPage!
-  getClosedPositions(cursor: String, limit: Int = 10): PositionPage!
-}
-
-# Stability Pool
-
-type TradingPairDeposit {
-  _id: ID!
-  tradingPair: TradingPair!
-  amount: Float!
-  totalValueUSD: Float!
-  # All timestamps and dates are in ISO 8601 format
-  timestamp: String!
-}
-
-type TradingPairExchange {
-  _id: ID!
-  tradingPair: TradingPair!
-  amount: Float!
-  totalValueStableCoin: Float!
-  timestamp: String!
-}
-
-type StabilityRewardWithdrawal {
-  _id: ID!
-  amount: Float!
-  timestamp: String!
-}
-
-union StabilityEvent = TradingPairDeposit | TradingPairExchange | StabilityRewardWithdrawal
-
-type TradingPairDepositPage {
-  edges: [TradingPairDepositEdge!]!
-  pageInfo: PageInfo!
-}
-
-type TradingPairDepositEdge {
-  cursor: String!
-  node: TradingPairDeposit!
-}
-
-# For the simple global charts. We just need a simple timeseries.
-type PoolDataPoint {
-  value: Float!
-  timestamp: String!
-}
-
-# both global and user deposits must be retrieved together because they should be sorted by the users deposit and should be updated together
-type StabilityPool {
-  # We need pagination here because the list is potentially very long
-  globalPoolDeposits(limit: Int = 10, cursor: String): [TradingPairDepositPage!]!
-  # no pagination required here
-  userPoolDeposits: [TradingPairDeposit!]!
-  # simple global chart
-  chartData: [PoolDataPoint!]!
-}
-
-type Query {
-  getStabilityPool(limit: Int = 10, cursor: String): StabilityPool
-  getUserStabilityReward: Float!
-  # TODO: Potentially very long. Pagination might be required even when user based.
-  getUserStabilityEvents: [StabilityEvent!]!
-}
-
-type Mutation {
-  # on Chain
-  withdrawStabilityReward(amount: Float!): Float!
-  # on Chain
-  depositStability(tradingPairId: ID!, amount: Float!): StabilityPool!
-}
-
-# RESERVE POOL
-
-type Query {
-  # simple global chart
-  getReservePoolChartData: [PoolDataPoint!]!
-  getReserveDeposits(limit: Int = 10, cursor: String): [TradingPairDepositPage!]!
-}
-
-# LIQUIDITY POOL
-
-type LiquidityPoolPosition {
-  _id: ID!
-  tradingPair: TradingPair!
-  amount: Float!
-  totalValueStableCoin: Float!
-  # TODO: What exactly is meant here? 24h of the token, of the token in the pool or of the token from the user specifically?
-  last24hTradingVolumeUSD: Float!
-  timestamp: String!
-}
-
-type Query {
-  getUserLiquidityPoolPositions: [LiquidityPoolPosition!]!
-  # simple global chart
-  getLiquidityPoolChartData: [PoolDataPoint!]!
+  # every pool is returned, even if it is empty
+  # without borrower address borrowerLiquidity and borrowerRewards are always undefined
+  getPools(borrower: String): [Pool!]!
+  getPoolHistoryAdv(poolId: String!): [[Int]]! # [[timestamp, value], [...], ...] todo time range filter needed?
+  #
+  getCollateralUSDHistory: [Int!]! # 6h interval, from now into the past
+  getDebtUSDHistory: [Int!]! # 6h interval, from now into the past
+  getCRHistory: [Int!]! # 6h interval, from now into the past
+  getReserveUSDHistory: [Int!]! # 6h interval, from now into the past
 }
