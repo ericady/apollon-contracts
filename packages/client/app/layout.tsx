@@ -6,11 +6,12 @@ import '@fontsource/roboto/400.css';
 import '@fontsource/roboto/500.css';
 import '@fontsource/roboto/700.css';
 import CssBaseline from '@mui/material/CssBaseline';
-import type { Metadata } from 'next';
+import ThemeProvider from '@mui/material/styles/ThemeProvider';
 import { Inter } from 'next/font/google';
 import { useEffect } from 'react';
 import { client } from './client';
 import './globals.css';
+import theme from './theme';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -30,8 +31,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <meta name="viewport" content="initial-scale=1, width=device-width" />
       </head>
       <body className={inter.className}>
-        <CssBaseline />
-        <ApolloProvider client={client}>{children}</ApolloProvider>
+        <ThemeProvider theme={theme}>
+          <CssBaseline />
+          <ApolloProvider client={client}>{children}</ApolloProvider>
+        </ThemeProvider>
       </body>
     </html>
   );
