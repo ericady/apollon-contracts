@@ -1,5 +1,4 @@
-import Login from './components/Login.tsx/Login';
-import Test from './components/Test';
+import Assets from './components/Features/Assets/Assets';
 import EthersProvider from './context/EthersProvider';
 
 export default function Home() {
@@ -12,8 +11,9 @@ export default function Home() {
   return (
     <main>
       <EthersProvider>
-        <Test />
-        <Login />
+        <div style={{ height: '100vh', width: '100vw', display: 'gird', placeItems: 'center' }}>
+          <Assets />
+        </div>
       </EthersProvider>
     </main>
   );
