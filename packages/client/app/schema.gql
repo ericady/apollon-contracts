@@ -6,53 +6,57 @@ type Token {
   priceUSD: Float!
   priceUSD24hAgo: Float!
   #
-  isDebt: Boolean!
-  totalSupplyUSD: Float! # minted - burned (only for debt tokens)
-  totalSupplyUSD24hAgo: Float!
-  #
-  isColl: Boolean!
-  totalValueLockedUSD: Float! # (only for coll tokens)
-  totalValueLockedUSD24hAgo: Float!
+  isPoolToken: Boolean!
 }
 
-enum TokenType {
-  DEBT
-  COLL
-}
-
-type TokenAmount {
+type DebtTokenMeta {
   token: Token!
-  usedAs: TokenType! # there are tokens, which can be used as debt and collateral
   # borrower specific
-  troveAmount: Float # minted (as debt), locked (as coll)
   walletAmount: Float
-  stabilityAmount: Float # lost deposit (as debt), gained collateral (as coll)
+  troveMintedAmount: Float
+  stabilityLostAmount: Float
   # global
-  totalDepositedStability: Float # (only for debt tokens)
-  totalReserve: Float # (only for debt tokens)
-  totalReserve24hAgo: Float # (only for debt tokens)
+  totalDepositedStability: Float!
+  totalReserve: Float!
+  totalReserve24hAgo: Float!
+  totalSupplyUSD: Float!
+  totalSupplyUSD24hAgo: Float!
+}
+
+type CollateralTokenMeta {
+  token: Token!
+  # borrower specific
+  walletAmount: Float
+  troveLockedAmount: Float
+  stabilityGainedAmount: Float
+  # global
+  totalValueLockedUSD: Float!
+  totalValueLockedUSD24hAgo: Float!
 }
 
 type Query {
   # without borrower address troveAmount and walletAmount are always undefined
   # every token is returned, even if it is not used by the borrower (troveAmount, walletAmount = 0)
   # the same token can be returned twice, if it is used as debt and collateral
-  getTokens(borrower: String): [TokenAmount!]!
+  getDebtTokens(borrower: String): [DebtTokenMeta!]!
+  getCollateralTokens(borrower: String): [CollateralTokenMeta!]!
 }
 
-type PoolTokenLiquidity {
+type PoolLiquidity {
   token: Token!
-  isLiquidity: Boolean! # if false, the token is only used for rewards (not relevant for the swap)
-  # only when isLiquidity
-  totalLiquidity: Float
-  borrowerLiquidity: Float
-  #
-  borrowerRewards: Float # unclaimed
+  totalAmount: Float!
+  borrowerAmount: Float!
+}
+
+type PoolReward {
+  token: Token!
+  amount: Float!
 }
 
 type Pool {
   id: String!
-  tokens: [PoolTokenLiquidity!]!
+  liquidity: [PoolLiquidity!]!
+  rewards: [PoolReward!]!
   volume24hUSD: Float!
   volume24hUSD24hAgo: Float!
 }
@@ -61,10 +65,33 @@ type Query {
   # every pool is returned, even if it is empty
   # without borrower address borrowerLiquidity and borrowerRewards are always undefined
   getPools(borrower: String): [Pool!]!
-  getPoolHistoryAdv(poolId: String!): [[Int]]! # [[timestamp, value], [...], ...] todo time range filter needed?
+  getPoolPriceHistory(poolId: String!): [[Int!]!]! # [[timestamp, value], [...], ...] todo time range filter needed?
   #
-  getCollateralUSDHistory: [Int!]! # 6h interval, from now into the past
-  getDebtUSDHistory: [Int!]! # 6h interval, from now into the past
-  getCRHistory: [Int!]! # 6h interval, from now into the past
-  getReserveUSDHistory: [Int!]! # 6h interval, from now into the past
+  getCollateralUSDHistory: [[Int!]!]! # [[timestamp, value], [...], ...]
+  getDebtUSDHistory: [[Int!]!]! # [[timestamp, value], [...], ...]
+  getCRHistory: [[Int!]!]! # [[timestamp, value], [...], ...]
+  getReserveUSDHistory: [[Int!]!]! # [[timestamp, value], [...], ...]
+}
+
+type TokenAmount {
+  token: Token!
+  amount: Float!
+}
+
+enum BorrowerHistoryType {
+  DEPOSITED
+  WITHDRAWN
+  CLAIMED_REWARDS
+}
+
+type BorrowerHistory {
+  timestamp: Int!
+  type: BorrowerHistoryType!
+  values: [TokenAmount!]!
+  resultInUSD: Float!
+}
+
+type Query {
+  getBorrowerPoolHistory(poolId: String!, borrower: String!): [BorrowerHistory!]!
+  getBorrowerStabilityHistory(borrower: String!): [BorrowerHistory!]!
 }
