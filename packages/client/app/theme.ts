@@ -34,6 +34,22 @@ const theme = createTheme({
       disabled: '#504D59', // Text color for disabled action items
     },
   },
+  components: {
+    MuiTableCell: {
+      styleOverrides: {
+        root: {
+          borderBottom: 'none', // This will remove the border from the TableRow
+        },
+      },
+    },
+    MuiTableRow: {
+      styleOverrides: {
+        root: {
+          borderBottom: 'none',
+        },
+      },
+    },
+  },
 });
 
 export default theme;

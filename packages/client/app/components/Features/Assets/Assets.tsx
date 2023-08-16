@@ -1,15 +1,19 @@
 'use client';
 
+import KeyboardArrowDownOutlinedIcon from '@mui/icons-material/KeyboardArrowDownOutlined';
+import KeyboardArrowUpOutlinedIcon from '@mui/icons-material/KeyboardArrowUpOutlined';
 import PushPinIcon from '@mui/icons-material/PushPin';
 import PushPinOutlinedIcon from '@mui/icons-material/PushPinOutlined';
-import Paper from '@mui/material/Paper';
+import { IconButton } from '@mui/material';
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
 import TableCell from '@mui/material/TableCell';
 import TableContainer from '@mui/material/TableContainer';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
+import { useState } from 'react';
 import FeatureBox from '../../FeatureBox/FeatureBox';
+import HeaderCell from '../../Table/HeaderCell';
 
 const DEMO_DATA = [
   {
@@ -45,25 +49,52 @@ const DEMO_DATA = [
 ];
 
 function Assets() {
+  const [selectedAsset, setSelectedAsset] = useState<string | null>(null);
+
+  const toggleFavorite = (symbol: string) => {
+    // TODO: To be implemented
+  };
+
   return (
     <FeatureBox title="Assets">
-      <TableContainer component={Paper}>
-        <Table sx={{ minWidth: 650 }} aria-label="simple table">
-          <TableHead>
+      <TableContainer>
+        <Table>
+          <TableHead sx={{ borderBottom: '1px solid', borderBottomColor: 'background.paper' }}>
             <TableRow>
-              <TableCell>Type</TableCell>
-              <TableCell align="right">$</TableCell>
-              <TableCell align="right">%</TableCell>
-              <TableCell></TableCell>
+              <HeaderCell title="Type" />
+              <HeaderCell title="$" cellProps={{ align: 'right' }} />
+              <HeaderCell title="%" cellProps={{ align: 'right' }} />
+              <HeaderCell title="" />
             </TableRow>
           </TableHead>
           <TableBody>
             {DEMO_DATA.map(({ change, isFavorite, price, symbol }) => (
-              <TableRow key={symbol}>
-                <TableCell>{symbol}</TableCell>
-                <TableCell align="right">{price}</TableCell>
-                <TableCell align="right">{change}</TableCell>
-                <TableCell align="right">{isFavorite ? <PushPinIcon /> : <PushPinOutlinedIcon />}</TableCell>
+              <TableRow
+                key={symbol}
+                hover
+                onClick={() => setSelectedAsset(symbol)}
+                sx={{ cursor: 'pointer' }}
+                selected={selectedAsset === symbol}
+              >
+                <TableCell size="small">{symbol}</TableCell>
+                <TableCell align="right" size="small">
+                  {price}
+                </TableCell>
+                <TableCell align="right" sx={{ color: change < 0 ? 'error.main' : 'success.main' }} size="small">
+                  <div style={{ display: 'flex', alignContent: 'center', justifyContent: 'flex-end' }}>
+                    {change}
+                    {change < 0 ? (
+                      <KeyboardArrowDownOutlinedIcon sx={{ pb: 0.5 }} />
+                    ) : (
+                      <KeyboardArrowUpOutlinedIcon sx={{ pb: 0.5 }} />
+                    )}
+                  </div>
+                </TableCell>
+                <TableCell align="right" size="small">
+                  <IconButton onClick={() => toggleFavorite(symbol)}>
+                    {isFavorite ? <PushPinIcon /> : <PushPinOutlinedIcon />}
+                  </IconButton>
+                </TableCell>
               </TableRow>
             ))}
           </TableBody>

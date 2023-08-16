@@ -12,11 +12,13 @@ type Props = {
 
 function FeatureBox({ title, icon = <StarBorderIcon />, children }: PropsWithChildren<Props>) {
   return (
-    <Box sx={{ m: 2 }}>
-      <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
-        {icon}
+    <Box sx={{ borderBottom: '1px solid', borderBottomColor: 'background.paper' }}>
+      <Box sx={{ m: 2 }}>
+        <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
+          {icon}
 
-        <Typography>{title}</Typography>
+          <Typography>{title}</Typography>
+        </Box>
       </Box>
 
       {children}
