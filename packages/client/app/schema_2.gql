@@ -1,0 +1,101 @@
+type Token {
+  address: String! # contract address, used as id
+  symbol: String!
+  createdAt: String!
+  #
+  priceUSD: Float!
+  priceUSD24hAgo: Float!
+}
+
+type TokenCollateral {
+  token: Token!
+
+  totalSupplyMintedUSD: Float!
+  totalSupplyMintedUSD24hAgo: Float!
+
+  totalValueLockedUSD: Float! # (only for coll tokens)
+  totalValueLockedUSD24hAgo: Float!
+}
+
+type TokenDebt {
+  token: Token!
+
+  totalSupplyBurnedUSD: Float!
+  totalSupplyBurnedUSD24hAgo: Float!
+
+  totalDepositedStability: Float! # (only for debt tokens)
+  totalReserve: Float! # (only for debt tokens)
+  totalReserve24hAgo: Float! # (only for debt tokens)
+}
+
+type Debt {
+  token: TokenDebt!
+  lostDeposit: Float! # stabilityAmount lost deposit (as debt), gained collateral (as coll)
+}
+
+type BorrowerDebt {
+  token: TokenDebt!
+  lostDeposit: Float! # stabilityAmount lost deposit (as debt), gained collateral (as coll)
+  troveAmountMinted: Float! # minted (as debt), locked (as coll)
+  walletAmount: Float!
+}
+
+type Collateral {
+  token: TokenCollateral!
+  gainedCollateral: Float! # stabilityAmount lost deposit (as debt), gained collateral (as coll)
+}
+
+type BorrowerCollateral {
+  token: TokenCollateral!
+  gainedCollateral: Float! # stabilityAmount lost deposit (as debt), gained collateral (as coll)
+  troveAmountLocked: Float! # minted (as debt), locked (as coll)
+  walletAmount: Float!
+}
+
+union TokenAmount = Debt | Collateral
+union TokenAmountBorrower = BorrowerDebt | BorrowerCollateral
+
+type Query {
+  # every token is returned, even if it is not used by the borrower (troveAmount, walletAmount = 0)
+  # the same token can be returned twice, if it is used as debt and collateral
+  getTokens: [TokenAmount!]!
+  getBorrowerTokens(borrower: String!): [TokenAmountBorrower!]!
+}
+
+type PoolTokenLiquidity {
+  token: Token!
+  totalLiquidity: Float!
+  borrowerLiquidity: Float!
+}
+
+type PoolTokenLiquidityReward {
+  token: Token!
+  #
+  borrowerRewards: Float! # unclaimed
+}
+
+type Pool {
+  id: String!
+  tokens: [PoolTokenLiquidity!]!
+  rewards: [PoolTokenLiquidityReward!]!
+  volume24hUSD: Float!
+  volume24hUSD24hAgo: Float!
+}
+
+type Query {
+  # every pool is returned, even if it is empty
+  # without borrower address borrowerLiquidity and borrowerRewards are always undefined
+  # TODO: Can we get individual pools for more granular updates? We dont want all the pools to "blink" all the time.
+  # TODO: How are we modeling previous events in the pool (like the partial exchange of liquidity for a reward). You wanted a log of these events in the LiquidityPool feature
+  getPools(borrower: String): [Pool!]!
+  getPoolHistoryAdv(poolId: String!): [[Int]]! # [[timestamp, value], [...], ...] todo time range filter needed?
+  #
+  # TODO: I think we need timestamps for this chart data. Otherwise it will be nasty business on the client.
+  getCollateralUSDHistory: [Int!]! # 6h interval, from now into the past
+  getDebtUSDHistory: [Int!]! # 6h interval, from now into the past
+  getCRHistory: [Int!]! # 6h interval, from now into the past
+  getReserveUSDHistory: [Int!]! # 6h interval, from now into the past
+}
+
+# TODO: What about the getSwapEstimate query?
+# TODO: What about the getLongShortEstimate query?
