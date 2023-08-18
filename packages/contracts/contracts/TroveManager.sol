@@ -75,13 +75,14 @@ contract TroveManager is LiquityBase, Ownable, CheckContract, ITroveManager {
     //
     address[] collTokens;
     mapping(address => uint) colls;
-    mapping(address => uint) stakes; // his (troves) stake of the entire system, relative to coll token, total trove stake need to be calculated on runtime using token prices
+    //
+    mapping(address => uint) stakes; // his (troves) stake of the entire system, total trove stake need to be calculated on runtime using token prices
   }
   mapping(address => Trove) public Troves;
 
   // todo need to be manged
   address[] public collTokenAddresses;
-  address[] public tokenAddresses; // for tracking used tokens in the maps (coll and debts) // todo need to be manged
+  address[] public debtTokenAddresses;
 
   // stakes gets stored relative to the coll token, total stake needs to be calculated on runtime using token prices
   mapping(address => uint) public totalStakes; // [collTokenAddress] => total system stake, relative to the coll token
@@ -94,9 +95,9 @@ contract TroveManager is LiquityBase, Ownable, CheckContract, ITroveManager {
    * A gain of ( stake * [L_TOKEN[T] - L_TOKEN[T](0)] )
    * Where L_TOKEN[T](0) are snapshots of token T for the active Trove taken at the instant the stake was made
    */
-  mapping(address => uint) public liquidatedTokens; // token address -> liquidated/redistributed amount
-  mapping(address => mapping(address => uint)) public rewardSnapshots; // [user][tokenAddress] value, snapshots
-  mapping(address => uint) public lastErrorRedistribution; // [tokenAddress] value, Error trackers for the trove redistribution calculation
+  mapping(address => mapping(bool => uint)) public liquidatedTokens; // [tokenAddress][isColl] -> liquidated/redistributed amount
+  mapping(address => mapping(bool => mapping(address => uint))) public rewardSnapshots; // [user][tokenAddress][isColl] -> value, snapshots
+  mapping(address => mapping(bool => uint)) public lastErrorRedistribution; // [tokenAddress][isColl] -> value, Error trackers for the trove redistribution calculation
 
   // Array of all active trove addresses - used to to compute an approximate hint off-chain, for the sorted list insertion
   address[] public TroveOwners;
@@ -724,10 +725,11 @@ contract TroveManager is LiquityBase, Ownable, CheckContract, ITroveManager {
   }
 
   function _initializeEmptyTokensToRedistribute() internal returns (CAmount[] memory tokensToRedistribute) {
-    tokensToRedistribute = new CAmount[](tokenAddresses.length + collTokenAddresses.length);
-    for (uint i = 0; i < tokenAddresses.length; i++) tokensToRedistribute[i] = CAmount(tokenAddresses[i], false, 0);
+    tokensToRedistribute = new CAmount[](debtTokenAddresses.length + collTokenAddresses.length);
     for (uint i = 0; i < collTokenAddresses.length; i++)
       tokensToRedistribute[tokenAddresses.length + i] = CAmount(collTokenAddresses[i], true, 0);
+    for (uint i = 0; i < debtTokenAddresses.length; i++)
+      tokensToRedistribute[i] = CAmount(debtTokenAddresses[i], false, 0);
 
     return tokensToRedistribute;
   }
@@ -1076,7 +1078,7 @@ contract TroveManager is LiquityBase, Ownable, CheckContract, ITroveManager {
       address token = _trove.collTokens[i];
 
       uint tokenPrice = priceFeed.getPrice(_priceCache, token);
-      uint pendingRewards = getPendingReward(_borrower, token);
+      uint pendingRewards = getPendingReward(_borrower, token, true);
       currentCollInStable = currentCollInStable.add(_trove.colls[token].add(pendingRewards).mul(tokenPrice));
     }
 
@@ -1084,7 +1086,7 @@ contract TroveManager is LiquityBase, Ownable, CheckContract, ITroveManager {
       IDebtToken token = _trove.debtTokens[i];
 
       uint tokenPrice = token.getPrice(_priceCache);
-      uint pendingRewards = getPendingReward(_borrower, address(token));
+      uint pendingRewards = getPendingReward(_borrower, address(token), true);
       currentDebtInStable = currentDebtInStable.add(_trove.debts[token].add(pendingRewards).mul(tokenPrice));
     }
 
@@ -1104,7 +1106,7 @@ contract TroveManager is LiquityBase, Ownable, CheckContract, ITroveManager {
     for (uint i = 0; i < _trove.collTokens.length; i++) {
       address token = _trove.collTokens[i];
 
-      uint pendingRewards = getPendingReward(_borrower, token);
+      uint pendingRewards = getPendingReward(_borrower, token, true);
       if (pendingRewards == 0) continue;
 
       _trove.colls[token] = _trove.colls[token].add(pendingRewards);
@@ -1115,7 +1117,7 @@ contract TroveManager is LiquityBase, Ownable, CheckContract, ITroveManager {
       IDebtToken token = _trove.debtTokens[i];
       address tokenAddress = address(token);
 
-      uint pendingRewards = getPendingReward(_borrower, tokenAddress);
+      uint pendingRewards = getPendingReward(_borrower, tokenAddress, false);
       if (pendingRewards == 0) continue;
 
       _trove.debts[token] = _trove.debts[token].add(pendingRewards);
@@ -1139,9 +1141,13 @@ contract TroveManager is LiquityBase, Ownable, CheckContract, ITroveManager {
   }
 
   function _updateTroveRewardSnapshots(address _borrower) internal {
-    for (uint i = 0; i < tokenAddresses.length; i++) {
-      address token = tokenAddresses[i];
-      rewardSnapshots[_borrower][token] = liquidatedTokens[token];
+    for (uint i = 0; i < debtTokenAddresses.length; i++) {
+      address token = debtTokenAddresses[i];
+      rewardSnapshots[_borrower][token][false] = liquidatedTokens[token][false];
+    }
+    for (uint i = 0; i < collTokenAddresses.length; i++) {
+      address token = collTokenAddresses[i];
+      rewardSnapshots[_borrower][token][true] = liquidatedTokens[token][true];
     }
 
     //todo
@@ -1152,12 +1158,14 @@ contract TroveManager is LiquityBase, Ownable, CheckContract, ITroveManager {
   // jUSD (stable coin)  can exists as debt and coll, so the isColl bool need to be included into the rewards
 
   // Get the borrower's pending accumulated rewards, earned by their stake through their redistribution
-  function getPendingReward(address _borrower, address _tokenAddress) public view returns (uint pendingReward) {
-    uint snapshotValue = rewardSnapshots[_borrower][_tokenAddress];
-    uint rewardPerUnitStaked = liquidatedTokens[_tokenAddress].sub(snapshotValue);
-    if (rewardPerUnitStaked == 0 || Troves[_borrower].status != Status.active) {
-      return 0;
-    }
+  function getPendingReward(
+    address _borrower,
+    address _tokenAddress,
+    bool _isColl
+  ) public view returns (uint pendingReward) {
+    uint snapshotValue = rewardSnapshots[_borrower][_tokenAddress][_isColl];
+    uint rewardPerUnitStaked = liquidatedTokens[_tokenAddress][_idColl].sub(snapshotValue);
+    if (rewardPerUnitStaked == 0 || Troves[_borrower].status != Status.active) return 0;
 
     uint stake = Troves[_borrower].stakes[_tokenAddress];
     pendingReward = stake.mul(rewardPerUnitStaked).div(DECIMAL_PRECISION);
@@ -1172,20 +1180,6 @@ contract TroveManager is LiquityBase, Ownable, CheckContract, ITroveManager {
     Trove storage trove = Troves[_borrower];
     amounts = new RAmount[](trove.collTokens.length + trove.debtTokens.length);
 
-    for (uint i = 0; i < trove.debtTokens.length; i++) {
-      address tokenAddress = address(trove.debtTokens[i]);
-      amounts[i] = RAmount(
-        tokenAddress,
-        trove.debtTokens[i].getPrice(_priceCache),
-        false,
-        trove.debts[trove.debtTokens[i]],
-        getPendingReward(_borrower, tokenAddress),
-        0,
-        0,
-        0,
-        0
-      );
-    }
     for (uint i = 0; i < trove.collTokens.length; i++) {
       address tokenAddress = address(trove.collTokens[i]);
       amounts[i + trove.debtTokens.length] = RAmount(
@@ -1193,7 +1187,21 @@ contract TroveManager is LiquityBase, Ownable, CheckContract, ITroveManager {
         _priceFeed.getPrice(_priceCache, tokenAddress),
         true,
         trove.colls[trove.collTokens[i]],
-        getPendingReward(_borrower, tokenAddress),
+        getPendingReward(_borrower, tokenAddress, true),
+        0,
+        0,
+        0,
+        0
+      );
+    }
+    for (uint i = 0; i < trove.debtTokens.length; i++) {
+      address tokenAddress = address(trove.debtTokens[i]);
+      amounts[i] = RAmount(
+        tokenAddress,
+        trove.debtTokens[i].getPrice(_priceCache),
+        false,
+        trove.debts[trove.debtTokens[i]],
+        getPendingReward(_borrower, tokenAddress, false),
         0,
         0,
         0,
@@ -1263,8 +1271,9 @@ contract TroveManager is LiquityBase, Ownable, CheckContract, ITroveManager {
 
   // Remove borrower's stake from the totalStakes sum, and set their stake to 0
   function _removeStake(address _borrower) internal {
-    for (uint i = 0; i < tokenAddresses.length; i++) {
-      address tokenAddress = tokenAddresses[i];
+    for (uint i = 0; i < collTokenAddresses.length; i++) {
+      address tokenAddress = collTokenAddresses[i];
+
       uint oldStake = Troves[_borrower].stakes[tokenAddress];
       totalStakes[tokenAddress] = totalStakes[tokenAddress].sub(oldStake);
       Troves[_borrower].stakes[tokenAddress] = 0;
@@ -1278,14 +1287,17 @@ contract TroveManager is LiquityBase, Ownable, CheckContract, ITroveManager {
 
   // Update borrower's stake based on their latest collateral value
   function _updateStakeAndTotalStakes(address _borrower) internal {
-    for (uint i = 0; i < tokenAddresses.length; i++) {
-      address tokenAddress = tokenAddresses[i];
+    for (uint i = 0; i < collTokenAddresses.length; i++) {
+      address tokenAddress = collTokenAddresses[i];
+
       uint newStake = _computeNewStake(tokenAddress, Troves[_borrower].colls[tokenAddress]);
       uint oldStake = Troves[_borrower].stakes[tokenAddress];
       Troves[_borrower].stakes[tokenAddress] = newStake;
 
       totalStakes[tokenAddress] = totalStakes[tokenAddress].sub(oldStake).add(newStake);
-      // todo emit TotalStakesUpdated(tokenAddress, totalStakes);
+
+      // todo
+      // emit TotalStakesUpdated(tokenAddress, totalStakes);
     }
   }
 
@@ -1327,39 +1339,49 @@ contract TroveManager is LiquityBase, Ownable, CheckContract, ITroveManager {
 
     uint totalStake = _calculateTotalStakeSum(_priceCache);
     for (uint i = 0; i < toRedistribute.length; i++) {
-      if (toRedistribute[i].amount == 0) continue;
-      address tokenAddress = toRedistribute[i].tokenAddress;
+      CAmount redistributeEntry = toRedistribute[i];
+      if (redistributeEntry.amount == 0) continue;
 
       // Get the per-unit-staked terms
-      uint numerator = toRedistribute[i].amount.mul(DECIMAL_PRECISION).add(lastErrorRedistribution[tokenAddress]);
+      uint numerator = redistributeEntry.amount.mul(DECIMAL_PRECISION).add(
+        lastErrorRedistribution[redistributeEntry.tokenAddress][redistributeEntry.isColl]
+      );
       uint rewardPerUnitStaked = numerator.div(totalStake);
-      lastErrorRedistribution[tokenAddress] = numerator.sub(rewardPerUnitStaked.mul(totalStake));
+      lastErrorRedistribution[redistributeEntry.tokenAddress][redistributeEntry.isColl] = numerator.sub(
+        rewardPerUnitStaked.mul(totalStake)
+      );
 
       // Add per-unit-staked terms to the running totals
-      liquidatedTokens[tokenAddress] = liquidatedTokens[tokenAddress].add(rewardPerUnitStaked);
-      //            emit LTermsUpdated(tokenAddress, liquidatedTokens[tokenAddress]); todo
+      liquidatedTokens[redistributeEntry.tokenAddress][redistributeEntry.isColl] = liquidatedTokens[
+        redistributeEntry.tokenAddress
+      ][redistributeEntry.isCol].add(rewardPerUnitStaked);
+
+      // todo
+      // emit LTermsUpdated(tokenAddress, liquidatedTokens[tokenAddress]);
 
       _storagePool.transferBetweenTypes(
         tokenAddress,
-        toRedistribute[i].isColl,
+        redistributeEntry.isColl,
         PoolType.Active,
         PoolType.Default,
-        toRedistribute[i].amount
+        redistributeEntry.amount
       );
     }
   }
 
   function _calculateTrovesStakeSum(PriceCache memory _priceCache, address _borrower) internal returns (uint stakeSum) {
     Trove storage trove = Troves[_borrower];
-    for (uint i = 0; i < tokenAddresses.length; i++) {
-      stakeSum = stakeSum.add(trove.stakes[tokenAddresses[i]].mul(priceFeed.getPrice(_priceCache, tokenAddresses[i])));
+    for (uint i = 0; i < collTokenAddresses.length; i++) {
+      address tokenAddress = collTokenAddresses[i];
+      stakeSum = stakeSum.add(trove.stakes[tokenAddress].mul(priceFeed.getPrice(_priceCache, tokenAddress)));
     }
     return stakeSum;
   }
 
   function _calculateTotalStakeSum(PriceCache memory _priceCache) internal returns (uint stakeSum) {
-    for (uint i = 0; i < tokenAddresses.length; i++) {
-      stakeSum = stakeSum.add(totalStakes[tokenAddresses[i]].mul(priceFeed.getPrice(_priceCache, tokenAddresses[i])));
+    for (uint i = 0; i < collTokenAddresses.length; i++) {
+      address tokenAddress = collTokenAddresses[i];
+      stakeSum = stakeSum.add(totalStakes[tokenAddress].mul(priceFeed.getPrice(_priceCache, tokenAddress)));
     }
     return stakeSum;
   }
@@ -1377,15 +1399,9 @@ contract TroveManager is LiquityBase, Ownable, CheckContract, ITroveManager {
 
     Trove storage trove = Troves[_borrower];
     trove.status = closedStatus;
-    for (uint i = 0; i < trove.debtTokens.length; i++) {
-      trove.debts[trove.debtTokens[i]] = 0;
-    }
-    for (uint i = 0; i < trove.collTokens.length; i++) {
-      trove.colls[trove.collTokens[i]] = 0;
-    }
-    for (uint i = 0; i < tokenAddresses.length; i++) {
-      trove.stakes[trove.collTokens[i]] = 0;
-    }
+    for (uint i = 0; i < trove.debtTokens.length; i++) trove.debts[trove.debtTokens[i]] = 0;
+    for (uint i = 0; i < trove.collTokens.length; i++) trove.colls[trove.collTokens[i]] = 0;
+    for (uint i = 0; i < collTokenAddresses.length; i++) trove.stakes[collTokenAddresses[i]] = 0;
 
     _removeTroveOwner(_borrower, TroveOwnersArrayLength);
     sortedTroves.remove(_borrower);
@@ -1396,8 +1412,8 @@ contract TroveManager is LiquityBase, Ownable, CheckContract, ITroveManager {
    * Used in a liquidation sequence.
    */
   function _updateSystemSnapshots_excludeCollRemainder(IStoragePool _storagePool) internal {
-    for (uint i = 0; i < tokenAddresses.length; i++) {
-      address tokenAddress = tokenAddresses[i];
+    for (uint i = 0; i < collTokenAddresses.length; i++) {
+      address tokenAddress = collTokenAddresses[i];
 
       totalStakesSnapshot[tokenAddress] = totalStakes[tokenAddress];
 
