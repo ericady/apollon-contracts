@@ -12,7 +12,6 @@ interface IBorrowerOperations is IBBase {
   event StoragePoolAddressChanged(address _storagePoolAddress);
   event StabilityPoolAddressChanged(address _stabilityPoolAddress);
   event PriceFeedAddressChanged(address _newPriceFeedAddress);
-  event SortedTrovesAddressChanged(address _sortedTrovesAddress);
   event DebtTokenManagerAddressChanged(address _debtTokenManagerAddress);
 
   event TroveCreated(address indexed _borrower, uint arrayIndex);

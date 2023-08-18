@@ -7,7 +7,6 @@ import './Interfaces/IStabilityPool.sol';
 import './Interfaces/IBorrowerOperations.sol';
 import './Interfaces/ITroveManager.sol';
 import './Interfaces/IDebtToken.sol';
-import './Interfaces/ISortedTroves.sol';
 import './Dependencies/LiquityBase.sol';
 import './Dependencies/SafeMath.sol';
 import './Dependencies/LiquitySafeMath128.sol';
@@ -154,7 +153,6 @@ contract StabilityPool is LiquityBase, Ownable, CheckContract, IStabilityPool {
   string public constant NAME = 'StabilityPool';
 
   ITroveManager public troveManager;
-  ISortedTroves public sortedTroves; // Needed to check if there are pending liquidations
   IPriceFeed public priceFeed;
   IStoragePool public storagePool;
 
@@ -216,20 +214,15 @@ contract StabilityPool is LiquityBase, Ownable, CheckContract, IStabilityPool {
 
   function setAddresses(
     address _troveManagerAddress,
-    address _sortedTrovesAddress,
     address _priceFeedAddress,
     address _storagePoolAddress
   ) external onlyOwner {
     checkContract(_troveManagerAddress);
-    checkContract(_sortedTrovesAddress);
     checkContract(_priceFeedAddress);
     checkContract(_storagePoolAddress);
 
     troveManager = ITroveManager(_troveManagerAddress);
     emit TroveManagerAddressChanged(_troveManagerAddress);
-
-    sortedTroves = ISortedTroves(_sortedTrovesAddress);
-    emit SortedTrovesAddressChanged(_sortedTrovesAddress);
 
     priceFeed = IPriceFeed(_priceFeedAddress);
     emit PriceFeedAddressChanged(_priceFeedAddress);

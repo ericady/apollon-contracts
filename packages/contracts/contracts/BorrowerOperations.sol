@@ -6,7 +6,6 @@ import './Interfaces/IBorrowerOperations.sol';
 import './Interfaces/ITroveManager.sol';
 import './Dependencies/IERC20.sol';
 import './Interfaces/IDebtToken.sol';
-import './Interfaces/ISortedTroves.sol';
 import './Dependencies/LiquityBase.sol';
 import './Dependencies/Ownable.sol';
 import './Dependencies/CheckContract.sol';
@@ -24,7 +23,6 @@ contract BorrowerOperations is LiquityBase, Ownable, CheckContract, IBorrowerOpe
 
   ITroveManager public troveManager;
   IDebtTokenManager public debtTokenManager;
-  ISortedTroves public sortedTroves; // A doubly linked list of Troves, sorted by their collateral ratios
   IStoragePool public storagePool;
   IPriceFeed public priceFeed;
   address stabilityPoolAddress;
@@ -84,7 +82,6 @@ contract BorrowerOperations is LiquityBase, Ownable, CheckContract, IBorrowerOpe
     ITroveManager troveManager;
     IStoragePool storagePool;
     IDebtTokenManager debtTokenManager;
-    ISortedTroves sortedTroves;
   }
 
   enum BorrowerOperation {
@@ -100,7 +97,6 @@ contract BorrowerOperations is LiquityBase, Ownable, CheckContract, IBorrowerOpe
     address _storagePoolAddress,
     address _stabilityPoolAddress,
     address _priceFeedAddress,
-    address _sortedTrovesAddress,
     address _debtTokenManagerAddress
   ) external onlyOwner {
     // This makes impossible to open a trove with zero withdrawn LUSD
@@ -110,7 +106,6 @@ contract BorrowerOperations is LiquityBase, Ownable, CheckContract, IBorrowerOpe
     checkContract(_storagePoolAddress);
     checkContract(_stabilityPoolAddress);
     checkContract(_priceFeedAddress);
-    checkContract(_sortedTrovesAddress);
     checkContract(_debtTokenManagerAddress);
 
     troveManager = ITroveManager(_troveManagerAddress);
@@ -125,9 +120,6 @@ contract BorrowerOperations is LiquityBase, Ownable, CheckContract, IBorrowerOpe
     priceFeed = IPriceFeed(_priceFeedAddress);
     emit PriceFeedAddressChanged(_priceFeedAddress);
 
-    sortedTroves = ISortedTroves(_sortedTrovesAddress);
-    emit SortedTrovesAddressChanged(_sortedTrovesAddress);
-
     debtTokenManager = IDebtTokenManager(_debtTokenManagerAddress);
     emit DebtTokenManagerAddressChanged(_debtTokenManagerAddress);
 
@@ -137,7 +129,7 @@ contract BorrowerOperations is LiquityBase, Ownable, CheckContract, IBorrowerOpe
   // --- Borrower Trove Operations ---
 
   function openTrove(TokenAmount[] memory _colls, address _upperHint, address _lowerHint) external override {
-    ContractsCache memory contractsCache = ContractsCache(troveManager, storagePool, debtTokenManager, sortedTroves);
+    ContractsCache memory contractsCache = ContractsCache(troveManager, storagePool, debtTokenManager);
     LocalVariables_openTrove memory vars;
     PriceCache memory priceCache;
 
@@ -190,8 +182,6 @@ contract BorrowerOperations is LiquityBase, Ownable, CheckContract, IBorrowerOpe
 
     vars.arrayIndex = contractsCache.troveManager.addTroveOwnerToArray(msg.sender);
     emit TroveCreated(msg.sender, vars.arrayIndex);
-
-    contractsCache.sortedTroves.insert(priceCache, msg.sender, vars.NICR, _upperHint, _lowerHint);
 
     // Move the coll to the active pool
     for (uint i = 0; i < vars.colls.length; i++) {
@@ -398,7 +388,7 @@ contract BorrowerOperations is LiquityBase, Ownable, CheckContract, IBorrowerOpe
     internal
     returns (ContractsCache memory contractsCache, LocalVariables_adjustTrove memory vars, PriceCache memory priceCache)
   {
-    contractsCache = ContractsCache(troveManager, storagePool, debtTokenManager, sortedTroves);
+    contractsCache = ContractsCache(troveManager, storagePool, debtTokenManager);
 
     (vars.isInRecoveryMode, vars.TCR, vars.entireSystemColl, vars.entireSystemDebt) = contractsCache
       .storagePool
@@ -444,9 +434,6 @@ contract BorrowerOperations is LiquityBase, Ownable, CheckContract, IBorrowerOpe
 
     // update troves stake
     contractsCache.troveManager.updateStakeAndTotalStakes(_borrower);
-
-    // Re-insert trove in to the sorted list
-    sortedTroves.reInsert(priceCache, _borrower, vars.newNCR, _upperHint, _lowerHint);
 
     // todo...
     //    emit TroveUpdated(

@@ -23,7 +23,6 @@ interface ITroveManager is IBBase {
   event DebtTokenManagerAddressChanged(address _newDebtTokenManagerAddress);
   event StoragePoolAddressChanged(address _storagePoolAddress);
   event StabilityPoolManagerAddressChanged(address _stabilityPoolManagerAddress);
-  event SortedTrovesAddressChanged(address _sortedTrovesAddress);
 
   event Liquidation(uint _liquidatedDebt, uint _liquidatedColl, uint _collGasCompensation, uint _LUSDGasCompensation);
   event Redemption(uint _attemptedLUSDAmount, uint _actualLUSDAmount, uint _ETHSent, uint _ETHFee);
@@ -57,19 +56,9 @@ interface ITroveManager is IBBase {
 
   function liquidate(address _borrower) external;
 
-  function liquidateTroves(uint _n) external;
-
   function batchLiquidateTroves(address[] calldata _troveArray) external;
 
-  function redeemCollateral(
-    uint _stableCoinAmount,
-    address _firstRedemptionHint,
-    address _upperPartialRedemptionHint,
-    address _lowerPartialRedemptionHint,
-    uint _partialRedemptionHintNICR,
-    uint _maxIterations,
-    uint _maxFee
-  ) external;
+  function redeemCollateral(uint _stableCoinAmount, uint _maxIterations, uint _maxFee) external;
 
   function updateStakeAndTotalStakes(address _borrower) external;
 

@@ -3,7 +3,6 @@
 pragma solidity ^0.8.9;
 
 import './Interfaces/ITroveManager.sol';
-import './Interfaces/ISortedTroves.sol';
 import './Dependencies/LiquityBase.sol';
 import './Dependencies/Ownable.sol';
 import './Dependencies/CheckContract.sol';
@@ -11,32 +10,23 @@ import './Dependencies/CheckContract.sol';
 contract HintHelpers is LiquityBase, Ownable, CheckContract {
   string public constant NAME = 'HintHelpers';
 
-  ISortedTroves public sortedTroves;
   ITroveManager public troveManager;
   IPriceFeed public priceFeed;
 
   // --- Events ---
 
-  event SortedTrovesAddressChanged(address _sortedTrovesAddress);
   event TroveManagerAddressChanged(address _troveManagerAddress);
   event PriceFeedAddressChanged(address _priceFeed);
 
   // --- Dependency setters ---
 
-  function setAddresses(
-    address _sortedTrovesAddress,
-    address _troveManagerAddress,
-    address _priceFeedAddress
-  ) external onlyOwner {
-    checkContract(_sortedTrovesAddress);
+  function setAddresses(address _troveManagerAddress, address _priceFeedAddress) external onlyOwner {
     checkContract(_troveManagerAddress);
     checkContract(_priceFeedAddress);
 
-    sortedTroves = ISortedTroves(_sortedTrovesAddress);
     troveManager = ITroveManager(_troveManagerAddress);
     priceFeed = IPriceFeed(_priceFeedAddress);
 
-    emit SortedTrovesAddressChanged(_sortedTrovesAddress);
     emit TroveManagerAddressChanged(_troveManagerAddress);
     emit PriceFeedAddressChanged(_priceFeedAddress);
 
@@ -136,12 +126,13 @@ contract HintHelpers is LiquityBase, Ownable, CheckContract {
       return (address(0), 0, _inputRandomSeed);
     }
 
-    hintAddress = sortedTroves.getLast();
-    diff = LiquityMath._getAbsoluteDifference(
-      _CR,
-      troveManager.getNominalICR(hintAddress, priceFeedCached, priceCache)
-    );
-    latestRandomSeed = _inputRandomSeed;
+    // todo
+    //    hintAddress = sortedTroves.getLast();
+    //    diff = LiquityMath._getAbsoluteDifference(
+    //      _CR,
+    //      troveManager.getNominalICR(hintAddress, priceFeedCached, priceCache)
+    //    );
+    //    latestRandomSeed = _inputRandomSeed;
 
     uint i = 1;
 
