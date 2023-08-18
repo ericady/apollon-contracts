@@ -405,7 +405,7 @@ contract BorrowerOperations is LiquityBase, Ownable, CheckContract, IBorrowerOpe
       .checkRecoveryMode(priceCache);
 
     _requireTroveisActive(contractsCache.troveManager, _borrower);
-    contractsCache.troveManager.applyPendingRewards(_borrower); // from redistributions
+    contractsCache.troveManager.applyPendingRewards(priceFeed, priceCache, _borrower); // from redistributions
 
     // fetching old/current debts and colls including prices + calc ICR
     (vars.debts, ) = _getDebtTokenAmountsWithFetchedPrices(
@@ -666,11 +666,13 @@ contract BorrowerOperations is LiquityBase, Ownable, CheckContract, IBorrowerOpe
     PriceCache memory _priceCache,
     TokenAmount[] memory _colls
   ) internal returns (PriceTokenAmount[] memory collTokenAmounts) {
+    IPriceFeed _priceFeedCached = priceFeed;
+
     collTokenAmounts = new PriceTokenAmount[](_colls.length);
     for (uint i = 0; i < _colls.length; i++) {
       collTokenAmounts[i].tokenAddress = _colls[i].tokenAddress;
       collTokenAmounts[i].amount = _colls[i].amount;
-      collTokenAmounts[i].price = priceFeed.getPrice(_priceCache, _colls[i].tokenAddress);
+      collTokenAmounts[i].price = _priceFeedCached.getPrice(_priceCache, _colls[i].tokenAddress);
     }
     return collTokenAmounts;
   }

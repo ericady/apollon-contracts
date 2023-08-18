@@ -43,10 +43,15 @@ interface ITroveManager is IBBase {
 
   function getTroveFromTroveOwnersArray(uint _index) external view returns (address);
 
-  function getNominalICR(address _borrower, PriceCache memory _priceCache) external returns (uint);
+  function getNominalICR(
+    address _borrower,
+    IPriceFeed _priceFeedCached,
+    PriceCache memory _priceCache
+  ) external returns (uint);
 
   function getCurrentICR(
     address _borrower,
+    IPriceFeed _priceFeedCached,
     PriceCache memory _priceCache
   ) external view returns (uint ICR, uint currentDebtInStable);
 
@@ -72,7 +77,7 @@ interface ITroveManager is IBBase {
 
   function addTroveOwnerToArray(address _borrower) external returns (uint index);
 
-  function applyPendingRewards(address _borrower) external;
+  function applyPendingRewards(IPriceFeed _priceFeedCached, PriceCache memory _priceCache, address _borrower) external;
 
   function getEntireDebtAndColl(
     IPriceFeed _priceFeed,
@@ -102,13 +107,17 @@ interface ITroveManager is IBBase {
 
   function getTroveStatus(address _borrower) external view returns (uint);
 
-  function getTroveStake(address _borrower) external view returns (uint);
-
   function getTroveDebt(address _borrower) external view returns (TokenAmount[] memory);
 
   function getTroveColl(address _borrower) external view returns (TokenAmount[] memory);
 
   function setTroveStatus(address _borrower, uint num) external;
+
+  function getTroveStake(
+    address _borrower,
+    IPriceFeed _priceFeed,
+    PriceCache memory _priceCache
+  ) external view returns (uint);
 
   function increaseTroveColl(address _borrower, PriceTokenAmount[] memory _collTokenAmounts) external;
 

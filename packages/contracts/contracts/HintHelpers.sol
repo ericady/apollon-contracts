@@ -13,23 +13,32 @@ contract HintHelpers is LiquityBase, Ownable, CheckContract {
 
   ISortedTroves public sortedTroves;
   ITroveManager public troveManager;
+  IPriceFeed public priceFeed;
 
   // --- Events ---
 
   event SortedTrovesAddressChanged(address _sortedTrovesAddress);
   event TroveManagerAddressChanged(address _troveManagerAddress);
+  event PriceFeedAddressChanged(address _priceFeed);
 
   // --- Dependency setters ---
 
-  function setAddresses(address _sortedTrovesAddress, address _troveManagerAddress) external onlyOwner {
+  function setAddresses(
+    address _sortedTrovesAddress,
+    address _troveManagerAddress,
+    address _priceFeedAddress
+  ) external onlyOwner {
     checkContract(_sortedTrovesAddress);
     checkContract(_troveManagerAddress);
+    checkContract(_priceFeedAddress);
 
     sortedTroves = ISortedTroves(_sortedTrovesAddress);
     troveManager = ITroveManager(_troveManagerAddress);
+    priceFeed = IPriceFeed(_priceFeedAddress);
 
     emit SortedTrovesAddressChanged(_sortedTrovesAddress);
     emit TroveManagerAddressChanged(_troveManagerAddress);
+    emit PriceFeedAddressChanged(_priceFeedAddress);
 
     _renounceOwnership();
   }
@@ -118,7 +127,9 @@ contract HintHelpers is LiquityBase, Ownable, CheckContract {
     uint _numTrials,
     uint _inputRandomSeed
   ) external returns (address hintAddress, uint diff, uint latestRandomSeed) {
+    IPriceFeed priceFeedCached = priceFeed;
     PriceCache memory priceCache;
+
     uint arrayLength = troveManager.getTroveOwnersCount();
 
     if (arrayLength == 0) {
@@ -126,7 +137,10 @@ contract HintHelpers is LiquityBase, Ownable, CheckContract {
     }
 
     hintAddress = sortedTroves.getLast();
-    diff = LiquityMath._getAbsoluteDifference(_CR, troveManager.getNominalICR(hintAddress, priceCache));
+    diff = LiquityMath._getAbsoluteDifference(
+      _CR,
+      troveManager.getNominalICR(hintAddress, priceFeedCached, priceCache)
+    );
     latestRandomSeed = _inputRandomSeed;
 
     uint i = 1;
@@ -136,7 +150,7 @@ contract HintHelpers is LiquityBase, Ownable, CheckContract {
 
       uint arrayIndex = latestRandomSeed % arrayLength;
       address currentAddress = troveManager.getTroveFromTroveOwnersArray(arrayIndex);
-      uint currentNICR = troveManager.getNominalICR(currentAddress, priceCache);
+      uint currentNICR = troveManager.getNominalICR(currentAddress, priceFeedCached, priceCache);
 
       // check if abs(current - CR) > abs(closest - CR), and update closest if current is closer
       uint currentDiff = LiquityMath._getAbsoluteDifference(currentNICR, _CR);
