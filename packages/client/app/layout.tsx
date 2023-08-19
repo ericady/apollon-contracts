@@ -10,6 +10,8 @@ import ThemeProvider from '@mui/material/styles/ThemeProvider';
 import { Inter } from 'next/font/google';
 import { useEffect } from 'react';
 import { client } from './client';
+import NavigationBar from './components/NavigationBar/NavigationBar';
+import EthersProvider from './context/EthersProvider';
 import './globals.css';
 import theme from './theme';
 
@@ -33,7 +35,14 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <body className={inter.className}>
         <ThemeProvider theme={theme}>
           <CssBaseline />
-          <ApolloProvider client={client}>{children}</ApolloProvider>
+
+          <EthersProvider>
+            <NavigationBar />
+
+            <ApolloProvider client={client}>
+              <main>{children}</main>
+            </ApolloProvider>
+          </EthersProvider>
         </ThemeProvider>
       </body>
     </html>
