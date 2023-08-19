@@ -1,6 +1,8 @@
 name: CI - CLIENT
 on:
   pull_request:
+    paths:
+      - packages/client/**
 
 jobs:
   QualityGate:
