@@ -134,7 +134,12 @@ export type TokenAmount = {
   token: Token;
 };
 
-export type GetAllDebtTokensQueryVariables = Exact<{ [key: string]: never; }>;
+export type GetDebtTokensQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type GetAllDebtTokensQuery = { __typename?: 'Query', getDebtTokens: Array<{ __typename?: 'DebtTokenMeta', token: { __typename?: 'Token', address: string } }> };
+export type GetDebtTokensQuery = { __typename?: 'Query', getDebtTokens: Array<{ __typename?: 'DebtTokenMeta', totalReserve: number, token: { __typename?: 'Token', address: string } }> };
+
+export type GetCollateralTokensQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type GetCollateralTokensQuery = { __typename?: 'Query', getCollateralTokens: Array<{ __typename?: 'CollateralTokenMeta', walletAmount?: number | null, token: { __typename?: 'Token', address: string } }> };

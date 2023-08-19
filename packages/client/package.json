@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "next build",
+    "build": "npm run && codegennext build",
     "start": "next start",
     "lint": "next lint",
     "prettier:check": "prettier --check **/*.{js,jsx,mjs,ts,tsx,json,css,md}",
@@ -12,7 +12,8 @@
     "test:unit": "jest",
     "test:unit:watch": "jest --watch",
     "test:component:integration": "playwright test -c playwright-ct.config.ts",
-    "test:e2e": "playwright test"
+    "test:e2e": "playwright test",
+    "codegen": "npx graphql-codegen"
   },
   "dependencies": {
     "@apollo/client": "3.8.1",

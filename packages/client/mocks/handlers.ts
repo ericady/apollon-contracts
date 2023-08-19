@@ -2,12 +2,6 @@ import { faker } from '@faker-js/faker';
 import { graphql } from 'msw';
 import { Query, QueryGetDebtTokensArgs, Token } from '../app/generated/gql-types';
 
-// interface of apollo
-interface GraphQLRequest {
-  query: string;
-  variables?: Record<string, any>;
-}
-
 const tokens: Token[] = Array(10)
   .fill(null)
   .map(() => ({
@@ -20,7 +14,9 @@ const tokens: Token[] = Array(10)
   }));
 
 export const handlers = [
-  graphql.query<Query['getDebtTokens'], QueryGetDebtTokensArgs>('GetAllDebtTokens', (req, res, ctx) => {
+  // GetDebtTokens
+
+  graphql.query<Query['getDebtTokens'], QueryGetDebtTokensArgs>('GetDebtTokens', (req, res, ctx) => {
     const { borrower } = req.variables;
 
     const result: Query['getDebtTokens'] = tokens.map((token) => ({
@@ -37,4 +33,23 @@ export const handlers = [
 
     return res(ctx.data(result));
   }),
+
+  // GetCollateralTokens
+
+  graphql.query<Query['getCollateralTokens'], QueryGetDebtTokensArgs>('GetCollateralTokens', (req, res, ctx) => {
+    const { borrower } = req.variables;
+
+    const result: Query['getCollateralTokens'] = tokens.map((token) => ({
+      token: token,
+      walletAmount: borrower ? parseFloat(faker.finance.amount(0, 1000, 2)) : null,
+      troveLockedAmount: borrower ? parseFloat(faker.finance.amount(0, 500, 2)) : null,
+      stabilityGainedAmount: borrower ? parseFloat(faker.finance.amount(0, 50, 2)) : null,
+      totalValueLockedUSD: parseFloat(faker.finance.amount(10000, 50000, 2)),
+      totalValueLockedUSD24hAgo: parseFloat(faker.finance.amount(10000, 50000, 2)),
+    }));
+
+    return res(ctx.data(result));
+  }),
+
+  // GetCollateralTokens
 ];
