@@ -23,6 +23,9 @@
     "react-dom": "18.2.0"
   },
   "devDependencies": {
+    "@graphql-codegen/cli": "^5.0.0",
+    "@graphql-codegen/typescript": "^4.0.1",
+    "@graphql-codegen/typescript-operations": "^4.0.1",
     "@playwright/experimental-ct-react": "1.37.0",
     "@playwright/test": "1.37.0",
     "@testing-library/jest-dom": "^5.17.0",
