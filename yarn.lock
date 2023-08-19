@@ -2513,6 +2513,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@faker-js/faker@npm:^8.0.2":
+  version: 8.0.2
+  resolution: "@faker-js/faker@npm:8.0.2"
+  checksum: cf73daf9a50397eb0b3f04a7ef3fbb6f54acc026b167707136a7e58a517fd805a46c9e8c5f017f3022f104a4ff984765daaeee2cb98b3c34646db05c2acad441
+  languageName: node
+  linkType: hard
+
 "@float-capital/float-subgraph-uncrashable@npm:^0.0.0-alpha.4":
   version: 0.0.0-internal-testing.5
   resolution: "@float-capital/float-subgraph-uncrashable@npm:0.0.0-internal-testing.5"
@@ -11314,6 +11321,7 @@ __metadata:
   resolution: "client@workspace:packages/client"
   dependencies:
     "@apollo/client": 3.8.1
+    "@faker-js/faker": ^8.0.2
     "@graphql-codegen/cli": ^5.0.0
     "@graphql-codegen/typescript": ^4.0.1
     "@graphql-codegen/typescript-operations": ^4.0.1

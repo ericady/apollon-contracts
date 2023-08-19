@@ -1,9 +1,7 @@
 import { ApolloClient, InMemoryCache } from '@apollo/client';
-import { RetryLink } from '@apollo/client/link/retry';
 
-const link = new RetryLink();
 export const client = new ApolloClient({
-  uri: 'localhost:3000/',
+  // TODO: replace with your own graphql server
+  uri: 'https://flyby-router-demo.herokuapp.com/',
   cache: new InMemoryCache(),
-  link,
 });
