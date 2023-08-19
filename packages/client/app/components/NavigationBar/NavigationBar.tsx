@@ -11,7 +11,7 @@ function NavigationBar() {
 
   return (
     <AppBar position="static">
-      <Toolbar sx={{ height: '46px' }}>
+      <Toolbar>
         <img src="assets/svgs/Apollon_logo_negative.svg" alt="Apollon Logo" height="30" typeof="image/svg+xml" />
 
         <Button
