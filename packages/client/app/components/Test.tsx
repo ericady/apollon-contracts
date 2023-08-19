@@ -10,10 +10,10 @@ function Test() {
   console.log('data: ', data);
 
   return (
-    <div data-test-id="test">
-      Learn React
+    <>
+      <div data-test-id="test">Learn React</div>
       <button onClick={() => refetch()}>Refetch</button>
-    </div>
+    </>
   );
 }
 
