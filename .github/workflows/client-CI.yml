@@ -2,6 +2,7 @@ name: CI - CLIENT
 on:
   pull_request:
     paths:
+    # We can run the QualityGate only on client changes because its isolated and has no dependencies to other modules of the monorepo  
       - packages/client/**
 
 jobs:
