@@ -21,3 +21,11 @@ export const GET_ALL_COLLATERAL_TOKENS = gql`
     }
   }
 `;
+
+export const GET_ALL_POOLS = gql`
+  query GetPools {
+    getPools {
+      id
+    }
+  }
+`;

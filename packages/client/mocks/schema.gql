@@ -45,7 +45,7 @@ type Query {
 type PoolLiquidity {
   token: Token!
   totalAmount: Float!
-  borrowerAmount: Float!
+  borrowerAmount: Float
 }
 
 type PoolReward {

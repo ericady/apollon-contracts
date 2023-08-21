@@ -62,7 +62,7 @@ export type Pool = {
 
 export type PoolLiquidity = {
   __typename?: 'PoolLiquidity';
-  borrowerAmount: Scalars['Float']['output'];
+  borrowerAmount?: Maybe<Scalars['Float']['output']>;
   token: Token;
   totalAmount: Scalars['Float']['output'];
 };
@@ -143,3 +143,8 @@ export type GetCollateralTokensQueryVariables = Exact<{ [key: string]: never; }>
 
 
 export type GetCollateralTokensQuery = { __typename?: 'Query', getCollateralTokens: Array<{ __typename?: 'CollateralTokenMeta', walletAmount?: number | null, token: { __typename?: 'Token', address: string } }> };
+
+export type GetPoolsQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type GetPoolsQuery = { __typename?: 'Query', getPools: Array<{ __typename?: 'Pool', id: string }> };

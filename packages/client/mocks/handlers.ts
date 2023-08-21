@@ -51,5 +51,28 @@ export const handlers = [
     return res(ctx.data(result));
   }),
 
-  // GetCollateralTokens
+  // GetPools
+  graphql.query<Query['getPools'], QueryGetDebtTokensArgs>('GetPools', (req, res, ctx) => {
+    const { borrower } = req.variables;
+
+    const result: Query['getPools'] = Array(5)
+      .fill(null)
+      .map(() => ({
+        id: faker.string.uuid(),
+        liquidity: tokens.map((token) => ({
+          token,
+          totalAmount: parseFloat(faker.finance.amount(100, 1000, 2)),
+          borrowerAmount: borrower ? parseFloat(faker.finance.amount(0, 100, 2)) : null,
+        })),
+        rewards: tokens.slice(0, 3).map((token) => ({
+          // Taking a subset of tokens for demonstration
+          token,
+          amount: parseFloat(faker.finance.amount(1, 50, 2)),
+        })),
+        volume24hUSD: parseFloat(faker.finance.amount(10000, 50000, 2)),
+        volume24hUSD24hAgo: parseFloat(faker.finance.amount(10000, 50000, 2)),
+      }));
+
+    return res(ctx.data(result));
+  }),
 ];
