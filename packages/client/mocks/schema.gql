@@ -69,7 +69,7 @@ type Query {
   #
   getCollateralUSDHistory: [[Int!]!]! # [[timestamp, value], [...], ...]
   getDebtUSDHistory: [[Int!]!]! # [[timestamp, value], [...], ...]
-  getCRHistory: [[Int!]!]! # [[timestamp, value], [...], ...]
+  getCRHistory: [[Int!]!]! # [[timestamp, value], [...], ...] TODO: CR?
   getReserveUSDHistory: [[Int!]!]! # [[timestamp, value], [...], ...]
 }
 

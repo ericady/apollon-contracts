@@ -1,6 +1,13 @@
 import { faker } from '@faker-js/faker';
 import { graphql } from 'msw';
-import { Query, QueryGetDebtTokensArgs, Token } from '../app/generated/gql-types';
+import {
+  Query,
+  QueryGetCollateralTokensArgs,
+  QueryGetDebtTokensArgs,
+  QueryGetPoolPriceHistoryArgs,
+  QueryGetPoolsArgs,
+  Token,
+} from '../app/generated/gql-types';
 
 const tokens: Token[] = Array(10)
   .fill(null)
@@ -53,7 +60,7 @@ export const handlers = [
 
   // GetCollateralTokens
 
-  graphql.query<Query['getCollateralTokens'], QueryGetDebtTokensArgs>('GetCollateralTokens', (req, res, ctx) => {
+  graphql.query<Query['getCollateralTokens'], QueryGetCollateralTokensArgs>('GetCollateralTokens', (req, res, ctx) => {
     const { borrower } = req.variables;
 
     const result: Query['getCollateralTokens'] = tokens.map((token) => ({
@@ -69,7 +76,7 @@ export const handlers = [
   }),
 
   // GetPools
-  graphql.query<Query['getPools'], QueryGetDebtTokensArgs>('GetPools', (req, res, ctx) => {
+  graphql.query<Query['getPools'], QueryGetPoolsArgs>('GetPools', (req, res, ctx) => {
     const { borrower } = req.variables;
 
     const result: Query['getPools'] = Array(5)
@@ -93,8 +100,31 @@ export const handlers = [
     return res(ctx.data(result));
   }),
 
+  // CHART DATA MOCK
+
   // GetPoolPriceHistory
-  graphql.query<Query['getPoolPriceHistory'], QueryGetDebtTokensArgs>('GetPoolPriceHistory', (req, res, ctx) => {
+  graphql.query<Query['getPoolPriceHistory'], QueryGetPoolPriceHistoryArgs>('GetPoolPriceHistory', (req, res, ctx) => {
+    // For this mock, we ignore the actual poolId and just generate mock data
+    const result = generatePoolPriceHistory();
+
+    return res(ctx.data(result));
+  }),
+  // GetCollateralUSDHistory
+  graphql.query<Query['getCollateralUSDHistory']>('GetCollateralUSDHistory', (req, res, ctx) => {
+    // For this mock, we ignore the actual poolId and just generate mock data
+    const result = generatePoolPriceHistory();
+
+    return res(ctx.data(result));
+  }),
+  // GetDebtUSDHistory
+  graphql.query<Query['getDebtUSDHistory']>('GetDebtUSDHistory', (req, res, ctx) => {
+    // For this mock, we ignore the actual poolId and just generate mock data
+    const result = generatePoolPriceHistory();
+
+    return res(ctx.data(result));
+  }),
+  // GetReserveUSDHistory
+  graphql.query<Query['getReserveUSDHistory']>('GetReserveUSDHistory', (req, res, ctx) => {
     // For this mock, we ignore the actual poolId and just generate mock data
     const result = generatePoolPriceHistory();
 

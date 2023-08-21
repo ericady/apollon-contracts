@@ -153,3 +153,18 @@ export type GetPoolPriceHistoryQueryVariables = Exact<{ [key: string]: never; }>
 
 
 export type GetPoolPriceHistoryQuery = { __typename?: 'Query', getPoolPriceHistory: Array<Array<number>> };
+
+export type GetCollateralUsdHistoryQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type GetCollateralUsdHistoryQuery = { __typename?: 'Query', getCollateralUSDHistory: Array<Array<number>> };
+
+export type GetDebtUsdHistoryQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type GetDebtUsdHistoryQuery = { __typename?: 'Query', getDebtUSDHistory: Array<Array<number>> };
+
+export type GetReserveUsdHistoryQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type GetReserveUsdHistoryQuery = { __typename?: 'Query', getReserveUSDHistory: Array<Array<number>> };

@@ -30,8 +30,28 @@ export const GET_ALL_POOLS = gql`
   }
 `;
 
+// CHARTS
+
 export const GET_POOL_PRICE_HISTORY = gql`
   query GetPoolPriceHistory {
     getPoolPriceHistory(poolId: "1")
+  }
+`;
+
+export const GET_COLLATERAL_USD_HISTORY = gql`
+  query GetCollateralUSDHistory {
+    getCollateralUSDHistory
+  }
+`;
+
+export const GET_DEBT_USD_HISTORY = gql`
+  query GetDebtUSDHistory {
+    getDebtUSDHistory
+  }
+`;
+
+export const GET_RESERVE_USD_HISTORY = gql`
+  query GetReserveUSDHistory {
+    getReserveUSDHistory
   }
 `;
