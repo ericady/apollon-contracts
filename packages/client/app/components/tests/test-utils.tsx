@@ -1,7 +1,4 @@
-import { ApolloProvider } from '@apollo/client';
+import { MockedProvider } from '@apollo/client/testing';
 import { PropsWithChildren } from 'react';
-import { client } from '../../client';
 
-export const IntegrationWrapper = ({ children }: PropsWithChildren<{}>) => (
-  <ApolloProvider client={client}>{children}</ApolloProvider>
-);
+export const IntegrationWrapper = ({ children }: PropsWithChildren<{}>) => <MockedProvider>{children}</MockedProvider>;
