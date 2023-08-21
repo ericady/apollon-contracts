@@ -2,4 +2,4 @@
 public/mockServiceWorker.js
 
 # generated files
-app/generated/gql-types.ts
+app/generated
