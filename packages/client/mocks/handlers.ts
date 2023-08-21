@@ -13,6 +13,23 @@ const tokens: Token[] = Array(10)
     isPoolToken: faker.datatype.boolean(),
   }));
 
+// Define a helper function to generate pool price history data
+const generatePoolPriceHistory = (): number[][] => {
+  const now = Date.now();
+  const oneDayInMs = 24 * 60 * 60 * 1000;
+
+  return Array(30)
+    .fill(null)
+    .map((_, i) => {
+      // Generate a timestamp for each day in the past month
+      const timestamp = now - i * oneDayInMs;
+      // Generate a random price between $1 and $5000 for demo purposes
+      const price = parseFloat(faker.finance.amount(1, 5000, 2));
+      return [timestamp, price];
+    })
+    .reverse(); // reverse to get the timeline in chronological order
+};
+
 export const handlers = [
   // GetDebtTokens
 
@@ -72,6 +89,14 @@ export const handlers = [
         volume24hUSD: parseFloat(faker.finance.amount(10000, 50000, 2)),
         volume24hUSD24hAgo: parseFloat(faker.finance.amount(10000, 50000, 2)),
       }));
+
+    return res(ctx.data(result));
+  }),
+
+  // GetPoolPriceHistory
+  graphql.query<Query['getPoolPriceHistory'], QueryGetDebtTokensArgs>('GetPoolPriceHistory', (req, res, ctx) => {
+    // For this mock, we ignore the actual poolId and just generate mock data
+    const result = generatePoolPriceHistory();
 
     return res(ctx.data(result));
   }),

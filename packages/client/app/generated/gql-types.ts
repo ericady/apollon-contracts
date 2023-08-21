@@ -148,3 +148,8 @@ export type GetPoolsQueryVariables = Exact<{ [key: string]: never; }>;
 
 
 export type GetPoolsQuery = { __typename?: 'Query', getPools: Array<{ __typename?: 'Pool', id: string }> };
+
+export type GetPoolPriceHistoryQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type GetPoolPriceHistoryQuery = { __typename?: 'Query', getPoolPriceHistory: Array<Array<number>> };

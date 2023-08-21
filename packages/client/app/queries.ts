@@ -29,3 +29,9 @@ export const GET_ALL_POOLS = gql`
     }
   }
 `;
+
+export const GET_POOL_PRICE_HISTORY = gql`
+  query GetPoolPriceHistory {
+    getPoolPriceHistory(poolId: "1")
+  }
+`;
