@@ -168,3 +168,13 @@ export type GetReserveUsdHistoryQueryVariables = Exact<{ [key: string]: never; }
 
 
 export type GetReserveUsdHistoryQuery = { __typename?: 'Query', getReserveUSDHistory: Array<Array<number>> };
+
+export type GetBorrowerPoolHistoryQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type GetBorrowerPoolHistoryQuery = { __typename?: 'Query', getBorrowerPoolHistory: Array<{ __typename?: 'BorrowerHistory', timestamp: number }> };
+
+export type GetBorrowerStabilityHistoryQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type GetBorrowerStabilityHistoryQuery = { __typename?: 'Query', getBorrowerStabilityHistory: Array<{ __typename?: 'BorrowerHistory', timestamp: number }> };

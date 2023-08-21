@@ -1,7 +1,11 @@
 import { faker } from '@faker-js/faker';
 import { graphql } from 'msw';
 import {
+  BorrowerHistory,
+  BorrowerHistoryType,
   Query,
+  QueryGetBorrowerPoolHistoryArgs,
+  QueryGetBorrowerStabilityHistoryArgs,
   QueryGetCollateralTokensArgs,
   QueryGetDebtTokensArgs,
   QueryGetPoolPriceHistoryArgs,
@@ -35,6 +39,28 @@ const generatePoolPriceHistory = (): number[][] => {
       return [timestamp, price];
     })
     .reverse(); // reverse to get the timeline in chronological order
+};
+
+const generateBorrowerHistory = (): BorrowerHistory[] => {
+  const now = Date.now();
+  const oneDayInMs = 24 * 60 * 60 * 1000;
+
+  return Array(10)
+    .fill(null)
+    .map(() => {
+      const randomToken = tokens[faker.number.int({ min: 0, max: tokens.length - 1 })];
+      return {
+        timestamp: now - faker.number.int({ min: 0, max: 29 }) * oneDayInMs,
+        type: faker.helpers.arrayElement(Object.values(BorrowerHistoryType)),
+        values: [
+          {
+            token: randomToken,
+            amount: parseFloat(faker.finance.amount(1, 1000, 2)),
+          },
+        ],
+        resultInUSD: parseFloat(faker.finance.amount(1, 5000, 2)),
+      };
+    });
 };
 
 export const handlers = [
@@ -130,4 +156,25 @@ export const handlers = [
 
     return res(ctx.data(result));
   }),
+
+  // GetBorrowerPoolHistory
+  graphql.query<Query['getBorrowerPoolHistory'], QueryGetBorrowerPoolHistoryArgs>(
+    'GetBorrowerPoolHistory',
+    (req, res, ctx) => {
+      // For this mock, we ignore the actual poolId and just generate mock data
+      const result = generateBorrowerHistory();
+
+      return res(ctx.data(result));
+    },
+  ),
+  // GetBorrowerStabilityHistory
+  graphql.query<Query['getBorrowerStabilityHistory'], QueryGetBorrowerStabilityHistoryArgs>(
+    'GetBorrowerStabilityHistory',
+    (req, res, ctx) => {
+      // For this mock, we ignore the actual poolId and just generate mock data
+      const result = generateBorrowerHistory();
+
+      return res(ctx.data(result));
+    },
+  ),
 ];
