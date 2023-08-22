@@ -1,5 +1,6 @@
 import Box from '@mui/material/Box';
 import Assets from '../components/Features/Assets/Assets';
+import Farm from '../components/Features/Assets/Farm';
 import Swap from '../components/Features/Assets/Swap';
 
 function Balance() {
@@ -39,7 +40,9 @@ function Balance() {
         style={{
           gridArea: 'farm',
         }}
-      ></Box>
+      >
+        <Farm />
+      </Box>
       <Box
         style={{
           gridArea: 'trading',
