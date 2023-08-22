@@ -24,36 +24,45 @@ function Balance() {
           gridArea: 'asset',
           borderRight: '1px solid',
           borderRightColor: 'background.paper',
-          borderBottom: '1px solid',
-          borderBottomColor: 'background.paper',
         }}
       >
         <Assets />
       </Box>
       <Box
-        style={{
+        sx={{
           gridArea: 'swap',
+          borderRight: '1px solid',
+          borderRightColor: 'background.paper',
         }}
       >
         <Swap />
       </Box>
       <Box
-        style={{
+        sx={{
           gridArea: 'farm',
+          borderRight: '1px solid',
+          borderRightColor: 'background.paper',
         }}
       >
         <Farm />
       </Box>
 
       <Box
-        style={{
+        sx={{
           gridArea: 'trading',
           display: 'flex',
           flexDirection: 'column',
           justifyContent: 'flex-end',
         }}
       >
-        <Positions />
+        <Box
+          sx={{
+            borderTop: '1px solid',
+            borderTopColor: 'background.paper',
+          }}
+        >
+          <Positions />
+        </Box>
       </Box>
     </div>
   );

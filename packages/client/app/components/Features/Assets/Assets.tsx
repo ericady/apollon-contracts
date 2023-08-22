@@ -56,7 +56,7 @@ function Assets() {
   };
 
   return (
-    <FeatureBox title="Assets">
+    <FeatureBox title="Assets" noPadding>
       <TableContainer>
         <Table>
           <TableHead sx={{ borderBottom: '1px solid', borderBottomColor: 'background.paper' }}>
@@ -73,7 +73,7 @@ function Assets() {
                 key={symbol}
                 hover
                 onClick={() => setSelectedAsset(symbol)}
-                sx={{ cursor: 'pointer' }}
+                sx={{ cursor: 'pointer', '& .MuiTableCell-root': { borderBottom: 'none' } }}
                 selected={selectedAsset === symbol}
               >
                 <TableCell size="small">{symbol}</TableCell>

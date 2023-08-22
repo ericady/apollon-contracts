@@ -1,8 +1,6 @@
 'use client';
 
-import DragIndicatorIcon from '@mui/icons-material/DragIndicator';
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
-import Square from '@mui/icons-material/Square';
 import Button from '@mui/material/Button';
 import InputAdornment from '@mui/material/InputAdornment';
 import Tab from '@mui/material/Tab';
@@ -10,6 +8,7 @@ import Tabs from '@mui/material/Tabs';
 import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
 import { useState } from 'react';
+import FeatureBox from '../../FeatureBox/FeatureBox';
 
 const Farm = () => {
   const [value, setValue] = useState(0);
@@ -19,25 +18,7 @@ const Farm = () => {
   };
 
   return (
-    <>
-      <div className="swap-heading">
-        <Typography variant="subtitle2" component="h5">
-          <Square
-            sx={{
-              color: '#fff',
-              fontSize: '15px',
-              marginRight: '10px',
-            }}
-          />
-          FARM
-        </Typography>
-        <DragIndicatorIcon
-          sx={{
-            color: '#64616D',
-          }}
-        />
-      </div>
-
+    <FeatureBox title="Farm">
       <div className="farm-tabs">
         <Tabs value={value} onChange={handleChange} aria-label="Shared Data Tabs" className="farm-tabs-heading">
           <Tab label="LONG" />
@@ -98,7 +79,7 @@ const Farm = () => {
           </div>
         </div>
       </div>
-    </>
+    </FeatureBox>
   );
 };
 

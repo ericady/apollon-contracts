@@ -14,6 +14,7 @@ import Tabs from '@mui/material/Tabs';
 import Typography from '@mui/material/Typography';
 import { useTheme } from '@mui/material/styles';
 import { useState } from 'react';
+import Label from '../../Label/Label';
 
 const Positions = () => {
   const theme = useTheme();
@@ -27,8 +28,8 @@ const Positions = () => {
     <>
       <div className="tabs-sheet">
         <Tabs value={value} onChange={handleChange} aria-label="Shared Data Tabs" className="farm-tabs-heading">
-          <Tab label={<span>BALANCE </span>} />
-          <Tab label={<span>COLLATERAL</span>} />
+          <Tab label="BALANCE" />
+          <Tab label="COLLATERAL" />
           <Tab
             label={
               <span>
@@ -39,7 +40,7 @@ const Positions = () => {
           <Tab
             label={
               <span>
-                HISTORY <Typography variant="h6">48</Typography>{' '}
+                HISTORY <Typography variant="h6">48</Typography>
               </span>
             }
           />
@@ -315,13 +316,14 @@ const Positions = () => {
                         PNL
                         <ArrowDropDownIcon />
                       </TableCell>
+                      <TableCell className="table-hdng"></TableCell>
                     </TableRow>
                   </TableHead>
                   <TableBody>
                     <TableRow>
                       <TableCell>12.06.2023 12:34 (-12d)</TableCell>
                       <TableCell>
-                        <Typography color="success.main">Long</Typography>
+                        <Label variant="success">Long</Label>
                       </TableCell>
                       <TableCell>
                         <div className="flex">
@@ -346,14 +348,13 @@ const Positions = () => {
                         </div>
                       </TableCell>
                       <TableCell>
-                        {/* @ts-ignore */}
                         <Button variant="rounded">Close</Button>
                       </TableCell>
                     </TableRow>
                     <TableRow>
                       <TableCell>06.06.2023 12:24 (-18d)</TableCell>
                       <TableCell>
-                        <Typography color="error.main">Short</Typography>
+                        <Label variant="error">Short</Label>
                       </TableCell>
                       <TableCell>
                         <div className="flex">
@@ -378,7 +379,6 @@ const Positions = () => {
                         </div>
                       </TableCell>
                       <TableCell>
-                        {/* @ts-ignore */}
                         <Button variant="rounded">Close</Button>
                       </TableCell>
                     </TableRow>
@@ -429,7 +429,7 @@ const Positions = () => {
                     <TableRow>
                       <TableCell>12.06.2023 12:34 (-12d)</TableCell>
                       <TableCell>
-                        <Typography color="success.main">Long</Typography>
+                        <Label variant="success">Long</Label>
                       </TableCell>
                       <TableCell>
                         <div className="flex">
@@ -457,7 +457,7 @@ const Positions = () => {
                     <TableRow>
                       <TableCell>06.06.2023 12:24 (-18d)</TableCell>
                       <TableCell>
-                        <Typography color="error.main">Short</Typography>
+                        <Label variant="error">Short</Label>
                       </TableCell>
                       <TableCell>
                         <div className="flex">

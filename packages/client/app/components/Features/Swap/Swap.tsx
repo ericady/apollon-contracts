@@ -1,14 +1,13 @@
 'use client';
 
-import DragIndicatorIcon from '@mui/icons-material/DragIndicator';
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
-import Square from '@mui/icons-material/Square';
 import SwapHorizIcon from '@mui/icons-material/SwapHoriz';
 import Button from '@mui/material/Button';
 import InputAdornment from '@mui/material/InputAdornment';
 import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
 import { useState } from 'react';
+import FeatureBox from '../../FeatureBox/FeatureBox';
 
 const Swap = () => {
   const [showMore, setShowMore] = useState(false);
@@ -18,24 +17,7 @@ const Swap = () => {
   };
 
   return (
-    <>
-      <div className="swap-heading">
-        <Typography variant="subtitle2" component="h5">
-          <Square
-            sx={{
-              color: '#fff',
-              fontSize: '15px',
-              marginRight: '10px',
-            }}
-          />
-          SWAP
-        </Typography>
-        <DragIndicatorIcon
-          sx={{
-            color: '#64616D',
-          }}
-        />
-      </div>
+    <FeatureBox title="Swap">
       <div className="currency-swap">
         <TextField
           placeholder="3333"
@@ -108,7 +90,7 @@ const Swap = () => {
           The final values will be calculated after the swap.
         </Typography>
       </div>
-    </>
+    </FeatureBox>
   );
 };
 
