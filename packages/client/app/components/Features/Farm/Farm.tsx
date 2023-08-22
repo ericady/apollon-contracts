@@ -17,6 +17,7 @@ const Farm = () => {
   const handleChange = (event: React.SyntheticEvent, newValue: number) => {
     setValue(newValue);
   };
+
   return (
     <>
       <div className="swap-heading">

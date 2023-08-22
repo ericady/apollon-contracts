@@ -1,7 +1,8 @@
 import Box from '@mui/material/Box';
 import Assets from '../components/Features/Assets/Assets';
-import Farm from '../components/Features/Assets/Farm';
-import Swap from '../components/Features/Assets/Swap';
+import Farm from '../components/Features/Farm/Farm';
+import Positions from '../components/Features/Positions/Positions';
+import Swap from '../components/Features/Swap/Swap';
 
 function Balance() {
   return (
@@ -43,11 +44,17 @@ function Balance() {
       >
         <Farm />
       </Box>
+
       <Box
         style={{
           gridArea: 'trading',
+          display: 'flex',
+          flexDirection: 'column',
+          justifyContent: 'flex-end',
         }}
-      ></Box>
+      >
+        <Positions />
+      </Box>
     </div>
   );
 }
