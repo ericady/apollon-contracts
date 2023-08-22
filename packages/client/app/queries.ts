@@ -3,9 +3,13 @@ import { gql } from '@apollo/client';
 export const GET_ALL_DEBT_TOKENS = gql`
   query GetDebtTokens {
     getDebtTokens {
-      totalReserve
+      # TODO: Implement sort in query or sort server side
+      totalSupplyUSD
       token {
         address
+        symbol
+        priceUSD
+        priceUSD24hAgo
       }
     }
   }

@@ -1,5 +1,6 @@
 'use client';
 
+import { useQuery } from '@apollo/client';
 import KeyboardArrowDownOutlinedIcon from '@mui/icons-material/KeyboardArrowDownOutlined';
 import KeyboardArrowUpOutlinedIcon from '@mui/icons-material/KeyboardArrowUpOutlined';
 import PushPinIcon from '@mui/icons-material/PushPin';
@@ -11,48 +12,55 @@ import TableCell from '@mui/material/TableCell';
 import TableContainer from '@mui/material/TableContainer';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
+import { GetDebtTokensQuery, GetDebtTokensQueryVariables } from '../../../generated/gql-types';
+import { GET_ALL_DEBT_TOKENS } from '../../../queries';
 import FeatureBox from '../../FeatureBox/FeatureBox';
 import HeaderCell from '../../Table/HeaderCell';
 
-const DEMO_DATA = [
-  {
-    symbol: 'ISLA',
-    price: 2398,
-    change: 3.16,
-    isFavorite: true,
-  },
-  {
-    symbol: 'GKD',
-    price: 13313,
-    change: -9.18,
-    isFavorite: true,
-  },
-  {
-    symbol: 'AAPL',
-    price: 4530,
-    change: -6.23,
-    isFavorite: false,
-  },
-  {
-    symbol: 'ISLA',
-    price: 2398,
-    change: 3.47,
-    isFavorite: false,
-  },
-  {
-    symbol: 'GKD',
-    price: 13313,
-    change: -9.89,
-    isFavorite: false,
-  },
-];
+export const FAVORITE_ASSETS_LOCALSTORAGE_KEY = 'favoriteAssets';
 
 function Assets() {
   const [selectedAsset, setSelectedAsset] = useState<string | null>(null);
+  const [favoritedAssets, setFavoritedAssets] = useState<string[]>(() =>
+    JSON.parse(window.localStorage.getItem(FAVORITE_ASSETS_LOCALSTORAGE_KEY) ?? '[]'),
+  );
 
-  const toggleFavorite = (symbol: string) => {
-    // TODO: To be implemented
+  const { data } = useQuery<GetDebtTokensQuery, GetDebtTokensQueryVariables>(GET_ALL_DEBT_TOKENS);
+
+  const tokens = useMemo(() => {
+    // get token address from local storage and set isFavorite if it is present
+    return data?.getDebtTokens
+      .map(({ token, totalSupplyUSD }) => {
+        return {
+          ...token,
+          totalSupplyUSD,
+          // calculate change over last 24h
+          change: (token.priceUSD - token.priceUSD24hAgo) / token.priceUSD24hAgo,
+          isFavorite: favoritedAssets.find((address) => token.address === address) !== undefined ? true : false,
+        };
+      })
+      .sort((a, b) => (a.isFavorite ? -1 : 1));
+  }, [data, favoritedAssets]);
+
+  if (!tokens) return null;
+
+  const toggleFavorite = (address: string) => {
+    const favoritedAssetsFromLS: string[] = JSON.parse(
+      window.localStorage.getItem(FAVORITE_ASSETS_LOCALSTORAGE_KEY) ?? '[]',
+    );
+    const assetIncluded = favoritedAssetsFromLS.includes(address);
+
+    if (assetIncluded) {
+      const tokenInListIndex = favoritedAssetsFromLS.findIndex((addressInLS) => addressInLS === address);
+      favoritedAssetsFromLS.splice(tokenInListIndex, 1);
+      window.localStorage.setItem(FAVORITE_ASSETS_LOCALSTORAGE_KEY, JSON.stringify(favoritedAssetsFromLS));
+      setFavoritedAssets(favoritedAssetsFromLS);
+    } else {
+      favoritedAssetsFromLS.push(address);
+      window.localStorage.setItem(FAVORITE_ASSETS_LOCALSTORAGE_KEY, JSON.stringify(favoritedAssetsFromLS));
+      setFavoritedAssets(favoritedAssetsFromLS);
+    }
   };
 
   return (
@@ -68,16 +76,16 @@ function Assets() {
             </TableRow>
           </TableHead>
           <TableBody>
-            {DEMO_DATA.map(({ change, isFavorite, price, symbol }) => (
+            {tokens.map(({ address, isFavorite, symbol, priceUSD, change }) => (
               <TableRow
-                key={symbol}
+                key={address}
                 hover
-                onClick={() => setSelectedAsset(symbol)}
+                onClick={() => setSelectedAsset(address)}
                 sx={{ cursor: 'pointer', '& .MuiTableCell-root': { borderBottom: 'none' } }}
                 selected={selectedAsset === symbol}
               >
                 <TableCell>{symbol}</TableCell>
-                <TableCell align="right">{price}</TableCell>
+                <TableCell align="right">{priceUSD}</TableCell>
                 <TableCell align="right" sx={{ color: change < 0 ? 'error.main' : 'success.main' }}>
                   <div style={{ display: 'flex', alignContent: 'center', justifyContent: 'flex-end' }}>
                     {change}
@@ -89,7 +97,12 @@ function Assets() {
                   </div>
                 </TableCell>
                 <TableCell align="right">
-                  <IconButton sx={{ height: 20, width: 20 }} size="small" onClick={() => toggleFavorite(symbol)}>
+                  <IconButton
+                    sx={{ height: 20, width: 20 }}
+                    size="small"
+                    onClick={() => toggleFavorite(address)}
+                    disableRipple
+                  >
                     {isFavorite ? <PushPinIcon fontSize="small" /> : <PushPinOutlinedIcon fontSize="small" />}
                   </IconButton>
                 </TableCell>

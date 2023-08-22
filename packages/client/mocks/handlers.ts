@@ -66,8 +66,10 @@ const generateBorrowerHistory = (): BorrowerHistory[] => {
 export const handlers = [
   // GetDebtTokens
 
-  graphql.query<Query['getDebtTokens'], QueryGetDebtTokensArgs>('GetDebtTokens', (req, res, ctx) => {
+  graphql.query<{ getDebtTokens: Query['getDebtTokens'] }, QueryGetDebtTokensArgs>('GetDebtTokens', (req, res, ctx) => {
     const { borrower } = req.variables;
+
+    console.log('localStorage', localStorage);
 
     const result: Query['getDebtTokens'] = tokens.map((token) => ({
       token: token,
@@ -81,28 +83,31 @@ export const handlers = [
       totalSupplyUSD24hAgo: parseFloat(faker.finance.amount(10000, 50000, 2)),
     }));
 
-    return res(ctx.data(result));
+    return res(ctx.data({ getDebtTokens: result }));
   }),
 
   // GetCollateralTokens
 
-  graphql.query<Query['getCollateralTokens'], QueryGetCollateralTokensArgs>('GetCollateralTokens', (req, res, ctx) => {
-    const { borrower } = req.variables;
+  graphql.query<{ getCollateralTokens: Query['getCollateralTokens'] }, QueryGetCollateralTokensArgs>(
+    'GetCollateralTokens',
+    (req, res, ctx) => {
+      const { borrower } = req.variables;
 
-    const result: Query['getCollateralTokens'] = tokens.map((token) => ({
-      token: token,
-      walletAmount: borrower ? parseFloat(faker.finance.amount(0, 1000, 2)) : null,
-      troveLockedAmount: borrower ? parseFloat(faker.finance.amount(0, 500, 2)) : null,
-      stabilityGainedAmount: borrower ? parseFloat(faker.finance.amount(0, 50, 2)) : null,
-      totalValueLockedUSD: parseFloat(faker.finance.amount(10000, 50000, 2)),
-      totalValueLockedUSD24hAgo: parseFloat(faker.finance.amount(10000, 50000, 2)),
-    }));
+      const result: Query['getCollateralTokens'] = tokens.map((token) => ({
+        token: token,
+        walletAmount: borrower ? parseFloat(faker.finance.amount(0, 1000, 2)) : null,
+        troveLockedAmount: borrower ? parseFloat(faker.finance.amount(0, 500, 2)) : null,
+        stabilityGainedAmount: borrower ? parseFloat(faker.finance.amount(0, 50, 2)) : null,
+        totalValueLockedUSD: parseFloat(faker.finance.amount(10000, 50000, 2)),
+        totalValueLockedUSD24hAgo: parseFloat(faker.finance.amount(10000, 50000, 2)),
+      }));
 
-    return res(ctx.data(result));
-  }),
+      return res(ctx.data({ getCollateralTokens: result }));
+    },
+  ),
 
   // GetPools
-  graphql.query<Query['getPools'], QueryGetPoolsArgs>('GetPools', (req, res, ctx) => {
+  graphql.query<{ getPools: Query['getPools'] }, QueryGetPoolsArgs>('GetPools', (req, res, ctx) => {
     const { borrower } = req.variables;
 
     const result: Query['getPools'] = Array(5)
@@ -123,58 +128,64 @@ export const handlers = [
         volume24hUSD24hAgo: parseFloat(faker.finance.amount(10000, 50000, 2)),
       }));
 
-    return res(ctx.data(result));
+    return res(ctx.data({ getPools: result }));
   }),
 
   // CHART DATA MOCK
 
   // GetPoolPriceHistory
-  graphql.query<Query['getPoolPriceHistory'], QueryGetPoolPriceHistoryArgs>('GetPoolPriceHistory', (req, res, ctx) => {
-    // For this mock, we ignore the actual poolId and just generate mock data
-    const result = generatePoolPriceHistory();
+  graphql.query<{ getPoolPriceHistory: Query['getPoolPriceHistory'] }, QueryGetPoolPriceHistoryArgs>(
+    'GetPoolPriceHistory',
+    (req, res, ctx) => {
+      // For this mock, we ignore the actual poolId and just generate mock data
+      const result = generatePoolPriceHistory();
 
-    return res(ctx.data(result));
-  }),
+      return res(ctx.data({ getPoolPriceHistory: result }));
+    },
+  ),
   // GetCollateralUSDHistory
-  graphql.query<Query['getCollateralUSDHistory']>('GetCollateralUSDHistory', (req, res, ctx) => {
-    // For this mock, we ignore the actual poolId and just generate mock data
-    const result = generatePoolPriceHistory();
+  graphql.query<{ getCollateralUSDHistory: Query['getCollateralUSDHistory'] }>(
+    'GetCollateralUSDHistory',
+    (req, res, ctx) => {
+      // For this mock, we ignore the actual poolId and just generate mock data
+      const result = generatePoolPriceHistory();
 
-    return res(ctx.data(result));
-  }),
+      return res(ctx.data({ getCollateralUSDHistory: result }));
+    },
+  ),
   // GetDebtUSDHistory
-  graphql.query<Query['getDebtUSDHistory']>('GetDebtUSDHistory', (req, res, ctx) => {
+  graphql.query<{ getDebtUSDHistory: Query['getDebtUSDHistory'] }>('GetDebtUSDHistory', (req, res, ctx) => {
     // For this mock, we ignore the actual poolId and just generate mock data
     const result = generatePoolPriceHistory();
 
-    return res(ctx.data(result));
+    return res(ctx.data({ getDebtUSDHistory: result }));
   }),
   // GetReserveUSDHistory
-  graphql.query<Query['getReserveUSDHistory']>('GetReserveUSDHistory', (req, res, ctx) => {
+  graphql.query<{ getReserveUSDHistory: Query['getReserveUSDHistory'] }>('GetReserveUSDHistory', (req, res, ctx) => {
     // For this mock, we ignore the actual poolId and just generate mock data
     const result = generatePoolPriceHistory();
 
-    return res(ctx.data(result));
+    return res(ctx.data({ getReserveUSDHistory: result }));
   }),
 
   // GetBorrowerPoolHistory
-  graphql.query<Query['getBorrowerPoolHistory'], QueryGetBorrowerPoolHistoryArgs>(
+  graphql.query<{ getBorrowerPoolHistory: Query['getBorrowerPoolHistory'] }, QueryGetBorrowerPoolHistoryArgs>(
     'GetBorrowerPoolHistory',
     (req, res, ctx) => {
       // For this mock, we ignore the actual poolId and just generate mock data
       const result = generateBorrowerHistory();
 
-      return res(ctx.data(result));
+      return res(ctx.data({ getBorrowerPoolHistory: result }));
     },
   ),
   // GetBorrowerStabilityHistory
-  graphql.query<Query['getBorrowerStabilityHistory'], QueryGetBorrowerStabilityHistoryArgs>(
-    'GetBorrowerStabilityHistory',
-    (req, res, ctx) => {
-      // For this mock, we ignore the actual poolId and just generate mock data
-      const result = generateBorrowerHistory();
+  graphql.query<
+    { getBorrowerStabilityHistory: Query['getBorrowerStabilityHistory'] },
+    QueryGetBorrowerStabilityHistoryArgs
+  >('GetBorrowerStabilityHistory', (req, res, ctx) => {
+    // For this mock, we ignore the actual poolId and just generate mock data
+    const result = generateBorrowerHistory();
 
-      return res(ctx.data(result));
-    },
-  ),
+    return res(ctx.data({ getBorrowerStabilityHistory: result }));
+  }),
 ];

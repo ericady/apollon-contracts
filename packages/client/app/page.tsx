@@ -6,10 +6,10 @@ export default function Home() {
   const router = useRouter();
 
   if (process.env.NEXT_PUBLIC_API_MOCKING === 'enabled') {
-    import('../mocks').then((module) => {
-      module.default();
+    import('../mocks').then(async (module) => {
+      await module.default();
+      router.replace('/balance');
     });
-    router.replace('/balance');
   }
 
   return null;
