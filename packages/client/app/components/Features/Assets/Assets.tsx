@@ -58,7 +58,7 @@ function Assets() {
   return (
     <FeatureBox title="Assets" noPadding>
       <TableContainer>
-        <Table>
+        <Table size="small">
           <TableHead sx={{ borderBottom: '1px solid', borderBottomColor: 'background.paper' }}>
             <TableRow>
               <HeaderCell title="Type" />
@@ -76,23 +76,21 @@ function Assets() {
                 sx={{ cursor: 'pointer', '& .MuiTableCell-root': { borderBottom: 'none' } }}
                 selected={selectedAsset === symbol}
               >
-                <TableCell size="small">{symbol}</TableCell>
-                <TableCell align="right" size="small">
-                  {price}
-                </TableCell>
-                <TableCell align="right" sx={{ color: change < 0 ? 'error.main' : 'success.main' }} size="small">
+                <TableCell>{symbol}</TableCell>
+                <TableCell align="right">{price}</TableCell>
+                <TableCell align="right" sx={{ color: change < 0 ? 'error.main' : 'success.main' }}>
                   <div style={{ display: 'flex', alignContent: 'center', justifyContent: 'flex-end' }}>
                     {change}
                     {change < 0 ? (
-                      <KeyboardArrowDownOutlinedIcon sx={{ pb: 0.5 }} />
+                      <KeyboardArrowDownOutlinedIcon fontSize="small" sx={{ pb: 0.5 }} />
                     ) : (
-                      <KeyboardArrowUpOutlinedIcon sx={{ pb: 0.5 }} />
+                      <KeyboardArrowUpOutlinedIcon fontSize="small" sx={{ pb: 0.5 }} />
                     )}
                   </div>
                 </TableCell>
-                <TableCell align="right" size="small">
-                  <IconButton onClick={() => toggleFavorite(symbol)}>
-                    {isFavorite ? <PushPinIcon /> : <PushPinOutlinedIcon />}
+                <TableCell align="right">
+                  <IconButton sx={{ height: 20, width: 20 }} size="small" onClick={() => toggleFavorite(symbol)}>
+                    {isFavorite ? <PushPinIcon fontSize="small" /> : <PushPinOutlinedIcon fontSize="small" />}
                   </IconButton>
                 </TableCell>
               </TableRow>
