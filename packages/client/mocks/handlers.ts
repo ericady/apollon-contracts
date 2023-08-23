@@ -1,5 +1,6 @@
 import { faker } from '@faker-js/faker';
 import { graphql } from 'msw';
+import { FAVORITE_ASSETS_LOCALSTORAGE_KEY } from '../app/components/Features/Assets/Assets';
 import {
   BorrowerHistory,
   BorrowerHistoryType,
@@ -13,10 +14,12 @@ import {
   Token,
 } from '../app/generated/gql-types';
 
+const favoritedAssets: string[] = JSON.parse(localStorage.getItem(FAVORITE_ASSETS_LOCALSTORAGE_KEY) ?? '[]');
+
 const tokens: Token[] = Array(10)
   .fill(null)
-  .map(() => ({
-    address: faker.string.uuid(),
+  .map((_, index) => ({
+    address: index <= favoritedAssets.length - 1 ? favoritedAssets[index] : faker.string.uuid(),
     symbol: faker.finance.currencyCode(),
     createdAt: faker.date.past().toISOString(),
     priceUSD: parseFloat(faker.finance.amount(1, 5000, 2)),
@@ -34,7 +37,6 @@ const generatePoolPriceHistory = (): number[][] => {
     .map((_, i) => {
       // Generate a timestamp for each day in the past month
       const timestamp = now - i * oneDayInMs;
-      // Generate a random price between $1 and $5000 for demo purposes
       const price = parseFloat(faker.finance.amount(1, 5000, 2));
       return [timestamp, price];
     })
@@ -68,8 +70,6 @@ export const handlers = [
 
   graphql.query<{ getDebtTokens: Query['getDebtTokens'] }, QueryGetDebtTokensArgs>('GetDebtTokens', (req, res, ctx) => {
     const { borrower } = req.variables;
-
-    console.log('localStorage', localStorage);
 
     const result: Query['getDebtTokens'] = tokens.map((token) => ({
       token: token,

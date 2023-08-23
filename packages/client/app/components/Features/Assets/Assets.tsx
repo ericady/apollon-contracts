@@ -15,6 +15,7 @@ import TableRow from '@mui/material/TableRow';
 import { useMemo, useState } from 'react';
 import { GetDebtTokensQuery, GetDebtTokensQueryVariables } from '../../../generated/gql-types';
 import { GET_ALL_DEBT_TOKENS } from '../../../queries';
+import { roundCurrency } from '../../../utils/math';
 import FeatureBox from '../../FeatureBox/FeatureBox';
 import HeaderCell from '../../Table/HeaderCell';
 
@@ -36,7 +37,7 @@ function Assets() {
           ...token,
           totalSupplyUSD,
           // calculate change over last 24h
-          change: (token.priceUSD - token.priceUSD24hAgo) / token.priceUSD24hAgo,
+          change: roundCurrency((token.priceUSD - token.priceUSD24hAgo) / token.priceUSD24hAgo),
           isFavorite: favoritedAssets.find((address) => token.address === address) !== undefined ? true : false,
         };
       })
@@ -65,7 +66,7 @@ function Assets() {
 
   return (
     <FeatureBox title="Assets" noPadding>
-      <TableContainer>
+      <TableContainer sx={{ maxHeight: 170, overflow: 'scroll' }}>
         <Table size="small">
           <TableHead sx={{ borderBottom: '1px solid', borderBottomColor: 'background.paper' }}>
             <TableRow>
