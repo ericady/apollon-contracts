@@ -26,6 +26,14 @@ const tokens: Token[] = Array(10)
     priceUSD24hAgo: parseFloat(faker.finance.amount(1, 5000, 2)),
     isPoolToken: faker.datatype.boolean(),
   }));
+tokens.push({
+  address: '0x6cA13a4ab78dd7D657226b155873A04DB929A3A4',
+  symbol: 'JUSD',
+  createdAt: faker.date.past().toISOString(),
+  priceUSD: parseFloat(faker.finance.amount(1, 5000, 2)),
+  priceUSD24hAgo: parseFloat(faker.finance.amount(1, 5000, 2)),
+  isPoolToken: faker.datatype.boolean(),
+});
 
 // Define a helper function to generate pool price history data
 const generatePoolPriceHistory = (): number[][] => {

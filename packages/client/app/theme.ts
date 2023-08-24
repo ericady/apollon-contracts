@@ -16,12 +16,12 @@ import '@fontsource/space-grotesk/700.css';
 const PRIMARY_BACKGROUND = '#14111D';
 const PAPER_BACKGROUND = '#2A2636';
 const PRIMARY_TEXT = '#FFFFFF';
-const SECONDARY_TEXT = '#827F8B';
+export const SECONDARY_TEXT = '#827F8B';
 const THRID_TEXT = '#504D59';
 const DISABLED_TEXT = '#504D59';
 const BUTTON_BACKGROUND = '#1E1B27';
 const BUTTON_TEXT = '#827F8B';
-const BUTTON_BORDER = '#282531';
+export const BUTTON_BORDER = '#282531';
 const BUTTON_2_TEXT = '#ffffff';
 const BUTTON_2_BORDER = '#3C3945';
 const BUTTON_BACKGROUND_HOVER = '#1D202F';
@@ -62,6 +62,7 @@ const theme = createTheme({
   },
 
   typography: {
+    fontFamily: ['inter', 'space-grotesk'].join(','),
     body1: {
       color: PRIMARY_TEXT,
       fontWeight: '700',
@@ -93,6 +94,13 @@ const theme = createTheme({
     },
   },
   components: {
+    MuiTableHead: {
+      styleOverrides: {
+        root: {
+          font: '11px space-grotesk !important',
+        },
+      },
+    },
     MuiButton: {
       variants: [
         {

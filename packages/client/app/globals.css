@@ -21,7 +21,7 @@
 }
 
 /* swap widget css */
-.swap-info p {
+.swap-info-paragraph {
   display: flex;
   justify-content: space-between;
   align-items: center;
@@ -30,40 +30,19 @@
   display: block;
   padding: 10px;
 }
-.currency-swap {
-  display: flex;
-  align-items: center;
-}
-.swap-info p {
-  margin: 10px 0;
-}
-.swap-info {
-  padding: 15px 0;
-}
+
 .swap-heading h5 {
   margin: 0;
   display: flex;
   align-items: center;
   line-height: inherit;
 }
-.swap-btn h6 {
-  text-align: center;
-  margin-bottom: 0;
-  display: flex;
-  justify-content: center;
-  gap: 5px;
-  align-items: center;
-  margin-top: 10px;
-}
+
 .swap-heading {
   margin-bottom: 20px;
   display: flex;
   align-items: center;
   justify-content: space-between;
-}
-.swap-info p span {
-  display: flex;
-  align-items: center;
 }
 
 /* farm widget css */

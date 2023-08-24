@@ -1,6 +1,5 @@
 'use client';
 
-import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 import Button from '@mui/material/Button';
 import InputAdornment from '@mui/material/InputAdornment';
 import Tab from '@mui/material/Tab';
@@ -8,6 +7,7 @@ import Tabs from '@mui/material/Tabs';
 import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
 import { useState } from 'react';
+import InfoButton from '../../Buttons/InfoButton';
 import FeatureBox from '../../FeatureBox/FeatureBox';
 
 const Farm = () => {
@@ -26,7 +26,7 @@ const Farm = () => {
         </Tabs>
 
         <div className="tab-content">
-          <div className="swap-more-btn">
+          <div>
             <TextField
               placeholder="3,360"
               fullWidth
@@ -43,14 +43,14 @@ const Farm = () => {
             </Button>
           </div>
 
-          <div className="swap-info">
-            <Typography className="swap-price" variant="body1">
+          <div style={{ padding: '15px 0' }}>
+            <Typography variant="body1" className="swap-info-paragraph" marginY={1.25}>
               Position size: <span>45753.3522 jUSD</span>
             </Typography>
-            <Typography variant="body2">
+            <Typography variant="body2" className="swap-info-paragraph" marginY={1.25}>
               Price per unit: <span>4.0953 jUSD</span>
             </Typography>
-            <Typography variant="body2">
+            <Typography variant="body2" className="swap-info-paragraph" marginY={1.25}>
               Protocol fee:{' '}
               <span>
                 0.2% |
@@ -65,18 +65,12 @@ const Farm = () => {
                 423 jUSD
               </span>
             </Typography>
-            <Typography variant="body2">
+            <Typography variant="body2" className="swap-info-paragraph" marginY={1.25}>
               Slippage: <span>0.53 %</span>
             </Typography>
           </div>
 
-          <div className="swap-btn">
-            <Button variant="outlined">EXECUTE</Button>
-            <Typography className="swap-btn-line" variant="subtitle1" sx={{ fontSize: '12px' }}>
-              <InfoOutlinedIcon sx={{ fontSize: '15px' }} />
-              The final values will be calculated after the swap.
-            </Typography>
-          </div>
+          <InfoButton title="EXECUTE" description="The final values will be calculated after the swap." />
         </div>
       </div>
     </FeatureBox>

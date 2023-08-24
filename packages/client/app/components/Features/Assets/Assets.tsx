@@ -13,6 +13,7 @@ import TableContainer from '@mui/material/TableContainer';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import { useMemo, useState } from 'react';
+import { SelectedToken, useSelectedToken } from '../../../context/SelectedTokenProvider';
 import { GetDebtTokensQuery, GetDebtTokensQueryVariables } from '../../../generated/gql-types';
 import { GET_ALL_DEBT_TOKENS } from '../../../queries';
 import { roundCurrency } from '../../../utils/math';
@@ -22,14 +23,15 @@ import HeaderCell from '../../Table/HeaderCell';
 export const FAVORITE_ASSETS_LOCALSTORAGE_KEY = 'favoriteAssets';
 
 function Assets() {
-  const [selectedAsset, setSelectedAsset] = useState<string | null>(null);
   const [favoritedAssets, setFavoritedAssets] = useState<string[]>(() =>
     JSON.parse(window.localStorage.getItem(FAVORITE_ASSETS_LOCALSTORAGE_KEY) ?? '[]'),
   );
 
+  const { selectedToken, setSelectedToken } = useSelectedToken();
+
   const { data } = useQuery<GetDebtTokensQuery, GetDebtTokensQueryVariables>(GET_ALL_DEBT_TOKENS);
 
-  const tokens = useMemo(() => {
+  const tokens = useMemo<SelectedToken[] | undefined>(() => {
     // get token address from local storage and set isFavorite if it is present
     return data?.getDebtTokens
       .map(({ token, totalSupplyUSD }) => {
@@ -77,38 +79,42 @@ function Assets() {
             </TableRow>
           </TableHead>
           <TableBody>
-            {tokens.map(({ address, isFavorite, symbol, priceUSD, change }) => (
-              <TableRow
-                key={address}
-                hover
-                onClick={() => setSelectedAsset(address)}
-                sx={{ cursor: 'pointer', '& .MuiTableCell-root': { borderBottom: 'none' } }}
-                selected={selectedAsset === symbol}
-              >
-                <TableCell>{symbol}</TableCell>
-                <TableCell align="right">{priceUSD}</TableCell>
-                <TableCell align="right" sx={{ color: change < 0 ? 'error.main' : 'success.main' }}>
-                  <div style={{ display: 'flex', alignContent: 'center', justifyContent: 'flex-end' }}>
-                    {change}
-                    {change < 0 ? (
-                      <KeyboardArrowDownOutlinedIcon fontSize="small" sx={{ pb: 0.5 }} />
-                    ) : (
-                      <KeyboardArrowUpOutlinedIcon fontSize="small" sx={{ pb: 0.5 }} />
-                    )}
-                  </div>
-                </TableCell>
-                <TableCell align="right">
-                  <IconButton
-                    sx={{ height: 20, width: 20 }}
-                    size="small"
-                    onClick={() => toggleFavorite(address)}
-                    disableRipple
-                  >
-                    {isFavorite ? <PushPinIcon fontSize="small" /> : <PushPinOutlinedIcon fontSize="small" />}
-                  </IconButton>
-                </TableCell>
-              </TableRow>
-            ))}
+            {tokens.map((token) => {
+              const { address, isFavorite, symbol, priceUSD, change } = token;
+
+              return (
+                <TableRow
+                  key={address}
+                  hover
+                  onClick={() => setSelectedToken(token)}
+                  sx={{ cursor: 'pointer', '& .MuiTableCell-root': { borderBottom: 'none' } }}
+                  selected={selectedToken?.symbol === symbol}
+                >
+                  <TableCell>{symbol}</TableCell>
+                  <TableCell align="right">{priceUSD}</TableCell>
+                  <TableCell align="right" sx={{ color: change < 0 ? 'error.main' : 'success.main' }}>
+                    <div style={{ display: 'flex', alignContent: 'center', justifyContent: 'flex-end' }}>
+                      {change}
+                      {change < 0 ? (
+                        <KeyboardArrowDownOutlinedIcon fontSize="small" sx={{ pb: 0.5 }} />
+                      ) : (
+                        <KeyboardArrowUpOutlinedIcon fontSize="small" sx={{ pb: 0.5 }} />
+                      )}
+                    </div>
+                  </TableCell>
+                  <TableCell align="right">
+                    <IconButton
+                      sx={{ height: 20, width: 20 }}
+                      size="small"
+                      onClick={() => toggleFavorite(address)}
+                      disableRipple
+                    >
+                      {isFavorite ? <PushPinIcon fontSize="small" /> : <PushPinOutlinedIcon fontSize="small" />}
+                    </IconButton>
+                  </TableCell>
+                </TableRow>
+              );
+            })}
           </TableBody>
         </Table>
       </TableContainer>
