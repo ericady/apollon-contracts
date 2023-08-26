@@ -732,7 +732,11 @@ contract TroveManager is LiquityBase, Ownable, CheckContract, ITroveManager {
    * redemption will stop after the last completely redeemed Trove and the sender will keep the remaining stable amount, which they can attempt
    * to redeem later.
    */
-  function redeemCollateral(uint _stableCoinAmount, uint _maxIterations, uint _maxFeePercentage) external override {
+  function redeemCollateral(
+    uint _stableCoinAmount,
+    uint _maxFeePercentage,
+    address[] memory _sourceTroves
+  ) external override {
     RedemptionVariables memory vars;
     vars.storagePoolCached = storagePool;
     vars.stableCoinCached = debtTokenManager.getStableCoin();
@@ -756,19 +760,11 @@ contract TroveManager is LiquityBase, Ownable, CheckContract, ITroveManager {
     vars.totalCollDrawn = new RedemptionCollAmount[](collTokenAddresses.length);
     for (uint i = 0; i < collTokenAddresses.length; i++) vars.totalCollDrawn[i].tokenAddress = collTokenAddresses[i];
 
-    // todo
-    // loop throw a list of troves with minted stable, to redeem from (without gas comp)
-    address[] memory stableCoinTroves = new address[](1); // todo...
-    if (stableCoinTroves.length < 1) return;
-    address currentBorrower = stableCoinTroves[0]; // todo select the troves randomly
-
-    // Loop through the Troves starting from the one with lowest collateral ratio
-    if (_maxIterations == 0) _maxIterations = type(uint256).max;
-    while (currentBorrower != address(0) && vars.remainingStableToRedeem > 0 && _maxIterations > 0) {
-      // Save the address of the Trove preceding the current one, before potentially modifying the list
-
-      address nextUserToCheck = stableCoinTroves[0]; // todo get next borrower
-      _maxIterations--;
+    // Loop through the stable coin source troves
+    assert(_sourceTroves.length >= 1);
+    for (uint i = 0; i < _sourceTroves.length; i++) {
+      address currentBorrower = _sourceTroves[i];
+      if (currentBorrower == address(0) || vars.remainingStableToRedeem == 0) continue;
 
       SingleRedemptionVariables memory singleRedemption = _redeemCollateralFromTrove(
         vars,
@@ -787,9 +783,8 @@ contract TroveManager is LiquityBase, Ownable, CheckContract, ITroveManager {
           break;
         }
       }
-
-      currentBorrower = nextUserToCheck;
     }
+
     require(vars.totalRedeemedStable > 0, 'TroveManager: Unable to redeem any amount');
 
     // Decay the baseRate due to time passed, and then increase it according to the size of this redemption.
@@ -847,6 +842,12 @@ contract TroveManager is LiquityBase, Ownable, CheckContract, ITroveManager {
       outerVars.priceCache,
       _borrower
     );
+
+    // todo stable coin only CRs are needed here, all the other debt tokens need to be excluded.
+    // also just < TCR is not enough, if the user whats to redeem more then 50% of the stable coin supply...
+    uint preCR = LiquityMath._computeCR(vars.troveCollInStable, vars.troveDebtInStable);
+    (, uint TCR, , ) = outerVars.storagePoolCached.checkRecoveryMode(outerVars.priceCache);
+    require(preCR < TCR, 'TroveManager: Source troves CR is not under the TCR.');
 
     // Determine the remaining amount (lot) to be redeemed, capped by the entire debt of the Trove minus the liquidation reserve
     vars.stableCoinLot = LiquityMath._min(

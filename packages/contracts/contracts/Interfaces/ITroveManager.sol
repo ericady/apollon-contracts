@@ -58,8 +58,6 @@ interface ITroveManager is IBBase {
 
   function batchLiquidateTroves(address[] calldata _troveArray) external;
 
-  function redeemCollateral(uint _stableCoinAmount, uint _maxIterations, uint _maxFee) external;
-
   function updateStakeAndTotalStakes(address _borrower) external;
 
   function updateTroveRewardSnapshots(address _borrower) external;
@@ -77,6 +75,8 @@ interface ITroveManager is IBBase {
   function closeTrove(address _borrower) external;
 
   function removeStake(address _borrower) external;
+
+  function redeemCollateral(uint _stableCoinAmount, uint _maxFee, address[] memory _sourceTroves) external;
 
   function getRedemptionRate() external view returns (uint);
 

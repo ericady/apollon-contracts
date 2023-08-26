@@ -53,6 +53,7 @@ contract BorrowerOperations is LiquityBase, Ownable, CheckContract, IBorrowerOpe
   struct LocalVariables_adjustTrove {
     PriceTokenAmount[] colls;
     DebtTokenAmount[] debts;
+    DebtTokenAmount stableCoinEntry;
     //
     uint oldCompositeDebtInStable;
     uint oldCompositeCollInStable;
@@ -233,7 +234,6 @@ contract BorrowerOperations is LiquityBase, Ownable, CheckContract, IBorrowerOpe
       );
     }
 
-    // todo required checks should not be needed, new collateral should be always fine...
     _finaliseTrove(false, false, contractsCache, vars, priceCache, borrower, _upperHint, _lowerHint);
   }
 
@@ -275,7 +275,6 @@ contract BorrowerOperations is LiquityBase, Ownable, CheckContract, IBorrowerOpe
     _finaliseTrove(true, false, contractsCache, vars, priceCache, borrower, _upperHint, _lowerHint);
   }
 
-  // todo will be wrapped into the long/short farms
   // increasing debt of a trove
   function increaseDebt(
     TokenAmount[] memory _debts,
@@ -303,7 +302,7 @@ contract BorrowerOperations is LiquityBase, Ownable, CheckContract, IBorrowerOpe
     for (uint i = 0; i < addedDebts.length; i++) _requireAtLeastMinNetDebt(addedDebts[i].netDebt);
 
     // adding the borrowing fee to the net debt
-    uint borrowingFeesPaid = 0; // todo only used for an event emit
+    uint borrowingFeesPaid = 0;
     if (!vars.isInRecoveryMode)
       borrowingFeesPaid = _addBorrowingFees(
         contractsCache.troveManager,
@@ -330,7 +329,6 @@ contract BorrowerOperations is LiquityBase, Ownable, CheckContract, IBorrowerOpe
     _finaliseTrove(false, true, contractsCache, vars, priceCache, msg.sender, _upperHint, _lowerHint);
   }
 
-  // todo will be wrapped into the long/short farms
   // repay debt of a trove
   function repayDebt(
     TokenAmount[] memory _debts,
@@ -345,16 +343,13 @@ contract BorrowerOperations is LiquityBase, Ownable, CheckContract, IBorrowerOpe
       PriceCache memory priceCache
     ) = _prepareTroveAdjustment(borrower);
 
-    DebtTokenAmount memory stableCoinAmount;
-    DebtTokenAmount[] memory removedDebts;
-    (removedDebts, stableCoinAmount) = _getDebtTokenAmountsWithFetchedPrices(
+    (DebtTokenAmount[] memory removedDebts, ) = _getDebtTokenAmountsWithFetchedPrices(
       contractsCache.debtTokenManager,
       priceCache,
       _debts
     );
     vars.newCompositeDebtInStable -= _getCompositeDebt(removedDebts);
-
-    contractsCache.troveManager.decreaseTroveDebt(borrower, removedDebts);
+    contractsCache.troveManager.decreaseTroveDebt(borrower, vars.debts);
 
     for (uint i = 0; i < removedDebts.length; i++) {
       DebtTokenAmount memory debtTokenAmount = removedDebts[i];
@@ -382,6 +377,62 @@ contract BorrowerOperations is LiquityBase, Ownable, CheckContract, IBorrowerOpe
     _finaliseTrove(false, false, contractsCache, vars, priceCache, borrower, _upperHint, _lowerHint);
   }
 
+  function closeTrove() external override {
+    address borrower = msg.sender;
+    (
+      ContractsCache memory contractsCache,
+      LocalVariables_adjustTrove memory vars,
+      PriceCache memory priceCache
+    ) = _prepareTroveAdjustment(borrower);
+
+    uint newTCR = _getNewTCRFromTroveChange(
+      vars.oldCompositeCollInStable,
+      false,
+      vars.oldCompositeDebtInStable,
+      false,
+      vars.entireSystemColl,
+      vars.entireSystemDebt
+    );
+    _requireNewTCRisAboveCCR(newTCR);
+
+    // repay any open debts
+    DebtTokenAmount memory existingDebt;
+    for (uint i = 0; i < vars.debts.length; i++) {
+      DebtTokenAmount memory debtTokenAmount = vars.debts[i];
+
+      uint toRepay;
+      if (debtTokenAmount.debtToken.isStableCoin()) toRepay = debtTokenAmount.netDebt.sub(STABLE_COIN_GAS_COMPENSATION);
+      else toRepay = debtTokenAmount.netDebt;
+      if (toRepay == 0) continue;
+
+      _poolRepayDebt(borrower, contractsCache.storagePool, debtTokenAmount.debtToken, toRepay);
+    }
+
+    // burn the gas compensation
+    _poolBurnGasComp(contractsCache.storagePool, vars.stableCoinEntry.debtToken);
+
+    // Send the collateral back to the user
+    for (uint i = 0; i < vars.colls.length; i++) {
+      PriceTokenAmount memory collTokenAmount = vars.colls[i];
+
+      _poolSubtractColl(
+        borrower,
+        contractsCache.storagePool,
+        collTokenAmount.tokenAddress,
+        collTokenAmount.amount,
+        PoolType.Active
+      );
+    }
+
+    contractsCache.troveManager.removeStake(borrower);
+    contractsCache.troveManager.closeTrove(borrower);
+
+    // todo
+    // emit TroveUpdated(msg.sender, 0, 0, 0, BorrowerOperation.closeTrove);
+  }
+
+  // --- Helper functions ---
+
   function _prepareTroveAdjustment(
     address _borrower
   )
@@ -398,7 +449,7 @@ contract BorrowerOperations is LiquityBase, Ownable, CheckContract, IBorrowerOpe
     contractsCache.troveManager.applyPendingRewards(priceFeed, priceCache, _borrower); // from redistributions
 
     // fetching old/current debts and colls including prices + calc ICR
-    (vars.debts, ) = _getDebtTokenAmountsWithFetchedPrices(
+    (vars.debts, vars.stableCoinEntry) = _getDebtTokenAmountsWithFetchedPrices(
       contractsCache.debtTokenManager,
       priceCache,
       contractsCache.troveManager.getTroveDebt(_borrower)
@@ -445,65 +496,6 @@ contract BorrowerOperations is LiquityBase, Ownable, CheckContract, IBorrowerOpe
     //    );
     //    emit LUSDBorrowingFeePaid(msg.sender, vars.LUSDFee);
   }
-
-  function closeTrove() external override {
-    (
-      ContractsCache memory contractsCache,
-      LocalVariables_adjustTrove memory vars,
-      PriceCache memory priceCache
-    ) = _prepareTroveAdjustment(msg.sender);
-
-    // todo this does not work, pending rewards gets applied, for there can be more debts then only the gas compensation, even if all postions are closed
-    DebtTokenAmount memory remainingStableCoinDebt = vars.debts[0]; // works because we check in the following line if only stable coin debt is left...
-    require(
-      vars.debts.length == 1 &&
-        remainingStableCoinDebt.debtToken.isStableCoin() &&
-        remainingStableCoinDebt.netDebt <= STABLE_COIN_GAS_COMPENSATION,
-      'TroveManager: Trove must have only gas compensation debt'
-    ); // works because there are no borrowing fees for the gas compensation
-
-    uint newTCR = _getNewTCRFromTroveChange(
-      vars.oldCompositeCollInStable,
-      false,
-      vars.oldCompositeDebtInStable,
-      false,
-      vars.entireSystemColl,
-      vars.entireSystemDebt
-    );
-    _requireNewTCRisAboveCCR(newTCR);
-
-    contractsCache.troveManager.removeStake(msg.sender);
-    contractsCache.troveManager.closeTrove(msg.sender);
-
-    // todo
-    // emit TroveUpdated(msg.sender, 0, 0, 0, BorrowerOperation.closeTrove);
-
-    // burn the gas compensation
-    contractsCache.storagePool.subtractValue(
-      address(remainingStableCoinDebt.debtToken),
-      false,
-      PoolType.GasCompensation,
-      remainingStableCoinDebt.netDebt
-    );
-    remainingStableCoinDebt.debtToken.burn(address(contractsCache.storagePool), remainingStableCoinDebt.netDebt);
-
-    // Send the collateral back to the user
-    for (uint i = 0; i < vars.colls.length; i++) {
-      PriceTokenAmount memory collTokenAmount = vars.colls[i];
-
-      _poolSubtractColl(
-        msg.sender,
-        contractsCache.storagePool,
-        collTokenAmount.tokenAddress,
-        collTokenAmount.amount,
-        PoolType.Active
-      );
-    }
-
-    // todo the trove still needs to be updated?!
-  }
-
-  // --- Helper functions ---
 
   function _getNewTCRFromTroveChange(
     uint _collChange,
@@ -590,6 +582,11 @@ contract BorrowerOperations is LiquityBase, Ownable, CheckContract, IBorrowerOpe
   ) internal {
     _storagePool.subtractValue(address(_debtToken), false, PoolType.Active, _repayAmount);
     _debtToken.burn(_borrower, _repayAmount);
+  }
+
+  function _poolBurnGasComp(IStoragePool _storagePool, IDebtToken _stableCoin) internal {
+    _storagePool.subtractValue(address(_stableCoin), false, PoolType.GasCompensation, STABLE_COIN_GAS_COMPENSATION);
+    _stableCoin.burn(address(_storagePool), STABLE_COIN_GAS_COMPENSATION);
   }
 
   // --- 'Require' wrapper functions ---
