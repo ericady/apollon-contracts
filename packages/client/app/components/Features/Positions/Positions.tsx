@@ -58,9 +58,7 @@ const Positions = () => {
           />
         </Tabs>
 
-        <div className="tab-content">
-          <div style={{ height: '270px' }}>{renderTableContent()}</div>
-        </div>
+        <div style={{ height: '270px' }}>{renderTableContent()}</div>
       </div>
     </>
   );
