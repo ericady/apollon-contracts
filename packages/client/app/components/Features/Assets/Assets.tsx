@@ -24,7 +24,7 @@ export const FAVORITE_ASSETS_LOCALSTORAGE_KEY = 'favoriteAssets';
 
 function Assets() {
   const [favoritedAssets, setFavoritedAssets] = useState<string[]>(() =>
-    JSON.parse(window.localStorage.getItem(FAVORITE_ASSETS_LOCALSTORAGE_KEY) ?? '[]'),
+    JSON.parse(window?.localStorage.getItem(FAVORITE_ASSETS_LOCALSTORAGE_KEY) ?? '[]'),
   );
 
   const { selectedToken, setSelectedToken } = useSelectedToken();
