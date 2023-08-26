@@ -8,7 +8,6 @@ type Props = TextFieldProps & {
 /**
  * Because the web platform can not create a reliable number input ._.
  * TODO: Exchange it with https://mui.com/base-ui/react-number-input/ some wonderful day.
- *
  */
 const NumberInput = forwardRef<HTMLInputElement | undefined, Props>((textfieldProps, ref) => {
   return (

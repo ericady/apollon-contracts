@@ -31,6 +31,10 @@ export const RED_BACKGROUND = '#321923';
 const theme = createTheme({
   palette: {
     mode: 'dark',
+    primary: {
+      main: BUTTON_TEXT,
+      contrastText: '#FFFFFF',
+    },
     background: {
       default: PRIMARY_BACKGROUND,
       paper: PAPER_BACKGROUND,
@@ -81,15 +85,6 @@ const theme = createTheme({
     subtitle2: {
       color: SECONDARY_TEXT,
       fontWeight: '700',
-      fontSize: '14px',
-    },
-    h6: {
-      background: BUTTON_BORDER,
-      display: 'inline-block',
-      padding: '1px 5px',
-      color: SECONDARY_TEXT,
-      fontWeight: '700',
-      borderRadius: '3px',
       fontSize: '14px',
     },
   },

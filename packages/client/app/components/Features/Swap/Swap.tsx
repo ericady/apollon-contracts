@@ -20,10 +20,6 @@ const Swap = () => {
 
   const { selectedToken, tokenRatio } = useSelectedToken();
 
-  const toggleMore = () => {
-    setShowSlippage(!showSlippage);
-  };
-
   const handleSwapValueChange = (variant: 'JUSD' | 'Token', value: string) => {
     const numericValue = parseFloat(value);
 
@@ -102,7 +98,7 @@ const Swap = () => {
         />
       )}
 
-      <Button variant="contained" onClick={toggleMore} sx={{ marginTop: '15px' }}>
+      <Button variant="contained" onClick={() => setShowSlippage(!showSlippage)} sx={{ marginTop: '15px' }}>
         {showSlippage ? 'Less' : 'More'}
       </Button>
 

@@ -68,7 +68,7 @@ function Assets() {
 
   return (
     <FeatureBox title="Assets" noPadding>
-      <TableContainer sx={{ maxHeight: 170, overflow: 'scroll' }}>
+      <TableContainer sx={{ maxHeight: 170, overflowY: 'scroll' }}>
         <Table size="small">
           <TableHead sx={{ borderBottom: '1px solid', borderBottomColor: 'background.paper' }}>
             <TableRow>

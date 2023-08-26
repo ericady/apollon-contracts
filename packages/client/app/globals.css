@@ -4,22 +4,6 @@
   }
 }
 
-.swap-block,
-.tab-block,
-.poolwidget-block {
-  margin: 20px;
-  border: 2px dashed #9747ff;
-  display: block;
-  border-radius: 7px;
-  padding: 40px;
-}
-.swap-block {
-  max-width: 350px;
-}
-.poolwidget-block {
-  display: flex;
-}
-
 /* swap widget css */
 .swap-info-paragraph {
   display: flex;
@@ -29,20 +13,6 @@
 .swap-block input {
   display: block;
   padding: 10px;
-}
-
-.swap-heading h5 {
-  margin: 0;
-  display: flex;
-  align-items: center;
-  line-height: inherit;
-}
-
-.swap-heading {
-  margin-bottom: 20px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
 }
 
 /* farm widget css */
@@ -69,28 +39,20 @@
 }
 
 /* transition widget css */
-.balance-tab {
-  display: flex;
-}
 .tabs-sheet .tab-content th,
 .tabs-sheet .tab-content td {
   border-bottom: 2px solid #1e1b27;
   padding: 10px 15px;
-  text-align: right;
 }
-.tabs-sheet .balance-tab th:nth-child(1),
-.tabs-sheet .balance-tab td:nth-child(1),
-.tabs-sheet .balance-tab th:nth-child(3),
-.tabs-sheet .balance-tab td:nth-child(3) {
-  text-align: left;
+.tabs-sheet .tab-content td {
+  color: #827f8b;
+  font-weight: 400;
+  font-size: 14px;
 }
 .tabs-sheet .tab-content tr:last-child td {
   border: 0;
 }
-.tabs-sheet .tab-content th svg {
-  position: relative;
-  top: 7px;
-}
+
 .tabs-sheet .farm-tabs-heading button {
   width: auto;
   min-width: auto;
@@ -98,68 +60,12 @@
   margin: 0 15px;
   padding: 0;
 }
+
 .flex {
   display: flex;
   align-items: center;
   gap: 10px;
   justify-content: end;
-}
-.position-tab th:nth-child(1),
-.position-tab td:nth-child(1),
-.position-tab th:nth-child(2),
-.position-tab td:nth-child(2) {
-  text-align: left;
-}
-.colletral-tab th,
-.colletral-tab td,
-.position-tab th,
-.position-tab td {
-  text-align: right;
-}
-.pie-block {
-  width: 40%;
-}
-.colletral-tab {
-  display: flex;
-}
-.table-block {
-  width: 100%;
-}
-.range-hdng {
-  display: flex;
-  align-items: center;
-  gap: 15px;
-}
-.range-hdng span {
-  color: #1e89da;
-}
-.range-slide {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 20px 0px;
-}
-.tabs-sheet .tab-content .table-hdng {
-  color: #504d59;
-  font-weight: 700;
-  font-size: 14px;
-}
-.tabs-sheet .tab-content .table-box {
-  background: #282531;
-  display: inline-block;
-  padding: 1px 5px;
-  color: #827f8b;
-  font-weight: 700;
-  border-radius: 3px;
-  font-size: 14px;
-}
-.tabs-sheet .tab-content td {
-  color: #827f8b;
-  font-weight: 400;
-  font-size: 14px;
-}
-.tabs-sheet .tab-content .table-wht-txt {
-  color: #fff;
 }
 
 /* pool widget css */
