@@ -1,8 +1,9 @@
-import Stability from '../components/Features/Stability/Stability';
+import StabilityHistory from '../components/Features/Stability/StabilityHistory';
 
 function Pools() {
   // return <LiquidityPool />;
-  return <Stability />;
+  return <StabilityHistory />;
+  // return <Stability />;
   // return <Collateral />;
 }
 

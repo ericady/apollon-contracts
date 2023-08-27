@@ -26,6 +26,7 @@ const BUTTON_2_BORDER = '#3C3945';
 const BUTTON_BACKGROUND_HOVER = '#1D202F';
 export const GREEN_BACKGROUND = '#1A2E25';
 export const RED_BACKGROUND = '#321923';
+export const BLUE_BACKGROUND = '#18293e';
 
 const theme = createTheme({
   palette: {

@@ -1,9 +1,9 @@
 import { Box } from '@mui/material';
 import { PropsWithChildren } from 'react';
-import { BUTTON_BORDER, GREEN_BACKGROUND, RED_BACKGROUND, SECONDARY_TEXT } from '../../theme';
+import { BLUE_BACKGROUND, BUTTON_BORDER, GREEN_BACKGROUND, RED_BACKGROUND, SECONDARY_TEXT } from '../../theme';
 
 type Props = {
-  variant: 'success' | 'error' | 'none';
+  variant: 'success' | 'error' | 'info' | 'none';
 };
 
 function Label({ variant, children }: PropsWithChildren<Props>) {
@@ -30,6 +30,22 @@ function Label({ variant, children }: PropsWithChildren<Props>) {
           sx={{
             color: 'error.main',
             background: RED_BACKGROUND,
+            display: 'inline-block',
+            padding: '1px 5px',
+            fontWeight: '700',
+            borderRadius: '3px',
+            fontSize: '14px',
+          }}
+        >
+          {children}
+        </Box>
+      );
+    case 'info':
+      return (
+        <Box
+          sx={{
+            color: 'info.main',
+            background: BLUE_BACKGROUND,
             display: 'inline-block',
             padding: '1px 5px',
             fontWeight: '700',
