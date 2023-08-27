@@ -9,7 +9,6 @@ import Tab from '@mui/material/Tab';
 import Tabs from '@mui/material/Tabs';
 import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
-import { useTheme } from '@mui/material/styles';
 import { SyntheticEvent, useState } from 'react';
 import FeatureBox from '../../FeatureBox/FeatureBox';
 import Label from '../../Label/Label';
@@ -22,8 +21,6 @@ const LiquidityPool = () => {
   const handleChange = (_: SyntheticEvent, newValue: 'DEPOSIT' | 'WITHDRAW') => {
     setTabValue(newValue);
   };
-
-  const theme = useTheme();
 
   return (
     <PageLayout>
