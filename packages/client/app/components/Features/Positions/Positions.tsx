@@ -4,8 +4,8 @@ import Tab from '@mui/material/Tab';
 import Tabs from '@mui/material/Tabs';
 import { SyntheticEvent, useState } from 'react';
 import Label from '../../Label/Label';
+import CollateralTable from '../Collateral/CollateralTable';
 import BalanceTable from './BalanceTable';
-import CollateralTable from './CollateralTable';
 import HistoryTable from './HistoryTable';
 import PositionsTable from './PositionsTable';
 

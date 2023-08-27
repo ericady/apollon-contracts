@@ -151,6 +151,13 @@ export type GetCollateralTokensQueryVariables = Exact<{ [key: string]: never; }>
 
 export type GetCollateralTokensQuery = { __typename?: 'Query', getCollateralTokens: Array<{ __typename?: 'CollateralTokenMeta', walletAmount?: number | null, token: { __typename?: 'Token', address: string } }> };
 
+export type GetBorrowerCollateralTokensQueryVariables = Exact<{
+  borrower: Scalars['String']['input'];
+}>;
+
+
+export type GetBorrowerCollateralTokensQuery = { __typename?: 'Query', getCollateralTokens: Array<{ __typename?: 'CollateralTokenMeta', troveLockedAmount?: number | null, stabilityGainedAmount?: number | null, token: { __typename?: 'Token', address: string, symbol: string } }> };
+
 export type GetPoolsQueryVariables = Exact<{ [key: string]: never; }>;
 
 

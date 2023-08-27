@@ -12,6 +12,7 @@ import { useEffect } from 'react';
 import { client } from './client';
 import NavigationBar from './components/NavigationBar/NavigationBar';
 import EthersProvider from './context/EthersProvider';
+import WalletProvider from './context/WalletProvider';
 import './globals.css';
 import theme from './theme';
 
@@ -37,11 +38,13 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           <CssBaseline enableColorScheme />
 
           <EthersProvider>
-            <NavigationBar />
+            <WalletProvider>
+              <NavigationBar />
 
-            <ApolloProvider client={client}>
-              <main>{children}</main>
-            </ApolloProvider>
+              <ApolloProvider client={client}>
+                <main>{children}</main>
+              </ApolloProvider>
+            </WalletProvider>
           </EthersProvider>
         </ThemeProvider>
       </body>

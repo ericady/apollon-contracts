@@ -13,7 +13,12 @@ import {
   QueryGetPoolsArgs,
   Token,
 } from '../app/generated/gql-types';
-import { GET_ALL_DEBT_TOKENS, GET_BORROWER_DEBT_TOKENS } from '../app/queries';
+import {
+  GET_ALL_COLLATERAL_TOKENS,
+  GET_ALL_DEBT_TOKENS,
+  GET_BORROWER_COLLATERAL_TOKENS,
+  GET_BORROWER_DEBT_TOKENS,
+} from '../app/queries';
 
 const favoritedAssets: string[] = JSON.parse(localStorage.getItem(FAVORITE_ASSETS_LOCALSTORAGE_KEY) ?? '[]');
 
@@ -76,7 +81,6 @@ const generateBorrowerHistory = (): BorrowerHistory[] => {
 
 export const handlers = [
   // GetDebtTokens
-
   graphql.query<{ getDebtTokens: Query['getDebtTokens'] }, QueryGetDebtTokensArgs>(
     GET_ALL_DEBT_TOKENS,
     (req, res, ctx) => {
@@ -95,7 +99,7 @@ export const handlers = [
       return res(ctx.data({ getDebtTokens: result }));
     },
   ),
-
+  // GetBorrowerDebtTokens
   graphql.query<{ getDebtTokens: Query['getDebtTokens'] }, QueryGetDebtTokensArgs>(
     GET_BORROWER_DEBT_TOKENS,
     (req, res, ctx) => {
@@ -118,17 +122,34 @@ export const handlers = [
   ),
 
   // GetCollateralTokens
-
   graphql.query<{ getCollateralTokens: Query['getCollateralTokens'] }, QueryGetCollateralTokensArgs>(
-    'GetCollateralTokens',
+    GET_ALL_COLLATERAL_TOKENS,
+    (req, res, ctx) => {
+      const { borrower } = req.variables;
+
+      const result: Query['getCollateralTokens'] = tokens.map((token) => ({
+        token: token,
+        walletAmount: borrower ? parseFloat(faker.finance.amount(0, 1000, 10)) : null,
+        troveLockedAmount: borrower ? parseFloat(faker.finance.amount(0, 50, 10)) : null,
+        stabilityGainedAmount: borrower ? parseFloat(faker.finance.amount(50, 500, 10)) : null,
+        totalValueLockedUSD: parseFloat(faker.finance.amount(10000, 50000, 2)),
+        totalValueLockedUSD24hAgo: parseFloat(faker.finance.amount(10000, 50000, 2)),
+      }));
+
+      return res(ctx.data({ getCollateralTokens: result }));
+    },
+  ),
+  // GetBorrowerCollateralTokens
+  graphql.query<{ getCollateralTokens: Query['getCollateralTokens'] }, QueryGetCollateralTokensArgs>(
+    GET_BORROWER_COLLATERAL_TOKENS,
     (req, res, ctx) => {
       const { borrower } = req.variables;
 
       const result: Query['getCollateralTokens'] = tokens.map((token) => ({
         token: token,
         walletAmount: borrower ? parseFloat(faker.finance.amount(0, 1000, 2)) : null,
-        troveLockedAmount: borrower ? parseFloat(faker.finance.amount(0, 500, 2)) : null,
-        stabilityGainedAmount: borrower ? parseFloat(faker.finance.amount(0, 50, 2)) : null,
+        troveLockedAmount: borrower ? parseFloat(faker.finance.amount(0, 50, 10)) : null,
+        stabilityGainedAmount: borrower ? parseFloat(faker.finance.amount(50, 500, 10)) : null,
         totalValueLockedUSD: parseFloat(faker.finance.amount(10000, 50000, 2)),
         totalValueLockedUSD24hAgo: parseFloat(faker.finance.amount(10000, 50000, 2)),
       }));

@@ -40,6 +40,19 @@ export const GET_ALL_COLLATERAL_TOKENS = gql`
   }
 `;
 
+export const GET_BORROWER_COLLATERAL_TOKENS = gql`
+  query GetBorrowerCollateralTokens($borrower: String!) {
+    getCollateralTokens(borrower: $borrower) {
+      troveLockedAmount
+      stabilityGainedAmount
+      token {
+        address
+        symbol
+      }
+    }
+  }
+`;
+
 export const GET_ALL_POOLS = gql`
   query GetPools {
     getPools {

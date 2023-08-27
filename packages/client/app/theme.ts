@@ -87,6 +87,14 @@ const theme = createTheme({
       fontWeight: '700',
       fontSize: '14px',
     },
+    caption: {
+      color: '#827F8B',
+      fontFamily: 'Inter',
+      fontSize: '11px',
+      fontWeight: '400',
+      lineHeight: '13px',
+      letterSpacing: '0em',
+    },
   },
   components: {
     MuiTableHead: {
