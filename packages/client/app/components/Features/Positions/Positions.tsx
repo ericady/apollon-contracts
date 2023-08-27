@@ -35,7 +35,7 @@ const Positions = () => {
   return (
     <>
       <div className="tabs-sheet">
-        <Tabs value={tabValue} onChange={handleChange} className="farm-tabs-heading">
+        <Tabs value={tabValue} onChange={handleChange} className="tabs-style">
           <Tab label="BALANCE" value="BALANCE" disableRipple />
           <Tab label="COLLATERAL" value="COLLATERAL" disableRipple />
           <Tab

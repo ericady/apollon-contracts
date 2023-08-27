@@ -16,7 +16,7 @@
 }
 
 /* farm widget css */
-.farm-tabs-heading button {
+.tabs-style button {
   width: 50%;
   color: #827f8b;
   font-weight: 700;
@@ -24,10 +24,10 @@
 .farm-tabs-tab-content {
   margin-top: 20px;
 }
-.farm-tabs-heading button.Mui-selected {
+.tabs-style button.Mui-selected {
   color: #fff;
 }
-.farm-tabs-heading .MuiTabs-indicator {
+.tabs-style .MuiTabs-indicator {
   background: #fff;
 }
 .MuiTabs-flexContainer {
@@ -53,7 +53,7 @@
   border: 0;
 }
 
-.tabs-sheet .farm-tabs-heading button {
+.tabs-sheet .tabs-style button {
   width: auto;
   min-width: auto;
   max-width: 100%;

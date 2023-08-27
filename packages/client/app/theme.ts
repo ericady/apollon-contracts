@@ -6,7 +6,6 @@ import '@fontsource/inter';
 import '@fontsource/inter/400.css';
 import '@fontsource/inter/600.css';
 import '@fontsource/inter/700.css';
-
 import '@fontsource/space-grotesk';
 import '@fontsource/space-grotesk/400.css';
 import '@fontsource/space-grotesk/600.css';
@@ -116,6 +115,24 @@ const theme = createTheme({
             },
           },
         },
+        {
+          props: { variant: 'undercover' },
+          style: {
+            // sx={{ padding: '0px', display: 'block', margin: '5px 0 0 auto', color: '#33B6FF' }}
+            margin: '5px 0',
+            minWidth: 'auto',
+            backgroundColor: 'transparent',
+            color: '#33B6FF',
+            border: `none`,
+            padding: '0px',
+            display: 'inline-block',
+            textTransform: 'none',
+            '&:hover': {
+              backgroundColor: BUTTON_BACKGROUND_HOVER,
+              color: PRIMARY_TEXT,
+            },
+          },
+        },
       ],
 
       styleOverrides: {
@@ -158,6 +175,7 @@ import '@mui/material/Button';
 declare module '@mui/material/Button' {
   interface ButtonPropsVariantOverrides {
     rounded: true;
+    undercover: true;
   }
 }
 

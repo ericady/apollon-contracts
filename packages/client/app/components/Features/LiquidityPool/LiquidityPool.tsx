@@ -31,12 +31,7 @@ const LiquidityPool = () => {
         <div className="poolwidget-block" style={{ width: '30%' }}>
           <div className="liquidity-block" style={{ border: '1px solid #25222E', borderRadius: '5px 0 0 5px' }}>
             <FeatureBox title="Your Liquidity" noPadding>
-              <Tabs
-                value={tabValue}
-                onChange={handleChange}
-                aria-label="Shared Data Tabs"
-                className="farm-tabs-heading"
-              >
+              <Tabs value={tabValue} onChange={handleChange} aria-label="Shared Data Tabs" className="tabs-style">
                 <Tab label="DEPOSIT" value="DEPOSIT" disableRipple />
                 <Tab label="WITHDRAW" value="WITHDRAW" disableRipple />
               </Tabs>
@@ -46,11 +41,9 @@ const LiquidityPool = () => {
                   <Label variant="success">ETH</Label>
                   <Typography sx={{ fontWeight: '400', marginTop: '10px' }}>3.14821</Typography>
                 </div>
-                <div>
+                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end' }}>
                   <TextField placeholder="Value" />
-                  <Button sx={{ padding: '0px', display: 'block', margin: '5px 0 0 auto', color: '#33B6FF' }}>
-                    18.1781
-                  </Button>
+                  <Button variant="undercover">18.1781</Button>
                 </div>
               </div>
               <div className="pool-input">
@@ -58,11 +51,9 @@ const LiquidityPool = () => {
                   <Label variant="success">ETH</Label>
                   <Typography sx={{ fontWeight: '400', marginTop: '10px' }}>3.14821</Typography>
                 </div>
-                <div>
+                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end' }}>
                   <TextField placeholder="Value" />
-                  <Button sx={{ padding: '0px', display: 'block', margin: '5px 0 0 auto', color: '#33B6FF' }}>
-                    18.1781
-                  </Button>
+                  <Button variant="undercover">18.1781</Button>
                 </div>
               </div>
 
@@ -90,8 +81,8 @@ const LiquidityPool = () => {
         </div>
 
         <div className="pool-block tabs-sheet" style={{ width: '70%' }}>
-          <FeatureBox title="Pools" noPadding>
-            <TableContainer>
+          <FeatureBox title="Pools" noPadding headBorder>
+            <TableContainer sx={{ borderRight: '1px solid', borderColor: 'background.paper' }}>
               <Table>
                 <TableHead>
                   <TableRow>
@@ -188,8 +179,6 @@ const LiquidityPool = () => {
                 </TableBody>
               </Table>
             </TableContainer>
-
-            {/* <div className="pool-block-content" style={{ background: '#1E1A27', borderLeft: '1px solid #33B6FF' }}></div> */}
           </FeatureBox>
         </div>
       </div>
