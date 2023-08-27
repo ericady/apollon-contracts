@@ -13,6 +13,7 @@ import {
   QueryGetPoolsArgs,
   Token,
 } from '../app/generated/gql-types';
+import { GET_ALL_DEBT_TOKENS, GET_BORROWER_DEBT_TOKENS } from '../app/queries';
 
 const favoritedAssets: string[] = JSON.parse(localStorage.getItem(FAVORITE_ASSETS_LOCALSTORAGE_KEY) ?? '[]');
 
@@ -76,23 +77,45 @@ const generateBorrowerHistory = (): BorrowerHistory[] => {
 export const handlers = [
   // GetDebtTokens
 
-  graphql.query<{ getDebtTokens: Query['getDebtTokens'] }, QueryGetDebtTokensArgs>('GetDebtTokens', (req, res, ctx) => {
-    const { borrower } = req.variables;
+  graphql.query<{ getDebtTokens: Query['getDebtTokens'] }, QueryGetDebtTokensArgs>(
+    GET_ALL_DEBT_TOKENS,
+    (req, res, ctx) => {
+      const result: Query['getDebtTokens'] = tokens.map((token) => ({
+        token: token,
+        walletAmount: null,
+        troveMintedAmount: null,
+        stabilityLostAmount: null,
+        totalDepositedStability: parseFloat(faker.finance.amount(1000, 5000, 2)),
+        totalReserve: parseFloat(faker.finance.amount(1000, 5000, 2)),
+        totalReserve24hAgo: parseFloat(faker.finance.amount(1000, 5000, 2)),
+        totalSupplyUSD: parseFloat(faker.finance.amount(10000, 50000, 2)),
+        totalSupplyUSD24hAgo: parseFloat(faker.finance.amount(10000, 50000, 2)),
+      }));
 
-    const result: Query['getDebtTokens'] = tokens.map((token) => ({
-      token: token,
-      walletAmount: borrower ? parseFloat(faker.finance.amount(0, 1000, 2)) : null,
-      troveMintedAmount: borrower ? parseFloat(faker.finance.amount(0, 500, 2)) : null,
-      stabilityLostAmount: borrower ? parseFloat(faker.finance.amount(0, 50, 2)) : null,
-      totalDepositedStability: parseFloat(faker.finance.amount(1000, 5000, 2)),
-      totalReserve: parseFloat(faker.finance.amount(1000, 5000, 2)),
-      totalReserve24hAgo: parseFloat(faker.finance.amount(1000, 5000, 2)),
-      totalSupplyUSD: parseFloat(faker.finance.amount(10000, 50000, 2)),
-      totalSupplyUSD24hAgo: parseFloat(faker.finance.amount(10000, 50000, 2)),
-    }));
+      return res(ctx.data({ getDebtTokens: result }));
+    },
+  ),
 
-    return res(ctx.data({ getDebtTokens: result }));
-  }),
+  graphql.query<{ getDebtTokens: Query['getDebtTokens'] }, QueryGetDebtTokensArgs>(
+    GET_BORROWER_DEBT_TOKENS,
+    (req, res, ctx) => {
+      const { borrower } = req.variables;
+
+      const result: Query['getDebtTokens'] = tokens.map((token) => ({
+        token: token,
+        walletAmount: borrower ? parseFloat(faker.finance.amount(0, 1000, 2)) : null,
+        troveMintedAmount: borrower ? parseFloat(faker.finance.amount(0, 500, 2)) : null,
+        stabilityLostAmount: borrower ? parseFloat(faker.finance.amount(0, 50, 2)) : null,
+        totalDepositedStability: parseFloat(faker.finance.amount(1000, 5000, 2)),
+        totalReserve: parseFloat(faker.finance.amount(1000, 5000, 2)),
+        totalReserve24hAgo: parseFloat(faker.finance.amount(1000, 5000, 2)),
+        totalSupplyUSD: parseFloat(faker.finance.amount(10000, 50000, 2)),
+        totalSupplyUSD24hAgo: parseFloat(faker.finance.amount(10000, 50000, 2)),
+      }));
+
+      return res(ctx.data({ getDebtTokens: result }));
+    },
+  ),
 
   // GetCollateralTokens
 

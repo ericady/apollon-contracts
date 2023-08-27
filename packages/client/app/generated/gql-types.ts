@@ -139,6 +139,13 @@ export type GetDebtTokensQueryVariables = Exact<{ [key: string]: never; }>;
 
 export type GetDebtTokensQuery = { __typename?: 'Query', getDebtTokens: Array<{ __typename?: 'DebtTokenMeta', totalSupplyUSD: number, token: { __typename?: 'Token', address: string, symbol: string, priceUSD: number, priceUSD24hAgo: number } }> };
 
+export type GetBorrowerDebtTokensQueryVariables = Exact<{
+  borrower: Scalars['String']['input'];
+}>;
+
+
+export type GetBorrowerDebtTokensQuery = { __typename?: 'Query', getDebtTokens: Array<{ __typename?: 'DebtTokenMeta', walletAmount?: number | null, token: { __typename?: 'Token', address: string, symbol: string, priceUSD: number, isPoolToken: boolean } }> };
+
 export type GetCollateralTokensQueryVariables = Exact<{ [key: string]: never; }>;
 
 

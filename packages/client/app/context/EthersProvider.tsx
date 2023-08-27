@@ -13,13 +13,13 @@ export const EthersContext = createContext<{
   provider: BrowserProvider | null;
   signer: JsonRpcSigner | null;
   loginError: LoginError | null;
-  address: string | null;
+  address: string;
   connectWallet: () => void;
 }>({
   provider: null,
   signer: null,
   loginError: null,
-  address: null,
+  address: '',
   connectWallet: () => {},
 });
 
@@ -28,7 +28,7 @@ type LoginError = 'User rejected permissions' | 'MetaMask is not installed' | 'A
 export default function EthersProvider({ children }: { children: React.ReactNode }): JSX.Element {
   const [provider, setProvider] = useState<BrowserProvider | null>(null);
   const [signer, setSigner] = useState<JsonRpcSigner | null>(null);
-  const [address, setAddress] = useState<string | null>(null);
+  const [address, setAddress] = useState<string>('');
   const [loginError, setLoginError] = useState<LoginError | null>(null);
 
   const connectWallet = async () => {
@@ -70,7 +70,7 @@ export function useEthers(): {
   provider: BrowserProvider | null;
   signer: JsonRpcSigner | null;
   loginError: LoginError | null;
-  address: string | null;
+  address: string;
   connectWallet: () => void;
 } {
   const context = useContext(EthersContext);

@@ -58,7 +58,7 @@ const Positions = () => {
           />
         </Tabs>
 
-        <div style={{ height: '270px' }}>{renderTableContent()}</div>
+        <div style={{ height: '270px', overflowY: 'scroll' }}>{renderTableContent()}</div>
       </div>
     </>
   );
