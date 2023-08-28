@@ -10,11 +10,6 @@ const FunctionCaller = artifacts.require('./TestContracts/FunctionCaller.sol');
 const BorrowerOperations = artifacts.require('./BorrowerOperations.sol');
 const HintHelpers = artifacts.require('./HintHelpers.sol');
 
-const LQTYStaking = artifacts.require('./LQTYStaking.sol');
-const LQTYToken = artifacts.require('./LQTYToken.sol');
-const LockupContractFactory = artifacts.require('./LockupContractFactory.sol');
-const CommunityIssuance = artifacts.require('./CommunityIssuance.sol');
-
 const LQTYTokenTester = artifacts.require('./LQTYTokenTester.sol');
 const CommunityIssuanceTester = artifacts.require('./CommunityIssuanceTester.sol');
 const StabilityPoolTester = artifacts.require('./StabilityPoolTester.sol');
@@ -42,16 +37,6 @@ const {
   LQTYStakingProxy,
 } = require('../utils/proxyHelpers.js');
 
-/* "Liquity core" consists of all contracts in the core Liquity system.
-
-LQTY contracts consist of only those contracts related to the LQTY Token:
-
--the LQTY token
--the Lockup factory and lockup contracts
--the LQTYStaking contract
--the CommunityIssuance contract 
-*/
-
 const ZERO_ADDRESS = '0x' + '0'.repeat(40);
 const maxBytes32 = '0x' + 'f'.repeat(64);
 
@@ -65,18 +50,6 @@ class DeploymentHelper {
       return this.deployLiquityCoreHardhat();
     } else if (frameworkPath.includes('truffle')) {
       return this.deployLiquityCoreTruffle();
-    }
-  }
-
-  static async deployLQTYContracts(bountyAddress, lpRewardsAddress, multisigAddress) {
-    const cmdLineArgs = process.argv;
-    const frameworkPath = cmdLineArgs[1];
-    // console.log(`Framework used:  ${frameworkPath}`)
-
-    if (frameworkPath.includes('hardhat')) {
-      return this.deployLQTYContractsHardhat(bountyAddress, lpRewardsAddress, multisigAddress);
-    } else if (frameworkPath.includes('truffle')) {
-      return this.deployLQTYContractsTruffle(bountyAddress, lpRewardsAddress, multisigAddress);
     }
   }
 
@@ -145,64 +118,6 @@ class DeploymentHelper {
     return testerContracts;
   }
 
-  static async deployLQTYContractsHardhat(bountyAddress, lpRewardsAddress, multisigAddress) {
-    const lqtyStaking = await LQTYStaking.new();
-    const lockupContractFactory = await LockupContractFactory.new();
-    const communityIssuance = await CommunityIssuance.new();
-
-    LQTYStaking.setAsDeployed(lqtyStaking);
-    LockupContractFactory.setAsDeployed(lockupContractFactory);
-    CommunityIssuance.setAsDeployed(communityIssuance);
-
-    // Deploy LQTY Token, passing Community Issuance and Factory addresses to the constructor
-    const lqtyToken = await LQTYToken.new(
-      communityIssuance.address,
-      lqtyStaking.address,
-      lockupContractFactory.address,
-      bountyAddress,
-      lpRewardsAddress,
-      multisigAddress
-    );
-    LQTYToken.setAsDeployed(lqtyToken);
-
-    const LQTYContracts = {
-      lqtyStaking,
-      lockupContractFactory,
-      communityIssuance,
-      lqtyToken,
-    };
-    return LQTYContracts;
-  }
-
-  static async deployLQTYTesterContractsHardhat(bountyAddress, lpRewardsAddress, multisigAddress) {
-    const lqtyStaking = await LQTYStaking.new();
-    const lockupContractFactory = await LockupContractFactory.new();
-    const communityIssuance = await CommunityIssuanceTester.new();
-
-    LQTYStaking.setAsDeployed(lqtyStaking);
-    LockupContractFactory.setAsDeployed(lockupContractFactory);
-    CommunityIssuanceTester.setAsDeployed(communityIssuance);
-
-    // Deploy LQTY Token, passing Community Issuance and Factory addresses to the constructor
-    const lqtyToken = await LQTYTokenTester.new(
-      communityIssuance.address,
-      lqtyStaking.address,
-      lockupContractFactory.address,
-      bountyAddress,
-      lpRewardsAddress,
-      multisigAddress
-    );
-    LQTYTokenTester.setAsDeployed(lqtyToken);
-
-    const LQTYContracts = {
-      lqtyStaking,
-      lockupContractFactory,
-      communityIssuance,
-      lqtyToken,
-    };
-    return LQTYContracts;
-  }
-
   static async deployLiquityCoreTruffle() {
     const priceFeedTestnet = await PriceFeedTestnet.new();
     const troveManager = await TroveManager.new();
@@ -229,31 +144,6 @@ class DeploymentHelper {
       hintHelpers,
     };
     return coreContracts;
-  }
-
-  static async deployLQTYContractsTruffle(bountyAddress, lpRewardsAddress, multisigAddress) {
-    const lqtyStaking = await lqtyStaking.new();
-    const lockupContractFactory = await LockupContractFactory.new();
-    const communityIssuance = await CommunityIssuance.new();
-
-    /* Deploy LQTY Token, passing Community Issuance,  LQTYStaking, and Factory addresses 
-    to the constructor  */
-    const lqtyToken = await LQTYToken.new(
-      communityIssuance.address,
-      lqtyStaking.address,
-      lockupContractFactory.address,
-      bountyAddress,
-      lpRewardsAddress,
-      multisigAddress
-    );
-
-    const LQTYContracts = {
-      lqtyStaking,
-      lockupContractFactory,
-      communityIssuance,
-      lqtyToken,
-    };
-    return LQTYContracts;
   }
 
   static async deployLUSDToken(contracts) {
@@ -377,26 +267,6 @@ class DeploymentHelper {
 
     // set contracts in HintHelpers
     await contracts.hintHelpers.setAddresses(contracts.troveManager.address);
-  }
-
-  static async connectLQTYContracts(LQTYContracts) {
-    // Set LQTYToken address in LCF
-    await LQTYContracts.lockupContractFactory.setLQTYTokenAddress(LQTYContracts.lqtyToken.address);
-  }
-
-  static async connectLQTYContractsToCore(LQTYContracts, coreContracts) {
-    await LQTYContracts.lqtyStaking.setAddresses(
-      LQTYContracts.lqtyToken.address,
-      coreContracts.lusdToken.address,
-      coreContracts.troveManager.address,
-      coreContracts.borrowerOperations.address,
-      coreContracts.activePool.address
-    );
-
-    await LQTYContracts.communityIssuance.setAddresses(
-      LQTYContracts.lqtyToken.address,
-      coreContracts.stabilityPool.address
-    );
   }
 
   static async connectUnipool(uniPool, LQTYContracts, uniswapPairAddr, duration) {
