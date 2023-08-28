@@ -21,6 +21,7 @@ contract DebtTokenManager is Ownable, CheckContract, IDebtTokenManager {
 
   mapping(address => IDebtToken) public debtTokens;
   IDebtToken[] public debtTokensArray;
+  address[] public debtTokenAddresses;
   IDebtToken public stableCoin;
 
   // --- Dependency setter ---
@@ -63,15 +64,20 @@ contract DebtTokenManager is Ownable, CheckContract, IDebtTokenManager {
     return debtToken;
   }
 
+  function getDebtTokenAddresses() external view override returns (address[] memory) {
+    return debtTokenAddresses;
+  }
+
   // --- Setters ---
 
   // todo (flat) owner only, should be also callable after deployment
+  // todo price oracle id missing...
   function addDebtToken(
     string memory _symbol,
     string memory _name,
     string memory _version,
     bool _isStableCoin
-  ) external override onlyOwner returns (bool) {
+  ) external override onlyOwner {
     if (_isStableCoin) require(address(stableCoin) == address(0), 'stableCoin already exists');
 
     for (uint i = 0; i < debtTokensArray.length; i++) {
@@ -90,9 +96,11 @@ contract DebtTokenManager is Ownable, CheckContract, IDebtTokenManager {
       _isStableCoin
     );
 
-    debtTokens[address(debtToken)] = debtToken;
+    address debtTokenAddress = address(debtToken);
+    debtTokenAddresses.push(debtTokenAddress);
+    debtTokens[debtTokenAddress] = debtToken;
     if (_isStableCoin) stableCoin = debtToken;
+
     emit DebtTokenAdded(debtToken);
-    return true;
   }
 }

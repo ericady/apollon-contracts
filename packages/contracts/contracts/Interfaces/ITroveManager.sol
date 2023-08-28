@@ -6,6 +6,7 @@ import './IStabilityPool.sol';
 import './IDebtToken.sol';
 import './IBBase.sol';
 import './IPriceFeed.sol';
+import './IDebtTokenManager.sol';
 
 // Common interface for the Trove Manager.
 interface ITroveManager is IBBase {
@@ -21,6 +22,7 @@ interface ITroveManager is IBBase {
   event BorrowerOperationsAddressChanged(address _newBorrowerOperationsAddress);
   event PriceFeedAddressChanged(address _newPriceFeedAddress);
   event DebtTokenManagerAddressChanged(address _newDebtTokenManagerAddress);
+  event CollTokenManagerAddressChanged(address _newCollTokenManagerAddress);
   event StoragePoolAddressChanged(address _storagePoolAddress);
   event StabilityPoolManagerAddressChanged(address _stabilityPoolManagerAddress);
 
@@ -42,39 +44,41 @@ interface ITroveManager is IBBase {
 
   function getTroveFromTroveOwnersArray(uint _index) external view returns (address);
 
-  function getNominalICR(
-    address _borrower,
-    IPriceFeed _priceFeedCached,
-    PriceCache memory _priceCache
-  ) external returns (uint);
+  function getNominalICR(address _borrower) external returns (uint);
 
-  function getCurrentICR(
-    address _borrower,
-    IPriceFeed _priceFeedCached,
-    PriceCache memory _priceCache
-  ) external view returns (uint ICR, uint currentDebtInStable);
+  function getCurrentICR(address _borrower) external view returns (uint ICR, uint currentDebtInStable);
 
   function liquidate(address _borrower) external;
 
   function batchLiquidateTroves(address[] calldata _troveArray) external;
 
-  function updateStakeAndTotalStakes(address _borrower) external;
+  function updateStakeAndTotalStakes(address[] memory collTokenAddresses, address _borrower) external;
 
-  function updateTroveRewardSnapshots(address _borrower) external;
+  function updateTroveRewardSnapshots(
+    address[] memory collTokenAddresses,
+    IDebtTokenManager _debtTokenManager,
+    address _borrower
+  ) external;
 
   function addTroveOwnerToArray(address _borrower) external returns (uint index);
 
-  function applyPendingRewards(IPriceFeed _priceFeedCached, PriceCache memory _priceCache, address _borrower) external;
+  function applyPendingRewards(
+    IPriceFeed _priceFeedCached,
+    PriceCache memory _priceCache,
+    address[] memory _collTokenAddresses,
+    address _borrower
+  ) external;
 
   function getEntireDebtAndColl(
     IPriceFeed _priceFeed,
     PriceCache memory _priceCache,
+    address[] memory _collTokenAddresses,
     address _borrower
   ) external view returns (RAmount[] memory amounts, uint troveCollInStable, uint troveDebtInStable);
 
-  function closeTrove(address _borrower) external;
+  function closeTrove(address[] memory collTokenAddresses, address _borrower) external;
 
-  function removeStake(address _borrower) external;
+  function removeStake(address[] memory collTokenAddresses, address _borrower) external;
 
   function redeemCollateral(uint _stableCoinAmount, uint _maxFee, address[] memory _sourceTroves) external;
 
@@ -102,11 +106,7 @@ interface ITroveManager is IBBase {
 
   function setTroveStatus(address _borrower, uint num) external;
 
-  function getTroveStake(
-    address _borrower,
-    IPriceFeed _priceFeed,
-    PriceCache memory _priceCache
-  ) external view returns (uint);
+  function getTroveStake(address _borrower) external view returns (uint);
 
   function increaseTroveColl(address _borrower, PriceTokenAmount[] memory _collTokenAmounts) external;
 

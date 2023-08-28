@@ -14,6 +14,7 @@ import './Interfaces/IDebtTokenManager.sol';
 import './Interfaces/IStoragePool.sol';
 import './Interfaces/IPriceFeed.sol';
 import './Interfaces/IBBase.sol';
+import './Interfaces/ICollTokenManager.sol';
 
 contract BorrowerOperations is LiquityBase, Ownable, CheckContract, IBorrowerOperations {
   using SafeMath for uint256;
@@ -23,6 +24,7 @@ contract BorrowerOperations is LiquityBase, Ownable, CheckContract, IBorrowerOpe
 
   ITroveManager public troveManager;
   IDebtTokenManager public debtTokenManager;
+  ICollTokenManager public collTokenManager;
   IStoragePool public storagePool;
   IPriceFeed public priceFeed;
   address stabilityPoolAddress;
@@ -36,6 +38,8 @@ contract BorrowerOperations is LiquityBase, Ownable, CheckContract, IBorrowerOpe
     "CompilerError: Stack too deep". */
 
   struct LocalVariables_openTrove {
+    address[] collTokenAddresses;
+    //
     PriceTokenAmount[] colls;
     DebtTokenAmount[] debts;
     uint compositeDebtInStable;
@@ -51,6 +55,8 @@ contract BorrowerOperations is LiquityBase, Ownable, CheckContract, IBorrowerOpe
   }
 
   struct LocalVariables_adjustTrove {
+    address[] collTokenAddresses;
+    //
     PriceTokenAmount[] colls;
     DebtTokenAmount[] debts;
     DebtTokenAmount stableCoinEntry;
@@ -83,6 +89,7 @@ contract BorrowerOperations is LiquityBase, Ownable, CheckContract, IBorrowerOpe
     ITroveManager troveManager;
     IStoragePool storagePool;
     IDebtTokenManager debtTokenManager;
+    ICollTokenManager collTokenManager;
   }
 
   enum BorrowerOperation {
@@ -98,7 +105,8 @@ contract BorrowerOperations is LiquityBase, Ownable, CheckContract, IBorrowerOpe
     address _storagePoolAddress,
     address _stabilityPoolAddress,
     address _priceFeedAddress,
-    address _debtTokenManagerAddress
+    address _debtTokenManagerAddress,
+    address _collTokenManagerAddress
   ) external onlyOwner {
     // This makes impossible to open a trove with zero withdrawn LUSD
     assert(MIN_NET_DEBT > 0);
@@ -108,6 +116,7 @@ contract BorrowerOperations is LiquityBase, Ownable, CheckContract, IBorrowerOpe
     checkContract(_stabilityPoolAddress);
     checkContract(_priceFeedAddress);
     checkContract(_debtTokenManagerAddress);
+    checkContract(_collTokenManagerAddress);
 
     troveManager = ITroveManager(_troveManagerAddress);
     emit TroveManagerAddressChanged(_troveManagerAddress);
@@ -124,14 +133,23 @@ contract BorrowerOperations is LiquityBase, Ownable, CheckContract, IBorrowerOpe
     debtTokenManager = IDebtTokenManager(_debtTokenManagerAddress);
     emit DebtTokenManagerAddressChanged(_debtTokenManagerAddress);
 
+    collTokenManager = ICollTokenManager(_collTokenManagerAddress);
+    emit CollTokenManagerAddressChanged(_collTokenManagerAddress);
+
     _renounceOwnership();
   }
 
   // --- Borrower Trove Operations ---
 
   function openTrove(TokenAmount[] memory _colls, address _upperHint, address _lowerHint) external override {
-    ContractsCache memory contractsCache = ContractsCache(troveManager, storagePool, debtTokenManager);
+    ContractsCache memory contractsCache = ContractsCache(
+      troveManager,
+      storagePool,
+      debtTokenManager,
+      collTokenManager
+    );
     LocalVariables_openTrove memory vars;
+    vars.collTokenAddresses = contractsCache.collTokenManager.getCollTokenAddresses();
     PriceCache memory priceCache;
 
     _requireTroveIsNotActive(contractsCache.troveManager, msg.sender);
@@ -178,8 +196,12 @@ contract BorrowerOperations is LiquityBase, Ownable, CheckContract, IBorrowerOpe
     contractsCache.troveManager.setTroveStatus(msg.sender, 1); // active
     contractsCache.troveManager.increaseTroveColl(msg.sender, vars.colls);
     contractsCache.troveManager.increaseTroveDebt(msg.sender, vars.debts);
-    contractsCache.troveManager.updateTroveRewardSnapshots(msg.sender);
-    contractsCache.troveManager.updateStakeAndTotalStakes(msg.sender);
+    contractsCache.troveManager.updateTroveRewardSnapshots(
+      vars.collTokenAddresses,
+      contractsCache.debtTokenManager,
+      msg.sender
+    );
+    contractsCache.troveManager.updateStakeAndTotalStakes(vars.collTokenAddresses, msg.sender);
 
     vars.arrayIndex = contractsCache.troveManager.addTroveOwnerToArray(msg.sender);
     emit TroveCreated(msg.sender, vars.arrayIndex);
@@ -424,8 +446,8 @@ contract BorrowerOperations is LiquityBase, Ownable, CheckContract, IBorrowerOpe
       );
     }
 
-    contractsCache.troveManager.removeStake(borrower);
-    contractsCache.troveManager.closeTrove(borrower);
+    contractsCache.troveManager.removeStake(vars.collTokenAddresses, borrower);
+    contractsCache.troveManager.closeTrove(vars.collTokenAddresses, borrower);
 
     // todo
     // emit TroveUpdated(msg.sender, 0, 0, 0, BorrowerOperation.closeTrove);
@@ -439,14 +461,15 @@ contract BorrowerOperations is LiquityBase, Ownable, CheckContract, IBorrowerOpe
     internal
     returns (ContractsCache memory contractsCache, LocalVariables_adjustTrove memory vars, PriceCache memory priceCache)
   {
-    contractsCache = ContractsCache(troveManager, storagePool, debtTokenManager);
+    contractsCache = ContractsCache(troveManager, storagePool, debtTokenManager, collTokenManager);
+    vars.collTokenAddresses = contractsCache.collTokenManager.getCollTokenAddresses();
 
     (vars.isInRecoveryMode, vars.TCR, vars.entireSystemColl, vars.entireSystemDebt) = contractsCache
       .storagePool
       .checkRecoveryMode(priceCache);
 
     _requireTroveisActive(contractsCache.troveManager, _borrower);
-    contractsCache.troveManager.applyPendingRewards(priceFeed, priceCache, _borrower); // from redistributions
+    contractsCache.troveManager.applyPendingRewards(priceFeed, priceCache, vars.collTokenAddresses, _borrower); // from redistributions
 
     // fetching old/current debts and colls including prices + calc ICR
     (vars.debts, vars.stableCoinEntry) = _getDebtTokenAmountsWithFetchedPrices(
@@ -484,7 +507,7 @@ contract BorrowerOperations is LiquityBase, Ownable, CheckContract, IBorrowerOpe
     _requireValidAdjustmentInCurrentMode(_isCollWithdrawal, _isDebtIncrease, vars);
 
     // update troves stake
-    contractsCache.troveManager.updateStakeAndTotalStakes(_borrower);
+    contractsCache.troveManager.updateStakeAndTotalStakes(vars.collTokenAddresses, _borrower);
 
     // todo...
     //    emit TroveUpdated(
