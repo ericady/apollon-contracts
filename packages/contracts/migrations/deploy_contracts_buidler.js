@@ -1,6 +1,5 @@
 // Buidler-Truffle fixture for deployment to Buidler EVM
 
-const SortedTroves = artifacts.require('./SortedTroves.sol');
 const ActivePool = artifacts.require('./ActivePool.sol');
 const DefaultPool = artifacts.require('./DefaultPool.sol');
 const StabilityPool = artifacts.require('./StabilityPool.sol');
@@ -18,7 +17,6 @@ const connectContracts = deploymentHelpers.connectContracts;
 module.exports = async () => {
   const borrowerOperations = await BorrowerOperations.new();
   const priceFeed = await PriceFeed.new();
-  const sortedTroves = await SortedTroves.new();
   const troveManager = await TroveManager.new();
   const activePool = await ActivePool.new();
   const stabilityPool = await StabilityPool.new();
@@ -27,7 +25,6 @@ module.exports = async () => {
   const lusdToken = await LUSDToken.new(troveManager.address, stabilityPool.address, borrowerOperations.address);
   BorrowerOperations.setAsDeployed(borrowerOperations);
   PriceFeed.setAsDeployed(priceFeed);
-  SortedTroves.setAsDeployed(sortedTroves);
   TroveManager.setAsDeployed(troveManager);
   ActivePool.setAsDeployed(activePool);
   StabilityPool.setAsDeployed(stabilityPool);
@@ -39,7 +36,6 @@ module.exports = async () => {
     borrowerOperations,
     priceFeed,
     lusdToken,
-    sortedTroves,
     troveManager,
     activePool,
     stabilityPool,

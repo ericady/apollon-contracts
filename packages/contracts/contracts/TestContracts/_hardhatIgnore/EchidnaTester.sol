@@ -8,7 +8,6 @@ import '../StoragePool.sol';
 import '../StabilityPool.sol';
 import '../DebtToken.sol';
 import './PriceFeedTestnet.sol';
-import '../SortedTroves.sol';
 import './EchidnaProxy.sol';
 
 //import "../Dependencies/console.sol";

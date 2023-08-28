@@ -1,6 +1,6 @@
-import { JsonFragment, LogDescription } from "@ethersproject/abi";
-import { BigNumber } from "@ethersproject/bignumber";
-import { Log } from "@ethersproject/abstract-provider";
+import { JsonFragment, LogDescription } from '@ethersproject/abi';
+import { BigNumber } from '@ethersproject/bignumber';
+import { Log } from '@ethersproject/abstract-provider';
 
 import {
   Contract,
@@ -9,29 +9,28 @@ import {
   Overrides,
   CallOverrides,
   PopulatedTransaction,
-  ContractTransaction
-} from "@ethersproject/contracts";
+  ContractTransaction,
+} from '@ethersproject/contracts';
 
-import activePoolAbi from "../abi/ActivePool.json";
-import borrowerOperationsAbi from "../abi/BorrowerOperations.json";
-import troveManagerAbi from "../abi/TroveManager.json";
-import lusdTokenAbi from "../abi/LUSDToken.json";
-import collSurplusPoolAbi from "../abi/CollSurplusPool.json";
-import communityIssuanceAbi from "../abi/CommunityIssuance.json";
-import defaultPoolAbi from "../abi/DefaultPool.json";
-import lqtyTokenAbi from "../abi/LQTYToken.json";
-import hintHelpersAbi from "../abi/HintHelpers.json";
-import lockupContractFactoryAbi from "../abi/LockupContractFactory.json";
-import lqtyStakingAbi from "../abi/LQTYStaking.json";
-import multiTroveGetterAbi from "../abi/MultiTroveGetter.json";
-import priceFeedAbi from "../abi/PriceFeed.json";
-import priceFeedTestnetAbi from "../abi/PriceFeedTestnet.json";
-import sortedTrovesAbi from "../abi/SortedTroves.json";
-import stabilityPoolAbi from "../abi/StabilityPool.json";
-import gasPoolAbi from "../abi/GasPool.json";
-import unipoolAbi from "../abi/Unipool.json";
-import iERC20Abi from "../abi/IERC20.json";
-import erc20MockAbi from "../abi/ERC20Mock.json";
+import activePoolAbi from '../abi/ActivePool.json';
+import borrowerOperationsAbi from '../abi/BorrowerOperations.json';
+import troveManagerAbi from '../abi/TroveManager.json';
+import lusdTokenAbi from '../abi/LUSDToken.json';
+import collSurplusPoolAbi from '../abi/CollSurplusPool.json';
+import communityIssuanceAbi from '../abi/CommunityIssuance.json';
+import defaultPoolAbi from '../abi/DefaultPool.json';
+import lqtyTokenAbi from '../abi/LQTYToken.json';
+import hintHelpersAbi from '../abi/HintHelpers.json';
+import lockupContractFactoryAbi from '../abi/LockupContractFactory.json';
+import lqtyStakingAbi from '../abi/LQTYStaking.json';
+import multiTroveGetterAbi from '../abi/MultiTroveGetter.json';
+import priceFeedAbi from '../abi/PriceFeed.json';
+import priceFeedTestnetAbi from '../abi/PriceFeedTestnet.json';
+import stabilityPoolAbi from '../abi/StabilityPool.json';
+import gasPoolAbi from '../abi/GasPool.json';
+import unipoolAbi from '../abi/Unipool.json';
+import iERC20Abi from '../abi/IERC20.json';
+import erc20MockAbi from '../abi/ERC20Mock.json';
 
 import {
   ActivePool,
@@ -48,17 +47,16 @@ import {
   MultiTroveGetter,
   PriceFeed,
   PriceFeedTestnet,
-  SortedTroves,
   StabilityPool,
   GasPool,
   Unipool,
   ERC20Mock,
-  IERC20
-} from "../types";
+  IERC20,
+} from '../types';
 
-import { EthersProvider, EthersSigner } from "./types";
+import { EthersProvider, EthersSigner } from './types';
 
-export interface _TypedLogDescription<T> extends Omit<LogDescription, "args"> {
+export interface _TypedLogDescription<T> extends Omit<LogDescription, 'args'> {
   args: T;
 }
 
@@ -85,11 +83,8 @@ type EstimatedContractFunction<R = unknown, A extends unknown[] = unknown[], O =
 type CallOverridesArg = [overrides?: CallOverrides];
 
 type TypedContract<T extends Contract, U, V> = _TypeSafeContract<T> &
-  U &
-  {
-    [P in keyof V]: V[P] extends (...args: infer A) => unknown
-      ? (...args: A) => Promise<ContractTransaction>
-      : never;
+  U & {
+    [P in keyof V]: V[P] extends (...args: infer A) => unknown ? (...args: A) => Promise<ContractTransaction> : never;
   } & {
     readonly callStatic: {
       [P in keyof V]: V[P] extends (...args: [...infer A, never]) => infer R
@@ -98,9 +93,7 @@ type TypedContract<T extends Contract, U, V> = _TypeSafeContract<T> &
     };
 
     readonly estimateGas: {
-      [P in keyof V]: V[P] extends (...args: infer A) => unknown
-        ? (...args: A) => Promise<BigNumber>
-        : never;
+      [P in keyof V]: V[P] extends (...args: infer A) => unknown ? (...args: A) => Promise<BigNumber> : never;
     };
 
     readonly populateTransaction: {
@@ -129,12 +122,12 @@ const buildEstimatedFunctions = <T>(
 
           overrides = {
             ...overrides,
-            gasLimit: adjustEstimate(estimatedGas)
+            gasLimit: adjustEstimate(estimatedGas),
           };
         }
 
         return functions[functionName](...args, overrides);
-      }
+      },
     ])
   );
 
@@ -178,7 +171,6 @@ export interface _LiquityContracts {
   lqtyStaking: LQTYStaking;
   multiTroveGetter: MultiTroveGetter;
   priceFeed: PriceFeed | PriceFeedTestnet;
-  sortedTroves: SortedTroves;
   stabilityPool: StabilityPool;
   gasPool: GasPool;
   unipool: Unipool;
@@ -186,13 +178,11 @@ export interface _LiquityContracts {
 }
 
 /** @internal */
-export const _priceFeedIsTestnet = (
-  priceFeed: PriceFeed | PriceFeedTestnet
-): priceFeed is PriceFeedTestnet => "setPrice" in priceFeed;
+export const _priceFeedIsTestnet = (priceFeed: PriceFeed | PriceFeedTestnet): priceFeed is PriceFeedTestnet =>
+  'setPrice' in priceFeed;
 
 /** @internal */
-export const _uniTokenIsMock = (uniToken: IERC20 | ERC20Mock): uniToken is ERC20Mock =>
-  "mint" in uniToken;
+export const _uniTokenIsMock = (uniToken: IERC20 | ERC20Mock): uniToken is ERC20Mock => 'mint' in uniToken;
 
 type LiquityContractsKey = keyof _LiquityContracts;
 
@@ -214,21 +204,21 @@ const getAbi = (priceFeedIsTestnet: boolean, uniTokenIsMock: boolean): LiquityCo
   lqtyStaking: lqtyStakingAbi,
   multiTroveGetter: multiTroveGetterAbi,
   priceFeed: priceFeedIsTestnet ? priceFeedTestnetAbi : priceFeedAbi,
-  sortedTroves: sortedTrovesAbi,
   stabilityPool: stabilityPoolAbi,
   gasPool: gasPoolAbi,
   collSurplusPool: collSurplusPoolAbi,
   unipool: unipoolAbi,
-  uniToken: uniTokenIsMock ? erc20MockAbi : iERC20Abi
+  uniToken: uniTokenIsMock ? erc20MockAbi : iERC20Abi,
 });
 
 const mapLiquityContracts = <T, U>(
   contracts: Record<LiquityContractsKey, T>,
   f: (t: T, key: LiquityContractsKey) => U
 ) =>
-  Object.fromEntries(
-    Object.entries(contracts).map(([key, t]) => [key, f(t, key as LiquityContractsKey)])
-  ) as Record<LiquityContractsKey, U>;
+  Object.fromEntries(Object.entries(contracts).map(([key, t]) => [key, f(t, key as LiquityContractsKey)])) as Record<
+    LiquityContractsKey,
+    U
+  >;
 
 /** @internal */
 export interface _LiquityDeploymentJSON {
@@ -254,7 +244,6 @@ export const _connectToContracts = (
 
   return mapLiquityContracts(
     addresses,
-    (address, key) =>
-      new _LiquityContract(address, abi[key], signerOrProvider) as _TypedLiquityContract
+    (address, key) => new _LiquityContract(address, abi[key], signerOrProvider) as _TypedLiquityContract
   ) as _LiquityContracts;
 };

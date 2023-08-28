@@ -1,5 +1,4 @@
 // Hardhat script
-const SortedTroves = artifacts.require('./SortedTroves.sol');
 const TroveManager = artifacts.require('./TroveManager.sol');
 const PriceFeed = artifacts.require('./PriceFeed.sol');
 const LUSDToken = artifacts.require('./LUSDToken.sol');
@@ -32,7 +31,6 @@ const coreContractABIs = [
   BorrowerOperations,
   PriceFeed,
   LUSDToken,
-  SortedTroves,
   TroveManager,
   ActivePool,
   StabilityPool,
