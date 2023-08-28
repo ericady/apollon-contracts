@@ -20,28 +20,42 @@ type Props = {
   collateralData: GetBorrowerCollateralTokensQuery;
 };
 
+type FieldValues = {
+  etherTokenAmount: number;
+};
+
 const CollateralUpdateDialog = ({ collateralData }: Props) => {
   const [isOpen, setIsOpen] = useState(false);
   const [tabValue, setTabValue] = useState<'DEPOSIT' | 'WITHDRAW'>('DEPOSIT');
 
   const { etherAmount } = useWallet();
 
-  const methods = useForm({
+  // get the fieldnames as a type from react hook form
+  const methods = useForm<FieldValues>({
     defaultValues: {
       etherTokenAmount: 0,
     },
   });
-
-  const { handleSubmit, setValue } = methods;
+  const { handleSubmit, setValue, reset } = methods;
 
   const handleChange = (_: SyntheticEvent, newValue: 'DEPOSIT' | 'WITHDRAW') => {
     setTabValue(newValue);
+    reset();
   };
 
   // TODO: Add ETH address
+  // TODO: Add ETH, BTC, YLT, jUSD
   const depositedCollateralToDeposit = collateralData.getCollateralTokens.filter(
     ({ token }, index) => token.address && index === 0,
   );
+
+  const fillMaxInputValue = (fieldName: keyof FieldValues) => {
+    if (tabValue === 'DEPOSIT') {
+      setValue(fieldName, etherAmount, { shouldValidate: true });
+    } else {
+      setValue(fieldName, depositedCollateralToDeposit[0].stabilityGainedAmount!, { shouldValidate: true });
+    }
+  };
 
   const onSubmit = () => {
     console.log('onSubmit called');
@@ -110,24 +124,28 @@ const CollateralUpdateDialog = ({ collateralData }: Props) => {
               </Tabs>
 
               <div className="pool-input">
-                <div>
-                  <Label variant="success">ETH</Label>
-                  <Typography sx={{ fontWeight: '400', marginTop: '10px' }}>
-                    {roundCurrency(depositedCollateralToDeposit[0].stabilityGainedAmount!, 5)}
-                  </Typography>
-                  <Typography
-                    sx={{
-                      color: '#3C3945',
-                      fontFamily: 'Space Grotesk',
-                      fontSize: '9px',
-                      fontWeight: '700',
-                      lineHeight: '11px',
-                      letterSpacing: '0em',
-                    }}
-                  >
-                    Trove
-                  </Typography>
-                </div>
+                {tabValue === 'DEPOSIT' && (
+                  <div>
+                    <Label variant="success">ETH</Label>
+                    <Typography sx={{ fontWeight: '400', marginTop: '10px' }}>
+                      {roundCurrency(depositedCollateralToDeposit[0].stabilityGainedAmount!, 5)}
+                    </Typography>
+                    <Typography
+                      sx={{
+                        color: '#3C3945',
+                        fontFamily: 'Space Grotesk',
+                        fontSize: '9px',
+                        fontWeight: '700',
+                        lineHeight: '11px',
+                        letterSpacing: '0em',
+                      }}
+                    >
+                      Trove
+                    </Typography>
+                  </div>
+                )}
+                {tabValue === 'WITHDRAW' && <Label variant="success">ETH</Label>}
+
                 <div>
                   <NumberInput
                     name="etherTokenAmount"
@@ -135,31 +153,60 @@ const CollateralUpdateDialog = ({ collateralData }: Props) => {
                     fullWidth
                     rules={{
                       min: { value: 0, message: 'You can only invest positive amounts.' },
-                      max: { value: etherAmount, message: 'Your wallet does not contain the specified amount' },
+                      max:
+                        tabValue === 'DEPOSIT'
+                          ? { value: etherAmount, message: 'Your wallet does not contain the specified amount' }
+                          : {
+                              value: depositedCollateralToDeposit[0].stabilityGainedAmount!,
+                              message: 'Your trove does not contain the specified amount',
+                            },
                     }}
                   />
 
                   <div className="flex" style={{ justifyContent: 'space-between', alignContent: 'flex-start' }}>
                     <div>
-                      <Typography variant="caption">{etherAmount}</Typography>
-                      <Typography
-                        sx={{
-                          color: '#3C3945',
-                          fontFamily: 'Space Grotesk',
-                          fontSize: '9px',
-                          fontWeight: '700',
-                          lineHeight: '11px',
-                          letterSpacing: '0em',
-                        }}
-                      >
-                        Wallet
-                      </Typography>
+                      {tabValue === 'DEPOSIT' && (
+                        <>
+                          <Typography variant="caption">{etherAmount}</Typography>
+                          <Typography
+                            sx={{
+                              color: '#3C3945',
+                              fontFamily: 'Space Grotesk',
+                              fontSize: '9px',
+                              fontWeight: '700',
+                              lineHeight: '11px',
+                              letterSpacing: '0em',
+                            }}
+                          >
+                            Wallet
+                          </Typography>
+                        </>
+                      )}
+                      {tabValue === 'WITHDRAW' && (
+                        <>
+                          <Typography variant="caption">
+                            {roundCurrency(depositedCollateralToDeposit[0].stabilityGainedAmount!, 5)}
+                          </Typography>
+                          <Typography
+                            sx={{
+                              color: '#3C3945',
+                              fontFamily: 'Space Grotesk',
+                              fontSize: '9px',
+                              fontWeight: '700',
+                              lineHeight: '11px',
+                              letterSpacing: '0em',
+                            }}
+                          >
+                            Trove
+                          </Typography>
+                        </>
+                      )}
                     </div>
 
                     <Button
                       variant="undercover"
                       sx={{ textDecoration: 'underline' }}
-                      onClick={() => setValue('etherTokenAmount', etherAmount)}
+                      onClick={() => fillMaxInputValue('etherTokenAmount')}
                     >
                       max
                     </Button>

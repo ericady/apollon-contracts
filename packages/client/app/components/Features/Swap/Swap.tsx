@@ -22,6 +22,7 @@ const Swap = () => {
       tokenAmount: '',
       maxSlippage: '',
     },
+    shouldUnregister: true,
   });
   const { handleSubmit, setValue } = methods;
 

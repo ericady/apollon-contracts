@@ -22,6 +22,7 @@ const Farm = () => {
       farmShortValue: '',
       maxSlippage: '',
     },
+    shouldUnregister: true,
   });
   const { handleSubmit, setValue } = methods;
 
