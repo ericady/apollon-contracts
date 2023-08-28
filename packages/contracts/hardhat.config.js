@@ -9,7 +9,7 @@ const { subtask } = require('hardhat/config');
 const { TASK_COMPILE_SOLIDITY_GET_SOURCE_PATHS } = require('hardhat/builtin-tasks/task-names');
 subtask(TASK_COMPILE_SOLIDITY_GET_SOURCE_PATHS).setAction(async (_, __, runSuper) => {
   const paths = await runSuper();
-  return paths.filter(p => !p.includes('_hardhatIgnore') && !p.includes('/Proxy/') && !p.includes('/TestContracts/'));
+  return paths.filter(p => !p.includes('_hardhatIgnore') && !p.includes('/Proxy/'));
 });
 
 const accounts = require('./hardhatAccountsList2k.js');
@@ -43,6 +43,10 @@ module.exports = {
   },
   solidity: {
     compilers: [
+      {
+        version: '0.4.23',
+        settings: { optimizer: { enabled: true, runs: 100 } },
+      },
       {
         version: '0.8.9',
         settings: { optimizer: { enabled: true, runs: 100 } },
