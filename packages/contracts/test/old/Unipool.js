@@ -2,7 +2,7 @@
 
 const { BN, time } = require('@openzeppelin/test-helpers');
 const { expect } = require('chai');
-const { TestHelper } = require('../utils/testHelpers.js');
+const { TestHelper } = require('../../utils/testHelpers.js');
 
 const { assertRevert } = TestHelper;
 

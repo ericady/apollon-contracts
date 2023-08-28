@@ -1,5 +1,5 @@
-const deploymentHelper = require('../utils/deploymentHelpers.js');
-const testHelpers = require('../utils/testHelpers.js');
+const deploymentHelper = require('../../utils/deploymentHelpers.js');
+const testHelpers = require('../../utils/testHelpers.js');
 
 const TroveManagerTester = artifacts.require('TroveManagerTester');
 const LQTYTokenTester = artifacts.require('LQTYTokenTester');
@@ -25,7 +25,7 @@ const {
   SortedTrovesProxy,
   TokenProxy,
   LQTYStakingProxy,
-} = require('../utils/proxyHelpers.js');
+} = require('../../utils/proxyHelpers.js');
 
 contract('BorrowerWrappers', async accounts => {
   const [

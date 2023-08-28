@@ -1,6 +1,6 @@
-const deploymentHelper = require('../utils/deploymentHelpers.js');
-const { StabilityPoolProxy } = require('../utils/proxyHelpers.js');
-const testHelpers = require('../utils/testHelpers.js');
+const deploymentHelper = require('../../utils/deploymentHelpers.js');
+const { StabilityPoolProxy } = require('../../utils/proxyHelpers.js');
+const testHelpers = require('../../utils/testHelpers.js');
 
 const th = testHelpers.TestHelper;
 const timeValues = testHelpers.TimeValues;

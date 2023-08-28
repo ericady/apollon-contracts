@@ -1,5 +1,5 @@
-const deploymentHelper = require('../utils/deploymentHelpers.js');
-const { TestHelper: th, MoneyValues: mv } = require('../utils/testHelpers.js');
+const deploymentHelper = require('../../utils/deploymentHelpers.js');
+const { TestHelper: th, MoneyValues: mv } = require('../../utils/testHelpers.js');
 const { toBN, dec, ZERO_ADDRESS } = th;
 
 const TroveManagerTester = artifacts.require('./TroveManagerTester');

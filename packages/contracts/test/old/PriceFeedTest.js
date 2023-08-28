@@ -4,7 +4,7 @@ const MockChainlink = artifacts.require('./MockAggregator.sol');
 const MockTellor = artifacts.require('./MockTellor.sol');
 const TellorCaller = artifacts.require('./TellorCaller.sol');
 
-const testHelpers = require('../utils/testHelpers.js');
+const testHelpers = require('../../utils/testHelpers.js');
 const th = testHelpers.TestHelper;
 
 const { dec, assertRevert, toBN } = th;

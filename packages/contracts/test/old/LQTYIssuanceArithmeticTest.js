@@ -1,7 +1,7 @@
 const Decimal = require('decimal.js');
-const deploymentHelper = require('../utils/deploymentHelpers.js');
-const { BNConverter } = require('../utils/BNConverter.js');
-const testHelpers = require('../utils/testHelpers.js');
+const deploymentHelper = require('../../utils/deploymentHelpers.js');
+const { BNConverter } = require('../../utils/BNConverter.js');
+const testHelpers = require('../../utils/testHelpers.js');
 const StabilityPool = artifacts.require('./StabilityPool.sol');
 
 const th = testHelpers.TestHelper;

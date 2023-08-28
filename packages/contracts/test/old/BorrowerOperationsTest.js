@@ -1,5 +1,5 @@
-const deploymentHelper = require('../utils/deploymentHelpers.js');
-const testHelpers = require('../utils/testHelpers.js');
+const deploymentHelper = require('../../utils/deploymentHelpers.js');
+const testHelpers = require('../../utils/testHelpers.js');
 
 const BorrowerOperationsTester = artifacts.require('./BorrowerOperationsTester.sol');
 const NonPayable = artifacts.require('NonPayable.sol');

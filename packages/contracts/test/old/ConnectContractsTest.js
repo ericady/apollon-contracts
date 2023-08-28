@@ -1,4 +1,4 @@
-const deploymentHelper = require('../utils/deploymentHelpers.js');
+const deploymentHelper = require('../../utils/deploymentHelpers.js');
 
 contract('Deployment script - Sets correct contract addresses dependencies after deployment', async accounts => {
   const [owner] = accounts;
