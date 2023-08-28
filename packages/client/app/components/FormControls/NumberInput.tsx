@@ -1,7 +1,9 @@
 import { SxProps, TextField, TextFieldProps, Theme } from '@mui/material';
-import { forwardRef } from 'react';
+import { FieldValues, UseControllerProps, useController, useFormContext } from 'react-hook-form';
 
 type Props = TextFieldProps & {
+  name: string;
+  rules?: UseControllerProps<FieldValues, string>['rules'];
   sx?: SxProps<Theme>;
 };
 
@@ -9,11 +11,20 @@ type Props = TextFieldProps & {
  * Because the web platform can not create a reliable number input ._.
  * TODO: Exchange it with https://mui.com/base-ui/react-number-input/ some wonderful day.
  */
-const NumberInput = forwardRef<HTMLInputElement | undefined, Props>((textfieldProps, ref) => {
+function NumberInput({ name, helperText, rules, ...textfieldProps }: Props) {
+  const { control } = useFormContext();
+  const {
+    field: { ref, ...field },
+    fieldState: { error },
+  } = useController({ name, control, rules });
+
   return (
     <TextField
-      inputRef={ref}
+      {...field}
       {...textfieldProps}
+      inputRef={ref}
+      error={!!error}
+      helperText={error ? error.message : helperText}
       type="number"
       sx={{
         '& input::-webkit-outer-spin-button, & input::-webkit-inner-spin-button': {
@@ -26,7 +37,6 @@ const NumberInput = forwardRef<HTMLInputElement | undefined, Props>((textfieldPr
       }}
     />
   );
-});
-NumberInput.displayName = 'NumberInput';
+}
 
 export default NumberInput;

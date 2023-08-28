@@ -8,7 +8,8 @@ import Button from '@mui/material/Button';
 import Tab from '@mui/material/Tab';
 import Tabs from '@mui/material/Tabs';
 import Typography from '@mui/material/Typography';
-import { SyntheticEvent, useRef, useState } from 'react';
+import { SyntheticEvent, useState } from 'react';
+import { FormProvider, useForm } from 'react-hook-form';
 import { useWallet } from '../../../context/WalletProvider';
 import { GetBorrowerCollateralTokensQuery } from '../../../generated/gql-types';
 import { roundCurrency } from '../../../utils/math';
@@ -22,9 +23,16 @@ type Props = {
 const CollateralUpdateDialog = ({ collateralData }: Props) => {
   const [isOpen, setIsOpen] = useState(false);
   const [tabValue, setTabValue] = useState<'DEPOSIT' | 'WITHDRAW'>('DEPOSIT');
-  const tokenInputRef = useRef<HTMLInputElement>();
 
   const { etherAmount } = useWallet();
+
+  const methods = useForm({
+    defaultValues: {
+      etherTokenAmount: 0,
+    },
+  });
+
+  const { handleSubmit, setValue } = methods;
 
   const handleChange = (_: SyntheticEvent, newValue: 'DEPOSIT' | 'WITHDRAW') => {
     setTabValue(newValue);
@@ -34,6 +42,11 @@ const CollateralUpdateDialog = ({ collateralData }: Props) => {
   const depositedCollateralToDeposit = collateralData.getCollateralTokens.filter(
     ({ token }, index) => token.address && index === 0,
   );
+
+  const onSubmit = () => {
+    console.log('onSubmit called');
+    // TODO: Implement contract call
+  };
 
   return (
     <>
@@ -80,45 +93,28 @@ const CollateralUpdateDialog = ({ collateralData }: Props) => {
             />
           </IconButton>
         </DialogTitle>
-        <DialogContent
-          sx={{
-            p: 0,
-            backgroundColor: 'background.default',
-            border: '1px solid',
-            borderColor: 'background.paper',
-            borderBottom: 'none',
-          }}
-        >
-          <Tabs value={tabValue} onChange={handleChange} className="tabs-style">
-            <Tab label="DEPOSIT" value="DEPOSIT" />
-            <Tab label="WITHDRAW" value="WITHDRAW" />
-          </Tabs>
+        <FormProvider {...methods}>
+          <form onSubmit={handleSubmit(onSubmit)}>
+            <DialogContent
+              sx={{
+                p: 0,
+                backgroundColor: 'background.default',
+                border: '1px solid',
+                borderColor: 'background.paper',
+                borderBottom: 'none',
+              }}
+            >
+              <Tabs value={tabValue} onChange={handleChange} className="tabs-style">
+                <Tab label="DEPOSIT" value="DEPOSIT" />
+                <Tab label="WITHDRAW" value="WITHDRAW" />
+              </Tabs>
 
-          <div className="pool-input">
-            <div>
-              <Label variant="success">ETH</Label>
-              <Typography sx={{ fontWeight: '400', marginTop: '10px' }}>
-                {roundCurrency(depositedCollateralToDeposit[0].stabilityGainedAmount!, 5)}
-              </Typography>
-              <Typography
-                sx={{
-                  color: '#3C3945',
-                  fontFamily: 'Space Grotesk',
-                  fontSize: '9px',
-                  fontWeight: '700',
-                  lineHeight: '11px',
-                  letterSpacing: '0em',
-                }}
-              >
-                Trove
-              </Typography>
-            </div>
-            <div>
-              <NumberInput ref={tokenInputRef} placeholder="Value" fullWidth />
-
-              <div className="flex" style={{ justifyContent: 'space-between', alignContent: 'flex-start' }}>
+              <div className="pool-input">
                 <div>
-                  <Typography variant="caption">{etherAmount}</Typography>
+                  <Label variant="success">ETH</Label>
+                  <Typography sx={{ fontWeight: '400', marginTop: '10px' }}>
+                    {roundCurrency(depositedCollateralToDeposit[0].stabilityGainedAmount!, 5)}
+                  </Typography>
                   <Typography
                     sx={{
                       color: '#3C3945',
@@ -129,48 +125,77 @@ const CollateralUpdateDialog = ({ collateralData }: Props) => {
                       letterSpacing: '0em',
                     }}
                   >
-                    Wallet
+                    Trove
                   </Typography>
                 </div>
+                <div>
+                  <NumberInput
+                    name="etherTokenAmount"
+                    placeholder="Value"
+                    fullWidth
+                    rules={{
+                      min: { value: 0, message: 'You can only invest positive amounts.' },
+                      max: { value: etherAmount, message: 'Your wallet does not contain the specified amount' },
+                    }}
+                  />
 
-                <Button
-                  variant="undercover"
-                  sx={{ textDecoration: 'underline' }}
-                  onClick={() => (tokenInputRef.current!.value = etherAmount.toString())}
-                >
-                  max
-                </Button>
+                  <div className="flex" style={{ justifyContent: 'space-between', alignContent: 'flex-start' }}>
+                    <div>
+                      <Typography variant="caption">{etherAmount}</Typography>
+                      <Typography
+                        sx={{
+                          color: '#3C3945',
+                          fontFamily: 'Space Grotesk',
+                          fontSize: '9px',
+                          fontWeight: '700',
+                          lineHeight: '11px',
+                          letterSpacing: '0em',
+                        }}
+                      >
+                        Wallet
+                      </Typography>
+                    </div>
+
+                    <Button
+                      variant="undercover"
+                      sx={{ textDecoration: 'underline' }}
+                      onClick={() => setValue('etherTokenAmount', etherAmount)}
+                    >
+                      max
+                    </Button>
+                  </div>
+                </div>
               </div>
-            </div>
-          </div>
 
-          <div style={{ display: 'flex', justifyContent: 'space-between', padding: '20px' }}>
-            <Typography sx={{ color: '#827F8B', fontSize: '16px' }} className="range-hdng">
-              Collateral Ratio
-            </Typography>
-            <div className="pool-ratio">
-              <Typography sx={{ color: '#33B6FF', fontSize: '20px' }} className="range-hdng">
-                156 %
-              </Typography>
-              <ArrowForwardIosIcon sx={{ color: '#46434F', fontSize: '18px' }} />
-              <Typography sx={{ color: '#33B6FF', fontSize: '20px' }} className="range-hdng">
-                143 %
-              </Typography>
-            </div>
-          </div>
-        </DialogContent>
-        <DialogActions
-          sx={{
-            border: '1px solid',
-            borderColor: 'background.paper',
-            backgroundColor: 'background.default',
-            p: '30px 20px',
-          }}
-        >
-          <Button variant="outlined" sx={{ borderColor: '#fff' }}>
-            Update
-          </Button>
-        </DialogActions>
+              <div style={{ display: 'flex', justifyContent: 'space-between', padding: '20px' }}>
+                <Typography sx={{ color: '#827F8B', fontSize: '16px' }} className="range-hdng">
+                  Collateral Ratio
+                </Typography>
+                <div className="pool-ratio">
+                  <Typography sx={{ color: '#33B6FF', fontSize: '20px' }} className="range-hdng">
+                    156 %
+                  </Typography>
+                  <ArrowForwardIosIcon sx={{ color: '#46434F', fontSize: '18px' }} />
+                  <Typography sx={{ color: '#33B6FF', fontSize: '20px' }} className="range-hdng">
+                    143 %
+                  </Typography>
+                </div>
+              </div>
+            </DialogContent>
+            <DialogActions
+              sx={{
+                border: '1px solid',
+                borderColor: 'background.paper',
+                backgroundColor: 'background.default',
+                p: '30px 20px',
+              }}
+            >
+              <Button type="submit" variant="outlined" sx={{ borderColor: '#fff' }}>
+                Update
+              </Button>
+            </DialogActions>
+          </form>
+        </FormProvider>
       </Dialog>
     </>
   );

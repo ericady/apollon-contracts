@@ -9,7 +9,9 @@ type Props = {
 function InfoButton({ title, description }: Props) {
   return (
     <div>
-      <Button variant="outlined">{title}</Button>
+      <Button variant="outlined" type="submit">
+        {title}
+      </Button>
       <Typography
         variant="subtitle1"
         fontSize={12}
