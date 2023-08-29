@@ -56,12 +56,12 @@ function CollateralTable() {
             <TableHead>
               <TableRow>
                 <HeaderCell title="Locked" cellProps={{ align: 'right' }} />
-                <HeaderCell title="Avaiable" cellProps={{ align: 'right' }} />
+                <HeaderCell title="Wallet" cellProps={{ align: 'right' }} />
                 <HeaderCell title="Symbol" cellProps={{ align: 'right' }} />
               </TableRow>
             </TableHead>
             <TableBody>
-              {data.getCollateralTokens.map(({ token, troveLockedAmount, stabilityGainedAmount }) => (
+              {data.getCollateralTokens.map(({ token, walletAmount, troveLockedAmount }) => (
                 <TableRow key={token.address}>
                   <TableCell>
                     <div className="flex">
@@ -76,7 +76,7 @@ function CollateralTable() {
                       </Typography>
                     </div>
                   </TableCell>
-                  <TableCell align="right">{roundCurrency(stabilityGainedAmount! - troveLockedAmount!, 5)}</TableCell>
+                  <TableCell align="right">{roundCurrency(walletAmount!, 5)}</TableCell>
                   <TableCell align="right">
                     <Label variant="none">{token.symbol}</Label>
                   </TableCell>

@@ -102,6 +102,7 @@ type Pool {
 type Query {
   # every pool is returned, even if it is empty
   # without borrower address borrowerLiquidity and borrowerRewards are always undefined
+  # with borrower address only the pools are returned, where the borrower has liquidity or rewards
   getPools(borrower: String): [Pool!]!
   getPoolPriceHistory(poolId: String!): [[Int!]!]! # [[timestamp, value], [...], ...] todo time range filter needed?
   #

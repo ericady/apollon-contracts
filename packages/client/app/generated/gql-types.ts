@@ -139,13 +139,6 @@ export type GetDebtTokensQueryVariables = Exact<{ [key: string]: never; }>;
 
 export type GetDebtTokensQuery = { __typename?: 'Query', getDebtTokens: Array<{ __typename?: 'DebtTokenMeta', totalSupplyUSD: number, token: { __typename?: 'Token', address: string, symbol: string, priceUSD: number, priceUSD24hAgo: number } }> };
 
-export type GetBorrowerDebtTokensQueryVariables = Exact<{
-  borrower: Scalars['String']['input'];
-}>;
-
-
-export type GetBorrowerDebtTokensQuery = { __typename?: 'Query', getDebtTokens: Array<{ __typename?: 'DebtTokenMeta', walletAmount?: number | null, token: { __typename?: 'Token', address: string, symbol: string, priceUSD: number, isPoolToken: boolean } }> };
-
 export type GetCollateralTokensQueryVariables = Exact<{ [key: string]: never; }>;
 
 
@@ -156,12 +149,26 @@ export type GetBorrowerCollateralTokensQueryVariables = Exact<{
 }>;
 
 
-export type GetBorrowerCollateralTokensQuery = { __typename?: 'Query', getCollateralTokens: Array<{ __typename?: 'CollateralTokenMeta', troveLockedAmount?: number | null, stabilityGainedAmount?: number | null, token: { __typename?: 'Token', address: string, symbol: string } }> };
+export type GetBorrowerCollateralTokensQuery = { __typename?: 'Query', getCollateralTokens: Array<{ __typename?: 'CollateralTokenMeta', troveLockedAmount?: number | null, walletAmount?: number | null, token: { __typename?: 'Token', address: string, symbol: string } }> };
 
-export type GetPoolsQueryVariables = Exact<{ [key: string]: never; }>;
+export type GetBorrowerDebtTokensQueryVariables = Exact<{
+  borrower: Scalars['String']['input'];
+}>;
 
 
-export type GetPoolsQuery = { __typename?: 'Query', getPools: Array<{ __typename?: 'Pool', id: string }> };
+export type GetBorrowerDebtTokensQuery = { __typename?: 'Query', getDebtTokens: Array<{ __typename?: 'DebtTokenMeta', troveMintedAmount?: number | null, walletAmount?: number | null, token: { __typename?: 'Token', address: string, symbol: string, priceUSD: number, isPoolToken: boolean } }> };
+
+export type GetLiquidityPoolsQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type GetLiquidityPoolsQuery = { __typename?: 'Query', getPools: Array<{ __typename?: 'Pool', id: string, volume24hUSD: number, volume24hUSD24hAgo: number, liquidity: Array<{ __typename?: 'PoolLiquidity', totalAmount: number, token: { __typename?: 'Token', address: string, symbol: string } }> }> };
+
+export type GetBorrowerLiquidityPoolsQueryVariables = Exact<{
+  borrower: Scalars['String']['input'];
+}>;
+
+
+export type GetBorrowerLiquidityPoolsQuery = { __typename?: 'Query', getPools: Array<{ __typename?: 'Pool', id: string, volume24hUSD: number, volume24hUSD24hAgo: number, liquidity: Array<{ __typename?: 'PoolLiquidity', totalAmount: number, borrowerAmount?: number | null, token: { __typename?: 'Token', address: string, symbol: string } }> }> };
 
 export type GetPoolPriceHistoryQueryVariables = Exact<{ [key: string]: never; }>;
 

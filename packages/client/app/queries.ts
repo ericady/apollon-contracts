@@ -15,20 +15,6 @@ export const GET_ALL_DEBT_TOKENS = gql`
   }
 `;
 
-export const GET_BORROWER_DEBT_TOKENS = gql`
-  query GetBorrowerDebtTokens($borrower: String!) {
-    getDebtTokens(borrower: $borrower) {
-      walletAmount
-      token {
-        address
-        symbol
-        priceUSD
-        isPoolToken
-      }
-    }
-  }
-`;
-
 export const GET_ALL_COLLATERAL_TOKENS = gql`
   query GetCollateralTokens {
     getCollateralTokens {
@@ -44,7 +30,7 @@ export const GET_BORROWER_COLLATERAL_TOKENS = gql`
   query GetBorrowerCollateralTokens($borrower: String!) {
     getCollateralTokens(borrower: $borrower) {
       troveLockedAmount
-      stabilityGainedAmount
+      walletAmount
       token {
         address
         symbol
@@ -53,10 +39,52 @@ export const GET_BORROWER_COLLATERAL_TOKENS = gql`
   }
 `;
 
-export const GET_ALL_POOLS = gql`
-  query GetPools {
+export const GET_BORROWER_DEBT_TOKENS = gql`
+  query GetBorrowerDebtTokens($borrower: String!) {
+    getDebtTokens(borrower: $borrower) {
+      troveMintedAmount
+      walletAmount
+      token {
+        address
+        symbol
+        priceUSD
+        isPoolToken
+      }
+    }
+  }
+`;
+
+export const GET_LIQUIDITY_POOLS = gql`
+  query GetLiquidityPools {
     getPools {
       id
+      liquidity {
+        token {
+          address
+          symbol
+        }
+        totalAmount
+      }
+      volume24hUSD
+      volume24hUSD24hAgo
+    }
+  }
+`;
+
+export const GET_BORROWER_LIQUIDITY_POOLS = gql`
+  query GetBorrowerLiquidityPools($borrower: String!) {
+    getPools(borrower: $borrower) {
+      id
+      liquidity {
+        token {
+          address
+          symbol
+        }
+        totalAmount
+        borrowerAmount
+      }
+      volume24hUSD
+      volume24hUSD24hAgo
     }
   }
 `;

@@ -1,9 +1,6 @@
 'use client';
 
 import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
-import ExpandMoreSharpIcon from '@mui/icons-material/ExpandMoreSharp';
-import SwapHorizIcon from '@mui/icons-material/SwapHoriz';
-import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from '@mui/material';
 import Button from '@mui/material/Button';
 import Tab from '@mui/material/Tab';
 import Tabs from '@mui/material/Tabs';
@@ -13,7 +10,7 @@ import { SyntheticEvent, useState } from 'react';
 import FeatureBox from '../../FeatureBox/FeatureBox';
 import Label from '../../Label/Label';
 import PageLayout from '../../Layout/PageLayout';
-import HeaderCell from '../../Table/HeaderCell';
+import LiquidityPoolsTable from './LiquidityPoolsTable';
 
 const LiquidityPool = () => {
   const [tabValue, setTabValue] = useState<'DEPOSIT' | 'WITHDRAW'>('DEPOSIT');
@@ -78,105 +75,7 @@ const LiquidityPool = () => {
         </div>
 
         <div className="pool-block tabs-sheet" style={{ width: '70%' }}>
-          <FeatureBox title="Pools" noPadding headBorder>
-            <TableContainer sx={{ borderRight: '1px solid', borderColor: 'background.paper' }}>
-              <Table>
-                <TableHead>
-                  <TableRow>
-                    <HeaderCell title="Asset" />
-                    <HeaderCell title="24h Volume" cellProps={{ align: 'right' }} />
-                  </TableRow>
-                </TableHead>
-                <TableBody>
-                  <TableRow>
-                    <TableCell align="right">
-                      <div className="pool-hdng-asset">
-                        <div className="pool-hdng-asset-value">
-                          <Typography fontWeight={400}>
-                            53.643,34532
-                            <span
-                              style={{
-                                color: '#827F8B',
-                                fontSize: '12px',
-                              }}
-                            >
-                              53.643,34532
-                            </span>
-                          </Typography>
-                          <Label variant="none">dTSLA</Label>
-                        </div>
-                        <SwapHorizIcon />
-                        <div className="pool-hdng-asset-value">
-                          <Typography fontWeight={400}>
-                            8.427.526,34
-                            <span
-                              style={{
-                                color: '#827F8B',
-                                fontSize: '12px',
-                              }}
-                            >
-                              53.643,34532
-                            </span>
-                          </Typography>
-                          <Label variant="none">jUSD</Label>
-                        </div>
-                      </div>
-                    </TableCell>
-                    <TableCell>
-                      <div className="flex">
-                        <Typography variant="body2">3114.34 $</Typography>
-                        <Typography sx={{ color: 'error.main', fontWeight: '400' }}>-5.42 %</Typography>
-                        <ExpandMoreSharpIcon sx={{ color: 'error.main', ml: '-5px' }} />
-                      </div>
-                    </TableCell>
-                  </TableRow>
-
-                  <TableRow>
-                    <TableCell align="right">
-                      <div className="pool-hdng-asset">
-                        <div className="pool-hdng-asset-value">
-                          <Typography fontWeight={400}>
-                            53.643,34532
-                            <span
-                              style={{
-                                color: '#827F8B',
-                                fontSize: '12px',
-                              }}
-                            >
-                              53.643,34532
-                            </span>
-                          </Typography>
-                          <Label variant="none">dTSLA</Label>
-                        </div>
-                        <SwapHorizIcon />
-                        <div className="pool-hdng-asset-value">
-                          <Typography fontWeight={400}>
-                            8.427.526,34
-                            <span
-                              style={{
-                                color: '#827F8B',
-                                fontSize: '12px',
-                              }}
-                            >
-                              53.643,34532
-                            </span>
-                          </Typography>
-                          <Label variant="none">jUSD</Label>
-                        </div>
-                      </div>
-                    </TableCell>
-                    <TableCell>
-                      <div className="flex">
-                        <Typography variant="body2">3114.34 $</Typography>
-                        <Typography sx={{ color: 'error.main', fontWeight: '400' }}>-5.42 %</Typography>
-                        <ExpandMoreSharpIcon sx={{ color: 'error.main', ml: '-5px' }} />
-                      </div>
-                    </TableCell>
-                  </TableRow>
-                </TableBody>
-              </Table>
-            </TableContainer>
-          </FeatureBox>
+          <LiquidityPoolsTable />
         </div>
       </div>
     </PageLayout>

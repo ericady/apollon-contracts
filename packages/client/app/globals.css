@@ -83,20 +83,6 @@
   color: #504d59;
 }
 
-.pool-hdng-asset-value span {
-  display: block;
-  text-align: right;
-}
-.pool-hdng-asset-value {
-  display: flex;
-  gap: 10px;
-  align-items: flex-start;
-}
-.pool-hdng-asset {
-  display: flex;
-  align-items: flex-start;
-  gap: 100px;
-}
 .pool-range-slide {
   display: flex;
   justify-content: space-between;

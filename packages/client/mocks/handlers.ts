@@ -18,6 +18,8 @@ import {
   GET_ALL_DEBT_TOKENS,
   GET_BORROWER_COLLATERAL_TOKENS,
   GET_BORROWER_DEBT_TOKENS,
+  GET_BORROWER_LIQUIDITY_POOLS,
+  GET_LIQUIDITY_POOLS,
 } from '../app/queries';
 
 const favoritedAssets: string[] = JSON.parse(localStorage.getItem(FAVORITE_ASSETS_LOCALSTORAGE_KEY) ?? '[]');
@@ -40,6 +42,28 @@ tokens.push({
   priceUSD24hAgo: parseFloat(faker.finance.amount(1, 5000, 2)),
   isPoolToken: faker.datatype.boolean(),
 });
+
+const liquidityPools = Array(20)
+  .fill(null)
+  .map(() => {
+    // take 2 random entries from tokens array that are not the same
+    const liqudityTokenPair = faker.helpers.arrayElements(tokens, 2);
+    return {
+      id: faker.string.uuid(),
+      liquidity: liqudityTokenPair.map((token) => ({
+        token,
+        totalAmount: parseFloat(faker.finance.amount(100000, 1000000, 2)),
+        borrowerAmount: null,
+      })),
+      rewards: tokens.slice(0, 3).map((token) => ({
+        // Taking a subset of tokens for demonstration
+        token,
+        amount: parseFloat(faker.finance.amount(1, 50, 2)),
+      })),
+      volume24hUSD: parseFloat(faker.finance.amount(10000, 50000, 2)),
+      volume24hUSD24hAgo: parseFloat(faker.finance.amount(10000, 50000, 2)),
+    };
+  });
 
 // Define a helper function to generate pool price history data
 const generatePoolPriceHistory = (): number[][] => {
@@ -158,27 +182,30 @@ export const handlers = [
     },
   ),
 
-  // GetPools
-  graphql.query<{ getPools: Query['getPools'] }, QueryGetPoolsArgs>('GetPools', (req, res, ctx) => {
-    const { borrower } = req.variables;
+  // GetLiquidityPools
+  graphql.query<{ getPools: Query['getPools'] }, QueryGetPoolsArgs>(GET_LIQUIDITY_POOLS, (req, res, ctx) => {
+    const result: Query['getPools'] = liquidityPools;
 
-    const result: Query['getPools'] = Array(5)
-      .fill(null)
-      .map(() => ({
-        id: faker.string.uuid(),
-        liquidity: tokens.map((token) => ({
-          token,
-          totalAmount: parseFloat(faker.finance.amount(100, 1000, 2)),
-          borrowerAmount: borrower ? parseFloat(faker.finance.amount(0, 100, 2)) : null,
+    return res(ctx.data({ getPools: result }));
+  }),
+  // GetBorrowerLiquidityPools
+  graphql.query<{ getPools: Query['getPools'] }, QueryGetPoolsArgs>(GET_BORROWER_LIQUIDITY_POOLS, (req, res, ctx) => {
+    const { borrower } = req.variables;
+    if (!borrower) {
+      throw new Error('Borrower address is required');
+    }
+
+    const borrowerLiquidityPools = faker.helpers.arrayElements(liquidityPools, { min: 1, max: 5 });
+
+    const result: Query['getPools'] = borrowerLiquidityPools.map((pool) => {
+      return {
+        ...pool,
+        liquidity: pool.liquidity.map((liquidity) => ({
+          ...liquidity,
+          borrowerAmount: parseFloat(faker.finance.amount(0, 10000, 2)),
         })),
-        rewards: tokens.slice(0, 3).map((token) => ({
-          // Taking a subset of tokens for demonstration
-          token,
-          amount: parseFloat(faker.finance.amount(1, 50, 2)),
-        })),
-        volume24hUSD: parseFloat(faker.finance.amount(10000, 50000, 2)),
-        volume24hUSD24hAgo: parseFloat(faker.finance.amount(10000, 50000, 2)),
-      }));
+      };
+    });
 
     return res(ctx.data({ getPools: result }));
   }),
