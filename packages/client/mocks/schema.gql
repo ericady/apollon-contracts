@@ -9,6 +9,22 @@ type Token {
   isPoolToken: Boolean!
 }
 
+type PositionsPage {
+  edges: [PositionsEdge!]!
+  pageInfo: PageInfo!
+}
+
+type PositionsEdge {
+  cursor: String!
+  node: Position!
+}
+
+# General meta info for pagination
+type PageInfo {
+  hasNextPage: Boolean!
+  endCursor: String!
+}
+
 type DebtTokenMeta {
   token: Token!
   # borrower specific
@@ -49,16 +65,14 @@ enum LongShortDirection {
 }
 
 type Position {
-  _id: String!
-
-  isOpen: Boolean!
+  id: String!
   openedAt: Int!
   closedAt: Int # undefined until closed
-
+  #
+  token: Token!
   direction: LongShortDirection!
-  unit: Token!
-  size: Float! # negative in case of a short
-
+  size: Float! # always positive, applied by direction
+  #
   totalPriceInStable: Float!
   feesInStable: Float! # protocol fees, without gas
   profitInStable: Float # undefined until closed
@@ -67,7 +81,7 @@ type Position {
 type Query {
   # returns 30 elements, cursor based pagination (position._id)
   # sorted by position.openedAt DESC
-  getPositions(borrower: String!, isOpen: Boolean! = true, cursor: String): [Position!]!
+  getPositions(borrower: String!, isOpen: Boolean = true, cursor: String): PositionsPage!
 }
 
 type PoolLiquidity {
