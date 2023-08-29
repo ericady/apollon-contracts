@@ -9,29 +9,12 @@ type Token {
   isPoolToken: Boolean!
 }
 
-enum LongShortDirection {
-  LONG
-  SHORT
-}
-
-type PositionStatus {
-  closedAt: Int
-  closingPriceUSD: Float
-
-  direction: LongShortDirection!
-  # includes the total applied gas fees
-  feeTotalUSD: Float!
-  # TODO: The table shows a PNL in jUSD but does it even make sense to show that?
-  openingPriceUSD: Float!
-}
-
 type DebtTokenMeta {
   token: Token!
   # borrower specific
   walletAmount: Float
   troveMintedAmount: Float
   stabilityLostAmount: Float
-  status: PositionStatus
 
   # global
   totalDepositedStability: Float!
@@ -58,6 +41,33 @@ type Query {
   # the same token can be returned twice, if it is used as debt and collateral
   getDebtTokens(borrower: String): [DebtTokenMeta!]!
   getCollateralTokens(borrower: String): [CollateralTokenMeta!]!
+}
+
+enum LongShortDirection {
+  LONG
+  SHORT
+}
+
+type Position {
+  _id: String!
+
+  isOpen: Boolean!
+  openedAt: Int!
+  closedAt: Int # undefined until closed
+
+  direction: LongShortDirection!
+  unit: Token!
+  size: Float! # negative in case of a short
+
+  totalPriceInStable: Float!
+  feesInStable: Float! # protocol fees, without gas
+  profitInStable: Float # undefined until closed
+}
+
+type Query {
+  # returns 30 elements, cursor based pagination (position._id)
+  # sorted by position.openedAt DESC
+  getPositions(borrower: String!, isOpen: Boolean! = true, cursor: String): [Position!]!
 }
 
 type PoolLiquidity {
@@ -87,7 +97,7 @@ type Query {
   #
   getCollateralUSDHistory: [[Int!]!]! # [[timestamp, value], [...], ...]
   getDebtUSDHistory: [[Int!]!]! # [[timestamp, value], [...], ...]
-  getCRHistory: [[Int!]!]! # [[timestamp, value], [...], ...] TODO: CR?
+  getCollateralRatioHistory: [[Int!]!]! # [[timestamp, value], [...], ...]
   getReserveUSDHistory: [[Int!]!]! # [[timestamp, value], [...], ...]
 }
 
