@@ -9,12 +9,30 @@ type Token {
   isPoolToken: Boolean!
 }
 
+enum LongShortDirection {
+  LONG
+  SHORT
+}
+
+type PositionStatus {
+  closedAt: Int
+  closingPriceUSD: Float
+
+  direction: LongShortDirection!
+  # includes the total applied gas fees
+  feeTotalUSD: Float!
+  # TODO: The table shows a PNL in jUSD but does it even make sense to show that?
+  openingPriceUSD: Float!
+}
+
 type DebtTokenMeta {
   token: Token!
   # borrower specific
   walletAmount: Float
   troveMintedAmount: Float
   stabilityLostAmount: Float
+  status: PositionStatus
+
   # global
   totalDepositedStability: Float!
   totalReserve: Float!
