@@ -69,6 +69,7 @@ type PositionsPage {
 
 # General meta info for pagination
 type PageInfo {
+  totalCount: Int!
   hasNextPage: Boolean!
   endCursor: String!
 }
@@ -76,7 +77,7 @@ type PageInfo {
 type Query {
   # returns 30 elements, cursor based pagination
   # sorted by position.openedAt DESC
-  getPositions(borrower: String!, isOpen: Boolean = true, cursor: String): PositionsPage!
+  getPositions(borrower: String!, isOpen: Boolean!, cursor: String): PositionsPage!
 }
 
 type PoolLiquidity {
