@@ -14,6 +14,7 @@ import LiquidityPoolsTable from './LiquidityPoolsTable';
 
 const LiquidityPool = () => {
   const [tabValue, setTabValue] = useState<'DEPOSIT' | 'WITHDRAW'>('DEPOSIT');
+  const [selectedPool, setSelectedPool] = useState<string | null>(null);
 
   const handleChange = (_: SyntheticEvent, newValue: 'DEPOSIT' | 'WITHDRAW') => {
     setTabValue(newValue);
@@ -74,8 +75,8 @@ const LiquidityPool = () => {
           </div>
         </div>
 
-        <div className="pool-block tabs-sheet" style={{ width: '70%' }}>
-          <LiquidityPoolsTable />
+        <div className="table-styles" style={{ width: '70%' }}>
+          <LiquidityPoolsTable selectedPool={selectedPool} setSelectedPool={setSelectedPool} />
         </div>
       </div>
     </PageLayout>

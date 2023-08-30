@@ -30,7 +30,6 @@ const CollateralUpdateDialog = ({ collateralData }: Props) => {
 
   const { etherAmount } = useWallet();
 
-  // get the fieldnames as a type from react hook form
   const methods = useForm<FieldValues>({
     defaultValues: {
       etherTokenAmount: 0,
@@ -53,7 +52,7 @@ const CollateralUpdateDialog = ({ collateralData }: Props) => {
     if (tabValue === 'DEPOSIT') {
       setValue(fieldName, etherAmount, { shouldValidate: true });
     } else {
-      setValue(fieldName, depositedCollateralToDeposit[0].stabilityGainedAmount!, { shouldValidate: true });
+      setValue(fieldName, depositedCollateralToDeposit[0].walletAmount!, { shouldValidate: true });
     }
   };
 
@@ -128,7 +127,7 @@ const CollateralUpdateDialog = ({ collateralData }: Props) => {
                   <div>
                     <Label variant="success">ETH</Label>
                     <Typography sx={{ fontWeight: '400', marginTop: '10px' }}>
-                      {roundCurrency(depositedCollateralToDeposit[0].stabilityGainedAmount!, 5)}
+                      {roundCurrency(depositedCollateralToDeposit[0].walletAmount!, 5)}
                     </Typography>
                     <Typography
                       sx={{
@@ -157,7 +156,7 @@ const CollateralUpdateDialog = ({ collateralData }: Props) => {
                         tabValue === 'DEPOSIT'
                           ? { value: etherAmount, message: 'Your wallet does not contain the specified amount' }
                           : {
-                              value: depositedCollateralToDeposit[0].stabilityGainedAmount!,
+                              value: depositedCollateralToDeposit[0].walletAmount!,
                               message: 'Your trove does not contain the specified amount',
                             },
                     }}
@@ -185,7 +184,7 @@ const CollateralUpdateDialog = ({ collateralData }: Props) => {
                       {tabValue === 'WITHDRAW' && (
                         <>
                           <Typography variant="caption">
-                            {roundCurrency(depositedCollateralToDeposit[0].stabilityGainedAmount!, 5)}
+                            {roundCurrency(depositedCollateralToDeposit[0].walletAmount!, 5)}
                           </Typography>
                           <Typography
                             sx={{

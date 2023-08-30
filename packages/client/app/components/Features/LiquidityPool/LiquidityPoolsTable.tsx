@@ -18,7 +18,12 @@ import FeatureBox from '../../FeatureBox/FeatureBox';
 import Label from '../../Label/Label';
 import HeaderCell from '../../Table/HeaderCell';
 
-function LiquidityPoolsTable() {
+type Props = {
+  selectedPool: string | null;
+  setSelectedPool: (pool: string | null) => void;
+};
+
+function LiquidityPoolsTable({ selectedPool, setSelectedPool }: Props) {
   const { address } = useEthers();
 
   const { data: allPoolsData } = useQuery<GetLiquidityPoolsQuery, GetLiquidityPoolsQueryVariables>(GET_LIQUIDITY_POOLS);
@@ -35,11 +40,27 @@ function LiquidityPoolsTable() {
       (allPool) => !borrowerPoolsData.getPools.find((borrowerPool) => allPool.id === borrowerPool.id),
     ),
   );
+  // move the pool with selectedPool to the top of the list
+  if (selectedPool) {
+    const index = allPoolsCombined.findIndex((pool) => pool.id === selectedPool);
+    const selectedPoolItem = allPoolsCombined[index];
+    allPoolsCombined.splice(index, 1);
+    allPoolsCombined.unshift(selectedPoolItem);
+  }
 
   return (
     <FeatureBox title="Pools" noPadding headBorder>
-      <TableContainer sx={{ borderRight: '1px solid', borderLeft: '1px solid', borderColor: 'background.paper' }}>
-        <Table>
+      <TableContainer
+        sx={{
+          borderRight: '1px solid',
+          borderLeft: '1px solid',
+          borderColor: 'background.paper',
+          // screen - toolbar - feature box - padding top - padding bottom
+          maxHeight: 'calc(100vh - 64px - 54px - 20px - 20px)',
+          overflowY: 'scroll',
+        }}
+      >
+        <Table stickyHeader>
           <TableHead>
             <TableRow>
               <HeaderCell title="Asset" cellProps={{ width: 1 }} />
@@ -50,67 +71,91 @@ function LiquidityPoolsTable() {
               <HeaderCell title="24h Volume" cellProps={{ align: 'right' }} />
             </TableRow>
           </TableHead>
+
           <TableBody>
-            {allPoolsCombined.map(({ id, liquidity, volume24hUSD, volume24hUSD24hAgo }) => {
+            {allPoolsCombined.map(({ id, liquidity, volume24hUSD, volume24hUSD24hAgo }, index) => {
               const [tokenA, tokenB] = liquidity;
               const volumeChange = percentageChange(volume24hUSD, volume24hUSD24hAgo);
 
               return (
-                <TableRow key={id}>
-                  <TableCell align="right">
-                    <Typography fontWeight={400}>
-                      {tokenA.totalAmount}
-                      <br />
-                      <span
-                        style={{
-                          color: '#827F8B',
-                          fontSize: '12px',
-                        }}
-                      >
-                        {tokenA.borrowerAmount}
-                      </span>
-                    </Typography>
-                  </TableCell>
-
-                  <TableCell>
-                    <Label variant="none">{tokenA.token.symbol}</Label>
-                  </TableCell>
-
-                  <TableCell align="right">
-                    <SwapHorizIcon />
-                  </TableCell>
-
-                  <TableCell align="right">
-                    <Typography fontWeight={400}>
-                      {tokenB.totalAmount}
-                      <br />
-                      <span
-                        style={{
-                          color: '#827F8B',
-                          fontSize: '12px',
-                        }}
-                      >
-                        {tokenB.borrowerAmount}
-                      </span>
-                    </Typography>
-                  </TableCell>
-
-                  <TableCell>
-                    <Label variant="none">{tokenB.token.symbol}</Label>
-                  </TableCell>
-
-                  <TableCell>
-                    <div className="flex">
-                      <Typography variant="body2">{volume24hUSD}$</Typography>
-                      <Typography sx={{ color: volumeChange > 0 ? 'success.main' : 'error.main', fontWeight: '400' }}>
-                        {volumeChange}%
+                <>
+                  <TableRow
+                    key={id}
+                    hover
+                    sx={
+                      selectedPool === id
+                        ? {
+                            background: '#1E1A27',
+                            borderLeft: '2px solid #33B6FF',
+                            // TODO: Fixed breaks the table style. Have to do it some other way later...
+                            position: 'fixed',
+                            width: '1230px',
+                          }
+                        : {
+                            ':hover': {
+                              cursor: 'pointer',
+                            },
+                          }
+                    }
+                    onClick={() => setSelectedPool(id)}
+                  >
+                    <TableCell align="right">
+                      <Typography fontWeight={400}>
+                        {tokenA.totalAmount}
+                        <br />
+                        <span
+                          style={{
+                            color: '#827F8B',
+                            fontSize: '12px',
+                          }}
+                        >
+                          {tokenA.borrowerAmount}
+                        </span>
                       </Typography>
-                      <ExpandMoreSharpIcon
-                        sx={{ color: volumeChange > 0 ? 'success.main' : 'error.main', ml: '-5px' }}
-                      />
-                    </div>
-                  </TableCell>
-                </TableRow>
+                    </TableCell>
+
+                    <TableCell>
+                      <Label variant="none">{tokenA.token.symbol}</Label>
+                    </TableCell>
+
+                    <TableCell align="right">
+                      <SwapHorizIcon />
+                    </TableCell>
+
+                    <TableCell align="right">
+                      <Typography fontWeight={400}>
+                        {tokenB.totalAmount}
+                        <br />
+                        <span
+                          style={{
+                            color: '#827F8B',
+                            fontSize: '12px',
+                          }}
+                        >
+                          {tokenB.borrowerAmount}
+                        </span>
+                      </Typography>
+                    </TableCell>
+
+                    <TableCell>
+                      <Label variant="none">{tokenB.token.symbol}</Label>
+                    </TableCell>
+
+                    <TableCell>
+                      <div className="flex">
+                        <Typography variant="body2">{volume24hUSD}$</Typography>
+                        <Typography sx={{ color: volumeChange > 0 ? 'success.main' : 'error.main', fontWeight: '400' }}>
+                          {volumeChange}%
+                        </Typography>
+                        <ExpandMoreSharpIcon
+                          sx={{ color: volumeChange > 0 ? 'success.main' : 'error.main', ml: '-5px' }}
+                        />
+                      </div>
+                    </TableCell>
+                  </TableRow>
+
+                  {index === 0 && selectedPool && <TableRow sx={{ height: 64 }}></TableRow>}
+                </>
               );
             })}
           </TableBody>
