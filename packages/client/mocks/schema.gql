@@ -9,22 +9,6 @@ type Token {
   isPoolToken: Boolean!
 }
 
-type PositionsPage {
-  edges: [PositionsEdge!]!
-  pageInfo: PageInfo!
-}
-
-type PositionsEdge {
-  cursor: String!
-  node: Position!
-}
-
-# General meta info for pagination
-type PageInfo {
-  hasNextPage: Boolean!
-  endCursor: String!
-}
-
 type DebtTokenMeta {
   token: Token!
   # borrower specific
@@ -78,8 +62,19 @@ type Position {
   profitInStable: Float # undefined until closed
 }
 
+type PositionsPage {
+  positions: [Position!]!
+  pageInfo: PageInfo!
+}
+
+# General meta info for pagination
+type PageInfo {
+  hasNextPage: Boolean!
+  endCursor: String!
+}
+
 type Query {
-  # returns 30 elements, cursor based pagination (position._id)
+  # returns 30 elements, cursor based pagination
   # sorted by position.openedAt DESC
   getPositions(borrower: String!, isOpen: Boolean = true, cursor: String): PositionsPage!
 }
