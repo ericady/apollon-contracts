@@ -15,15 +15,15 @@ contract StabilityPoolScript is CheckContract {
     stabilityPool = _stabilityPool;
   }
 
-  function provideToSP(uint _amount, address _frontEndTag) external {
-    stabilityPool.provideToSP(_amount, _frontEndTag);
+  function provideToSP(uint _amount) external {
+    stabilityPool.provideToSP(_amount);
   }
 
   function withdrawFromSP(uint _amount) external {
     stabilityPool.withdrawFromSP(_amount);
   }
 
-  function withdrawETHGainToTrove(address _upperHint, address _lowerHint) external {
-    stabilityPool.withdrawETHGainToTrove(_upperHint, _lowerHint);
+  function withdrawGains() external {
+    stabilityPool.withdrawGains();
   }
 }

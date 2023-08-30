@@ -35,7 +35,7 @@ interface IStabilityPool is IBase {
 
   function withdrawFromSP(uint _amount) external;
 
-  function withdrawGains(address _upperHint, address _lowerHint) external;
+  function withdrawGains() external;
 
   function offset(uint _debtToOffset, TokenAmount[] memory _collToAdd) external;
 

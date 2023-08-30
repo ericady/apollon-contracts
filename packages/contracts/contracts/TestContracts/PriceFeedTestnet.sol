@@ -9,12 +9,20 @@ import '../Interfaces/IPriceFeed.sol';
  * variable. The contract does not connect to a live Chainlink price feed.
  */
 contract PriceFeedTestnet is IPriceFeed {
-  uint256 private _price = 200 * 1e18;
+  uint256 private _price = 200 * 1e18; // todo extren for different prices...
 
   // --- Functions ---
 
   // View price getter for simplicity in tests
-  function getPrice() external view returns (uint256) {
+  function getPrice(PriceCache memory _priceCache, address _tokenAddress) external view override returns (uint price) {
+    // first try to get the price from the cache
+    for (uint i = 0; i < _priceCache.prices.length; i++) {
+      if (_priceCache.prices[i].tokenAddress != _tokenAddress) continue;
+
+      price = _priceCache.prices[i].amount;
+      if (price != 0) return price;
+    }
+
     return _price;
   }
 

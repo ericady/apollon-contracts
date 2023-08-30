@@ -8,8 +8,6 @@ const StabilityPool = artifacts.require('./StabilityPool.sol');
 const FunctionCaller = artifacts.require('./FunctionCaller.sol');
 const BorrowerOperations = artifacts.require('./BorrowerOperations.sol');
 
-const HintHelpers = artifacts.require('./HintHelpers.sol');
-
 const CommunityIssuanceTester = artifacts.require('./LQTY/CommunityIssuanceTester.sol');
 const ActivePoolTester = artifacts.require('./ActivePoolTester.sol');
 const DefaultPoolTester = artifacts.require('./DefaultPoolTester.sol');
@@ -32,7 +30,6 @@ const coreContractABIs = [
   StabilityPool,
   DefaultPool,
   FunctionCaller,
-  HintHelpers,
 ];
 
 const TesterContractABIs = [

@@ -16,22 +16,10 @@ contract TroveManagerScript is CheckContract {
   }
 
   function redeemCollateral(
-    uint _LUSDAmount,
-    address _firstRedemptionHint,
-    address _upperPartialRedemptionHint,
-    address _lowerPartialRedemptionHint,
-    uint _partialRedemptionHintNICR,
-    uint _maxIterations,
-    uint _maxFee
+    uint _stableCoinAmount,
+    uint _maxFeePercentage,
+    address[] memory _sourceTroves
   ) external returns (uint) {
-    troveManager.redeemCollateral(
-      _LUSDAmount,
-      _firstRedemptionHint,
-      _upperPartialRedemptionHint,
-      _lowerPartialRedemptionHint,
-      _partialRedemptionHintNICR,
-      _maxIterations,
-      _maxFee
-    );
+    troveManager.redeemCollateral(_stableCoinAmount, _maxFeePercentage, _sourceTroves);
   }
 }

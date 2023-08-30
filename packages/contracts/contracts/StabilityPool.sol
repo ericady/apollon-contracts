@@ -320,7 +320,7 @@ contract StabilityPool is LiquityBase, Ownable, CheckContract, IStabilityPool {
    * - Transfers the depositor's entire gains to its wallet
    * - Leaves their compounded deposit in the Stability Pool
    * - Updates snapshots for deposit stake */
-  function withdrawGains(address _upperHint, address _lowerHint) external override {
+  function withdrawGains() external override {
     _requireUserHasTrove(msg.sender);
 
     uint initialDeposit = deposits[msg.sender];

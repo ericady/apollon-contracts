@@ -20,7 +20,6 @@ import collSurplusPoolAbi from '../abi/CollSurplusPool.json';
 import communityIssuanceAbi from '../abi/CommunityIssuance.json';
 import defaultPoolAbi from '../abi/DefaultPool.json';
 import lqtyTokenAbi from '../abi/LQTYToken.json';
-import hintHelpersAbi from '../abi/HintHelpers.json';
 import lockupContractFactoryAbi from '../abi/LockupContractFactory.json';
 import lqtyStakingAbi from '../abi/LQTYStaking.json';
 import multiTroveGetterAbi from '../abi/MultiTroveGetter.json';
@@ -199,7 +198,6 @@ const getAbi = (priceFeedIsTestnet: boolean, uniTokenIsMock: boolean): LiquityCo
   communityIssuance: communityIssuanceAbi,
   defaultPool: defaultPoolAbi,
   lqtyToken: lqtyTokenAbi,
-  hintHelpers: hintHelpersAbi,
   lockupContractFactory: lockupContractFactoryAbi,
   lqtyStaking: lqtyStakingAbi,
   multiTroveGetter: multiTroveGetterAbi,

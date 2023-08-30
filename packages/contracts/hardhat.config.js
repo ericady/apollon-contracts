@@ -9,7 +9,7 @@ const { subtask } = require('hardhat/config');
 const { TASK_COMPILE_SOLIDITY_GET_SOURCE_PATHS } = require('hardhat/builtin-tasks/task-names');
 subtask(TASK_COMPILE_SOLIDITY_GET_SOURCE_PATHS).setAction(async (_, __, runSuper) => {
   const paths = await runSuper();
-  return paths.filter(p => !p.includes('_hardhatIgnore') && !p.includes('/Proxy/'));
+  return paths.filter(p => !p.includes('_hardhatIgnore'));
 });
 
 const accounts = require('./hardhatAccountsList2k.js');
@@ -60,6 +60,9 @@ module.exports = {
       blockGasLimit: 15000000,
       gasPrice: 20000000000,
       initialBaseFeePerGas: 0,
+      throwOnTransactionFailures: true,
+      throwOnCallFailures: true,
+      allowUnlimitedContractSize: true,
     },
     mainnet: {
       url: alchemyUrl(),
@@ -77,15 +80,8 @@ module.exports = {
       ],
     },
   },
-  etherscan: {
-    apiKey: getSecret('ETHERSCAN_API_KEY'),
-  },
+  etherscan: { apiKey: getSecret('ETHERSCAN_API_KEY') },
   mocha: { timeout: 12000000 },
-  rpc: {
-    host: 'localhost',
-    port: 8545,
-  },
-  gasReporter: {
-    enabled: process.env.REPORT_GAS ? true : false,
-  },
+  rpc: { host: 'localhost', port: 8545 },
+  gasReporter: { enabled: process.env.REPORT_GAS ? true : false },
 };

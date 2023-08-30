@@ -28,8 +28,8 @@ contract DebtTokenManager is Ownable, CheckContract, IDebtTokenManager {
 
   function setAddresses(
     address _troveManagerAddress,
-    address _stabilityPoolAddress,
     address _borrowerOperationsAddress,
+    address _stabilityPoolAddress,
     address _priceFeedAddress
   ) external onlyOwner {
     checkContract(_troveManagerAddress);

@@ -10,7 +10,6 @@ import CommunityIssuance from '../../contracts/artifacts/contracts/LQTY/Communit
 import DefaultPool from '../../contracts/artifacts/contracts/DefaultPool.sol/DefaultPool.json';
 import ERC20Mock from '../../contracts/artifacts/contracts/LPRewards/TestContracts/ERC20Mock.sol/ERC20Mock.json';
 import GasPool from '../../contracts/artifacts/contracts/GasPool.sol/GasPool.json';
-import HintHelpers from '../../contracts/artifacts/contracts/HintHelpers.sol/HintHelpers.json';
 import IERC20 from '../../contracts/artifacts/@openzeppelin/contracts/token/ERC20/IERC20.sol/IERC20.json';
 import LockupContractFactory from '../../contracts/artifacts/contracts/LQTY/LockupContractFactory.sol/LockupContractFactory.json';
 import LUSDToken from '../../contracts/artifacts/contracts/LUSDToken.sol/LUSDToken.json';
@@ -142,7 +141,6 @@ const contractArtifacts = [
   DefaultPool,
   ERC20Mock,
   GasPool,
-  HintHelpers,
   IERC20,
   LockupContractFactory,
   LUSDToken,

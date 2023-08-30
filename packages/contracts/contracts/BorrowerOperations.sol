@@ -141,7 +141,7 @@ contract BorrowerOperations is LiquityBase, Ownable, CheckContract, IBorrowerOpe
 
   // --- Borrower Trove Operations ---
 
-  function openTrove(TokenAmount[] memory _colls, address _upperHint, address _lowerHint) external override {
+  function openTrove(TokenAmount[] memory _colls) external override {
     ContractsCache memory contractsCache = ContractsCache(
       troveManager,
       storagePool,
@@ -232,7 +232,7 @@ contract BorrowerOperations is LiquityBase, Ownable, CheckContract, IBorrowerOpe
   }
 
   // Send collateral to a trove
-  function addColl(TokenAmount[] memory _colls, address _upperHint, address _lowerHint) external override {
+  function addColl(TokenAmount[] memory _colls) external override {
     address borrower = msg.sender;
     (
       ContractsCache memory contractsCache,
@@ -256,11 +256,11 @@ contract BorrowerOperations is LiquityBase, Ownable, CheckContract, IBorrowerOpe
       );
     }
 
-    _finaliseTrove(false, false, contractsCache, vars, priceCache, borrower, _upperHint, _lowerHint);
+    _finaliseTrove(false, false, contractsCache, vars, priceCache, borrower);
   }
 
   // Withdraw collateral from a trove
-  function withdrawColl(TokenAmount[] memory _colls, address _upperHint, address _lowerHint) external override {
+  function withdrawColl(TokenAmount[] memory _colls) external override {
     address borrower = msg.sender;
     (
       ContractsCache memory contractsCache,
@@ -294,16 +294,11 @@ contract BorrowerOperations is LiquityBase, Ownable, CheckContract, IBorrowerOpe
       );
     }
 
-    _finaliseTrove(true, false, contractsCache, vars, priceCache, borrower, _upperHint, _lowerHint);
+    _finaliseTrove(true, false, contractsCache, vars, priceCache, borrower);
   }
 
   // increasing debt of a trove
-  function increaseDebt(
-    TokenAmount[] memory _debts,
-    address _upperHint,
-    address _lowerHint,
-    uint _maxFeePercentage
-  ) external {
+  function increaseDebt(TokenAmount[] memory _debts, uint _maxFeePercentage) external override {
     (
       ContractsCache memory contractsCache,
       LocalVariables_adjustTrove memory vars,
@@ -348,16 +343,11 @@ contract BorrowerOperations is LiquityBase, Ownable, CheckContract, IBorrowerOpe
       );
     }
 
-    _finaliseTrove(false, true, contractsCache, vars, priceCache, msg.sender, _upperHint, _lowerHint);
+    _finaliseTrove(false, true, contractsCache, vars, priceCache, msg.sender);
   }
 
   // repay debt of a trove
-  function repayDebt(
-    TokenAmount[] memory _debts,
-    address _upperHint,
-    address _lowerHint,
-    uint _maxFeePercentage
-  ) external {
+  function repayDebt(TokenAmount[] memory _debts) external override {
     address borrower = msg.sender;
     (
       ContractsCache memory contractsCache,
@@ -396,7 +386,7 @@ contract BorrowerOperations is LiquityBase, Ownable, CheckContract, IBorrowerOpe
       );
     }
 
-    _finaliseTrove(false, false, contractsCache, vars, priceCache, borrower, _upperHint, _lowerHint);
+    _finaliseTrove(false, false, contractsCache, vars, priceCache, borrower);
   }
 
   function closeTrove() external override {
@@ -495,9 +485,7 @@ contract BorrowerOperations is LiquityBase, Ownable, CheckContract, IBorrowerOpe
     ContractsCache memory contractsCache,
     LocalVariables_adjustTrove memory vars,
     PriceCache memory priceCache,
-    address _borrower,
-    address _upperHint,
-    address _lowerHint
+    address _borrower
   ) internal {
     // calculate the new ICR
     vars.newICR = LiquityMath._computeCR(vars.newCompositeCollInStable, vars.newCompositeDebtInStable);

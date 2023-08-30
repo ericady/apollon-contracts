@@ -7,7 +7,7 @@ import '../BorrowerOperations.sol';
 import '../StoragePool.sol';
 import '../StabilityPool.sol';
 import '../DebtToken.sol';
-import './PriceFeedTestnet.sol';
+import '../PriceFeedTestnet.sol';
 import './EchidnaProxy.sol';
 
 //import "../Dependencies/console.sol";

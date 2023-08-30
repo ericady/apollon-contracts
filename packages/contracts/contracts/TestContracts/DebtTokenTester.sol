@@ -4,14 +4,31 @@ pragma solidity ^0.8.9;
 
 import '../DebtToken.sol';
 
-contract LUSDTokenTester is LUSDToken {
+contract DebtTokenTester is DebtToken {
   bytes32 private immutable _PERMIT_TYPEHASH = 0x6e71edae12b1b97f4d1f60370fef10105fa2faae0126114a169c64845d6126c9;
 
   constructor(
     address _troveManagerAddress,
     address _stabilityPoolAddress,
-    address _borrowerOperationsAddress
-  ) public LUSDToken(_troveManagerAddress, _stabilityPoolAddress, _borrowerOperationsAddress) {}
+    address _borrowerOperationsAddress,
+    address _priceFeedAddress,
+    string memory _symbol,
+    string memory _name,
+    string memory _version,
+    bool _isStableCoin
+  )
+    public
+    DebtToken(
+      _troveManagerAddress,
+      _stabilityPoolAddress,
+      _borrowerOperationsAddress,
+      _priceFeedAddress,
+      _symbol,
+      _name,
+      _version,
+      _isStableCoin
+    )
+  {}
 
   function unprotectedMint(address _account, uint256 _amount) external {
     // No check on caller here
@@ -41,7 +58,7 @@ contract LUSDTokenTester is LUSDToken {
     _approve(owner, spender, amount);
   }
 
-  function getChainId() external pure returns (uint256 chainID) {
+  function getChainId() external view returns (uint256 chainID) {
     //return _chainID(); // it’s private
     assembly {
       chainID := chainid()
@@ -59,7 +76,7 @@ contract LUSDTokenTester is LUSDToken {
       keccak256(
         abi.encodePacked(
           uint16(0x1901),
-          domainSeparator(),
+          this.domainSeparator(),
           keccak256(abi.encode(_PERMIT_TYPEHASH, owner, spender, amount, nonce, deadline))
         )
       );
