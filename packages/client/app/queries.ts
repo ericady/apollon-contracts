@@ -26,6 +26,21 @@ export const GET_ALL_COLLATERAL_TOKENS = gql`
   }
 `;
 
+export const GET_BORROWER_DEBT_TOKENS = gql`
+  query GetBorrowerDebtTokens($borrower: String!) {
+    getDebtTokens(borrower: $borrower) {
+      troveMintedAmount
+      walletAmount
+      token {
+        address
+        symbol
+        priceUSD
+        isPoolToken
+      }
+    }
+  }
+`;
+
 export const GET_BORROWER_COLLATERAL_TOKENS = gql`
   query GetBorrowerCollateralTokens($borrower: String!) {
     getCollateralTokens(borrower: $borrower) {
@@ -39,16 +54,27 @@ export const GET_BORROWER_COLLATERAL_TOKENS = gql`
   }
 `;
 
-export const GET_BORROWER_DEBT_TOKENS = gql`
-  query GetBorrowerDebtTokens($borrower: String!) {
-    getDebtTokens(borrower: $borrower) {
-      troveMintedAmount
-      walletAmount
-      token {
-        address
-        symbol
-        priceUSD
-        isPoolToken
+export const GET_BORROWER_POSITIONS = gql`
+  query GetBorrowerPositions($borrower: String!, $isOpen: Boolean!, $cursor: String) {
+    getPositions(borrower: $borrower, isOpen: $isOpen, cursor: $cursor) {
+      positions {
+        id
+        openedAt
+        closedAt
+        token {
+          address
+          symbol
+          priceUSD
+        }
+        direction
+        size
+        totalPriceInStable
+        feesInStable
+        profitInStable
+      }
+      pageInfo {
+        hasNextPage
+        endCursor
       }
     }
   }

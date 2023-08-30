@@ -51,6 +51,17 @@ export type DebtTokenMeta = {
   walletAmount?: Maybe<Scalars['Float']['output']>;
 };
 
+export enum LongShortDirection {
+  Long = 'LONG',
+  Short = 'SHORT'
+}
+
+export type PageInfo = {
+  __typename?: 'PageInfo';
+  endCursor: Scalars['String']['output'];
+  hasNextPage: Scalars['Boolean']['output'];
+};
+
 export type Pool = {
   __typename?: 'Pool';
   id: Scalars['String']['output'];
@@ -73,17 +84,37 @@ export type PoolReward = {
   token: Token;
 };
 
+export type Position = {
+  __typename?: 'Position';
+  closedAt?: Maybe<Scalars['Int']['output']>;
+  direction: LongShortDirection;
+  feesInStable: Scalars['Float']['output'];
+  id: Scalars['String']['output'];
+  openedAt: Scalars['Int']['output'];
+  profitInStable?: Maybe<Scalars['Float']['output']>;
+  size: Scalars['Float']['output'];
+  token: Token;
+  totalPriceInStable: Scalars['Float']['output'];
+};
+
+export type PositionsPage = {
+  __typename?: 'PositionsPage';
+  pageInfo: PageInfo;
+  positions: Array<Position>;
+};
+
 export type Query = {
   __typename?: 'Query';
   getBorrowerPoolHistory: Array<BorrowerHistory>;
   getBorrowerStabilityHistory: Array<BorrowerHistory>;
-  getCRHistory: Array<Array<Scalars['Int']['output']>>;
+  getCollateralRatioHistory: Array<Array<Scalars['Int']['output']>>;
   getCollateralTokens: Array<CollateralTokenMeta>;
   getCollateralUSDHistory: Array<Array<Scalars['Int']['output']>>;
   getDebtTokens: Array<DebtTokenMeta>;
   getDebtUSDHistory: Array<Array<Scalars['Int']['output']>>;
   getPoolPriceHistory: Array<Array<Scalars['Int']['output']>>;
   getPools: Array<Pool>;
+  getPositions: PositionsPage;
   getReserveUSDHistory: Array<Array<Scalars['Int']['output']>>;
 };
 
@@ -118,6 +149,13 @@ export type QueryGetPoolsArgs = {
   borrower?: InputMaybe<Scalars['String']['input']>;
 };
 
+
+export type QueryGetPositionsArgs = {
+  borrower: Scalars['String']['input'];
+  cursor?: InputMaybe<Scalars['String']['input']>;
+  isOpen: Scalars['Boolean']['input'];
+};
+
 export type Token = {
   __typename?: 'Token';
   address: Scalars['String']['output'];
@@ -144,6 +182,13 @@ export type GetCollateralTokensQueryVariables = Exact<{ [key: string]: never; }>
 
 export type GetCollateralTokensQuery = { __typename?: 'Query', getCollateralTokens: Array<{ __typename?: 'CollateralTokenMeta', walletAmount?: number | null, token: { __typename?: 'Token', address: string } }> };
 
+export type GetBorrowerDebtTokensQueryVariables = Exact<{
+  borrower: Scalars['String']['input'];
+}>;
+
+
+export type GetBorrowerDebtTokensQuery = { __typename?: 'Query', getDebtTokens: Array<{ __typename?: 'DebtTokenMeta', troveMintedAmount?: number | null, walletAmount?: number | null, token: { __typename?: 'Token', address: string, symbol: string, priceUSD: number, isPoolToken: boolean } }> };
+
 export type GetBorrowerCollateralTokensQueryVariables = Exact<{
   borrower: Scalars['String']['input'];
 }>;
@@ -151,12 +196,14 @@ export type GetBorrowerCollateralTokensQueryVariables = Exact<{
 
 export type GetBorrowerCollateralTokensQuery = { __typename?: 'Query', getCollateralTokens: Array<{ __typename?: 'CollateralTokenMeta', troveLockedAmount?: number | null, walletAmount?: number | null, token: { __typename?: 'Token', address: string, symbol: string } }> };
 
-export type GetBorrowerDebtTokensQueryVariables = Exact<{
+export type GetBorrowerPositionsQueryVariables = Exact<{
   borrower: Scalars['String']['input'];
+  isOpen: Scalars['Boolean']['input'];
+  cursor?: InputMaybe<Scalars['String']['input']>;
 }>;
 
 
-export type GetBorrowerDebtTokensQuery = { __typename?: 'Query', getDebtTokens: Array<{ __typename?: 'DebtTokenMeta', troveMintedAmount?: number | null, walletAmount?: number | null, token: { __typename?: 'Token', address: string, symbol: string, priceUSD: number, isPoolToken: boolean } }> };
+export type GetBorrowerPositionsQuery = { __typename?: 'Query', getPositions: { __typename?: 'PositionsPage', positions: Array<{ __typename?: 'Position', id: string, openedAt: number, closedAt?: number | null, direction: LongShortDirection, size: number, totalPriceInStable: number, feesInStable: number, profitInStable?: number | null, token: { __typename?: 'Token', address: string, symbol: string, priceUSD: number } }>, pageInfo: { __typename?: 'PageInfo', hasNextPage: boolean, endCursor: string } } };
 
 export type GetLiquidityPoolsQueryVariables = Exact<{ [key: string]: never; }>;
 

@@ -19,7 +19,6 @@ export default function WalletProvider({ children }: { children: React.ReactNode
     async function fetchBorrowerBalance() {
       const balance = await provider!.getBalance(address);
       const amount = ethers.formatEther(balance);
-      console.log('amount: ', amount);
       setEtherAmount(parseFloat(amount));
     }
 

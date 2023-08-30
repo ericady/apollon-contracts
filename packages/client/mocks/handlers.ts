@@ -4,6 +4,7 @@ import { FAVORITE_ASSETS_LOCALSTORAGE_KEY } from '../app/components/Features/Ass
 import {
   BorrowerHistory,
   BorrowerHistoryType,
+  LongShortDirection,
   Query,
   QueryGetBorrowerPoolHistoryArgs,
   QueryGetBorrowerStabilityHistoryArgs,
@@ -11,6 +12,7 @@ import {
   QueryGetDebtTokensArgs,
   QueryGetPoolPriceHistoryArgs,
   QueryGetPoolsArgs,
+  QueryGetPositionsArgs,
   Token,
 } from '../app/generated/gql-types';
 import {
@@ -19,6 +21,7 @@ import {
   GET_BORROWER_COLLATERAL_TOKENS,
   GET_BORROWER_DEBT_TOKENS,
   GET_BORROWER_LIQUIDITY_POOLS,
+  GET_BORROWER_POSITIONS,
   GET_LIQUIDITY_POOLS,
 } from '../app/queries';
 
@@ -34,14 +37,15 @@ const tokens: Token[] = Array(10)
     priceUSD24hAgo: parseFloat(faker.finance.amount(1, 5000, 2)),
     isPoolToken: faker.datatype.boolean(),
   }));
-tokens.push({
+const JUSD = {
   address: '0x6cA13a4ab78dd7D657226b155873A04DB929A3A4',
   symbol: 'JUSD',
   createdAt: faker.date.past().toISOString(),
   priceUSD: parseFloat(faker.finance.amount(1, 5000, 2)),
   priceUSD24hAgo: parseFloat(faker.finance.amount(1, 5000, 2)),
   isPoolToken: faker.datatype.boolean(),
-});
+};
+tokens.push(JUSD);
 
 const liquidityPools = Array(20)
   .fill(null)
@@ -64,6 +68,38 @@ const liquidityPools = Array(20)
       volume24hUSD24hAgo: parseFloat(faker.finance.amount(10000, 50000, 2)),
     };
   });
+
+const generatePositions = (open: boolean, cursor?: string): Query['getPositions']['positions'] => {
+  const now = Date.now();
+  const oneDayInMs = 24 * 60 * 60 * 1000;
+  const cursorTime = cursor ? parseInt(cursor, 10) : now;
+
+  return Array(30)
+    .fill(null)
+    .map(() => {
+      JUSD;
+      const openedAt = cursorTime - faker.number.int({ min: 1, max: oneDayInMs });
+      const size = parseFloat(faker.finance.amount(1, 1000, 2));
+      const token = faker.helpers.arrayElement(tokens);
+      return {
+        id: faker.string.uuid(),
+        openedAt,
+        closedAt: open ? openedAt + faker.number.int({ min: 1, max: oneDayInMs }) : null,
+        token,
+        direction: faker.helpers.enumValue(LongShortDirection),
+        size,
+        // I need a number for totalPriceInStable that is approximatly the ratio between token price and JUSD price * size
+        totalPriceInStable: faker.number.float({
+          min: (token.priceUSD / JUSD.priceUSD) * size * 0.7,
+          max: (token.priceUSD / JUSD.priceUSD) * size * 1.5,
+          precision: 2,
+        }),
+        feesInStable: parseFloat(faker.finance.amount(1, 50, 2)),
+        profitInStable: open ? null : parseFloat(faker.finance.amount(-500, 1000, 2)),
+      };
+    })
+    .sort((a, b) => b.openedAt - a.openedAt);
+};
 
 // Define a helper function to generate pool price history data
 const generatePoolPriceHistory = (): number[][] => {
@@ -91,7 +127,7 @@ const generateBorrowerHistory = (): BorrowerHistory[] => {
       const randomToken = tokens[faker.number.int({ min: 0, max: tokens.length - 1 })];
       return {
         timestamp: now - faker.number.int({ min: 0, max: 29 }) * oneDayInMs,
-        type: faker.helpers.arrayElement(Object.values(BorrowerHistoryType)),
+        type: faker.helpers.enumValue(BorrowerHistoryType),
         values: [
           {
             token: randomToken,
@@ -179,6 +215,31 @@ export const handlers = [
       }));
 
       return res(ctx.data({ getCollateralTokens: result }));
+    },
+  ),
+
+  // GetBorrowerPositions
+  graphql.query<{ getPositions: Query['getPositions'] }, QueryGetPositionsArgs>(
+    GET_BORROWER_POSITIONS,
+    (req, res, ctx) => {
+      const { borrower, isOpen, cursor } = req.variables;
+      if (!borrower) {
+        throw new Error('Borrower address is required');
+      }
+
+      const positions = generatePositions(isOpen, cursor!);
+      const hasNextPage = true; // For demonstration purposes
+      const endCursor = positions[positions.length - 1].openedAt.toString();
+
+      const result: Query['getPositions'] = {
+        positions,
+        pageInfo: {
+          hasNextPage,
+          endCursor,
+        },
+      };
+
+      return res(ctx.data({ getPositions: result }));
     },
   ),
 
