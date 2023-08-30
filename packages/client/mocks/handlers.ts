@@ -102,19 +102,20 @@ const closedPositions = Array(totalClosedPositions)
     const closedAt = openedAt + faker.number.int({ min: 1, max: 24 * 60 * 60 * 1000 });
     const size = parseFloat(faker.finance.amount(1, 1000, 2));
     const token = faker.helpers.arrayElement(tokens);
+    const totalPriceInStable = faker.number.float({
+      min: (token.priceUSD / JUSD.priceUSD) * size * 0.5,
+      max: (token.priceUSD / JUSD.priceUSD) * size * 2.5,
+      precision: 2,
+    });
     return {
       id: faker.string.uuid(),
       openedAt,
       closedAt,
       direction: faker.helpers.enumValue(LongShortDirection),
       size,
-      totalPriceInStable: faker.number.float({
-        min: (token.priceUSD / JUSD.priceUSD) * size * 0.7,
-        max: (token.priceUSD / JUSD.priceUSD) * size * 1.5,
-        precision: 2,
-      }),
+      totalPriceInStable,
       feesInStable: parseFloat(faker.finance.amount(1, 50, 2)),
-      profitInStable: parseFloat(faker.finance.amount(-500, 1000, 2)),
+      profitInStable: parseFloat(faker.finance.amount(totalPriceInStable * -0.5, totalPriceInStable * 2.5, 2)),
       token,
     };
   })

@@ -5,6 +5,7 @@ import ExpandMoreSharpIcon from '@mui/icons-material/ExpandMoreSharp';
 import SwapHorizIcon from '@mui/icons-material/SwapHoriz';
 import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from '@mui/material';
 import Typography from '@mui/material/Typography';
+import { Fragment } from 'react';
 import { useEthers } from '../../../context/EthersProvider';
 import {
   GetBorrowerLiquidityPoolsQuery,
@@ -78,9 +79,8 @@ function LiquidityPoolsTable({ selectedPool, setSelectedPool }: Props) {
               const volumeChange = percentageChange(volume24hUSD, volume24hUSD24hAgo);
 
               return (
-                <>
+                <Fragment key={id}>
                   <TableRow
-                    key={id}
                     hover
                     sx={
                       selectedPool === id
@@ -155,7 +155,7 @@ function LiquidityPoolsTable({ selectedPool, setSelectedPool }: Props) {
                   </TableRow>
 
                   {index === 0 && selectedPool && <TableRow sx={{ height: 64 }}></TableRow>}
-                </>
+                </Fragment>
               );
             })}
           </TableBody>
