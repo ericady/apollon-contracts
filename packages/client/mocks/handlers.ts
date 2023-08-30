@@ -69,37 +69,56 @@ const liquidityPools = Array(20)
     };
   });
 
-const generatePositions = (open: boolean, cursor?: string): Query['getPositions']['positions'] => {
-  const now = Date.now();
-  const oneDayInMs = 24 * 60 * 60 * 1000;
-  const cursorTime = cursor ? parseInt(cursor, 10) : now;
+const totalOpenPositions = faker.number.int({ min: 0, max: 90 });
+const openPositions = Array(totalOpenPositions)
+  .fill(null)
+  .map(() => {
+    const openedAt = faker.date.past().getTime();
+    const size = parseFloat(faker.finance.amount(1, 1000, 2));
+    const token = faker.helpers.arrayElement(tokens);
+    return {
+      id: faker.string.uuid(),
+      openedAt,
+      closedAt: null,
+      direction: faker.helpers.enumValue(LongShortDirection),
+      size,
+      totalPriceInStable: faker.number.float({
+        min: (token.priceUSD / JUSD.priceUSD) * size * 0.5,
+        max: (token.priceUSD / JUSD.priceUSD) * size * 2.5,
+        precision: 2,
+      }),
+      feesInStable: parseFloat(faker.finance.amount(1, 50, 2)),
+      profitInStable: null,
+      token,
+    };
+  })
+  .sort((a, b) => b.openedAt - a.openedAt);
 
-  return Array(30)
-    .fill(null)
-    .map(() => {
-      JUSD;
-      const openedAt = cursorTime - faker.number.int({ min: 1, max: oneDayInMs });
-      const size = parseFloat(faker.finance.amount(1, 1000, 2));
-      const token = faker.helpers.arrayElement(tokens);
-      return {
-        id: faker.string.uuid(),
-        openedAt,
-        closedAt: open ? openedAt + faker.number.int({ min: 1, max: oneDayInMs }) : null,
-        token,
-        direction: faker.helpers.enumValue(LongShortDirection),
-        size,
-        // I need a number for totalPriceInStable that is approximatly the ratio between token price and JUSD price * size
-        totalPriceInStable: faker.number.float({
-          min: (token.priceUSD / JUSD.priceUSD) * size * 0.7,
-          max: (token.priceUSD / JUSD.priceUSD) * size * 1.5,
-          precision: 2,
-        }),
-        feesInStable: parseFloat(faker.finance.amount(1, 50, 2)),
-        profitInStable: open ? null : parseFloat(faker.finance.amount(-500, 1000, 2)),
-      };
-    })
-    .sort((a, b) => b.openedAt - a.openedAt);
-};
+const totalClosedPositions = faker.number.int({ min: 0, max: 90 });
+const closedPositions = Array(totalClosedPositions)
+  .fill(null)
+  .map(() => {
+    const openedAt = faker.date.past().getTime();
+    const closedAt = openedAt + faker.number.int({ min: 1, max: 24 * 60 * 60 * 1000 });
+    const size = parseFloat(faker.finance.amount(1, 1000, 2));
+    const token = faker.helpers.arrayElement(tokens);
+    return {
+      id: faker.string.uuid(),
+      openedAt,
+      closedAt,
+      direction: faker.helpers.enumValue(LongShortDirection),
+      size,
+      totalPriceInStable: faker.number.float({
+        min: (token.priceUSD / JUSD.priceUSD) * size * 0.7,
+        max: (token.priceUSD / JUSD.priceUSD) * size * 1.5,
+        precision: 2,
+      }),
+      feesInStable: parseFloat(faker.finance.amount(1, 50, 2)),
+      profitInStable: parseFloat(faker.finance.amount(-500, 1000, 2)),
+      token,
+    };
+  })
+  .sort((a, b) => b.openedAt - a.openedAt);
 
 // Define a helper function to generate pool price history data
 const generatePoolPriceHistory = (): number[][] => {
@@ -227,19 +246,74 @@ export const handlers = [
         throw new Error('Borrower address is required');
       }
 
-      const positions = generatePositions(isOpen, cursor!);
-      const hasNextPage = true; // For demonstration purposes
-      const endCursor = positions[positions.length - 1].openedAt.toString();
+      if (isOpen) {
+        if (cursor) {
+          // find the open position with the id === cursor and return the next 30 entries from that position
+          const cursorPositionIndex = openPositions.findIndex(({ id }) => id === cursor);
+          const positions = openPositions.slice(cursorPositionIndex + 1, cursorPositionIndex + 31);
+          const hasNextPage = cursorPositionIndex + 31 < totalOpenPositions;
+          const endCursor = positions[positions.length - 1].id;
 
-      const result: Query['getPositions'] = {
-        positions,
-        pageInfo: {
-          hasNextPage,
-          endCursor,
-        },
-      };
+          const result: Query['getPositions'] = {
+            positions,
+            pageInfo: {
+              totalCount: totalOpenPositions,
+              hasNextPage,
+              endCursor,
+            },
+          };
+          return res(ctx.data({ getPositions: result }));
+        } else {
+          // return the first 30 open positions
+          const positions = openPositions.slice(0, 30);
+          const hasNextPage = totalOpenPositions > 30;
+          const endCursor = positions[positions.length - 1].id;
 
-      return res(ctx.data({ getPositions: result }));
+          const result: Query['getPositions'] = {
+            positions,
+            pageInfo: {
+              totalCount: totalOpenPositions,
+              hasNextPage,
+              endCursor,
+            },
+          };
+          return res(ctx.data({ getPositions: result }));
+        }
+      } else {
+        if (cursor) {
+          // find the closed position with the id === cursor and return the next 30 entries from that position
+
+          const cursorPositionIndex = closedPositions.findIndex(({ id }) => id === cursor);
+          const positions = closedPositions.slice(cursorPositionIndex + 1, cursorPositionIndex + 31);
+          const hasNextPage = cursorPositionIndex + 31 < totalClosedPositions;
+          const endCursor = positions[positions.length - 1].id;
+
+          const result: Query['getPositions'] = {
+            positions,
+            pageInfo: {
+              totalCount: totalClosedPositions,
+              hasNextPage,
+              endCursor,
+            },
+          };
+          return res(ctx.data({ getPositions: result }));
+        } else {
+          // return the first 30 closed positions
+          const positions = closedPositions.slice(0, 30);
+          const hasNextPage = totalClosedPositions > 30;
+          const endCursor = positions[positions.length - 1].id;
+
+          const result: Query['getPositions'] = {
+            positions,
+            pageInfo: {
+              totalCount: totalClosedPositions,
+              hasNextPage,
+              endCursor,
+            },
+          };
+          return res(ctx.data({ getPositions: result }));
+        }
+      }
     },
   ),
 

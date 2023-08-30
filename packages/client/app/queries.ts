@@ -73,6 +73,7 @@ export const GET_BORROWER_POSITIONS = gql`
         profitInStable
       }
       pageInfo {
+        totalCount
         hasNextPage
         endCursor
       }

@@ -10,7 +10,7 @@ export const client = new ApolloClient({
           getPositions: {
             // Don't cache separate results based on
             // any of this field's arguments.
-            keyArgs: false,
+            keyArgs: ['isOpen'],
             // Concatenate the incoming list items with
             // the existing list items.
             merge(existing = { positions: [] }, incoming) {

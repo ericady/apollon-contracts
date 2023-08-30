@@ -37,6 +37,8 @@ function PositionsTable() {
     },
   );
 
+  console.log('data: ', data);
+
   const handleScroll = (event: Event) => {
     const scrollableDiv = event.target as HTMLDivElement;
     if (scrollableDiv.scrollTop + scrollableDiv.clientHeight >= scrollableDiv.scrollHeight) {

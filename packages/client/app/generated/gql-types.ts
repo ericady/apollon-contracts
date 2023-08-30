@@ -60,6 +60,7 @@ export type PageInfo = {
   __typename?: 'PageInfo';
   endCursor: Scalars['String']['output'];
   hasNextPage: Scalars['Boolean']['output'];
+  totalCount: Scalars['Int']['output'];
 };
 
 export type Pool = {
@@ -203,7 +204,7 @@ export type GetBorrowerPositionsQueryVariables = Exact<{
 }>;
 
 
-export type GetBorrowerPositionsQuery = { __typename?: 'Query', getPositions: { __typename?: 'PositionsPage', positions: Array<{ __typename?: 'Position', id: string, openedAt: number, closedAt?: number | null, direction: LongShortDirection, size: number, totalPriceInStable: number, feesInStable: number, profitInStable?: number | null, token: { __typename?: 'Token', address: string, symbol: string, priceUSD: number } }>, pageInfo: { __typename?: 'PageInfo', hasNextPage: boolean, endCursor: string } } };
+export type GetBorrowerPositionsQuery = { __typename?: 'Query', getPositions: { __typename?: 'PositionsPage', positions: Array<{ __typename?: 'Position', id: string, openedAt: number, closedAt?: number | null, direction: LongShortDirection, size: number, totalPriceInStable: number, feesInStable: number, profitInStable?: number | null, token: { __typename?: 'Token', address: string, symbol: string, priceUSD: number } }>, pageInfo: { __typename?: 'PageInfo', totalCount: number, hasNextPage: boolean, endCursor: string } } };
 
 export type GetLiquidityPoolsQueryVariables = Exact<{ [key: string]: never; }>;
 

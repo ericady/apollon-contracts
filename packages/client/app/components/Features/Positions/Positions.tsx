@@ -1,8 +1,12 @@
 'use client';
 
+import { useQuery } from '@apollo/client';
 import Tab from '@mui/material/Tab';
 import Tabs from '@mui/material/Tabs';
 import { SyntheticEvent, useState } from 'react';
+import { useEthers } from '../../../context/EthersProvider';
+import { GetBorrowerPositionsQuery, GetBorrowerPositionsQueryVariables } from '../../../generated/gql-types';
+import { GET_BORROWER_POSITIONS } from '../../../queries';
 import Label from '../../Label/Label';
 import CollateralTable from '../Collateral/CollateralTable';
 import BalanceTable from './BalanceTable';
@@ -11,6 +15,29 @@ import PositionsTable from './PositionsTable';
 
 const Positions = () => {
   const [tabValue, setTabValue] = useState<'BALANCE' | 'COLLATERAL' | 'POSITIONS' | 'HISTORY'>('BALANCE');
+
+  const { address } = useEthers();
+
+  const { data: openPositions } = useQuery<GetBorrowerPositionsQuery, GetBorrowerPositionsQueryVariables>(
+    GET_BORROWER_POSITIONS,
+    {
+      variables: {
+        borrower: address,
+        isOpen: true,
+        cursor: null,
+      },
+    },
+  );
+  const { data: closedPositions } = useQuery<GetBorrowerPositionsQuery, GetBorrowerPositionsQueryVariables>(
+    GET_BORROWER_POSITIONS,
+    {
+      variables: {
+        borrower: address,
+        isOpen: false,
+        cursor: null,
+      },
+    },
+  );
 
   const handleChange = (_: SyntheticEvent, newValue: 'BALANCE' | 'COLLATERAL' | 'POSITIONS' | 'HISTORY') => {
     setTabValue(newValue);
@@ -42,7 +69,8 @@ const Positions = () => {
             value="POSITIONS"
             label={
               <span>
-                POSITIONS <Label variant="none">2</Label>
+                POSITIONS{' '}
+                {openPositions && <Label variant="none">{openPositions.getPositions.pageInfo.totalCount}</Label>}
               </span>
             }
             disableRipple
@@ -51,7 +79,8 @@ const Positions = () => {
             value="HISTORY"
             label={
               <span>
-                HISTORY <Label variant="none">48</Label>
+                HISTORY{' '}
+                {closedPositions && <Label variant="none">{closedPositions.getPositions.pageInfo.totalCount}</Label>}
               </span>
             }
             disableRipple
