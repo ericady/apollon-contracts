@@ -93,3 +93,27 @@
 .history-value .flex {
   width: 100%;
 }
+
+/* Apollon Widget CSS */
+.apollon-content {
+  display: flex;
+  gap: 30px;
+}
+
+.apollon-table-txt .table-hdng {
+  color: #504d59;
+  font-weight: 700;
+}
+.apollon-table-txt th,
+.apollon-table-txt td {
+  font-size: 14px;
+  text-align: right;
+  border-bottom: 1px solid #25222e;
+  padding: 10px;
+}
+.apollon-table-txt td {
+  padding: 20px 10px;
+}
+.apollon-table-txt tr:last-child td {
+  border-bottom: 0 solid #25222e;
+}

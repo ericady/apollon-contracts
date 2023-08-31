@@ -10,31 +10,51 @@ type Props = {
   title: string;
   isDraggable?: boolean;
   noPadding?: boolean;
+  border?: boolean;
   icon?: ReactNode;
-  headBorder?: boolean;
+  headBorder?: 'full' | 'bottom';
+  underline?: boolean;
 };
 
 function FeatureBox({
   title,
   isDraggable = false,
   noPadding = false,
-  headBorder = false,
+  headBorder = undefined,
+  border = false,
   icon = <StarBorderIcon fontSize="small" />,
   children,
 }: PropsWithChildren<Props>) {
   return (
-    <Box sx={{ borderBottom: '1px solid', borderBottomColor: 'background.paper', width: '100%', p: noPadding ? 0 : 2 }}>
+    <Box
+      sx={{
+        border: border ? '1px solid' : 'none',
+        borderBottom: '1px solid',
+        borderColor: 'background.paper',
+        width: '100%',
+        p: noPadding ? 0 : 2,
+      }}
+    >
       <Box
         sx={{
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'space-between',
           pb: 2,
-          border: headBorder ? '1px solid' : 'none',
+          border: headBorder === 'full' ? '1px solid' : 'none',
+          borderBottom: headBorder === 'bottom' ? '1px solid' : 'none',
           borderColor: headBorder ? 'background.paper' : 'none',
         }}
       >
-        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, pt: noPadding ? 2 : 0, pl: noPadding ? 2 : 0 }}>
+        <Box
+          sx={{
+            display: 'flex',
+            alignItems: 'center',
+            gap: 1,
+            pt: noPadding ? 2 : 0,
+            pl: noPadding ? 2 : 0,
+          }}
+        >
           {icon}
           <Typography variant="subtitle2" component="h5" textTransform="uppercase">
             {title}

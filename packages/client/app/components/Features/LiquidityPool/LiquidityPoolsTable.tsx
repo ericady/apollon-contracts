@@ -50,7 +50,7 @@ function LiquidityPoolsTable({ selectedPool, setSelectedPool }: Props) {
   }
 
   return (
-    <FeatureBox title="Pools" noPadding headBorder>
+    <FeatureBox title="Pools" noPadding headBorder="full">
       <TableContainer
         sx={{
           borderRight: '1px solid',

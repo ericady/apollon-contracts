@@ -1,5 +1,12 @@
+import CollateralBalance from '../components/Features/Collateral/CollateralBalance';
+import PageLayout from '../components/Layout/PageLayout';
+
 function Balance() {
-  return <div>Balance</div>;
+  return (
+    <PageLayout>
+      <CollateralBalance />
+    </PageLayout>
+  );
 }
 
 export default Balance;
