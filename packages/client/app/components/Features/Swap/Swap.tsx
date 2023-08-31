@@ -12,11 +12,17 @@ import FeatureBox from '../../FeatureBox/FeatureBox';
 import NumberInput from '../../FormControls/NumberInput';
 import Label from '../../Label/Label';
 
+type FieldValues = {
+  jUSDAmount: string;
+  tokenAmount: string;
+  maxSlippage: string;
+};
+
 const Swap = () => {
   const [showSlippage, setShowSlippage] = useState(false);
   const [tradingDirection, setTradingDirection] = useState<'jUSDSpent' | 'jUSDAquired'>('jUSDSpent');
 
-  const methods = useForm({
+  const methods = useForm<FieldValues>({
     defaultValues: {
       jUSDAmount: '',
       tokenAmount: '',

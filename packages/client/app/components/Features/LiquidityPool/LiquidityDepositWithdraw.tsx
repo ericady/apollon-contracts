@@ -18,8 +18,8 @@ type Props = {
 };
 
 type FieldValues = {
-  tokenAAmount: number;
-  tokenBAmount: number;
+  tokenAAmount: string;
+  tokenBAmount: string;
 };
 
 function LiquidityDepositWithdraw({ selectedPool }: Props) {
@@ -35,8 +35,8 @@ function LiquidityDepositWithdraw({ selectedPool }: Props) {
 
   const methods = useForm<FieldValues>({
     defaultValues: {
-      tokenAAmount: 0,
-      tokenBAmount: 0,
+      tokenAAmount: '',
+      tokenBAmount: '',
     },
   });
   const { handleSubmit, setValue, reset } = methods;
@@ -191,7 +191,9 @@ function LiquidityDepositWithdraw({ selectedPool }: Props) {
                   <Button
                     variant="undercover"
                     sx={{ textDecoration: 'underline' }}
-                    onClick={() => setValue('tokenAAmount', tokenA.borrowerAmount!, { shouldValidate: true })}
+                    onClick={() =>
+                      setValue('tokenAAmount', tokenA.borrowerAmount!.toString(), { shouldValidate: true })
+                    }
                   >
                     max
                   </Button>
@@ -238,7 +240,9 @@ function LiquidityDepositWithdraw({ selectedPool }: Props) {
                   <Button
                     variant="undercover"
                     sx={{ textDecoration: 'underline' }}
-                    onClick={() => setValue('tokenBAmount', tokenB.borrowerAmount!, { shouldValidate: true })}
+                    onClick={() =>
+                      setValue('tokenBAmount', tokenB.borrowerAmount!.toString(), { shouldValidate: true })
+                    }
                   >
                     max
                   </Button>

@@ -13,11 +13,16 @@ import FeatureBox from '../../FeatureBox/FeatureBox';
 import NumberInput from '../../FormControls/NumberInput';
 import Label from '../../Label/Label';
 
+type FieldValues = {
+  farmShortValue: string;
+  maxSlippage: string;
+};
+
 const Farm = () => {
   const [tabValue, setTabValue] = useState<'Long' | 'Short'>('Long');
   const [showSlippage, setShowSlippage] = useState(false);
 
-  const methods = useForm({
+  const methods = useForm<FieldValues>({
     defaultValues: {
       farmShortValue: '',
       maxSlippage: '',
