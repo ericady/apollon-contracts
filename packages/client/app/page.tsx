@@ -8,7 +8,7 @@ export default function Home() {
   if (process.env.NEXT_PUBLIC_API_MOCKING === 'enabled') {
     import('../mocks').then(async (module) => {
       await module.default();
-      router.replace('/balance');
+      router.replace('/spot');
     });
   }
 
