@@ -16,7 +16,11 @@ function MockServer() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  return <div>MockServer is starting...</div>;
+  return (
+    <div>
+      {process.env.NEXT_PUBLIC_API_MOCKING === 'enabled' ? 'MockServer is starting...' : 'Mocking is not enabled'}
+    </div>
+  );
 }
 
 export default MockServer;

@@ -47,7 +47,7 @@ const Farm = () => {
 
       <FormProvider {...methods}>
         <form onSubmit={handleSubmit(onSubmit)}>
-          <div className="farm-tabs-tab-content">
+          <div style={{ marginTop: '20px' }}>
             <div>
               <NumberInput
                 name="farmShortValue"

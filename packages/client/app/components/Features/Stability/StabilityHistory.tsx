@@ -56,7 +56,7 @@ const StabilityHistory = () => {
             <Label variant="success">Claimed Collateral</Label>
           </div>
 
-          <div className="history-stability">
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '40px' }}>
             <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', minWidth: 120, gap: 20 }}>
               <div className="flex">
                 <Typography fontWeight={400}>3.46815</Typography>

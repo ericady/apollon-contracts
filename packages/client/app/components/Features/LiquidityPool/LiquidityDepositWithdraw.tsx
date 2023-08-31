@@ -247,7 +247,14 @@ function LiquidityDepositWithdraw({ selectedPool }: Props) {
             </div>
           )}
 
-          <div className="pool-range-slide">
+          <div
+            style={{
+              display: 'flex',
+              justifyContent: 'space-between',
+              padding: '20px',
+              borderBottom: '1px solid #25222e',
+            }}
+          >
             <Typography sx={{ color: '#827F8B', fontSize: '16px' }} className="range-hdng">
               Collateral Ratio
             </Typography>
