@@ -20,8 +20,8 @@ import Label from '../../Label/Label';
 import HeaderCell from '../../Table/HeaderCell';
 
 type Props = {
-  selectedPool: string | null;
-  setSelectedPool: (pool: string | null) => void;
+  selectedPool: GetLiquidityPoolsQuery['getPools'][number] | null;
+  setSelectedPool: (pool: GetLiquidityPoolsQuery['getPools'][number] | null) => void;
 };
 
 function LiquidityPoolsTable({ selectedPool, setSelectedPool }: Props) {
@@ -43,7 +43,7 @@ function LiquidityPoolsTable({ selectedPool, setSelectedPool }: Props) {
   );
   // move the pool with selectedPool to the top of the list
   if (selectedPool) {
-    const index = allPoolsCombined.findIndex((pool) => pool.id === selectedPool);
+    const index = allPoolsCombined.findIndex((pool) => pool.id === selectedPool.id);
     const selectedPoolItem = allPoolsCombined[index];
     allPoolsCombined.splice(index, 1);
     allPoolsCombined.unshift(selectedPoolItem);
@@ -74,7 +74,8 @@ function LiquidityPoolsTable({ selectedPool, setSelectedPool }: Props) {
           </TableHead>
 
           <TableBody>
-            {allPoolsCombined.map(({ id, liquidity, volume24hUSD, volume24hUSD24hAgo }, index) => {
+            {allPoolsCombined.map((pool, index) => {
+              const { id, liquidity, volume24hUSD, volume24hUSD24hAgo } = pool;
               const [tokenA, tokenB] = liquidity;
               const volumeChange = percentageChange(volume24hUSD, volume24hUSD24hAgo);
 
@@ -83,7 +84,7 @@ function LiquidityPoolsTable({ selectedPool, setSelectedPool }: Props) {
                   <TableRow
                     hover
                     sx={
-                      selectedPool === id
+                      selectedPool?.id === id
                         ? {
                             background: '#1E1A27',
                             borderLeft: '2px solid #33B6FF',
@@ -97,7 +98,7 @@ function LiquidityPoolsTable({ selectedPool, setSelectedPool }: Props) {
                             },
                           }
                     }
-                    onClick={() => setSelectedPool(id)}
+                    onClick={() => setSelectedPool(pool)}
                   >
                     <TableCell align="right">
                       <Typography fontWeight={400}>

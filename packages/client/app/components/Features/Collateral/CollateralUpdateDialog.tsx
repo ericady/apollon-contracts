@@ -162,7 +162,7 @@ const CollateralUpdateDialog = ({ collateralData }: Props) => {
                     }}
                   />
 
-                  <div className="flex" style={{ justifyContent: 'space-between', alignContent: 'flex-start' }}>
+                  <div className="flex" style={{ justifyContent: 'space-between' }}>
                     <div>
                       {tabValue === 'DEPOSIT' && (
                         <>
