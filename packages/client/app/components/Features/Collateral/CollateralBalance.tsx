@@ -13,12 +13,12 @@ const CollateralBalance = () => {
     <FeatureBox title="Collateral" headBorder="bottom">
       <div style={{ display: 'flex' }}>
         <div style={{ width: '25%', padding: '20px 10px 0 0' }}>
-          <FeatureBox title="Total value locked" border>
+          <FeatureBox title="Total value locked" border="full">
             <DiagramPlaceholder />
           </FeatureBox>
         </div>
         <div style={{ width: '75%', padding: '20px 0 0 10px' }}>
-          <FeatureBox title="Collateral Token" noPadding border>
+          <FeatureBox title="Collateral Token" noPadding border="full">
             <div className="apollon-table">
               <div className="apollon-table-box">
                 <div className="apollon-table-txt">

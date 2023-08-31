@@ -10,7 +10,7 @@ type Props = {
   title: string;
   isDraggable?: boolean;
   noPadding?: boolean;
-  border?: boolean;
+  border?: 'full' | 'bottom';
   icon?: ReactNode;
   headBorder?: 'full' | 'bottom';
   underline?: boolean;
@@ -21,15 +21,15 @@ function FeatureBox({
   isDraggable = false,
   noPadding = false,
   headBorder = undefined,
-  border = false,
+  border = undefined,
   icon = <StarBorderIcon fontSize="small" />,
   children,
 }: PropsWithChildren<Props>) {
   return (
     <Box
       sx={{
-        border: border ? '1px solid' : 'none',
-        borderBottom: '1px solid',
+        border: border === 'full' ? '1px solid' : 'none',
+        borderBottom: border ? '1px solid' : 'none',
         borderColor: 'background.paper',
         width: '100%',
         p: noPadding ? 0 : 2,
