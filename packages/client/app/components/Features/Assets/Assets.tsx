@@ -12,7 +12,7 @@ import TableCell from '@mui/material/TableCell';
 import TableContainer from '@mui/material/TableContainer';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { SelectedToken, useSelectedToken } from '../../../context/SelectedTokenProvider';
 import { GetDebtTokensQuery, GetDebtTokensQueryVariables } from '../../../generated/gql-types';
 import { GET_ALL_DEBT_TOKENS } from '../../../queries';
@@ -23,9 +23,12 @@ import HeaderCell from '../../Table/HeaderCell';
 export const FAVORITE_ASSETS_LOCALSTORAGE_KEY = 'favoriteAssets';
 
 function Assets() {
-  const [favoritedAssets, setFavoritedAssets] = useState<string[]>(() =>
-    JSON.parse(window?.localStorage.getItem(FAVORITE_ASSETS_LOCALSTORAGE_KEY) ?? '[]'),
-  );
+  const [favoritedAssets, setFavoritedAssets] = useState<string[]>([]);
+
+  // FIXME: Cant access LS in useState initializer because of page pre-rendering.
+  useEffect(() => {
+    setFavoritedAssets(JSON.parse(window.localStorage.getItem(FAVORITE_ASSETS_LOCALSTORAGE_KEY) ?? '[]'));
+  }, []);
 
   const { selectedToken, setSelectedToken } = useSelectedToken();
 
@@ -43,7 +46,7 @@ function Assets() {
           isFavorite: favoritedAssets.find((address) => token.address === address) !== undefined ? true : false,
         };
       })
-      .sort((a, b) => (a.isFavorite ? -1 : 1));
+      .sort((a) => (a.isFavorite ? -1 : 1));
   }, [data, favoritedAssets]);
 
   if (!tokens) return null;
