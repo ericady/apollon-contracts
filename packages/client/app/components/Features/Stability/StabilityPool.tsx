@@ -7,26 +7,28 @@ import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import FeatureBox from '../../FeatureBox/FeatureBox';
 import DiagramPlaceholder from '../../Loader/DiagramPlaceholder';
+import StabilityHistoryDialog from './StabilityHistoryDialog';
+import StabilityUpdateDialog from './StabilityUpdateDialog';
 
 function DebtBalance() {
   return (
-    <FeatureBox title="Collateral" headBorder="bottom">
+    <FeatureBox title="Debt" headBorder="bottom">
       <div style={{ display: 'flex', width: '100%' }}>
-        <div style={{ display: 'flex', width: '25%', flexWrap: 'wrap', flexDirection: 'column' }}>
+        <div style={{ display: 'flex', flexWrap: 'wrap', flexDirection: 'column' }}>
           <div style={{ padding: '20px 10px 0 0' }}>
-            <FeatureBox title="Total value minted" border="full">
+            <FeatureBox title="Total value minted" border="full" noPadding>
               <DiagramPlaceholder />
             </FeatureBox>
           </div>
 
           <div style={{ padding: '20px 10px 0 0' }}>
-            <FeatureBox title="System collateral ratio" border="full">
+            <FeatureBox title="System collateral ratio" border="full" noPadding>
               <DiagramPlaceholder />
             </FeatureBox>
           </div>
         </div>
 
-        <div style={{ display: 'flex', width: '75%', flexWrap: 'wrap', flexDirection: 'column' }}>
+        <div style={{ display: 'flex', width: '100%', flexWrap: 'wrap', flexDirection: 'column' }}>
           <div style={{ padding: '20px 0 0 10px' }}>
             <FeatureBox title="Stability Pool" noPadding border="full">
               <div className="apollon-table">
@@ -56,11 +58,13 @@ function DebtBalance() {
                         </TableBody>
                       </Table>
                     </TableContainer>
-                    <div className="apollon-table-btns" style={{ padding: '0 30px' }}>
-                      <Button variant="contained">History</Button>
-                      <Button variant="outlined" sx={{ marginTop: '10px' }}>
-                        UPDATE
-                      </Button>
+                    <div style={{ minWidth: 190, margin: '0 30px' }}>
+                      <StabilityHistoryDialog />
+
+                      <div style={{ marginTop: '10px' }}>
+                        <StabilityUpdateDialog />
+                      </div>
+
                       <Button variant="outlined" sx={{ marginTop: '10px' }}>
                         CLAIM
                       </Button>

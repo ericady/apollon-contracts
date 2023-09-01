@@ -7,6 +7,7 @@ function DiagramPlaceholder() {
       style={{
         background: '#1e1b27',
         height: '190px',
+        width: '320px',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',
