@@ -84,7 +84,7 @@ const openPositions = Array(totalOpenPositions)
       size,
       totalPriceInStable: faker.number.float({
         min: (token.priceUSD / JUSD.priceUSD) * size * 0.5,
-        max: (token.priceUSD / JUSD.priceUSD) * size * 2.5,
+        max: (token.priceUSD / JUSD.priceUSD) * size * 3.5,
         precision: 2,
       }),
       feesInStable: parseFloat(faker.finance.amount(1, 50, 2)),
@@ -104,7 +104,7 @@ const closedPositions = Array(totalClosedPositions)
     const token = faker.helpers.arrayElement(tokens);
     const totalPriceInStable = faker.number.float({
       min: (token.priceUSD / JUSD.priceUSD) * size * 0.5,
-      max: (token.priceUSD / JUSD.priceUSD) * size * 2.5,
+      max: (token.priceUSD / JUSD.priceUSD) * size * 3.5,
       precision: 2,
     });
     return {

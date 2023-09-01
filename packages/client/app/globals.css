@@ -4,6 +4,15 @@
   }
 }
 
+/* Navigation */
+a:visited {
+  color: #827f8b;
+}
+
+a {
+  text-decoration: none;
+}
+
 /* swap widget css */
 .swap-info-paragraph {
   display: flex;

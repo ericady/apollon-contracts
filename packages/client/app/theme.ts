@@ -16,7 +16,7 @@ const PRIMARY_BACKGROUND = '#14111D';
 const PAPER_BACKGROUND = '#2A2636';
 const PRIMARY_TEXT = '#FFFFFF';
 export const SECONDARY_TEXT = '#827F8B';
-const THRID_TEXT = '#504D59';
+const THIRD_TEXT = '#504D59';
 const DISABLED_TEXT = '#504D59';
 const BUTTON_BACKGROUND = '#1E1B27';
 const BUTTON_TEXT = '#827F8B';
@@ -78,7 +78,7 @@ const theme = createTheme({
       fontSize: '14px',
     },
     subtitle1: {
-      color: THRID_TEXT,
+      color: THIRD_TEXT,
       fontWeight: '700',
       fontSize: '14px',
     },
@@ -86,9 +86,10 @@ const theme = createTheme({
       color: SECONDARY_TEXT,
       fontWeight: '700',
       fontSize: '14px',
+      lineHeight: '14.04px',
     },
     caption: {
-      color: '#827F8B',
+      color: SECONDARY_TEXT,
       fontFamily: 'Inter',
       fontSize: '11px',
       fontWeight: '400',
