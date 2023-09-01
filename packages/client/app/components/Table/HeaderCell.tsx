@@ -7,7 +7,10 @@ type Props = {
 
 function HeaderCell({ title, cellProps = {} }: Props) {
   return (
-    <TableCell sx={{ color: 'text.disabled' }} {...cellProps}>
+    <TableCell
+      sx={{ color: 'text.disabled', font: '11px space-grotesk', fontWeight: 700, borderColor: 'background.paper' }}
+      {...cellProps}
+    >
       {title}
     </TableCell>
   );

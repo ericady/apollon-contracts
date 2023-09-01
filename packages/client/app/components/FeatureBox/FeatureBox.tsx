@@ -1,17 +1,15 @@
 'use client';
 
-import DragIndicatorIcon from '@mui/icons-material/DragIndicator';
-import StarBorderIcon from '@mui/icons-material/StarBorder';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
-import { PropsWithChildren, ReactNode } from 'react';
+import { PropsWithChildren } from 'react';
 
 type Props = {
   title: string;
   isDraggable?: boolean;
   noPadding?: boolean;
   border?: 'full' | 'bottom';
-  icon?: ReactNode;
+  icon?: 'green' | 'neutral';
   headBorder?: 'full' | 'bottom';
   underline?: boolean;
 };
@@ -22,7 +20,7 @@ function FeatureBox({
   noPadding = false,
   headBorder = undefined,
   border = undefined,
-  icon = <StarBorderIcon fontSize="small" />,
+  icon = 'neutral',
   children,
 }: PropsWithChildren<Props>) {
   return (
@@ -40,10 +38,12 @@ function FeatureBox({
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'space-between',
-          pb: 2,
+          pb: 1.25,
           border: headBorder === 'full' ? '1px solid' : 'none',
           borderBottom: headBorder === 'bottom' ? '1px solid' : 'none',
           borderColor: headBorder ? 'background.paper' : 'none',
+          pt: noPadding ? 2 : 0,
+          pl: noPadding ? 2 : 0,
         }}
       >
         <Box
@@ -51,21 +51,35 @@ function FeatureBox({
             display: 'flex',
             alignItems: 'center',
             gap: 1,
-            pt: noPadding ? 2 : 0,
-            pl: noPadding ? 2 : 0,
           }}
         >
-          {icon}
-          <Typography variant="subtitle2" component="h5" textTransform="uppercase">
+          {icon === 'green' ? (
+            <img
+              src="assets/svgs/Star24_green.svg"
+              alt="Green colored diamond shape"
+              height="8"
+              typeof="image/svg+xml"
+            />
+          ) : (
+            <img
+              src="assets/svgs/Star24_white.svg"
+              alt="White colored diamond shape"
+              height="8"
+              typeof="image/svg+xml"
+            />
+          )}
+          <Typography variant="titleAlternate" component="h5" textTransform="uppercase">
             {title}
           </Typography>
         </Box>
 
         {isDraggable && (
-          <DragIndicatorIcon
-            sx={{
-              color: '#64616D',
-            }}
+          <img
+            style={{ paddingRight: 16 }}
+            src="assets/svgs/Drag-n-Drop.svg"
+            alt="Green colored diamond shape"
+            height="16"
+            typeof="image/svg+xml"
           />
         )}
       </Box>

@@ -8,7 +8,7 @@ function EthersAddressLabel() {
 
   return address ? (
     <div className="flex">
-      <img src="assets/svgs/Star24.svg" alt="Green colored diamond shape" height="8" typeof="image/svg+xml" />
+      <img src="assets/svgs/Star24_green.svg" alt="Green colored diamond shape" height="8" typeof="image/svg+xml" />
 
       <Typography fontSize={12} variant="subtitle2">
         {address}

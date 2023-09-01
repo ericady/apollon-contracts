@@ -12,7 +12,7 @@ import StabilityUpdateDialog from './StabilityUpdateDialog';
 
 function DebtBalance() {
   return (
-    <FeatureBox title="Debt" headBorder="bottom">
+    <FeatureBox title="Debt" headBorder="bottom" icon="green">
       <div style={{ display: 'flex', width: '100%' }}>
         <div style={{ display: 'flex', flexWrap: 'wrap', flexDirection: 'column' }}>
           <div style={{ padding: '20px 10px 0 0' }}>

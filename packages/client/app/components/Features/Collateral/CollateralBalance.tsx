@@ -10,7 +10,7 @@ import DiagramPlaceholder from '../../Loader/DiagramPlaceholder';
 
 const CollateralBalance = () => {
   return (
-    <FeatureBox title="Collateral" headBorder="bottom">
+    <FeatureBox title="Collateral" headBorder="bottom" icon="green">
       <div style={{ display: 'flex' }}>
         <div style={{ padding: '20px 10px 0 0' }}>
           <FeatureBox title="Total value locked" border="full" noPadding>

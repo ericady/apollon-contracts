@@ -16,10 +16,8 @@ const PRIMARY_BACKGROUND = '#14111D';
 const PAPER_BACKGROUND = '#2A2636';
 const PRIMARY_TEXT = '#FFFFFF';
 export const SECONDARY_TEXT = '#827F8B';
-const THIRD_TEXT = '#504D59';
 const DISABLED_TEXT = '#504D59';
 const BUTTON_BACKGROUND = '#1E1B27';
-const BUTTON_TEXT = '#827F8B';
 export const BUTTON_BORDER = '#282531';
 const BUTTON_2_TEXT = '#ffffff';
 const BUTTON_2_BORDER = '#3C3945';
@@ -32,7 +30,7 @@ const theme = createTheme({
   palette: {
     mode: 'dark',
     primary: {
-      main: BUTTON_TEXT,
+      main: SECONDARY_TEXT,
       contrastText: '#FFFFFF',
     },
     background: {
@@ -78,7 +76,7 @@ const theme = createTheme({
       fontSize: '14px',
     },
     subtitle1: {
-      color: THIRD_TEXT,
+      color: DISABLED_TEXT,
       fontWeight: '700',
       fontSize: '14px',
     },
@@ -96,15 +94,24 @@ const theme = createTheme({
       lineHeight: '13px',
       letterSpacing: '0em',
     },
+    titleAlternate: {
+      //styleName: Title/Title 3;
+      fontFamily: 'space-grotesk',
+      fontSize: '11px',
+      fontWeight: '700',
+      lineHeight: '14px',
+      color: SECONDARY_TEXT,
+    },
   },
   components: {
-    MuiTableHead: {
+    MuiTableCell: {
       styleOverrides: {
         root: {
-          font: '11px space-grotesk !important',
+          fontSize: '11px',
         },
       },
     },
+
     MuiButton: {
       variants: [
         {
@@ -148,7 +155,7 @@ const theme = createTheme({
       styleOverrides: {
         contained: {
           backgroundColor: BUTTON_BACKGROUND,
-          color: BUTTON_TEXT,
+          color: SECONDARY_TEXT,
           border: `2px solid ${BUTTON_BORDER}`,
           fontWeight: '700',
           width: '100%',
@@ -156,7 +163,7 @@ const theme = createTheme({
           textTransform: 'none',
           '&:hover': {
             backgroundColor: BUTTON_BACKGROUND_HOVER,
-            color: BUTTON_TEXT,
+            color: SECONDARY_TEXT,
             border: '2px solid transparent',
           },
         },
@@ -189,4 +196,24 @@ declare module '@mui/material/Button' {
   }
 }
 
+import '@mui/material/styles';
+import '@mui/material/Typography';
+
+declare module '@mui/material/styles' {
+  interface TypographyVariants {
+    titleAlternate: React.CSSProperties;
+  }
+
+  // allow configuration using `createTheme`
+  interface TypographyVariantsOptions {
+    titleAlternate?: React.CSSProperties;
+  }
+}
+
+// Update the Typography's variant prop options
+declare module '@mui/material/Typography' {
+  interface TypographyPropsVariantOverrides {
+    titleAlternate: true;
+  }
+}
 export default theme;

@@ -9,7 +9,7 @@ import DiagramPlaceholder from '../../Loader/DiagramPlaceholder';
 
 function ReservePool() {
   return (
-    <FeatureBox title="Reserve Pool" headBorder="bottom">
+    <FeatureBox title="Reserve Pool" headBorder="bottom" icon="green">
       <div style={{ display: 'flex' }}>
         <div style={{ padding: '20px 10px 0 0' }}>
           <FeatureBox title="Reserve Pool value" border="full" noPadding>

@@ -3,8 +3,6 @@
 import { useQuery } from '@apollo/client';
 import KeyboardArrowDownOutlinedIcon from '@mui/icons-material/KeyboardArrowDownOutlined';
 import KeyboardArrowUpOutlinedIcon from '@mui/icons-material/KeyboardArrowUpOutlined';
-import PushPinIcon from '@mui/icons-material/PushPin';
-import PushPinOutlinedIcon from '@mui/icons-material/PushPinOutlined';
 import { IconButton } from '@mui/material';
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
@@ -70,9 +68,9 @@ function Assets() {
   };
 
   return (
-    <FeatureBox title="Assets" noPadding>
+    <FeatureBox title="Assets" noPadding border="bottom">
       <TableContainer sx={{ maxHeight: 170, overflowY: 'scroll' }}>
-        <Table size="small">
+        <Table stickyHeader size="small">
           <TableHead sx={{ borderBottom: '1px solid', borderBottomColor: 'background.paper' }}>
             <TableRow>
               <HeaderCell title="Type" />
@@ -112,7 +110,23 @@ function Assets() {
                       onClick={() => toggleFavorite(address)}
                       disableRipple
                     >
-                      {isFavorite ? <PushPinIcon fontSize="small" /> : <PushPinOutlinedIcon fontSize="small" />}
+                      {isFavorite ? (
+                        <img
+                          src="assets/svgs/Pinned_active.svg"
+                          alt="a white pin icon with a transparant body"
+                          height="13"
+                          width="12"
+                          typeof="image/svg+xml"
+                        />
+                      ) : (
+                        <img
+                          src="assets/svgs/Pinned_inactive.svg"
+                          alt="a grey pin icon with a transparant body"
+                          height="13"
+                          width="12"
+                          typeof="image/svg+xml"
+                        />
+                      )}
                     </IconButton>
                   </TableCell>
                 </TableRow>
