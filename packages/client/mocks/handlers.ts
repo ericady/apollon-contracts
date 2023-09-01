@@ -73,7 +73,7 @@ const totalOpenPositions = faker.number.int({ min: 0, max: 90 });
 const openPositions = Array(totalOpenPositions)
   .fill(null)
   .map(() => {
-    const openedAt = faker.date.past().getTime();
+    const openedAt = faker.date.past({ years: 1 }).getTime();
     const size = parseFloat(faker.finance.amount(1, 1000, 2));
     const token = faker.helpers.arrayElement(tokens);
     return {
@@ -98,7 +98,7 @@ const totalClosedPositions = faker.number.int({ min: 0, max: 90 });
 const closedPositions = Array(totalClosedPositions)
   .fill(null)
   .map(() => {
-    const openedAt = faker.date.past().getTime();
+    const openedAt = faker.date.past({ years: 1 }).getTime();
     const closedAt = openedAt + faker.number.int({ min: 1, max: 24 * 60 * 60 * 1000 });
     const size = parseFloat(faker.finance.amount(1, 1000, 2));
     const token = faker.helpers.arrayElement(tokens);

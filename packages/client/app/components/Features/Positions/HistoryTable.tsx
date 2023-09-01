@@ -8,13 +8,13 @@ import TableRow from '@mui/material/TableRow';
 import Typography from '@mui/material/Typography';
 import { useEffect, useRef } from 'react';
 import { useEthers } from '../../../context/EthersProvider';
-import { useSelectedToken } from '../../../context/SelectedTokenProvider';
 import {
   GetBorrowerPositionsQuery,
   GetBorrowerPositionsQueryVariables,
   LongShortDirection,
 } from '../../../generated/gql-types';
 import { GET_BORROWER_POSITIONS } from '../../../queries';
+import { formatUnixTimestamp } from '../../../utils/date';
 import { percentageChange, roundCurrency } from '../../../utils/math';
 import Label from '../../Label/Label';
 import HeaderCell from '../../Table/HeaderCell';
@@ -23,7 +23,6 @@ function HistoryTable() {
   const tableBodyRef = useRef<HTMLTableSectionElement | null>(null);
 
   const { address } = useEthers();
-  const { JUSDToken } = useSelectedToken();
 
   const { data, fetchMore } = useQuery<GetBorrowerPositionsQuery, GetBorrowerPositionsQueryVariables>(
     GET_BORROWER_POSITIONS,
@@ -87,7 +86,7 @@ function HistoryTable() {
             ({ id, direction, feesInStable, openedAt, size, token, profitInStable, totalPriceInStable }) => {
               return (
                 <TableRow key={id}>
-                  <TableCell>{openedAt}</TableCell>
+                  <TableCell>{formatUnixTimestamp(openedAt)}</TableCell>
                   <TableCell>
                     {direction === LongShortDirection.Long ? (
                       <Label variant="success">Long</Label>

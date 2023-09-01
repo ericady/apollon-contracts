@@ -16,6 +16,7 @@ import {
   LongShortDirection,
 } from '../../../generated/gql-types';
 import { GET_BORROWER_POSITIONS } from '../../../queries';
+import { formatUnixTimestamp } from '../../../utils/date';
 import { percentageChange, roundCurrency } from '../../../utils/math';
 import Label from '../../Label/Label';
 import HeaderCell from '../../Table/HeaderCell';
@@ -92,7 +93,7 @@ function PositionsTable() {
 
               return (
                 <TableRow key={id}>
-                  <TableCell>{openedAt}</TableCell>
+                  <TableCell>{formatUnixTimestamp(openedAt)}</TableCell>
                   <TableCell>
                     {direction === LongShortDirection.Long ? (
                       <Label variant="success">Long</Label>
