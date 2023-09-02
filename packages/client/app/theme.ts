@@ -1,15 +1,7 @@
-'use client';
-
 import { createTheme } from '@mui/material/styles';
 
-import '@fontsource/inter';
-import '@fontsource/inter/400.css';
-import '@fontsource/inter/600.css';
-import '@fontsource/inter/700.css';
-import '@fontsource/space-grotesk';
-import '@fontsource/space-grotesk/400.css';
-import '@fontsource/space-grotesk/600.css';
-import '@fontsource/space-grotesk/700.css';
+import '@fontsource-variable/inter';
+import '@fontsource-variable/space-grotesk';
 
 // TODO: Move these into the finally
 const PRIMARY_BACKGROUND = '#14111D';
@@ -64,7 +56,7 @@ const theme = createTheme({
   },
 
   typography: {
-    fontFamily: ['inter', 'space-grotesk'].join(','),
+    fontFamily: ['Inter Variable', 'Space Grotesk Variable'].join(','),
     body1: {
       color: PRIMARY_TEXT,
       fontWeight: '700',
@@ -96,7 +88,7 @@ const theme = createTheme({
     },
     titleAlternate: {
       //styleName: Title/Title 3;
-      fontFamily: 'space-grotesk',
+      fontFamily: 'Space Grotesk Variable',
       fontSize: '11px',
       fontWeight: '700',
       lineHeight: '14px',
