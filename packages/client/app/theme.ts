@@ -80,11 +80,9 @@ const theme = createTheme({
     },
     caption: {
       color: SECONDARY_TEXT,
-      fontFamily: 'Inter',
       fontSize: '11px',
       fontWeight: '400',
       lineHeight: '13px',
-      letterSpacing: '0em',
     },
     titleAlternate: {
       //styleName: Title/Title 3;
@@ -94,12 +92,27 @@ const theme = createTheme({
       lineHeight: '14px',
       color: SECONDARY_TEXT,
     },
+    hint: {
+      //styleName: Text/xSmall
+      fontSize: '9px',
+      fontWeight: '400',
+      lineHeight: '11px',
+      color: DISABLED_TEXT,
+    },
   },
   components: {
     MuiTableCell: {
       styleOverrides: {
         root: {
           fontSize: '11px',
+        },
+      },
+    },
+
+    MuiInputLabel: {
+      styleOverrides: {
+        root: {
+          color: SECONDARY_TEXT,
         },
       },
     },
@@ -212,11 +225,13 @@ import '@mui/material/Typography';
 declare module '@mui/material/styles' {
   interface TypographyVariants {
     titleAlternate: React.CSSProperties;
+    hint: React.CSSProperties;
   }
 
   // allow configuration using `createTheme`
   interface TypographyVariantsOptions {
     titleAlternate?: React.CSSProperties;
+    hint?: React.CSSProperties;
   }
 }
 
@@ -224,6 +239,7 @@ declare module '@mui/material/styles' {
 declare module '@mui/material/Typography' {
   interface TypographyPropsVariantOverrides {
     titleAlternate: true;
+    hint: true;
   }
 }
 export default theme;

@@ -22,6 +22,7 @@ function NumberInput({ name, helperText, rules, ...textfieldProps }: Props) {
     <TextField
       {...field}
       {...textfieldProps}
+      size="small"
       inputRef={ref}
       error={!!error}
       helperText={error ? error.message : helperText}

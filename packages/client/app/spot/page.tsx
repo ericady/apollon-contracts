@@ -3,71 +3,53 @@ import Assets from '../components/Features/Assets/Assets';
 import Farm from '../components/Features/Farm/Farm';
 import Positions from '../components/Features/Positions/Positions';
 import Swap from '../components/Features/Swap/Swap';
-import SelectedTokenProvider from '../context/SelectedTokenProvider';
 
 function Spot() {
   return (
-    <SelectedTokenProvider>
-      <div
-        style={{
-          height: 'calc(100vh - 64px)',
-          display: 'grid',
-          gridTemplateColumns: '1fr 4fr',
-          gridTemplateRows: '1fr 1fr 1fr',
-          gridTemplateAreas: `
-    "asset trading"
-    "swap trading"
-    "farm trading"
+    <div
+      style={{
+        height: 'calc(100vh - 52px)',
+        display: 'grid',
+        gridTemplateColumns: '1fr 4fr',
+        gridTemplateRows: '1fr 1fr 1fr',
+        gridTemplateAreas: `
+    "widget trading"
+    "widget trading"
+    "widget trading"
 `,
+      }}
+    >
+      <Box
+        sx={{
+          gridArea: 'widget',
+          borderRight: '1px solid',
+          borderRightColor: 'background.paper',
+          overflowY: 'scroll',
+        }}
+      >
+        <Assets />
+        <Swap />
+        <Farm />
+      </Box>
+
+      <Box
+        sx={{
+          gridArea: 'trading',
+          display: 'flex',
+          flexDirection: 'column',
+          justifyContent: 'flex-end',
         }}
       >
         <Box
           sx={{
-            gridArea: 'asset',
-            borderRight: '1px solid',
-            borderRightColor: 'background.paper',
+            borderTop: '1px solid',
+            borderTopColor: 'background.paper',
           }}
         >
-          <Assets />
+          <Positions />
         </Box>
-        <Box
-          sx={{
-            gridArea: 'swap',
-            borderRight: '1px solid',
-            borderRightColor: 'background.paper',
-          }}
-        >
-          <Swap />
-        </Box>
-        <Box
-          sx={{
-            gridArea: 'farm',
-            borderRight: '1px solid',
-            borderRightColor: 'background.paper',
-          }}
-        >
-          <Farm />
-        </Box>
-
-        <Box
-          sx={{
-            gridArea: 'trading',
-            display: 'flex',
-            flexDirection: 'column',
-            justifyContent: 'flex-end',
-          }}
-        >
-          <Box
-            sx={{
-              borderTop: '1px solid',
-              borderTopColor: 'background.paper',
-            }}
-          >
-            <Positions />
-          </Box>
-        </Box>
-      </div>
-    </SelectedTokenProvider>
+      </Box>
+    </div>
   );
 }
 

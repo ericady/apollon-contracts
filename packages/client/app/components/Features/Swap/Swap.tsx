@@ -64,7 +64,7 @@ const Swap = () => {
   };
 
   return (
-    <FeatureBox title="Swap">
+    <FeatureBox title="Swap" border="bottom">
       <FormProvider {...methods}>
         <form onSubmit={handleSubmit(onSubmit)}>
           <div style={{ display: 'flex', alignItems: 'center' }}>
@@ -134,15 +134,15 @@ const Swap = () => {
             />
           )}
 
-          <Button variant="contained" onClick={() => setShowSlippage(!showSlippage)} sx={{ marginTop: '15px' }}>
+          <Button variant="contained" onClick={() => setShowSlippage(!showSlippage)} sx={{ marginTop: '10px' }}>
             {showSlippage ? 'Less' : 'More'}
           </Button>
 
-          <div style={{ padding: '15px 0' }}>
-            <Typography variant="body1" className="swap-info-paragraph" marginY={1.25}>
+          <div style={{ padding: '10px 0' }}>
+            <Typography variant="titleAlternate" color="primary.contrastText" className="swap-info-paragraph">
               Price per unit: <span>2.2 jUSD</span>
             </Typography>
-            <Typography variant="body2" className="swap-info-paragraph" marginY={1.25}>
+            <Typography variant="caption" className="swap-info-paragraph">
               Protocol swap fee:
               <span>
                 0.09% {/* TODO: issue with next */}
@@ -157,7 +157,7 @@ const Swap = () => {
                 | 0.0022 jUSD
               </span>
             </Typography>
-            <Typography variant="body2" className="swap-info-paragraph" marginY={1.25}>
+            <Typography variant="caption" className="swap-info-paragraph">
               Resulting pool slippage: <span>2 %</span>
             </Typography>
           </div>

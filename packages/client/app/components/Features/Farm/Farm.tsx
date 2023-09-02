@@ -44,7 +44,7 @@ const Farm = () => {
   };
 
   return (
-    <FeatureBox title="Farm">
+    <FeatureBox title="Farm" border="bottom">
       <Tabs value={tabValue} onChange={handleTabChange} variant="fullWidth">
         <Tab label="LONG" value="Long" />
         <Tab label="SHORT" value="Short" />
@@ -87,20 +87,20 @@ const Farm = () => {
                 />
               )}
 
-              <Button variant="contained" onClick={() => setShowSlippage(!showSlippage)} sx={{ marginTop: '15px' }}>
+              <Button variant="contained" onClick={() => setShowSlippage(!showSlippage)} sx={{ marginTop: '10px' }}>
                 {showSlippage ? 'Less' : 'More'}
               </Button>
             </div>
 
-            <div style={{ padding: '15px 0' }}>
-              <Typography variant="body1" className="swap-info-paragraph" marginY={1.25}>
+            <div style={{ padding: '10px 0' }}>
+              <Typography variant="titleAlternate" color="primary.contrastText" className="swap-info-paragraph">
                 Position size: <span>45753.3522 jUSD</span>
               </Typography>
-              <Typography variant="body2" className="swap-info-paragraph" marginY={1.25}>
+              <Typography variant="caption" className="swap-info-paragraph">
                 Price per unit: <span>4.0953 jUSD</span>
               </Typography>
-              <Typography variant="body2" className="swap-info-paragraph" marginY={1.25}>
-                Protocol fee:{' '}
+              <Typography variant="caption" className="swap-info-paragraph">
+                Protocol fee:
                 <span>
                   0.2% |
                   {/* <Divider
@@ -114,7 +114,7 @@ const Farm = () => {
                   423 jUSD
                 </span>
               </Typography>
-              <Typography variant="body2" className="swap-info-paragraph" marginY={1.25}>
+              <Typography variant="caption" className="swap-info-paragraph">
                 Slippage: <span>0.53 %</span>
               </Typography>
             </div>

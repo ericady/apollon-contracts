@@ -1,4 +1,3 @@
-import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 import { Button, Typography } from '@mui/material';
 
 type Props = {
@@ -13,18 +12,23 @@ function InfoButton({ title, description }: Props) {
         {title}
       </Button>
       <Typography
-        variant="subtitle1"
-        fontSize={12}
+        variant="hint"
         sx={{
-          textAlign: 'center',
           display: 'flex',
+          textAlign: 'center',
           justifyContent: 'center',
           gap: '5px',
           alignItems: 'center',
-          marginTop: '10px',
+          marginTop: '6px',
         }}
       >
-        <InfoOutlinedIcon sx={{ fontSize: '15px' }} />
+        <img
+          src="assets/svgs/Info.svg"
+          alt="an lower case i info icon with a rounded square"
+          height="12"
+          typeof="image/svg+xml"
+        />
+
         {description}
       </Typography>
     </div>
