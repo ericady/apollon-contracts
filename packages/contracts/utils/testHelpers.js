@@ -692,44 +692,42 @@ class TestHelper {
     return this.getGasMetrics(gasCostList);
   }
 
-  static async openTrove(contracts, { maxFeePercentage, extraLUSDAmount, upperHint, lowerHint, ICR, extraParams }) {
-    if (!maxFeePercentage) maxFeePercentage = this._100pct;
-    if (!extraLUSDAmount) extraLUSDAmount = this.toBN(0);
-    else if (typeof extraLUSDAmount == 'string') extraLUSDAmount = this.toBN(extraLUSDAmount);
-    if (!upperHint) upperHint = this.ZERO_ADDRESS;
-    if (!lowerHint) lowerHint = this.ZERO_ADDRESS;
+  // static async openTrove(
+  //   contracts,
+  //   { maxFeePercentage = this._100pct, extraStableAmount = this.toBN(0), ICR, extraParams }
+  // ) {
+  //   if (typeof extraStableAmount == 'string') extraStableAmount = this.toBN(extraStableAmount);
+  //   const MIN_DEBT = (
+  //     await this.getNetBorrowingAmount(contracts, await contracts.borrowerOperations.MIN_NET_DEBT())
+  //   ).add(this.toBN(1)); // add 1 to avoid rounding issues
+  //   const stableAmount = MIN_DEBT.add(extraStableAmount);
+  //
+  //   if (!ICR && !extraParams.value) ICR = this.toBN(this.dec(15, 17)); // 150%
+  //   else if (typeof ICR == 'string') ICR = this.toBN(ICR);
+  //
+  //   const totalDebt = await this.getOpenTroveTotalDebt(contracts, stableAmount);
+  //   const netDebt = await this.getActualDebtFromComposite(totalDebt, contracts);
+  //
+  //   if (ICR) {
+  //     const price = await contracts.priceFeedTestnet.getPrice();
+  //     extraParams.value = ICR.mul(totalDebt).div(price);
+  //   }
+  //
+  //   return {
+  //     stableAmount,
+  //     netDebt,
+  //     totalDebt,
+  //     ICR,
+  //     collateral: extraParams.value,
+  //     tx: await contracts.borrowerOperations.openTrove(maxFeePercentage, stableAmount, extraParams),
+  //   };
+  // }
 
-    const MIN_DEBT = (
-      await this.getNetBorrowingAmount(contracts, await contracts.borrowerOperations.MIN_NET_DEBT())
-    ).add(this.toBN(1)); // add 1 to avoid rounding issues
-    const lusdAmount = MIN_DEBT.add(extraLUSDAmount);
-
-    if (!ICR && !extraParams.value) ICR = this.toBN(this.dec(15, 17)); // 150%
-    else if (typeof ICR == 'string') ICR = this.toBN(ICR);
-
-    const totalDebt = await this.getOpenTroveTotalDebt(contracts, lusdAmount);
-    const netDebt = await this.getActualDebtFromComposite(totalDebt, contracts);
-
-    if (ICR) {
-      const price = await contracts.priceFeedTestnet.getPrice();
-      extraParams.value = ICR.mul(totalDebt).div(price);
-    }
-
-    const tx = await contracts.borrowerOperations.openTrove(
-      maxFeePercentage,
-      lusdAmount,
-      upperHint,
-      lowerHint,
-      extraParams
-    );
-
+  static async openTrove(contracts, { colls, extraParams }) {
+    // todo prepare those colls
+    // todo understand those extraParams (from...)
     return {
-      lusdAmount,
-      netDebt,
-      totalDebt,
-      ICR,
-      collateral: extraParams.value,
-      tx,
+      tx: await contracts.borrowerOperations.openTrove(colls),
     };
   }
 

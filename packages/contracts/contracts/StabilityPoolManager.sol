@@ -9,9 +9,17 @@ import './Interfaces/IDebtTokenManager.sol';
 import './Dependencies/LiquityBase.sol';
 import './Interfaces/IStabilityPool.sol';
 import './Interfaces/IStabilityPoolManager.sol';
+import './Interfaces/ITroveManager.sol';
+import './Interfaces/IStoragePool.sol';
+import './StabilityPool.sol';
 
 contract StabilityPoolManager is Ownable, CheckContract, IStabilityPoolManager {
   string public constant NAME = 'StabilityPoolManager';
+
+  address public troveManagerAddress;
+  address public priceFeedAddress;
+  address public storagePoolAddress;
+  address public debtTokenManagerAddress;
 
   // --- Data structures ---
 
@@ -20,8 +28,31 @@ contract StabilityPoolManager is Ownable, CheckContract, IStabilityPoolManager {
 
   // --- Dependency setter ---
 
-  function setAddresses() external onlyOwner {
-    _renounceOwnership();
+  function setAddresses(
+    address _troveManagerAddress,
+    address _priceFeedAddress,
+    address _storagePoolAddress,
+    address _debtTokenManagerAddress
+  ) external onlyOwner {
+    checkContract(_troveManagerAddress);
+    checkContract(_priceFeedAddress);
+    checkContract(_storagePoolAddress);
+    checkContract(_debtTokenManagerAddress);
+
+    troveManagerAddress = _troveManagerAddress;
+    emit TroveManagerAddressChanged(_troveManagerAddress);
+
+    priceFeedAddress = _priceFeedAddress;
+    emit PriceFeedAddressChanged(_priceFeedAddress);
+
+    storagePoolAddress = _storagePoolAddress;
+    emit StoragePoolAddressChanged(_storagePoolAddress);
+
+    debtTokenManagerAddress = _debtTokenManagerAddress;
+    emit DebtTokenManagerAddressChanged(_debtTokenManagerAddress);
+
+    // todo addDebtToken should be still callable...
+    //    _renounceOwnership();
   }
 
   // --- Getters ---
@@ -59,19 +90,19 @@ contract StabilityPoolManager is Ownable, CheckContract, IStabilityPoolManager {
 
   // --- Setters ---
 
-  // todo (flat) owner only, should be also callable after deployment
-  //    function addStabilityPool(IDebtToken _debtToken) external onlyOwner returns (bool) {
-  //        require(stabilityPools[_debtToken] == address(0), "pool already exists");
-  //
-  //        IStabilityPool stabilityPool = new IStabilityPool(
-  //            troveManagerAddress,
-  //            borrowerOperationsAddress,
-  //            _debtToken
-  //        );
-  //
-  //        stabilityPools[_debtToken] = stabilityPool;
-  //        stabilityPoolsArray.push(stabilityPool);
-  //        emit StabilityPoolAdded(stabilityPool);
-  //        return true;
-  //    }
+  function addStabilityPool(IDebtToken _debtToken) external override {
+    require(msg.sender == debtTokenManagerAddress, 'unauthorized');
+    require(address(stabilityPools[_debtToken]) == address(0), 'pool already exists');
+
+    IStabilityPool stabilityPool = new StabilityPool(
+      troveManagerAddress,
+      priceFeedAddress,
+      storagePoolAddress,
+      address(_debtToken)
+    );
+
+    stabilityPools[_debtToken] = stabilityPool;
+    stabilityPoolsArray.push(stabilityPool);
+    emit StabilityPoolAdded(stabilityPool);
+  }
 }

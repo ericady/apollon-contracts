@@ -8,14 +8,15 @@ import './Dependencies/CheckContract.sol';
 import './Interfaces/IDebtTokenManager.sol';
 import './Dependencies/LiquityBase.sol';
 import './DebtToken.sol';
+import './Interfaces/IStabilityPoolManager.sol';
 
 contract DebtTokenManager is Ownable, CheckContract, IDebtTokenManager {
   string public constant NAME = 'DTokenManager';
 
   address public troveManagerAddress;
-  address public stabilityPoolAddress;
   address public borrowerOperationsAddress;
   address public priceFeedAddress;
+  IStabilityPoolManager public stabilityPoolManager;
 
   // --- Data structures ---
 
@@ -29,19 +30,19 @@ contract DebtTokenManager is Ownable, CheckContract, IDebtTokenManager {
   function setAddresses(
     address _troveManagerAddress,
     address _borrowerOperationsAddress,
-    address _stabilityPoolAddress,
+    address _stabilityPoolManagerAddress,
     address _priceFeedAddress
   ) external onlyOwner {
     checkContract(_troveManagerAddress);
-    checkContract(_stabilityPoolAddress);
+    checkContract(_stabilityPoolManagerAddress);
     checkContract(_borrowerOperationsAddress);
     checkContract(_priceFeedAddress);
 
     troveManagerAddress = _troveManagerAddress;
     emit TroveManagerAddressChanged(_troveManagerAddress);
 
-    stabilityPoolAddress = _stabilityPoolAddress;
-    emit StabilityPoolAddressChanged(_stabilityPoolAddress);
+    stabilityPoolManager = IStabilityPoolManager(_stabilityPoolManagerAddress);
+    emit StabilityPoolManagerAddressChanged(_stabilityPoolManagerAddress);
 
     borrowerOperationsAddress = _borrowerOperationsAddress;
     emit BorrowerOperationsAddressChanged(_borrowerOperationsAddress);
@@ -49,7 +50,8 @@ contract DebtTokenManager is Ownable, CheckContract, IDebtTokenManager {
     priceFeedAddress = _priceFeedAddress;
     emit PriceFeedAddressChanged(_priceFeedAddress);
 
-    _renounceOwnership();
+    // todo addDebtToken should be still callable...
+    //    _renounceOwnership();
   }
 
   // --- Getters ---
@@ -70,7 +72,6 @@ contract DebtTokenManager is Ownable, CheckContract, IDebtTokenManager {
 
   // --- Setters ---
 
-  // todo (flat) owner only, should be also callable after deployment
   // todo price oracle id missing...
   function addDebtToken(
     string memory _symbol,
@@ -87,7 +88,6 @@ contract DebtTokenManager is Ownable, CheckContract, IDebtTokenManager {
 
     IDebtToken debtToken = new DebtToken(
       troveManagerAddress,
-      stabilityPoolAddress,
       borrowerOperationsAddress,
       priceFeedAddress,
       _symbol,
@@ -100,7 +100,8 @@ contract DebtTokenManager is Ownable, CheckContract, IDebtTokenManager {
     debtTokenAddresses.push(debtTokenAddress);
     debtTokens[debtTokenAddress] = debtToken;
     if (_isStableCoin) stableCoin = debtToken;
-
     emit DebtTokenAdded(debtToken);
+
+    stabilityPoolManager.addStabilityPool(debtToken);
   }
 }

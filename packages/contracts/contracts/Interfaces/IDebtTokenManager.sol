@@ -10,7 +10,7 @@ interface IDebtTokenManager {
 
   event DebtTokenAdded(IDebtToken _debtToken);
   event TroveManagerAddressChanged(address _troveManagerAddress);
-  event StabilityPoolAddressChanged(address _newStabilityPoolAddress);
+  event StabilityPoolManagerAddressChanged(address _newStabilityPoolAddress);
   event BorrowerOperationsAddressChanged(address _newBorrowerOperationsAddress);
   event PriceFeedAddressChanged(address _newPriceFeedAddress);
 

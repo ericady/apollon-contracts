@@ -23,7 +23,8 @@ contract CollTokenManager is Ownable, CheckContract, ICollTokenManager {
     priceFeedAddress = _priceFeedAddress;
     emit PriceFeedAddressChanged(_priceFeedAddress);
 
-    _renounceOwnership();
+    // todo addCollToken should be still callable...
+    //    _renounceOwnership();
   }
 
   // --- Getters ---
@@ -34,8 +35,7 @@ contract CollTokenManager is Ownable, CheckContract, ICollTokenManager {
 
   // --- Setters ---
 
-  // todo (flat) owner only, should be also callable after deployment
-  // todo price oracle id missing...
+  // todo oracle id missing
   function addCollToken(address _tokenAddress) external override onlyOwner {
     for (uint i = 0; i < collTokenAddresses.length; i++)
       require(collTokenAddresses[i] != _tokenAddress, 'CollTokenManager: token already added');

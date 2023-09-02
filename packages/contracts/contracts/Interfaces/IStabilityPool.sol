@@ -14,6 +14,7 @@ interface IStabilityPool is IBase {
   event TroveManagerAddressChanged(address _newTroveManagerAddress);
   event PriceFeedAddressChanged(address _newPriceFeedAddress);
   event StoragePoolAddressChanged(address _newStoragePoolAddress);
+  event DepositTokenAddressChanged(address _newDepositTokenAddress);
 
   event P_Updated(uint _P);
   event S_Updated(address _tokenAddress, uint _S, uint128 _epoch, uint128 _scale);

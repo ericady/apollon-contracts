@@ -210,16 +210,16 @@ contract StabilityPool is LiquityBase, Ownable, CheckContract, IStabilityPool {
 
   mapping(address => uint) public lastErrorOffset; // [tokenAddress] value, Error trackers for the error correction in the offset calculation
 
-  // --- Contract setters ---
-
-  function setAddresses(
+  constructor(
     address _troveManagerAddress,
     address _priceFeedAddress,
-    address _storagePoolAddress
-  ) external onlyOwner {
+    address _storagePoolAddress,
+    address _depositTokenAddress
+  ) public {
     checkContract(_troveManagerAddress);
     checkContract(_priceFeedAddress);
     checkContract(_storagePoolAddress);
+    checkContract(_depositTokenAddress);
 
     troveManager = ITroveManager(_troveManagerAddress);
     emit TroveManagerAddressChanged(_troveManagerAddress);
@@ -229,6 +229,9 @@ contract StabilityPool is LiquityBase, Ownable, CheckContract, IStabilityPool {
 
     storagePool = IStoragePool(_storagePoolAddress);
     emit StoragePoolAddressChanged(_storagePoolAddress);
+
+    depositToken = IDebtToken(_depositTokenAddress);
+    emit DepositTokenAddressChanged(_depositTokenAddress);
 
     _renounceOwnership();
   }

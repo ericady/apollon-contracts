@@ -13,6 +13,7 @@ const StabilityPoolTester = artifacts.require('./StabilityPoolTester.sol');
 const LiquityMathTester = artifacts.require('./LiquityMathTester.sol');
 const BorrowerOperationsTester = artifacts.require('./BorrowerOperationsTester.sol');
 const DebtTokenTester = artifacts.require('./DebtTokenTester.sol');
+const AnyTokenTester = artifacts.require('./AnyTokenTester.sol');
 
 // Proxy scripts
 const BorrowerOperationsScript = artifacts.require('BorrowerOperationsScript');
@@ -44,12 +45,6 @@ class DeploymentHelper {
       debtTokenManager: await DebtTokenManager.new(),
     };
 
-    // todo add coll tokens
-    // todo deploy debt tokens
-    // const lusdToken = await LUSDToken.new(troveManager.address, stabilityPool.address, borrowerOperations.address);
-    // todo deploy separate stability pools
-    // const stabilityPool = await StabilityPool.new();
-
     const cmdLineArgs = process.argv;
     const frameworkPath = cmdLineArgs[1];
     if (frameworkPath.includes('hardhat')) await this.extendHardhatCore(core);
@@ -80,14 +75,6 @@ class DeploymentHelper {
       borrowerOperations: await BorrowerOperationsTester.new(),
       math: await LiquityMathTester.new(),
     };
-
-    // todo add coll, debt tokens + stability pools
-    //      testerContracts.stabilityPool = await StabilityPoolTester.new();
-    // testerContracts.lusdToken = await LUSDTokenTester.new(
-    //     testerContracts.troveManager.address,
-    //     testerContracts.stabilityPool.address,
-    //     testerContracts.borrowerOperations.address
-    // );
 
     return testerContracts;
   }
@@ -145,6 +132,32 @@ class DeploymentHelper {
     );
 
     await contracts.collTokenManager.setAddresses(contracts.priceFeedTestnet.address);
+
+    await contracts.stabilityPoolManager.setAddresses(
+      contracts.troveManager.address,
+      contracts.priceFeedTestnet.address,
+      contracts.storagePool.address,
+      contracts.debtTokenManager.address
+    );
+  }
+
+  static async deployAndLinkToken(contracts) {
+    // coll tokens
+    contracts.collToken = {
+      USDT: await AnyTokenTester.new('USDT', 'USDT'),
+      BTC: await AnyTokenTester.new('Bitcoin', 'BTC'),
+    };
+    await contracts.collTokenManager.addCollToken(contracts.collToken.USDT.address);
+    await contracts.collTokenManager.addCollToken(contracts.collToken.BTC.address);
+
+    // debt tokens
+    await contracts.debtTokenManager.addDebtToken('STABLE', 'STABLE', '1', true);
+    await contracts.debtTokenManager.addDebtToken('STOCK', 'STOCK', '1', false);
+    const debtTokenAddresses = await contracts.debtTokenManager.getDebtTokenAddresses();
+    contracts.debtToken = {
+      STABLE: await DebtToken.at(debtTokenAddresses[0]),
+      STOCK: await DebtToken.at(debtTokenAddresses[1]),
+    };
   }
 
   static async deployProxyScripts(contracts, owner, users) {
@@ -166,18 +179,6 @@ class DeploymentHelper {
 
     const troveManagerScript = await TroveManagerScript.new(contracts.troveManager.address);
     contracts.troveManager = new TroveManagerProxy(owner, proxies, troveManagerScript.address, contracts.troveManager);
-
-    // todo deploy them over the manager contracts
-    // const stabilityPoolScript = await StabilityPoolScript.new(contracts.stabilityPool.address);
-    // contracts.stabilityPool = new StabilityPoolProxy(
-    //   owner,
-    //   proxies,
-    //   stabilityPoolScript.address,
-    //   contracts.stabilityPool
-    // );
-    //
-    // const lusdTokenScript = await TokenScript.new(contracts.lusdToken.address);
-    // contracts.lusdToken = new TokenProxy(owner, proxies, lusdTokenScript.address, contracts.lusdToken);
   }
 }
 module.exports = DeploymentHelper;

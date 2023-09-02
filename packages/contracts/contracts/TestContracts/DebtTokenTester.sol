@@ -9,7 +9,6 @@ contract DebtTokenTester is DebtToken {
 
   constructor(
     address _troveManagerAddress,
-    address _stabilityPoolAddress,
     address _borrowerOperationsAddress,
     address _priceFeedAddress,
     string memory _symbol,
@@ -20,7 +19,6 @@ contract DebtTokenTester is DebtToken {
     public
     DebtToken(
       _troveManagerAddress,
-      _stabilityPoolAddress,
       _borrowerOperationsAddress,
       _priceFeedAddress,
       _symbol,
