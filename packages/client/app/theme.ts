@@ -182,6 +182,24 @@ const theme = createTheme({
         },
       },
     },
+    MuiTabs: {
+      styleOverrides: {
+        flexContainer: {
+          borderBottom: 'none',
+        },
+        indicator: {
+          backgroundColor: PRIMARY_TEXT,
+        },
+      },
+    },
+    MuiTab: {
+      styleOverrides: {
+        textColorPrimary: {
+          color: SECONDARY_TEXT,
+          fontWeight: '700',
+        },
+      },
+    },
   },
 });
 

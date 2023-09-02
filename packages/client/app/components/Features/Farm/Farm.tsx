@@ -45,7 +45,7 @@ const Farm = () => {
 
   return (
     <FeatureBox title="Farm">
-      <Tabs value={tabValue} onChange={handleTabChange} aria-label="Shared Data Tabs" className="tabs-style">
+      <Tabs value={tabValue} onChange={handleTabChange} variant="fullWidth">
         <Tab label="LONG" value="Long" />
         <Tab label="SHORT" value="Short" />
       </Tabs>

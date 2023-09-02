@@ -20,27 +20,6 @@ a {
   align-items: center;
 }
 
-/* farm widget css */
-.tabs-style button {
-  width: 50%;
-  color: #827f8b;
-  font-weight: 700;
-}
-
-.tabs-style button.Mui-selected {
-  color: #fff;
-}
-.tabs-style .MuiTabs-indicator {
-  background: #fff;
-}
-.MuiTabs-flexContainer {
-  width: 100%;
-  border-bottom: 2px solid #282531;
-}
-.MuiFormControl-root .MuiInputBase-root.MuiOutlinedInput-root input::placeholder {
-  opacity: 1;
-}
-
 /* transition widget css */
 .table-styles th,
 .table-styles td {
@@ -54,14 +33,6 @@ a {
 }
 .table-styles tr:last-child td {
   border: 0;
-}
-
-.table-styles .tabs-style button {
-  width: auto;
-  min-width: auto;
-  max-width: 100%;
-  margin: 0 15px;
-  padding: 0;
 }
 
 /* UTILS */

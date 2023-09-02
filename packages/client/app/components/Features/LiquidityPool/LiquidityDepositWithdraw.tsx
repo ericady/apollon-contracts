@@ -57,7 +57,7 @@ function LiquidityDepositWithdraw({ selectedPool }: Props) {
 
   return (
     <FeatureBox title="Your Liquidity" noPadding>
-      <Tabs value={tabValue} onChange={handleChange} aria-label="Shared Data Tabs" className="tabs-style">
+      <Tabs value={tabValue} onChange={handleChange} variant="fullWidth">
         <Tab label="DEPOSIT" value="DEPOSIT" disableRipple />
         <Tab
           label="WITHDRAW"

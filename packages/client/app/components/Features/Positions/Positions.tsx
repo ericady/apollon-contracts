@@ -62,7 +62,7 @@ const Positions = () => {
   return (
     <>
       <div className="table-styles">
-        <Tabs value={tabValue} onChange={handleChange} className="tabs-style">
+        <Tabs value={tabValue} onChange={handleChange}>
           <Tab label="BALANCE" value="BALANCE" disableRipple />
           <Tab label="COLLATERAL" value="COLLATERAL" disableRipple />
           <Tab

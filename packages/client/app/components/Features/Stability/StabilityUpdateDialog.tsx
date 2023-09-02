@@ -65,7 +65,7 @@ const StabilityUpdateDialog = () => {
             borderBottom: 'none',
           }}
         >
-          <Tabs value={tabValue} onChange={handleChange} className="tabs-style">
+          <Tabs value={tabValue} onChange={handleChange} variant="fullWidth">
             <Tab label="DEPOSIT" value="DEPOSIT" />
             <Tab label="WITHDRAW" value="WITHDRAW" />
           </Tabs>

@@ -38,7 +38,7 @@ function NavigationBar() {
       >
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%' }}>
           <div className="flex">
-            <Link href="/">
+            <Link href="/" style={{ height: 30 }}>
               <img src="assets/svgs/Apollon_logo_negative.svg" alt="Apollon Logo" height="30" typeof="image/svg+xml" />
             </Link>
             <Tabs value={tabValue} onChange={handleChange}>
