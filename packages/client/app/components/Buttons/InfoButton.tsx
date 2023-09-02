@@ -25,7 +25,7 @@ function InfoButton({ title, description }: Props) {
         <img
           src="assets/svgs/Info.svg"
           alt="an lower case i info icon with a rounded square"
-          height="12"
+          height="16"
           typeof="image/svg+xml"
         />
 

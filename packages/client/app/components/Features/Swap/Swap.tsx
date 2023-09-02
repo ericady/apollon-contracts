@@ -91,7 +91,7 @@ const Swap = () => {
             <img
               src="assets/svgs/Exchange.svg"
               alt="Arrow indicating trading direction"
-              height="16"
+              height="21"
               typeof="image/svg+xml"
               style={{
                 transform: tradingDirection === 'jUSDAquired' ? 'rotate(180deg)' : 'rotate(0deg)',

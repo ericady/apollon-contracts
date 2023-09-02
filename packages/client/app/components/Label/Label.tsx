@@ -1,6 +1,6 @@
 import { Box, Typography } from '@mui/material';
 import { PropsWithChildren } from 'react';
-import { BUTTON_BORDER, SECONDARY_TEXT } from '../../theme';
+import { BUTTON_BORDER } from '../../theme';
 
 type Props = {
   variant: 'success' | 'error' | 'info' | 'none';
@@ -16,13 +16,14 @@ function Label({ variant, children }: PropsWithChildren<Props>) {
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              background: BUTTON_BORDER,
-              padding: '2px 5px',
-              color: SECONDARY_TEXT,
+              backgroundColor: 'success.background',
+              padding: '6px',
               borderRadius: '3px',
             }}
           >
-            <Typography variant="titleAlternate">{children}</Typography>
+            <Typography variant="titleAlternate" color="success.main">
+              {children}
+            </Typography>
           </Box>
         </div>
       );
@@ -34,13 +35,14 @@ function Label({ variant, children }: PropsWithChildren<Props>) {
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              background: BUTTON_BORDER,
-              padding: '2px 5px',
-              color: SECONDARY_TEXT,
+              backgroundColor: 'error.background',
+              padding: '6px',
               borderRadius: '3px',
             }}
           >
-            <Typography variant="titleAlternate">{children}</Typography>
+            <Typography variant="titleAlternate" color="error.main">
+              {children}
+            </Typography>
           </Box>
         </div>
       );
@@ -52,13 +54,14 @@ function Label({ variant, children }: PropsWithChildren<Props>) {
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              background: BUTTON_BORDER,
-              padding: '2px 5px',
-              color: SECONDARY_TEXT,
+              backgroundColor: 'info.background',
+              padding: '6px',
               borderRadius: '3px',
             }}
           >
-            <Typography variant="titleAlternate">{children}</Typography>
+            <Typography variant="titleAlternate" color="info.main">
+              {children}
+            </Typography>
           </Box>
         </div>
       );
@@ -71,8 +74,7 @@ function Label({ variant, children }: PropsWithChildren<Props>) {
               alignItems: 'center',
               justifyContent: 'center',
               background: BUTTON_BORDER,
-              padding: '2px 5px',
-              color: SECONDARY_TEXT,
+              padding: '6px 4px',
               borderRadius: '3px',
             }}
           >

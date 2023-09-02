@@ -97,9 +97,9 @@ function Assets() {
                     <div style={{ display: 'flex', alignContent: 'center', justifyContent: 'flex-end' }}>
                       {change}
                       {change < 0 ? (
-                        <KeyboardArrowDownOutlinedIcon fontSize="small" sx={{ pb: 0.5 }} />
+                        <KeyboardArrowDownOutlinedIcon fontSize="small" />
                       ) : (
-                        <KeyboardArrowUpOutlinedIcon fontSize="small" sx={{ pb: 0.5 }} />
+                        <KeyboardArrowUpOutlinedIcon fontSize="small" />
                       )}
                     </div>
                   </TableCell>
@@ -114,16 +114,16 @@ function Assets() {
                         <img
                           src="assets/svgs/Pinned_active.svg"
                           alt="a white pin icon with a transparant body"
-                          height="13"
-                          width="12"
+                          height="17"
+                          width="15.6"
                           typeof="image/svg+xml"
                         />
                       ) : (
                         <img
                           src="assets/svgs/Pinned_inactive.svg"
                           alt="a grey pin icon with a transparant body"
-                          height="13"
-                          width="12"
+                          height="17"
+                          width="15.6"
                           typeof="image/svg+xml"
                         />
                       )}

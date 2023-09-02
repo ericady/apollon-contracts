@@ -3,7 +3,6 @@ import { createTheme } from '@mui/material/styles';
 import '@fontsource-variable/inter';
 import '@fontsource-variable/space-grotesk';
 
-// TODO: Move these into the finally
 const PRIMARY_BACKGROUND = '#14111D';
 const PAPER_BACKGROUND = '#2A2636';
 const PRIMARY_TEXT = '#FFFFFF';
@@ -36,27 +35,29 @@ const theme = createTheme({
     },
     success: {
       main: '#3DD755',
-      contrastText: '#1E1B27', // Text color that will be readable against the success color
+      background: 'rgba(61, 215, 85, 0.15)',
+      contrastText: '#1E1B27',
     },
     error: {
       main: '#E04A4A',
+      background: 'rgba(224, 74, 74, 0.15)',
       contrastText: '#FFFFFF',
     },
     info: {
       main: '#33B6FF',
+      background: 'rgba(51, 182, 255, 0.15)',
       contrastText: '#1E1B27',
     },
-    // action: {
-    //   active: '#FFFFFF',
-    //   hover: '#504D59', // Color when an actionable item is hovered
-    //   selected: '#3D3945', // Color when an actionable item is selected
-    //   disabledBackground: '#3D3945', // Background color for disabled action items
-    //   disabled: '#504D59', // Text color for disabled action items
-    // },
   },
 
   typography: {
     fontFamily: ['Inter Variable', 'Space Grotesk Variable'].join(','),
+    h6: {
+      //styleName: Title/Title 1;
+      fontFamily: 'Space Grotesk Variable',
+      fontSize: '19.5px',
+      fontWeight: '700',
+    },
     body1: {
       color: PRIMARY_TEXT,
       fontWeight: '700',
@@ -80,21 +81,21 @@ const theme = createTheme({
     },
     caption: {
       color: SECONDARY_TEXT,
-      fontSize: '11px',
+      fontSize: '14.3px',
       fontWeight: '400',
       lineHeight: '13px',
     },
     titleAlternate: {
       //styleName: Title/Title 3;
       fontFamily: 'Space Grotesk Variable',
-      fontSize: '11px',
+      fontSize: '14.3px',
       fontWeight: '700',
       lineHeight: '14px',
       color: SECONDARY_TEXT,
     },
     hint: {
       //styleName: Text/xSmall
-      fontSize: '9px',
+      fontSize: '11.7px',
       fontWeight: '400',
       lineHeight: '11px',
       color: DISABLED_TEXT,
@@ -104,7 +105,7 @@ const theme = createTheme({
     MuiTableCell: {
       styleOverrides: {
         root: {
-          fontSize: '11px',
+          fontSize: '14.3px',
         },
       },
     },
@@ -140,7 +141,6 @@ const theme = createTheme({
         {
           props: { variant: 'undercover' },
           style: {
-            // sx={{ padding: '0px', display: 'block', margin: '5px 0 0 auto', color: '#33B6FF' }}
             margin: '5px 0',
             minWidth: 'auto',
             backgroundColor: 'transparent',
@@ -164,7 +164,7 @@ const theme = createTheme({
           border: `2px solid ${BUTTON_BORDER}`,
           fontWeight: '700',
           width: '100%',
-          height: '32px',
+          height: '30px',
           textTransform: 'none',
           '&:hover': {
             backgroundColor: BUTTON_BACKGROUND_HOVER,
@@ -242,4 +242,13 @@ declare module '@mui/material/Typography' {
     hint: true;
   }
 }
+
+declare module '@mui/material/styles' {
+  interface PaletteColorOptions {
+    main: string;
+    contrastText: string;
+    background?: string;
+  }
+}
+
 export default theme;

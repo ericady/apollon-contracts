@@ -57,14 +57,14 @@ function FeatureBox({
             <img
               src="assets/svgs/Star24_green.svg"
               alt="Green colored diamond shape"
-              height="8"
+              height="11"
               typeof="image/svg+xml"
             />
           ) : (
             <img
               src="assets/svgs/Star24_white.svg"
               alt="White colored diamond shape"
-              height="8"
+              height="11"
               typeof="image/svg+xml"
             />
           )}
@@ -78,7 +78,7 @@ function FeatureBox({
             style={{ paddingRight: 16 }}
             src="assets/svgs/Drag-n-Drop.svg"
             alt="Green colored diamond shape"
-            height="16"
+            height="21"
             typeof="image/svg+xml"
           />
         )}
