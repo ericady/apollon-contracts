@@ -29,7 +29,7 @@ function BalanceTable() {
     <div style={{ display: 'flex' }}>
       <TableContainer>
         <Table>
-          <TableHead>
+          <TableHead sx={{ borderTop: '1px solid', borderTopColor: 'background.paper' }}>
             <TableRow>
               <HeaderCell title="%" />
               <HeaderCell title="Amount" cellProps={{ align: 'right' }} />
@@ -58,7 +58,7 @@ function BalanceTable() {
 
       <TableContainer sx={{ borderLeft: '2px solid #1E1B27' }}>
         <Table>
-          <TableHead>
+          <TableHead sx={{ borderTop: '1px solid', borderTopColor: 'background.paper' }}>
             <TableRow>
               <HeaderCell title="%" />
               <HeaderCell title="Amount" cellProps={{ align: 'right' }} />

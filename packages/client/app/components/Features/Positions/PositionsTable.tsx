@@ -72,6 +72,7 @@ function PositionsTable() {
   return (
     <TableContainer ref={tableBodyRef} style={{ maxHeight: '270px', overflow: 'auto' }}>
       <Table stickyHeader>
+        {/* Can not at header border here with sticky header */}
         <TableHead>
           <TableRow>
             <HeaderCell title="Opening" />
@@ -103,22 +104,14 @@ function PositionsTable() {
                   </TableCell>
                   <TableCell align="right">
                     <div className="flex">
-                      <Typography sx={{ color: 'primary.contrastText' }}>{size}</Typography>
+                      <Typography>{size}</Typography>
                       <Label variant="none">{token.symbol}</Label>
                     </div>
                   </TableCell>
 
-                  <TableCell align="right">
-                    <Typography sx={{ color: 'primary.contrastText' }}>
-                      {roundCurrency(totalPriceInStable)} jUSD
-                    </Typography>
-                  </TableCell>
+                  <TableCell align="right">{roundCurrency(totalPriceInStable)} jUSD</TableCell>
 
-                  <TableCell align="right">
-                    <Typography sx={{ color: 'primary.contrastText' }}>
-                      {roundCurrency(totalPriceInStable / size)} jUSD
-                    </Typography>
-                  </TableCell>
+                  <TableCell align="right">{roundCurrency(totalPriceInStable / size)} jUSD</TableCell>
 
                   <TableCell align="right">{roundCurrency(feesInStable, 5)} jUSD</TableCell>
                   <TableCell align="right">

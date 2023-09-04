@@ -1,5 +1,6 @@
 import { useQuery } from '@apollo/client';
 import Square from '@mui/icons-material/Square';
+import { Box } from '@mui/material';
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
 import TableCell from '@mui/material/TableCell';
@@ -40,14 +41,22 @@ function CollateralTable() {
             padding: '20px',
           }}
         >
-          <Typography
-            variant="body1"
-            sx={{ color: '#303A4C', fontSize: '24px', display: 'flex', alignItems: 'center', gap: '15px' }}
-          >
-            <span style={{ color: '#1e89da' }}>174 %</span>
-            <Square sx={{ color: '#fff', fontSize: '14px' }} />
-            Collateral Ratio
-          </Typography>
+          <Box sx={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
+            <Typography
+              sx={{ fontFamily: 'Space Grotesk Variable', color: 'info.main', fontWeight: '700', fontSize: '20px' }}
+            >
+              174 %
+            </Typography>
+
+            <img
+              src="assets/svgs/Star24_white.svg"
+              alt="White colored diamond shape"
+              height="11"
+              typeof="image/svg+xml"
+            />
+
+            <Typography variant="h4">Collateral Ratio</Typography>
+          </Box>
 
           <CollateralUpdateDialog collateralData={data} />
         </div>
@@ -55,7 +64,7 @@ function CollateralTable() {
           <Table>
             <TableHead>
               <TableRow>
-                <HeaderCell title="Locked" cellProps={{ align: 'right' }} />
+                <HeaderCell title="Trove" cellProps={{ align: 'right' }} />
                 <HeaderCell title="Wallet" cellProps={{ align: 'right' }} />
                 <HeaderCell title="Symbol" cellProps={{ align: 'right' }} />
               </TableRow>
@@ -67,11 +76,11 @@ function CollateralTable() {
                     <div className="flex">
                       <Square
                         sx={{
-                          color: '#33B6FF',
+                          color: 'info.main',
                           fontSize: '14px',
                         }}
                       />
-                      <Typography sx={{ color: 'primary.contrastText' }}>
+                      <Typography color="primary.contrastText" fontSize={14.3}>
                         {roundCurrency(troveLockedAmount!, 5)}
                       </Typography>
                     </div>

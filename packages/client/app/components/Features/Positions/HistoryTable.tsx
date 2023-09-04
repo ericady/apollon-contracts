@@ -74,10 +74,10 @@ function HistoryTable() {
             <HeaderCell title="Opening" />
             <HeaderCell title="Type" />
             <HeaderCell title="Size" cellProps={{ align: 'right' }} />
-            <HeaderCell title="Total position" cellProps={{ align: 'right' }} />
+            <HeaderCell title="Price" cellProps={{ align: 'right' }} />
             <HeaderCell title="Price per unit" cellProps={{ align: 'right' }} />
             <HeaderCell title="Fee" cellProps={{ align: 'right' }} />
-            <HeaderCell title="Profit" cellProps={{ align: 'right' }} />
+            <HeaderCell title="PNL" cellProps={{ align: 'right' }} />
           </TableRow>
         </TableHead>
 
@@ -96,22 +96,14 @@ function HistoryTable() {
                   </TableCell>
                   <TableCell align="right">
                     <div className="flex">
-                      <Typography sx={{ color: 'primary.contrastText' }}>{size}</Typography>
+                      <Typography>{size}</Typography>
                       <Label variant="none">{token.symbol}</Label>
                     </div>
                   </TableCell>
 
-                  <TableCell align="right">
-                    <Typography sx={{ color: 'primary.contrastText' }}>
-                      {roundCurrency(totalPriceInStable)} jUSD
-                    </Typography>
-                  </TableCell>
+                  <TableCell align="right">{roundCurrency(totalPriceInStable)} jUSD</TableCell>
 
-                  <TableCell align="right">
-                    <Typography sx={{ color: 'primary.contrastText' }}>
-                      {roundCurrency(totalPriceInStable / size)} jUSD
-                    </Typography>
-                  </TableCell>
+                  <TableCell align="right">{roundCurrency(totalPriceInStable / size)} jUSD</TableCell>
 
                   <TableCell align="right">{roundCurrency(feesInStable, 5)} jUSD</TableCell>
                   <TableCell align="right">

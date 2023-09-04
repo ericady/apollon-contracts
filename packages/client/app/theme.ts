@@ -52,6 +52,12 @@ const theme = createTheme({
 
   typography: {
     fontFamily: ['Inter Variable', 'Space Grotesk Variable'].join(','),
+    h4: {
+      fontFamily: 'Space Grotesk Variable',
+      color: '#303A4C',
+      fontWeight: '700',
+      fontSize: '20px',
+    },
     h6: {
       //styleName: Title/Title 1;
       fontFamily: 'Space Grotesk Variable',
@@ -105,7 +111,11 @@ const theme = createTheme({
     MuiTableCell: {
       styleOverrides: {
         root: {
+          color: SECONDARY_TEXT,
           fontSize: '14.3px',
+          borderBottom: '1px solid',
+          borderBottomColor: BUTTON_BACKGROUND,
+          padding: '10px 15px',
         },
       },
     },

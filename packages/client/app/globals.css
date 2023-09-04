@@ -22,21 +22,6 @@ a {
   margin-bottom: 12px;
 }
 
-/* transition widget css */
-.table-styles th,
-.table-styles td {
-  border-bottom: 2px solid #1e1b27;
-  padding: 10px 15px;
-}
-.table-styles td {
-  color: #827f8b;
-  font-weight: 400;
-  font-size: 14px;
-}
-.table-styles tr:last-child td {
-  border: 0;
-}
-
 /* UTILS */
 .flex {
   display: flex;

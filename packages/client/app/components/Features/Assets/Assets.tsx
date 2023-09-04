@@ -91,9 +91,11 @@ function Assets() {
                   sx={{ cursor: 'pointer', '& .MuiTableCell-root': { borderBottom: 'none' } }}
                   selected={selectedToken?.symbol === symbol}
                 >
-                  <TableCell>{symbol}</TableCell>
-                  <TableCell align="right">{priceUSD}</TableCell>
-                  <TableCell align="right" sx={{ color: change < 0 ? 'error.main' : 'success.main' }}>
+                  <TableCell sx={{ p: 0.5 }}>{symbol}</TableCell>
+                  <TableCell sx={{ p: 0.5 }} align="right">
+                    {priceUSD}
+                  </TableCell>
+                  <TableCell align="right" sx={{ color: change < 0 ? 'error.main' : 'success.main', p: 0.5 }}>
                     <div style={{ display: 'flex', alignContent: 'center', justifyContent: 'flex-end' }}>
                       {change}
                       {change < 0 ? (
@@ -103,7 +105,7 @@ function Assets() {
                       )}
                     </div>
                   </TableCell>
-                  <TableCell align="right">
+                  <TableCell sx={{ p: 0.5 }} align="right">
                     <IconButton
                       sx={{ height: 20, width: 20 }}
                       size="small"
