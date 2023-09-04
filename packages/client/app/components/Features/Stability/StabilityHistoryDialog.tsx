@@ -2,7 +2,6 @@
 
 import CloseIcon from '@mui/icons-material/Close';
 import ExpandLessSharpIcon from '@mui/icons-material/ExpandLessSharp';
-import Square from '@mui/icons-material/Square';
 import { Button, Dialog, DialogContent, DialogTitle, IconButton } from '@mui/material';
 import Typography from '@mui/material/Typography';
 import { useState } from 'react';
@@ -29,13 +28,12 @@ const StabilityHistoryDialog = () => {
             borderBottom: 'none',
           }}
         >
-          <div>
-            <Square
-              sx={{
-                color: '#504D59',
-                fontSize: '12px',
-                marginRight: '15px',
-              }}
+          <div className="flex">
+            <img
+              src="assets/svgs/Star24_white.svg"
+              alt="White colored diamond shape"
+              height="11"
+              typeof="image/svg+xml"
             />
             <Typography variant="h6" display="inline-block">
               STABILITY PER HISTORY
@@ -60,7 +58,9 @@ const StabilityHistoryDialog = () => {
           <div className="history-block" style={{ borderBottom: '2px solid #25222E', padding: '20px' }}>
             <div className="history-hdng flex" style={{ justifyContent: 'space-between', marginBottom: '20px' }}>
               <div className="flex">
-                <Typography>13.04.2023 18:07</Typography>
+                <Typography variant="titleAlternate" color="primary.contrastText">
+                  13.04.2023 18:07
+                </Typography>
               </div>
 
               <Label variant="success">Claimed Collateral</Label>
@@ -90,33 +90,46 @@ const StabilityHistoryDialog = () => {
                 >
                   <Typography
                     className="flex"
-                    sx={{ color: '#33B6FF', fontWeight: '400', gap: '5px', marginBottom: '20px' }}
+                    variant="titleAlternate"
+                    color="info.main"
+                    fontWeight={400}
+                    sx={{
+                      gap: '5px',
+                      marginBottom: '20px',
+                      justifyContent: 'end',
+                    }}
                   >
-                    + 3.18 % <ExpandLessSharpIcon sx={{ color: '#33B6FF' }} />
+                    + 3.18% <ExpandLessSharpIcon sx={{ color: 'info.main' }} />
                   </Typography>
-                  <Typography className="flex" sx={{ color: '#33B6FF', fontWeight: '400', gap: '5px' }}>
-                    + 35118.18 $ <ExpandLessSharpIcon sx={{ color: '#33B6FF' }} />
+                  <Typography
+                    className="flex"
+                    variant="titleAlternate"
+                    color="info.main"
+                    fontWeight={400}
+                    sx={{ gap: '5px', justifyContent: 'end' }}
+                  >
+                    + 35118.18$ <ExpandLessSharpIcon sx={{ color: 'info.main' }} />
                   </Typography>
                 </div>
               </div>
 
               <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
-                <div className="flex">
+                <div className="flex" style={{ justifyContent: 'end' }}>
                   <Typography fontWeight={400}>8.18571</Typography>
                   <Label variant="none">ETH</Label>
                 </div>
 
-                <div className="flex">
+                <div className="flex" style={{ justifyContent: 'end' }}>
                   <Typography fontWeight={400}>187.18871</Typography>
                   <Label variant="none">BTC</Label>
                 </div>
 
-                <div className="flex">
+                <div className="flex" style={{ justifyContent: 'end' }}>
                   <Typography fontWeight={400}>187.18871</Typography>
                   <Label variant="none">YLT</Label>
                 </div>
 
-                <div className="flex">
+                <div className="flex" style={{ justifyContent: 'end' }}>
                   <Typography fontWeight={400}>187.18871</Typography>
                   <Label variant="none">USDT</Label>
                 </div>
@@ -127,19 +140,21 @@ const StabilityHistoryDialog = () => {
           <div className="history-block" style={{ borderBottom: '2px solid #25222E', padding: '20px' }}>
             <div className="history-hdng flex" style={{ justifyContent: 'space-between', marginBottom: '20px' }}>
               <div className="flex">
-                <Typography>11.04.2023 06:03</Typography>
+                <Typography variant="titleAlternate" color="primary.contrastText">
+                  11.04.2023 06:03
+                </Typography>
               </div>
 
               <Label variant="none">Deposited token</Label>
             </div>
 
-            <div className="history-value">
-              <div className="flex">
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '20px' }}>
+              <div className="flex" style={{ width: '100%', justifyContent: 'end' }}>
                 <Typography fontWeight={400}>1.78145</Typography>
                 <Label variant="none">AAPL</Label>
               </div>
 
-              <div className="flex">
+              <div className="flex" style={{ width: '100%', justifyContent: 'end' }}>
                 <Typography fontWeight={400}>8.14431</Typography>
                 <Label variant="none">TSLA</Label>
               </div>
@@ -149,19 +164,21 @@ const StabilityHistoryDialog = () => {
           <div className="history-block" style={{ padding: '20px' }}>
             <div className="history-hdng flex" style={{ justifyContent: 'space-between', marginBottom: '20px' }}>
               <div className="flex">
-                <Typography>03.02.2023 15:18</Typography>
+                <Typography variant="titleAlternate" color="primary.contrastText">
+                  03.02.2023 15:18
+                </Typography>
               </div>
 
               <Label variant="info">Withdrawn token</Label>
             </div>
 
-            <div className="history-value">
-              <div className="flex">
+            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '20px' }}>
+              <div className="flex" style={{ width: '100%', justifyContent: 'end' }}>
                 <Typography fontWeight={400}>8.00012</Typography>
                 <Label variant="none">GLD</Label>
               </div>
 
-              <div className="flex">
+              <div className="flex" style={{ width: '100%', justifyContent: 'end' }}>
                 <Typography fontWeight={400}>181.00028</Typography>
                 <Label variant="none">TSLA</Label>
               </div>

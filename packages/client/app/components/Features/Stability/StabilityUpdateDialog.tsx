@@ -1,6 +1,5 @@
 'use client';
 import CloseIcon from '@mui/icons-material/Close';
-import Square from '@mui/icons-material/Square';
 import { Dialog, DialogActions, DialogContent, DialogTitle, IconButton } from '@mui/material';
 import Button from '@mui/material/Button';
 import Tab from '@mui/material/Tab';
@@ -36,13 +35,12 @@ const StabilityUpdateDialog = () => {
             borderBottom: 'none',
           }}
         >
-          <div>
-            <Square
-              sx={{
-                color: '#504D59',
-                fontSize: '12px',
-                marginRight: '15px',
-              }}
+          <div className="flex">
+            <img
+              src="assets/svgs/Star24_white.svg"
+              alt="White colored diamond shape"
+              height="11"
+              typeof="image/svg+xml"
             />
             <Typography variant="h6" display="inline-block">
               COLLATERAL UPDATE

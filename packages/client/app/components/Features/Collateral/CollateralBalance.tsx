@@ -58,12 +58,12 @@ const CollateralBalance = () => {
                           <TableCell></TableCell>
                         </TableRow>
                         <TableRow>
-                          <TableCell></TableCell>
-                          <TableCell>
+                          <TableCell style={{ padding: '2px' }}></TableCell>
+                          <TableCell style={{ padding: '2px' }}>
                             <Button>UPDATE</Button>
                           </TableCell>
-                          <TableCell></TableCell>
-                          <TableCell></TableCell>
+                          <TableCell style={{ padding: '2px' }}></TableCell>
+                          <TableCell style={{ padding: '2px' }}></TableCell>
                         </TableRow>
                       </TableBody>
                     </Table>
