@@ -5,11 +5,11 @@ import TableCell from '@mui/material/TableCell';
 import TableContainer from '@mui/material/TableContainer';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
-import FeatureBox from '../../FeatureBox/FeatureBox';
-import DiagramPlaceholder from '../../Loader/DiagramPlaceholder';
-import HeaderCell from '../../Table/HeaderCell';
+import FeatureBox from '../../../FeatureBox/FeatureBox';
+import DiagramPlaceholder from '../../../Loader/DiagramPlaceholder';
+import HeaderCell from '../../../Table/HeaderCell';
 
-const CollateralBalance = () => {
+const CollateralBalanceLoader = () => {
   return (
     <FeatureBox title="Collateral" headBorder="bottom" icon="green">
       <div style={{ display: 'flex' }}>
@@ -75,4 +75,4 @@ const CollateralBalance = () => {
   );
 };
 
-export default CollateralBalance;
+export default CollateralBalanceLoader;

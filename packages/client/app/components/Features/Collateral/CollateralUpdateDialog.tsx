@@ -3,27 +3,29 @@
 import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
 import CloseIcon from '@mui/icons-material/Close';
 import { Box, Dialog, DialogActions, DialogContent, DialogTitle, IconButton } from '@mui/material';
-import Button from '@mui/material/Button';
+import Button, { ButtonProps } from '@mui/material/Button';
 import Tab from '@mui/material/Tab';
 import Tabs from '@mui/material/Tabs';
 import Typography from '@mui/material/Typography';
 import { SyntheticEvent, useState } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
 import { useWallet } from '../../../context/WalletProvider';
-import { GetBorrowerCollateralTokensQuery } from '../../../generated/gql-types';
+import { GetCollateralTokensQuery } from '../../../generated/gql-types';
 import { roundCurrency } from '../../../utils/math';
 import NumberInput from '../../FormControls/NumberInput';
 import Label from '../../Label/Label';
 
 type Props = {
-  collateralData: GetBorrowerCollateralTokensQuery;
+  collateralData: GetCollateralTokensQuery;
+  buttonVariant: ButtonProps['variant'];
+  buttonSx?: ButtonProps['sx'];
 };
 
 type FieldValues = {
   etherTokenAmount: number;
 };
 
-const CollateralUpdateDialog = ({ collateralData }: Props) => {
+const CollateralUpdateDialog = ({ collateralData, buttonVariant, buttonSx = {} }: Props) => {
   const [isOpen, setIsOpen] = useState(false);
   const [tabValue, setTabValue] = useState<'DEPOSIT' | 'WITHDRAW'>('DEPOSIT');
 
@@ -63,10 +65,11 @@ const CollateralUpdateDialog = ({ collateralData }: Props) => {
   return (
     <>
       <Button
-        variant="outlined"
+        variant={buttonVariant}
         sx={{
           width: 'auto',
           padding: '0 50px',
+          ...buttonSx,
         }}
         onClick={() => setIsOpen(true)}
       >
@@ -217,8 +220,6 @@ const CollateralUpdateDialog = ({ collateralData }: Props) => {
                   justifyContent: 'space-between',
                   alignItems: 'center',
                   padding: '20px',
-                  borderBottom: '1px solid',
-                  borderBottomColor: 'background.paper',
                 }}
               >
                 <Typography variant="titleAlternate">Collateral Ratio</Typography>

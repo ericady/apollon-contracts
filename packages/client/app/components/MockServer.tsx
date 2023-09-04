@@ -10,7 +10,7 @@ function MockServer() {
     if (process.env.NEXT_PUBLIC_API_MOCKING === 'enabled') {
       import('../../mocks').then(async (module) => {
         await module.default();
-        router.replace('/spot');
+        router.replace('/balance');
       });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps

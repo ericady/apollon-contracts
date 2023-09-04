@@ -15,7 +15,7 @@ import {
 } from '../../../generated/gql-types';
 import { GET_BORROWER_POSITIONS } from '../../../queries';
 import { formatUnixTimestamp } from '../../../utils/date';
-import { percentageChange, roundCurrency } from '../../../utils/math';
+import { displayPercentage, percentageChange, roundCurrency } from '../../../utils/math';
 import Label from '../../Label/Label';
 import HeaderCell from '../../Table/HeaderCell';
 
@@ -116,7 +116,7 @@ function HistoryTable() {
                       <Typography
                         sx={{ color: profitInStable! > 0 ? 'success.main' : 'error.main', fontWeight: '400' }}
                       >
-                        {percentageChange(totalPriceInStable + profitInStable!, totalPriceInStable)} %
+                        {displayPercentage(percentageChange(totalPriceInStable + profitInStable!, totalPriceInStable))}
                       </Typography>
                     </div>
                   </TableCell>

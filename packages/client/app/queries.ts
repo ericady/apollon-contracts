@@ -32,17 +32,6 @@ export const GET_ALL_DEBT_TOKENS = gql`
   }
 `;
 
-export const GET_ALL_COLLATERAL_TOKENS = gql`
-  query GetCollateralTokens {
-    getCollateralTokens {
-      walletAmount
-      token {
-        address
-      }
-    }
-  }
-`;
-
 export const GET_BORROWER_DEBT_TOKENS = gql`
   query GetBorrowerDebtTokens($borrower: String!) {
     getDebtTokens(borrower: $borrower) {
@@ -53,19 +42,6 @@ export const GET_BORROWER_DEBT_TOKENS = gql`
         symbol
         priceUSD
         isPoolToken
-      }
-    }
-  }
-`;
-
-export const GET_BORROWER_COLLATERAL_TOKENS = gql`
-  query GetBorrowerCollateralTokens($borrower: String!) {
-    getCollateralTokens(borrower: $borrower) {
-      troveLockedAmount
-      walletAmount
-      token {
-        address
-        symbol
       }
     }
   }
@@ -129,6 +105,23 @@ export const GET_BORROWER_LIQUIDITY_POOLS = gql`
       }
       volume24hUSD
       volume24hUSD24hAgo
+    }
+  }
+`;
+
+// BALANCE PAGE
+
+export const GET_ALL_COLLATERAL_TOKENS = gql`
+  query GetCollateralTokens($borrower: String!) {
+    getCollateralTokens(borrower: $borrower) {
+      token {
+        address
+        symbol
+      }
+      walletAmount
+      troveLockedAmount
+      totalValueLockedUSD
+      totalValueLockedUSD24hAgo
     }
   }
 `;

@@ -9,11 +9,8 @@ import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import Typography from '@mui/material/Typography';
 import { useEthers } from '../../../context/EthersProvider';
-import {
-  GetBorrowerCollateralTokensQuery,
-  GetBorrowerCollateralTokensQueryVariables,
-} from '../../../generated/gql-types';
-import { GET_BORROWER_COLLATERAL_TOKENS } from '../../../queries';
+import { GetCollateralTokensQuery, GetCollateralTokensQueryVariables } from '../../../generated/gql-types';
+import { GET_ALL_COLLATERAL_TOKENS } from '../../../queries';
 import { roundCurrency } from '../../../utils/math';
 import Label from '../../Label/Label';
 import HeaderCell from '../../Table/HeaderCell';
@@ -22,12 +19,13 @@ import CollateralUpdateDialog from './CollateralUpdateDialog';
 function CollateralTable() {
   const { address } = useEthers();
 
-  const { data } = useQuery<GetBorrowerCollateralTokensQuery, GetBorrowerCollateralTokensQueryVariables>(
-    GET_BORROWER_COLLATERAL_TOKENS,
-    { variables: { borrower: address } },
-  );
+  const { data } = useQuery<GetCollateralTokensQuery, GetCollateralTokensQueryVariables>(GET_ALL_COLLATERAL_TOKENS, {
+    variables: { borrower: address },
+  });
 
   if (!data) return null;
+
+  const borrowerCollateralTokens = data.getCollateralTokens.filter((token) => token.walletAmount! > 0);
 
   return (
     <div style={{ display: 'flex' }}>
@@ -58,7 +56,7 @@ function CollateralTable() {
             <Typography variant="h4">Collateral Ratio</Typography>
           </Box>
 
-          <CollateralUpdateDialog collateralData={data} />
+          <CollateralUpdateDialog collateralData={data} buttonVariant="outlined" />
         </div>
         <TableContainer>
           <Table>
@@ -70,9 +68,9 @@ function CollateralTable() {
               </TableRow>
             </TableHead>
             <TableBody>
-              {data.getCollateralTokens.map(({ token, walletAmount, troveLockedAmount }) => (
+              {borrowerCollateralTokens.map(({ token, walletAmount, troveLockedAmount }) => (
                 <TableRow key={token.address}>
-                  <TableCell>
+                  <TableCell align="right">
                     <div className="flex">
                       <Square
                         sx={{

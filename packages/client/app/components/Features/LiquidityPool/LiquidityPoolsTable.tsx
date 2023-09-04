@@ -13,7 +13,7 @@ import {
   GetLiquidityPoolsQueryVariables,
 } from '../../../generated/gql-types';
 import { GET_BORROWER_LIQUIDITY_POOLS, GET_LIQUIDITY_POOLS } from '../../../queries';
-import { percentageChange } from '../../../utils/math';
+import { displayPercentage, percentageChange } from '../../../utils/math';
 import FeatureBox from '../../FeatureBox/FeatureBox';
 import Label from '../../Label/Label';
 import HeaderCell from '../../Table/HeaderCell';
@@ -139,7 +139,7 @@ function LiquidityPoolsTable({ selectedPool, setSelectedPool }: Props) {
                       <div className="flex">
                         <Typography variant="caption">{volume24hUSD}$</Typography>
                         <Typography sx={{ color: volumeChange > 0 ? 'success.main' : 'error.main', fontWeight: '400' }}>
-                          {volumeChange}%
+                          {displayPercentage(volumeChange)}
                         </Typography>
                         <ExpandMoreSharpIcon
                           sx={{ color: volumeChange > 0 ? 'success.main' : 'error.main', ml: '-5px' }}

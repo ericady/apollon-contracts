@@ -17,7 +17,7 @@ import {
 } from '../../../generated/gql-types';
 import { GET_BORROWER_POSITIONS } from '../../../queries';
 import { formatUnixTimestamp } from '../../../utils/date';
-import { percentageChange, roundCurrency } from '../../../utils/math';
+import { displayPercentage, percentageChange, roundCurrency } from '../../../utils/math';
 import Label from '../../Label/Label';
 import HeaderCell from '../../Table/HeaderCell';
 
@@ -120,7 +120,7 @@ function PositionsTable() {
                         {roundCurrency(pnl)} jUSD{' '}
                       </Typography>
                       <Typography sx={{ color: pnl > 0 ? 'success.main' : 'error.main', fontWeight: '400' }}>
-                        {percentageChange(totalPriceNow, totalPriceInStable)} %
+                        {displayPercentage(percentageChange(totalPriceNow, totalPriceInStable))}
                       </Typography>
                     </div>
                   </TableCell>
