@@ -724,7 +724,7 @@ class TestHelper {
   // }
 
   static async openTrove(contracts, { colls, extraParams }) {
-    return {tx: await contracts.borrowerOperations.openTrove(colls, extraParams)};
+    return { tx: await contracts.borrowerOperations.openTrove(colls, extraParams) };
   }
 
   static async withdrawLUSD(contracts, { maxFeePercentage, lusdAmount, ICR, upperHint, lowerHint, extraParams }) {
@@ -1097,21 +1097,6 @@ class TestHelper {
   }
 
   // --- StabilityPool gas functions ---
-
-  static async checkRemainingStability(contracts, { ofStock = 0, ofStable = 0 }) {
-    const remainingStability = await contracts.stabilityPoolManager.getRemainingStability([
-      contracts.collToken.BTC.address,
-      contracts.collToken.USDT.address,
-    ]);
-    assert.equal(
-      remainingStability.find(e => e.tokenAddress === contracts.debtToken.STABLE.address)?.remaining,
-      ofStable
-    );
-    assert.equal(
-      remainingStability.find(e => e.tokenAddress === contracts.debtToken.STOCK.address)?.remaining,
-      ofStock
-    );
-  }
 
   static async provideToSP_allAccounts(accounts, stabilityPool, amount) {
     const gasCostList = [];

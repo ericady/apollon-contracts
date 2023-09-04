@@ -12,25 +12,8 @@ const maxBytes32 = th.maxBytes32;
 const GAS_PRICE = 10000000;
 
 contract('StabilityPool', async accounts => {
-  const [
-    owner,
-    defaulter_1,
-    defaulter_2,
-    defaulter_3,
-    whale,
-    alice,
-    bob,
-    carol,
-    dennis,
-    erin,
-    flyn,
-    A,
-    B,
-    C,
-    D,
-    E,
-    F,
-  ] = accounts;
+  const [owner, defaulter_1, defaulter_2, defaulter_3, whale, alice, bob, carol, dennis, erin, flyn, A, B, C, D, E, F] =
+    accounts;
   const [bountyAddress, lpRewardsAddress, multisig] = accounts.slice(997, 1000);
 
   let STABLE;
@@ -50,7 +33,6 @@ contract('StabilityPool', async accounts => {
   const getOpenTroveLUSDAmount = async totalDebt => th.getOpenTroveLUSDAmount(contracts, totalDebt);
   const openTrove = async params => th.openTrove(contracts, params);
   const assertRevert = th.assertRevert;
-  const checkRemainingStability = async params => th.checkRemainingStability(contracts, params);
 
   describe('Stability Pool Mechanisms', async () => {
     before(async () => {
@@ -76,11 +58,55 @@ contract('StabilityPool', async accounts => {
 
     // --- provideToSP() ---
 
-    // increases recorded LUSD at Stability Pool
+    // increases recorded stable at Stability Pool
     it('provideToSP(): increases the Stability Pool stable balance', async () => {
-      await contracts.debtToken.STOCK.unprotectedMint(alice, 10000000);
+      // --- SETUP --- Give Alice a least 200
+      await contracts.debtToken.STOCK.unprotectedMint(alice, 200);
+
+      // --- TEST ---
       await stabilityPoolManager.provideStability([{ tokenAddress: STOCK, amount: 200 }], { from: alice });
-      await checkRemainingStability({ ofStock: 200, ofStable: 0 });
+
+      // check pools total
+      const stockDeposit = (await contracts.stabilityPoolManager.getTotalDeposits()).find(
+        d => d.tokenAddress === STOCK
+      );
+      assert.equal(stockDeposit.amount, 200);
+    });
+
+    it("provideToSP(): updates the user's deposit record in StabilityPool", async () => {
+      // --- SETUP --- Give Alice a least 200
+      await contracts.debtToken.STOCK.unprotectedMint(alice, 200);
+
+      // --- TEST ---
+      // check user's deposit record before
+      const depositBefore = (await contracts.stabilityPoolManager.getCompoundedDeposits({ from: alice })).find(
+        d => d.tokenAddress === STOCK
+      ).amount;
+      assert.equal(depositBefore, 0);
+
+      await stabilityPoolManager.provideStability([{ tokenAddress: STOCK, amount: 200 }], { from: alice });
+
+      // check user's deposit record after
+      const depositAfter = (await contracts.stabilityPoolManager.getCompoundedDeposits({ from: alice })).find(
+        d => d.tokenAddress === STOCK
+      ).amount;
+      assert.equal(depositAfter, 200);
+    });
+
+    it("provideToSP(): reduces the user's stock balance by the correct amount", async () => {
+      // --- SETUP --- Give Alice a least 200
+      await contracts.debtToken.STOCK.unprotectedMint(alice, 200);
+
+      // --- TEST ---
+      // get user's deposit record before
+      const stockBefore = await contracts.debtToken.STOCK.balanceOf(alice);
+
+      // provideToSP()
+      await stabilityPoolManager.provideStability([{ tokenAddress: STOCK, amount: 200 }], { from: alice });
+
+      // check user's balance change
+      const stockAfter = await contracts.debtToken.STOCK.balanceOf(alice);
+      assert.equal(stockBefore.sub(stockAfter), '200');
     });
   });
 });

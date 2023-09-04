@@ -262,20 +262,20 @@ contract StabilityPool is LiquityBase, Ownable, CheckContract, IStabilityPool {
    * - Sends depositor's accumulated gains to depositor
    * - Increases deposit stake, and takes new snapshots.
    */
-  function provideToSP(address user, uint _amount) external override {
+  function provideToSP(address depositor, uint _amount) external override {
     _requireNonZeroAmount(_amount);
 
-    uint initialDeposit = deposits[user];
-    uint remainingDeposit = this.getCompoundedDebtDeposit(user);
+    uint initialDeposit = deposits[depositor];
+    uint remainingDeposit = this.getCompoundedDebtDeposit(depositor);
     uint depositLoss = initialDeposit.sub(remainingDeposit); // Needed only for event log
-    //        emit DepositLoss(msg.sender, depositLoss); todo
+    //        emit DepositLoss(depositor, depositLoss); todo
 
-    _payoutCollGains(user);
+    _payoutCollGains(depositor);
 
     // update deposit snapshots
-    _sendDepositToStabilityPool(user, _amount);
+    _sendDepositToStabilityPool(depositor, _amount);
     uint newDeposit = remainingDeposit.add(_amount);
-    _updateDepositAndSnapshots(user, newDeposit);
+    _updateDepositAndSnapshots(depositor, newDeposit);
     //        emit UserDepositChanged(user, newDeposit); todo
 
     // todo gov token...
@@ -630,9 +630,7 @@ contract StabilityPool is LiquityBase, Ownable, CheckContract, IStabilityPool {
    */
   function getCompoundedDebtDeposit(address _depositor) external view override returns (uint) {
     uint initialDeposit = deposits[_depositor];
-    if (initialDeposit == 0) {
-      return 0;
-    }
+    if (initialDeposit == 0) return 0;
 
     Snapshots storage snapshots = depositSnapshots[_depositor];
     uint compoundedDeposit = _getCompoundedStakeFromSnapshots(initialDeposit, snapshots);
