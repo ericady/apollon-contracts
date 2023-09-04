@@ -18,3 +18,16 @@ export const formatUnixTimestamp = (timestamp: number) => {
 
   return `${day}.${month}.${year} ${hours}:${minutes} (-${daysFromToday}d)`;
 };
+
+export const generateDateChartTicks = (timestamp: number, tickCount = 4) => {
+  const weekInSec = 7 * 24 * 60 * 60;
+
+  // return an array of timestamps with a length of tickCount. Each tick should be weekInSec / tickCount seconds apart
+
+  const ticks = [];
+  for (let i = 0; i < tickCount; i++) {
+    ticks.push(timestamp - (weekInSec / tickCount) * 1000 * i);
+  }
+
+  return ticks;
+};

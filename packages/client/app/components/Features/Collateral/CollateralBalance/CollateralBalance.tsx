@@ -14,9 +14,9 @@ import { GET_ALL_COLLATERAL_TOKENS } from '../../../../queries';
 import { displayPercentage, percentageChange, roundCurrency } from '../../../../utils/math';
 import FeatureBox from '../../../FeatureBox/FeatureBox';
 import Label from '../../../Label/Label';
-import DiagramPlaceholder from '../../../Loader/DiagramPlaceholder';
 import HeaderCell from '../../../Table/HeaderCell';
 import CollateralUpdateDialog from '../CollateralUpdateDialog';
+import CollateralBalanceChart from './CollateralBalanceChart';
 import CollateralBalanceLoader from './CollateralBalanceLoader';
 
 const CollateralBalance = () => {
@@ -37,7 +37,7 @@ const CollateralBalance = () => {
       <div style={{ display: 'flex' }}>
         <div style={{ padding: '20px 10px 0 0' }}>
           <FeatureBox title="Total value locked" border="full" noPadding>
-            <DiagramPlaceholder />
+            <CollateralBalanceChart />
           </FeatureBox>
         </div>
         <div style={{ width: '100%', padding: '20px 0 0 10px' }}>

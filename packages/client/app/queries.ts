@@ -128,15 +128,15 @@ export const GET_ALL_COLLATERAL_TOKENS = gql`
 
 // CHARTS
 
-export const GET_POOL_PRICE_HISTORY = gql`
-  query GetPoolPriceHistory {
-    getPoolPriceHistory(poolId: "String!")
-  }
-`;
-
 export const GET_COLLATERAL_USD_HISTORY = gql`
   query GetCollateralUSDHistory {
     getCollateralUSDHistory
+  }
+`;
+
+export const GET_POOL_PRICE_HISTORY = gql`
+  query GetPoolPriceHistory {
+    getPoolPriceHistory(poolId: "String!")
   }
 `;
 

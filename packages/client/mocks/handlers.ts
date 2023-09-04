@@ -153,7 +153,7 @@ const generatePoolPriceHistory = (): number[][] => {
   const now = Date.now();
   const oneDayInMs = 24 * 60 * 60 * 1000;
 
-  return Array(30)
+  return Array(60)
     .fill(null)
     .map((_, i) => {
       // Generate a timestamp for each day in the past month
