@@ -7,6 +7,7 @@ import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import FeatureBox from '../../FeatureBox/FeatureBox';
 import DiagramPlaceholder from '../../Loader/DiagramPlaceholder';
+import HeaderCell from '../../Table/HeaderCell';
 import StabilityHistoryDialog from './StabilityHistoryDialog';
 import StabilityUpdateDialog from './StabilityUpdateDialog';
 
@@ -31,45 +32,41 @@ function DebtBalance() {
         <div style={{ display: 'flex', width: '100%', flexWrap: 'wrap', flexDirection: 'column' }}>
           <div style={{ padding: '20px 0 0 10px' }}>
             <FeatureBox title="Stability Pool" noPadding border="full">
-              <div className="apollon-table">
-                <div className="apollon-table-box">
-                  <div className="apollon-table-txt" style={{ display: 'flex', alignItems: 'center' }}>
-                    <TableContainer>
-                      <Table sx={{ borderRight: '1px solid #25222E' }}>
-                        <TableHead>
-                          <TableRow>
-                            <TableCell className="table-hdng">Lost Stability</TableCell>
-                            <TableCell className="table-hdng">Gained collateral</TableCell>
-                          </TableRow>
-                        </TableHead>
-                        <TableBody>
-                          <TableRow>
-                            <TableCell></TableCell>
-                            <TableCell></TableCell>
-                          </TableRow>
-                          <TableRow>
-                            <TableCell></TableCell>
-                            <TableCell></TableCell>
-                          </TableRow>
-                          <TableRow>
-                            <TableCell></TableCell>
-                            <TableCell></TableCell>
-                          </TableRow>
-                        </TableBody>
-                      </Table>
-                    </TableContainer>
-                    <div style={{ minWidth: 190, margin: '0 30px' }}>
-                      <StabilityHistoryDialog />
+              <div className="apollon-table-txt" style={{ display: 'flex', alignItems: 'center' }}>
+                <TableContainer>
+                  <Table sx={{ borderRight: '1px solid #25222E' }}>
+                    <TableHead>
+                      <TableRow>
+                        <HeaderCell title="Lost Stability" cellProps={{ align: 'right' }} />
+                        <HeaderCell title="Gained collateral" cellProps={{ align: 'right' }} />
+                      </TableRow>
+                    </TableHead>
+                    <TableBody>
+                      <TableRow>
+                        <TableCell align="right"></TableCell>
+                        <TableCell align="right"></TableCell>
+                      </TableRow>
+                      <TableRow>
+                        <TableCell align="right"></TableCell>
+                        <TableCell align="right"></TableCell>
+                      </TableRow>
+                      <TableRow>
+                        <TableCell align="right"></TableCell>
+                        <TableCell align="right"></TableCell>
+                      </TableRow>
+                    </TableBody>
+                  </Table>
+                </TableContainer>
+                <div style={{ minWidth: 190, margin: '0 30px' }}>
+                  <StabilityHistoryDialog />
 
-                      <div style={{ marginTop: '10px' }}>
-                        <StabilityUpdateDialog />
-                      </div>
-
-                      <Button variant="outlined" sx={{ marginTop: '10px' }}>
-                        CLAIM
-                      </Button>
-                    </div>
+                  <div style={{ marginTop: '10px' }}>
+                    <StabilityUpdateDialog />
                   </div>
+
+                  <Button variant="outlined" sx={{ marginTop: '10px' }}>
+                    CLAIM
+                  </Button>
                 </div>
               </div>
             </FeatureBox>
@@ -77,82 +74,78 @@ function DebtBalance() {
 
           <div style={{ padding: '20px 0 0 10px' }}>
             <FeatureBox title="Debt Token" noPadding border="full">
-              <div className="apollon-table">
-                <div className="apollon-table-box">
-                  <div className="apollon-table-txt">
-                    <TableContainer>
-                      <Table>
-                        <TableHead>
-                          <TableRow>
-                            <TableCell className="table-hdng">Minted</TableCell>
-                            <TableCell className="table-hdng">Deposited Stability</TableCell>
-                            <TableCell className="table-hdng">Token</TableCell>
-                            <TableCell className="table-hdng">Total Supply</TableCell>
-                            <TableCell className="table-hdng">Total Stability</TableCell>
-                          </TableRow>
-                        </TableHead>
-                        <TableBody>
-                          <TableRow>
-                            <TableCell></TableCell>
-                            <TableCell></TableCell>
-                            <TableCell></TableCell>
-                            <TableCell></TableCell>
-                            <TableCell></TableCell>
-                          </TableRow>
-                          <TableRow>
-                            <TableCell></TableCell>
-                            <TableCell></TableCell>
-                            <TableCell></TableCell>
-                            <TableCell></TableCell>
-                            <TableCell></TableCell>
-                          </TableRow>
-                          <TableRow>
-                            <TableCell></TableCell>
-                            <TableCell></TableCell>
-                            <TableCell></TableCell>
-                            <TableCell></TableCell>
-                            <TableCell></TableCell>
-                          </TableRow>
-                          <TableRow>
-                            <TableCell></TableCell>
-                            <TableCell></TableCell>
-                            <TableCell></TableCell>
-                            <TableCell></TableCell>
-                            <TableCell></TableCell>
-                          </TableRow>
-                          <TableRow>
-                            <TableCell></TableCell>
-                            <TableCell></TableCell>
-                            <TableCell></TableCell>
-                            <TableCell></TableCell>
-                            <TableCell></TableCell>
-                          </TableRow>
-                          <TableRow>
-                            <TableCell></TableCell>
-                            <TableCell></TableCell>
-                            <TableCell></TableCell>
-                            <TableCell></TableCell>
-                            <TableCell></TableCell>
-                          </TableRow>
-                          <TableRow>
-                            <TableCell></TableCell>
-                            <TableCell></TableCell>
-                            <TableCell></TableCell>
-                            <TableCell></TableCell>
-                            <TableCell></TableCell>
-                          </TableRow>
-                          <TableRow>
-                            <TableCell></TableCell>
-                            <TableCell></TableCell>
-                            <TableCell></TableCell>
-                            <TableCell></TableCell>
-                            <TableCell></TableCell>
-                          </TableRow>
-                        </TableBody>
-                      </Table>
-                    </TableContainer>
-                  </div>
-                </div>
+              <div className="apollon-table-txt">
+                <TableContainer>
+                  <Table>
+                    <TableHead>
+                      <TableRow>
+                        <HeaderCell title="Minted" cellProps={{ align: 'right' }} />
+                        <HeaderCell title="Deposited Stability" cellProps={{ align: 'right' }} />
+                        <HeaderCell title="Token" cellProps={{ align: 'right' }} />
+                        <HeaderCell title="Total Supply" cellProps={{ align: 'right' }} />
+                        <HeaderCell title="Total Stability" cellProps={{ align: 'right' }} />
+                      </TableRow>
+                    </TableHead>
+                    <TableBody>
+                      <TableRow>
+                        <TableCell align="right"></TableCell>
+                        <TableCell align="right"></TableCell>
+                        <TableCell align="right"></TableCell>
+                        <TableCell align="right"></TableCell>
+                        <TableCell align="right"></TableCell>
+                      </TableRow>
+                      <TableRow>
+                        <TableCell align="right"></TableCell>
+                        <TableCell align="right"></TableCell>
+                        <TableCell align="right"></TableCell>
+                        <TableCell align="right"></TableCell>
+                        <TableCell align="right"></TableCell>
+                      </TableRow>
+                      <TableRow>
+                        <TableCell align="right"></TableCell>
+                        <TableCell align="right"></TableCell>
+                        <TableCell align="right"></TableCell>
+                        <TableCell align="right"></TableCell>
+                        <TableCell align="right"></TableCell>
+                      </TableRow>
+                      <TableRow>
+                        <TableCell align="right"></TableCell>
+                        <TableCell align="right"></TableCell>
+                        <TableCell align="right"></TableCell>
+                        <TableCell align="right"></TableCell>
+                        <TableCell align="right"></TableCell>
+                      </TableRow>
+                      <TableRow>
+                        <TableCell align="right"></TableCell>
+                        <TableCell align="right"></TableCell>
+                        <TableCell align="right"></TableCell>
+                        <TableCell align="right"></TableCell>
+                        <TableCell align="right"></TableCell>
+                      </TableRow>
+                      <TableRow>
+                        <TableCell align="right"></TableCell>
+                        <TableCell align="right"></TableCell>
+                        <TableCell align="right"></TableCell>
+                        <TableCell align="right"></TableCell>
+                        <TableCell align="right"></TableCell>
+                      </TableRow>
+                      <TableRow>
+                        <TableCell align="right"></TableCell>
+                        <TableCell align="right"></TableCell>
+                        <TableCell align="right"></TableCell>
+                        <TableCell align="right"></TableCell>
+                        <TableCell align="right"></TableCell>
+                      </TableRow>
+                      <TableRow>
+                        <TableCell align="right"></TableCell>
+                        <TableCell align="right"></TableCell>
+                        <TableCell align="right"></TableCell>
+                        <TableCell align="right"></TableCell>
+                        <TableCell align="right"></TableCell>
+                      </TableRow>
+                    </TableBody>
+                  </Table>
+                </TableContainer>
               </div>
             </FeatureBox>
           </div>

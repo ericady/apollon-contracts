@@ -7,6 +7,7 @@ import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import FeatureBox from '../../FeatureBox/FeatureBox';
 import DiagramPlaceholder from '../../Loader/DiagramPlaceholder';
+import HeaderCell from '../../Table/HeaderCell';
 
 const CollateralBalance = () => {
   return (
@@ -19,57 +20,53 @@ const CollateralBalance = () => {
         </div>
         <div style={{ width: '100%', padding: '20px 0 0 10px' }}>
           <FeatureBox title="Collateral Token" noPadding border="full">
-            <div className="apollon-table">
-              <div className="apollon-table-box">
-                <div className="apollon-table-txt">
-                  <TableContainer>
-                    <Table>
-                      <TableHead>
-                        <TableRow>
-                          <TableCell className="table-hdng">Wallet</TableCell>
-                          <TableCell className="table-hdng">Your Trove</TableCell>
-                          <TableCell className="table-hdng">Token</TableCell>
-                          <TableCell className="table-hdng">TVL</TableCell>
-                        </TableRow>
-                      </TableHead>
-                      <TableBody>
-                        <TableRow>
-                          <TableCell></TableCell>
-                          <TableCell></TableCell>
-                          <TableCell></TableCell>
-                          <TableCell></TableCell>
-                        </TableRow>
-                        <TableRow>
-                          <TableCell></TableCell>
-                          <TableCell></TableCell>
-                          <TableCell></TableCell>
-                          <TableCell></TableCell>
-                        </TableRow>
-                        <TableRow>
-                          <TableCell></TableCell>
-                          <TableCell></TableCell>
-                          <TableCell></TableCell>
-                          <TableCell></TableCell>
-                        </TableRow>
-                        <TableRow>
-                          <TableCell></TableCell>
-                          <TableCell></TableCell>
-                          <TableCell></TableCell>
-                          <TableCell></TableCell>
-                        </TableRow>
-                        <TableRow>
-                          <TableCell style={{ padding: '2px' }}></TableCell>
-                          <TableCell style={{ padding: '2px' }}>
-                            <Button>UPDATE</Button>
-                          </TableCell>
-                          <TableCell style={{ padding: '2px' }}></TableCell>
-                          <TableCell style={{ padding: '2px' }}></TableCell>
-                        </TableRow>
-                      </TableBody>
-                    </Table>
-                  </TableContainer>
-                </div>
-              </div>
+            <div className="apollon-table-txt">
+              <TableContainer>
+                <Table>
+                  <TableHead>
+                    <TableRow>
+                      <HeaderCell title="Wallet" cellProps={{ align: 'right' }} />
+                      <HeaderCell title="Your Trove" cellProps={{ align: 'right' }} />
+                      <HeaderCell title="Token" cellProps={{ align: 'right' }} />
+                      <HeaderCell title="TVL" cellProps={{ align: 'right' }} />
+                    </TableRow>
+                  </TableHead>
+                  <TableBody>
+                    <TableRow>
+                      <TableCell align="right"></TableCell>
+                      <TableCell align="right"></TableCell>
+                      <TableCell align="right"></TableCell>
+                      <TableCell align="right"></TableCell>
+                    </TableRow>
+                    <TableRow>
+                      <TableCell align="right"></TableCell>
+                      <TableCell align="right"></TableCell>
+                      <TableCell align="right"></TableCell>
+                      <TableCell align="right"></TableCell>
+                    </TableRow>
+                    <TableRow>
+                      <TableCell align="right"></TableCell>
+                      <TableCell align="right"></TableCell>
+                      <TableCell align="right"></TableCell>
+                      <TableCell align="right"></TableCell>
+                    </TableRow>
+                    <TableRow>
+                      <TableCell align="right"></TableCell>
+                      <TableCell align="right"></TableCell>
+                      <TableCell align="right"></TableCell>
+                      <TableCell align="right"></TableCell>
+                    </TableRow>
+                    <TableRow>
+                      <TableCell align="right" style={{ padding: '2px' }}></TableCell>
+                      <TableCell align="right" style={{ padding: '2px' }}>
+                        <Button>UPDATE</Button>
+                      </TableCell>
+                      <TableCell align="right" style={{ padding: '2px' }}></TableCell>
+                      <TableCell align="right" style={{ padding: '2px' }}></TableCell>
+                    </TableRow>
+                  </TableBody>
+                </Table>
+              </TableContainer>
             </div>
           </FeatureBox>
         </div>

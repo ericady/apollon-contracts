@@ -6,6 +6,7 @@ import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import FeatureBox from '../../FeatureBox/FeatureBox';
 import DiagramPlaceholder from '../../Loader/DiagramPlaceholder';
+import HeaderCell from '../../Table/HeaderCell';
 
 function ReservePool() {
   return (
@@ -18,39 +19,35 @@ function ReservePool() {
         </div>
         <div style={{ width: '100%', padding: '20px 0 0 10px' }}>
           <FeatureBox title="Treasury" noPadding border="full">
-            <div className="apollon-table">
-              <div className="apollon-table-box">
-                <div className="apollon-table-txt">
-                  <TableContainer>
-                    <Table>
-                      <TableHead>
-                        <TableRow>
-                          <TableCell className="table-hdng">Deposited Token</TableCell>
-                          <TableCell className="table-hdng">Last 24h Difference</TableCell>
-                        </TableRow>
-                      </TableHead>
-                      <TableBody>
-                        <TableRow>
-                          <TableCell></TableCell>
-                          <TableCell></TableCell>
-                        </TableRow>
-                        <TableRow>
-                          <TableCell></TableCell>
-                          <TableCell></TableCell>
-                        </TableRow>
-                        <TableRow>
-                          <TableCell></TableCell>
-                          <TableCell></TableCell>
-                        </TableRow>
-                        <TableRow>
-                          <TableCell></TableCell>
-                          <TableCell></TableCell>
-                        </TableRow>
-                      </TableBody>
-                    </Table>
-                  </TableContainer>
-                </div>
-              </div>
+            <div className="apollon-table-txt">
+              <TableContainer>
+                <Table>
+                  <TableHead>
+                    <TableRow>
+                      <HeaderCell title="Deposited Token" cellProps={{ align: 'right' }} />
+                      <HeaderCell title="Last 24h Difference" cellProps={{ align: 'right' }} />
+                    </TableRow>
+                  </TableHead>
+                  <TableBody>
+                    <TableRow>
+                      <TableCell align="right"></TableCell>
+                      <TableCell align="right"></TableCell>
+                    </TableRow>
+                    <TableRow>
+                      <TableCell align="right"></TableCell>
+                      <TableCell align="right"></TableCell>
+                    </TableRow>
+                    <TableRow>
+                      <TableCell align="right"></TableCell>
+                      <TableCell align="right"></TableCell>
+                    </TableRow>
+                    <TableRow>
+                      <TableCell align="right"></TableCell>
+                      <TableCell align="right"></TableCell>
+                    </TableRow>
+                  </TableBody>
+                </Table>
+              </TableContainer>
             </div>
           </FeatureBox>
         </div>
