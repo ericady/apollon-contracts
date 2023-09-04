@@ -75,8 +75,6 @@ for (let i = 0; i < tokens.length; i++) {
   }
 }
 
-console.log('pools: ', pools);
-
 const liquidityPools = pools;
 
 const totalOpenPositions = faker.number.int({ min: 0, max: 90 });
@@ -191,8 +189,6 @@ export const handlers = [
   ),
   // GET_ALL_POOLS
   graphql.query<{ getPools: Query['getPools'] }, QueryGetDebtTokensArgs>(GET_ALL_POOLS, (req, res, ctx) => {
-    // For every pair of tokens, generate a pool
-
     const result: Query['getPools'] = pools;
     return res(ctx.data({ getPools: result }));
   }),
