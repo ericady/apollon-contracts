@@ -7,7 +7,7 @@ import TableRow from '@mui/material/TableRow';
 import { useEthers } from '../../../context/EthersProvider';
 import { GetBorrowerDebtTokensQuery, GetBorrowerDebtTokensQueryVariables } from '../../../generated/gql-types';
 import { GET_BORROWER_DEBT_TOKENS } from '../../../queries';
-import { roundCurrency } from '../../../utils/math';
+import { displayPercentage, roundCurrency } from '../../../utils/math';
 import Label from '../../Label/Label';
 import HeaderCell from '../../Table/HeaderCell';
 
@@ -41,7 +41,7 @@ function BalanceTable() {
           <TableBody>
             {poolToken.map(({ token, walletAmount }) => (
               <TableRow key={token.address}>
-                <TableCell>{roundCurrency(walletAmount! / totalAmount)}%</TableCell>
+                <TableCell>{displayPercentage(walletAmount! / totalAmount)}</TableCell>
                 <TableCell align="right">
                   <Typography sx={{ color: 'primary.contrastText' }}>11363.21</Typography>
                 </TableCell>
@@ -70,7 +70,7 @@ function BalanceTable() {
           <TableBody>
             {nonPoolToken.map(({ token, walletAmount }) => (
               <TableRow key={token.address}>
-                <TableCell>{roundCurrency(walletAmount! / totalAmount)}%</TableCell>
+                <TableCell>{roundCurrency((walletAmount! / totalAmount) * 100)}%</TableCell>
                 <TableCell align="right">
                   <Typography sx={{ color: 'primary.contrastText' }}>11363.21</Typography>
                 </TableCell>

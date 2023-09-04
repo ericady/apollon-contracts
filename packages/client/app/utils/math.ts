@@ -5,3 +5,7 @@ export const roundCurrency = (value: number, decimals = 2) => {
 export const percentageChange = (newValue: number, oldValue: number, decimals = 2) => {
   return roundCurrency(((newValue - oldValue) / oldValue) * 100, decimals);
 };
+
+export const displayPercentage = (value: number) => {
+  return `${roundCurrency(value * 100)}%`;
+};

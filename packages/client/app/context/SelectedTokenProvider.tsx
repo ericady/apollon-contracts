@@ -2,11 +2,12 @@
 
 import { useQuery } from '@apollo/client';
 import { createContext, useContext, useState } from 'react';
+import { JUSD_SYMBOL } from '../components/Features/Assets/Assets';
 import { GetDebtTokensQuery, GetDebtTokensQueryVariables } from '../generated/gql-types';
 import { GET_ALL_DEBT_TOKENS } from '../queries';
 
 export type SelectedToken = {
-  totalSupplyUSD: number;
+  openingFee: number;
   change: number;
   isFavorite: boolean;
   address: string;
@@ -31,7 +32,7 @@ export default function SelectedTokenProvider({ children }: { children: React.Re
   const [selectedToken, setSelectedToken] = useState<SelectedToken | null>(null);
 
   const { data } = useQuery<GetDebtTokensQuery, GetDebtTokensQueryVariables>(GET_ALL_DEBT_TOKENS);
-  const JUSDToken = data?.getDebtTokens.find(({ token }) => token.symbol === 'JUSD')?.token;
+  const JUSDToken = data?.getDebtTokens.find(({ token }) => token.symbol === JUSD_SYMBOL)?.token;
   const tokenRatio =
     JUSDToken === undefined || selectedToken === null ? 0 : JUSDToken!.priceUSD / selectedToken!.priceUSD;
 

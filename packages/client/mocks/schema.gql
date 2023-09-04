@@ -93,6 +93,8 @@ type PoolReward {
 
 type Pool {
   id: String!
+  # Percent value applied when opening the first position for this pool. Can be negative and positive.
+  openingFee: Float!
   liquidity: [PoolLiquidity!]!
   rewards: [PoolReward!]!
   volume24hUSD: Float!

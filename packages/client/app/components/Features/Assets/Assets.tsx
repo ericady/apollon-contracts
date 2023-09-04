@@ -3,7 +3,7 @@
 import { useQuery } from '@apollo/client';
 import KeyboardArrowDownOutlinedIcon from '@mui/icons-material/KeyboardArrowDownOutlined';
 import KeyboardArrowUpOutlinedIcon from '@mui/icons-material/KeyboardArrowUpOutlined';
-import { IconButton } from '@mui/material';
+import { IconButton, Typography } from '@mui/material';
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
 import TableCell from '@mui/material/TableCell';
@@ -12,13 +12,15 @@ import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import { useEffect, useMemo, useState } from 'react';
 import { SelectedToken, useSelectedToken } from '../../../context/SelectedTokenProvider';
-import { GetDebtTokensQuery, GetDebtTokensQueryVariables } from '../../../generated/gql-types';
-import { GET_ALL_DEBT_TOKENS } from '../../../queries';
-import { roundCurrency } from '../../../utils/math';
+import { GetAllPoolsQuery, GetAllPoolsQueryVariables } from '../../../generated/gql-types';
+import { GET_ALL_POOLS } from '../../../queries';
+import { displayPercentage, roundCurrency } from '../../../utils/math';
 import FeatureBox from '../../FeatureBox/FeatureBox';
 import HeaderCell from '../../Table/HeaderCell';
 
 export const FAVORITE_ASSETS_LOCALSTORAGE_KEY = 'favoriteAssets';
+// FIXME: Hardcode address for stability once its there.
+export const JUSD_SYMBOL = 'JUSD';
 
 function Assets() {
   const [favoritedAssets, setFavoritedAssets] = useState<string[]>([]);
@@ -30,15 +32,24 @@ function Assets() {
 
   const { selectedToken, setSelectedToken } = useSelectedToken();
 
-  const { data } = useQuery<GetDebtTokensQuery, GetDebtTokensQueryVariables>(GET_ALL_DEBT_TOKENS);
+  const { data } = useQuery<GetAllPoolsQuery, GetAllPoolsQueryVariables>(GET_ALL_POOLS);
 
   const tokens = useMemo<SelectedToken[] | undefined>(() => {
+    const jUSDPools =
+      data?.getPools.filter(({ liquidity }) => {
+        const [tokenA, tokenB] = liquidity;
+        return tokenA.token.symbol === JUSD_SYMBOL || tokenB.token.symbol === JUSD_SYMBOL;
+      }) ?? [];
+
     // get token address from local storage and set isFavorite if it is present
-    return data?.getDebtTokens
-      .map(({ token, totalSupplyUSD }) => {
+    return jUSDPools
+      .map(({ liquidity, openingFee }) => {
+        const [tokenA, tokenB] = liquidity;
+        const token = tokenA.token.symbol === JUSD_SYMBOL ? tokenB.token : tokenA.token;
+
         return {
           ...token,
-          totalSupplyUSD,
+          openingFee,
           // calculate change over last 24h
           change: roundCurrency((token.priceUSD - token.priceUSD24hAgo) / token.priceUSD24hAgo),
           isFavorite: favoritedAssets.find((address) => token.address === address) !== undefined ? true : false,
@@ -73,15 +84,16 @@ function Assets() {
         <Table stickyHeader size="small">
           <TableHead sx={{ borderBottom: '1px solid', borderBottomColor: 'background.paper' }}>
             <TableRow>
-              <HeaderCell title="Type" />
-              <HeaderCell title="$" cellProps={{ align: 'right' }} />
-              <HeaderCell title="%" cellProps={{ align: 'right' }} />
-              <HeaderCell title="" />
+              <HeaderCell title="Type" cellProps={{ sx: { p: 0.5, pl: 2 } }} />
+              <HeaderCell title="$" cellProps={{ align: 'right', sx: { p: 0.5 } }} />
+              <HeaderCell title="OF" cellProps={{ align: 'right', sx: { p: 0.5 } }} />
+              <HeaderCell title="%" cellProps={{ align: 'right', sx: { p: 0.5 } }} />
+              <HeaderCell title="" cellProps={{ sx: { p: 0.5, pr: 2 } }} />
             </TableRow>
           </TableHead>
           <TableBody>
             {tokens.map((token) => {
-              const { address, isFavorite, symbol, priceUSD, change } = token;
+              const { address, isFavorite, symbol, priceUSD, change, openingFee } = token;
 
               return (
                 <TableRow
@@ -91,9 +103,14 @@ function Assets() {
                   sx={{ cursor: 'pointer', '& .MuiTableCell-root': { borderBottom: 'none' } }}
                   selected={selectedToken?.symbol === symbol}
                 >
-                  <TableCell sx={{ p: 0.5 }}>{symbol}</TableCell>
+                  <TableCell sx={{ p: 0.5, pl: 2 }}>
+                    <Typography fontWeight={400}>{symbol}</Typography>
+                  </TableCell>
                   <TableCell sx={{ p: 0.5 }} align="right">
-                    {priceUSD}
+                    <Typography fontWeight={400}>{priceUSD}</Typography>
+                  </TableCell>
+                  <TableCell sx={{ p: 0.5 }} align="right">
+                    <Typography fontWeight={400}> {displayPercentage(openingFee)}</Typography>
                   </TableCell>
                   <TableCell align="right" sx={{ color: change < 0 ? 'error.main' : 'success.main', p: 0.5 }}>
                     <div style={{ display: 'flex', alignContent: 'center', justifyContent: 'flex-end' }}>
@@ -105,7 +122,7 @@ function Assets() {
                       )}
                     </div>
                   </TableCell>
-                  <TableCell sx={{ p: 0.5 }} align="right">
+                  <TableCell sx={{ p: 0.5, pr: 2 }} align="right">
                     <IconButton
                       sx={{ height: 20, width: 20 }}
                       size="small"

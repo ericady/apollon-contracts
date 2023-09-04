@@ -5,6 +5,7 @@ import {
   BorrowerHistory,
   BorrowerHistoryType,
   LongShortDirection,
+  Pool,
   Query,
   QueryGetBorrowerPoolHistoryArgs,
   QueryGetBorrowerStabilityHistoryArgs,
@@ -18,6 +19,7 @@ import {
 import {
   GET_ALL_COLLATERAL_TOKENS,
   GET_ALL_DEBT_TOKENS,
+  GET_ALL_POOLS,
   GET_BORROWER_COLLATERAL_TOKENS,
   GET_BORROWER_DEBT_TOKENS,
   GET_BORROWER_LIQUIDITY_POOLS,
@@ -47,14 +49,17 @@ const JUSD = {
 };
 tokens.push(JUSD);
 
-const liquidityPools = Array(20)
-  .fill(null)
-  .map(() => {
-    // take 2 random entries from tokens array that are not the same
-    const liqudityTokenPair = faker.helpers.arrayElements(tokens, 2);
-    return {
+// Generate pools once for each pair of tokens
+const pools: Pool[] = [];
+
+for (let i = 0; i < tokens.length; i++) {
+  for (let j = i + 1; j < tokens.length; j++) {
+    const sortedPair = [tokens[i], tokens[j]];
+
+    pools.push({
       id: faker.string.uuid(),
-      liquidity: liqudityTokenPair.map((token) => ({
+      openingFee: faker.number.float({ min: -0.05, max: 0.05 }),
+      liquidity: sortedPair.map((token) => ({
         token,
         totalAmount: parseFloat(faker.finance.amount(100000, 1000000, 2)),
         borrowerAmount: null,
@@ -66,8 +71,13 @@ const liquidityPools = Array(20)
       })),
       volume24hUSD: parseFloat(faker.finance.amount(10000, 50000, 2)),
       volume24hUSD24hAgo: parseFloat(faker.finance.amount(10000, 50000, 2)),
-    };
-  });
+    });
+  }
+}
+
+console.log('pools: ', pools);
+
+const liquidityPools = pools;
 
 const totalOpenPositions = faker.number.int({ min: 0, max: 90 });
 const openPositions = Array(totalOpenPositions)
@@ -179,6 +189,13 @@ export const handlers = [
       return res(ctx.data({ getDebtTokens: result }));
     },
   ),
+  // GET_ALL_POOLS
+  graphql.query<{ getPools: Query['getPools'] }, QueryGetDebtTokensArgs>(GET_ALL_POOLS, (req, res, ctx) => {
+    // For every pair of tokens, generate a pool
+
+    const result: Query['getPools'] = pools;
+    return res(ctx.data({ getPools: result }));
+  }),
   // GetBorrowerDebtTokens
   graphql.query<{ getDebtTokens: Query['getDebtTokens'] }, QueryGetDebtTokensArgs>(
     GET_BORROWER_DEBT_TOKENS,

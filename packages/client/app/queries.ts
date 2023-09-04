@@ -1,5 +1,22 @@
 import { gql } from '@apollo/client';
 
+export const GET_ALL_POOLS = gql`
+  query GetAllPools {
+    getPools {
+      id
+      openingFee
+      liquidity {
+        token {
+          address
+          symbol
+          priceUSD
+          priceUSD24hAgo
+        }
+      }
+    }
+  }
+`;
+
 export const GET_ALL_DEBT_TOKENS = gql`
   query GetDebtTokens {
     getDebtTokens {
