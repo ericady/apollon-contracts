@@ -262,21 +262,21 @@ contract StabilityPool is LiquityBase, Ownable, CheckContract, IStabilityPool {
    * - Sends depositor's accumulated gains to depositor
    * - Increases deposit stake, and takes new snapshots.
    */
-  function provideToSP(uint _amount) external override {
+  function provideToSP(address user, uint _amount) external override {
     _requireNonZeroAmount(_amount);
 
-    uint initialDeposit = deposits[msg.sender];
-    uint remainingDeposit = this.getCompoundedDebtDeposit(msg.sender);
+    uint initialDeposit = deposits[user];
+    uint remainingDeposit = this.getCompoundedDebtDeposit(user);
     uint depositLoss = initialDeposit.sub(remainingDeposit); // Needed only for event log
     //        emit DepositLoss(msg.sender, depositLoss); todo
 
-    _payoutCollGains(msg.sender);
+    _payoutCollGains(user);
 
     // update deposit snapshots
-    _sendDepositToStabilityPool(msg.sender, _amount);
+    _sendDepositToStabilityPool(user, _amount);
     uint newDeposit = remainingDeposit.add(_amount);
-    _updateDepositAndSnapshots(msg.sender, newDeposit);
-    //        emit UserDepositChanged(msg.sender, newDeposit); todo
+    _updateDepositAndSnapshots(user, newDeposit);
+    //        emit UserDepositChanged(user, newDeposit); todo
 
     // todo gov token...
     // ICommunityIssuance communityIssuanceCached = communityIssuance;
@@ -290,6 +290,8 @@ contract StabilityPool is LiquityBase, Ownable, CheckContract, IStabilityPool {
    * - If _amount > userDeposit, the user withdraws all of their compounded deposit.
    */
   function withdrawFromSP(uint debtToWithdrawal) external override {
+    // todo will be called from the manager -> user instead of msg.sender
+
     // todo removed this check, because we do not know about potential under collateralized loans
     // (sorted troves is not anymore sorted by runtime cr, its the cr on creation time)
     // this check is not required for any security reasons

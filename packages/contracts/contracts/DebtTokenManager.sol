@@ -9,10 +9,12 @@ import './Interfaces/IDebtTokenManager.sol';
 import './Dependencies/LiquityBase.sol';
 import './DebtToken.sol';
 import './Interfaces/IStabilityPoolManager.sol';
+import "./TestContracts/DebtTokenTester.sol";
 
 contract DebtTokenManager is Ownable, CheckContract, IDebtTokenManager {
   string public constant NAME = 'DTokenManager';
 
+  // todo not in use...
   address public troveManagerAddress;
   address public borrowerOperationsAddress;
   address public priceFeedAddress;
@@ -74,32 +76,23 @@ contract DebtTokenManager is Ownable, CheckContract, IDebtTokenManager {
 
   // todo price oracle id missing...
   function addDebtToken(
-    string memory _symbol,
-    string memory _name,
-    string memory _version,
-    bool _isStableCoin
+  address _debtTokenAddress
   ) external override onlyOwner {
-    if (_isStableCoin) require(address(stableCoin) == address(0), 'stableCoin already exists');
+    checkContract(_debtTokenAddress);
 
+    IDebtToken debtToken = IDebtToken(_debtTokenAddress);
+    bool isStableCoin = debtToken.isStableCoin();
+    if (isStableCoin) require(address(stableCoin) == address(0), 'stableCoin already exists');
+
+    string memory symbol = debtToken.symbol();
     for (uint i = 0; i < debtTokensArray.length; i++) {
-      if (keccak256(bytes(debtTokensArray[i].symbol())) != keccak256(bytes(_symbol))) continue;
+      if (keccak256(bytes(debtTokensArray[i].symbol())) != keccak256(bytes(symbol))) continue;
       require(false, 'symbol already exists');
     }
 
-    IDebtToken debtToken = new DebtToken(
-      troveManagerAddress,
-      borrowerOperationsAddress,
-      priceFeedAddress,
-      _symbol,
-      _name,
-      _version,
-      _isStableCoin
-    );
-
-    address debtTokenAddress = address(debtToken);
-    debtTokenAddresses.push(debtTokenAddress);
-    debtTokens[debtTokenAddress] = debtToken;
-    if (_isStableCoin) stableCoin = debtToken;
+    debtTokenAddresses.push(_debtTokenAddress);
+    debtTokens[_debtTokenAddress] = debtToken;
+    if (isStableCoin) stableCoin = debtToken;
     emit DebtTokenAdded(debtToken);
 
     stabilityPoolManager.addStabilityPool(debtToken);

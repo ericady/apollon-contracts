@@ -22,10 +22,5 @@ interface IDebtTokenManager {
 
   function getDebtTokenAddresses() external view returns (address[] memory);
 
-  function addDebtToken(
-    string memory _symbol,
-    string memory _name,
-    string memory _version,
-    bool _isStableCoin
-  ) external;
+  function addDebtToken(address _debtTokenAddress) external;
 }

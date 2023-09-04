@@ -119,6 +119,7 @@ contract DebtToken is CheckContract, IDebtToken {
   }
 
   function sendToPool(address _sender, address _poolAddress, uint256 _amount) external override {
+    // todo check over stabilitypoolmanager, is the sender is one of the stability pools...
     //    _requireCallerIsStabilityPool();
     _transfer(_sender, _poolAddress, _amount);
   }

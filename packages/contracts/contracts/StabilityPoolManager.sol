@@ -90,6 +90,16 @@ contract StabilityPoolManager is Ownable, CheckContract, IStabilityPoolManager {
 
   // --- Setters ---
 
+  function provideStability(TokenAmount[] memory _debts) external override {
+    for (uint i = 0; i < _debts.length; i++) {
+      IDebtToken debtToken = IDebtToken(_debts[i].tokenAddress);
+      IStabilityPool stabilityPool = stabilityPools[debtToken];
+      require(address(stabilityPool) != address(0), 'pool does not exist');
+
+      stabilityPool.provideToSP(msg.sender, _debts[i].amount);
+    }
+  }
+
   function addStabilityPool(IDebtToken _debtToken) external override {
     require(msg.sender == debtTokenManagerAddress, 'unauthorized');
     require(address(stabilityPools[_debtToken]) == address(0), 'pool already exists');

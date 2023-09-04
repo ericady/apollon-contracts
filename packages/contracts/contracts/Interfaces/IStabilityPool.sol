@@ -32,7 +32,7 @@ interface IStabilityPool is IBase {
 
   function getDepositToken() external view returns (IDebtToken);
 
-  function provideToSP(uint _amount) external;
+  function provideToSP(address user, uint _amount) external;
 
   function withdrawFromSP(uint _amount) external;
 

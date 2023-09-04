@@ -79,24 +79,6 @@ class DeploymentHelper {
     return testerContracts;
   }
 
-  // static async deployLUSDToken(contracts) {
-  //   contracts.lusdToken = await LUSDToken.new(
-  //     contracts.troveManager.address,
-  //     contracts.stabilityPool.address,
-  //     contracts.borrowerOperations.address
-  //   );
-  //   return contracts;
-  // }
-  //
-  // static async deployLUSDTokenTester(contracts) {
-  //   contracts.lusdToken = await LUSDTokenTester.new(
-  //     contracts.troveManager.address,
-  //     contracts.stabilityPool.address,
-  //     contracts.borrowerOperations.address
-  //   );
-  //   return contracts;
-  // }
-
   // Connect contracts to their dependencies
   static async connectCoreContracts(contracts) {
     await contracts.troveManager.setAddresses(
@@ -151,13 +133,12 @@ class DeploymentHelper {
     await contracts.collTokenManager.addCollToken(contracts.collToken.BTC.address);
 
     // debt tokens
-    await contracts.debtTokenManager.addDebtToken('STABLE', 'STABLE', '1', true);
-    await contracts.debtTokenManager.addDebtToken('STOCK', 'STOCK', '1', false);
-    const debtTokenAddresses = await contracts.debtTokenManager.getDebtTokenAddresses();
     contracts.debtToken = {
-      STABLE: await DebtToken.at(debtTokenAddresses[0]),
-      STOCK: await DebtToken.at(debtTokenAddresses[1]),
+      STABLE: await DebtTokenTester.new(contracts.troveManager.address, contracts.borrowerOperations.address, contracts.priceFeedTestnet.address,'STABLE', 'STABLE', '1', true),
+      STOCK: await DebtTokenTester.new(contracts.troveManager.address, contracts.borrowerOperations.address, contracts.priceFeedTestnet.address,'STOCK', 'STOCK', '1', false),
     };
+    await contracts.debtTokenManager.addDebtToken(contracts.debtToken.STABLE.address);
+    await contracts.debtTokenManager.addDebtToken(contracts.debtToken.STOCK.address);
   }
 
   static async deployProxyScripts(contracts, owner, users) {
