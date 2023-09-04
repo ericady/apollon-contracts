@@ -61,34 +61,32 @@ const Positions = () => {
 
   return (
     <>
-      <div className="table-styles">
-        <Tabs value={tabValue} onChange={handleChange}>
-          <Tab label="BALANCE" value="BALANCE" disableRipple />
-          <Tab label="COLLATERAL" value="COLLATERAL" disableRipple />
-          <Tab
-            value="POSITIONS"
-            label={
-              <span>
-                POSITIONS{' '}
-                {openPositions && <Label variant="none">{openPositions.getPositions.pageInfo.totalCount}</Label>}
-              </span>
-            }
-            disableRipple
-          />
-          <Tab
-            value="HISTORY"
-            label={
-              <span>
-                HISTORY{' '}
-                {closedPositions && <Label variant="none">{closedPositions.getPositions.pageInfo.totalCount}</Label>}
-              </span>
-            }
-            disableRipple
-          />
-        </Tabs>
+      <Tabs value={tabValue} onChange={handleChange}>
+        <Tab label="BALANCE" value="BALANCE" disableRipple />
+        <Tab label="COLLATERAL" value="COLLATERAL" disableRipple />
+        <Tab
+          value="POSITIONS"
+          label={
+            <span>
+              POSITIONS{' '}
+              {openPositions && <Label variant="none">{openPositions.getPositions.pageInfo.totalCount}</Label>}
+            </span>
+          }
+          disableRipple
+        />
+        <Tab
+          value="HISTORY"
+          label={
+            <span>
+              HISTORY{' '}
+              {closedPositions && <Label variant="none">{closedPositions.getPositions.pageInfo.totalCount}</Label>}
+            </span>
+          }
+          disableRipple
+        />
+      </Tabs>
 
-        <div style={{ height: '270px', overflowY: 'scroll' }}>{renderTableContent()}</div>
-      </div>
+      <div style={{ height: '270px', overflowY: 'scroll' }}>{renderTableContent()}</div>
     </>
   );
 };

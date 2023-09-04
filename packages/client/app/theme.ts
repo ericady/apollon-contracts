@@ -16,6 +16,7 @@ const BUTTON_BACKGROUND_HOVER = '#1D202F';
 export const GREEN_BACKGROUND = '#1A2E25';
 export const RED_BACKGROUND = '#321923';
 export const BLUE_BACKGROUND = '#18293e';
+export const FIELDSET_COLOR = '#46434F';
 
 const theme = createTheme({
   palette: {
@@ -54,7 +55,7 @@ const theme = createTheme({
     fontFamily: ['Inter Variable', 'Space Grotesk Variable'].join(','),
     h4: {
       fontFamily: 'Space Grotesk Variable',
-      color: '#303A4C',
+      color: SECONDARY_TEXT,
       fontWeight: '700',
       fontSize: '20px',
     },
@@ -72,7 +73,7 @@ const theme = createTheme({
     body2: {
       color: SECONDARY_TEXT,
       fontWeight: '400',
-      fontSize: '14px',
+      fontSize: '11.7px',
     },
     subtitle1: {
       color: DISABLED_TEXT,
@@ -106,6 +107,12 @@ const theme = createTheme({
       lineHeight: '11px',
       color: DISABLED_TEXT,
     },
+    label: {
+      fontFamily: 'Space Grotesk Variable',
+      color: '#3C3945',
+      fontWeight: '700',
+      fontSize: '11.7px',
+    },
   },
   components: {
     MuiTableCell: {
@@ -124,6 +131,22 @@ const theme = createTheme({
       styleOverrides: {
         root: {
           color: SECONDARY_TEXT,
+        },
+      },
+    },
+
+    MuiInputBase: {
+      styleOverrides: {
+        root: {
+          '& fieldset': {
+            borderColor: FIELDSET_COLOR, // change border color
+            borderWidth: '1px', // change border thickness
+          },
+        },
+        input: {
+          '&::placeholder': {
+            color: DISABLED_TEXT, // change placeholder color
+          },
         },
       },
     },
@@ -236,12 +259,14 @@ declare module '@mui/material/styles' {
   interface TypographyVariants {
     titleAlternate: React.CSSProperties;
     hint: React.CSSProperties;
+    label: React.CSSProperties;
   }
 
   // allow configuration using `createTheme`
   interface TypographyVariantsOptions {
     titleAlternate?: React.CSSProperties;
     hint?: React.CSSProperties;
+    label?: React.CSSProperties;
   }
 }
 
@@ -250,6 +275,7 @@ declare module '@mui/material/Typography' {
   interface TypographyPropsVariantOverrides {
     titleAlternate: true;
     hint: true;
+    label: true;
   }
 }
 

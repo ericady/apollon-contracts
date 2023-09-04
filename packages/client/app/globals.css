@@ -32,23 +32,11 @@ a {
 
 /* Pool Widget CSS */
 .pool-input {
-  border-bottom: 1px solid #25222e;
   padding: 20px;
   display: flex;
   justify-content: space-between;
   align-items: center;
-}
-.pool-input input {
-  padding: 10px 15px;
-}
-.pool-input input::placeholder {
-  color: #504d59;
-}
-
-.pool-ratio {
-  display: flex;
-  align-items: center;
-  gap: 5px;
+  border-bottom: 1px solid #25222e;
 }
 
 /* Stability History Widget CSS */

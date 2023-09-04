@@ -1,6 +1,7 @@
 'use client';
 
 import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
+import { Box } from '@mui/material';
 import Button from '@mui/material/Button';
 import Tab from '@mui/material/Tab';
 import Tabs from '@mui/material/Tabs';
@@ -56,7 +57,7 @@ function LiquidityDepositWithdraw({ selectedPool }: Props) {
   }, [selectedPool]);
 
   return (
-    <FeatureBox title="Your Liquidity" noPadding>
+    <FeatureBox title="Your Liquidity" noPadding headBorder="bottom" border="full">
       <Tabs value={tabValue} onChange={handleChange} variant="fullWidth">
         <Tab label="DEPOSIT" value="DEPOSIT" disableRipple />
         <Tab
@@ -80,18 +81,7 @@ function LiquidityDepositWithdraw({ selectedPool }: Props) {
                       <Typography sx={{ fontWeight: '400', marginTop: '10px' }}>
                         {roundCurrency(tokenA.borrowerAmount, 5)}
                       </Typography>
-                      <Typography
-                        sx={{
-                          color: '#3C3945',
-                          fontFamily: 'Space Grotesk',
-                          fontSize: '9px',
-                          fontWeight: '700',
-                          lineHeight: '11px',
-                          letterSpacing: '0em',
-                        }}
-                      >
-                        Deposit
-                      </Typography>
+                      <Typography variant="label">Deposit</Typography>
                     </>
                   )}
                 </div>
@@ -119,18 +109,7 @@ function LiquidityDepositWithdraw({ selectedPool }: Props) {
                       <Typography sx={{ fontWeight: '400', marginTop: '10px' }}>
                         {roundCurrency(tokenB.borrowerAmount, 5)}
                       </Typography>
-                      <Typography
-                        sx={{
-                          color: '#3C3945',
-                          fontFamily: 'Space Grotesk',
-                          fontSize: '9px',
-                          fontWeight: '700',
-                          lineHeight: '11px',
-                          letterSpacing: '0em',
-                        }}
-                      >
-                        Deposit
-                      </Typography>
+                      <Typography variant="label">Deposit</Typography>
                     </>
                   )}
                 </div>
@@ -175,18 +154,7 @@ function LiquidityDepositWithdraw({ selectedPool }: Props) {
                 <div className="flex" style={{ justifyContent: 'space-between' }}>
                   <div>
                     <Typography variant="caption">{roundCurrency(tokenA.borrowerAmount!, 5)}</Typography>
-                    <Typography
-                      sx={{
-                        color: '#3C3945',
-                        fontFamily: 'Space Grotesk',
-                        fontSize: '9px',
-                        fontWeight: '700',
-                        lineHeight: '11px',
-                        letterSpacing: '0em',
-                      }}
-                    >
-                      Deposit
-                    </Typography>
+                    <Typography variant="label">Deposit</Typography>
                   </div>
                   <Button
                     variant="undercover"
@@ -224,18 +192,7 @@ function LiquidityDepositWithdraw({ selectedPool }: Props) {
                 <div className="flex" style={{ justifyContent: 'space-between' }}>
                   <div>
                     <Typography variant="caption">{roundCurrency(tokenB.borrowerAmount!, 5)}</Typography>
-                    <Typography
-                      sx={{
-                        color: '#3C3945',
-                        fontFamily: 'Space Grotesk',
-                        fontSize: '9px',
-                        fontWeight: '700',
-                        lineHeight: '11px',
-                        letterSpacing: '0em',
-                      }}
-                    >
-                      Deposit
-                    </Typography>
+                    <Typography variant="label">Deposit</Typography>
                   </div>
                   <Button
                     variant="undercover"
@@ -251,27 +208,31 @@ function LiquidityDepositWithdraw({ selectedPool }: Props) {
             </div>
           )}
 
-          <div
-            style={{
+          <Box
+            sx={{
               display: 'flex',
               justifyContent: 'space-between',
+              alignItems: 'center',
               padding: '20px',
-              borderBottom: '1px solid #25222e',
+              borderBottom: '1px solid',
+              borderBottomColor: 'background.paper',
             }}
           >
-            <Typography sx={{ color: '#827F8B', fontSize: '16px' }} className="range-hdng">
-              Collateral Ratio
-            </Typography>
-            <div className="pool-ratio">
-              <Typography sx={{ color: '#33B6FF', fontSize: '20px' }} className="range-hdng">
-                156 %
+            <Typography variant="titleAlternate">Collateral Ratio</Typography>
+            <div className="flex">
+              <Typography
+                sx={{ fontFamily: 'Space Grotesk Variable', color: 'info.main', fontWeight: '700', fontSize: '20px' }}
+              >
+                174 %
               </Typography>
               <ArrowForwardIosIcon sx={{ color: '#46434F', fontSize: '18px' }} />
-              <Typography sx={{ color: '#33B6FF', fontSize: '20px' }} className="range-hdng">
+              <Typography
+                sx={{ fontFamily: 'Space Grotesk Variable', color: 'info.main', fontWeight: '700', fontSize: '20px' }}
+              >
                 143 %
               </Typography>
             </div>
-          </div>
+          </Box>
           <div style={{ padding: '20px' }}>
             <Button type="submit" variant="outlined" sx={{ borderColor: '#fff' }}>
               UPDATE

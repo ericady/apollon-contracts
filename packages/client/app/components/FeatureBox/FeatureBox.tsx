@@ -40,7 +40,7 @@ function FeatureBox({
           justifyContent: 'space-between',
           pb: 1.25,
           border: headBorder === 'full' ? '1px solid' : 'none',
-          borderBottom: headBorder === 'bottom' ? '1px solid' : 'none',
+          borderBottom: headBorder === 'bottom' || headBorder === 'full' ? '1px solid' : 'none',
           borderColor: headBorder ? 'background.paper' : 'none',
           pt: noPadding ? 2 : 0,
           pl: noPadding ? 2 : 0,

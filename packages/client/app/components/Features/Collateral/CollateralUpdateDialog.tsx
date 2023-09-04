@@ -3,7 +3,7 @@
 import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
 import CloseIcon from '@mui/icons-material/Close';
 import Square from '@mui/icons-material/Square';
-import { Dialog, DialogActions, DialogContent, DialogTitle, IconButton } from '@mui/material';
+import { Box, Dialog, DialogActions, DialogContent, DialogTitle, IconButton } from '@mui/material';
 import Button from '@mui/material/Button';
 import Tab from '@mui/material/Tab';
 import Tabs from '@mui/material/Tabs';
@@ -213,20 +213,41 @@ const CollateralUpdateDialog = ({ collateralData }: Props) => {
                 </div>
               </div>
 
-              <div style={{ display: 'flex', justifyContent: 'space-between', padding: '20px' }}>
-                <Typography sx={{ color: '#827F8B', fontSize: '16px' }} className="range-hdng">
-                  Collateral Ratio
-                </Typography>
-                <div className="pool-ratio">
-                  <Typography sx={{ color: '#33B6FF', fontSize: '20px' }} className="range-hdng">
-                    156 %
+              <Box
+                sx={{
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
+                  padding: '20px',
+                  borderBottom: '1px solid',
+                  borderBottomColor: 'background.paper',
+                }}
+              >
+                <Typography variant="titleAlternate">Collateral Ratio</Typography>
+                <div className="flex">
+                  <Typography
+                    sx={{
+                      fontFamily: 'Space Grotesk Variable',
+                      color: 'info.main',
+                      fontWeight: '700',
+                      fontSize: '20px',
+                    }}
+                  >
+                    174 %
                   </Typography>
                   <ArrowForwardIosIcon sx={{ color: '#46434F', fontSize: '18px' }} />
-                  <Typography sx={{ color: '#33B6FF', fontSize: '20px' }} className="range-hdng">
+                  <Typography
+                    sx={{
+                      fontFamily: 'Space Grotesk Variable',
+                      color: 'info.main',
+                      fontWeight: '700',
+                      fontSize: '20px',
+                    }}
+                  >
                     143 %
                   </Typography>
                 </div>
-              </div>
+              </Box>
             </DialogContent>
             <DialogActions
               sx={{

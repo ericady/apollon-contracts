@@ -2,7 +2,6 @@
 
 import { useQuery } from '@apollo/client';
 import ExpandMoreSharpIcon from '@mui/icons-material/ExpandMoreSharp';
-import SwapHorizIcon from '@mui/icons-material/SwapHoriz';
 import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from '@mui/material';
 import Typography from '@mui/material/Typography';
 import { Fragment } from 'react';
@@ -41,13 +40,6 @@ function LiquidityPoolsTable({ selectedPool, setSelectedPool }: Props) {
       (allPool) => !borrowerPoolsData.getPools.find((borrowerPool) => allPool.id === borrowerPool.id),
     ),
   );
-  // move the pool with selectedPool to the top of the list
-  if (selectedPool) {
-    const index = allPoolsCombined.findIndex((pool) => pool.id === selectedPool.id);
-    const selectedPoolItem = allPoolsCombined[index];
-    allPoolsCombined.splice(index, 1);
-    allPoolsCombined.unshift(selectedPoolItem);
-  }
 
   return (
     <FeatureBox title="Pools" noPadding headBorder="full">
@@ -56,9 +48,9 @@ function LiquidityPoolsTable({ selectedPool, setSelectedPool }: Props) {
           borderRight: '1px solid',
           borderLeft: '1px solid',
           borderColor: 'background.paper',
-          // screen - toolbar - feature box - padding top - padding bottom
-          maxHeight: 'calc(100vh - 64px - 54px - 20px - 20px)',
-          overflowY: 'scroll',
+          // // screen - toolbar - feature box - padding top - padding bottom
+          // maxHeight: 'calc(100vh - 64px - 54px - 20px - 20px)',
+          // overflowY: 'scroll',
         }}
       >
         <Table stickyHeader>
@@ -83,31 +75,27 @@ function LiquidityPoolsTable({ selectedPool, setSelectedPool }: Props) {
                 <Fragment key={id}>
                   <TableRow
                     hover
-                    sx={
-                      selectedPool?.id === id
-                        ? {
-                            background: '#1E1A27',
-                            borderLeft: '2px solid #33B6FF',
-                            // TODO: Fixed breaks the table style. Have to do it some other way later...
-                            position: 'fixed',
-                            width: '1230px',
-                          }
-                        : {
-                            ':hover': {
-                              cursor: 'pointer',
-                            },
-                          }
-                    }
+                    selected={selectedPool?.id === id}
+                    sx={{
+                      ':hover': {
+                        cursor: selectedPool?.id !== id ? 'pointer' : 'default',
+                      },
+                    }}
                     onClick={() => setSelectedPool(pool)}
                   >
-                    <TableCell align="right">
+                    <TableCell
+                      align="right"
+                      sx={{
+                        borderLeft: selectedPool?.id === id ? '2px solid #33B6FF' : 'none',
+                      }}
+                    >
                       <Typography fontWeight={400}>
                         {tokenA.totalAmount}
                         <br />
                         <span
                           style={{
                             color: '#827F8B',
-                            fontSize: '12px',
+                            fontSize: '11.7px',
                           }}
                         >
                           {tokenA.borrowerAmount}
@@ -120,7 +108,12 @@ function LiquidityPoolsTable({ selectedPool, setSelectedPool }: Props) {
                     </TableCell>
 
                     <TableCell align="right">
-                      <SwapHorizIcon />
+                      <img
+                        src="assets/svgs/Exchange.svg"
+                        alt="Arrow indicating trading direction"
+                        height="21"
+                        typeof="image/svg+xml"
+                      />
                     </TableCell>
 
                     <TableCell align="right">
@@ -130,7 +123,7 @@ function LiquidityPoolsTable({ selectedPool, setSelectedPool }: Props) {
                         <span
                           style={{
                             color: '#827F8B',
-                            fontSize: '12px',
+                            fontSize: '11.7px',
                           }}
                         >
                           {tokenB.borrowerAmount}
@@ -144,7 +137,7 @@ function LiquidityPoolsTable({ selectedPool, setSelectedPool }: Props) {
 
                     <TableCell>
                       <div className="flex">
-                        <Typography variant="body2">{volume24hUSD}$</Typography>
+                        <Typography variant="caption">{volume24hUSD}$</Typography>
                         <Typography sx={{ color: volumeChange > 0 ? 'success.main' : 'error.main', fontWeight: '400' }}>
                           {volumeChange}%
                         </Typography>
@@ -154,8 +147,6 @@ function LiquidityPoolsTable({ selectedPool, setSelectedPool }: Props) {
                       </div>
                     </TableCell>
                   </TableRow>
-
-                  {index === 0 && selectedPool && <TableRow sx={{ height: 64 }}></TableRow>}
                 </Fragment>
               );
             })}

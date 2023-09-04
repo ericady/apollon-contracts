@@ -12,13 +12,9 @@ const LiquidityPool = () => {
   return (
     <PageLayout>
       <div style={{ display: 'flex' }}>
-        <div className="poolwidget-block" style={{ width: '30%' }}>
-          <div className="liquidity-block" style={{ border: '1px solid #25222E', borderRadius: '5px 0 0 5px' }}>
-            {selectedPool && <LiquidityDepositWithdraw selectedPool={selectedPool} />}
-          </div>
-        </div>
+        <div style={{ width: '30%' }}>{selectedPool && <LiquidityDepositWithdraw selectedPool={selectedPool} />}</div>
 
-        <div className="table-styles" style={{ width: '70%' }}>
+        <div style={{ width: '70%' }}>
           <LiquidityPoolsTable selectedPool={selectedPool} setSelectedPool={setSelectedPool} />
         </div>
       </div>
