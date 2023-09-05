@@ -10,7 +10,6 @@ import './Dependencies/LiquityBase.sol';
 import './Interfaces/IPriceFeed.sol';
 import './Dependencies/Ownable.sol';
 import './Dependencies/CheckContract.sol';
-import './Dependencies/console.sol';
 import './Interfaces/IStoragePool.sol';
 import './Interfaces/IStabilityPoolManager.sol';
 import './Interfaces/IBBase.sol';
@@ -497,7 +496,7 @@ contract TroveManager is LiquityBase, Ownable, CheckContract, ITroveManager {
       // trying to hand the debt over to the stability pool
       if (remainingStability.remaining > 0) {
         rAmountDebt.toOffset = LiquityMath._min(rAmountDebt.toLiquidate, remainingStability.remaining);
-        remainingStability.debtToOffset.add(rAmountDebt.toOffset);
+        remainingStability.debtToOffset = remainingStability.debtToOffset.add(rAmountDebt.toOffset);
         remainingStability.remaining = remainingStability.remaining.sub(rAmountDebt.toOffset);
 
         uint offsetPercentage = rAmountDebt.toOffset.mul(rAmountDebt.price).div(troveDebtInStable); // relative to the troves total debt
@@ -514,7 +513,9 @@ contract TroveManager is LiquityBase, Ownable, CheckContract, ITroveManager {
           for (uint iii = 0; iii < remainingStability.collGained.length; iii++) {
             if (remainingStability.collGained[iii].tokenAddress != rAmountColl.tokenAddress) continue;
 
-            remainingStability.collGained[iii].amount.add(rAmountColl.toOffset);
+            remainingStability.collGained[iii].amount = remainingStability.collGained[iii].amount.add(
+              rAmountColl.toOffset
+            );
             break;
           }
         }
@@ -798,7 +799,7 @@ contract TroveManager is LiquityBase, Ownable, CheckContract, ITroveManager {
         for (uint b = 0; b < vars.totalCollDrawn.length; b++) {
           if (singleRedemption.collLots[a].tokenAddress != vars.totalCollDrawn[b].tokenAddress) continue;
 
-          vars.totalCollDrawn[b].drawn.add(singleRedemption.collLots[a].amount);
+          vars.totalCollDrawn[b].drawn = vars.totalCollDrawn[b].drawn.add(singleRedemption.collLots[a].amount);
           break;
         }
       }
@@ -1176,7 +1177,7 @@ contract TroveManager is LiquityBase, Ownable, CheckContract, ITroveManager {
       uint price = debtToken.getPrice(_priceCache);
 
       if (debtToken.isStableCoin()) stableCoinEntry = PriceTokenAmount(address(debtToken), price, amount);
-      troveDebtInStable.add(amount.mul(price));
+      troveDebtInStable = troveDebtInStable.add(amount.mul(price));
     }
 
     amounts = new PriceTokenAmount[](trove.collTokens.length);
@@ -1187,7 +1188,7 @@ contract TroveManager is LiquityBase, Ownable, CheckContract, ITroveManager {
         _priceFeed.getPrice(_priceCache, tokenAddress),
         trove.colls[trove.collTokens[i]]
       );
-      troveCollInStable.add(amounts[i].amount.mul(amounts[i].price));
+      troveCollInStable = troveCollInStable.add(amounts[i].amount.mul(amounts[i].price));
     }
 
     return (amounts, stableCoinEntry, troveCollInStable, troveDebtInStable);
@@ -1630,8 +1631,17 @@ contract TroveManager is LiquityBase, Ownable, CheckContract, ITroveManager {
 
     Trove storage trove = Troves[_borrower];
     for (uint i = 0; i < _collTokenAmounts.length; i++) {
-      uint newColl = trove.colls[_collTokenAmounts[i].tokenAddress].add(_collTokenAmounts[i].amount);
-      trove.colls[_collTokenAmounts[i].tokenAddress] = newColl;
+      address tokenAddress = _collTokenAmounts[i].tokenAddress;
+      uint newColl = trove.colls[tokenAddress].add(_collTokenAmounts[i].amount);
+      trove.colls[tokenAddress] = newColl;
+
+      bool tokenAlreadyAdded = false;
+      for (uint j = 0; j < trove.collTokens.length; j++) {
+        if (trove.collTokens[j] != tokenAddress) continue;
+        tokenAlreadyAdded = true;
+        break;
+      }
+      if (!tokenAlreadyAdded) trove.collTokens.push(tokenAddress);
     }
   }
 
@@ -1650,8 +1660,17 @@ contract TroveManager is LiquityBase, Ownable, CheckContract, ITroveManager {
 
     Trove storage trove = Troves[_borrower];
     for (uint i = 0; i < _debtTokenAmounts.length; i++) {
-      uint newDebt = trove.debts[_debtTokenAmounts[i].debtToken].add(_debtTokenAmounts[i].netDebt);
-      trove.debts[_debtTokenAmounts[i].debtToken] = newDebt;
+      IDebtToken debtToken = _debtTokenAmounts[i].debtToken;
+      uint newDebt = trove.debts[debtToken].add(_debtTokenAmounts[i].netDebt);
+      trove.debts[debtToken] = newDebt;
+
+      bool tokenAlreadyAdded = false;
+      for (uint j = 0; j < trove.debtTokens.length; j++) {
+        if (address(trove.debtTokens[j]) != address(debtToken)) continue;
+        tokenAlreadyAdded = true;
+        break;
+      }
+      if (!tokenAlreadyAdded) trove.debtTokens.push(debtToken);
     }
   }
 

@@ -87,6 +87,7 @@ contract StoragePool is LiquityBase, Ownable, CheckContract, IStoragePool {
     }
 
     entry.poolTypes[_poolType] = entry.poolTypes[_poolType].add(_amount);
+    entry.totalAmount = entry.totalAmount.add(_amount);
     emit PoolValueUpdated(_tokenAddress, _isColl, _poolType, entry.poolTypes[_poolType]);
   }
 
@@ -97,6 +98,7 @@ contract StoragePool is LiquityBase, Ownable, CheckContract, IStoragePool {
     require(entry.exists, 'StoragePool: PoolEntry does not exist');
 
     entry.poolTypes[_poolType] = entry.poolTypes[_poolType].sub(_amount);
+    entry.totalAmount = entry.totalAmount.sub(_amount);
     emit PoolValueUpdated(_tokenAddress, _isColl, _poolType, entry.poolTypes[_poolType]);
   }
 
@@ -123,7 +125,7 @@ contract StoragePool is LiquityBase, Ownable, CheckContract, IStoragePool {
     IPriceFeed priceFeedCached = priceFeed;
     for (uint i = 0; i < collTokenAddresses.length; i++) {
       uint price = priceFeedCached.getPrice(_priceCache, collTokenAddresses[i]);
-      entireSystemColl.add(poolEntries[collTokenAddresses[i]][true].totalAmount.mul(price)); // todo should surplus or gas be excluded?
+      entireSystemColl = entireSystemColl.add(poolEntries[collTokenAddresses[i]][true].totalAmount.mul(price)); // todo should surplus or gas be excluded?
     }
     return entireSystemColl;
   }
@@ -132,7 +134,7 @@ contract StoragePool is LiquityBase, Ownable, CheckContract, IStoragePool {
     IPriceFeed priceFeedCached = priceFeed;
     for (uint i = 0; i < debtTokenAddresses.length; i++) {
       uint price = priceFeedCached.getPrice(_priceCache, debtTokenAddresses[i]);
-      entireSystemDebt.add(poolEntries[debtTokenAddresses[i]][false].totalAmount.mul(price)); // todo should surplus or gas be excluded?
+      entireSystemDebt = entireSystemDebt.add(poolEntries[debtTokenAddresses[i]][false].totalAmount.mul(price)); // todo should surplus or gas be excluded?
     }
     return entireSystemDebt;
   }

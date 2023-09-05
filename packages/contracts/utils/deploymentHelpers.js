@@ -29,6 +29,7 @@ const {
   StabilityPoolProxy,
   TokenProxy,
 } = require('../utils/proxyHelpers.js');
+const { TestHelper: th } = require('../utils/testHelpers.js');
 
 const ZERO_ADDRESS = '0x' + '0'.repeat(40);
 const maxBytes32 = '0x' + 'f'.repeat(64);
@@ -131,14 +132,32 @@ class DeploymentHelper {
     };
     await contracts.collTokenManager.addCollToken(contracts.collToken.USDT.address);
     await contracts.collTokenManager.addCollToken(contracts.collToken.BTC.address);
+    await contracts.priceFeedTestnet.setTokenPrice(contracts.collToken.BTC.address, th.toBN(th.dec(21000, 18)));
 
     // debt tokens
     contracts.debtToken = {
-      STABLE: await DebtTokenTester.new(contracts.troveManager.address, contracts.borrowerOperations.address, contracts.priceFeedTestnet.address,'STABLE', 'STABLE', '1', true),
-      STOCK: await DebtTokenTester.new(contracts.troveManager.address, contracts.borrowerOperations.address, contracts.priceFeedTestnet.address,'STOCK', 'STOCK', '1', false),
+      STABLE: await DebtTokenTester.new(
+        contracts.troveManager.address,
+        contracts.borrowerOperations.address,
+        contracts.priceFeedTestnet.address,
+        'STABLE',
+        'STABLE',
+        '1',
+        true
+      ),
+      STOCK: await DebtTokenTester.new(
+        contracts.troveManager.address,
+        contracts.borrowerOperations.address,
+        contracts.priceFeedTestnet.address,
+        'STOCK',
+        'STOCK',
+        '1',
+        false
+      ),
     };
     await contracts.debtTokenManager.addDebtToken(contracts.debtToken.STABLE.address);
     await contracts.debtTokenManager.addDebtToken(contracts.debtToken.STOCK.address);
+    await contracts.priceFeedTestnet.setTokenPrice(contracts.debtToken.STOCK.address, th.toBN(th.dec(150, 18)));
   }
 
   static async deployProxyScripts(contracts, owner, users) {

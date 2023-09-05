@@ -727,6 +727,10 @@ class TestHelper {
     return { tx: await contracts.borrowerOperations.openTrove(colls, extraParams) };
   }
 
+  static async increaseDebt(contracts, { debts, maxFeePercentage = this._100pct, extraParams }) {
+    return { tx: await contracts.borrowerOperations.increaseDebt(debts, maxFeePercentage, extraParams) };
+  }
+
   static async withdrawLUSD(contracts, { maxFeePercentage, lusdAmount, ICR, upperHint, lowerHint, extraParams }) {
     if (!maxFeePercentage) maxFeePercentage = this._100pct;
     if (!upperHint) upperHint = this.ZERO_ADDRESS;
