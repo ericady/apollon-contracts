@@ -59,7 +59,7 @@ function BalanceTable() {
         </Table>
       </TableContainer>
 
-      <TableContainer sx={{ borderLeft: '2px solid #1E1B27' }}>
+      <TableContainer sx={{ borderLeft: '1px solid', borderColor: 'background.paper' }}>
         <Table>
           <TableHead sx={{ borderTop: '1px solid', borderTopColor: 'background.paper' }}>
             <TableRow>
