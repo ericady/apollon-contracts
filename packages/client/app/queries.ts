@@ -109,6 +109,22 @@ export const GET_BORROWER_LIQUIDITY_POOLS = gql`
   }
 `;
 
+export const GET_BORROWER_REWARDS = gql`
+  query GetBorrowerRewards($borrower: String!) {
+    getPools(borrower: $borrower) {
+      id
+      rewards {
+        token {
+          address
+          symbol
+          priceUSD
+        }
+        amount
+      }
+    }
+  }
+`;
+
 // BALANCE PAGE
 
 export const GET_ALL_COLLATERAL_TOKENS = gql`
@@ -134,15 +150,15 @@ export const GET_COLLATERAL_USD_HISTORY = gql`
   }
 `;
 
-export const GET_POOL_PRICE_HISTORY = gql`
-  query GetPoolPriceHistory {
-    getPoolPriceHistory(poolId: "String!")
-  }
-`;
-
 export const GET_DEBT_USD_HISTORY = gql`
   query GetDebtUSDHistory {
     getDebtUSDHistory
+  }
+`;
+
+export const GET_POOL_PRICE_HISTORY = gql`
+  query GetPoolPriceHistory {
+    getPoolPriceHistory(poolId: "String!")
   }
 `;
 

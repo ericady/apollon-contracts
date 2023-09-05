@@ -23,6 +23,7 @@ import {
   GET_BORROWER_DEBT_TOKENS,
   GET_BORROWER_LIQUIDITY_POOLS,
   GET_BORROWER_POSITIONS,
+  GET_BORROWER_REWARDS,
   GET_LIQUIDITY_POOLS,
 } from '../app/queries';
 
@@ -83,11 +84,13 @@ for (let i = 0; i < tokens.length; i++) {
         totalAmount: parseFloat(faker.finance.amount(100000, 1000000, 2)),
         borrowerAmount: null,
       })),
-      rewards: tokens.slice(0, 3).map((token) => ({
-        // Taking a subset of tokens for demonstration
-        token,
-        amount: parseFloat(faker.finance.amount(1, 50, 2)),
-      })),
+      // Taking a subset of tokens for demonstration
+      rewards: faker.datatype.boolean({ probability: 0.05 })
+        ? faker.helpers.arrayElements(tokens, { min: 0, max: 3 }).map((token) => ({
+            token,
+            amount: parseFloat(faker.finance.amount(1, 50, 2)),
+          }))
+        : [],
       volume24hUSD: parseFloat(faker.finance.amount(10000, 50000, 2)),
       volume24hUSD24hAgo: parseFloat(faker.finance.amount(10000, 50000, 2)),
     });
@@ -211,6 +214,12 @@ export const handlers = [
     const result: Query['getPools'] = pools;
     return res(ctx.data({ getPools: result }));
   }),
+  // GetBorrowerRewards
+  graphql.query<{ getPools: Query['getPools'] }, QueryGetDebtTokensArgs>(GET_BORROWER_REWARDS, (req, res, ctx) => {
+    const result: Query['getPools'] = pools;
+    return res(ctx.data({ getPools: result }));
+  }),
+
   // GetBorrowerDebtTokens
   graphql.query<{ getDebtTokens: Query['getDebtTokens'] }, QueryGetDebtTokensArgs>(
     GET_BORROWER_DEBT_TOKENS,

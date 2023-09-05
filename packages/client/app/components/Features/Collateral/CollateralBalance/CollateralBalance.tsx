@@ -42,9 +42,9 @@ const CollateralBalance = () => {
         </div>
         <div style={{ width: '100%', padding: '20px 0 0 10px' }}>
           <FeatureBox title="Collateral Token" noPadding border="full">
-            <div className="apollon-table-txt">
+            <div>
               <TableContainer>
-                <Table>
+                <Table size="small">
                   <TableHead>
                     <TableRow>
                       <HeaderCell title="Wallet" cellProps={{ align: 'right' }} />

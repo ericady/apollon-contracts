@@ -5,13 +5,13 @@ import TableCell from '@mui/material/TableCell';
 import TableContainer from '@mui/material/TableContainer';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
-import FeatureBox from '../../FeatureBox/FeatureBox';
-import DiagramPlaceholder from '../../Loader/DiagramPlaceholder';
-import HeaderCell from '../../Table/HeaderCell';
-import StabilityHistoryDialog from './StabilityHistoryDialog';
-import StabilityUpdateDialog from './StabilityUpdateDialog';
+import FeatureBox from '../../../FeatureBox/FeatureBox';
+import DiagramPlaceholder from '../../../Loader/DiagramPlaceholder';
+import HeaderCell from '../../../Table/HeaderCell';
+import StabilityHistoryDialog from '../StabilityHistoryDialog';
+import StabilityUpdateDialog from '../StabilityUpdateDialog';
 
-function DebtBalance() {
+function StabilityBalanceLoader() {
   return (
     <FeatureBox title="Debt" headBorder="bottom" icon="green">
       <div style={{ display: 'flex', width: '100%' }}>
@@ -155,4 +155,4 @@ function DebtBalance() {
   );
 }
 
-export default DebtBalance;
+export default StabilityBalanceLoader;

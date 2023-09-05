@@ -23,7 +23,10 @@ function BalanceTable() {
   const poolToken = data.getDebtTokens.filter(({ token }) => token.isPoolToken);
   const nonPoolToken = data.getDebtTokens.filter(({ token }) => !token.isPoolToken);
 
-  const totalAmount: number = data.getDebtTokens.reduce((acc, { walletAmount }) => acc + walletAmount!, 0);
+  const totalValue: number = data.getDebtTokens.reduce(
+    (acc, { walletAmount, token }) => acc + walletAmount! * token.priceUSD,
+    0,
+  );
 
   return (
     <div style={{ display: 'flex' }}>
@@ -41,15 +44,15 @@ function BalanceTable() {
           <TableBody>
             {poolToken.map(({ token, walletAmount }) => (
               <TableRow key={token.address}>
-                <TableCell>{displayPercentage(walletAmount! / totalAmount)}</TableCell>
+                <TableCell>{displayPercentage((walletAmount! * token.priceUSD) / totalValue)}</TableCell>
                 <TableCell align="right">
-                  <Typography sx={{ color: 'primary.contrastText' }}>11363.21</Typography>
+                  <Typography sx={{ color: 'primary.contrastText' }}>{walletAmount}</Typography>
                 </TableCell>
                 <TableCell>
                   <Label variant="none">{token.symbol}</Label>
                 </TableCell>
-                <TableCell align="right">{walletAmount} $</TableCell>
-                <TableCell align="right">{token.priceUSD} $</TableCell>
+                <TableCell align="right">{roundCurrency(walletAmount! * token.priceUSD)}$</TableCell>
+                <TableCell align="right">{token.priceUSD}$</TableCell>
               </TableRow>
             ))}
           </TableBody>
@@ -70,15 +73,15 @@ function BalanceTable() {
           <TableBody>
             {nonPoolToken.map(({ token, walletAmount }) => (
               <TableRow key={token.address}>
-                <TableCell>{roundCurrency((walletAmount! / totalAmount) * 100)}%</TableCell>
+                <TableCell>{displayPercentage((walletAmount! * token.priceUSD) / totalValue)}</TableCell>
                 <TableCell align="right">
-                  <Typography sx={{ color: 'primary.contrastText' }}>11363.21</Typography>
+                  <Typography sx={{ color: 'primary.contrastText' }}>{walletAmount}</Typography>
                 </TableCell>
                 <TableCell>
                   <Label variant="none">{token.symbol}</Label>
                 </TableCell>
-                <TableCell align="right">{walletAmount} $</TableCell>
-                <TableCell align="right">{token.priceUSD} $</TableCell>
+                <TableCell align="right">{roundCurrency(walletAmount! * token.priceUSD)}$</TableCell>
+                <TableCell align="right">{token.priceUSD}$</TableCell>
               </TableRow>
             ))}
           </TableBody>

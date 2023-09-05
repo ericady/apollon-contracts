@@ -1,13 +1,13 @@
 import CollateralBalance from '../components/Features/Collateral/CollateralBalance/CollateralBalance';
 import ReservePool from '../components/Features/ReservePool/ReservePool';
-import DebtBalance from '../components/Features/Stability/StabilityPool';
+import StabilityBalance from '../components/Features/Stability/StabilityBalance/StabilityBalance';
 import PageLayout from '../components/Layout/PageLayout';
 
 function Balance() {
   return (
     <PageLayout>
       <CollateralBalance />
-      <DebtBalance />
+      <StabilityBalance />
       <ReservePool />
     </PageLayout>
   );
