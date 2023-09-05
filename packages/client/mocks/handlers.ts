@@ -113,8 +113,8 @@ const openPositions = Array(totalOpenPositions)
       direction: faker.helpers.enumValue(LongShortDirection),
       size,
       totalPriceInStable: faker.number.float({
-        min: (token.priceUSD / JUSD.priceUSD) * size * 0.5,
-        max: (token.priceUSD / JUSD.priceUSD) * size * 3.5,
+        min: (token.priceUSD / JUSD.priceUSD) * size * 0.3,
+        max: (token.priceUSD / JUSD.priceUSD) * size * 5.5,
         precision: 2,
       }),
       feesInStable: parseFloat(faker.finance.amount(1, 50, 2)),
@@ -133,8 +133,8 @@ const closedPositions = Array(totalClosedPositions)
     const size = parseFloat(faker.finance.amount(1, 1000, 2));
     const token = faker.helpers.arrayElement(tokens);
     const totalPriceInStable = faker.number.float({
-      min: (token.priceUSD / JUSD.priceUSD) * size * 0.5,
-      max: (token.priceUSD / JUSD.priceUSD) * size * 3.5,
+      min: (token.priceUSD / JUSD.priceUSD) * size * 0.3,
+      max: (token.priceUSD / JUSD.priceUSD) * size * 5.5,
       precision: 2,
     });
     return {
@@ -167,6 +167,22 @@ const generatePoolPriceHistory = (): number[][] => {
     .reverse(); // reverse to get the timeline in chronological order
 };
 
+const generateTokenValues = (maxValue: number, tokens: Token[]) => {
+  let leftValue = maxValue;
+
+  return tokens.map((token, index) => {
+    const value = parseFloat(faker.finance.amount(0, leftValue, 2));
+    // Last token gets all the left value
+    const amount = index === tokens.length - 1 ? leftValue : value / token.priceUSD;
+    leftValue -= value;
+
+    return {
+      token,
+      amount,
+    };
+  });
+};
+
 const generateBorrowerHistory = (): BorrowerHistory[] => {
   const now = Date.now();
   const oneDayInMs = 24 * 60 * 60 * 1000;
@@ -174,19 +190,32 @@ const generateBorrowerHistory = (): BorrowerHistory[] => {
   return Array(10)
     .fill(null)
     .map(() => {
-      const randomToken = tokens[faker.number.int({ min: 0, max: tokens.length - 1 })];
+      const type = faker.helpers.enumValue(BorrowerHistoryType);
+
+      const lostAmount = parseFloat(faker.finance.amount(1, 1000, 2));
+      const gainedAmount = parseFloat(
+        faker.finance.amount(lostAmount, faker.number.int({ min: lostAmount, max: lostAmount * 1.1 }), 2),
+      );
+
+      // negative amount and only on lost token for claimed rewards
+      const lostToken =
+        type === BorrowerHistoryType.ClaimedRewards
+          ? generateTokenValues(lostAmount, faker.helpers.arrayElements(tokens, { min: 1, max: 5 })).map((token) => ({
+              ...token,
+              amount: token.amount * -1,
+            }))
+          : [];
+      // positive amount and always bigger than any potential lost amount
+      const gainedToken = generateTokenValues(gainedAmount, faker.helpers.arrayElements(tokens, { min: 1, max: 5 }));
       return {
         timestamp: now - faker.number.int({ min: 0, max: 29 }) * oneDayInMs,
-        type: faker.helpers.enumValue(BorrowerHistoryType),
-        values: [
-          {
-            token: randomToken,
-            amount: parseFloat(faker.finance.amount(1, 1000, 2)),
-          },
-        ],
-        resultInUSD: parseFloat(faker.finance.amount(1, 5000, 2)),
+        type,
+        values: [...lostToken, ...gainedToken],
+        resultInUSD: gainedAmount,
+        claimInUSD: type === BorrowerHistoryType.ClaimedRewards ? lostAmount : null,
       };
-    });
+    })
+    .sort((a, b) => b.timestamp - a.timestamp);
 };
 
 export const handlers = [

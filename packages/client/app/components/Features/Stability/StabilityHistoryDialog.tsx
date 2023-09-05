@@ -1,14 +1,52 @@
 'use client';
 
+import { useQuery } from '@apollo/client';
 import CloseIcon from '@mui/icons-material/Close';
 import ExpandLessSharpIcon from '@mui/icons-material/ExpandLessSharp';
-import { Button, Dialog, DialogContent, DialogTitle, IconButton } from '@mui/material';
+import { Box, Button, Dialog, DialogContent, DialogTitle, IconButton } from '@mui/material';
 import Typography from '@mui/material/Typography';
 import { useState } from 'react';
+import { useEthers } from '../../../context/EthersProvider';
+import {
+  BorrowerHistoryType,
+  GetBorrowerStabilityHistoryQuery,
+  GetBorrowerStabilityHistoryQueryVariables,
+} from '../../../generated/gql-types';
+import { GET_BORROWER_STABILITY_HISTORY } from '../../../queries';
+import { formatUnixTimestamp } from '../../../utils/date';
+import { displayPercentage, percentageChange, roundCurrency } from '../../../utils/math';
 import Label from '../../Label/Label';
 
 const StabilityHistoryDialog = () => {
   const [open, setOpen] = useState(false);
+  const { address } = useEthers();
+
+  const { data } = useQuery<GetBorrowerStabilityHistoryQuery, GetBorrowerStabilityHistoryQueryVariables>(
+    GET_BORROWER_STABILITY_HISTORY,
+    {
+      variables: {
+        borrower: address,
+      },
+    },
+  );
+
+  const getComponentForBorrowerHistoryType = (
+    history: GetBorrowerStabilityHistoryQuery['getBorrowerStabilityHistory'][number],
+  ) => {
+    switch (history.type) {
+      case BorrowerHistoryType.ClaimedRewards:
+        return <StabilityClaimedRewards history={history} />;
+
+      case BorrowerHistoryType.Deposited:
+        return <StabilityDeposit history={history} />;
+
+      case BorrowerHistoryType.Withdrawn:
+        return <StabilityWithdraw history={history} />;
+
+      default:
+        const _: never = history.type;
+    }
+  };
 
   return (
     <>
@@ -16,178 +54,192 @@ const StabilityHistoryDialog = () => {
         History
       </Button>
 
-      <Dialog open={open} onClose={() => setOpen(false)} fullWidth>
-        <DialogTitle
-          sx={{
-            display: 'flex',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-            backgroundColor: 'background.default',
-            border: '1px solid',
-            borderColor: 'background.paper',
-            borderBottom: 'none',
-          }}
-        >
-          <div className="flex">
-            <img
-              src="assets/svgs/Star24_white.svg"
-              alt="White colored diamond shape"
-              height="11"
-              typeof="image/svg+xml"
-            />
-            <Typography variant="h6" display="inline-block">
-              STABILITY PER HISTORY
-            </Typography>
-          </div>
-          <IconButton onClick={() => setOpen(false)}>
-            <CloseIcon
-              sx={{
-                color: '#64616D',
-              }}
-            />
-          </IconButton>
-        </DialogTitle>
-        <DialogContent
-          sx={{
-            p: 0,
-            backgroundColor: 'background.default',
-            border: '1px solid',
-            borderColor: 'background.paper',
-          }}
-        >
-          <div className="history-block" style={{ borderBottom: '2px solid #25222E', padding: '20px' }}>
-            <div className="history-hdng flex" style={{ justifyContent: 'space-between', marginBottom: '20px' }}>
-              <div className="flex">
-                <Typography variant="titleAlternate" color="primary.contrastText">
-                  13.04.2023 18:07
-                </Typography>
-              </div>
-
-              <Label variant="success">Claimed Collateral</Label>
+      {data && (
+        <Dialog open={open} onClose={() => setOpen(false)} fullWidth>
+          <DialogTitle
+            sx={{
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              backgroundColor: 'background.default',
+              border: '1px solid',
+              borderColor: 'background.paper',
+              borderBottom: 'none',
+            }}
+          >
+            <div className="flex">
+              <img
+                src="assets/svgs/Star24_white.svg"
+                alt="White colored diamond shape"
+                height="11"
+                typeof="image/svg+xml"
+              />
+              <Typography variant="h6" display="inline-block">
+                STABILITY PER HISTORY
+              </Typography>
             </div>
-
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '40px' }}>
-              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', minWidth: 120, gap: 20 }}>
-                <div className="flex">
-                  <Typography fontWeight={400}>3.46815</Typography>
-                  <Label variant="none">dPSL</Label>
-                </div>
-
-                <div className="flex">
-                  <Typography fontWeight={400}>1.81789</Typography>
-                  <Label variant="none">dAAPL</Label>
-                </div>
+            <IconButton onClick={() => setOpen(false)}>
+              <CloseIcon
+                sx={{
+                  color: '#64616D',
+                }}
+              />
+            </IconButton>
+          </DialogTitle>
+          <DialogContent
+            sx={{
+              p: 0,
+              backgroundColor: 'background.default',
+              border: '1px solid',
+              borderColor: 'background.paper',
+            }}
+          >
+            {data.getBorrowerStabilityHistory.map((history, index) => (
+              <div
+                style={{
+                  borderBottom: index === data.getBorrowerStabilityHistory.length - 1 ? 'none' : '1px solid #25222E',
+                  padding: '20px',
+                }}
+                key={index}
+              >
+                {getComponentForBorrowerHistoryType(history)}
               </div>
-
-              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', width: '100%' }}>
-                <div
-                  style={{
-                    background: '#18293e',
-                    border: '1px solid #33b6ff',
-                    padding: '10px',
-                    width: 170,
-                  }}
-                >
-                  <Typography
-                    className="flex"
-                    variant="titleAlternate"
-                    color="info.main"
-                    fontWeight={400}
-                    sx={{
-                      gap: '5px',
-                      marginBottom: '20px',
-                      justifyContent: 'end',
-                    }}
-                  >
-                    + 3.18% <ExpandLessSharpIcon sx={{ color: 'info.main' }} />
-                  </Typography>
-                  <Typography
-                    className="flex"
-                    variant="titleAlternate"
-                    color="info.main"
-                    fontWeight={400}
-                    sx={{ gap: '5px', justifyContent: 'end' }}
-                  >
-                    + 35118.18$ <ExpandLessSharpIcon sx={{ color: 'info.main' }} />
-                  </Typography>
-                </div>
-              </div>
-
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
-                <div className="flex" style={{ justifyContent: 'end' }}>
-                  <Typography fontWeight={400}>8.18571</Typography>
-                  <Label variant="none">ETH</Label>
-                </div>
-
-                <div className="flex" style={{ justifyContent: 'end' }}>
-                  <Typography fontWeight={400}>187.18871</Typography>
-                  <Label variant="none">BTC</Label>
-                </div>
-
-                <div className="flex" style={{ justifyContent: 'end' }}>
-                  <Typography fontWeight={400}>187.18871</Typography>
-                  <Label variant="none">YLT</Label>
-                </div>
-
-                <div className="flex" style={{ justifyContent: 'end' }}>
-                  <Typography fontWeight={400}>187.18871</Typography>
-                  <Label variant="none">USDT</Label>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div className="history-block" style={{ borderBottom: '2px solid #25222E', padding: '20px' }}>
-            <div className="history-hdng flex" style={{ justifyContent: 'space-between', marginBottom: '20px' }}>
-              <div className="flex">
-                <Typography variant="titleAlternate" color="primary.contrastText">
-                  11.04.2023 06:03
-                </Typography>
-              </div>
-
-              <Label variant="none">Deposited token</Label>
-            </div>
-
-            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '20px' }}>
-              <div className="flex" style={{ width: '100%', justifyContent: 'end' }}>
-                <Typography fontWeight={400}>1.78145</Typography>
-                <Label variant="none">AAPL</Label>
-              </div>
-
-              <div className="flex" style={{ width: '100%', justifyContent: 'end' }}>
-                <Typography fontWeight={400}>8.14431</Typography>
-                <Label variant="none">TSLA</Label>
-              </div>
-            </div>
-          </div>
-
-          <div className="history-block" style={{ padding: '20px' }}>
-            <div className="history-hdng flex" style={{ justifyContent: 'space-between', marginBottom: '20px' }}>
-              <div className="flex">
-                <Typography variant="titleAlternate" color="primary.contrastText">
-                  03.02.2023 15:18
-                </Typography>
-              </div>
-
-              <Label variant="info">Withdrawn token</Label>
-            </div>
-
-            <div style={{ display: 'flex', flexWrap: 'wrap', gap: '20px' }}>
-              <div className="flex" style={{ width: '100%', justifyContent: 'end' }}>
-                <Typography fontWeight={400}>8.00012</Typography>
-                <Label variant="none">GLD</Label>
-              </div>
-
-              <div className="flex" style={{ width: '100%', justifyContent: 'end' }}>
-                <Typography fontWeight={400}>181.00028</Typography>
-                <Label variant="none">TSLA</Label>
-              </div>
-            </div>
-          </div>
-        </DialogContent>
-      </Dialog>
+            ))}
+          </DialogContent>
+        </Dialog>
+      )}
     </>
   );
 };
+
+type StabilityWidgetProps = {
+  history: GetBorrowerStabilityHistoryQuery['getBorrowerStabilityHistory'][number];
+};
+
+function StabilityClaimedRewards({ history }: StabilityWidgetProps) {
+  const lostTokens = history.values.filter((reward) => reward.amount < 0);
+  const gainedTokens = history.values.filter((reward) => reward.amount > 0);
+
+  return (
+    <>
+      <div className="flex" style={{ justifyContent: 'space-between', marginBottom: '20px' }}>
+        <div className="flex">
+          <Typography variant="titleAlternate" color="primary.contrastText">
+            {formatUnixTimestamp(history.timestamp, false)}
+          </Typography>
+        </div>
+
+        <Label variant="success">Claimed Collateral</Label>
+      </div>
+
+      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '40px' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', minWidth: 120, gap: 20 }}>
+          {lostTokens.map(({ token, amount }) => (
+            <div className="flex" key={token.address}>
+              <Typography fontWeight={400}>{roundCurrency(amount, 5)}</Typography>
+              <Label variant="none">{token.symbol}</Label>
+            </div>
+          ))}
+        </div>
+
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', width: '100%' }}>
+          <Box
+            sx={{
+              backgroundColor: 'info.background',
+              border: '1px solid',
+              borderColor: 'info.main',
+              padding: '10px',
+              width: 170,
+            }}
+          >
+            <Typography
+              className="flex"
+              variant="titleAlternate"
+              color="info.main"
+              fontWeight={400}
+              sx={{
+                gap: '5px',
+                marginBottom: '20px',
+                justifyContent: 'end',
+              }}
+            >
+              + {displayPercentage(percentageChange(history.resultInUSD, history.claimInUSD!))}
+              <ExpandLessSharpIcon sx={{ color: 'info.main' }} />
+            </Typography>
+            <Typography
+              className="flex"
+              variant="titleAlternate"
+              color="info.main"
+              fontWeight={400}
+              sx={{ gap: '5px', justifyContent: 'end' }}
+            >
+              + {roundCurrency(history.resultInUSD - history.claimInUSD!)}$
+              <ExpandLessSharpIcon sx={{ color: 'info.main' }} />
+            </Typography>
+          </Box>
+        </div>
+
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
+          {gainedTokens.map(({ token, amount }) => (
+            <div className="flex" style={{ justifyContent: 'end' }} key={token.address}>
+              <Typography fontWeight={400}>{roundCurrency(amount, 5)}</Typography>
+              <Label variant="none">{token.symbol}</Label>
+            </div>
+          ))}
+        </div>
+      </div>
+    </>
+  );
+}
+
+function StabilityDeposit({ history }: StabilityWidgetProps) {
+  return (
+    <>
+      <div className="flex" style={{ justifyContent: 'space-between', marginBottom: '20px' }}>
+        <div className="flex">
+          <Typography variant="titleAlternate" color="primary.contrastText">
+            {formatUnixTimestamp(history.timestamp, false)}
+          </Typography>
+        </div>
+
+        <Label variant="none">Deposited token</Label>
+      </div>
+
+      <div style={{ display: 'flex', flexWrap: 'wrap', gap: '20px' }}>
+        {history.values.map(({ amount, token }) => (
+          <div className="flex" style={{ width: '100%', justifyContent: 'end' }} key={token.address}>
+            <Typography fontWeight={400}>{roundCurrency(amount, 5)}</Typography>
+            <Label variant="none">{token.symbol}</Label>
+          </div>
+        ))}
+      </div>
+    </>
+  );
+}
+
+function StabilityWithdraw({ history }: StabilityWidgetProps) {
+  return (
+    <>
+      <div className="flex" style={{ justifyContent: 'space-between', marginBottom: '20px' }}>
+        <div className="flex">
+          <Typography variant="titleAlternate" color="primary.contrastText">
+            {formatUnixTimestamp(history.timestamp, false)}
+          </Typography>
+        </div>
+
+        <Label variant="info">Withdrawn token</Label>
+      </div>
+
+      <div style={{ display: 'flex', flexWrap: 'wrap', gap: '20px' }}>
+        {history.values.map(({ amount, token }) => (
+          <div className="flex" style={{ width: '100%', justifyContent: 'end' }} key={token.address}>
+            <Typography fontWeight={400}>{roundCurrency(amount, 5)}</Typography>
+            <Label variant="none">{token.symbol}</Label>
+          </div>
+        ))}
+      </div>
+    </>
+  );
+}
 
 export default StabilityHistoryDialog;

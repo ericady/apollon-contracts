@@ -129,6 +129,8 @@ type BorrowerHistory {
   timestamp: Int!
   type: BorrowerHistoryType!
   values: [TokenAmount!]!
+  # worth of the claimed tokens in USD at the time of the event, only set on CLAIMED_REWARDS
+  claimInUSD: Float
   resultInUSD: Float!
 }
 

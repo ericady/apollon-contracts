@@ -13,10 +13,12 @@ export const constructFromUnixTimestamp = (timestamp: number) => {
   return { day, month, year, hours, minutes, daysFromToday };
 };
 
-export const formatUnixTimestamp = (timestamp: number) => {
+export const formatUnixTimestamp = (timestamp: number, withDelta = true) => {
   const { day, daysFromToday, hours, minutes, month, year } = constructFromUnixTimestamp(timestamp);
 
-  return `${day}.${month}.${year} ${hours}:${minutes} (-${daysFromToday}d)`;
+  return withDelta
+    ? `${day}.${month}.${year} ${hours}:${minutes} (-${daysFromToday}d)`
+    : `${day}.${month}.${year} ${hours}:${minutes}`;
 };
 
 export const generateDateChartTicks = (timestamp: number, tickCount = 4) => {

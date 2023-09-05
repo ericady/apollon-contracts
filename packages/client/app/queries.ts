@@ -109,6 +109,23 @@ export const GET_BORROWER_LIQUIDITY_POOLS = gql`
   }
 `;
 
+// BALANCE PAGE
+
+export const GET_ALL_COLLATERAL_TOKENS = gql`
+  query GetCollateralTokens($borrower: String!) {
+    getCollateralTokens(borrower: $borrower) {
+      token {
+        address
+        symbol
+      }
+      walletAmount
+      troveLockedAmount
+      totalValueLockedUSD
+      totalValueLockedUSD24hAgo
+    }
+  }
+`;
+
 export const GET_BORROWER_REWARDS = gql`
   query GetBorrowerRewards($borrower: String!) {
     getPools(borrower: $borrower) {
@@ -125,19 +142,20 @@ export const GET_BORROWER_REWARDS = gql`
   }
 `;
 
-// BALANCE PAGE
-
-export const GET_ALL_COLLATERAL_TOKENS = gql`
-  query GetCollateralTokens($borrower: String!) {
-    getCollateralTokens(borrower: $borrower) {
-      token {
-        address
-        symbol
+export const GET_BORROWER_STABILITY_HISTORY = gql`
+  query GetBorrowerStabilityHistory($borrower: String!) {
+    getBorrowerStabilityHistory(borrower: $borrower) {
+      timestamp
+      type
+      values {
+        token {
+          address
+          symbol
+        }
+        amount
       }
-      walletAmount
-      troveLockedAmount
-      totalValueLockedUSD
-      totalValueLockedUSD24hAgo
+      resultInUSD
+      claimInUSD
     }
   }
 `;
@@ -171,14 +189,6 @@ export const GET_RESERVE_USD_HISTORY = gql`
 export const GET_BORROWER_POOL_HISTORY = gql`
   query GetBorrowerPoolHistory {
     getBorrowerPoolHistory(poolId: "String!", borrower: "String!") {
-      timestamp
-    }
-  }
-`;
-
-export const GET_BORROWER_STABILITY_HISTORY = gql`
-  query GetBorrowerStabilityHistory {
-    getBorrowerStabilityHistory(borrower: "String!") {
       timestamp
     }
   }
