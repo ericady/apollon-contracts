@@ -17,6 +17,7 @@ type DebtTokenMeta {
   stabilityLostAmount: Float
 
   # global
+  stabilityDepositAPY: Float!
   totalDepositedStability: Float!
   totalReserve: Float!
   totalReserve24hAgo: Float!

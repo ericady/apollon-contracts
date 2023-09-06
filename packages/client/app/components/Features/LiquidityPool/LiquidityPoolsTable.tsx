@@ -136,7 +136,7 @@ function LiquidityPoolsTable({ selectedPool, setSelectedPool }: Props) {
                     </TableCell>
 
                     <TableCell>
-                      <div className="flex">
+                      <div className="flex" style={{ justifyContent: 'flex-end' }}>
                         <Typography variant="caption">{volume24hUSD}$</Typography>
                         <Typography sx={{ color: volumeChange > 0 ? 'success.main' : 'error.main', fontWeight: '400' }}>
                           {displayPercentage(volumeChange)}

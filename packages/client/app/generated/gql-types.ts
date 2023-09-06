@@ -41,6 +41,7 @@ export type CollateralTokenMeta = {
 
 export type DebtTokenMeta = {
   __typename?: 'DebtTokenMeta';
+  stabilityDepositAPY: Scalars['Float']['output'];
   stabilityLostAmount?: Maybe<Scalars['Float']['output']>;
   token: Token;
   totalDepositedStability: Scalars['Float']['output'];
@@ -190,7 +191,7 @@ export type GetBorrowerDebtTokensQueryVariables = Exact<{
 }>;
 
 
-export type GetBorrowerDebtTokensQuery = { __typename?: 'Query', getDebtTokens: Array<{ __typename?: 'DebtTokenMeta', troveMintedAmount?: number | null, walletAmount?: number | null, token: { __typename?: 'Token', address: string, symbol: string, priceUSD: number, isPoolToken: boolean } }> };
+export type GetBorrowerDebtTokensQuery = { __typename?: 'Query', getDebtTokens: Array<{ __typename?: 'DebtTokenMeta', troveMintedAmount?: number | null, walletAmount?: number | null, stabilityDepositAPY: number, totalDepositedStability: number, totalReserve: number, totalReserve24hAgo: number, token: { __typename?: 'Token', address: string, symbol: string, priceUSD: number, isPoolToken: boolean } }> };
 
 export type GetBorrowerPositionsQueryVariables = Exact<{
   borrower: Scalars['String']['input'];
@@ -243,6 +244,11 @@ export type GetDebtUsdHistoryQueryVariables = Exact<{ [key: string]: never; }>;
 
 
 export type GetDebtUsdHistoryQuery = { __typename?: 'Query', getDebtUSDHistory: Array<Array<number>> };
+
+export type GetCollateralRatioHistoryQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type GetCollateralRatioHistoryQuery = { __typename?: 'Query', getCollateralRatioHistory: Array<Array<number>> };
 
 export type GetPoolPriceHistoryQueryVariables = Exact<{ [key: string]: never; }>;
 

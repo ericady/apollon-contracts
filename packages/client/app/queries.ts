@@ -37,6 +37,10 @@ export const GET_BORROWER_DEBT_TOKENS = gql`
     getDebtTokens(borrower: $borrower) {
       troveMintedAmount
       walletAmount
+      stabilityDepositAPY
+      totalDepositedStability
+      totalReserve
+      totalReserve24hAgo
       token {
         address
         symbol
@@ -171,6 +175,12 @@ export const GET_COLLATERAL_USD_HISTORY = gql`
 export const GET_DEBT_USD_HISTORY = gql`
   query GetDebtUSDHistory {
     getDebtUSDHistory
+  }
+`;
+
+export const GET_COLLATERAL_RATIO_HISTORY = gql`
+  query GetCollateralRatioHistory {
+    getCollateralRatioHistory
   }
 `;
 

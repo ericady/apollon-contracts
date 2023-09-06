@@ -24,6 +24,10 @@ import {
   GET_BORROWER_LIQUIDITY_POOLS,
   GET_BORROWER_POSITIONS,
   GET_BORROWER_REWARDS,
+  GET_BORROWER_STABILITY_HISTORY,
+  GET_COLLATERAL_RATIO_HISTORY,
+  GET_COLLATERAL_USD_HISTORY,
+  GET_DEBT_USD_HISTORY,
   GET_LIQUIDITY_POOLS,
 } from '../app/queries';
 
@@ -78,7 +82,7 @@ for (let i = 0; i < tokens.length; i++) {
 
     pools.push({
       id: faker.string.uuid(),
-      openingFee: faker.number.float({ min: -0.05, max: 0.05 }),
+      openingFee: faker.number.float({ min: -0.05, max: 0.05, precision: 0.0001 }),
       liquidity: sortedPair.map((token) => ({
         token,
         totalAmount: parseFloat(faker.finance.amount(100000, 1000000, 2)),
@@ -115,7 +119,7 @@ const openPositions = Array(totalOpenPositions)
       totalPriceInStable: faker.number.float({
         min: (token.priceUSD / JUSD.priceUSD) * size * 0.3,
         max: (token.priceUSD / JUSD.priceUSD) * size * 5.5,
-        precision: 2,
+        precision: 0.00001,
       }),
       feesInStable: parseFloat(faker.finance.amount(1, 50, 2)),
       profitInStable: null,
@@ -133,9 +137,9 @@ const closedPositions = Array(totalClosedPositions)
     const size = parseFloat(faker.finance.amount(1, 1000, 2));
     const token = faker.helpers.arrayElement(tokens);
     const totalPriceInStable = faker.number.float({
-      min: (token.priceUSD / JUSD.priceUSD) * size * 0.3,
+      min: (token.priceUSD / JUSD.priceUSD) * size * 0.01,
       max: (token.priceUSD / JUSD.priceUSD) * size * 5.5,
-      precision: 2,
+      precision: 0.00001,
     });
     return {
       id: faker.string.uuid(),
@@ -233,6 +237,7 @@ export const handlers = [
         totalReserve24hAgo: parseFloat(faker.finance.amount(1000, 5000, 2)),
         totalSupplyUSD: parseFloat(faker.finance.amount(10000, 50000, 2)),
         totalSupplyUSD24hAgo: parseFloat(faker.finance.amount(10000, 50000, 2)),
+        stabilityDepositAPY: faker.number.float({ min: 0.01, max: 0.1, precision: 0.01 }),
       }));
 
       return res(ctx.data({ getDebtTokens: result }));
@@ -265,6 +270,7 @@ export const handlers = [
         totalReserve24hAgo: parseFloat(faker.finance.amount(1000, 5000, 2)),
         totalSupplyUSD: parseFloat(faker.finance.amount(10000, 50000, 2)),
         totalSupplyUSD24hAgo: parseFloat(faker.finance.amount(10000, 50000, 2)),
+        stabilityDepositAPY: faker.number.float({ min: 0, max: 10, precision: 0.0001 }) / 100,
       }));
 
       return res(ctx.data({ getDebtTokens: result }));
@@ -402,6 +408,40 @@ export const handlers = [
 
   // CHART DATA MOCK
 
+  // GetCollateralUSDHistory
+  graphql.query<{ getCollateralUSDHistory: Query['getCollateralUSDHistory'] }>(
+    GET_COLLATERAL_USD_HISTORY,
+    (req, res, ctx) => {
+      const result = generatePoolPriceHistory();
+
+      return res(ctx.data({ getCollateralUSDHistory: result }));
+    },
+  ),
+  // GetDebtUSDHistory
+  graphql.query<{ getDebtUSDHistory: Query['getDebtUSDHistory'] }>(GET_DEBT_USD_HISTORY, (req, res, ctx) => {
+    const result = generatePoolPriceHistory();
+
+    return res(ctx.data({ getDebtUSDHistory: result }));
+  }),
+  // GetBorrowerStabilityHistory
+  graphql.query<
+    { getBorrowerStabilityHistory: Query['getBorrowerStabilityHistory'] },
+    QueryGetBorrowerStabilityHistoryArgs
+  >(GET_BORROWER_STABILITY_HISTORY, (req, res, ctx) => {
+    // For this mock, we ignore the actual poolId and just generate mock data
+    const result = generateBorrowerHistory();
+
+    return res(ctx.data({ getBorrowerStabilityHistory: result }));
+  }),
+  // GetCollateralRatioHistory
+  graphql.query<{ getCollateralRatioHistory: Query['getCollateralRatioHistory'] }>(
+    GET_COLLATERAL_RATIO_HISTORY,
+    (req, res, ctx) => {
+      const result = generatePoolPriceHistory();
+
+      return res(ctx.data({ getCollateralRatioHistory: result }));
+    },
+  ),
   // GetPoolPriceHistory
   graphql.query<{ getPoolPriceHistory: Query['getPoolPriceHistory'] }, QueryGetPoolPriceHistoryArgs>(
     'GetPoolPriceHistory',
@@ -412,23 +452,6 @@ export const handlers = [
       return res(ctx.data({ getPoolPriceHistory: result }));
     },
   ),
-  // GetCollateralUSDHistory
-  graphql.query<{ getCollateralUSDHistory: Query['getCollateralUSDHistory'] }>(
-    'GetCollateralUSDHistory',
-    (req, res, ctx) => {
-      // For this mock, we ignore the actual poolId and just generate mock data
-      const result = generatePoolPriceHistory();
-
-      return res(ctx.data({ getCollateralUSDHistory: result }));
-    },
-  ),
-  // GetDebtUSDHistory
-  graphql.query<{ getDebtUSDHistory: Query['getDebtUSDHistory'] }>('GetDebtUSDHistory', (req, res, ctx) => {
-    // For this mock, we ignore the actual poolId and just generate mock data
-    const result = generatePoolPriceHistory();
-
-    return res(ctx.data({ getDebtUSDHistory: result }));
-  }),
   // GetReserveUSDHistory
   graphql.query<{ getReserveUSDHistory: Query['getReserveUSDHistory'] }>('GetReserveUSDHistory', (req, res, ctx) => {
     // For this mock, we ignore the actual poolId and just generate mock data
@@ -447,14 +470,4 @@ export const handlers = [
       return res(ctx.data({ getBorrowerPoolHistory: result }));
     },
   ),
-  // GetBorrowerStabilityHistory
-  graphql.query<
-    { getBorrowerStabilityHistory: Query['getBorrowerStabilityHistory'] },
-    QueryGetBorrowerStabilityHistoryArgs
-  >('GetBorrowerStabilityHistory', (req, res, ctx) => {
-    // For this mock, we ignore the actual poolId and just generate mock data
-    const result = generateBorrowerHistory();
-
-    return res(ctx.data({ getBorrowerStabilityHistory: result }));
-  }),
 ];

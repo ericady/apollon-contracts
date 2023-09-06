@@ -51,7 +51,7 @@ const CollateralBalance = () => {
                       <HeaderCell title="Your Trove" cellProps={{ align: 'right' }} />
                       <HeaderCell title="Token" cellProps={{ align: 'right' }} />
                       <HeaderCell title="" />
-                      <HeaderCell title="TVL" cellProps={{ align: 'right' }} />
+                      <HeaderCell title="TVL" cellProps={{ align: 'left' }} />
                     </TableRow>
                   </TableHead>
                   <TableBody>
