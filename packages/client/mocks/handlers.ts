@@ -259,12 +259,15 @@ export const handlers = [
     GET_BORROWER_DEBT_TOKENS,
     (req, res, ctx) => {
       const { borrower } = req.variables;
+      if (!borrower) {
+        throw new Error('Borrower address is required');
+      }
 
       const result: Query['getDebtTokens'] = tokens.map((token) => ({
         token: token,
-        walletAmount: borrower ? parseFloat(faker.finance.amount(0, 1000, 2)) : null,
-        troveMintedAmount: borrower ? parseFloat(faker.finance.amount(0, 500, 2)) : null,
-        stabilityLostAmount: borrower ? parseFloat(faker.finance.amount(0, 50, 2)) : null,
+        walletAmount: faker.datatype.boolean() ? parseFloat(faker.finance.amount(0, 1000, 2)) : 0,
+        troveMintedAmount: faker.datatype.boolean() ? parseFloat(faker.finance.amount(0, 500, 2)) : 0,
+        stabilityLostAmount: faker.datatype.boolean() ? parseFloat(faker.finance.amount(0, 50, 2)) : 0,
         totalDepositedStability: parseFloat(faker.finance.amount(1000, 5000, 2)),
         totalReserve: parseFloat(faker.finance.amount(1000, 5000, 2)),
         totalReserve24hAgo: parseFloat(faker.finance.amount(1000, 5000, 2)),
