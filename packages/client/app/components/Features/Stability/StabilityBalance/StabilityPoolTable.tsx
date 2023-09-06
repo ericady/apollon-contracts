@@ -41,7 +41,7 @@ function StabilityPoolTable() {
           <Table sx={{ borderRight: '1px solid', borderColor: BUTTON_BORDER }}>
             <TableHead>
               <TableRow>
-                <HeaderCell title="Lost Stability" cellProps={{ align: 'right' }} />
+                <HeaderCell title="Lost Stability" />
                 <HeaderCell title="" />
                 <HeaderCell title="Gained collateral" />
               </TableRow>
@@ -49,10 +49,7 @@ function StabilityPoolTable() {
             <TableBody>
               {rewards.map(({ amount, token }, index) => (
                 <TableRow key={index}>
-                  <TableCell
-                    sx={index === rewards.length - 1 ? { borderBottom: 'none' } : {}}
-                    align="right"
-                  ></TableCell>
+                  <TableCell sx={index === rewards.length - 1 ? { borderBottom: 'none' } : {}}></TableCell>
                   <TableCell sx={index === rewards.length - 1 ? { borderBottom: 'none' } : {}} align="right">
                     {amount}
                   </TableCell>

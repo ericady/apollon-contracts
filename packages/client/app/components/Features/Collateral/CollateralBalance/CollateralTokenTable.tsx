@@ -39,8 +39,8 @@ const CollateralTokenTable = () => {
           <Table size="small">
             <TableHead>
               <TableRow>
-                <HeaderCell title="Wallet" cellProps={{ align: 'right' }} />
-                <HeaderCell title="Your Trove" cellProps={{ align: 'right' }} />
+                <HeaderCell title="Wallet" cellProps={{ align: 'right', sx: { borderRight: '1px solid' } }} />
+                <HeaderCell title="Your Trove" cellProps={{ align: 'right', sx: { borderRight: '1px solid' } }} />
                 <HeaderCell title="Token" cellProps={{ align: 'right' }} />
                 <HeaderCell title="" />
                 <HeaderCell title="TVL" cellProps={{ align: 'left' }} />
@@ -50,8 +50,12 @@ const CollateralTokenTable = () => {
               {data.getCollateralTokens.map(
                 ({ token, totalValueLockedUSD, totalValueLockedUSD24hAgo, troveLockedAmount, walletAmount }) => (
                   <TableRow key={token.address}>
-                    <TableCell align="right">{roundCurrency(walletAmount ?? 0, 5)}</TableCell>
-                    <TableCell align="right">{roundCurrency(troveLockedAmount ?? 0, 5)}</TableCell>
+                    <TableCell align="right" sx={{ borderRight: '1px solid', borderColor: 'table.border' }}>
+                      {roundCurrency(walletAmount ?? 0, 5)}
+                    </TableCell>
+                    <TableCell align="right" sx={{ borderRight: '1px solid', borderColor: 'table.border' }}>
+                      {roundCurrency(troveLockedAmount ?? 0, 5)}
+                    </TableCell>
                     <TableCell align="right">
                       <Label variant="none">{token.symbol}</Label>
                     </TableCell>
@@ -78,8 +82,11 @@ const CollateralTokenTable = () => {
               )}
 
               <TableRow>
-                <TableCell align="right" style={{ padding: '2px' }}></TableCell>
-                <TableCell align="right" style={{ padding: '2px' }}>
+                <TableCell
+                  align="right"
+                  sx={{ borderRight: '1px solid', borderColor: 'table.border', padding: '2px' }}
+                ></TableCell>
+                <TableCell align="right" sx={{ borderRight: '1px solid', borderColor: 'table.border', padding: '2px' }}>
                   <CollateralUpdateDialog collateralData={data} buttonVariant="text" buttonSx={{ p: '6px 8px' }} />
                 </TableCell>
                 <TableCell align="right" style={{ padding: '2px' }}></TableCell>

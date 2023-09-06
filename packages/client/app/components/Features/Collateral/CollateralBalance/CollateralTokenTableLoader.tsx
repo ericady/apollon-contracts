@@ -1,4 +1,4 @@
-import { Button } from '@mui/material';
+import { Button, Skeleton } from '@mui/material';
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
 import TableCell from '@mui/material/TableCell';
@@ -11,46 +11,88 @@ import HeaderCell from '../../../Table/HeaderCell';
 const CollateralTokenTableLoader = () => {
   return (
     <FeatureBox title="Collateral Token" noPadding border="full" borderRadius>
-      <div className="apollon-table-txt">
+      <div>
         <TableContainer>
           <Table>
             <TableHead>
               <TableRow>
-                <HeaderCell title="Wallet" cellProps={{ align: 'right' }} />
-                <HeaderCell title="Your Trove" cellProps={{ align: 'right' }} />
+                <HeaderCell title="Wallet" cellProps={{ align: 'right', sx: { borderRight: '1px solid' } }} />
+                <HeaderCell title="Your Trove" cellProps={{ align: 'right', sx: { borderRight: '1px solid' } }} />
                 <HeaderCell title="Token" cellProps={{ align: 'right' }} />
                 <HeaderCell title="TVL" cellProps={{ align: 'right' }} />
               </TableRow>
             </TableHead>
             <TableBody>
               <TableRow>
-                <TableCell align="right"></TableCell>
-                <TableCell align="right"></TableCell>
-                <TableCell align="right"></TableCell>
-                <TableCell align="right"></TableCell>
+                <TableCell align="right" sx={{ borderRight: '1px solid', borderColor: 'table.border' }}>
+                  <Skeleton variant="text" />
+                </TableCell>
+                <TableCell align="right" sx={{ borderRight: '1px solid', borderColor: 'table.border' }}>
+                  <Skeleton variant="text" />
+                </TableCell>
+                <TableCell align="right" sx={{ borderRight: '1px solid', borderColor: 'table.border' }}>
+                  <Skeleton variant="text" />
+                </TableCell>
+                <TableCell align="right">
+                  <Skeleton variant="text" />
+                </TableCell>
               </TableRow>
               <TableRow>
-                <TableCell align="right"></TableCell>
-                <TableCell align="right"></TableCell>
-                <TableCell align="right"></TableCell>
-                <TableCell align="right"></TableCell>
+                <TableCell align="right" sx={{ borderRight: '1px solid', borderColor: 'table.border' }}>
+                  <Skeleton variant="text" />
+                </TableCell>
+                <TableCell align="right" sx={{ borderRight: '1px solid', borderColor: 'table.border' }}>
+                  <Skeleton variant="text" />
+                </TableCell>
+                <TableCell align="right" sx={{ borderRight: '1px solid', borderColor: 'table.border' }}>
+                  <Skeleton variant="text" />
+                </TableCell>
+                <TableCell align="right" sx={{ borderRight: '1px solid', borderColor: 'table.border' }}>
+                  <Skeleton variant="text" />
+                </TableCell>
               </TableRow>
               <TableRow>
-                <TableCell align="right"></TableCell>
-                <TableCell align="right"></TableCell>
-                <TableCell align="right"></TableCell>
-                <TableCell align="right"></TableCell>
+                <TableCell align="right" sx={{ borderRight: '1px solid', borderColor: 'table.border' }}>
+                  <Skeleton variant="text" />
+                </TableCell>
+                <TableCell align="right" sx={{ borderRight: '1px solid', borderColor: 'table.border' }}>
+                  <Skeleton variant="text" />
+                </TableCell>
+                <TableCell align="right" sx={{ borderRight: '1px solid', borderColor: 'table.border' }}>
+                  <Skeleton variant="text" />
+                </TableCell>
+                <TableCell align="right" sx={{ borderRight: '1px solid', borderColor: 'table.border' }}>
+                  <Skeleton variant="text" />
+                </TableCell>
               </TableRow>
               <TableRow>
-                <TableCell align="right"></TableCell>
-                <TableCell align="right"></TableCell>
-                <TableCell align="right"></TableCell>
-                <TableCell align="right"></TableCell>
+                <TableCell align="right" sx={{ borderRight: '1px solid', borderColor: 'table.border' }}>
+                  <Skeleton variant="text" />
+                </TableCell>
+                <TableCell align="right" sx={{ borderRight: '1px solid', borderColor: 'table.border' }}>
+                  <Skeleton variant="text" />
+                </TableCell>
+                <TableCell align="right" sx={{ borderRight: '1px solid', borderColor: 'table.border' }}>
+                  <Skeleton variant="text" />
+                </TableCell>
+                <TableCell align="right" sx={{ borderRight: '1px solid', borderColor: 'table.border' }}>
+                  <Skeleton variant="text" />
+                </TableCell>
               </TableRow>
               <TableRow>
-                <TableCell align="right" style={{ padding: '2px' }}></TableCell>
-                <TableCell align="right" style={{ padding: '2px' }}>
-                  <Button>UPDATE</Button>
+                <TableCell
+                  align="right"
+                  sx={{ borderRight: '1px solid', borderColor: 'table.border', padding: '2px' }}
+                ></TableCell>
+                <TableCell align="right" sx={{ borderRight: '1px solid', borderColor: 'table.border', padding: '2px' }}>
+                  <Button
+                    sx={{
+                      width: 'auto',
+                      p: '6px 8px',
+                    }}
+                  >
+                    Update
+                  </Button>
                 </TableCell>
                 <TableCell align="right" style={{ padding: '2px' }}></TableCell>
                 <TableCell align="right" style={{ padding: '2px' }}></TableCell>

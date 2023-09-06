@@ -1,4 +1,4 @@
-import { Button } from '@mui/material';
+import { Button, Skeleton } from '@mui/material';
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
 import TableCell from '@mui/material/TableCell';
@@ -12,27 +12,42 @@ import HeaderCell from '../../../Table/HeaderCell';
 function StabilityPoolTableLoader() {
   return (
     <FeatureBox title="Stability Pool" noPadding border="full" borderRadius>
-      <div className="apollon-table-txt" style={{ display: 'flex', alignItems: 'center' }}>
+      <div style={{ display: 'flex', alignItems: 'center' }}>
         <TableContainer>
           <Table sx={{ borderRight: '1px solid', borderColor: BUTTON_BORDER }}>
             <TableHead>
               <TableRow>
-                <HeaderCell title="Lost Stability" cellProps={{ align: 'right' }} />
-                <HeaderCell title="Gained collateral" cellProps={{ align: 'right' }} />
+                <HeaderCell title="Lost Stability" />
+
+                <HeaderCell title="Gained collateral" />
               </TableRow>
             </TableHead>
             <TableBody>
               <TableRow>
-                <TableCell align="right"></TableCell>
-                <TableCell align="right"></TableCell>
+                <TableCell>
+                  <Skeleton variant="text" />
+                </TableCell>
+
+                <TableCell>
+                  <Skeleton variant="text" />
+                </TableCell>
               </TableRow>
               <TableRow>
-                <TableCell align="right"></TableCell>
-                <TableCell align="right"></TableCell>
+                <TableCell>
+                  <Skeleton variant="text" />
+                </TableCell>
+
+                <TableCell>
+                  <Skeleton variant="text" />
+                </TableCell>
               </TableRow>
               <TableRow>
-                <TableCell align="right"></TableCell>
-                <TableCell align="right"></TableCell>
+                <TableCell sx={{ borderBottom: 'none' }}>
+                  <Skeleton variant="text" />
+                </TableCell>
+                <TableCell sx={{ borderBottom: 'none' }}>
+                  <Skeleton variant="text" />
+                </TableCell>
               </TableRow>
             </TableBody>
           </Table>

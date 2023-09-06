@@ -1,3 +1,4 @@
+import { Skeleton } from '@mui/material';
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
 import TableCell from '@mui/material/TableCell';
@@ -21,20 +22,36 @@ function TreasuryTableLoader() {
             </TableHead>
             <TableBody>
               <TableRow>
-                <TableCell align="right"></TableCell>
-                <TableCell align="right"></TableCell>
+                <TableCell align="right">
+                  <Skeleton variant="text" />
+                </TableCell>
+                <TableCell align="right">
+                  <Skeleton variant="text" />
+                </TableCell>
               </TableRow>
               <TableRow>
-                <TableCell align="right"></TableCell>
-                <TableCell align="right"></TableCell>
+                <TableCell align="right">
+                  <Skeleton variant="text" />
+                </TableCell>
+                <TableCell align="right">
+                  <Skeleton variant="text" />
+                </TableCell>
               </TableRow>
               <TableRow>
-                <TableCell align="right"></TableCell>
-                <TableCell align="right"></TableCell>
+                <TableCell align="right">
+                  <Skeleton variant="text" />
+                </TableCell>
+                <TableCell align="right">
+                  <Skeleton variant="text" />
+                </TableCell>
               </TableRow>
               <TableRow>
-                <TableCell align="right"></TableCell>
-                <TableCell align="right"></TableCell>
+                <TableCell align="right">
+                  <Skeleton variant="text" />
+                </TableCell>
+                <TableCell align="right">
+                  <Skeleton variant="text" />
+                </TableCell>
               </TableRow>
             </TableBody>
           </Table>

@@ -49,6 +49,9 @@ const theme = createTheme({
       background: 'rgba(51, 182, 255, 0.15)',
       contrastText: '#1E1B27',
     },
+    table: {
+      border: BUTTON_BACKGROUND,
+    },
   },
 
   typography: {
@@ -121,7 +124,7 @@ const theme = createTheme({
           color: SECONDARY_TEXT,
           fontSize: '14.3px',
           borderBottom: '1px solid',
-          borderBottomColor: BUTTON_BACKGROUND,
+          borderColor: BUTTON_BACKGROUND,
           padding: '10px 15px',
         },
       },
@@ -268,6 +271,24 @@ declare module '@mui/material/styles' {
     hint?: React.CSSProperties;
     label?: React.CSSProperties;
   }
+
+  interface PaletteOptions {
+    table: {
+      border: string;
+    };
+  }
+
+  interface Palette {
+    table: {
+      border: string;
+    };
+  }
+
+  interface PaletteColorOptions {
+    main: string;
+    contrastText: string;
+    background?: string;
+  }
 }
 
 // Update the Typography's variant prop options
@@ -276,14 +297,6 @@ declare module '@mui/material/Typography' {
     titleAlternate: true;
     hint: true;
     label: true;
-  }
-}
-
-declare module '@mui/material/styles' {
-  interface PaletteColorOptions {
-    main: string;
-    contrastText: string;
-    background?: string;
   }
 }
 
