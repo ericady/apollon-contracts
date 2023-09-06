@@ -267,18 +267,22 @@ export const handlers = [
         throw new Error('Borrower address is required');
       }
 
-      const result: Query['getDebtTokens'] = tokens.map((token) => ({
-        token: token,
-        walletAmount: faker.datatype.boolean() ? parseFloat(faker.finance.amount(0, 1000, 2)) : 0,
-        troveMintedAmount: faker.datatype.boolean() ? parseFloat(faker.finance.amount(0, 500, 2)) : 0,
-        stabilityLostAmount: faker.datatype.boolean() ? parseFloat(faker.finance.amount(0, 50, 2)) : 0,
-        totalDepositedStability: parseFloat(faker.finance.amount(1000, 5000, 2)),
-        totalReserve: parseFloat(faker.finance.amount(1000, 5000, 2)),
-        totalReserve24hAgo: parseFloat(faker.finance.amount(1000, 5000, 2)),
-        totalSupplyUSD: parseFloat(faker.finance.amount(10000, 50000, 2)),
-        totalSupplyUSD24hAgo: parseFloat(faker.finance.amount(10000, 50000, 2)),
-        stabilityDepositAPY: faker.number.float({ min: 0, max: 10, precision: 0.0001 }) / 100,
-      }));
+      const result: Query['getDebtTokens'] = tokens.map((token) => {
+        const shouldHaveUserBalance = token.isPoolToken ? faker.datatype.boolean() : true;
+
+        return {
+          token: token,
+          walletAmount: shouldHaveUserBalance ? parseFloat(faker.finance.amount(0, 1000, 2)) : 0,
+          troveMintedAmount: shouldHaveUserBalance ? parseFloat(faker.finance.amount(0, 500, 2)) : 0,
+          stabilityLostAmount: shouldHaveUserBalance ? parseFloat(faker.finance.amount(0, 50, 2)) : 0,
+          totalDepositedStability: parseFloat(faker.finance.amount(1000, 5000, 2)),
+          totalReserve: parseFloat(faker.finance.amount(1000, 5000, 2)),
+          totalReserve24hAgo: parseFloat(faker.finance.amount(1000, 5000, 2)),
+          totalSupplyUSD: parseFloat(faker.finance.amount(10000, 50000, 2)),
+          totalSupplyUSD24hAgo: parseFloat(faker.finance.amount(10000, 50000, 2)),
+          stabilityDepositAPY: faker.number.float({ min: 0, max: 10, precision: 0.0001 }) / 100,
+        };
+      });
 
       return res(ctx.data({ getDebtTokens: result }));
     },
