@@ -25,6 +25,8 @@ function ReservePoolValueChart() {
 
   if (chartData.length === 0) return <DiagramPlaceholder />;
 
+  const reservePoolValue = chartData[chartData.length - 1].value;
+
   return (
     <div style={{ background: BUTTON_BACKGROUND }}>
       <LineChart width={320} height={190} data={chartData}>
@@ -37,7 +39,7 @@ function ReservePoolValueChart() {
 
       <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: 0.5, pt: 0.5, pb: 1, px: 2 }}>
         <Typography variant="titleAlternate" color="info.main">
-          ≈ 123.123
+          ≈ {reservePoolValue}
         </Typography>
 
         <Typography variant="titleAlternate">$</Typography>
