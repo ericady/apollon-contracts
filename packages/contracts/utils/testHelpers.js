@@ -723,8 +723,17 @@ class TestHelper {
   //   };
   // }
 
-  static async openTrove(contracts, { colls, extraParams }) {
-    return { tx: await contracts.borrowerOperations.openTrove(colls, extraParams) };
+  static async openTrove(contracts, { collToken, collAmount, debts, extraParams }) {
+    await collToken.unprotectedMint(extraParams.from, collAmount);
+    await collToken.approve(contracts.borrowerOperations.address, collAmount, extraParams);
+    const openingTx = await contracts.borrowerOperations.openTrove(
+      [{ tokenAddress: collToken.address, amount: collAmount }],
+      extraParams
+    );
+
+    if (debts) await this.increaseDebt(contracts, { debts, extraParams });
+
+    return { tx: openingTx };
   }
 
   static async increaseDebt(contracts, { debts, maxFeePercentage = this._100pct, extraParams }) {

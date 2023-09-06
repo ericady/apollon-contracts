@@ -18,7 +18,7 @@ contract StabilityPoolManager is Ownable, CheckContract, IStabilityPoolManager {
 
   address public troveManagerAddress;
   address public priceFeedAddress;
-  address public storagePoolAddress;
+  IStoragePool public storagePool;
   address public debtTokenManagerAddress;
 
   // --- Data structures ---
@@ -45,7 +45,7 @@ contract StabilityPoolManager is Ownable, CheckContract, IStabilityPoolManager {
     priceFeedAddress = _priceFeedAddress;
     emit PriceFeedAddressChanged(_priceFeedAddress);
 
-    storagePoolAddress = _storagePoolAddress;
+    storagePool = IStoragePool(_storagePoolAddress);
     emit StoragePoolAddressChanged(_storagePoolAddress);
 
     debtTokenManagerAddress = _debtTokenManagerAddress;
@@ -57,7 +57,7 @@ contract StabilityPoolManager is Ownable, CheckContract, IStabilityPoolManager {
 
   // --- Getters ---
 
-  function getStabilityPool(IDebtToken _debtToken) external view returns (IStabilityPool) {
+  function getStabilityPool(IDebtToken _debtToken) external view override returns (IStabilityPool) {
     IStabilityPool stabilityPool = stabilityPools[_debtToken];
     require(address(stabilityPool) != address(0), 'pool does not exist');
     return stabilityPool;
@@ -124,19 +124,61 @@ contract StabilityPoolManager is Ownable, CheckContract, IStabilityPoolManager {
     }
   }
 
+  function offset(RemainingStability[] memory _toOffset) external override {
+    _requireCallerIsTroveManager();
+
+    IStoragePool storagePoolCached = storagePool;
+    for (uint i = 0; i < _toOffset.length; i++) {
+      RemainingStability memory remainingStability = _toOffset[i];
+      address stabilityPoolAddress = address(remainingStability.stabilityPool);
+      if (remainingStability.debtToOffset == 0) continue;
+
+      // update internal pool stake snapshots
+      remainingStability.stabilityPool.offset(remainingStability.debtToOffset, remainingStability.collGained);
+
+      // Cancel the liquidated debt with the debt in the stability pool
+      storagePoolCached.subtractValue(
+        remainingStability.tokenAddress,
+        false,
+        PoolType.Active,
+        remainingStability.debtToOffset
+      );
+      // Burn the debt that was successfully offset
+      remainingStability.stabilityPool.getDepositToken().burn(stabilityPoolAddress, remainingStability.debtToOffset);
+
+      // move the coll from the active pool into the stability pool
+      for (uint i = 0; i < remainingStability.collGained.length; i++) {
+        // todo there is no coll gained on stability pool offset -> has to be a bug!
+        if (remainingStability.collGained[i].amount == 0) continue;
+        storagePoolCached.withdrawalValue(
+          stabilityPoolAddress,
+          remainingStability.collGained[i].tokenAddress,
+          true,
+          PoolType.Active,
+          remainingStability.collGained[i].amount
+        );
+      }
+    }
+  }
+
   function addStabilityPool(IDebtToken _debtToken) external override {
     require(msg.sender == debtTokenManagerAddress, 'unauthorized');
     require(address(stabilityPools[_debtToken]) == address(0), 'pool already exists');
 
     IStabilityPool stabilityPool = new StabilityPool(
+      address(this),
       troveManagerAddress,
       priceFeedAddress,
-      storagePoolAddress,
+      address(storagePool),
       address(_debtToken)
     );
 
     stabilityPools[_debtToken] = stabilityPool;
     stabilityPoolsArray.push(stabilityPool);
     emit StabilityPoolAdded(stabilityPool);
+  }
+
+  function _requireCallerIsTroveManager() internal view {
+    require(msg.sender == troveManagerAddress, 'StabilityPool: Caller is not TroveManager');
   }
 }

@@ -17,8 +17,8 @@ interface IBase {
     uint pendingReward; // gained rewards since deposit
     uint gasCompensation; // gas compensation for liquidation
     uint toLiquidate; // amount + pendingReward - gasCompensation
-    uint toRedistribute;
-    uint toOffset;
+    uint toRedistribute; // across other open troves
+    uint toOffset; // by stability pools
   }
 
   struct CAmount {

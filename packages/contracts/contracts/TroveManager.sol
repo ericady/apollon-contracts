@@ -400,8 +400,8 @@ contract TroveManager is LiquityBase, Ownable, CheckContract, ITroveManager {
       vars.user = _troveArray[vars.i];
       if (Troves[vars.user].status != Status.active) continue; // Skip non-active troves
 
-      _executeTroveLiquidation_NormalMode(outerVars, vars);
-      if (!atLeastOneTroveLiquidated) atLeastOneTroveLiquidated = true;
+      bool liquidated = _executeTroveLiquidation_NormalMode(outerVars, vars);
+      if (liquidated && !atLeastOneTroveLiquidated) atLeastOneTroveLiquidated = true;
     }
 
     return (vars.tokensToRedistribute, vars.gasCompensationInStable, atLeastOneTroveLiquidated);
@@ -445,11 +445,10 @@ contract TroveManager is LiquityBase, Ownable, CheckContract, ITroveManager {
 
     for (uint i = 0; i < troveAmountsIncludingRewards.length; i++) {
       RAmount memory rAmount = troveAmountsIncludingRewards[i];
-      if (!rAmount.isColl) continue; // debt will be handled later in the debts loop
-      rAmount.toRedistribute = rAmount.toLiquidate; // by default the entire debt amount needs to be redistributed
+      if (rAmount.isColl) rAmount.toRedistribute = rAmount.toLiquidate; // by default the entire debt amount needs to be redistributed
     }
 
-    _innerOffset(troveDebtInStable, troveAmountsIncludingRewards, remainingStabilities);
+    _debtOffset(troveDebtInStable, troveAmountsIncludingRewards, remainingStabilities);
   }
 
   /*
@@ -472,10 +471,10 @@ contract TroveManager is LiquityBase, Ownable, CheckContract, ITroveManager {
       rAmount.toLiquidate = LiquityMath._min(cappedColl, rAmount.toLiquidate);
     }
 
-    _innerOffset(troveDebtInStable, troveAmountsIncludingRewards, remainingStabilities);
+    _debtOffset(troveDebtInStable, troveAmountsIncludingRewards, remainingStabilities);
   }
 
-  function _innerOffset(
+  function _debtOffset(
     uint troveDebtInStable,
     RAmount[] memory troveAmountsIncludingRewards,
     RemainingStability[] memory remainingStabilities
@@ -673,13 +672,10 @@ contract TroveManager is LiquityBase, Ownable, CheckContract, ITroveManager {
     bool atLeastOneTroveLiquidated,
     LocalVariables_OuterLiquidationFunction memory vars
   ) internal {
-    require(!atLeastOneTroveLiquidated, 'TroveManager: nothing to liquidate');
+    require(atLeastOneTroveLiquidated, 'TroveManager: nothing to liquidate');
 
     // move tokens into the stability pools
-    for (uint i = 0; i < vars.remainingStabilities.length; i++) {
-      RemainingStability memory remainingStability = vars.remainingStabilities[i];
-      remainingStability.stabilityPool.offset(remainingStability.debtToOffset, remainingStability.collGained);
-    }
+    vars.stabilityPoolManagerCached.offset(vars.remainingStabilities);
 
     // and redistribute the rest (which could not be handled by the stability pool)
     _redistributeDebtAndColl(
@@ -709,8 +705,13 @@ contract TroveManager is LiquityBase, Ownable, CheckContract, ITroveManager {
     if (_stableCoinGasCompensation == 0) return;
 
     IDebtToken stableCoin = debtTokenManager.getStableCoin();
-    _storagePool.subtractValue(address(stableCoin), false, PoolType.GasCompensation, _stableCoinGasCompensation);
-    stableCoin.transferFrom(address(_storagePool), _liquidator, _stableCoinGasCompensation);
+    _storagePool.withdrawalValue(
+      _liquidator,
+      address(stableCoin),
+      false,
+      PoolType.GasCompensation,
+      _stableCoinGasCompensation
+    );
   }
 
   // Move a Trove's pending debt and collateral rewards from distributions, from the Default Pool to the Active Pool
@@ -720,12 +721,13 @@ contract TroveManager is LiquityBase, Ownable, CheckContract, ITroveManager {
   ) internal {
     for (uint i = 0; i < _troveAmountsIncludingRewards.length; i++) {
       RAmount memory rAmount = _troveAmountsIncludingRewards[i];
+      if (rAmount.pendingReward == 0) continue;
       _storagePool.transferBetweenTypes(
         rAmount.tokenAddress,
         rAmount.isColl,
         PoolType.Default,
         PoolType.Active,
-        rAmount.amount
+        rAmount.pendingReward
       );
     }
   }
@@ -836,11 +838,12 @@ contract TroveManager is LiquityBase, Ownable, CheckContract, ITroveManager {
       RedemptionCollAmount memory collEntry = vars.totalCollDrawn[i];
       if (collEntry.sendToRedeemer == 0) continue;
 
-      vars.storagePoolCached.subtractValue(collEntry.tokenAddress, true, PoolType.Active, collEntry.drawn);
-      IERC20(collEntry.tokenAddress).transferFrom(
-        address(vars.storagePoolCached),
+      vars.storagePoolCached.withdrawalValue(
         msg.sender,
-        collEntry.sendToRedeemer
+        collEntry.tokenAddress,
+        true,
+        PoolType.Active,
+        collEntry.drawn
       );
 
       // todo jelly handover
@@ -1112,26 +1115,30 @@ contract TroveManager is LiquityBase, Ownable, CheckContract, ITroveManager {
 
     for (uint i = 0; i < trove.collTokens.length; i++) {
       address tokenAddress = address(trove.collTokens[i]);
-      amounts[i + trove.debtTokens.length] = RAmount(
+      amounts[i] = RAmount(
         tokenAddress,
         _priceFeed.getPrice(_priceCache, tokenAddress),
         true,
         trove.colls[trove.collTokens[i]],
-        _getPendingReward(_borrower, tokenAddress, true, _priceFeed, _priceCache, _collTokenAddresses),
+        0,
         0,
         0,
         0,
         0
       );
     }
+
+    uint stableCoinIndex;
     for (uint i = 0; i < trove.debtTokens.length; i++) {
+      if (trove.debtTokens[i].isStableCoin()) stableCoinIndex = i.add(trove.collTokens.length);
+
       address tokenAddress = address(trove.debtTokens[i]);
-      amounts[i] = RAmount(
+      amounts[i + trove.collTokens.length] = RAmount(
         tokenAddress,
         trove.debtTokens[i].getPrice(_priceCache),
         false,
         trove.debts[trove.debtTokens[i]],
-        _getPendingReward(_borrower, tokenAddress, false, _priceFeed, _priceCache, _collTokenAddresses),
+        0,
         0,
         0,
         0,
@@ -1141,14 +1148,25 @@ contract TroveManager is LiquityBase, Ownable, CheckContract, ITroveManager {
 
     // adding gas compensation + toLiquidate
     for (uint i = 0; i < amounts.length; i++) {
-      // todo do we miss the stableCoinGasComp at this point? should it be subtracted?
+      RAmount memory amountEntry = amounts[i];
 
-      uint totalAmount = amounts[i].amount.add(amounts[i].pendingReward);
-      amounts[i].gasCompensation = _getCollGasCompensation(totalAmount);
-      amounts[i].toLiquidate = totalAmount.sub(amounts[i].gasCompensation);
+      amountEntry.pendingReward = _getPendingReward(
+        _borrower,
+        amountEntry.tokenAddress,
+        amountEntry.isColl,
+        _priceFeed,
+        _priceCache,
+        _collTokenAddresses
+      );
+      uint totalAmount = amountEntry.amount.add(amountEntry.pendingReward);
+      if (amountEntry.isColl) amountEntry.gasCompensation = _getCollGasCompensation(totalAmount);
 
-      uint inStable = totalAmount.mul(amounts[i].price);
-      if (amounts[i].isColl) troveCollInStable = troveCollInStable.add(inStable);
+      amountEntry.toLiquidate = totalAmount.sub(amountEntry.gasCompensation);
+      // stable coin gas compensation should not be liquidated, it will be paid out as reward for the liquidator
+      if (i == stableCoinIndex) amountEntry.toLiquidate = amountEntry.toLiquidate.sub(STABLE_COIN_GAS_COMPENSATION);
+
+      uint inStable = totalAmount.mul(amountEntry.price);
+      if (amountEntry.isColl) troveCollInStable = troveCollInStable.add(inStable);
       else troveDebtInStable = troveDebtInStable.add(inStable);
     }
 
@@ -1359,8 +1377,7 @@ contract TroveManager is LiquityBase, Ownable, CheckContract, ITroveManager {
   }
 
   function _addTroveOwnerToArray(address _borrower) internal returns (uint128 index) {
-    /* Max array size is 2**128 - 1, i.e. ~3e30 troves. No risk of overflow, since troves have minimum LUSD
-        debt of liquidation reserve plus MIN_NET_DEBT. 3e30 LUSD dwarfs the value of all wealth in the world ( which is < 1e15 USD). */
+    /* Max array size is 2**128 - 1, i.e. ~3e30 troves. 3e30 LUSD dwarfs the value of all wealth in the world ( which is < 1e15 USD). */
 
     // Push the Troveowner to the array
     TroveOwners.push(_borrower);

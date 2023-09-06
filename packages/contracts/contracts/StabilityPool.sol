@@ -155,6 +155,7 @@ contract StabilityPool is LiquityBase, Ownable, CheckContract, IStabilityPool {
   ITroveManager public troveManager;
   IPriceFeed public priceFeed;
   IStoragePool public storagePool;
+  address public stabilityPoolManagerAddress;
 
   // --- Data structures ---
 
@@ -211,15 +212,20 @@ contract StabilityPool is LiquityBase, Ownable, CheckContract, IStabilityPool {
   mapping(address => uint) public lastErrorOffset; // [tokenAddress] value, Error trackers for the error correction in the offset calculation
 
   constructor(
+    address _stabilityPoolManagerAddress,
     address _troveManagerAddress,
     address _priceFeedAddress,
     address _storagePoolAddress,
     address _depositTokenAddress
   ) public {
+    checkContract(_stabilityPoolManagerAddress);
     checkContract(_troveManagerAddress);
     checkContract(_priceFeedAddress);
     checkContract(_storagePoolAddress);
     checkContract(_depositTokenAddress);
+
+    stabilityPoolManagerAddress = _stabilityPoolManagerAddress;
+    emit StabilityPoolManagerAddressChanged(_stabilityPoolManagerAddress);
 
     troveManager = ITroveManager(_troveManagerAddress);
     emit TroveManagerAddressChanged(_troveManagerAddress);
@@ -440,7 +446,7 @@ contract StabilityPool is LiquityBase, Ownable, CheckContract, IStabilityPool {
    * Only called by liquidation functions in the TroveManager.
    */
   function offset(uint _debtToOffset, TokenAmount[] memory _collToAdd) external override {
-    _requireCallerIsTroveManager();
+    _requireCallerIsStabilityPoolManager();
 
     uint _totalDeposits = totalDeposits;
     if (_totalDeposits == 0 || _debtToOffset == 0) return;
@@ -455,7 +461,10 @@ contract StabilityPool is LiquityBase, Ownable, CheckContract, IStabilityPool {
     );
     _updateRewardSumAndProduct(collGainPerUnitStaked, depositLossPerUnitStaked); // updates S and P
 
-    _moveOffsetCollAndDebt(_debtToOffset, _collToAdd);
+    uint newTotalDeposit = totalDeposits.sub(_debtToOffset);
+    totalDeposits = newTotalDeposit;
+    // todo
+    //    emit StabilityPoolDepositBalanceUpdated(newTotalDeposit);
   }
 
   function _computeRewardsPerUnitStaked(
@@ -557,24 +566,6 @@ contract StabilityPool is LiquityBase, Ownable, CheckContract, IStabilityPool {
     assert(newP > 0);
     P = newP;
     emit P_Updated(newP);
-  }
-
-  function _moveOffsetCollAndDebt(uint _debtToOffset, TokenAmount[] memory _collToAdd) internal {
-    IStoragePool storagePoolCached = storagePool;
-
-    // Cancel the liquidated debt with the debt in the stability pool
-    storagePoolCached.subtractValue(address(depositToken), false, PoolType.Active, _debtToOffset);
-    depositToken.burn(address(this), _debtToOffset); // Burn the debt that was successfully offset
-
-    uint newTotalDeposit = totalDeposits.sub(_debtToOffset);
-    totalDeposits = newTotalDeposit;
-    emit StabilityPoolDepositBalanceUpdated(newTotalDeposit);
-
-    // move the coll from the active pool into the stability pool
-    for (uint i = 0; i < _collToAdd.length; i++) {
-      storagePoolCached.subtractValue(_collToAdd[i].tokenAddress, true, PoolType.Active, _collToAdd[i].amount);
-      IERC20(_collToAdd[i].tokenAddress).transferFrom(address(storagePoolCached), address(this), _collToAdd[i].amount);
-    }
   }
 
   // --- Reward calculator functions ---
@@ -744,8 +735,8 @@ contract StabilityPool is LiquityBase, Ownable, CheckContract, IStabilityPool {
 
   // --- 'require' functions ---
 
-  function _requireCallerIsTroveManager() internal view {
-    require(msg.sender == address(troveManager), 'StabilityPool: Caller is not TroveManager');
+  function _requireCallerIsStabilityPoolManager() internal view {
+    require(msg.sender == stabilityPoolManagerAddress, 'StabilityPool: Caller is not StabilityPoolManager');
   }
 
   function _requireUserHasDeposit(uint _initialDeposit) internal pure {

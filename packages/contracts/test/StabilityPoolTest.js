@@ -32,6 +32,7 @@ contract('StabilityPool', async accounts => {
 
   const getOpenTroveLUSDAmount = async totalDebt => th.getOpenTroveLUSDAmount(contracts, totalDebt);
   const openTrove = async params => th.openTrove(contracts, params);
+  const increaseDebt = async params => th.increaseDebt(contracts, params);
   const assertRevert = th.assertRevert;
 
   describe('Stability Pool Mechanisms', async () => {
@@ -107,6 +108,93 @@ contract('StabilityPool', async accounts => {
       // check user's balance change
       const stockAfter = await contracts.debtToken.STOCK.balanceOf(alice);
       assert.equal(stockBefore.sub(stockAfter), '200');
+    });
+
+    it('provideToSP(): Correctly updates user snapshots of accumulated rewards per unit staked', async () => {
+      // --- SETUP ---
+
+      // Whale opens Trove and deposits to SP
+      await openTrove({
+        collToken: contracts.collToken.BTC,
+        collAmount: dec(1, 18),
+        debts: [{ tokenAddress: STOCK, amount: dec(1, 18) }],
+        extraParams: { from: whale },
+      });
+      await stabilityPoolManager.provideStability([{ tokenAddress: STOCK, amount: dec(1, 18) }], {
+        from: whale,
+      });
+
+      // 2 Troves opened, each withdraws minimum debt
+      await openTrove({
+        collToken: contracts.collToken.BTC,
+        collAmount: dec(2, 16), // 0.02 BTC
+        debts: [{ tokenAddress: STOCK, amount: dec(1, 5) }],
+        extraParams: { from: defaulter_1 },
+      });
+      await openTrove({
+        collToken: contracts.collToken.BTC,
+        collAmount: dec(2, 16), // 0.02 BTC
+        debts: [{ tokenAddress: STOCK, amount: dec(1, 5) }],
+        extraParams: { from: defaulter_2 },
+      });
+
+      // Alice makes Trove and withdraws 100 stock
+      await openTrove({
+        collToken: contracts.collToken.BTC,
+        collAmount: dec(1, 18),
+        debts: [{ tokenAddress: STOCK, amount: dec(1, 18) }],
+        extraParams: { from: alice },
+      });
+
+      // price drops: defaulter's Troves fall below MCR, whale doesn't
+      await priceFeed.setTokenPrice(BTC, dec(9500, 18));
+
+      const stockBefore = (await contracts.stabilityPoolManager.getTotalDeposits()).find(
+        d => d.tokenAddress === STOCK
+      ).amount;
+
+      // Troves are closed
+      await troveManager.liquidate(defaulter_1, { from: owner });
+      assert.equal(await troveManager.getTroveStatus(defaulter_1), 3);
+      await troveManager.liquidate(defaulter_2, { from: owner });
+      assert.equal(await troveManager.getTroveStatus(defaulter_2), 3);
+
+      // Confirm SP has decreased
+      const stockAfter = (await contracts.stabilityPoolManager.getTotalDeposits()).find(
+        d => d.tokenAddress === STOCK
+      ).amount;
+
+      assert.isTrue(toBN(stockAfter).lt(toBN(stockBefore)));
+      // todo fix missing stability coll gain first
+
+      // // --- TEST ---
+      // const P_Before = await stabilityPool.P();
+      // const S_Before = await stabilityPool.epochToScaleToSum(0, 0);
+      // const G_Before = await stabilityPool.epochToScaleToG(0, 0);
+      // assert.isTrue(P_Before.gt(toBN('0')));
+      // assert.isTrue(S_Before.gt(toBN('0')));
+      //
+      // // Check 'Before' snapshots
+      // const alice_snapshot_Before = await stabilityPool.depositSnapshots(alice);
+      // const alice_snapshot_S_Before = alice_snapshot_Before[0].toString();
+      // const alice_snapshot_P_Before = alice_snapshot_Before[1].toString();
+      // const alice_snapshot_G_Before = alice_snapshot_Before[2].toString();
+      // assert.equal(alice_snapshot_S_Before, '0');
+      // assert.equal(alice_snapshot_P_Before, '0');
+      // assert.equal(alice_snapshot_G_Before, '0');
+      //
+      // // Make deposit
+      // await stabilityPool.provideToSP(dec(100, 18), frontEnd_1, { from: alice });
+      //
+      // // Check 'After' snapshots
+      // const alice_snapshot_After = await stabilityPool.depositSnapshots(alice);
+      // const alice_snapshot_S_After = alice_snapshot_After[0].toString();
+      // const alice_snapshot_P_After = alice_snapshot_After[1].toString();
+      // const alice_snapshot_G_After = alice_snapshot_After[2].toString();
+      //
+      // assert.equal(alice_snapshot_S_After, S_Before);
+      // assert.equal(alice_snapshot_P_After, P_Before);
+      // assert.equal(alice_snapshot_G_After, G_Before);
     });
   });
 });

@@ -6,11 +6,21 @@ import '../StabilityPool.sol';
 
 contract StabilityPoolTester is StabilityPool {
   constructor(
+    address _stabilityPoolManagerAddress,
     address _troveManagerAddress,
     address _priceFeedAddress,
     address _storagePoolAddress,
     address _depositTokenAddress
-  ) public StabilityPool(_troveManagerAddress, _priceFeedAddress, _storagePoolAddress, _depositTokenAddress) {}
+  )
+    public
+    StabilityPool(
+      _stabilityPoolManagerAddress,
+      _troveManagerAddress,
+      _priceFeedAddress,
+      _storagePoolAddress,
+      _depositTokenAddress
+    )
+  {}
 
   function setCurrentScale(uint128 _currentScale) external {
     currentScale = _currentScale;

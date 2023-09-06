@@ -107,9 +107,6 @@ contract BorrowerOperations is LiquityBase, Ownable, CheckContract, IBorrowerOpe
     address _debtTokenManagerAddress,
     address _collTokenManagerAddress
   ) external onlyOwner {
-    // This makes impossible to open a trove with zero withdrawn LUSD
-    assert(MIN_NET_DEBT > 0);
-
     checkContract(_troveManagerAddress);
     checkContract(_storagePoolAddress);
     checkContract(_stabilityPoolAddress);
@@ -172,10 +169,13 @@ contract BorrowerOperations is LiquityBase, Ownable, CheckContract, IBorrowerOpe
     vars.ICR = LiquityMath._computeCR(vars.compositeCollInStable, vars.compositeDebtInStable);
     vars.NICR = LiquityMath._computeNominalCR(vars.compositeCollInStable, vars.compositeDebtInStable);
 
-    // checking collateral ratios
-    (vars.isInRecoveryMode, vars.TCR, vars.entireSystemColl, vars.entireSystemDebt) = contractsCache
-      .storagePool
-      .checkRecoveryMode(priceCache);
+    (
+      // checking collateral ratios
+      vars.isInRecoveryMode,
+      vars.TCR,
+      vars.entireSystemColl,
+      vars.entireSystemDebt
+    ) = contractsCache.storagePool.checkRecoveryMode(priceCache);
     if (vars.isInRecoveryMode) {
       _requireICRisAboveCCR(vars.ICR); // > 150 %
     } else {

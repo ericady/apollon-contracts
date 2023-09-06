@@ -11,7 +11,7 @@ interface IStoragePool is IBase {
   event PoolValueUpdated(address _tokenAddress, bool _isColl, PoolType _poolType, uint _updatedAmount);
   event BorrowerOperationsAddressChanged(address _newBorrowerOperationsAddress);
   event TroveManagerAddressChanged(address _newTroveManagerAddress);
-  event StabilityPoolAddressChanged(address _newStabilityPoolAddress);
+  event StabilityPoolManagerAddressChanged(address _newStabilityPoolAddress);
   event PriceFeedAddressChanged(address _priceFeedAddress);
 
   // --- Functions ---
@@ -21,6 +21,14 @@ interface IStoragePool is IBase {
   function addValue(address _tokenAddress, bool _isColl, PoolType _poolType, uint _amount) external;
 
   function subtractValue(address _tokenAddress, bool _isColl, PoolType _poolType, uint _amount) external;
+
+  function withdrawalValue(
+    address _receiver,
+    address _tokenAddress,
+    bool _isColl,
+    PoolType _poolType,
+    uint _amount
+  ) external;
 
   function transferBetweenTypes(
     address _tokenAddress,

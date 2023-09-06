@@ -11,6 +11,7 @@ interface IStabilityPool is IBase {
   event StabilityPoolCollBalanceUpdates(address _tokenAddress, uint _newBalance);
   event StabilityPoolDepositBalanceUpdated(uint _newBalance);
 
+  event StabilityPoolManagerAddressChanged(address _newStabilityPoolManagerAddress);
   event TroveManagerAddressChanged(address _newTroveManagerAddress);
   event PriceFeedAddressChanged(address _newPriceFeedAddress);
   event StoragePoolAddressChanged(address _newStoragePoolAddress);

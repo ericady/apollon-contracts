@@ -139,6 +139,7 @@ class DeploymentHelper {
       STABLE: await DebtTokenTester.new(
         contracts.troveManager.address,
         contracts.borrowerOperations.address,
+        contracts.stabilityPoolManager.address,
         contracts.priceFeedTestnet.address,
         'STABLE',
         'STABLE',
@@ -148,6 +149,7 @@ class DeploymentHelper {
       STOCK: await DebtTokenTester.new(
         contracts.troveManager.address,
         contracts.borrowerOperations.address,
+        contracts.stabilityPoolManager.address,
         contracts.priceFeedTestnet.address,
         'STOCK',
         'STOCK',

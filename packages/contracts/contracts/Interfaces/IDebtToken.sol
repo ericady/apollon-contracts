@@ -10,8 +10,8 @@ interface IDebtToken is IERC20, IERC2612, IBase {
   // --- Events ---
 
   event TroveManagerAddressChanged(address _troveManagerAddress);
-  event StabilityPoolAddressChanged(address _newStabilityPoolAddress);
   event BorrowerOperationsAddressChanged(address _newBorrowerOperationsAddress);
+  event StabilityPoolManagerAddressChanged(address _stabilityPoolManagerAddress);
   event PriceFeedAddressChanged(address _newPriceFeedAddress);
 
   // --- Functions ---

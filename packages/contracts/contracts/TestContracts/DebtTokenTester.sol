@@ -10,6 +10,7 @@ contract DebtTokenTester is DebtToken {
   constructor(
     address _troveManagerAddress,
     address _borrowerOperationsAddress,
+    address _stabilityPoolManagerAddress,
     address _priceFeedAddress,
     string memory _symbol,
     string memory _name,
@@ -20,6 +21,7 @@ contract DebtTokenTester is DebtToken {
     DebtToken(
       _troveManagerAddress,
       _borrowerOperationsAddress,
+      _stabilityPoolManagerAddress,
       _priceFeedAddress,
       _symbol,
       _name,
@@ -54,7 +56,9 @@ contract DebtTokenTester is DebtToken {
 
   function getChainId() external view returns (uint256 chainID) {
     //return _chainID(); // it’s private
-    assembly {chainID := chainid()}
+    assembly {
+      chainID := chainid()
+    }
   }
 
   function getDigest(

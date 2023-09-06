@@ -60,11 +60,13 @@ contract DebtToken is CheckContract, IDebtToken {
   // --- Addresses ---
   address public immutable troveManagerAddress;
   address public immutable borrowerOperationsAddress;
+  address public immutable stabilityPoolManagerAddress;
   IPriceFeed public immutable priceFeed;
 
   constructor(
     address _troveManagerAddress,
     address _borrowerOperationsAddress,
+    address _stabilityPoolManagerAddress,
     address _priceFeedAddress,
     string memory _symbol,
     string memory _name,
@@ -73,6 +75,7 @@ contract DebtToken is CheckContract, IDebtToken {
   ) public {
     checkContract(_troveManagerAddress);
     checkContract(_borrowerOperationsAddress);
+    checkContract(_stabilityPoolManagerAddress);
     checkContract(_priceFeedAddress);
 
     troveManagerAddress = _troveManagerAddress;
@@ -80,6 +83,9 @@ contract DebtToken is CheckContract, IDebtToken {
 
     borrowerOperationsAddress = _borrowerOperationsAddress;
     emit BorrowerOperationsAddressChanged(_borrowerOperationsAddress);
+
+    stabilityPoolManagerAddress = _stabilityPoolManagerAddress;
+    emit StabilityPoolManagerAddressChanged(_stabilityPoolManagerAddress);
 
     priceFeed = IPriceFeed(_priceFeedAddress);
     emit PriceFeedAddressChanged(_priceFeedAddress);
@@ -119,8 +125,7 @@ contract DebtToken is CheckContract, IDebtToken {
   }
 
   function sendToPool(address _sender, address _poolAddress, uint256 _amount) external override {
-    // todo check over stabilitypoolmanager, is the sender is one of the stability pools...
-    //    _requireCallerIsStabilityPool();
+    //    _requireCallerIsStabilityPoolManager(); todo! needs to be called from the manager, not the pool itself...
     _transfer(_sender, _poolAddress, _amount);
   }
 
@@ -272,8 +277,9 @@ contract DebtToken is CheckContract, IDebtToken {
       'dToken: Cannot transfer tokens directly to the dToken token contract or the zero address'
     );
     require(
-      //      _recipient != stabilityPoolAddress &&
-      _recipient != troveManagerAddress && _recipient != borrowerOperationsAddress,
+      _recipient != stabilityPoolManagerAddress &&
+        _recipient != troveManagerAddress &&
+        _recipient != borrowerOperationsAddress,
       'dToken: Cannot transfer tokens directly to the StabilityPool, TroveManager or BorrowerOps'
     );
   }
@@ -284,21 +290,21 @@ contract DebtToken is CheckContract, IDebtToken {
 
   function _requireCallerIsBOorTroveMorSP() internal view {
     require(
-      msg.sender == borrowerOperationsAddress || msg.sender == troveManagerAddress,
-      //      || msg.sender == stabilityPoolAddress,
-      'dToken: Caller is neither BorrowerOperations nor TroveManager nor StabilityPool'
+      msg.sender == borrowerOperationsAddress ||
+        msg.sender == troveManagerAddress ||
+        msg.sender == stabilityPoolManagerAddress,
+      'dToken: Caller is neither BorrowerOperations nor TroveManager nor StabilityPoolManager'
     );
   }
 
-  //  function _requireCallerIsStabilityPool() internal view {
-  //    require(msg.sender == stabilityPoolAddress, 'dToken: Caller is not the StabilityPool');
-  //  }
+  function _requireCallerIsStabilityPoolManager() internal view {
+    require(msg.sender == stabilityPoolManagerAddress, 'dToken: Caller is not the StabilityPoolManager');
+  }
 
   function _requireCallerIsTroveMorSP() internal view {
     require(
-      msg.sender == troveManagerAddress,
-      //      || msg.sender == stabilityPoolAddress,
-      'dToken: Caller is neither TroveManager nor StabilityPool'
+      msg.sender == troveManagerAddress || msg.sender == stabilityPoolManagerAddress,
+      'dToken: Caller is neither TroveManager nor StabilityPoolManager'
     );
   }
 
