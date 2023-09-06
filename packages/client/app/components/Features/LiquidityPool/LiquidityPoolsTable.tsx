@@ -1,7 +1,6 @@
 'use client';
 
 import { useQuery } from '@apollo/client';
-import ExpandMoreSharpIcon from '@mui/icons-material/ExpandMoreSharp';
 import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from '@mui/material';
 import Typography from '@mui/material/Typography';
 import { Fragment } from 'react';
@@ -15,6 +14,7 @@ import {
 import { GET_BORROWER_LIQUIDITY_POOLS, GET_LIQUIDITY_POOLS } from '../../../queries';
 import { displayPercentage, percentageChange } from '../../../utils/math';
 import FeatureBox from '../../FeatureBox/FeatureBox';
+import DirectionIcon from '../../Icons/DirectionIcon';
 import Label from '../../Label/Label';
 import HeaderCell from '../../Table/HeaderCell';
 
@@ -141,9 +141,7 @@ function LiquidityPoolsTable({ selectedPool, setSelectedPool }: Props) {
                         <Typography sx={{ color: volumeChange > 0 ? 'success.main' : 'error.main', fontWeight: '400' }}>
                           {displayPercentage(volumeChange)}
                         </Typography>
-                        <ExpandMoreSharpIcon
-                          sx={{ color: volumeChange > 0 ? 'success.main' : 'error.main', ml: '-5px' }}
-                        />
+                        <DirectionIcon showIncrease={volumeChange > 0} />
                       </div>
                     </TableCell>
                   </TableRow>

@@ -13,6 +13,7 @@ import { GetCollateralTokensQuery, GetCollateralTokensQueryVariables } from '../
 import { GET_ALL_COLLATERAL_TOKENS } from '../../../../queries';
 import { displayPercentage, percentageChange, roundCurrency } from '../../../../utils/math';
 import FeatureBox from '../../../FeatureBox/FeatureBox';
+import DirectionIcon from '../../../Icons/DirectionIcon';
 import Label from '../../../Label/Label';
 import HeaderCell from '../../../Table/HeaderCell';
 import CollateralUpdateDialog from '../CollateralUpdateDialog';
@@ -32,7 +33,7 @@ const CollateralTokenTable = () => {
   }
 
   return (
-    <FeatureBox title="Collateral Token" noPadding border="full">
+    <FeatureBox title="Collateral Token" noPadding border="full" borderRadius>
       <div>
         <TableContainer>
           <Table size="small">
@@ -55,17 +56,22 @@ const CollateralTokenTable = () => {
                       <Label variant="none">{token.symbol}</Label>
                     </TableCell>
                     <TableCell align="right">{totalValueLockedUSD}</TableCell>
-                    <TableCell align="left" sx={{ width: 70 }}>
-                      <Typography
-                        fontWeight={400}
-                        color={
-                          percentageChange(totalValueLockedUSD, totalValueLockedUSD24hAgo) > 0
-                            ? 'success.main'
-                            : 'error.main'
-                        }
-                      >
-                        {displayPercentage(percentageChange(totalValueLockedUSD, totalValueLockedUSD24hAgo))}
-                      </Typography>
+                    <TableCell align="left" sx={{ width: 110 }}>
+                      <div className="flex">
+                        <Typography
+                          fontWeight={400}
+                          color={
+                            percentageChange(totalValueLockedUSD, totalValueLockedUSD24hAgo) > 0
+                              ? 'success.main'
+                              : 'error.main'
+                          }
+                        >
+                          {displayPercentage(percentageChange(totalValueLockedUSD, totalValueLockedUSD24hAgo))}
+                        </Typography>
+                        <DirectionIcon
+                          showIncrease={percentageChange(totalValueLockedUSD, totalValueLockedUSD24hAgo) > 0}
+                        />
+                      </div>
                     </TableCell>
                   </TableRow>
                 ),

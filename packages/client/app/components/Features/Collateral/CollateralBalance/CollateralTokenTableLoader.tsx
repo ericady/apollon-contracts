@@ -10,7 +10,7 @@ import HeaderCell from '../../../Table/HeaderCell';
 
 const CollateralTokenTableLoader = () => {
   return (
-    <FeatureBox title="Collateral Token" noPadding border="full">
+    <FeatureBox title="Collateral Token" noPadding border="full" borderRadius>
       <div className="apollon-table-txt">
         <TableContainer>
           <Table>

@@ -184,14 +184,14 @@ export type GetAllPoolsQuery = { __typename?: 'Query', getPools: Array<{ __typen
 export type GetDebtTokensQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type GetDebtTokensQuery = { __typename?: 'Query', getDebtTokens: Array<{ __typename?: 'DebtTokenMeta', totalSupplyUSD: number, token: { __typename?: 'Token', address: string, symbol: string, priceUSD: number, priceUSD24hAgo: number } }> };
+export type GetDebtTokensQuery = { __typename?: 'Query', getDebtTokens: Array<{ __typename?: 'DebtTokenMeta', totalSupplyUSD: number, totalReserve: number, totalReserve24hAgo: number, token: { __typename?: 'Token', address: string, symbol: string, priceUSD: number, priceUSD24hAgo: number } }> };
 
 export type GetBorrowerDebtTokensQueryVariables = Exact<{
   borrower: Scalars['String']['input'];
 }>;
 
 
-export type GetBorrowerDebtTokensQuery = { __typename?: 'Query', getDebtTokens: Array<{ __typename?: 'DebtTokenMeta', troveMintedAmount?: number | null, walletAmount?: number | null, stabilityDepositAPY: number, totalDepositedStability: number, totalReserve: number, totalReserve24hAgo: number, token: { __typename?: 'Token', address: string, symbol: string, priceUSD: number, isPoolToken: boolean } }> };
+export type GetBorrowerDebtTokensQuery = { __typename?: 'Query', getDebtTokens: Array<{ __typename?: 'DebtTokenMeta', troveMintedAmount?: number | null, walletAmount?: number | null, stabilityDepositAPY: number, totalDepositedStability: number, totalSupplyUSD: number, totalSupplyUSD24hAgo: number, token: { __typename?: 'Token', address: string, symbol: string, priceUSD: number, isPoolToken: boolean } }> };
 
 export type GetBorrowerPositionsQueryVariables = Exact<{
   borrower: Scalars['String']['input'];
@@ -250,17 +250,7 @@ export type GetCollateralRatioHistoryQueryVariables = Exact<{ [key: string]: nev
 
 export type GetCollateralRatioHistoryQuery = { __typename?: 'Query', getCollateralRatioHistory: Array<Array<number>> };
 
-export type GetPoolPriceHistoryQueryVariables = Exact<{ [key: string]: never; }>;
-
-
-export type GetPoolPriceHistoryQuery = { __typename?: 'Query', getPoolPriceHistory: Array<Array<number>> };
-
 export type GetReserveUsdHistoryQueryVariables = Exact<{ [key: string]: never; }>;
 
 
 export type GetReserveUsdHistoryQuery = { __typename?: 'Query', getReserveUSDHistory: Array<Array<number>> };
-
-export type GetBorrowerPoolHistoryQueryVariables = Exact<{ [key: string]: never; }>;
-
-
-export type GetBorrowerPoolHistoryQuery = { __typename?: 'Query', getBorrowerPoolHistory: Array<{ __typename?: 'BorrowerHistory', timestamp: number }> };

@@ -9,7 +9,7 @@ const CollateralBalance = () => {
     <FeatureBox title="Collateral" headBorder="bottom" icon="green">
       <div style={{ display: 'flex' }}>
         <div style={{ padding: '20px 10px 0 0' }}>
-          <FeatureBox title="Total value locked" border="full" noPadding>
+          <FeatureBox title="Total value locked" border="full" noPadding borderRadius>
             <CollateralBalanceChart />
           </FeatureBox>
         </div>

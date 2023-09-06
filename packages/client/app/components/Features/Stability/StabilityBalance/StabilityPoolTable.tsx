@@ -9,6 +9,7 @@ import TableRow from '@mui/material/TableRow';
 import { useEthers } from '../../../../context/EthersProvider';
 import { GetBorrowerRewardsQuery, GetBorrowerRewardsQueryVariables } from '../../../../generated/gql-types';
 import { GET_BORROWER_REWARDS } from '../../../../queries';
+import { BUTTON_BORDER } from '../../../../theme';
 import { roundCurrency } from '../../../../utils/math';
 import FeatureBox from '../../../FeatureBox/FeatureBox';
 import Label from '../../../Label/Label';
@@ -34,14 +35,15 @@ function StabilityPoolTable() {
   const rewardsValue = rewards.reduce((acc, { amount, token }) => acc + amount * token.priceUSD, 0);
 
   return (
-    <FeatureBox title="Stability Pool" noPadding border="full">
+    <FeatureBox title="Stability Pool" noPadding border="full" borderRadius>
       <div style={{ display: 'flex', alignItems: 'center' }}>
         <TableContainer>
-          <Table sx={{ borderRight: '1px solid #25222E' }}>
+          <Table sx={{ borderRight: '1px solid', borderColor: BUTTON_BORDER }}>
             <TableHead>
               <TableRow>
                 <HeaderCell title="Lost Stability" cellProps={{ align: 'right' }} />
-                <HeaderCell title="Gained collateral" cellProps={{ align: 'right' }} />
+                <HeaderCell title="" />
+                <HeaderCell title="Gained collateral" />
               </TableRow>
             </TableHead>
             <TableBody>
@@ -52,15 +54,17 @@ function StabilityPoolTable() {
                     align="right"
                   ></TableCell>
                   <TableCell sx={index === rewards.length - 1 ? { borderBottom: 'none' } : {}} align="right">
-                    {amount} <Label variant="success">{token.symbol}</Label>
+                    {amount}
+                  </TableCell>
+                  <TableCell sx={index === rewards.length - 1 ? { borderBottom: 'none' } : {}}>
+                    <Label variant="success">{token.symbol}</Label>
                   </TableCell>
                 </TableRow>
               ))}
               <TableRow>
-                <TableCell sx={{ borderBottom: 'none' }} align="right"></TableCell>
-                <TableCell sx={{ borderBottom: 'none' }} align="right">
-                  (≈ {roundCurrency(rewardsValue)}$)
-                </TableCell>
+                <TableCell sx={{ borderBottom: 'none' }}></TableCell>
+                <TableCell sx={{ borderBottom: 'none' }}></TableCell>
+                <TableCell sx={{ borderBottom: 'none' }}>(≈ {roundCurrency(rewardsValue)}$)</TableCell>
               </TableRow>
             </TableBody>
           </Table>

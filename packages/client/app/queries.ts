@@ -22,6 +22,9 @@ export const GET_ALL_DEBT_TOKENS = gql`
     getDebtTokens {
       # TODO: Implement sort in query or sort server side
       totalSupplyUSD
+      totalReserve
+      totalReserve24hAgo
+
       token {
         address
         symbol
@@ -39,8 +42,8 @@ export const GET_BORROWER_DEBT_TOKENS = gql`
       walletAmount
       stabilityDepositAPY
       totalDepositedStability
-      totalReserve
-      totalReserve24hAgo
+      totalSupplyUSD
+      totalSupplyUSD24hAgo
       token {
         address
         symbol
@@ -184,22 +187,8 @@ export const GET_COLLATERAL_RATIO_HISTORY = gql`
   }
 `;
 
-export const GET_POOL_PRICE_HISTORY = gql`
-  query GetPoolPriceHistory {
-    getPoolPriceHistory(poolId: "String!")
-  }
-`;
-
 export const GET_RESERVE_USD_HISTORY = gql`
   query GetReserveUSDHistory {
     getReserveUSDHistory
-  }
-`;
-
-export const GET_BORROWER_POOL_HISTORY = gql`
-  query GetBorrowerPoolHistory {
-    getBorrowerPoolHistory(poolId: "String!", borrower: "String!") {
-      timestamp
-    }
   }
 `;

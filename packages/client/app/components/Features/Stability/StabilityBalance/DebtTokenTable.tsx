@@ -1,5 +1,4 @@
 import { useQuery } from '@apollo/client';
-import ExpandMoreSharpIcon from '@mui/icons-material/ExpandMoreSharp';
 import { Typography } from '@mui/material';
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
@@ -13,6 +12,7 @@ import { GET_BORROWER_DEBT_TOKENS } from '../../../../queries';
 import { BUTTON_BACKGROUND } from '../../../../theme';
 import { displayPercentage, percentageChange, roundCurrency } from '../../../../utils/math';
 import FeatureBox from '../../../FeatureBox/FeatureBox';
+import DirectionIcon from '../../../Icons/DirectionIcon';
 import Label from '../../../Label/Label';
 import HeaderCell from '../../../Table/HeaderCell';
 import DebtTokenTableLoader from './DebtTokenTableLoader';
@@ -25,12 +25,11 @@ function DebtTokenTable() {
       borrower: address,
     },
   });
-  console.log('data: ', data);
 
   if (!data) return <DebtTokenTableLoader />;
 
   return (
-    <FeatureBox title="Debt Token" noPadding border="full">
+    <FeatureBox title="Debt Token" noPadding border="full" borderRadius>
       <TableContainer>
         <Table>
           <TableHead>
@@ -65,8 +64,8 @@ function DebtTokenTable() {
                 totalDepositedStability,
                 token,
                 troveMintedAmount,
-                totalReserve,
-                totalReserve24hAgo,
+                totalSupplyUSD,
+                totalSupplyUSD24hAgo,
               }) => (
                 <TableRow key={token.address}>
                   <TableCell align="right">{troveMintedAmount}</TableCell>
@@ -74,21 +73,19 @@ function DebtTokenTable() {
                   <TableCell sx={{ borderRight: '1px solid', borderColor: BUTTON_BACKGROUND }}>
                     <Label variant="none">{token.symbol}</Label>
                   </TableCell>
-                  <TableCell align="right">{totalReserve}</TableCell>
+                  <TableCell align="right">{totalSupplyUSD}</TableCell>
                   <TableCell>
                     <div className="flex">
                       <Typography
                         fontWeight={400}
-                        color={percentageChange(totalReserve, totalReserve24hAgo) > 0 ? 'success.main' : 'error.main'}
+                        color={
+                          percentageChange(totalSupplyUSD, totalSupplyUSD24hAgo) > 0 ? 'success.main' : 'error.main'
+                        }
                       >
-                        {displayPercentage(percentageChange(totalReserve, totalReserve24hAgo))}
+                        {displayPercentage(percentageChange(totalSupplyUSD, totalSupplyUSD24hAgo))}
                       </Typography>
-                      <ExpandMoreSharpIcon
-                        sx={{
-                          color: percentageChange(totalReserve, totalReserve24hAgo) > 0 ? 'success.main' : 'error.main',
-                          ml: '-5px',
-                        }}
-                      />
+
+                      <DirectionIcon showIncrease={percentageChange(totalSupplyUSD, totalSupplyUSD24hAgo) > 0} />
                     </div>
                   </TableCell>
                   <TableCell align="right">{roundCurrency(totalDepositedStability)}</TableCell>

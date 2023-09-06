@@ -12,13 +12,13 @@ function StabilityBalance() {
       <div style={{ display: 'flex', width: '100%' }}>
         <div style={{ display: 'flex', flexWrap: 'wrap', flexDirection: 'column' }}>
           <div style={{ padding: '20px 10px 0 0' }}>
-            <FeatureBox title="Total value minted" border="full" noPadding>
+            <FeatureBox title="Total value minted" border="full" noPadding borderRadius>
               <TotalValueMintedChart />
             </FeatureBox>
           </div>
 
           <div style={{ padding: '20px 10px 0 0' }}>
-            <FeatureBox title="System collateral ratio" border="full" noPadding>
+            <FeatureBox title="System collateral ratio" border="full" noPadding borderRadius>
               <SystemCollateralRatioChart />
             </FeatureBox>
           </div>

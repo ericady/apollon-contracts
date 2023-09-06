@@ -6,7 +6,7 @@ function DiagramPlaceholder() {
     <div
       style={{
         background: '#1e1b27',
-        height: '190px',
+        height: '216px',
         width: '320px',
         display: 'flex',
         alignItems: 'center',

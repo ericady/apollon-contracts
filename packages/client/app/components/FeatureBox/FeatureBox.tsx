@@ -8,6 +8,7 @@ type Props = {
   title: string;
   isDraggable?: boolean;
   noPadding?: boolean;
+  borderRadius?: boolean;
   border?: 'full' | 'bottom';
   icon?: 'green' | 'neutral';
   headBorder?: 'full' | 'bottom';
@@ -19,6 +20,7 @@ function FeatureBox({
   isDraggable = false,
   noPadding = false,
   headBorder = undefined,
+  borderRadius = false,
   border = undefined,
   icon = 'neutral',
   children,
@@ -29,6 +31,7 @@ function FeatureBox({
         border: border === 'full' ? '1px solid' : 'none',
         borderBottom: border ? '1px solid' : 'none',
         borderColor: 'background.paper',
+        borderRadius: borderRadius ? 1 : 0,
         width: '100%',
         p: noPadding ? 0 : 2,
       }}

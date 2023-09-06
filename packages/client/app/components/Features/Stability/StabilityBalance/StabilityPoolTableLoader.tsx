@@ -5,15 +5,16 @@ import TableCell from '@mui/material/TableCell';
 import TableContainer from '@mui/material/TableContainer';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
+import { BUTTON_BORDER } from '../../../../theme';
 import FeatureBox from '../../../FeatureBox/FeatureBox';
 import HeaderCell from '../../../Table/HeaderCell';
 
 function StabilityPoolTableLoader() {
   return (
-    <FeatureBox title="Stability Pool" noPadding border="full">
+    <FeatureBox title="Stability Pool" noPadding border="full" borderRadius>
       <div className="apollon-table-txt" style={{ display: 'flex', alignItems: 'center' }}>
         <TableContainer>
-          <Table sx={{ borderRight: '1px solid #25222E' }}>
+          <Table sx={{ borderRight: '1px solid', borderColor: BUTTON_BORDER }}>
             <TableHead>
               <TableRow>
                 <HeaderCell title="Lost Stability" cellProps={{ align: 'right' }} />

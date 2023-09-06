@@ -9,7 +9,7 @@ import HeaderCell from '../../../Table/HeaderCell';
 
 function DebtTokenTableLoader() {
   return (
-    <FeatureBox title="Debt Token" noPadding border="full">
+    <FeatureBox title="Debt Token" noPadding border="full" borderRadius>
       <div className="apollon-table-txt">
         <TableContainer>
           <Table>

@@ -29,10 +29,19 @@ import {
   GET_COLLATERAL_USD_HISTORY,
   GET_DEBT_USD_HISTORY,
   GET_LIQUIDITY_POOLS,
+  GET_RESERVE_USD_HISTORY,
 } from '../app/queries';
 
 const favoritedAssets: string[] = JSON.parse(localStorage.getItem(FAVORITE_ASSETS_LOCALSTORAGE_KEY) ?? '[]');
 
+const JUSD = {
+  address: '0x6cA13a4ab78dd7D657226b155873A04DB929AXXX',
+  symbol: 'JUSD',
+  createdAt: faker.date.past().toISOString(),
+  priceUSD: parseFloat(faker.finance.amount(1, 5000, 2)),
+  priceUSD24hAgo: parseFloat(faker.finance.amount(1, 5000, 2)),
+  isPoolToken: faker.datatype.boolean(),
+};
 const tokens: Token[] = Array(10)
   .fill(null)
   .map((_, index) => ({
@@ -42,19 +51,12 @@ const tokens: Token[] = Array(10)
     priceUSD: parseFloat(faker.finance.amount(1, 5000, 2)),
     priceUSD24hAgo: parseFloat(faker.finance.amount(1, 5000, 2)),
     isPoolToken: faker.datatype.boolean(),
-  }));
-const JUSD = {
-  address: '0x6cA13a4ab78dd7D657226b155873A04DB929A3A4',
-  symbol: 'JUSD',
-  createdAt: faker.date.past().toISOString(),
-  priceUSD: parseFloat(faker.finance.amount(1, 5000, 2)),
-  priceUSD24hAgo: parseFloat(faker.finance.amount(1, 5000, 2)),
-  isPoolToken: faker.datatype.boolean(),
-};
+  }))
+  .concat(JUSD);
 
 // 4 hard tokens always with JUSD
 const collateralTokens = faker.helpers
-  .arrayElements(tokens, 3)
+  .arrayElements(tokens.slice(0, tokens.length - 2), 3)
   .concat(JUSD)
   .map((token) => {
     const totalValueLockedUSD = parseFloat(faker.finance.amount(10000, 50000, 2));
@@ -70,8 +72,6 @@ const collateralTokens = faker.helpers
       ),
     };
   });
-
-tokens.push(JUSD);
 
 // Generate pools once for each pair of tokens
 const pools: Pool[] = [];
@@ -227,18 +227,22 @@ export const handlers = [
   graphql.query<{ getDebtTokens: Query['getDebtTokens'] }, QueryGetDebtTokensArgs>(
     GET_ALL_DEBT_TOKENS,
     (req, res, ctx) => {
-      const result: Query['getDebtTokens'] = tokens.map((token) => ({
-        token: token,
-        walletAmount: null,
-        troveMintedAmount: null,
-        stabilityLostAmount: null,
-        totalDepositedStability: parseFloat(faker.finance.amount(1000, 5000, 2)),
-        totalReserve: parseFloat(faker.finance.amount(1000, 5000, 2)),
-        totalReserve24hAgo: parseFloat(faker.finance.amount(1000, 5000, 2)),
-        totalSupplyUSD: parseFloat(faker.finance.amount(10000, 50000, 2)),
-        totalSupplyUSD24hAgo: parseFloat(faker.finance.amount(10000, 50000, 2)),
-        stabilityDepositAPY: faker.number.float({ min: 0.01, max: 0.1, precision: 0.01 }),
-      }));
+      const result: Query['getDebtTokens'] = tokens.map((token) => {
+        const shouldHaveReserve = faker.datatype.boolean();
+
+        return {
+          token: token,
+          walletAmount: null,
+          troveMintedAmount: null,
+          stabilityLostAmount: null,
+          totalDepositedStability: parseFloat(faker.finance.amount(1000, 5000, 2)),
+          totalReserve: shouldHaveReserve ? parseFloat(faker.finance.amount(1000, 5000, 2)) : 0,
+          totalReserve24hAgo: shouldHaveReserve ? parseFloat(faker.finance.amount(1000, 5000, 2)) : 0,
+          totalSupplyUSD: parseFloat(faker.finance.amount(10000, 50000, 2)),
+          totalSupplyUSD24hAgo: parseFloat(faker.finance.amount(10000, 50000, 2)),
+          stabilityDepositAPY: faker.number.float({ min: 0.01, max: 0.1, precision: 0.01 }),
+        };
+      });
 
       return res(ctx.data({ getDebtTokens: result }));
     },
@@ -445,6 +449,15 @@ export const handlers = [
       return res(ctx.data({ getCollateralRatioHistory: result }));
     },
   ),
+  // GetReserveUSDHistory
+  graphql.query<{ getReserveUSDHistory: Query['getReserveUSDHistory'] }>(GET_RESERVE_USD_HISTORY, (req, res, ctx) => {
+    const result = generatePoolPriceHistory();
+
+    return res(ctx.data({ getReserveUSDHistory: result }));
+  }),
+
+  // TODO: Are they needed??
+
   // GetPoolPriceHistory
   graphql.query<{ getPoolPriceHistory: Query['getPoolPriceHistory'] }, QueryGetPoolPriceHistoryArgs>(
     'GetPoolPriceHistory',
@@ -455,13 +468,6 @@ export const handlers = [
       return res(ctx.data({ getPoolPriceHistory: result }));
     },
   ),
-  // GetReserveUSDHistory
-  graphql.query<{ getReserveUSDHistory: Query['getReserveUSDHistory'] }>('GetReserveUSDHistory', (req, res, ctx) => {
-    // For this mock, we ignore the actual poolId and just generate mock data
-    const result = generatePoolPriceHistory();
-
-    return res(ctx.data({ getReserveUSDHistory: result }));
-  }),
 
   // GetBorrowerPoolHistory
   graphql.query<{ getBorrowerPoolHistory: Query['getBorrowerPoolHistory'] }, QueryGetBorrowerPoolHistoryArgs>(

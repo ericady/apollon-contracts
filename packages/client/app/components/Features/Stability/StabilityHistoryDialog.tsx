@@ -13,6 +13,7 @@ import {
   GetBorrowerStabilityHistoryQueryVariables,
 } from '../../../generated/gql-types';
 import { GET_BORROWER_STABILITY_HISTORY } from '../../../queries';
+import { BUTTON_BORDER } from '../../../theme';
 import { formatUnixTimestamp } from '../../../utils/date';
 import { displayPercentage, percentageChange, roundCurrency } from '../../../utils/math';
 import Label from '../../Label/Label';
@@ -97,7 +98,8 @@ const StabilityHistoryDialog = () => {
             {data.getBorrowerStabilityHistory.map((history, index) => (
               <div
                 style={{
-                  borderBottom: index === data.getBorrowerStabilityHistory.length - 1 ? 'none' : '1px solid #25222E',
+                  borderBottom:
+                    index === data.getBorrowerStabilityHistory.length - 1 ? 'none' : `1px solid ${BUTTON_BORDER}`,
                   padding: '20px',
                 }}
                 key={index}
