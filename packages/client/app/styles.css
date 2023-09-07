@@ -14,7 +14,7 @@ a {
 }
 
 /* swap widget css */
-.swap-info-paragraph {
+.swap-info-paragraph.swap-info-paragraph {
   display: flex;
   justify-content: space-between;
   align-items: center;

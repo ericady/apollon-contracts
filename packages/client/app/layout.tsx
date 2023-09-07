@@ -1,6 +1,6 @@
 import { Metadata } from 'next/types';
 import ContextWrapper from './context/ContextWrapper';
-import './globals.css';
+import './styles.css';
 
 export const metadata: Metadata = {
   title: 'Apollon',

@@ -45,7 +45,7 @@ const Farm = () => {
 
   return (
     <FeatureBox title="Farm" border="bottom">
-      <Tabs value={tabValue} onChange={handleTabChange} variant="fullWidth">
+      <Tabs value={tabValue} onChange={handleTabChange} variant="fullWidth" sx={{ mx: '-15px' }}>
         <Tab label="LONG" value="Long" />
         <Tab label="SHORT" value="Short" />
       </Tabs>

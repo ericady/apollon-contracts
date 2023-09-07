@@ -1,8 +1,6 @@
 'use client';
 
 import { useQuery } from '@apollo/client';
-import KeyboardArrowDownOutlinedIcon from '@mui/icons-material/KeyboardArrowDownOutlined';
-import KeyboardArrowUpOutlinedIcon from '@mui/icons-material/KeyboardArrowUpOutlined';
 import { IconButton, Typography } from '@mui/material';
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
@@ -16,6 +14,7 @@ import { GetAllPoolsQuery, GetAllPoolsQueryVariables } from '../../../generated/
 import { GET_ALL_POOLS } from '../../../queries';
 import { displayPercentage, roundCurrency } from '../../../utils/math';
 import FeatureBox from '../../FeatureBox/FeatureBox';
+import DirectionIcon from '../../Icons/DirectionIcon';
 import HeaderCell from '../../Table/HeaderCell';
 
 export const FAVORITE_ASSETS_LOCALSTORAGE_KEY = 'favoriteAssets';
@@ -86,7 +85,7 @@ function Assets() {
             <TableRow>
               <HeaderCell title="Type" cellProps={{ sx: { p: 0.5, pl: 2 } }} />
               <HeaderCell title="$" cellProps={{ align: 'right', sx: { p: 0.5 } }} />
-              <HeaderCell title="OF" cellProps={{ align: 'right', sx: { p: 0.5 } }} />
+              <HeaderCell title="OF %" cellProps={{ align: 'right', sx: { p: 0.5 } }} />
               <HeaderCell title="%" cellProps={{ align: 'right', sx: { p: 0.5 } }} />
               <HeaderCell title="" cellProps={{ sx: { p: 0.5, pr: 2 } }} />
             </TableRow>
@@ -110,16 +109,13 @@ function Assets() {
                     <Typography fontWeight={400}>{priceUSD}</Typography>
                   </TableCell>
                   <TableCell sx={{ p: 0.5 }} align="right">
-                    <Typography fontWeight={400}> {displayPercentage(openingFee)}</Typography>
+                    <Typography fontWeight={400} sx={{ color: openingFee > 0 ? 'success.main' : 'error.main' }}>
+                      {displayPercentage(openingFee, true)}
+                    </Typography>
                   </TableCell>
                   <TableCell align="right" sx={{ color: change < 0 ? 'error.main' : 'success.main', p: 0.5 }}>
-                    <div style={{ display: 'flex', alignContent: 'center', justifyContent: 'flex-end' }}>
-                      {change}
-                      {change < 0 ? (
-                        <KeyboardArrowDownOutlinedIcon fontSize="small" />
-                      ) : (
-                        <KeyboardArrowUpOutlinedIcon fontSize="small" />
-                      )}
+                    <div style={{ display: 'flex', alignContent: 'center', justifyContent: 'flex-end', gap: 4 }}>
+                      {change} <DirectionIcon showIncrease={change > 0} fontSize="small" />
                     </div>
                   </TableCell>
                   <TableCell sx={{ p: 0.5, pr: 2 }} align="right">

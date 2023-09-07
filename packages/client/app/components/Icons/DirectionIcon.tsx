@@ -1,15 +1,16 @@
 import KeyboardArrowDownIcon from '@mui/icons-material/KeyboardArrowDown';
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp';
+import { SvgIconProps } from '@mui/material';
 
-type Props = {
+type Props = SvgIconProps & {
   showIncrease: boolean;
 };
 
-function DirectionIcon({ showIncrease }: Props) {
+function DirectionIcon({ showIncrease, ...iconProps }: Props) {
   return showIncrease ? (
-    <KeyboardArrowUpIcon sx={{ color: 'success.main', ml: '-5px' }} />
+    <KeyboardArrowUpIcon sx={{ color: 'success.main', ml: '-5px' }} {...iconProps} />
   ) : (
-    <KeyboardArrowDownIcon sx={{ color: 'error.main', ml: '-5px' }} />
+    <KeyboardArrowDownIcon sx={{ color: 'error.main', ml: '-5px' }} {...iconProps} />
   );
 }
 

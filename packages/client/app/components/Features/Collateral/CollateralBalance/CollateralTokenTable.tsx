@@ -41,7 +41,7 @@ const CollateralTokenTable = () => {
               <TableRow>
                 <HeaderCell title="Wallet" cellProps={{ align: 'right', sx: { borderRight: '1px solid' } }} />
                 <HeaderCell title="Your Trove" cellProps={{ align: 'right', sx: { borderRight: '1px solid' } }} />
-                <HeaderCell title="Token" cellProps={{ align: 'right' }} />
+                <HeaderCell title="Token" />
                 <HeaderCell title="" />
                 <HeaderCell title="TVL" cellProps={{ align: 'left' }} />
               </TableRow>
@@ -56,11 +56,11 @@ const CollateralTokenTable = () => {
                     <TableCell align="right" sx={{ borderRight: '1px solid', borderColor: 'table.border' }}>
                       {roundCurrency(troveLockedAmount ?? 0, 5)}
                     </TableCell>
-                    <TableCell align="right">
+                    <TableCell>
                       <Label variant="none">{token.symbol}</Label>
                     </TableCell>
                     <TableCell align="right">{totalValueLockedUSD}</TableCell>
-                    <TableCell align="left" sx={{ width: 110 }}>
+                    <TableCell align="left" sx={{ width: 120 }}>
                       <div className="flex">
                         <Typography
                           fontWeight={400}
@@ -87,7 +87,11 @@ const CollateralTokenTable = () => {
                   sx={{ borderRight: '1px solid', borderColor: 'table.border', padding: '2px' }}
                 ></TableCell>
                 <TableCell align="right" sx={{ borderRight: '1px solid', borderColor: 'table.border', padding: '2px' }}>
-                  <CollateralUpdateDialog collateralData={data} buttonVariant="text" buttonSx={{ p: '6px 8px' }} />
+                  <CollateralUpdateDialog
+                    collateralData={data}
+                    buttonVariant="text"
+                    buttonSx={{ p: '6px 8px', width: '100%' }}
+                  />
                 </TableCell>
                 <TableCell align="right" style={{ padding: '2px' }}></TableCell>
                 <TableCell align="right" style={{ padding: '2px' }}></TableCell>

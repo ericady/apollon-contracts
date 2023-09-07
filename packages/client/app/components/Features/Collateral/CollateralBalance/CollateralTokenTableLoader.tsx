@@ -18,7 +18,7 @@ const CollateralTokenTableLoader = () => {
               <TableRow>
                 <HeaderCell title="Wallet" cellProps={{ align: 'right', sx: { borderRight: '1px solid' } }} />
                 <HeaderCell title="Your Trove" cellProps={{ align: 'right', sx: { borderRight: '1px solid' } }} />
-                <HeaderCell title="Token" cellProps={{ align: 'right' }} />
+                <HeaderCell title="Token" />
                 <HeaderCell title="TVL" cellProps={{ align: 'right' }} />
               </TableRow>
             </TableHead>
@@ -87,7 +87,7 @@ const CollateralTokenTableLoader = () => {
                 <TableCell align="right" sx={{ borderRight: '1px solid', borderColor: 'table.border', padding: '2px' }}>
                   <Button
                     sx={{
-                      width: 'auto',
+                      width: '100%',
                       p: '6px 8px',
                     }}
                   >
