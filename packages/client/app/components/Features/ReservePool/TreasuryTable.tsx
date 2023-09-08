@@ -39,12 +39,16 @@ function TreasuryTable() {
           <TableBody>
             {debtTokensInReserve.map(({ token, totalReserve, totalReserve24hAgo }) => (
               <TableRow key={token.address}>
-                <TableCell align="right">{stdFormatter.format(totalReserve)}</TableCell>
+                <TableCell align="right" sx={{ pr: 0 }}>
+                  {stdFormatter.format(totalReserve)}
+                </TableCell>
                 <TableCell>
                   <Label variant="none">{token.symbol}</Label>
                 </TableCell>
-                <TableCell align="right">{roundCurrency(totalReserve - totalReserve24hAgo, 5)}</TableCell>
-                <TableCell>
+                <TableCell align="right" sx={{ pr: 0 }}>
+                  {roundCurrency(totalReserve - totalReserve24hAgo, 5)}
+                </TableCell>
+                <TableCell width={120}>
                   <div className="flex">
                     <Typography
                       fontWeight={400}
