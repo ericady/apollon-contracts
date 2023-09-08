@@ -1,5 +1,7 @@
 'use client';
 
+import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
+import { Box } from '@mui/material';
 import Button from '@mui/material/Button';
 import InputAdornment from '@mui/material/InputAdornment';
 import Tab from '@mui/material/Tab';
@@ -8,7 +10,9 @@ import Typography from '@mui/material/Typography';
 import { useState } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
 import { useSelectedToken } from '../../../context/SelectedTokenProvider';
+import { displayPercentage } from '../../../utils/math';
 import InfoButton from '../../Buttons/InfoButton';
+import CollateralRatio from '../../CollateralRatio/CollateralRatio';
 import FeatureBox from '../../FeatureBox/FeatureBox';
 import NumberInput from '../../FormControls/NumberInput';
 import Label from '../../Label/Label';
@@ -123,6 +127,42 @@ const Farm = () => {
           </div>
         </form>
       </FormProvider>
+
+      <Box
+        sx={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          marginTop: '20px',
+        }}
+      >
+        <Typography variant="titleAlternate">Collateral Ratio</Typography>
+        <div className="flex">
+          <Typography
+            sx={{
+              fontFamily: 'Space Grotesk Variable',
+              color: 'info.main',
+              fontWeight: '700',
+              fontSize: '20px',
+            }}
+          >
+            {displayPercentage(1.56, false, 0)}
+          </Typography>
+          <ArrowForwardIosIcon sx={{ color: '#46434F', fontSize: '18px' }} />
+          <Typography
+            sx={{
+              fontFamily: 'Space Grotesk Variable',
+              color: 'info.main',
+              fontWeight: '700',
+              fontSize: '20px',
+            }}
+          >
+            {displayPercentage(1.43, false, 0)}
+          </Typography>
+        </div>
+      </Box>
+
+      <CollateralRatio criticalRatio={1.1} newRatio={1.43} oldRatio={1.56} />
     </FeatureBox>
   );
 };
