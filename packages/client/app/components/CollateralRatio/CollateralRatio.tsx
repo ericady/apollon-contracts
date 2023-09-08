@@ -2,14 +2,29 @@ import { Box, Typography } from '@mui/material';
 import { displayPercentage } from '../../utils/math';
 
 type Props = {
+  /**
+   * white indicator marking the ratio after the action on the chart
+   */
   newRatio: number;
+  /**
+   * blue indicator marking the ratio before the action on the chart. Area is marked with a gradient.
+   */
   oldRatio: number;
+  /**
+   * red indicator marking the critical ratio on the chart. PUT THIS BETWEEN THE MIN AND MAX VALUES.
+   */
   criticalRatio: number;
+  /**
+   * left scale for all chart values. Defaults to 1.
+   */
   scaleMin?: number;
+  /**
+   * right scale for all chart values. Defaults to 2.
+   */
   scaleMax?: number;
 };
 
-function CollateralRatio({ criticalRatio, newRatio, oldRatio, scaleMax = 2, scaleMin = 1 }: Props) {
+function CollateralRatioVisualization({ criticalRatio, newRatio, oldRatio, scaleMax = 2, scaleMin = 1 }: Props) {
   const scaleDelta = scaleMax - scaleMin;
 
   const criticalPosition = (criticalRatio - scaleMin) / scaleDelta;
@@ -96,4 +111,4 @@ function CollateralRatio({ criticalRatio, newRatio, oldRatio, scaleMax = 2, scal
   );
 }
 
-export default CollateralRatio;
+export default CollateralRatioVisualization;

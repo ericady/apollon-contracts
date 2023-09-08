@@ -12,7 +12,7 @@ import { FormProvider, useForm } from 'react-hook-form';
 import { useSelectedToken } from '../../../context/SelectedTokenProvider';
 import { displayPercentage } from '../../../utils/math';
 import InfoButton from '../../Buttons/InfoButton';
-import CollateralRatio from '../../CollateralRatio/CollateralRatio';
+import CollateralRatioVisualization from '../../CollateralRatio/CollateralRatio';
 import FeatureBox from '../../FeatureBox/FeatureBox';
 import NumberInput from '../../FormControls/NumberInput';
 import Label from '../../Label/Label';
@@ -162,7 +162,7 @@ const Farm = () => {
         </div>
       </Box>
 
-      <CollateralRatio criticalRatio={1.1} newRatio={1.43} oldRatio={1.56} />
+      <CollateralRatioVisualization criticalRatio={1.1} newRatio={1.43} oldRatio={1.56} />
     </FeatureBox>
   );
 };
