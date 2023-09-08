@@ -7,10 +7,15 @@ import TableContainer from '@mui/material/TableContainer';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import { useEthers } from '../../../../context/EthersProvider';
-import { GetBorrowerRewardsQuery, GetBorrowerRewardsQueryVariables } from '../../../../generated/gql-types';
-import { GET_BORROWER_REWARDS } from '../../../../queries';
+import {
+  GetBorrowerDebtTokensQuery,
+  GetBorrowerDebtTokensQueryVariables,
+  GetCollateralTokensQuery,
+  GetCollateralTokensQueryVariables,
+} from '../../../../generated/gql-types';
+import { GET_BORROWER_COLLATERAL_TOKENS, GET_BORROWER_DEBT_TOKENS } from '../../../../queries';
 import { BUTTON_BORDER } from '../../../../theme';
-import { roundCurrency } from '../../../../utils/math';
+import { displayPercentage, percentageChange, roundCurrency } from '../../../../utils/math';
 import FeatureBox from '../../../FeatureBox/FeatureBox';
 import Label from '../../../Label/Label';
 import HeaderCell from '../../../Table/HeaderCell';
@@ -21,18 +26,47 @@ import StabilityPoolTableLoader from './StabilityPoolTableLoader';
 function StabilityPoolTable() {
   const { address } = useEthers();
 
-  const { data } = useQuery<GetBorrowerRewardsQuery, GetBorrowerRewardsQueryVariables>(GET_BORROWER_REWARDS, {
-    variables: {
-      borrower: address,
+  const { data: collateralData } = useQuery<GetCollateralTokensQuery, GetCollateralTokensQueryVariables>(
+    GET_BORROWER_COLLATERAL_TOKENS,
+    {
+      variables: { borrower: address },
     },
-  });
+  );
+  const { data: debtData } = useQuery<GetBorrowerDebtTokensQuery, GetBorrowerDebtTokensQueryVariables>(
+    GET_BORROWER_DEBT_TOKENS,
+    {
+      variables: {
+        borrower: address,
+      },
+    },
+  );
 
-  if (!data) {
+  if (!collateralData || !debtData) {
     return <StabilityPoolTableLoader />;
   }
 
-  const rewards = data.getPools.flatMap(({ rewards }) => rewards);
-  const rewardsValue = rewards.reduce((acc, { amount, token }) => acc + amount * token.priceUSD, 0);
+  // Sort both arrays for common tokens and in same alphabetical order.
+  const rewards = collateralData.getCollateralTokens.filter(({ stabilityGainedAmount }) => stabilityGainedAmount! > 0);
+  const stabilityLostSorted = debtData.getDebtTokens
+    .filter(({ stabilityLostAmount }) => stabilityLostAmount! > 0)
+    .sort((a, b) => a.token.symbol.localeCompare(b.token.symbol))
+    .sort((a, b) => (rewards.find(({ token }) => token.address === a.token.address) ? -1 : 1));
+
+  const rewardsSorted = rewards
+    .slice()
+    .sort((a, b) => a.token.symbol.localeCompare(b.token.symbol))
+    .sort((a, b) => (stabilityLostSorted.find(({ token }) => token.address === a.token.address) ? -1 : 1));
+
+  const rewardsTotalInUSD = rewardsSorted.reduce(
+    (acc, { stabilityGainedAmount, token }) => acc + stabilityGainedAmount! * token.priceUSD,
+    0,
+  );
+  const lossTotalInUSD = stabilityLostSorted.reduce(
+    (acc, { stabilityLostAmount, token }) => acc + stabilityLostAmount! * token.priceUSD,
+    0,
+  );
+
+  const listLength = Math.max(rewardsSorted.length, stabilityLostSorted.length);
 
   return (
     <FeatureBox title="Stability Pool" noPadding border="full" borderRadius>
@@ -41,27 +75,45 @@ function StabilityPoolTable() {
           <Table sx={{ borderRight: '1px solid', borderColor: BUTTON_BORDER }}>
             <TableHead>
               <TableRow>
+                <HeaderCell title="" />
                 <HeaderCell title="Lost Stability" />
                 <HeaderCell title="" />
                 <HeaderCell title="Gained collateral" />
               </TableRow>
             </TableHead>
             <TableBody>
-              {rewards.map(({ amount, token }, index) => (
-                <TableRow key={index}>
-                  <TableCell sx={index === rewards.length - 1 ? { borderBottom: 'none' } : {}}></TableCell>
-                  <TableCell sx={index === rewards.length - 1 ? { borderBottom: 'none' } : {}} align="right">
-                    {roundCurrency(amount, 5)}
-                  </TableCell>
-                  <TableCell sx={index === rewards.length - 1 ? { borderBottom: 'none' } : {}}>
-                    <Label variant="success">{token.symbol}</Label>
-                  </TableCell>
-                </TableRow>
-              ))}
+              {Array(listLength)
+                .fill(null)
+                .map((_, index) => {
+                  const { stabilityLostAmount, token: lostToken } = stabilityLostSorted[index] ?? {};
+                  const { stabilityGainedAmount, token: rewardToken } = rewardsSorted[index] ?? {};
+                  const noBorder = index === listLength - 1;
+
+                  return (
+                    <TableRow key={index}>
+                      <TableCell sx={noBorder ? { borderBottom: 'none', pr: 0 } : { pr: 0 }} align="right">
+                        {!isNaN(stabilityLostAmount!) ? roundCurrency(stabilityLostAmount!, 5) : null}
+                      </TableCell>
+                      <TableCell sx={noBorder ? { borderBottom: 'none' } : {}}>
+                        {lostToken && <Label variant="error">{lostToken.symbol}</Label>}
+                      </TableCell>
+                      <TableCell sx={noBorder ? { borderBottom: 'none', pr: 0 } : { pr: 0 }} align="right">
+                        {!isNaN(stabilityGainedAmount!) ? roundCurrency(stabilityGainedAmount!, 5) : null}
+                      </TableCell>
+                      <TableCell sx={noBorder ? { borderBottom: 'none' } : {}}>
+                        {rewardToken && <Label variant="success">{rewardToken.symbol}</Label>}
+                      </TableCell>
+                    </TableRow>
+                  );
+                })}
               <TableRow>
                 <TableCell sx={{ borderBottom: 'none' }}></TableCell>
                 <TableCell sx={{ borderBottom: 'none' }}></TableCell>
-                <TableCell sx={{ borderBottom: 'none' }}>(≈ {roundCurrency(rewardsValue)}$)</TableCell>
+                <TableCell sx={{ borderBottom: 'none' }}></TableCell>
+                <TableCell sx={{ borderBottom: 'none' }}>
+                  + {displayPercentage(percentageChange(rewardsTotalInUSD, lossTotalInUSD))} (≈{' '}
+                  {roundCurrency(rewardsTotalInUSD - lossTotalInUSD)}$)
+                </TableCell>
               </TableRow>
             </TableBody>
           </Table>

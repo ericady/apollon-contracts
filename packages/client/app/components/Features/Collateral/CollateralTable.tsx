@@ -10,7 +10,7 @@ import TableRow from '@mui/material/TableRow';
 import Typography from '@mui/material/Typography';
 import { useEthers } from '../../../context/EthersProvider';
 import { GetCollateralTokensQuery, GetCollateralTokensQueryVariables } from '../../../generated/gql-types';
-import { GET_ALL_COLLATERAL_TOKENS } from '../../../queries';
+import { GET_BORROWER_COLLATERAL_TOKENS } from '../../../queries';
 import { roundCurrency } from '../../../utils/math';
 import Label from '../../Label/Label';
 import HeaderCell from '../../Table/HeaderCell';
@@ -19,9 +19,12 @@ import CollateralUpdateDialog from './CollateralUpdateDialog';
 function CollateralTable() {
   const { address } = useEthers();
 
-  const { data } = useQuery<GetCollateralTokensQuery, GetCollateralTokensQueryVariables>(GET_ALL_COLLATERAL_TOKENS, {
-    variables: { borrower: address },
-  });
+  const { data } = useQuery<GetCollateralTokensQuery, GetCollateralTokensQueryVariables>(
+    GET_BORROWER_COLLATERAL_TOKENS,
+    {
+      variables: { borrower: address },
+    },
+  );
 
   if (!data) return null;
 

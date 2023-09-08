@@ -40,6 +40,8 @@ export const GET_BORROWER_DEBT_TOKENS = gql`
     getDebtTokens(borrower: $borrower) {
       troveMintedAmount
       walletAmount
+      stabilityLostAmount
+
       stabilityDepositAPY
       totalDepositedStability
       totalSupplyUSD
@@ -118,33 +120,20 @@ export const GET_BORROWER_LIQUIDITY_POOLS = gql`
 
 // BALANCE PAGE
 
-export const GET_ALL_COLLATERAL_TOKENS = gql`
+export const GET_BORROWER_COLLATERAL_TOKENS = gql`
   query GetCollateralTokens($borrower: String!) {
     getCollateralTokens(borrower: $borrower) {
       token {
         address
         symbol
+        priceUSD
       }
       walletAmount
       troveLockedAmount
+      stabilityGainedAmount
+
       totalValueLockedUSD
       totalValueLockedUSD24hAgo
-    }
-  }
-`;
-
-export const GET_BORROWER_REWARDS = gql`
-  query GetBorrowerRewards($borrower: String!) {
-    getPools(borrower: $borrower) {
-      id
-      rewards {
-        token {
-          address
-          symbol
-          priceUSD
-        }
-        amount
-      }
     }
   }
 `;

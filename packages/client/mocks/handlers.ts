@@ -4,6 +4,8 @@ import { FAVORITE_ASSETS_LOCALSTORAGE_KEY } from '../app/components/Features/Ass
 import {
   BorrowerHistory,
   BorrowerHistoryType,
+  CollateralTokenMeta,
+  DebtTokenMeta,
   LongShortDirection,
   Pool,
   Query,
@@ -17,13 +19,12 @@ import {
   Token,
 } from '../app/generated/gql-types';
 import {
-  GET_ALL_COLLATERAL_TOKENS,
   GET_ALL_DEBT_TOKENS,
   GET_ALL_POOLS,
+  GET_BORROWER_COLLATERAL_TOKENS,
   GET_BORROWER_DEBT_TOKENS,
   GET_BORROWER_LIQUIDITY_POOLS,
   GET_BORROWER_POSITIONS,
-  GET_BORROWER_REWARDS,
   GET_BORROWER_STABILITY_HISTORY,
   GET_COLLATERAL_RATIO_HISTORY,
   GET_COLLATERAL_USD_HISTORY,
@@ -54,22 +55,43 @@ const tokens: Token[] = Array(10)
   }))
   .concat(JUSD);
 
-// 4 hard tokens always with JUSD
-const collateralTokens = faker.helpers
-  .arrayElements(tokens.slice(0, tokens.length - 2), 3)
+// 5 hard tokens always with JUSD
+const collateralTokens: CollateralTokenMeta[] = faker.helpers
+  .arrayElements(tokens.slice(0, tokens.length - 2), 4)
   .concat(JUSD)
   .map((token) => {
     const totalValueLockedUSD = parseFloat(faker.finance.amount(10000, 50000, 2));
 
     return {
       token: token,
-      walletAmount: faker.datatype.boolean() ? parseFloat(faker.finance.amount(0, 1000, 10)) : null,
-      troveLockedAmount: faker.datatype.boolean() ? parseFloat(faker.finance.amount(0, 50, 10)) : null,
-      stabilityGainedAmount: faker.datatype.boolean() ? parseFloat(faker.finance.amount(50, 500, 10)) : null,
+      walletAmount: parseFloat(faker.finance.amount(0, 1000, 10)),
+      troveLockedAmount: parseFloat(faker.finance.amount(0, 50, 10)),
+      stabilityGainedAmount: parseFloat(faker.finance.amount(50, 500, 10)),
       totalValueLockedUSD,
       totalValueLockedUSD24hAgo: parseFloat(
         faker.finance.amount(totalValueLockedUSD * 0.9, totalValueLockedUSD * 1.2, 2),
       ),
+    };
+  });
+
+// less than 5 hard tokens always with JUSD that are less in worth than the collateral tokens
+const debtTokens: DebtTokenMeta[] = faker.helpers
+  .arrayElements(collateralTokens.slice(0, collateralTokens.length - 1), 3)
+  .map(({ token, stabilityGainedAmount }) => {
+    const totalSupplyUSD = parseFloat(faker.finance.amount(10000, 50000, 2));
+    const totalReserve = parseFloat(faker.finance.amount(1000, 5000, 2));
+
+    return {
+      token: token,
+      walletAmount: parseFloat(faker.finance.amount(0, 1000, 2)),
+      troveMintedAmount: parseFloat(faker.finance.amount(0, 500, 2)),
+      stabilityLostAmount: faker.number.float({ min: 0, max: stabilityGainedAmount!, precision: 0.0001 }),
+      totalDepositedStability: parseFloat(faker.finance.amount(1000, 5000, 2)),
+      totalReserve,
+      totalReserve24hAgo: parseFloat(faker.finance.amount(totalReserve * 0.9, totalReserve * 1.2, 2)),
+      totalSupplyUSD,
+      totalSupplyUSD24hAgo: parseFloat(faker.finance.amount(totalSupplyUSD * 0.9, totalSupplyUSD * 1.2, 2)),
+      stabilityDepositAPY: faker.number.float({ min: 0, max: 10, precision: 0.0001 }) / 100,
     };
   });
 
@@ -252,11 +274,11 @@ export const handlers = [
     const result: Query['getPools'] = pools;
     return res(ctx.data({ getPools: result }));
   }),
-  // GetBorrowerRewards
-  graphql.query<{ getPools: Query['getPools'] }, QueryGetDebtTokensArgs>(GET_BORROWER_REWARDS, (req, res, ctx) => {
-    const result: Query['getPools'] = pools;
-    return res(ctx.data({ getPools: result }));
-  }),
+  // // GetBorrowerRewards
+  // graphql.query<{ getPools: Query['getPools'] }, QueryGetDebtTokensArgs>(GET_BORROWER_REWARDS, (req, res, ctx) => {
+  //   const result: Query['getPools'] = pools;
+  //   return res(ctx.data({ getPools: result }));
+  // }),
 
   // GetBorrowerDebtTokens
   graphql.query<{ getDebtTokens: Query['getDebtTokens'] }, QueryGetDebtTokensArgs>(
@@ -267,44 +289,77 @@ export const handlers = [
         throw new Error('Borrower address is required');
       }
 
-      const result: Query['getDebtTokens'] = tokens.map((token) => {
-        const shouldHaveUserBalance = token.isPoolToken ? faker.datatype.boolean() : true;
+      // All the usual tokens and the borrower specific debt tokens
+      const borrowerAddresses = debtTokens.map(({ token }) => token.address);
+      const tokensWithBorrowerDebtTokens: Query['getDebtTokens'] = debtTokens.concat(
+        tokens
+          .filter(({ address }) => !borrowerAddresses.includes(address))
+          .map<DebtTokenMeta>((token) => {
+            return {
+              token: token,
+              walletAmount: null,
+              troveMintedAmount: null,
+              stabilityLostAmount: null,
+              totalDepositedStability: parseFloat(faker.finance.amount(1000, 5000, 2)),
+              totalReserve: parseFloat(faker.finance.amount(1000, 5000, 2)),
+              totalReserve24hAgo: parseFloat(faker.finance.amount(1000, 5000, 2)),
+              totalSupplyUSD: parseFloat(faker.finance.amount(10000, 50000, 2)),
+              totalSupplyUSD24hAgo: parseFloat(faker.finance.amount(10000, 50000, 2)),
+              stabilityDepositAPY: faker.number.float({ min: 0, max: 10, precision: 0.0001 }) / 100,
+            };
+          }),
+      );
 
-        return {
-          token: token,
-          walletAmount: shouldHaveUserBalance ? parseFloat(faker.finance.amount(0, 1000, 2)) : 0,
-          troveMintedAmount: shouldHaveUserBalance ? parseFloat(faker.finance.amount(0, 500, 2)) : 0,
-          stabilityLostAmount: shouldHaveUserBalance ? parseFloat(faker.finance.amount(0, 50, 2)) : 0,
-          totalDepositedStability: parseFloat(faker.finance.amount(1000, 5000, 2)),
-          totalReserve: parseFloat(faker.finance.amount(1000, 5000, 2)),
-          totalReserve24hAgo: parseFloat(faker.finance.amount(1000, 5000, 2)),
-          totalSupplyUSD: parseFloat(faker.finance.amount(10000, 50000, 2)),
-          totalSupplyUSD24hAgo: parseFloat(faker.finance.amount(10000, 50000, 2)),
-          stabilityDepositAPY: faker.number.float({ min: 0, max: 10, precision: 0.0001 }) / 100,
-        };
-      });
-
-      return res(ctx.data({ getDebtTokens: result }));
+      return res(ctx.data({ getDebtTokens: tokensWithBorrowerDebtTokens }));
     },
   ),
 
   // GetBorrowerCollateralTokens
   graphql.query<{ getCollateralTokens: Query['getCollateralTokens'] }, QueryGetCollateralTokensArgs>(
-    GET_ALL_COLLATERAL_TOKENS,
+    GET_BORROWER_COLLATERAL_TOKENS,
     (req, res, ctx) => {
       const { borrower } = req.variables;
 
       if (!borrower) {
-        const result: Query['getCollateralTokens'] = collateralTokens.map((collateralToken) => ({
-          ...collateralToken,
-          walletAmount: null,
-          troveLockedAmount: null,
-          stabilityGainedAmount: null,
-        }));
+        const result: Query['getCollateralTokens'] = tokens.map((token) => {
+          const totalValueLockedUSD = parseFloat(faker.finance.amount(10000, 50000, 2));
+
+          return {
+            token: token,
+            totalValueLockedUSD,
+            totalValueLockedUSD24hAgo: parseFloat(
+              faker.finance.amount(totalValueLockedUSD * 0.9, totalValueLockedUSD * 1.2, 2),
+            ),
+            walletAmount: null,
+            troveLockedAmount: null,
+            stabilityGainedAmount: null,
+          };
+        });
 
         return res(ctx.data({ getCollateralTokens: result }));
       } else {
-        return res(ctx.data({ getCollateralTokens: collateralTokens }));
+        // All the usual tokens and the borrower specific debt tokens
+        const borrowerAddresses = collateralTokens.map(({ token }) => token.address);
+        const tokensWithCollateralTokens: Query['getCollateralTokens'] = collateralTokens.concat(
+          tokens
+            .filter(({ address }) => !borrowerAddresses.includes(address))
+            .map<CollateralTokenMeta>((token) => {
+              const totalValueLockedUSD = parseFloat(faker.finance.amount(10000, 50000, 2));
+
+              return {
+                token: token,
+                totalValueLockedUSD,
+                totalValueLockedUSD24hAgo: parseFloat(
+                  faker.finance.amount(totalValueLockedUSD * 0.9, totalValueLockedUSD * 1.2, 2),
+                ),
+                walletAmount: null,
+                troveLockedAmount: null,
+                stabilityGainedAmount: null,
+              };
+            }),
+        );
+
+        return res(ctx.data({ getCollateralTokens: tokensWithCollateralTokens }));
       }
     },
   ),

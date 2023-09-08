@@ -191,7 +191,7 @@ export type GetBorrowerDebtTokensQueryVariables = Exact<{
 }>;
 
 
-export type GetBorrowerDebtTokensQuery = { __typename?: 'Query', getDebtTokens: Array<{ __typename?: 'DebtTokenMeta', troveMintedAmount?: number | null, walletAmount?: number | null, stabilityDepositAPY: number, totalDepositedStability: number, totalSupplyUSD: number, totalSupplyUSD24hAgo: number, token: { __typename?: 'Token', address: string, symbol: string, priceUSD: number, isPoolToken: boolean } }> };
+export type GetBorrowerDebtTokensQuery = { __typename?: 'Query', getDebtTokens: Array<{ __typename?: 'DebtTokenMeta', troveMintedAmount?: number | null, walletAmount?: number | null, stabilityLostAmount?: number | null, stabilityDepositAPY: number, totalDepositedStability: number, totalSupplyUSD: number, totalSupplyUSD24hAgo: number, token: { __typename?: 'Token', address: string, symbol: string, priceUSD: number, isPoolToken: boolean } }> };
 
 export type GetBorrowerPositionsQueryVariables = Exact<{
   borrower: Scalars['String']['input'];
@@ -219,14 +219,7 @@ export type GetCollateralTokensQueryVariables = Exact<{
 }>;
 
 
-export type GetCollateralTokensQuery = { __typename?: 'Query', getCollateralTokens: Array<{ __typename?: 'CollateralTokenMeta', walletAmount?: number | null, troveLockedAmount?: number | null, totalValueLockedUSD: number, totalValueLockedUSD24hAgo: number, token: { __typename?: 'Token', address: string, symbol: string } }> };
-
-export type GetBorrowerRewardsQueryVariables = Exact<{
-  borrower: Scalars['String']['input'];
-}>;
-
-
-export type GetBorrowerRewardsQuery = { __typename?: 'Query', getPools: Array<{ __typename?: 'Pool', id: string, rewards: Array<{ __typename?: 'PoolReward', amount: number, token: { __typename?: 'Token', address: string, symbol: string, priceUSD: number } }> }> };
+export type GetCollateralTokensQuery = { __typename?: 'Query', getCollateralTokens: Array<{ __typename?: 'CollateralTokenMeta', walletAmount?: number | null, troveLockedAmount?: number | null, stabilityGainedAmount?: number | null, totalValueLockedUSD: number, totalValueLockedUSD24hAgo: number, token: { __typename?: 'Token', address: string, symbol: string, priceUSD: number } }> };
 
 export type GetBorrowerStabilityHistoryQueryVariables = Exact<{
   borrower: Scalars['String']['input'];

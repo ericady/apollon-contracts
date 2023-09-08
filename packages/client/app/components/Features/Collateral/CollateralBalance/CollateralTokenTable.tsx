@@ -10,7 +10,7 @@ import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import { useEthers } from '../../../../context/EthersProvider';
 import { GetCollateralTokensQuery, GetCollateralTokensQueryVariables } from '../../../../generated/gql-types';
-import { GET_ALL_COLLATERAL_TOKENS } from '../../../../queries';
+import { GET_BORROWER_COLLATERAL_TOKENS } from '../../../../queries';
 import { displayPercentage, percentageChange, roundCurrency, stdFormatter } from '../../../../utils/math';
 import FeatureBox from '../../../FeatureBox/FeatureBox';
 import DirectionIcon from '../../../Icons/DirectionIcon';
@@ -22,11 +22,14 @@ import CollateralTokenTableLoader from './CollateralTokenTableLoader';
 const CollateralTokenTable = () => {
   const { address } = useEthers();
 
-  const { data } = useQuery<GetCollateralTokensQuery, GetCollateralTokensQueryVariables>(GET_ALL_COLLATERAL_TOKENS, {
-    variables: {
-      borrower: address,
+  const { data } = useQuery<GetCollateralTokensQuery, GetCollateralTokensQueryVariables>(
+    GET_BORROWER_COLLATERAL_TOKENS,
+    {
+      variables: {
+        borrower: address,
+      },
     },
-  });
+  );
 
   if (!data) {
     return <CollateralTokenTableLoader />;
@@ -59,7 +62,9 @@ const CollateralTokenTable = () => {
                     <TableCell>
                       <Label variant="none">{token.symbol}</Label>
                     </TableCell>
-                    <TableCell align="right">{stdFormatter.format(totalValueLockedUSD)}</TableCell>
+                    <TableCell align="right" sx={{ pr: 0 }}>
+                      {stdFormatter.format(totalValueLockedUSD)}
+                    </TableCell>
                     <TableCell align="left" sx={{ width: 120 }}>
                       <div className="flex">
                         <Typography

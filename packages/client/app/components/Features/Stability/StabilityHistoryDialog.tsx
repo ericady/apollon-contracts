@@ -15,7 +15,7 @@ import {
 import { GET_BORROWER_STABILITY_HISTORY } from '../../../queries';
 import { BUTTON_BORDER } from '../../../theme';
 import { formatUnixTimestamp } from '../../../utils/date';
-import { displayPercentage, percentageChange, roundCurrency } from '../../../utils/math';
+import { roundCurrency } from '../../../utils/math';
 import Label from '../../Label/Label';
 
 const StabilityHistoryDialog = () => {
@@ -154,20 +154,6 @@ function StabilityClaimedRewards({ history }: StabilityWidgetProps) {
               width: 170,
             }}
           >
-            <Typography
-              className="flex"
-              variant="titleAlternate"
-              color="info.main"
-              fontWeight={400}
-              sx={{
-                gap: '5px',
-                marginBottom: '20px',
-                justifyContent: 'end',
-              }}
-            >
-              + {displayPercentage(percentageChange(history.resultInUSD, history.claimInUSD!))}
-              <ExpandLessSharpIcon sx={{ color: 'info.main' }} />
-            </Typography>
             <Typography
               className="flex"
               variant="titleAlternate"
