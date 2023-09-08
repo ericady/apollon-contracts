@@ -10,7 +10,9 @@ function EthersAddressLabel() {
     <div className="flex">
       <img src="assets/svgs/Star24_green.svg" alt="Green colored diamond shape" height="11" typeof="image/svg+xml" />
 
-      <Typography variant="titleAlternate">{address}</Typography>
+      <Typography variant="titleAlternate">
+        {address.slice(0, 6)}...{address.slice(-4)}
+      </Typography>
     </div>
   ) : (
     <Button

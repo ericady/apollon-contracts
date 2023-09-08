@@ -118,14 +118,14 @@ const CollateralUpdateDialog = ({ collateralData, buttonVariant, buttonSx = {} }
                 borderBottom: 'none',
               }}
             >
-              <Tabs value={tabValue} onChange={handleChange} variant="fullWidth">
+              <Tabs value={tabValue} onChange={handleChange} variant="fullWidth" sx={{ mt: 2 }}>
                 <Tab label="DEPOSIT" value="DEPOSIT" />
                 <Tab label="WITHDRAW" value="WITHDRAW" />
               </Tabs>
 
-              <div className="pool-input">
+              <div style={{ display: 'flex', justifyContent: 'space-between', padding: 20 }}>
                 {tabValue === 'DEPOSIT' && (
-                  <div>
+                  <div style={{ marginTop: 6 }}>
                     <Label variant="success">ETH</Label>
                     <Typography sx={{ fontWeight: '400', marginTop: '10px' }}>
                       {roundCurrency(depositedCollateralToDeposit[0].walletAmount!, 5)}
@@ -144,7 +144,11 @@ const CollateralUpdateDialog = ({ collateralData, buttonVariant, buttonSx = {} }
                     </Typography>
                   </div>
                 )}
-                {tabValue === 'WITHDRAW' && <Label variant="success">ETH</Label>}
+                {tabValue === 'WITHDRAW' && (
+                  <div style={{ marginTop: 6 }}>
+                    <Label variant="success">ETH</Label>
+                  </div>
+                )}
 
                 <div>
                   <NumberInput
@@ -163,11 +167,11 @@ const CollateralUpdateDialog = ({ collateralData, buttonVariant, buttonSx = {} }
                     }}
                   />
 
-                  <div className="flex" style={{ justifyContent: 'space-between' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                     <div>
                       {tabValue === 'DEPOSIT' && (
                         <>
-                          <Typography variant="caption">{etherAmount}</Typography>
+                          <Typography variant="caption">{roundCurrency(etherAmount, 5)}</Typography>
                           <Typography
                             sx={{
                               color: '#3C3945',
@@ -205,7 +209,7 @@ const CollateralUpdateDialog = ({ collateralData, buttonVariant, buttonSx = {} }
 
                     <Button
                       variant="undercover"
-                      sx={{ textDecoration: 'underline' }}
+                      sx={{ textDecoration: 'underline', p: 0, mt: 0.25, height: 25 }}
                       onClick={() => fillMaxInputValue('etherTokenAmount')}
                     >
                       max

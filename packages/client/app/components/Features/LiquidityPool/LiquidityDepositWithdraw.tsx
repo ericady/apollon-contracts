@@ -58,7 +58,7 @@ function LiquidityDepositWithdraw({ selectedPool }: Props) {
 
   return (
     <FeatureBox title="Your Liquidity" noPadding headBorder="bottom" border="full">
-      <Tabs value={tabValue} onChange={handleChange} variant="fullWidth">
+      <Tabs value={tabValue} onChange={handleChange} variant="fullWidth" sx={{ mt: 2 }}>
         <Tab label="DEPOSIT" value="DEPOSIT" disableRipple />
         <Tab
           label="WITHDRAW"
@@ -73,8 +73,8 @@ function LiquidityDepositWithdraw({ selectedPool }: Props) {
 
           {tabValue === 'DEPOSIT' && (
             <>
-              <div className="pool-input">
-                <div>
+              <div style={{ display: 'flex', justifyContent: 'space-between', padding: 20 }}>
+                <div style={{ marginTop: 6 }}>
                   <Label variant="success">{tokenA.token.symbol}</Label>
                   {tokenA.borrowerAmount && (
                     <>
@@ -101,8 +101,8 @@ function LiquidityDepositWithdraw({ selectedPool }: Props) {
                 </div>
               </div>
 
-              <div className="pool-input">
-                <div>
+              <div style={{ display: 'flex', justifyContent: 'space-between', padding: 20 }}>
+                <div style={{ marginTop: 6 }}>
                   <Label variant="success">{tokenB.token.symbol}</Label>
                   {tokenB.borrowerAmount && (
                     <>
@@ -134,8 +134,10 @@ function LiquidityDepositWithdraw({ selectedPool }: Props) {
           {/* WITHDRAW */}
 
           {tabValue === 'WITHDRAW' && tokenA.borrowerAmount && (
-            <div className="pool-input">
-              <Label variant="success">{tokenA.token.symbol}</Label>
+            <div style={{ display: 'flex', justifyContent: 'space-between', padding: 20 }}>
+              <div style={{ marginTop: 6 }}>
+                <Label variant="success">{tokenA.token.symbol}</Label>
+              </div>
               {/* TODO: Each stock token must be implemented with etherjs. Cant show a label here */}
 
               <div>
@@ -151,14 +153,15 @@ function LiquidityDepositWithdraw({ selectedPool }: Props) {
                     },
                   }}
                 />
-                <div className="flex" style={{ justifyContent: 'space-between' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                   <div>
                     <Typography variant="caption">{roundCurrency(tokenA.borrowerAmount!, 5)}</Typography>
+                    <br />
                     <Typography variant="label">Deposit</Typography>
                   </div>
                   <Button
                     variant="undercover"
-                    sx={{ textDecoration: 'underline' }}
+                    sx={{ textDecoration: 'underline', p: 0, mt: 0.25, height: 25 }}
                     onClick={() =>
                       setValue('tokenAAmount', tokenA.borrowerAmount!.toString(), { shouldValidate: true })
                     }
@@ -171,8 +174,10 @@ function LiquidityDepositWithdraw({ selectedPool }: Props) {
           )}
 
           {tabValue === 'WITHDRAW' && tokenB.borrowerAmount && (
-            <div className="pool-input">
-              <Label variant="success">{tokenB.token.symbol}</Label>
+            <div style={{ display: 'flex', justifyContent: 'space-between', padding: 20 }}>
+              <div style={{ marginTop: 6 }}>
+                <Label variant="success">{tokenB.token.symbol}</Label>
+              </div>
               {/* TODO: Each stock token must be implemented with etherjs. Cant show a label here */}
 
               <div>
@@ -189,14 +194,15 @@ function LiquidityDepositWithdraw({ selectedPool }: Props) {
                   }}
                 />
 
-                <div className="flex" style={{ justifyContent: 'space-between' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                   <div>
                     <Typography variant="caption">{roundCurrency(tokenB.borrowerAmount!, 5)}</Typography>
+                    <br />
                     <Typography variant="label">Deposit</Typography>
                   </div>
                   <Button
                     variant="undercover"
-                    sx={{ textDecoration: 'underline' }}
+                    sx={{ textDecoration: 'underline', p: 0, mt: 0.25, height: 25 }}
                     onClick={() =>
                       setValue('tokenBAmount', tokenB.borrowerAmount!.toString(), { shouldValidate: true })
                     }

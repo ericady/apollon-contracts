@@ -41,6 +41,11 @@ function LiquidityPoolsTable({ selectedPool, setSelectedPool }: Props) {
     ),
   );
 
+  // Select first pool by default
+  if (!selectedPool && allPoolsCombined.length > 0) {
+    setSelectedPool(allPoolsCombined[0]);
+  }
+
   return (
     <FeatureBox title="Pools" noPadding headBorder="full">
       <TableContainer
@@ -99,7 +104,7 @@ function LiquidityPoolsTable({ selectedPool, setSelectedPool }: Props) {
                             fontSize: '11.7px',
                           }}
                         >
-                          {!isNaN(tokenA.borrowerAmount!) && roundCurrency(tokenA.borrowerAmount!)}
+                          {!isNaN(tokenA.borrowerAmount!) ? roundCurrency(tokenA.borrowerAmount!) : 0}
                         </span>
                       </Typography>
                     </TableCell>
@@ -127,7 +132,7 @@ function LiquidityPoolsTable({ selectedPool, setSelectedPool }: Props) {
                             fontSize: '11.7px',
                           }}
                         >
-                          {!isNaN(tokenB.borrowerAmount!) && roundCurrency(tokenB.borrowerAmount!)}
+                          {!isNaN(tokenB.borrowerAmount!) ? roundCurrency(tokenB.borrowerAmount!) : 0}
                         </span>
                       </Typography>
                     </TableCell>

@@ -25,7 +25,7 @@ function NavigationBar() {
   }, [pathname, setTabValue, tabValue]);
 
   return (
-    <AppBar sx={{ height: 52 }} position="static">
+    <AppBar sx={{ height: 52 }} position="sticky">
       <Toolbar
         style={{
           minHeight: '52px',
