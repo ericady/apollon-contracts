@@ -5,7 +5,7 @@ import CloseIcon from '@mui/icons-material/Close';
 import ExpandLessSharpIcon from '@mui/icons-material/ExpandLessSharp';
 import { Box, Button, Dialog, DialogContent, DialogContentProps, DialogTitle, IconButton } from '@mui/material';
 import Typography from '@mui/material/Typography';
-import { useRef, useState } from 'react';
+import { useState } from 'react';
 import { useEthers } from '../../../context/EthersProvider';
 import {
   BorrowerHistoryType,
@@ -20,7 +20,6 @@ import Label from '../../Label/Label';
 
 const StabilityHistoryDialog = () => {
   const [open, setOpen] = useState(false);
-  const tableBodyRef = useRef<HTMLTableSectionElement | null>(null);
 
   const { address } = useEthers();
 
@@ -109,7 +108,6 @@ const StabilityHistoryDialog = () => {
             </IconButton>
           </DialogTitle>
           <DialogContent
-            ref={tableBodyRef}
             onScroll={handleScroll}
             sx={{
               p: 0,
