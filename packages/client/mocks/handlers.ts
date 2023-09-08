@@ -9,7 +9,6 @@ import {
   LongShortDirection,
   Pool,
   Query,
-  QueryGetBorrowerPoolHistoryArgs,
   QueryGetBorrowerStabilityHistoryArgs,
   QueryGetCollateralTokensArgs,
   QueryGetDebtTokensArgs,
@@ -34,6 +33,8 @@ import {
 } from '../app/queries';
 
 const favoritedAssets: string[] = JSON.parse(localStorage.getItem(FAVORITE_ASSETS_LOCALSTORAGE_KEY) ?? '[]');
+const now = Date.now();
+const oneDayInMs = 24 * 60 * 60 * 1000;
 
 const JUSD = {
   address: '0x6cA13a4ab78dd7D657226b155873A04DB929AXXX',
@@ -179,9 +180,6 @@ const closedPositions = Array(totalClosedPositions)
 
 // Define a helper function to generate pool price history data
 const generatePoolPriceHistory = (): number[][] => {
-  const now = Date.now();
-  const oneDayInMs = 24 * 60 * 60 * 1000;
-
   return Array(60)
     .fill(null)
     .map((_, i) => {
@@ -209,40 +207,37 @@ const generateTokenValues = (maxValue: number, tokens: Token[]) => {
   });
 };
 
-const generateBorrowerHistory = (): BorrowerHistory[] => {
-  const now = Date.now();
-  const oneDayInMs = 24 * 60 * 60 * 1000;
+const borrowerHistory: BorrowerHistory[] = Array(faker.number.int({ min: 0, max: 90 }))
+  .fill(null)
+  .map(() => {
+    const type = faker.helpers.enumValue(BorrowerHistoryType);
 
-  return Array(10)
-    .fill(null)
-    .map(() => {
-      const type = faker.helpers.enumValue(BorrowerHistoryType);
+    const lostAmount = parseFloat(faker.finance.amount(1, 1000, 2));
+    const gainedAmount = parseFloat(
+      faker.finance.amount(lostAmount, faker.number.int({ min: lostAmount, max: lostAmount * 1.1 }), 2),
+    );
 
-      const lostAmount = parseFloat(faker.finance.amount(1, 1000, 2));
-      const gainedAmount = parseFloat(
-        faker.finance.amount(lostAmount, faker.number.int({ min: lostAmount, max: lostAmount * 1.1 }), 2),
-      );
-
-      // negative amount and only on lost token for claimed rewards
-      const lostToken =
-        type === BorrowerHistoryType.ClaimedRewards
-          ? generateTokenValues(lostAmount, faker.helpers.arrayElements(tokens, { min: 1, max: 5 })).map((token) => ({
-              ...token,
-              amount: token.amount * -1,
-            }))
-          : [];
-      // positive amount and always bigger than any potential lost amount
-      const gainedToken = generateTokenValues(gainedAmount, faker.helpers.arrayElements(tokens, { min: 1, max: 5 }));
-      return {
-        timestamp: now - faker.number.int({ min: 0, max: 29 }) * oneDayInMs,
-        type,
-        values: [...lostToken, ...gainedToken],
-        resultInUSD: gainedAmount,
-        claimInUSD: type === BorrowerHistoryType.ClaimedRewards ? lostAmount : null,
-      };
-    })
-    .sort((a, b) => b.timestamp - a.timestamp);
-};
+    // negative amount and only on lost token for claimed rewards
+    const lostToken =
+      type === BorrowerHistoryType.ClaimedRewards
+        ? generateTokenValues(lostAmount, faker.helpers.arrayElements(tokens, { min: 1, max: 5 })).map((token) => ({
+            ...token,
+            amount: token.amount * -1,
+          }))
+        : [];
+    // positive amount and always bigger than any potential lost amount
+    const gainedToken = generateTokenValues(gainedAmount, faker.helpers.arrayElements(tokens, { min: 1, max: 5 }));
+    return {
+      id: faker.string.uuid(),
+      timestamp: now - faker.number.int({ min: 0, max: 29 }) * oneDayInMs,
+      type,
+      values: [...lostToken, ...gainedToken],
+      resultInUSD: gainedAmount,
+      claimInUSD: type === BorrowerHistoryType.ClaimedRewards ? lostAmount : null,
+    };
+  })
+  .sort((a, b) => b.timestamp - a.timestamp);
+const totalBorrowerHistory = borrowerHistory.length;
 
 export const handlers = [
   // GetDebtTokens
@@ -495,9 +490,43 @@ export const handlers = [
     QueryGetBorrowerStabilityHistoryArgs
   >(GET_BORROWER_STABILITY_HISTORY, (req, res, ctx) => {
     // For this mock, we ignore the actual poolId and just generate mock data
-    const result = generateBorrowerHistory();
+    const { borrower, cursor } = req.variables;
+    if (!borrower) {
+      throw new Error('Borrower address is required');
+    }
 
-    return res(ctx.data({ getBorrowerStabilityHistory: result }));
+    if (cursor) {
+      // find the open position with the id === cursor and return the next 30 entries from that position
+      const cursorPositionIndex = borrowerHistory.findIndex(({ id }) => id === cursor);
+      const history = borrowerHistory.slice(cursorPositionIndex + 1, cursorPositionIndex + 31);
+      const hasNextPage = cursorPositionIndex + 31 < totalBorrowerHistory;
+      const endCursor = history[history.length - 1].id;
+
+      const result: Query['getBorrowerStabilityHistory'] = {
+        history,
+        pageInfo: {
+          totalCount: totalBorrowerHistory,
+          hasNextPage,
+          endCursor,
+        },
+      };
+      return res(ctx.data({ getBorrowerStabilityHistory: result }));
+    } else {
+      // return the first 30 open positions
+      const history = borrowerHistory.slice(0, 30);
+      const hasNextPage = totalBorrowerHistory > 30;
+      const endCursor = history[history.length - 1].id;
+
+      const result: Query['getBorrowerStabilityHistory'] = {
+        history,
+        pageInfo: {
+          totalCount: totalBorrowerHistory,
+          hasNextPage,
+          endCursor,
+        },
+      };
+      return res(ctx.data({ getBorrowerStabilityHistory: result }));
+    }
   }),
   // GetCollateralRatioHistory
   graphql.query<{ getCollateralRatioHistory: Query['getCollateralRatioHistory'] }>(
@@ -529,13 +558,13 @@ export const handlers = [
   ),
 
   // GetBorrowerPoolHistory
-  graphql.query<{ getBorrowerPoolHistory: Query['getBorrowerPoolHistory'] }, QueryGetBorrowerPoolHistoryArgs>(
-    'GetBorrowerPoolHistory',
-    (req, res, ctx) => {
-      // For this mock, we ignore the actual poolId and just generate mock data
-      const result = generateBorrowerHistory();
+  // graphql.query<{ getBorrowerPoolHistory: Query['getBorrowerPoolHistory'] }, QueryGetBorrowerPoolHistoryArgs>(
+  //   'GetBorrowerPoolHistory',
+  //   (req, res, ctx) => {
+  //     // For this mock, we ignore the actual poolId and just generate mock data
+  //     const result = generateBorrowerHistory();
 
-      return res(ctx.data({ getBorrowerPoolHistory: result }));
-    },
-  ),
+  //     return res(ctx.data({ getBorrowerPoolHistory: result }));
+  //   },
+  // ),
 ];

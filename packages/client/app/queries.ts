@@ -141,17 +141,25 @@ export const GET_BORROWER_COLLATERAL_TOKENS = gql`
 export const GET_BORROWER_STABILITY_HISTORY = gql`
   query GetBorrowerStabilityHistory($borrower: String!) {
     getBorrowerStabilityHistory(borrower: $borrower) {
-      timestamp
-      type
-      values {
-        token {
-          address
-          symbol
+      history {
+        id
+        timestamp
+        type
+        values {
+          token {
+            address
+            symbol
+          }
+          amount
         }
-        amount
+        resultInUSD
+        claimInUSD
       }
-      resultInUSD
-      claimInUSD
+      pageInfo {
+        totalCount
+        hasNextPage
+        endCursor
+      }
     }
   }
 `;

@@ -3,9 +3,9 @@
 import { useQuery } from '@apollo/client';
 import CloseIcon from '@mui/icons-material/Close';
 import ExpandLessSharpIcon from '@mui/icons-material/ExpandLessSharp';
-import { Box, Button, Dialog, DialogContent, DialogTitle, IconButton } from '@mui/material';
+import { Box, Button, Dialog, DialogContent, DialogContentProps, DialogTitle, IconButton } from '@mui/material';
 import Typography from '@mui/material/Typography';
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import { useEthers } from '../../../context/EthersProvider';
 import {
   BorrowerHistoryType,
@@ -20,9 +20,11 @@ import Label from '../../Label/Label';
 
 const StabilityHistoryDialog = () => {
   const [open, setOpen] = useState(false);
+  const tableBodyRef = useRef<HTMLTableSectionElement | null>(null);
+
   const { address } = useEthers();
 
-  const { data } = useQuery<GetBorrowerStabilityHistoryQuery, GetBorrowerStabilityHistoryQueryVariables>(
+  const { data, fetchMore } = useQuery<GetBorrowerStabilityHistoryQuery, GetBorrowerStabilityHistoryQueryVariables>(
     GET_BORROWER_STABILITY_HISTORY,
     {
       variables: {
@@ -32,7 +34,7 @@ const StabilityHistoryDialog = () => {
   );
 
   const getComponentForBorrowerHistoryType = (
-    history: GetBorrowerStabilityHistoryQuery['getBorrowerStabilityHistory'][number],
+    history: GetBorrowerStabilityHistoryQuery['getBorrowerStabilityHistory']['history'][number],
   ) => {
     switch (history.type) {
       case BorrowerHistoryType.ClaimedRewards:
@@ -48,6 +50,25 @@ const StabilityHistoryDialog = () => {
         const _: never = history.type;
     }
   };
+
+  const handleScroll: DialogContentProps['onScroll'] = (event) => {
+    const scrollableDiv = event.target as HTMLDivElement;
+    if (scrollableDiv.scrollTop + scrollableDiv.clientHeight >= scrollableDiv.scrollHeight) {
+      if (data?.getBorrowerStabilityHistory.pageInfo.hasNextPage) {
+        fetchMorePositions();
+      }
+    }
+  };
+
+  const fetchMorePositions = () => {
+    fetchMore({
+      variables: {
+        cursor: data?.getBorrowerStabilityHistory.pageInfo.endCursor,
+      },
+    });
+  };
+
+  if (!data) return null;
 
   return (
     <>
@@ -88,6 +109,8 @@ const StabilityHistoryDialog = () => {
             </IconButton>
           </DialogTitle>
           <DialogContent
+            ref={tableBodyRef}
+            onScroll={handleScroll}
             sx={{
               p: 0,
               backgroundColor: 'background.default',
@@ -95,11 +118,13 @@ const StabilityHistoryDialog = () => {
               borderColor: 'background.paper',
             }}
           >
-            {data.getBorrowerStabilityHistory.map((history, index) => (
+            {data.getBorrowerStabilityHistory.history.map((history, index) => (
               <div
                 style={{
                   borderBottom:
-                    index === data.getBorrowerStabilityHistory.length - 1 ? 'none' : `1px solid ${BUTTON_BORDER}`,
+                    index === data.getBorrowerStabilityHistory.pageInfo.totalCount - 1
+                      ? 'none'
+                      : `1px solid ${BUTTON_BORDER}`,
                   padding: '20px',
                 }}
                 key={index}
@@ -115,7 +140,7 @@ const StabilityHistoryDialog = () => {
 };
 
 type StabilityWidgetProps = {
-  history: GetBorrowerStabilityHistoryQuery['getBorrowerStabilityHistory'][number];
+  history: GetBorrowerStabilityHistoryQuery['getBorrowerStabilityHistory']['history'][number];
 };
 
 function StabilityClaimedRewards({ history }: StabilityWidgetProps) {

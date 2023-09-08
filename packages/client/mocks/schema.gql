@@ -127,6 +127,7 @@ enum BorrowerHistoryType {
 }
 
 type BorrowerHistory {
+  id: String!
   timestamp: Int!
   type: BorrowerHistoryType!
   values: [TokenAmount!]!
@@ -135,7 +136,12 @@ type BorrowerHistory {
   resultInUSD: Float!
 }
 
+type PoolHistoryPage {
+  history: [BorrowerHistory!]!
+  pageInfo: PageInfo!
+}
+
 type Query {
-  getBorrowerPoolHistory(poolId: String!, borrower: String!): [BorrowerHistory!]!
-  getBorrowerStabilityHistory(borrower: String!): [BorrowerHistory!]!
+  getBorrowerPoolHistory(poolId: String!, borrower: String!, cursor: String): PoolHistoryPage!
+  getBorrowerStabilityHistory(borrower: String!, cursor: String): PoolHistoryPage!
 }

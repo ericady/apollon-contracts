@@ -23,6 +23,23 @@ export const client = new ApolloClient({
               return existing;
             },
           },
+
+          getBorrowerStabilityHistory: {
+            // Don't cache separate results based on
+            // any of this field's arguments.
+            keyArgs: [],
+            // Concatenate the incoming list items with
+            // the existing list items.
+            merge(existing = { history: [] }, incoming) {
+              return {
+                ...incoming,
+                history: [...existing.history, ...incoming.history],
+              };
+            },
+            read: (existing, args) => {
+              return existing;
+            },
+          },
         },
       },
     },
