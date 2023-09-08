@@ -50,7 +50,7 @@ function Assets() {
           ...token,
           openingFee,
           // calculate change over last 24h
-          change: roundCurrency((token.priceUSD - token.priceUSD24hAgo) / token.priceUSD24hAgo),
+          change: (token.priceUSD - token.priceUSD24hAgo) / token.priceUSD24hAgo,
           isFavorite: favoritedAssets.find((address) => token.address === address) !== undefined ? true : false,
         };
       })
@@ -115,7 +115,7 @@ function Assets() {
                   </TableCell>
                   <TableCell align="right" sx={{ color: change < 0 ? 'error.main' : 'success.main', p: 0.5 }}>
                     <div style={{ display: 'flex', alignContent: 'center', justifyContent: 'flex-end', gap: 4 }}>
-                      {stdFormatter.format(change)} <DirectionIcon showIncrease={change > 0} fontSize="small" />
+                      {roundCurrency(change)} <DirectionIcon showIncrease={change > 0} fontSize="small" />
                     </div>
                   </TableCell>
                   <TableCell sx={{ p: 0.5, pr: 2 }} align="right">
