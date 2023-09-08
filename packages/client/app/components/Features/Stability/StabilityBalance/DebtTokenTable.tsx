@@ -10,7 +10,7 @@ import { useEthers } from '../../../../context/EthersProvider';
 import { GetBorrowerDebtTokensQuery, GetBorrowerDebtTokensQueryVariables } from '../../../../generated/gql-types';
 import { GET_BORROWER_DEBT_TOKENS } from '../../../../queries';
 import { BUTTON_BACKGROUND } from '../../../../theme';
-import { displayPercentage, percentageChange, roundCurrency } from '../../../../utils/math';
+import { displayPercentage, percentageChange, roundCurrency, stdFormatter } from '../../../../utils/math';
 import FeatureBox from '../../../FeatureBox/FeatureBox';
 import DirectionIcon from '../../../Icons/DirectionIcon';
 import Label from '../../../Label/Label';
@@ -73,7 +73,7 @@ function DebtTokenTable() {
                   <TableCell sx={{ borderRight: '1px solid', borderColor: BUTTON_BACKGROUND }}>
                     <Label variant="none">{token.symbol}</Label>
                   </TableCell>
-                  <TableCell align="right">{totalSupplyUSD}</TableCell>
+                  <TableCell align="right">{stdFormatter.format(totalSupplyUSD)}</TableCell>
                   <TableCell>
                     <div className="flex">
                       <Typography

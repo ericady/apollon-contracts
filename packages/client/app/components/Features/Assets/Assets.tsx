@@ -12,7 +12,7 @@ import { useEffect, useMemo, useState } from 'react';
 import { SelectedToken, useSelectedToken } from '../../../context/SelectedTokenProvider';
 import { GetAllPoolsQuery, GetAllPoolsQueryVariables } from '../../../generated/gql-types';
 import { GET_ALL_POOLS } from '../../../queries';
-import { displayPercentage, roundCurrency } from '../../../utils/math';
+import { displayPercentage, roundCurrency, stdFormatter } from '../../../utils/math';
 import FeatureBox from '../../FeatureBox/FeatureBox';
 import DirectionIcon from '../../Icons/DirectionIcon';
 import HeaderCell from '../../Table/HeaderCell';
@@ -106,7 +106,7 @@ function Assets() {
                     <Typography fontWeight={400}>{symbol}</Typography>
                   </TableCell>
                   <TableCell sx={{ p: 0.5 }} align="right">
-                    <Typography fontWeight={400}>{priceUSD}</Typography>
+                    <Typography fontWeight={400}>{stdFormatter.format(priceUSD)}</Typography>
                   </TableCell>
                   <TableCell sx={{ p: 0.5 }} align="right">
                     <Typography fontWeight={400} sx={{ color: openingFee > 0 ? 'success.main' : 'error.main' }}>
@@ -115,7 +115,7 @@ function Assets() {
                   </TableCell>
                   <TableCell align="right" sx={{ color: change < 0 ? 'error.main' : 'success.main', p: 0.5 }}>
                     <div style={{ display: 'flex', alignContent: 'center', justifyContent: 'flex-end', gap: 4 }}>
-                      {change} <DirectionIcon showIncrease={change > 0} fontSize="small" />
+                      {stdFormatter.format(change)} <DirectionIcon showIncrease={change > 0} fontSize="small" />
                     </div>
                   </TableCell>
                   <TableCell sx={{ p: 0.5, pr: 2 }} align="right">

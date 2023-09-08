@@ -51,7 +51,7 @@ function StabilityPoolTable() {
                 <TableRow key={index}>
                   <TableCell sx={index === rewards.length - 1 ? { borderBottom: 'none' } : {}}></TableCell>
                   <TableCell sx={index === rewards.length - 1 ? { borderBottom: 'none' } : {}} align="right">
-                    {amount}
+                    {roundCurrency(amount, 5)}
                   </TableCell>
                   <TableCell sx={index === rewards.length - 1 ? { borderBottom: 'none' } : {}}>
                     <Label variant="success">{token.symbol}</Label>

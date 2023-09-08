@@ -5,6 +5,7 @@ import CssBaseline from '@mui/material/CssBaseline';
 import ThemeProvider from '@mui/material/styles/ThemeProvider';
 import { PropsWithChildren } from 'react';
 import { client } from '../client';
+import MockServer from '../components/MockServer';
 import NavigationBar from '../components/NavigationBar/NavigationBar';
 import theme from '../theme';
 import EthersProvider from './EthersProvider';
@@ -16,15 +17,17 @@ function ContextWrapper({ children }: PropsWithChildren<{}>) {
     <ThemeProvider theme={theme}>
       <CssBaseline enableColorScheme />
 
-      <EthersProvider>
-        <WalletProvider>
-          <NavigationBar />
+      <MockServer>
+        <EthersProvider>
+          <WalletProvider>
+            <NavigationBar />
 
-          <ApolloProvider client={client}>
-            <SelectedTokenProvider>{children}</SelectedTokenProvider>
-          </ApolloProvider>
-        </WalletProvider>
-      </EthersProvider>
+            <ApolloProvider client={client}>
+              <SelectedTokenProvider>{children}</SelectedTokenProvider>
+            </ApolloProvider>
+          </WalletProvider>
+        </EthersProvider>
+      </MockServer>
     </ThemeProvider>
   );
 }

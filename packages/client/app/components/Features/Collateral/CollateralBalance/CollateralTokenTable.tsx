@@ -11,7 +11,7 @@ import TableRow from '@mui/material/TableRow';
 import { useEthers } from '../../../../context/EthersProvider';
 import { GetCollateralTokensQuery, GetCollateralTokensQueryVariables } from '../../../../generated/gql-types';
 import { GET_ALL_COLLATERAL_TOKENS } from '../../../../queries';
-import { displayPercentage, percentageChange, roundCurrency } from '../../../../utils/math';
+import { displayPercentage, percentageChange, roundCurrency, stdFormatter } from '../../../../utils/math';
 import FeatureBox from '../../../FeatureBox/FeatureBox';
 import DirectionIcon from '../../../Icons/DirectionIcon';
 import Label from '../../../Label/Label';
@@ -59,7 +59,7 @@ const CollateralTokenTable = () => {
                     <TableCell>
                       <Label variant="none">{token.symbol}</Label>
                     </TableCell>
-                    <TableCell align="right">{totalValueLockedUSD}</TableCell>
+                    <TableCell align="right">{stdFormatter.format(totalValueLockedUSD)}</TableCell>
                     <TableCell align="left" sx={{ width: 120 }}>
                       <div className="flex">
                         <Typography

@@ -7,7 +7,7 @@ import TableRow from '@mui/material/TableRow';
 import { useEthers } from '../../../context/EthersProvider';
 import { GetBorrowerDebtTokensQuery, GetBorrowerDebtTokensQueryVariables } from '../../../generated/gql-types';
 import { GET_BORROWER_DEBT_TOKENS } from '../../../queries';
-import { displayPercentage, roundCurrency } from '../../../utils/math';
+import { displayPercentage, roundCurrency, stdFormatter } from '../../../utils/math';
 import Label from '../../Label/Label';
 import HeaderCell from '../../Table/HeaderCell';
 
@@ -46,13 +46,13 @@ function BalanceTable() {
               <TableRow key={token.address}>
                 <TableCell>{displayPercentage((walletAmount! * token.priceUSD) / totalValue)}</TableCell>
                 <TableCell align="right">
-                  <Typography sx={{ color: 'primary.contrastText' }}>{walletAmount}</Typography>
+                  <Typography sx={{ color: 'primary.contrastText' }}>{stdFormatter.format(walletAmount!)}</Typography>
                 </TableCell>
                 <TableCell>
                   <Label variant="none">{token.symbol}</Label>
                 </TableCell>
                 <TableCell align="right">{roundCurrency(walletAmount! * token.priceUSD)}$</TableCell>
-                <TableCell align="right">{token.priceUSD}$</TableCell>
+                <TableCell align="right">{stdFormatter.format(token.priceUSD)}$</TableCell>
               </TableRow>
             ))}
           </TableBody>
@@ -75,13 +75,13 @@ function BalanceTable() {
               <TableRow key={token.address}>
                 <TableCell>{displayPercentage((walletAmount! * token.priceUSD) / totalValue)}</TableCell>
                 <TableCell align="right">
-                  <Typography sx={{ color: 'primary.contrastText' }}>{walletAmount}</Typography>
+                  <Typography sx={{ color: 'primary.contrastText' }}>{stdFormatter.format(walletAmount!)}</Typography>
                 </TableCell>
                 <TableCell>
                   <Label variant="none">{token.symbol}</Label>
                 </TableCell>
                 <TableCell align="right">{roundCurrency(walletAmount! * token.priceUSD)}$</TableCell>
-                <TableCell align="right">{token.priceUSD}$</TableCell>
+                <TableCell align="right">{stdFormatter.format(token.priceUSD)}$</TableCell>
               </TableRow>
             ))}
           </TableBody>

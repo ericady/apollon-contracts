@@ -68,7 +68,7 @@ const Positions = () => {
           value="POSITIONS"
           label={
             <span>
-              POSITIONS{' '}
+              POSITIONS{'  '}
               {openPositions && <Label variant="none">{openPositions.getPositions.pageInfo.totalCount}</Label>}
             </span>
           }
@@ -78,7 +78,7 @@ const Positions = () => {
           value="HISTORY"
           label={
             <span>
-              HISTORY{' '}
+              HISTORY{'  '}
               {closedPositions && <Label variant="none">{closedPositions.getPositions.pageInfo.totalCount}</Label>}
             </span>
           }

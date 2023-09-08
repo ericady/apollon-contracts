@@ -8,6 +8,7 @@ import {
 } from '../../../../generated/gql-types';
 import { GET_COLLATERAL_RATIO_HISTORY } from '../../../../queries';
 import { BUTTON_BACKGROUND, BUTTON_BORDER } from '../../../../theme';
+import { stdFormatter } from '../../../../utils/math';
 import DiagramPlaceholder from '../../../Loader/DiagramPlaceholder';
 
 function SystemCollateralRatioChart() {
@@ -42,7 +43,7 @@ function SystemCollateralRatioChart() {
 
       <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: 0.5, pt: 0.5, pb: 1, px: 2 }}>
         <Typography variant="titleAlternate" color="info.main">
-          {systemCollateralRatio}
+          {stdFormatter.format(systemCollateralRatio)}
         </Typography>
 
         <Typography variant="titleAlternate">%</Typography>

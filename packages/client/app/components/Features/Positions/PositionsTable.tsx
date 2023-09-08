@@ -17,7 +17,7 @@ import {
 } from '../../../generated/gql-types';
 import { GET_BORROWER_POSITIONS } from '../../../queries';
 import { formatUnixTimestamp } from '../../../utils/date';
-import { displayPercentage, percentageChange, roundCurrency } from '../../../utils/math';
+import { displayPercentage, percentageChange, roundCurrency, stdFormatter } from '../../../utils/math';
 import Label from '../../Label/Label';
 import HeaderCell from '../../Table/HeaderCell';
 
@@ -69,6 +69,8 @@ function PositionsTable() {
     });
   };
 
+  if (!data) return null;
+
   return (
     <TableContainer ref={tableBodyRef} style={{ maxHeight: '270px', overflow: 'auto' }}>
       <Table stickyHeader>
@@ -88,9 +90,9 @@ function PositionsTable() {
         <TableBody>
           {data?.getPositions.positions.map(
             ({ id, direction, feesInStable, openedAt, size, token, totalPriceInStable }) => {
-              const ratioStableCoinNow = JUSDToken ? token.priceUSD / JUSDToken?.priceUSD : 0;
-              const totalPriceNow = ratioStableCoinNow * size;
-              const pnl = totalPriceNow - totalPriceInStable;
+              const ratioStableCoinNow = token.priceUSD / JUSDToken!.priceUSD;
+              const totalPriceInStableNow = ratioStableCoinNow * size;
+              const pnl = totalPriceInStableNow - totalPriceInStable;
 
               return (
                 <TableRow key={id}>
@@ -104,7 +106,7 @@ function PositionsTable() {
                   </TableCell>
                   <TableCell align="right">
                     <div className="flex">
-                      <Typography>{size}</Typography>
+                      <Typography>{stdFormatter.format(size)}</Typography>
                       <Label variant="none">{token.symbol}</Label>
                     </div>
                   </TableCell>
@@ -117,10 +119,10 @@ function PositionsTable() {
                   <TableCell align="right">
                     <div className="flex">
                       <Typography sx={{ color: pnl > 0 ? 'success.main' : 'error.main', fontWeight: '400' }}>
-                        {roundCurrency(pnl)} jUSD{' '}
+                        {roundCurrency(pnl)} jUSD
                       </Typography>
                       <Typography sx={{ color: pnl > 0 ? 'success.main' : 'error.main', fontWeight: '400' }}>
-                        {displayPercentage(percentageChange(totalPriceNow, totalPriceInStable))}
+                        {displayPercentage(percentageChange(totalPriceInStableNow, totalPriceInStable))}
                       </Typography>
                     </div>
                   </TableCell>

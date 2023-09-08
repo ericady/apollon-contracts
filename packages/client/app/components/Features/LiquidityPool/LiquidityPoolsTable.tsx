@@ -12,7 +12,7 @@ import {
   GetLiquidityPoolsQueryVariables,
 } from '../../../generated/gql-types';
 import { GET_BORROWER_LIQUIDITY_POOLS, GET_LIQUIDITY_POOLS } from '../../../queries';
-import { displayPercentage, percentageChange } from '../../../utils/math';
+import { displayPercentage, percentageChange, roundCurrency, stdFormatter } from '../../../utils/math';
 import FeatureBox from '../../FeatureBox/FeatureBox';
 import DirectionIcon from '../../Icons/DirectionIcon';
 import Label from '../../Label/Label';
@@ -61,12 +61,13 @@ function LiquidityPoolsTable({ selectedPool, setSelectedPool }: Props) {
               <HeaderCell title="" />
               <HeaderCell title="" cellProps={{ align: 'right' }} />
               <HeaderCell title="" />
-              <HeaderCell title="24h Volume" cellProps={{ align: 'right' }} />
+              <HeaderCell title="" />
+              <HeaderCell title="24h Volume" />
             </TableRow>
           </TableHead>
 
           <TableBody>
-            {allPoolsCombined.map((pool, index) => {
+            {allPoolsCombined.map((pool) => {
               const { id, liquidity, volume24hUSD, volume24hUSD24hAgo } = pool;
               const [tokenA, tokenB] = liquidity;
               const volumeChange = percentageChange(volume24hUSD, volume24hUSD24hAgo);
@@ -90,7 +91,7 @@ function LiquidityPoolsTable({ selectedPool, setSelectedPool }: Props) {
                       }}
                     >
                       <Typography fontWeight={400}>
-                        {tokenA.totalAmount}
+                        {roundCurrency(tokenA.totalAmount, 5)}
                         <br />
                         <span
                           style={{
@@ -98,7 +99,7 @@ function LiquidityPoolsTable({ selectedPool, setSelectedPool }: Props) {
                             fontSize: '11.7px',
                           }}
                         >
-                          {tokenA.borrowerAmount}
+                          {!isNaN(tokenA.borrowerAmount!) && roundCurrency(tokenA.borrowerAmount!)}
                         </span>
                       </Typography>
                     </TableCell>
@@ -118,7 +119,7 @@ function LiquidityPoolsTable({ selectedPool, setSelectedPool }: Props) {
 
                     <TableCell align="right">
                       <Typography fontWeight={400}>
-                        {tokenB.totalAmount}
+                        {roundCurrency(tokenB.totalAmount, 5)}
                         <br />
                         <span
                           style={{
@@ -126,7 +127,7 @@ function LiquidityPoolsTable({ selectedPool, setSelectedPool }: Props) {
                             fontSize: '11.7px',
                           }}
                         >
-                          {tokenB.borrowerAmount}
+                          {!isNaN(tokenB.borrowerAmount!) && roundCurrency(tokenB.borrowerAmount!)}
                         </span>
                       </Typography>
                     </TableCell>
@@ -135,9 +136,11 @@ function LiquidityPoolsTable({ selectedPool, setSelectedPool }: Props) {
                       <Label variant="none">{tokenB.token.symbol}</Label>
                     </TableCell>
 
-                    <TableCell>
-                      <div className="flex" style={{ justifyContent: 'flex-end' }}>
-                        <Typography variant="caption">{volume24hUSD}$</Typography>
+                    <TableCell align="right">
+                      <Typography variant="caption">{stdFormatter.format(volume24hUSD)}$</Typography>
+                    </TableCell>
+                    <TableCell align="left" width={130}>
+                      <div className="flex">
                         <Typography sx={{ color: volumeChange > 0 ? 'success.main' : 'error.main', fontWeight: '400' }}>
                           {displayPercentage(volumeChange)}
                         </Typography>

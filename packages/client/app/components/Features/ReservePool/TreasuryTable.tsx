@@ -10,7 +10,7 @@ import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import { GetDebtTokensQuery, GetDebtTokensQueryVariables } from '../../../generated/gql-types';
 import { GET_ALL_DEBT_TOKENS } from '../../../queries';
-import { displayPercentage, percentageChange, roundCurrency } from '../../../utils/math';
+import { displayPercentage, percentageChange, roundCurrency, stdFormatter } from '../../../utils/math';
 import FeatureBox from '../../FeatureBox/FeatureBox';
 import DirectionIcon from '../../Icons/DirectionIcon';
 import Label from '../../Label/Label';
@@ -39,7 +39,7 @@ function TreasuryTable() {
           <TableBody>
             {debtTokensInReserve.map(({ token, totalReserve, totalReserve24hAgo }) => (
               <TableRow key={token.address}>
-                <TableCell align="right">{totalReserve}</TableCell>
+                <TableCell align="right">{stdFormatter.format(totalReserve)}</TableCell>
                 <TableCell>
                   <Label variant="none">{token.symbol}</Label>
                 </TableCell>

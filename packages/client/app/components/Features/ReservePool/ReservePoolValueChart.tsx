@@ -7,6 +7,7 @@ import { CartesianGrid, Line, LineChart, Tooltip } from 'recharts';
 import { GetReserveUsdHistoryQuery, GetReserveUsdHistoryQueryVariables } from '../../../generated/gql-types';
 import { GET_RESERVE_USD_HISTORY } from '../../../queries';
 import { BUTTON_BACKGROUND, BUTTON_BORDER } from '../../../theme';
+import { stdFormatter } from '../../../utils/math';
 import DiagramPlaceholder from '../../Loader/DiagramPlaceholder';
 
 function ReservePoolValueChart() {
@@ -39,7 +40,7 @@ function ReservePoolValueChart() {
 
       <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: 0.5, pt: 0.5, pb: 1, px: 2 }}>
         <Typography variant="titleAlternate" color="info.main">
-          ≈ {reservePoolValue}
+          ≈ {stdFormatter.format(reservePoolValue)}
         </Typography>
 
         <Typography variant="titleAlternate">$</Typography>

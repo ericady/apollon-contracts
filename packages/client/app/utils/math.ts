@@ -1,5 +1,15 @@
+export const stdFormatter = new Intl.NumberFormat('en-US', {
+  minimumFractionDigits: 2,
+  maximumFractionDigits: 2,
+});
+
 export const roundCurrency = (value: number, decimals = 2) => {
-  return Math.round(value * Math.pow(10, decimals)) / Math.pow(10, decimals);
+  const formatter = new Intl.NumberFormat('en-US', {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: decimals,
+  });
+
+  return formatter.format(Math.round(value * Math.pow(10, decimals)) / Math.pow(10, decimals));
 };
 
 export const percentageChange = (newValue: number, oldValue: number) => {

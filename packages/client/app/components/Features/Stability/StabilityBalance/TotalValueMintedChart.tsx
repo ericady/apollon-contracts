@@ -5,6 +5,7 @@ import { CartesianGrid, Line, LineChart, Tooltip } from 'recharts';
 import { GetDebtUsdHistoryQuery, GetDebtUsdHistoryQueryVariables } from '../../../../generated/gql-types';
 import { GET_DEBT_USD_HISTORY } from '../../../../queries';
 import { BUTTON_BACKGROUND, BUTTON_BORDER } from '../../../../theme';
+import { stdFormatter } from '../../../../utils/math';
 import DiagramPlaceholder from '../../../Loader/DiagramPlaceholder';
 
 function TotalValueMintedChart() {
@@ -37,7 +38,7 @@ function TotalValueMintedChart() {
 
       <Box sx={{ display: 'flex', alignItems: 'center', justifyContent: 'flex-end', gap: 0.5, pt: 0.5, pb: 1, px: 2 }}>
         <Typography variant="titleAlternate" color="info.main">
-          ≈ {totalValueMintedChart}
+          ≈ {stdFormatter.format(totalValueMintedChart)}
         </Typography>
 
         <Typography variant="titleAlternate">$</Typography>
