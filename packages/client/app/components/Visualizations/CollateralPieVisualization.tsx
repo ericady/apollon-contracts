@@ -11,7 +11,7 @@ type Props = {
 
 const renderCustomizedLabel = (svgPropsAndData: any) => {
   // has all the spread data and some props from the library
-  const { x, y, cx, troveValueUSD, chartColor, token } = svgPropsAndData;
+  const { x, y, cx, troveLockedAmount, chartColor, token } = svgPropsAndData;
   const isRight = x > cx;
 
   return (
@@ -38,7 +38,7 @@ const renderCustomizedLabel = (svgPropsAndData: any) => {
         textAnchor={x > cx ? 'start' : 'end'}
         dominantBaseline="central"
       >
-        {roundCurrency(troveValueUSD, 5)}
+        {roundCurrency(troveLockedAmount, 4)}
       </text>
     </g>
   );

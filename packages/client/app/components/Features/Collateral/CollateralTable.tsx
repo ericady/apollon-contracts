@@ -1,5 +1,4 @@
 import { useQuery } from '@apollo/client';
-import Square from '@mui/icons-material/Square';
 import { Box } from '@mui/material';
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
@@ -110,16 +109,16 @@ function CollateralTable() {
               </TableRow>
             </TableHead>
             <TableBody>
-              {borrowerCollateralTokens.map(({ token, walletAmount, troveLockedAmount }) => (
+              {borrowerCollateralTokens.map(({ token, walletAmount, troveLockedAmount, chartColor }) => (
                 <TableRow key={token.address}>
                   <TableCell align="right">
                     <div style={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center', gap: 10 }}>
-                      <Square
-                        sx={{
-                          color: 'info.main',
-                          fontSize: '14px',
-                        }}
-                      />
+                      <svg xmlns="http://www.w3.org/2000/svg" width="8" height="8" fill="none">
+                        <path
+                          fill={chartColor}
+                          d="M4 0a6.449 6.449 0 0 0 4 4 6.449 6.449 0 0 0-4 4 6.449 6.449 0 0 0-4-4 6.449 6.449 0 0 0 4-4Z"
+                        />
+                      </svg>
                       <Typography color="primary.contrastText" fontSize={14.3}>
                         {roundCurrency(troveLockedAmount!, 5)}
                       </Typography>
