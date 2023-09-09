@@ -11,9 +11,10 @@ import Typography from '@mui/material/Typography';
 import { useEthers } from '../../../context/EthersProvider';
 import { GetCollateralTokensQuery, GetCollateralTokensQueryVariables } from '../../../generated/gql-types';
 import { GET_BORROWER_COLLATERAL_TOKENS } from '../../../queries';
-import { roundCurrency } from '../../../utils/math';
+import { displayPercentage, roundCurrency } from '../../../utils/math';
 import Label from '../../Label/Label';
 import HeaderCell from '../../Table/HeaderCell';
+import CollateralRatioVisualization from '../../Visualizations/CollateralRatioVisualization';
 import CollateralUpdateDialog from './CollateralUpdateDialog';
 
 function CollateralTable() {
@@ -34,33 +35,35 @@ function CollateralTable() {
     <div style={{ display: 'flex' }}>
       <div style={{ width: '40%' }}></div>
       <div style={{ width: '100%' }}>
-        <div
-          style={{
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'space-between',
-            padding: '20px',
-          }}
-        >
-          <Box sx={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
-            <Typography
-              sx={{ fontFamily: 'Space Grotesk Variable', color: 'info.main', fontWeight: '700', fontSize: '20px' }}
-            >
-              174 %
-            </Typography>
+        <div style={{ padding: '20px' }}>
+          <div
+            style={{
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+            }}
+          >
+            <Box sx={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
+              <Typography
+                sx={{ fontFamily: 'Space Grotesk Variable', color: 'info.main', fontWeight: '700', fontSize: '20px' }}
+              >
+                {displayPercentage(1.74, false, 0)}
+              </Typography>
 
-            <img
-              src="assets/svgs/Star24_white.svg"
-              alt="White colored diamond shape"
-              height="11"
-              typeof="image/svg+xml"
-            />
+              <img
+                src="assets/svgs/Star24_white.svg"
+                alt="White colored diamond shape"
+                height="11"
+                typeof="image/svg+xml"
+              />
 
-            <Typography variant="h4">Collateral Ratio</Typography>
-          </Box>
-
-          <CollateralUpdateDialog collateralData={data} buttonVariant="outlined" />
+              <Typography variant="h4">Collateral Ratio</Typography>
+            </Box>
+            <CollateralUpdateDialog collateralData={data} buttonVariant="outlined" />
+          </div>
+          <CollateralRatioVisualization criticalRatio={1.1} newRatio={1.5} oldRatio={1.74} />
         </div>
+
         <TableContainer>
           <Table>
             <TableHead>

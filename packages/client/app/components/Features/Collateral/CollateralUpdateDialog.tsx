@@ -12,9 +12,9 @@ import { FormProvider, useForm } from 'react-hook-form';
 import { useWallet } from '../../../context/WalletProvider';
 import { GetCollateralTokensQuery } from '../../../generated/gql-types';
 import { displayPercentage, roundCurrency } from '../../../utils/math';
-import CollateralRatioVisualization from '../../CollateralRatioVisualization/CollateralRatioVisualization';
 import NumberInput from '../../FormControls/NumberInput';
 import Label from '../../Label/Label';
+import CollateralRatioVisualization from '../../Visualizations/CollateralRatioVisualization';
 
 type Props = {
   collateralData: GetCollateralTokensQuery;

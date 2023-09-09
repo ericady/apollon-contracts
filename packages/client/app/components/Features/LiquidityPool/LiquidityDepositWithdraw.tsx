@@ -10,10 +10,10 @@ import { SyntheticEvent, useEffect, useState } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
 import { GetBorrowerLiquidityPoolsQuery } from '../../../generated/gql-types';
 import { displayPercentage, roundCurrency } from '../../../utils/math';
-import CollateralRatioVisualization from '../../CollateralRatioVisualization/CollateralRatioVisualization';
 import FeatureBox from '../../FeatureBox/FeatureBox';
 import NumberInput from '../../FormControls/NumberInput';
 import Label from '../../Label/Label';
+import CollateralRatioVisualization from '../../Visualizations/CollateralRatioVisualization';
 
 type Props = {
   selectedPool: GetBorrowerLiquidityPoolsQuery['getPools'][number];
