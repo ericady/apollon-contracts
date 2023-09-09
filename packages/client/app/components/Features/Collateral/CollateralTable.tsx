@@ -8,14 +8,34 @@ import TableContainer from '@mui/material/TableContainer';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import Typography from '@mui/material/Typography';
+import { useMemo } from 'react';
 import { useEthers } from '../../../context/EthersProvider';
 import { GetCollateralTokensQuery, GetCollateralTokensQueryVariables } from '../../../generated/gql-types';
 import { GET_BORROWER_COLLATERAL_TOKENS } from '../../../queries';
 import { displayPercentage, roundCurrency } from '../../../utils/math';
 import Label from '../../Label/Label';
 import HeaderCell from '../../Table/HeaderCell';
+import CollateralPieVisualization from '../../Visualizations/CollateralPieVisualization';
 import CollateralRatioVisualization from '../../Visualizations/CollateralRatioVisualization';
 import CollateralUpdateDialog from './CollateralUpdateDialog';
+
+const generateColorPalette = (paletteLength: number) => {
+  // Initialize an array with the first 3 fixed colors
+  const colors = ['#3DD755', '#E04A4A', '#33B6FF'];
+
+  // Add 5 well-matching colors
+  const matchingColors = ['#FFA07A', '#8A2BE2', '#5F9EA0', '#D2691E', '#FFD700'];
+  colors.push(...matchingColors);
+
+  // Generate random colors for the remaining spots
+  while (colors.length < paletteLength) {
+    const randomColor = '#' + Math.floor(Math.random() * 16777215).toString(16);
+    colors.push(randomColor);
+  }
+
+  // Slice the array to the desired length
+  return colors.slice(0, paletteLength);
+};
 
 function CollateralTable() {
   const { address } = useEthers();
@@ -27,13 +47,29 @@ function CollateralTable() {
     },
   );
 
-  if (!data) return null;
+  const borrowerCollateralTokens = useMemo(() => {
+    const colorPalette: string[] = data ? generateColorPalette(data.getCollateralTokens.length) : [];
 
-  const borrowerCollateralTokens = data.getCollateralTokens.filter((token) => token.walletAmount! > 0);
+    return (
+      data?.getCollateralTokens
+        .filter(({ troveLockedAmount, walletAmount }) => walletAmount! > 0 || troveLockedAmount! > 0)
+        .map((token) => ({
+          ...token,
+          chartColor: colorPalette.shift(),
+          troveValueUSD: parseFloat(roundCurrency(token.troveLockedAmount ?? 0 * token.token.priceUSD)),
+        })) ?? []
+    );
+  }, [data]);
+
+  console.log('borrowerCollateralTokens: ', borrowerCollateralTokens);
+
+  if (!data) return null;
 
   return (
     <div style={{ display: 'flex' }}>
-      <div style={{ width: '40%' }}></div>
+      <div style={{ width: '40%', display: 'flex', justifyContent: 'center' }}>
+        <CollateralPieVisualization borrowerCollateralTokens={borrowerCollateralTokens} />
+      </div>
       <div style={{ width: '100%' }}>
         <div style={{ padding: '20px' }}>
           <div
@@ -77,7 +113,7 @@ function CollateralTable() {
               {borrowerCollateralTokens.map(({ token, walletAmount, troveLockedAmount }) => (
                 <TableRow key={token.address}>
                   <TableCell align="right">
-                    <div className="flex">
+                    <div style={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center', gap: 10 }}>
                       <Square
                         sx={{
                           color: 'info.main',
