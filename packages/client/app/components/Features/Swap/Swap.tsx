@@ -64,7 +64,7 @@ const Swap = () => {
   };
 
   return (
-    <FeatureBox title="Swap" border="bottom">
+    <FeatureBox title="Swap" border="bottom" isDraggable={{ y: '1', gsHeight: '32', gsWidth: '1' }}>
       <FormProvider {...methods}>
         <form onSubmit={handleSubmit(onSubmit)}>
           <div style={{ display: 'flex', alignItems: 'center' }}>

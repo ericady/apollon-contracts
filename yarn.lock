@@ -11578,6 +11578,7 @@ __metadata:
     eslint-config-next: 13.4.19
     ethers: 6.7.0
     graphql: 16.8.0
+    gridstack: 9.1.0
     jest: ^29.6.2
     jest-environment-jsdom: ^29.6.2
     msw: ^1.2.3
@@ -16512,6 +16513,13 @@ __metadata:
   version: 16.8.0
   resolution: "graphql@npm:16.8.0"
   checksum: d853d4085b0c911a7e2a926c3b0d379934ec61cd4329e70cdf281763102f024fd80a97db7a505b8b04fed9050cb4875f8f518150ea854557a500a0b41dcd7f4e
+  languageName: node
+  linkType: hard
+
+"gridstack@npm:9.1.0":
+  version: 9.1.0
+  resolution: "gridstack@npm:9.1.0"
+  checksum: cb390dfc70d64641351d1daa7ae0901183574c554891ca0083430912b40bc012d4953c9a51f8493c84f8708d2b97446872e3275db58dd0bba5296bcc0def32ba
   languageName: node
   linkType: hard
 
