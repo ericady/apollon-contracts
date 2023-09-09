@@ -12,7 +12,7 @@ import { FormProvider, useForm } from 'react-hook-form';
 import { useSelectedToken } from '../../../context/SelectedTokenProvider';
 import { displayPercentage } from '../../../utils/math';
 import InfoButton from '../../Buttons/InfoButton';
-import CollateralRatioVisualization from '../../CollateralRatio/CollateralRatio';
+import CollateralRatioVisualization from '../../CollateralRatioVisualization/CollateralRatioVisualization';
 import FeatureBox from '../../FeatureBox/FeatureBox';
 import NumberInput from '../../FormControls/NumberInput';
 import Label from '../../Label/Label';

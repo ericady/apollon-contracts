@@ -59,23 +59,19 @@ function CollateralRatioVisualization({ criticalRatio, newRatio, oldRatio, scale
         <Box
           sx={{
             position: 'absolute',
-
             width: `${criticalPosition * 100}%`,
             height: '100%',
             borderRight: '2px solid',
             borderColor: 'error.main',
-            zIndex: -1,
           }}
         ></Box>
         <Box
           sx={{
             position: 'absolute',
-
             width: `${newPosition * 100}%`,
             height: '100%',
             borderRight: '2px solid',
             borderColor: 'primary.contrastText',
-            zIndex: -1,
           }}
         ></Box>
         <div
@@ -91,6 +87,7 @@ function CollateralRatioVisualization({ criticalRatio, newRatio, oldRatio, scale
               width: `${oldPosition * 100}%`,
               height: 2,
               backgroundColor: 'info.main',
+              zIndex: 1,
             }}
           ></Box>
           <Box

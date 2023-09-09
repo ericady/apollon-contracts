@@ -21,9 +21,11 @@ function MockServer({ children }: PropsWithChildren<{}>) {
 
   if (!mockStarted)
     return (
-      <div style={{ display: 'grid', placeItems: 'center' }}>
-        {process.env.NEXT_PUBLIC_API_MOCKING === 'enabled' ? 'MockServer is starting...' : 'Mocking is not enabled'}
-        <CircularProgress />
+      <div style={{ display: 'grid', placeItems: 'center', height: '100vh' }}>
+        <div style={{ display: 'grid', placeItems: 'center' }}>
+          {process.env.NEXT_PUBLIC_API_MOCKING === 'enabled' ? 'MockServer is starting...' : 'Mocking is not enabled'}
+          <CircularProgress />
+        </div>
       </div>
     );
 

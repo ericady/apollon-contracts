@@ -9,7 +9,8 @@ import Typography from '@mui/material/Typography';
 import { SyntheticEvent, useEffect, useState } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
 import { GetBorrowerLiquidityPoolsQuery } from '../../../generated/gql-types';
-import { roundCurrency } from '../../../utils/math';
+import { displayPercentage, roundCurrency } from '../../../utils/math';
+import CollateralRatioVisualization from '../../CollateralRatioVisualization/CollateralRatioVisualization';
 import FeatureBox from '../../FeatureBox/FeatureBox';
 import NumberInput from '../../FormControls/NumberInput';
 import Label from '../../Label/Label';
@@ -216,29 +217,36 @@ function LiquidityDepositWithdraw({ selectedPool }: Props) {
 
           <Box
             sx={{
-              display: 'flex',
-              justifyContent: 'space-between',
-              alignItems: 'center',
               padding: '20px',
               borderBottom: '1px solid',
               borderBottomColor: 'background.paper',
             }}
           >
-            <Typography variant="titleAlternate">Collateral Ratio</Typography>
-            <div className="flex">
-              <Typography
-                sx={{ fontFamily: 'Space Grotesk Variable', color: 'info.main', fontWeight: '700', fontSize: '20px' }}
-              >
-                174 %
-              </Typography>
-              <ArrowForwardIosIcon sx={{ color: '#46434F', fontSize: '18px' }} />
-              <Typography
-                sx={{ fontFamily: 'Space Grotesk Variable', color: 'info.main', fontWeight: '700', fontSize: '20px' }}
-              >
-                143 %
-              </Typography>
-            </div>
+            <Box
+              sx={{
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+              }}
+            >
+              <Typography variant="titleAlternate">Collateral Ratio</Typography>
+              <div className="flex">
+                <Typography
+                  sx={{ fontFamily: 'Space Grotesk Variable', color: 'info.main', fontWeight: '700', fontSize: '20px' }}
+                >
+                  {displayPercentage(1.74, false, 0)}
+                </Typography>
+                <ArrowForwardIosIcon sx={{ color: '#46434F', fontSize: '18px' }} />
+                <Typography
+                  sx={{ fontFamily: 'Space Grotesk Variable', color: 'info.main', fontWeight: '700', fontSize: '20px' }}
+                >
+                  {displayPercentage(1.43, false, 0)}
+                </Typography>
+              </div>
+            </Box>
+            <CollateralRatioVisualization criticalRatio={1.1} newRatio={1.43} oldRatio={1.74} />
           </Box>
+
           <div style={{ padding: '20px' }}>
             <Button type="submit" variant="outlined" sx={{ borderColor: '#fff' }}>
               UPDATE

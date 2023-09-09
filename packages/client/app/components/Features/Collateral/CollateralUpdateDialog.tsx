@@ -11,7 +11,8 @@ import { SyntheticEvent, useState } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
 import { useWallet } from '../../../context/WalletProvider';
 import { GetCollateralTokensQuery } from '../../../generated/gql-types';
-import { roundCurrency } from '../../../utils/math';
+import { displayPercentage, roundCurrency } from '../../../utils/math';
+import CollateralRatioVisualization from '../../CollateralRatioVisualization/CollateralRatioVisualization';
 import NumberInput from '../../FormControls/NumberInput';
 import Label from '../../Label/Label';
 
@@ -220,36 +221,45 @@ const CollateralUpdateDialog = ({ collateralData, buttonVariant, buttonSx = {} }
 
               <Box
                 sx={{
-                  display: 'flex',
-                  justifyContent: 'space-between',
-                  alignItems: 'center',
                   padding: '20px',
+                  borderTop: '1px solid',
+                  borderColor: 'background.paper',
                 }}
               >
-                <Typography variant="titleAlternate">Collateral Ratio</Typography>
-                <div className="flex">
-                  <Typography
-                    sx={{
-                      fontFamily: 'Space Grotesk Variable',
-                      color: 'info.main',
-                      fontWeight: '700',
-                      fontSize: '20px',
-                    }}
-                  >
-                    174 %
-                  </Typography>
-                  <ArrowForwardIosIcon sx={{ color: '#46434F', fontSize: '18px' }} />
-                  <Typography
-                    sx={{
-                      fontFamily: 'Space Grotesk Variable',
-                      color: 'info.main',
-                      fontWeight: '700',
-                      fontSize: '20px',
-                    }}
-                  >
-                    143 %
-                  </Typography>
-                </div>
+                <Box
+                  sx={{
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
+                  }}
+                >
+                  <Typography variant="titleAlternate">Collateral Ratio</Typography>
+                  <div className="flex">
+                    <Typography
+                      sx={{
+                        fontFamily: 'Space Grotesk Variable',
+                        color: 'info.main',
+                        fontWeight: '700',
+                        fontSize: '20px',
+                      }}
+                    >
+                      {displayPercentage(1.56, false, 0)}
+                    </Typography>
+                    <ArrowForwardIosIcon sx={{ color: '#46434F', fontSize: '18px' }} />
+                    <Typography
+                      sx={{
+                        fontFamily: 'Space Grotesk Variable',
+                        color: 'info.main',
+                        fontWeight: '700',
+                        fontSize: '20px',
+                      }}
+                    >
+                      {displayPercentage(1.43, false, 0)}
+                    </Typography>
+                  </div>
+                </Box>
+
+                <CollateralRatioVisualization criticalRatio={1.1} newRatio={1.43} oldRatio={1.56} />
               </Box>
             </DialogContent>
             <DialogActions
