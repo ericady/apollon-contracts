@@ -48,7 +48,11 @@ const Farm = () => {
   };
 
   return (
-    <FeatureBox title="Farm" border="bottom" isDraggable={{ y: '2', gsHeight: '51', gsWidth: '1' }}>
+    <FeatureBox
+      title="Farm"
+      border="bottom"
+      isDraggable={{ y: '2', gsHeight: '51', gsWidth: '1', id: 'apollon-farm-widget' }}
+    >
       <Tabs value={tabValue} onChange={handleTabChange} variant="fullWidth" sx={{ mx: '-15px' }}>
         <Tab label="LONG" value="Long" />
         <Tab label="SHORT" value="Short" />

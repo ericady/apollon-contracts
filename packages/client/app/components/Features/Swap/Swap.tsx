@@ -64,7 +64,11 @@ const Swap = () => {
   };
 
   return (
-    <FeatureBox title="Swap" border="bottom" isDraggable={{ y: '1', gsHeight: '32', gsWidth: '1' }}>
+    <FeatureBox
+      title="Swap"
+      border="bottom"
+      isDraggable={{ y: '1', gsHeight: '32', gsWidth: '1', id: 'apollon-swap-widget' }}
+    >
       <FormProvider {...methods}>
         <form onSubmit={handleSubmit(onSubmit)}>
           <div style={{ display: 'flex', alignItems: 'center' }}>

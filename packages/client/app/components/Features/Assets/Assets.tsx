@@ -78,7 +78,12 @@ function Assets() {
   };
 
   return (
-    <FeatureBox title="Assets" noPadding border="bottom" isDraggable={{ y: '0', gsHeight: '22', gsWidth: '1' }}>
+    <FeatureBox
+      title="Assets"
+      noPadding
+      border="bottom"
+      isDraggable={{ y: '0', gsHeight: '22', gsWidth: '1', id: 'apollon-assets-widget' }}
+    >
       <TableContainer sx={{ maxHeight: 170, overflowY: 'scroll' }}>
         <Table stickyHeader size="small">
           <TableHead sx={{ borderBottom: '1px solid', borderBottomColor: 'background.paper' }}>

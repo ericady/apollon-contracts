@@ -7,6 +7,7 @@ import { PropsWithChildren } from 'react';
 type Props = {
   title: string;
   isDraggable?: {
+    id: string;
     y: string;
     gsWidth: string;
     gsHeight: string;
@@ -33,6 +34,7 @@ function FeatureBox({
     <div
       className={isDraggable ? 'grid-stack-item' : ''}
       // style={{ border: '2px solid red' }}
+      id={isDraggable?.id}
       gs-y={isDraggable?.y}
       gs-w={isDraggable?.gsWidth}
       gs-h={isDraggable?.gsHeight}
