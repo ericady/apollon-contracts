@@ -48,7 +48,7 @@ function CollateralPieVisualization({ borrowerCollateralTokens }: Props) {
   return (
     <PieChart width={360} height={280} margin={{ top: 0, right: 0, bottom: 0, left: 0 }}>
       <Pie
-        animationDuration={1000}
+        isAnimationActive={false}
         data={borrowerCollateralTokens}
         dataKey="troveValueUSD"
         nameKey="token.symbol"
