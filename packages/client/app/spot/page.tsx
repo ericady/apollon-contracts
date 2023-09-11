@@ -6,6 +6,7 @@ import Positions from '../components/Features/Positions/Positions';
 import Swap from '../components/Features/Swap/Swap';
 import ResizeableDiv from '../components/GridStack/ResizeableDiv';
 import SpotWidgetGridStack from '../components/GridStack/SpotWidgetGridStack';
+import TradingView from '../components/TradingView/TradingView';
 
 function Spot() {
   return (
@@ -45,6 +46,7 @@ function Spot() {
           justifyContent: 'flex-end',
         }}
       >
+        <TradingView />
         <Box
           sx={{
             borderTop: '1px solid',
