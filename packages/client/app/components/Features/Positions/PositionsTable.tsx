@@ -55,7 +55,7 @@ function PositionsTable() {
   if (!data) return null;
 
   return (
-    <TableContainer onScroll={handleScroll} style={{ maxHeight: '270px', overflow: 'auto' }}>
+    <TableContainer onScroll={handleScroll} style={{ maxHeight: '100%', overflow: 'auto' }}>
       <Table stickyHeader>
         {/* Can not at header border here with sticky header */}
         <TableHead>

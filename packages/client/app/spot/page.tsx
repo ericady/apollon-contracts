@@ -4,6 +4,7 @@ import Assets from '../components/Features/Assets/Assets';
 import Farm from '../components/Features/Farm/Farm';
 import Positions from '../components/Features/Positions/Positions';
 import Swap from '../components/Features/Swap/Swap';
+import ResizeableDiv from '../components/GridStack/ResizeableDiv';
 import SpotWidgetGridStack from '../components/GridStack/SpotWidgetGridStack';
 
 function Spot() {
@@ -50,7 +51,9 @@ function Spot() {
             borderTopColor: 'background.paper',
           }}
         >
-          <Positions />
+          <ResizeableDiv>
+            <Positions />
+          </ResizeableDiv>
         </Box>
       </Box>
     </div>

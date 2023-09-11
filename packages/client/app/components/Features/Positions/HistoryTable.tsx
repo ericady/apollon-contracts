@@ -50,7 +50,7 @@ function HistoryTable() {
   };
 
   return (
-    <TableContainer onScroll={handleScroll} style={{ maxHeight: '270px', overflow: 'auto' }}>
+    <TableContainer onScroll={handleScroll} style={{ maxHeight: '100%', overflow: 'auto' }}>
       <Table stickyHeader>
         <TableHead>
           <TableRow>
