@@ -1,6 +1,7 @@
 'use client';
 
 import { useQuery } from '@apollo/client';
+import { Box } from '@mui/material';
 import Tab from '@mui/material/Tab';
 import Tabs from '@mui/material/Tabs';
 import { SyntheticEvent, useState } from 'react';
@@ -61,30 +62,37 @@ const Positions = () => {
 
   return (
     <>
-      <Tabs value={tabValue} onChange={handleChange}>
-        <Tab label="BALANCE" value="BALANCE" disableRipple />
-        <Tab label="COLLATERAL" value="COLLATERAL" disableRipple />
-        <Tab
-          value="POSITIONS"
-          label={
-            <span>
-              POSITIONS{'  '}
-              {openPositions && <Label variant="none">{openPositions.getPositions.pageInfo.totalCount}</Label>}
-            </span>
-          }
-          disableRipple
-        />
-        <Tab
-          value="HISTORY"
-          label={
-            <span>
-              HISTORY{'  '}
-              {closedPositions && <Label variant="none">{closedPositions.getPositions.pageInfo.totalCount}</Label>}
-            </span>
-          }
-          disableRipple
-        />
-      </Tabs>
+      <Box
+        sx={{
+          borderBottom: '1px solid',
+          borderColor: 'background.paper',
+        }}
+      >
+        <Tabs value={tabValue} onChange={handleChange}>
+          <Tab label="BALANCE" value="BALANCE" disableRipple />
+          <Tab label="COLLATERAL" value="COLLATERAL" disableRipple />
+          <Tab
+            value="POSITIONS"
+            label={
+              <span>
+                POSITIONS{'  '}
+                {openPositions && <Label variant="none">{openPositions.getPositions.pageInfo.totalCount}</Label>}
+              </span>
+            }
+            disableRipple
+          />
+          <Tab
+            value="HISTORY"
+            label={
+              <span>
+                HISTORY{'  '}
+                {closedPositions && <Label variant="none">{closedPositions.getPositions.pageInfo.totalCount}</Label>}
+              </span>
+            }
+            disableRipple
+          />
+        </Tabs>
+      </Box>
 
       <div style={{ height: 'calc(100% - 52px)', overflowY: 'scroll' }}>{renderTableContent()}</div>
     </>

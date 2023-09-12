@@ -1,5 +1,6 @@
-import Box from '@mui/material/Box';
 import 'gridstack/dist/gridstack.css';
+
+import Box from '@mui/material/Box';
 import Assets from '../components/Features/Assets/Assets';
 import Farm from '../components/Features/Farm/Farm';
 import Positions from '../components/Features/Positions/Positions';
@@ -47,12 +48,7 @@ function Spot() {
         }}
       >
         <TradingView />
-        <Box
-          sx={{
-            borderTop: '1px solid',
-            borderTopColor: 'background.paper',
-          }}
-        >
+        <Box>
           <ResizeableDiv>
             <Positions />
           </ResizeableDiv>

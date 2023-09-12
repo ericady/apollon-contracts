@@ -30,14 +30,16 @@ function ResizeableDiv({ children }: PropsWithChildren<{}>) {
     window.addEventListener('mousemove', resize);
   };
 
+  const stopResize: MouseEventHandler<HTMLDivElement> = () => {
+    const height = element.clientHeight;
+    window.removeEventListener('mousemove', resize);
+    // set css custom property globally to resize the TradingView
+    document.documentElement.style.setProperty('--apollon-drag-queen-height', height + 'px');
+  };
+
   return (
     <>
-      <div
-        onMouseUp={() => {
-          window.removeEventListener('mousemove', resize);
-        }}
-        style={{ display: 'flex', justifyContent: 'center' }}
-      >
+      <div onMouseUp={stopResize} style={{ display: 'flex', justifyContent: 'center' }}>
         <div onMouseDown={startResize}>
           <DragHandleIcon fontSize="small" sx={{ color: '#46434F', cursor: 'n-resize' }} />
         </div>

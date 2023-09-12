@@ -41,6 +41,7 @@ const chartOptions: Partial<ChartOptions> = {
     },
     mode: CrosshairMode.Normal,
   },
+  autoSize: true,
 };
 
 function TradingView() {
@@ -65,7 +66,7 @@ function TradingView() {
     ]);
 
     const candlestickSeries = chart.addCandlestickSeries({
-      priceLineColor: '#e04a4a',
+      priceLineColor: '#3dd755',
       upColor: '#3dd755',
       downColor: '#e04a4a',
       borderVisible: false,
@@ -91,7 +92,11 @@ function TradingView() {
   }, []);
 
   return (
-    <div style={{ height: '100%', width: '100%' }}>
+    <div
+      // Must have the height fixed in order to resize properly. We adapt via a CSS custom property.
+      style={{ height: 'calc(100vh - 52px - var(--apollon-drag-queen-height, 270px))', width: '100%' }}
+      id="apollon-trading-view-container"
+    >
       <div style={{ height: '100%' }} id="apollon-trading-view"></div>
     </div>
   );
