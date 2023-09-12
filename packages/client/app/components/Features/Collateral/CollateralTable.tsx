@@ -64,10 +64,10 @@ function CollateralTable() {
 
   return (
     <div style={{ display: 'flex' }}>
-      <div style={{ width: '40%', display: 'flex', justifyContent: 'center' }}>
+      <Box style={{ width: '40%', display: 'flex', justifyContent: 'center', backgroundColor: '#1e1b27' }}>
         <CollateralPieVisualization borrowerCollateralTokens={borrowerCollateralTokens} />
-      </div>
-      <div style={{ width: '100%' }}>
+      </Box>
+      <Box sx={{ width: '100%', borderLeft: '1px solid', borderColor: 'table.border' }}>
         <div style={{ padding: '20px' }}>
           <div
             style={{
@@ -131,7 +131,7 @@ function CollateralTable() {
             </TableBody>
           </Table>
         </TableContainer>
-      </div>
+      </Box>
     </div>
   );
 }
