@@ -112,7 +112,7 @@ function StabilityPoolTable() {
                 <TableCell sx={{ borderBottom: 'none' }}></TableCell>
                 <TableCell sx={{ borderBottom: 'none' }}>
                   + {displayPercentage(percentageChange(rewardsTotalInUSD, lossTotalInUSD))} (≈{' '}
-                  {roundCurrency(rewardsTotalInUSD - lossTotalInUSD)}$)
+                  {roundCurrency(rewardsTotalInUSD - lossTotalInUSD)} $)
                 </TableCell>
               </TableRow>
             </TableBody>

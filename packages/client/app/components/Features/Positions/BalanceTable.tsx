@@ -51,8 +51,8 @@ function BalanceTable() {
                 <TableCell>
                   <Label variant="none">{token.symbol}</Label>
                 </TableCell>
-                <TableCell align="right">{roundCurrency(walletAmount! * token.priceUSD)}$</TableCell>
-                <TableCell align="right">{stdFormatter.format(token.priceUSD)}$</TableCell>
+                <TableCell align="right">{roundCurrency(walletAmount! * token.priceUSD)} $</TableCell>
+                <TableCell align="right">{stdFormatter.format(token.priceUSD)} $</TableCell>
               </TableRow>
             ))}
           </TableBody>
@@ -80,8 +80,8 @@ function BalanceTable() {
                 <TableCell>
                   <Label variant="none">{token.symbol}</Label>
                 </TableCell>
-                <TableCell align="right">{roundCurrency(walletAmount! * token.priceUSD)}$</TableCell>
-                <TableCell align="right">{stdFormatter.format(token.priceUSD)}$</TableCell>
+                <TableCell align="right">{roundCurrency(walletAmount! * token.priceUSD)} $</TableCell>
+                <TableCell align="right">{stdFormatter.format(token.priceUSD)} $</TableCell>
               </TableRow>
             ))}
           </TableBody>

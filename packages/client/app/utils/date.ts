@@ -17,7 +17,7 @@ export const formatUnixTimestamp = (timestamp: number, withDelta = true) => {
   const { day, daysFromToday, hours, minutes, month, year } = constructFromUnixTimestamp(timestamp);
 
   return withDelta
-    ? `${day}.${month}.${year} ${hours}:${minutes} (-${daysFromToday}d)`
+    ? `${day}.${month}.${year} ${hours}:${minutes}(-${daysFromToday}d)`
     : `${day}.${month}.${year} ${hours}:${minutes}`;
 };
 

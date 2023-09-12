@@ -60,8 +60,6 @@ function CollateralTable() {
     );
   }, [data]);
 
-  console.log('borrowerCollateralTokens: ', borrowerCollateralTokens);
-
   if (!data) return null;
 
   return (
@@ -105,7 +103,7 @@ function CollateralTable() {
               <TableRow>
                 <HeaderCell title="Trove" cellProps={{ align: 'right' }} />
                 <HeaderCell title="Wallet" cellProps={{ align: 'right' }} />
-                <HeaderCell title="Symbol" cellProps={{ align: 'right' }} />
+                <HeaderCell title="Symbol" />
               </TableRow>
             </TableHead>
             <TableBody>
@@ -125,7 +123,7 @@ function CollateralTable() {
                     </div>
                   </TableCell>
                   <TableCell align="right">{roundCurrency(walletAmount!, 5)}</TableCell>
-                  <TableCell align="right">
+                  <TableCell>
                     <Label variant="none">{token.symbol}</Label>
                   </TableCell>
                 </TableRow>

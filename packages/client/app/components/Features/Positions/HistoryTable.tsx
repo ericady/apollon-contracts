@@ -15,6 +15,7 @@ import {
 import { GET_BORROWER_POSITIONS } from '../../../queries';
 import { formatUnixTimestamp } from '../../../utils/date';
 import { displayPercentage, percentageChange, roundCurrency } from '../../../utils/math';
+import DirectionIcon from '../../Icons/DirectionIcon';
 import Label from '../../Label/Label';
 import HeaderCell from '../../Table/HeaderCell';
 
@@ -57,10 +58,12 @@ function HistoryTable() {
             <HeaderCell title="Opening" />
             <HeaderCell title="Type" />
             <HeaderCell title="Size" cellProps={{ align: 'right' }} />
+            <HeaderCell title="" />
             <HeaderCell title="Price" cellProps={{ align: 'right' }} />
             <HeaderCell title="Price per unit" cellProps={{ align: 'right' }} />
             <HeaderCell title="Fee" cellProps={{ align: 'right' }} />
-            <HeaderCell title="PNL" cellProps={{ align: 'right' }} />
+            <HeaderCell title="" />
+            <HeaderCell title="PNL" />
           </TableRow>
         </TableHead>
 
@@ -77,11 +80,12 @@ function HistoryTable() {
                       <Label variant="error">Short</Label>
                     )}
                   </TableCell>
+
                   <TableCell align="right">
-                    <div className="flex">
-                      <Typography>{size}</Typography>
-                      <Label variant="none">{token.symbol}</Label>
-                    </div>
+                    <Typography>{size}</Typography>
+                  </TableCell>
+                  <TableCell sx={{ pl: 0 }}>
+                    <Label variant="none">{token.symbol}</Label>
                   </TableCell>
 
                   <TableCell align="right">{roundCurrency(totalPriceInStable)} jUSD</TableCell>
@@ -89,18 +93,20 @@ function HistoryTable() {
                   <TableCell align="right">{roundCurrency(totalPriceInStable / size)} jUSD</TableCell>
 
                   <TableCell align="right">{roundCurrency(feesInStable, 5)} jUSD</TableCell>
-                  <TableCell align="right">
-                    <div className="flex">
-                      <Typography
-                        sx={{ color: profitInStable! > 0 ? 'success.main' : 'error.main', fontWeight: '400' }}
-                      >
-                        {roundCurrency(profitInStable!)} jUSD
-                      </Typography>
+
+                  <TableCell align="right" sx={{ pr: 0 }}>
+                    <Typography sx={{ color: profitInStable! > 0 ? 'success.main' : 'error.main', fontWeight: '400' }}>
+                      {roundCurrency(profitInStable!)} jUSD
+                    </Typography>
+                  </TableCell>
+                  <TableCell sx={{ width: 120 }}>
+                    <div style={{ display: 'flex', alignItems: 'center' }}>
                       <Typography
                         sx={{ color: profitInStable! > 0 ? 'success.main' : 'error.main', fontWeight: '400' }}
                       >
                         {displayPercentage(percentageChange(totalPriceInStable + profitInStable!, totalPriceInStable))}
                       </Typography>
+                      <DirectionIcon showIncrease={profitInStable! > 0} />
                     </div>
                   </TableCell>
                 </TableRow>

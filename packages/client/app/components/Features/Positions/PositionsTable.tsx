@@ -17,6 +17,7 @@ import {
 import { GET_BORROWER_POSITIONS } from '../../../queries';
 import { formatUnixTimestamp } from '../../../utils/date';
 import { displayPercentage, percentageChange, roundCurrency, stdFormatter } from '../../../utils/math';
+import DirectionIcon from '../../Icons/DirectionIcon';
 import Label from '../../Label/Label';
 import HeaderCell from '../../Table/HeaderCell';
 
@@ -63,10 +64,12 @@ function PositionsTable() {
             <HeaderCell title="Opening" />
             <HeaderCell title="Type" />
             <HeaderCell title="Size" cellProps={{ align: 'right' }} />
+            <HeaderCell title="" />
             <HeaderCell title="Price" cellProps={{ align: 'right' }} />
             <HeaderCell title="Price per unit" cellProps={{ align: 'right' }} />
             <HeaderCell title="Fee" cellProps={{ align: 'right' }} />
-            <HeaderCell title="PNL" cellProps={{ align: 'right' }} />
+            <HeaderCell title="" />
+            <HeaderCell title="PNL" />
             <HeaderCell title="" />
           </TableRow>
         </TableHead>
@@ -87,11 +90,12 @@ function PositionsTable() {
                       <Label variant="error">Short</Label>
                     )}
                   </TableCell>
+
                   <TableCell align="right">
-                    <div className="flex">
-                      <Typography>{stdFormatter.format(size)}</Typography>
-                      <Label variant="none">{token.symbol}</Label>
-                    </div>
+                    <Typography>{stdFormatter.format(size)}</Typography>
+                  </TableCell>
+                  <TableCell sx={{ pl: 0 }}>
+                    <Label variant="none">{token.symbol}</Label>
                   </TableCell>
 
                   <TableCell align="right">{roundCurrency(totalPriceInStable)} jUSD</TableCell>
@@ -99,14 +103,17 @@ function PositionsTable() {
                   <TableCell align="right">{roundCurrency(totalPriceInStable / size)} jUSD</TableCell>
 
                   <TableCell align="right">{roundCurrency(feesInStable, 5)} jUSD</TableCell>
-                  <TableCell align="right">
-                    <div className="flex">
-                      <Typography sx={{ color: pnl > 0 ? 'success.main' : 'error.main', fontWeight: '400' }}>
-                        {roundCurrency(pnl)} jUSD
-                      </Typography>
-                      <Typography sx={{ color: pnl > 0 ? 'success.main' : 'error.main', fontWeight: '400' }}>
+                  <TableCell align="right" sx={{ pr: 0 }}>
+                    <Typography sx={{ color: pnl > 0 ? 'success.main' : 'error.main', fontWeight: '400' }}>
+                      {roundCurrency(pnl)} jUSD
+                    </Typography>
+                  </TableCell>
+                  <TableCell sx={{ width: 120 }}>
+                    <div style={{ display: 'flex', alignItems: 'center' }}>
+                      <Typography sx={{ color: pnl > 0 ? 'success.main' : 'error.main', fontWeight: '400', mr: '5px' }}>
                         {displayPercentage(percentageChange(totalPriceInStableNow, totalPriceInStable))}
                       </Typography>
+                      <DirectionIcon showIncrease={pnl > 0} />
                     </div>
                   </TableCell>
                   <TableCell align="right">

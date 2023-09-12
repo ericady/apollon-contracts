@@ -239,6 +239,12 @@ const theme = createTheme({
           color: SECONDARY_TEXT,
           fontWeight: '700',
         },
+        root: {
+          // These styles will apply when the tab is selected
+          '&.Mui-selected': {
+            color: PRIMARY_TEXT,
+          },
+        },
       },
     },
   },

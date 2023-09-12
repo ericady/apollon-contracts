@@ -184,7 +184,7 @@ function StabilityClaimedRewards({ history }: StabilityWidgetProps) {
               fontWeight={400}
               sx={{ gap: '5px', justifyContent: 'end' }}
             >
-              + {roundCurrency(history.resultInUSD - history.claimInUSD!)}$
+              + {roundCurrency(history.resultInUSD - history.claimInUSD!)} $
               <ExpandLessSharpIcon sx={{ color: 'info.main' }} />
             </Typography>
           </Box>
