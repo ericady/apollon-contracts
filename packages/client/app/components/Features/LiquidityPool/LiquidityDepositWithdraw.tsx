@@ -77,14 +77,11 @@ function LiquidityDepositWithdraw({ selectedPool }: Props) {
               <div style={{ display: 'flex', justifyContent: 'space-between', padding: 20 }}>
                 <div style={{ marginTop: 6 }}>
                   <Label variant="success">{tokenA.token.symbol}</Label>
-                  {tokenA.borrowerAmount && (
-                    <>
-                      <Typography sx={{ fontWeight: '400', marginTop: '10px' }}>
-                        {roundCurrency(tokenA.borrowerAmount, 5)}
-                      </Typography>
-                      <Typography variant="label">Deposit</Typography>
-                    </>
-                  )}
+
+                  <Typography sx={{ fontWeight: '400', marginTop: '10px' }}>
+                    {roundCurrency(tokenA.borrowerAmount ?? 0, 5)}
+                  </Typography>
+                  <Typography variant="label">Deposited</Typography>
                 </div>
                 <div>
                   <NumberInput
@@ -105,14 +102,11 @@ function LiquidityDepositWithdraw({ selectedPool }: Props) {
               <div style={{ display: 'flex', justifyContent: 'space-between', padding: 20 }}>
                 <div style={{ marginTop: 6 }}>
                   <Label variant="success">{tokenB.token.symbol}</Label>
-                  {tokenB.borrowerAmount && (
-                    <>
-                      <Typography sx={{ fontWeight: '400', marginTop: '10px' }}>
-                        {roundCurrency(tokenB.borrowerAmount, 5)}
-                      </Typography>
-                      <Typography variant="label">Deposit</Typography>
-                    </>
-                  )}
+
+                  <Typography sx={{ fontWeight: '400', marginTop: '10px' }}>
+                    {roundCurrency(tokenB.borrowerAmount ?? 0, 5)}
+                  </Typography>
+                  <Typography variant="label">Deposited</Typography>
                 </div>
                 <div>
                   <NumberInput
@@ -158,7 +152,7 @@ function LiquidityDepositWithdraw({ selectedPool }: Props) {
                   <div>
                     <Typography variant="caption">{roundCurrency(tokenA.borrowerAmount!, 5)}</Typography>
                     <br />
-                    <Typography variant="label">Deposit</Typography>
+                    <Typography variant="label">Deposited</Typography>
                   </div>
                   <Button
                     variant="undercover"
@@ -199,7 +193,7 @@ function LiquidityDepositWithdraw({ selectedPool }: Props) {
                   <div>
                     <Typography variant="caption">{roundCurrency(tokenB.borrowerAmount!, 5)}</Typography>
                     <br />
-                    <Typography variant="label">Deposit</Typography>
+                    <Typography variant="label">Deposited</Typography>
                   </div>
                   <Button
                     variant="undercover"

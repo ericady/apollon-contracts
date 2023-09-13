@@ -66,6 +66,7 @@ function LiquidityPoolsTable({ selectedPool, setSelectedPool }: Props) {
               <HeaderCell title="" />
               <HeaderCell title="" cellProps={{ align: 'right' }} />
               <HeaderCell title="" />
+              <HeaderCell title="APY" />
               <HeaderCell title="" />
               <HeaderCell title="24h Volume" />
             </TableRow>
@@ -73,7 +74,7 @@ function LiquidityPoolsTable({ selectedPool, setSelectedPool }: Props) {
 
           <TableBody>
             {allPoolsCombined.map((pool) => {
-              const { id, liquidity, volume24hUSD, volume24hUSD24hAgo } = pool;
+              const { id, liquidity, volume24hUSD, volume24hUSD24hAgo, liquidityDepositAPY } = pool;
               const [tokenA, tokenB] = liquidity;
               const volumeChange = percentageChange(volume24hUSD, volume24hUSD24hAgo);
 
@@ -109,7 +110,7 @@ function LiquidityPoolsTable({ selectedPool, setSelectedPool }: Props) {
                       </Typography>
                     </TableCell>
 
-                    <TableCell>
+                    <TableCell sx={{ pl: 0 }}>
                       <Label variant="none">{tokenA.token.symbol}</Label>
                     </TableCell>
 
@@ -137,11 +138,12 @@ function LiquidityPoolsTable({ selectedPool, setSelectedPool }: Props) {
                       </Typography>
                     </TableCell>
 
-                    <TableCell>
+                    <TableCell sx={{ pl: 0 }}>
                       <Label variant="none">{tokenB.token.symbol}</Label>
                     </TableCell>
+                    <TableCell>{displayPercentage(liquidityDepositAPY)}</TableCell>
 
-                    <TableCell align="right">
+                    <TableCell align="right" sx={{ pr: 0 }}>
                       <Typography variant="caption">{stdFormatter.format(volume24hUSD)} $</Typography>
                     </TableCell>
                     <TableCell align="left" width={130}>

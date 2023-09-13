@@ -113,17 +113,21 @@ function Assets() {
                   <TableCell sx={{ p: 0.5 }} align="right">
                     <Typography fontWeight={400}>{stdFormatter.format(priceUSD)}</Typography>
                   </TableCell>
-                  <TableCell sx={{ p: 0.5 }} align="right">
+                  <TableCell sx={{ p: 0.5 }} align="right" width={65}>
                     <Typography fontWeight={400} sx={{ color: openingFee > 0 ? 'success.main' : 'error.main' }}>
                       {displayPercentage(openingFee, true)}
                     </Typography>
                   </TableCell>
-                  <TableCell align="right" sx={{ color: change < 0 ? 'error.main' : 'success.main', p: 0.5 }}>
+                  <TableCell
+                    align="right"
+                    sx={{ color: change < 0 ? 'error.main' : 'success.main', p: 0.5 }}
+                    width={85}
+                  >
                     <div style={{ display: 'flex', alignContent: 'center', justifyContent: 'flex-end', gap: 4 }}>
                       {roundCurrency(change)} <DirectionIcon showIncrease={change > 0} fontSize="small" />
                     </div>
                   </TableCell>
-                  <TableCell sx={{ p: 0.5, pr: 2 }} align="right">
+                  <TableCell sx={{ p: 0.5, pr: 2 }} align="right" width={55}>
                     <IconButton
                       sx={{ height: 20, width: 20 }}
                       size="small"

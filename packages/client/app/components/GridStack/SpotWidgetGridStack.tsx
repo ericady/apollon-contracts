@@ -27,14 +27,13 @@ function SpotWidgetGridStack({ children }: PropsWithChildren<{}>) {
     }
 
     // Save grid state to local storage on unmount
-    return () => {
+    grid.on('change', () => {
       const gridSavePoint: { id: string; y: number }[] = [];
       grid.save(false, false, ({ y, el }) => {
         gridSavePoint.push({ id: el!.id, y: y as number });
       });
-
       localStorage.setItem(SPOT_PAGE_GRID_STATE_KEY, JSON.stringify(gridSavePoint));
-    };
+    });
   }, []);
 
   return <div className="grid-stack">{children}</div>;

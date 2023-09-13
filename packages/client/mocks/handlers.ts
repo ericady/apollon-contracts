@@ -118,6 +118,7 @@ for (let i = 0; i < tokens.length; i++) {
             amount: parseFloat(faker.finance.amount(1, 50, 2)),
           }))
         : [],
+      liquidityDepositAPY: faker.number.float({ min: 0, max: 0.5, precision: 0.0001 }),
       volume24hUSD: parseFloat(faker.finance.amount(10000, 50000, 2)),
       volume24hUSD24hAgo: parseFloat(faker.finance.amount(10000, 50000, 2)),
     });
@@ -214,7 +215,7 @@ const borrowerHistory: BorrowerHistory[] = Array(faker.number.int({ min: 0, max:
 
     const lostAmount = parseFloat(faker.finance.amount(1, 1000, 2));
     const gainedAmount = parseFloat(
-      faker.finance.amount(lostAmount, faker.number.int({ min: lostAmount, max: lostAmount * 1.1 }), 2),
+      faker.finance.amount(lostAmount, faker.number.int({ min: lostAmount, max: (lostAmount + 1) * 1.1 }), 2),
     );
 
     // negative amount and only on lost token for claimed rewards

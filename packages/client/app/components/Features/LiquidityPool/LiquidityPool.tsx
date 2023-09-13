@@ -11,9 +11,10 @@ const LiquidityPool = () => {
 
   return (
     <PageLayout>
-      <div style={{ display: 'flex' }}>
-        <div style={{ width: '30%' }}>{selectedPool && <LiquidityDepositWithdraw selectedPool={selectedPool} />}</div>
-
+      <div style={{ width: 'calc(calc(100% - 330px - 330px) * 0.3)', position: 'fixed' }}>
+        {selectedPool && <LiquidityDepositWithdraw selectedPool={selectedPool} />}
+      </div>
+      <div style={{ display: 'flex', justifyContent: 'flex-end' }}>
         <div style={{ width: '70%' }}>
           <LiquidityPoolsTable selectedPool={selectedPool} setSelectedPool={setSelectedPool} />
         </div>

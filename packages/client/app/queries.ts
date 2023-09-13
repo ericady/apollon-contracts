@@ -94,6 +94,7 @@ export const GET_LIQUIDITY_POOLS = gql`
         }
         totalAmount
       }
+      liquidityDepositAPY
       volume24hUSD
       volume24hUSD24hAgo
     }
@@ -112,6 +113,7 @@ export const GET_BORROWER_LIQUIDITY_POOLS = gql`
         totalAmount
         borrowerAmount
       }
+      liquidityDepositAPY
       volume24hUSD
       volume24hUSD24hAgo
     }
