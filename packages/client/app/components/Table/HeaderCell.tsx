@@ -1,11 +1,14 @@
+import { Tooltip } from '@mui/material';
 import TableCell from '@mui/material/TableCell';
+import { ComponentProps } from 'react';
 
 type Props = {
   title: string;
-  cellProps?: React.ComponentProps<typeof TableCell>;
+  cellProps?: ComponentProps<typeof TableCell>;
+  tooltipProps?: Omit<ComponentProps<typeof Tooltip>, 'children'>;
 };
 
-function HeaderCell({ title, cellProps = {} }: Props) {
+function HeaderCell({ title, cellProps = {}, tooltipProps }: Props) {
   return (
     <TableCell
       {...cellProps}
@@ -17,7 +20,17 @@ function HeaderCell({ title, cellProps = {} }: Props) {
         borderColor: 'background.paper',
       }}
     >
-      {title}
+      {tooltipProps ? (
+        <Tooltip
+          {...tooltipProps}
+          title={tooltipProps.title}
+          sx={{ backgroundColor: 'background.emphasis', ...tooltipProps.sx }}
+        >
+          <span>{title}</span>
+        </Tooltip>
+      ) : (
+        title
+      )}
     </TableCell>
   );
 }

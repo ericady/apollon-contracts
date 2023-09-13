@@ -13,7 +13,7 @@ import {
   GetBorrowerStabilityHistoryQueryVariables,
 } from '../../../generated/gql-types';
 import { GET_BORROWER_STABILITY_HISTORY } from '../../../queries';
-import { BUTTON_BORDER } from '../../../theme';
+import { BACKGROUND_EMPHASIS } from '../../../theme';
 import { formatUnixTimestamp } from '../../../utils/date';
 import { roundCurrency } from '../../../utils/math';
 import Label from '../../Label/Label';
@@ -122,7 +122,8 @@ const StabilityHistoryDialog = () => {
                   borderBottom:
                     index === data.getBorrowerStabilityHistory.pageInfo.totalCount - 1
                       ? 'none'
-                      : `1px solid ${BUTTON_BORDER}`,
+                      : `1px solid ${BACKGROUND_EMPHASIS}`,
+
                   padding: '20px',
                 }}
                 key={index}

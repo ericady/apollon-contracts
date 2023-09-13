@@ -4,7 +4,7 @@ import { useMemo } from 'react';
 import { CartesianGrid, Line, LineChart, Tooltip } from 'recharts';
 import { GetCollateralUsdHistoryQuery, GetCollateralUsdHistoryQueryVariables } from '../../../../generated/gql-types';
 import { GET_COLLATERAL_USD_HISTORY } from '../../../../queries';
-import { BUTTON_BACKGROUND, BUTTON_BORDER } from '../../../../theme';
+import { BACKGROUND_EMPHASIS, BUTTON_BACKGROUND } from '../../../../theme';
 import { stdFormatter } from '../../../../utils/math';
 import DiagramPlaceholder from '../../../Loader/DiagramPlaceholder';
 
@@ -33,7 +33,7 @@ function CollateralBalanceChart() {
       <LineChart width={320} height={190} data={chartData}>
         <Tooltip />
 
-        <CartesianGrid stroke={BUTTON_BORDER} />
+        <CartesianGrid stroke={BACKGROUND_EMPHASIS} />
 
         <Line type="linear" dataKey="value" stroke={theme.palette.info.main} dot={false} isAnimationActive={false} />
       </LineChart>

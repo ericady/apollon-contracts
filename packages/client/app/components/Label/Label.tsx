@@ -1,6 +1,5 @@
 import { Box, Typography } from '@mui/material';
 import { PropsWithChildren } from 'react';
-import { BUTTON_BORDER } from '../../theme';
 
 type Props = {
   variant: 'success' | 'error' | 'info' | 'none';
@@ -73,7 +72,7 @@ function Label({ variant, children }: PropsWithChildren<Props>) {
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              background: BUTTON_BORDER,
+              background: 'background.emphasis',
               padding: '6px 4px',
               borderRadius: '3px',
             }}

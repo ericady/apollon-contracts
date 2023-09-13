@@ -40,7 +40,13 @@ function DebtTokenTable() {
               <HeaderCell title="" />
               <HeaderCell title="" />
               <HeaderCell title="" />
-              <HeaderCell title="Protocol Level" cellProps={{ align: 'right' }} />
+
+              <HeaderCell
+                title="Protocol Level"
+                cellProps={{ align: 'right' }}
+                // TODO: Add Tooltip text
+                tooltipProps={{ title: 'TODO: Add Description', arrow: true, placement: 'right' }}
+              />
             </TableRow>
           </TableHead>
           <TableHead>

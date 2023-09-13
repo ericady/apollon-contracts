@@ -90,7 +90,12 @@ function Assets() {
             <TableRow>
               <HeaderCell title="Type" cellProps={{ sx: { p: 0.5, pl: 2 } }} />
               <HeaderCell title="$" cellProps={{ align: 'right', sx: { p: 0.5 } }} />
-              <HeaderCell title="OF %" cellProps={{ align: 'right', sx: { p: 0.5 } }} />
+              <HeaderCell
+                title="OF %"
+                cellProps={{ align: 'right', sx: { p: 0.5 } }}
+                // TODO: Add Tooltip text
+                tooltipProps={{ title: 'TODO: Add Description', arrow: true, placement: 'right' }}
+              />
               <HeaderCell title="%" cellProps={{ align: 'right', sx: { p: 0.5 } }} />
               <HeaderCell title="" cellProps={{ sx: { p: 0.5, pr: 2 } }} />
             </TableRow>

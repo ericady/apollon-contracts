@@ -14,7 +14,6 @@ import {
   GetCollateralTokensQueryVariables,
 } from '../../../../generated/gql-types';
 import { GET_BORROWER_COLLATERAL_TOKENS, GET_BORROWER_DEBT_TOKENS } from '../../../../queries';
-import { BUTTON_BORDER } from '../../../../theme';
 import { displayPercentage, percentageChange, roundCurrency } from '../../../../utils/math';
 import FeatureBox from '../../../FeatureBox/FeatureBox';
 import Label from '../../../Label/Label';
@@ -72,7 +71,7 @@ function StabilityPoolTable() {
     <FeatureBox title="Stability Pool" noPadding border="full" borderRadius>
       <div style={{ display: 'flex', alignItems: 'center' }}>
         <TableContainer>
-          <Table sx={{ borderRight: '1px solid', borderColor: BUTTON_BORDER }}>
+          <Table sx={{ borderRight: '1px solid', borderColor: 'background.emphasis' }}>
             <TableHead>
               <TableRow>
                 <HeaderCell title="" />

@@ -11,52 +11,50 @@ import HeaderCell from '../../Table/HeaderCell';
 function TreasuryTableLoader() {
   return (
     <FeatureBox title="Treasury" noPadding border="full" borderRadius>
-      <div className="apollon-table-txt">
-        <TableContainer>
-          <Table>
-            <TableHead>
-              <TableRow>
-                <HeaderCell title="Deposited Token" cellProps={{ align: 'right' }} />
-                <HeaderCell title="Last 24h Difference" cellProps={{ align: 'right' }} />
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              <TableRow>
-                <TableCell align="right">
-                  <Skeleton variant="text" />
-                </TableCell>
-                <TableCell align="right">
-                  <Skeleton variant="text" />
-                </TableCell>
-              </TableRow>
-              <TableRow>
-                <TableCell align="right">
-                  <Skeleton variant="text" />
-                </TableCell>
-                <TableCell align="right">
-                  <Skeleton variant="text" />
-                </TableCell>
-              </TableRow>
-              <TableRow>
-                <TableCell align="right">
-                  <Skeleton variant="text" />
-                </TableCell>
-                <TableCell align="right">
-                  <Skeleton variant="text" />
-                </TableCell>
-              </TableRow>
-              <TableRow>
-                <TableCell align="right">
-                  <Skeleton variant="text" />
-                </TableCell>
-                <TableCell align="right">
-                  <Skeleton variant="text" />
-                </TableCell>
-              </TableRow>
-            </TableBody>
-          </Table>
-        </TableContainer>
-      </div>
+      <TableContainer>
+        <Table>
+          <TableHead>
+            <TableRow>
+              <HeaderCell title="Deposited Token" cellProps={{ align: 'right' }} />
+              <HeaderCell title="Last 24h Difference" cellProps={{ align: 'right' }} />
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            <TableRow>
+              <TableCell align="right">
+                <Skeleton variant="text" />
+              </TableCell>
+              <TableCell align="right">
+                <Skeleton variant="text" />
+              </TableCell>
+            </TableRow>
+            <TableRow>
+              <TableCell align="right">
+                <Skeleton variant="text" />
+              </TableCell>
+              <TableCell align="right">
+                <Skeleton variant="text" />
+              </TableCell>
+            </TableRow>
+            <TableRow>
+              <TableCell align="right">
+                <Skeleton variant="text" />
+              </TableCell>
+              <TableCell align="right">
+                <Skeleton variant="text" />
+              </TableCell>
+            </TableRow>
+            <TableRow>
+              <TableCell align="right">
+                <Skeleton variant="text" />
+              </TableCell>
+              <TableCell align="right">
+                <Skeleton variant="text" />
+              </TableCell>
+            </TableRow>
+          </TableBody>
+        </Table>
+      </TableContainer>
     </FeatureBox>
   );
 }

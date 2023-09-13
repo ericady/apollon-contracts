@@ -5,7 +5,6 @@ import TableCell from '@mui/material/TableCell';
 import TableContainer from '@mui/material/TableContainer';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
-import { BUTTON_BORDER } from '../../../../theme';
 import FeatureBox from '../../../FeatureBox/FeatureBox';
 import HeaderCell from '../../../Table/HeaderCell';
 
@@ -14,7 +13,7 @@ function StabilityPoolTableLoader() {
     <FeatureBox title="Stability Pool" noPadding border="full" borderRadius>
       <div style={{ display: 'flex', alignItems: 'center' }}>
         <TableContainer>
-          <Table sx={{ borderRight: '1px solid', borderColor: BUTTON_BORDER }}>
+          <Table sx={{ borderRight: '1px solid', borderColor: 'background.emphasis' }}>
             <TableHead>
               <TableRow>
                 <HeaderCell title="Lost Stability" />

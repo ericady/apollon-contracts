@@ -6,17 +6,13 @@ import '@fontsource-variable/space-grotesk';
 const PRIMARY_BACKGROUND = '#14111D';
 const PAPER_BACKGROUND = '#2A2636';
 const PRIMARY_TEXT = '#FFFFFF';
-export const SECONDARY_TEXT = '#827F8B';
+const SECONDARY_TEXT = '#827F8B';
 const DISABLED_TEXT = '#504D59';
-export const BUTTON_BACKGROUND = '#1E1B27';
-export const BUTTON_BORDER = '#282531';
-const BUTTON_2_TEXT = '#ffffff';
 const BUTTON_2_BORDER = '#3C3945';
 const BUTTON_BACKGROUND_HOVER = '#1D202F';
-export const GREEN_BACKGROUND = '#1A2E25';
-export const RED_BACKGROUND = '#321923';
-export const BLUE_BACKGROUND = '#18293e';
-export const FIELDSET_COLOR = '#46434F';
+const FIELDSET_COLOR = '#46434F';
+export const BUTTON_BACKGROUND = '#1E1B27';
+export const BACKGROUND_EMPHASIS = '#282531';
 
 const theme = createTheme({
   palette: {
@@ -28,6 +24,7 @@ const theme = createTheme({
     background: {
       default: PRIMARY_BACKGROUND,
       paper: PAPER_BACKGROUND,
+      emphasis: BACKGROUND_EMPHASIS,
     },
     text: {
       primary: PRIMARY_TEXT,
@@ -161,7 +158,7 @@ const theme = createTheme({
           style: {
             backgroundColor: BUTTON_BACKGROUND,
             color: PRIMARY_TEXT,
-            border: `2px solid ${BUTTON_BORDER}`,
+            border: `2px solid ${BACKGROUND_EMPHASIS}`,
             fontWeight: '700',
             padding: '0px',
             height: '30px',
@@ -197,7 +194,7 @@ const theme = createTheme({
         contained: {
           backgroundColor: BUTTON_BACKGROUND,
           color: SECONDARY_TEXT,
-          border: `2px solid ${BUTTON_BORDER}`,
+          border: `2px solid ${BACKGROUND_EMPHASIS}`,
           fontWeight: '700',
           width: '100%',
           height: '30px',
@@ -210,14 +207,14 @@ const theme = createTheme({
         },
         outlined: {
           backgroundColor: 'transparent',
-          color: BUTTON_2_TEXT,
+          color: PRIMARY_TEXT,
           border: `2px solid ${BUTTON_2_BORDER}`,
           fontWeight: '700',
           width: '100%',
           height: '40px',
           '&:hover': {
             backgroundColor: BUTTON_BACKGROUND_HOVER,
-            color: BUTTON_2_TEXT,
+            color: PRIMARY_TEXT,
             border: '2px solid transparent',
           },
         },
@@ -244,6 +241,18 @@ const theme = createTheme({
           '&.Mui-selected': {
             color: PRIMARY_TEXT,
           },
+        },
+      },
+    },
+
+    MuiTooltip: {
+      styleOverrides: {
+        tooltip: {
+          backgroundColor: BACKGROUND_EMPHASIS,
+          color: SECONDARY_TEXT,
+        },
+        arrow: {
+          color: BACKGROUND_EMPHASIS,
         },
       },
     },
@@ -282,6 +291,12 @@ declare module '@mui/material/styles' {
     table: {
       border: string;
     };
+  }
+
+  interface TypeBackground {
+    default: string;
+    paper: string;
+    emphasis: string;
   }
 
   interface Palette {

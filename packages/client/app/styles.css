@@ -48,10 +48,3 @@ a {
   align-items: center;
   border-bottom: 1px solid #25222e;
 }
-
-/* Apollon Widget CSS */
-
-/* TODO: Placeholder, remove after skeletton and data is input */
-.apollon-table-txt td {
-  padding: 20px 10px;
-}
