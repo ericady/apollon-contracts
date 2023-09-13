@@ -13,7 +13,7 @@ function MockServer({ children }: PropsWithChildren<{}>) {
       import('../../mocks').then(async (module) => {
         await module.default();
         setMockStarted(true);
-        router.replace('/balance');
+        router.replace('/spot');
       });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps

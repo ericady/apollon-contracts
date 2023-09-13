@@ -72,7 +72,7 @@ function Label({ variant, children }: PropsWithChildren<Props>) {
               display: 'flex',
               alignItems: 'center',
               justifyContent: 'center',
-              background: 'background.emphasis',
+              backgroundColor: 'background.emphasis',
               padding: '6px 4px',
               borderRadius: '3px',
             }}

@@ -1,7 +1,7 @@
 'use client';
 
 import { useQuery } from '@apollo/client';
-import { IconButton, Typography } from '@mui/material';
+import { Box, IconButton, Typography } from '@mui/material';
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
 import TableCell from '@mui/material/TableCell';
@@ -16,6 +16,7 @@ import { displayPercentage, roundCurrency, stdFormatter } from '../../../utils/m
 import FeatureBox from '../../FeatureBox/FeatureBox';
 import DirectionIcon from '../../Icons/DirectionIcon';
 import HeaderCell from '../../Table/HeaderCell';
+import AssetsLoader from './AssetsLoader';
 
 export const FAVORITE_ASSETS_LOCALSTORAGE_KEY = 'favoriteAssets';
 // FIXME: Hardcode address for stability once its there.
@@ -84,86 +85,94 @@ function Assets() {
       border="bottom"
       isDraggable={{ y: '0', gsHeight: '22', gsWidth: '1', id: 'apollon-assets-widget' }}
     >
-      <TableContainer sx={{ maxHeight: 170, overflowY: 'scroll' }}>
-        <Table stickyHeader size="small">
-          <TableHead sx={{ borderBottom: '1px solid', borderBottomColor: 'background.paper' }}>
-            <TableRow>
-              <HeaderCell title="Type" cellProps={{ sx: { p: 0.5, pl: 2 } }} />
-              <HeaderCell title="$" cellProps={{ align: 'right', sx: { p: 0.5 } }} />
-              <HeaderCell
-                title="OF %"
-                cellProps={{ align: 'right', sx: { p: 0.5 } }}
-                // TODO: Add Tooltip text
-                tooltipProps={{ title: 'TODO: Add Description', arrow: true, placement: 'right' }}
-              />
-              <HeaderCell title="%" cellProps={{ align: 'right', sx: { p: 0.5 } }} />
-              <HeaderCell title="" cellProps={{ sx: { p: 0.5, pr: 2 } }} />
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {tokens.map((token) => {
-              const { address, isFavorite, symbol, priceUSD, change, openingFee } = token;
+      {!data ? (
+        <AssetsLoader />
+      ) : (
+        <TableContainer sx={{ maxHeight: 170, overflowY: 'scroll' }}>
+          <Table stickyHeader size="small">
+            <TableHead sx={{ borderBottom: '1px solid', borderBottomColor: 'background.paper' }}>
+              <TableRow>
+                <HeaderCell title="Type" cellProps={{ sx: { p: 0.5, pl: 2 } }} />
+                <HeaderCell title="$" cellProps={{ align: 'right', sx: { p: 0.5 } }} />
+                <HeaderCell
+                  title="OF %"
+                  cellProps={{ align: 'right', sx: { p: 0.5 } }}
+                  // TODO: Add Tooltip text
+                  tooltipProps={{ title: 'TODO: Add Description', arrow: true, placement: 'right' }}
+                />
+                <HeaderCell title="%" cellProps={{ align: 'right', sx: { p: 0.5 } }} />
+                <HeaderCell title="" cellProps={{ sx: { p: 0.5, pr: 2 } }} />
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {tokens.map((token) => {
+                const { address, isFavorite, symbol, priceUSD, change, openingFee } = token;
 
-              return (
-                <TableRow
-                  key={address}
-                  hover
-                  onClick={() => setSelectedToken(token)}
-                  sx={{ cursor: 'pointer', '& .MuiTableCell-root': { borderBottom: 'none' } }}
-                  selected={selectedToken?.symbol === symbol}
-                >
-                  <TableCell sx={{ p: 0.5, pl: 2 }}>
-                    <Typography fontWeight={400}>{symbol}</Typography>
-                  </TableCell>
-                  <TableCell sx={{ p: 0.5 }} align="right">
-                    <Typography fontWeight={400}>{stdFormatter.format(priceUSD)}</Typography>
-                  </TableCell>
-                  <TableCell sx={{ p: 0.5 }} align="right" width={65}>
-                    <Typography fontWeight={400} sx={{ color: openingFee > 0 ? 'success.main' : 'error.main' }}>
-                      {displayPercentage(openingFee, true)}
-                    </Typography>
-                  </TableCell>
-                  <TableCell
-                    align="right"
-                    sx={{ color: change < 0 ? 'error.main' : 'success.main', p: 0.5 }}
-                    width={85}
+                return (
+                  <TableRow
+                    key={address}
+                    hover
+                    onClick={() => setSelectedToken(token)}
+                    sx={{ cursor: 'pointer', '& .MuiTableCell-root': { borderBottom: 'none' } }}
+                    selected={selectedToken?.symbol === symbol}
                   >
-                    <div style={{ display: 'flex', alignContent: 'center', justifyContent: 'flex-end', gap: 4 }}>
-                      {roundCurrency(change)} <DirectionIcon showIncrease={change > 0} fontSize="small" />
-                    </div>
-                  </TableCell>
-                  <TableCell sx={{ p: 0.5, pr: 2 }} align="right" width={55}>
-                    <IconButton
-                      sx={{ height: 20, width: 20 }}
-                      size="small"
-                      onClick={() => toggleFavorite(address)}
-                      disableRipple
-                    >
-                      {isFavorite ? (
-                        <img
-                          src="assets/svgs/Pinned_active.svg"
-                          alt="a white pin icon with a transparant body"
-                          height="17"
-                          width="15.6"
-                          typeof="image/svg+xml"
-                        />
-                      ) : (
-                        <img
-                          src="assets/svgs/Pinned_inactive.svg"
-                          alt="a grey pin icon with a transparant body"
-                          height="17"
-                          width="15.6"
-                          typeof="image/svg+xml"
-                        />
-                      )}
-                    </IconButton>
-                  </TableCell>
-                </TableRow>
-              );
-            })}
-          </TableBody>
-        </Table>
-      </TableContainer>
+                    <TableCell sx={{ p: 0.5, pl: 2 }}>
+                      <Typography fontWeight={400}>{symbol}</Typography>
+                    </TableCell>
+                    <TableCell sx={{ p: 0.5 }} align="right">
+                      <Typography fontWeight={400}>{stdFormatter.format(priceUSD)}</Typography>
+                    </TableCell>
+                    <TableCell sx={{ p: 0.5 }} align="right" width={60}>
+                      <Typography fontWeight={400} sx={{ color: openingFee > 0 ? 'success.main' : 'error.main' }}>
+                        {displayPercentage(openingFee, true)}
+                      </Typography>
+                    </TableCell>
+                    <TableCell sx={{ p: 0.5 }} align="right" width={80}>
+                      <Box
+                        sx={{
+                          display: 'flex',
+                          alignContent: 'center',
+                          justifyContent: 'flex-end',
+                          gap: 0.5,
+                          color: change < 0 ? 'error.main' : 'success.main',
+                        }}
+                      >
+                        {roundCurrency(change)} <DirectionIcon showIncrease={change > 0} fontSize="small" />
+                      </Box>
+                    </TableCell>
+                    <TableCell sx={{ p: 0.5, pr: 2, minWidth: '30px' }} align="right" width={50}>
+                      <IconButton
+                        sx={{ height: 20, width: 20 }}
+                        size="small"
+                        onClick={() => toggleFavorite(address)}
+                        disableRipple
+                      >
+                        {isFavorite ? (
+                          <img
+                            src="assets/svgs/Pinned_active.svg"
+                            alt="a white pin icon with a transparant body"
+                            height="17"
+                            width="15.6"
+                            typeof="image/svg+xml"
+                          />
+                        ) : (
+                          <img
+                            src="assets/svgs/Pinned_inactive.svg"
+                            alt="a grey pin icon with a transparant body"
+                            height="17"
+                            width="15.6"
+                            typeof="image/svg+xml"
+                          />
+                        )}
+                      </IconButton>
+                    </TableCell>
+                  </TableRow>
+                );
+              })}
+            </TableBody>
+          </Table>
+        </TableContainer>
+      )}
     </FeatureBox>
   );
 }
