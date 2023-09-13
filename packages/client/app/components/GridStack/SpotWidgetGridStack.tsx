@@ -13,6 +13,7 @@ function SpotWidgetGridStack({ children }: PropsWithChildren<{}>) {
       },
       cellHeight: 10,
       disableResize: true,
+      animate: false,
     });
 
     // Load last saved grid state and change the order of the widgets accordingly
@@ -34,6 +35,10 @@ function SpotWidgetGridStack({ children }: PropsWithChildren<{}>) {
       });
       localStorage.setItem(SPOT_PAGE_GRID_STATE_KEY, JSON.stringify(gridSavePoint));
     });
+
+    setTimeout(() => {
+      grid.setAnimation(true);
+    }, 1000);
   }, []);
 
   return <div className="grid-stack">{children}</div>;
