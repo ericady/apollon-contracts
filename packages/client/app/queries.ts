@@ -41,6 +41,7 @@ export const GET_BORROWER_DEBT_TOKENS = gql`
       troveMintedAmount
       walletAmount
       stabilityLostAmount
+      stabilityCompoundAmount
 
       stabilityDepositAPY
       totalDepositedStability

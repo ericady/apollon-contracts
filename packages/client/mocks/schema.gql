@@ -15,6 +15,7 @@ type DebtTokenMeta {
   walletAmount: Float
   troveMintedAmount: Float
   stabilityLostAmount: Float
+  stabilityCompoundAmount: Float
 
   # global
   stabilityDepositAPY: Float!
