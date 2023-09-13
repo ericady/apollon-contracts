@@ -16,7 +16,7 @@ import { roundCurrency } from '../../../utils/math';
 import NumberInput from '../../FormControls/NumberInput';
 import Label from '../../Label/Label';
 
-type FieldValues = Record<string, number | ''>;
+type FieldValues = Record<string, string>;
 
 const StabilityUpdateDialog = () => {
   const [isOpen, setIsOpen] = useState(false);
@@ -41,9 +41,9 @@ const StabilityUpdateDialog = () => {
 
   const fillMaxInputValue = (tokenAddress: string, walletAmount: number, stabilityCompoundAmount: number) => {
     if (tabValue === 'DEPOSIT') {
-      setValue(tokenAddress, walletAmount, { shouldValidate: true });
+      setValue(tokenAddress, walletAmount.toString(), { shouldValidate: true });
     } else {
-      setValue(tokenAddress, stabilityCompoundAmount, { shouldValidate: true });
+      setValue(tokenAddress, stabilityCompoundAmount.toString(), { shouldValidate: true });
     }
   };
 

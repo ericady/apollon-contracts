@@ -10,7 +10,7 @@ import Typography from '@mui/material/Typography';
 import { useState } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
 import { useSelectedToken } from '../../../context/SelectedTokenProvider';
-import { displayPercentage } from '../../../utils/math';
+import { displayPercentage, roundCurrency } from '../../../utils/math';
 import InfoButton from '../../Buttons/InfoButton';
 import FeatureBox from '../../FeatureBox/FeatureBox';
 import NumberInput from '../../FormControls/NumberInput';
@@ -33,19 +33,21 @@ const Farm = () => {
     },
     shouldUnregister: true,
   });
-  const { handleSubmit, setValue } = methods;
+  const { handleSubmit, reset, watch } = methods;
 
-  const { selectedToken } = useSelectedToken();
+  const { selectedToken, tokenRatio } = useSelectedToken();
 
   const handleTabChange = (_: React.SyntheticEvent, newValue: 'Long' | 'Short') => {
     setTabValue(newValue);
-    setValue('farmShortValue', '');
+    reset();
   };
 
   const onSubmit = () => {
     console.log('onSubmit called');
     // TODO: Implement contract call
   };
+
+  const watchFarmShortValue = parseInt(watch('farmShortValue'));
 
   return (
     <FeatureBox
@@ -102,10 +104,13 @@ const Farm = () => {
 
             <div style={{ padding: '10px 0' }}>
               <Typography variant="titleAlternate" color="primary.contrastText" className="swap-info-paragraph">
-                Position size: <span>45753.3522 jUSD</span>
+                Position size:
+                <span>
+                  {!isNaN(watchFarmShortValue) ? `${roundCurrency(watchFarmShortValue * tokenRatio)} jUSD` : '-'}
+                </span>
               </Typography>
               <Typography variant="caption" className="swap-info-paragraph">
-                Price per unit: <span>4.0953 jUSD</span>
+                Price per unit: <span>{selectedToken ? `${roundCurrency(tokenRatio)} jUSD` : '-'}</span>
               </Typography>
               <Typography variant="caption" className="swap-info-paragraph">
                 Protocol fee:

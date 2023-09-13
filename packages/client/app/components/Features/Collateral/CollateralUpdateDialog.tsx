@@ -23,7 +23,7 @@ type Props = {
 };
 
 type FieldValues = {
-  etherTokenAmount: number;
+  etherTokenAmount: string;
 };
 
 const CollateralUpdateDialog = ({ collateralData, buttonVariant, buttonSx = {} }: Props) => {
@@ -34,7 +34,7 @@ const CollateralUpdateDialog = ({ collateralData, buttonVariant, buttonSx = {} }
 
   const methods = useForm<FieldValues>({
     defaultValues: {
-      etherTokenAmount: 0,
+      etherTokenAmount: '',
     },
   });
   const { handleSubmit, setValue, reset } = methods;
@@ -52,9 +52,9 @@ const CollateralUpdateDialog = ({ collateralData, buttonVariant, buttonSx = {} }
 
   const fillMaxInputValue = (fieldName: keyof FieldValues) => {
     if (tabValue === 'DEPOSIT') {
-      setValue(fieldName, etherAmount, { shouldValidate: true });
+      setValue(fieldName, etherAmount.toString(), { shouldValidate: true });
     } else {
-      setValue(fieldName, depositedCollateralToDeposit[0].walletAmount!, { shouldValidate: true });
+      setValue(fieldName, depositedCollateralToDeposit[0].walletAmount!.toString(), { shouldValidate: true });
     }
   };
 

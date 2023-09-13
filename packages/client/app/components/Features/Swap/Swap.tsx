@@ -144,7 +144,7 @@ const Swap = () => {
 
           <div style={{ padding: '10px 0' }}>
             <Typography variant="titleAlternate" color="primary.contrastText" className="swap-info-paragraph">
-              Price per unit: <span>2.2 jUSD</span>
+              Price per unit: <span>{roundCurrency(tokenRatio)} jUSD</span>
             </Typography>
             <Typography variant="caption" className="swap-info-paragraph">
               Protocol swap fee:
