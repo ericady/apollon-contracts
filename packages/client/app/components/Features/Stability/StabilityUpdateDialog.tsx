@@ -1,29 +1,64 @@
 'use client';
+
+import { useQuery } from '@apollo/client';
 import CloseIcon from '@mui/icons-material/Close';
 import { Dialog, DialogActions, DialogContent, DialogTitle, IconButton } from '@mui/material';
 import Button from '@mui/material/Button';
 import Tab from '@mui/material/Tab';
 import Tabs from '@mui/material/Tabs';
-import TextField from '@mui/material/TextField';
 import Typography from '@mui/material/Typography';
 import { SyntheticEvent, useState } from 'react';
+import { FormProvider, useForm } from 'react-hook-form';
+import { useEthers } from '../../../context/EthersProvider';
+import { GetBorrowerDebtTokensQuery, GetBorrowerDebtTokensQueryVariables } from '../../../generated/gql-types';
+import { GET_BORROWER_DEBT_TOKENS } from '../../../queries';
+import { roundCurrency } from '../../../utils/math';
+import NumberInput from '../../FormControls/NumberInput';
 import Label from '../../Label/Label';
 
+type FieldValues = Record<string, number | ''>;
+
 const StabilityUpdateDialog = () => {
-  const [open, setOpen] = useState(false);
+  const [isOpen, setIsOpen] = useState(false);
   const [tabValue, setTabValue] = useState<'DEPOSIT' | 'WITHDRAW'>('DEPOSIT');
+
+  const { address } = useEthers();
+
+  const { data } = useQuery<GetBorrowerDebtTokensQuery, GetBorrowerDebtTokensQueryVariables>(GET_BORROWER_DEBT_TOKENS, {
+    variables: {
+      borrower: address,
+    },
+  });
+
+  const methods = useForm<FieldValues>();
+  const { handleSubmit, setValue, reset } = methods;
 
   const handleChange = (_: SyntheticEvent, newValue: 'DEPOSIT' | 'WITHDRAW') => {
     setTabValue(newValue);
+    const emptyValues = data?.getDebtTokens.reduce((acc, { token }) => ({ ...acc, [token.address]: '' }), {});
+    reset(emptyValues);
+  };
+
+  const fillMaxInputValue = (tokenAddress: string, walletAmount: number, stabilityCompoundAmount: number) => {
+    if (tabValue === 'DEPOSIT') {
+      setValue(tokenAddress, walletAmount, { shouldValidate: true });
+    } else {
+      setValue(tokenAddress, stabilityCompoundAmount, { shouldValidate: true });
+    }
+  };
+
+  const onSubmit = () => {
+    console.log('onSubmit called');
+    // TODO: Implement contract call
   };
 
   return (
     <>
-      <Button onClick={() => setOpen(true)} variant="outlined">
-        UPDATE
+      <Button onClick={() => setIsOpen(true)} variant="outlined">
+        Update
       </Button>
 
-      <Dialog open={open} onClose={() => setOpen(false)} fullWidth>
+      <Dialog open={isOpen} onClose={() => setIsOpen(false)} fullWidth>
         <DialogTitle
           sx={{
             display: 'flex',
@@ -46,7 +81,7 @@ const StabilityUpdateDialog = () => {
               COLLATERAL UPDATE
             </Typography>
           </div>
-          <IconButton onClick={() => setOpen(false)}>
+          <IconButton onClick={() => setIsOpen(false)}>
             <CloseIcon
               sx={{
                 color: '#64616D',
@@ -54,63 +89,137 @@ const StabilityUpdateDialog = () => {
             />
           </IconButton>
         </DialogTitle>
-        <DialogContent
-          sx={{
-            p: 0,
-            backgroundColor: 'background.default',
-            border: '1px solid',
-            borderColor: 'background.paper',
-            borderBottom: 'none',
-          }}
-        >
-          <Tabs value={tabValue} onChange={handleChange} variant="fullWidth">
-            <Tab label="DEPOSIT" value="DEPOSIT" />
-            <Tab label="WITHDRAW" value="WITHDRAW" />
-          </Tabs>
+        <FormProvider {...methods}>
+          <form onSubmit={handleSubmit(onSubmit)}>
+            <DialogContent
+              sx={{
+                p: 0,
+                backgroundColor: 'background.default',
+                border: '1px solid',
+                borderColor: 'background.paper',
+                borderBottom: 'none',
+              }}
+            >
+              <Tabs value={tabValue} onChange={handleChange} variant="fullWidth" sx={{ mt: 2 }}>
+                <Tab label="DEPOSIT" value="DEPOSIT" />
+                <Tab label="WITHDRAW" value="WITHDRAW" />
+              </Tabs>
 
-          <div className="pool-input">
-            <div>
-              <Label variant="success">ETH</Label>
-              <Typography sx={{ fontWeight: '400', marginTop: '10px' }}>3.60251</Typography>
-            </div>
-            <div>
-              <TextField placeholder="Value" fullWidth />
-              <div className="flex" style={{ justifyContent: 'space-between' }}>
-                <Button variant="undercover">18.6345</Button>
-                <Button variant="undercover" sx={{ textDecoration: 'underline' }}>
-                  max
-                </Button>
+              <div style={{ overflowY: 'scroll', maxHeight: '60vh' }}>
+                {data?.getDebtTokens.map(({ token, walletAmount = 0, stabilityCompoundAmount = 0 }) => (
+                  <div
+                    key={token.address}
+                    style={{ display: 'flex', justifyContent: 'space-between', padding: 20, height: 114 }}
+                  >
+                    {tabValue === 'DEPOSIT' && (
+                      <div style={{ marginTop: 6 }}>
+                        <Label variant="success">{token.symbol}</Label>
+                        <Typography sx={{ fontWeight: '400', marginTop: '10px' }}>
+                          {roundCurrency(stabilityCompoundAmount!, 5)}
+                        </Typography>
+                        <Typography
+                          sx={{
+                            color: '#3C3945',
+                            fontFamily: 'Space Grotesk Variable',
+                            fontSize: '9px',
+                            fontWeight: '700',
+                            lineHeight: '11px',
+                            letterSpacing: '0em',
+                          }}
+                        >
+                          Deposited
+                        </Typography>
+                      </div>
+                    )}
+                    {tabValue === 'WITHDRAW' && (
+                      <div style={{ marginTop: 6 }}>
+                        <Label variant="success">{token.symbol}</Label>
+                      </div>
+                    )}
+
+                    <div>
+                      <NumberInput
+                        name={token.address}
+                        defaultValue=""
+                        placeholder="Value"
+                        fullWidth
+                        rules={{
+                          min: { value: 0, message: 'You can only invest positive amounts.' },
+                          max:
+                            tabValue === 'DEPOSIT'
+                              ? { value: walletAmount!, message: 'Your wallet does not contain the specified amount' }
+                              : {
+                                  value: stabilityCompoundAmount!,
+                                  message: 'Your deposited stability does not contain the specified amount',
+                                },
+                        }}
+                      />
+
+                      <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                        <div>
+                          {tabValue === 'DEPOSIT' && (
+                            <>
+                              <Typography variant="caption">{roundCurrency(walletAmount!, 5)}</Typography>
+                              <Typography
+                                sx={{
+                                  color: '#3C3945',
+                                  fontFamily: 'Space Grotesk Variable',
+                                  fontSize: '9px',
+                                  fontWeight: '700',
+                                  lineHeight: '11px',
+                                  letterSpacing: '0em',
+                                }}
+                              >
+                                Wallet
+                              </Typography>
+                            </>
+                          )}
+                          {tabValue === 'WITHDRAW' && (
+                            <>
+                              <Typography variant="caption">{roundCurrency(stabilityCompoundAmount!, 5)}</Typography>
+                              <Typography
+                                sx={{
+                                  color: '#3C3945',
+                                  fontFamily: 'Space Grotesk Variable',
+                                  fontSize: '9px',
+                                  fontWeight: '700',
+                                  lineHeight: '11px',
+                                  letterSpacing: '0em',
+                                }}
+                              >
+                                Deposited
+                              </Typography>
+                            </>
+                          )}
+                        </div>
+
+                        <Button
+                          variant="undercover"
+                          sx={{ textDecoration: 'underline', p: 0, mt: 0.25, height: 25 }}
+                          onClick={() => fillMaxInputValue(token.address, walletAmount!, stabilityCompoundAmount!)}
+                        >
+                          max
+                        </Button>
+                      </div>
+                    </div>
+                  </div>
+                ))}
               </div>
-            </div>
-          </div>
-          <div className="pool-input">
-            <div>
-              <Label variant="success">USDT</Label>
-              <Typography sx={{ fontWeight: '400', marginTop: '10px' }}>3.30601</Typography>
-            </div>
-            <div>
-              <TextField placeholder="Value" fullWidth />
-              <div className="flex" style={{ justifyContent: 'space-between' }}>
-                <Button variant="undercover">18.3050</Button>
-                <Button variant="undercover" sx={{ textDecoration: 'underline' }}>
-                  max
-                </Button>
-              </div>
-            </div>
-          </div>
-        </DialogContent>
-        <DialogActions
-          sx={{
-            border: '1px solid',
-            borderColor: 'background.paper',
-            backgroundColor: 'background.default',
-            p: '30px 20px',
-          }}
-        >
-          <Button variant="outlined" sx={{ borderColor: '#fff' }}>
-            Update
-          </Button>
-        </DialogActions>
+            </DialogContent>
+            <DialogActions
+              sx={{
+                border: '1px solid',
+                borderColor: 'background.paper',
+                backgroundColor: 'background.default',
+                p: '30px 20px',
+              }}
+            >
+              <Button type="submit" variant="outlined" sx={{ borderColor: '#fff' }}>
+                Update
+              </Button>
+            </DialogActions>
+          </form>
+        </FormProvider>
       </Dialog>
     </>
   );
