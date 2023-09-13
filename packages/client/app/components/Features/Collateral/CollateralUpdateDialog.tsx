@@ -124,7 +124,7 @@ const CollateralUpdateDialog = ({ collateralData, buttonVariant, buttonSx = {} }
                 <Tab label="WITHDRAW" value="WITHDRAW" />
               </Tabs>
 
-              <div style={{ display: 'flex', justifyContent: 'space-between', padding: 20 }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', padding: 20, height: 114 }}>
                 {tabValue === 'DEPOSIT' && (
                   <div style={{ marginTop: 6 }}>
                     <Label variant="success">ETH</Label>
@@ -134,7 +134,7 @@ const CollateralUpdateDialog = ({ collateralData, buttonVariant, buttonSx = {} }
                     <Typography
                       sx={{
                         color: '#3C3945',
-                        fontFamily: 'Space Grotesk',
+                        fontFamily: 'Space Grotesk Variable',
                         fontSize: '9px',
                         fontWeight: '700',
                         lineHeight: '11px',
@@ -176,7 +176,7 @@ const CollateralUpdateDialog = ({ collateralData, buttonVariant, buttonSx = {} }
                           <Typography
                             sx={{
                               color: '#3C3945',
-                              fontFamily: 'Space Grotesk',
+                              fontFamily: 'Space Grotesk Variable',
                               fontSize: '9px',
                               fontWeight: '700',
                               lineHeight: '11px',
@@ -195,7 +195,7 @@ const CollateralUpdateDialog = ({ collateralData, buttonVariant, buttonSx = {} }
                           <Typography
                             sx={{
                               color: '#3C3945',
-                              fontFamily: 'Space Grotesk',
+                              fontFamily: 'Space Grotesk Variable',
                               fontSize: '9px',
                               fontWeight: '700',
                               lineHeight: '11px',
