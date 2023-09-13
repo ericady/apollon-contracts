@@ -15,7 +15,7 @@
 }
 
 /* Navigation */
-a:visited {
+.apollon-navigation-bar a:visited {
   color: #827f8b;
 }
 

@@ -8,6 +8,8 @@ import { usePathname } from 'next/navigation';
 import { SyntheticEvent, useEffect, useState } from 'react';
 import EthersAddressLabel from '../EthersAddressLabel/EthersAddressLabel';
 
+const ROUTES = ['/balance', '/spot', '/pools', '/'];
+
 function NavigationBar() {
   const pathname = usePathname();
   const [tabValue, setTabValue] = useState<'/balance' | '/spot' | '/pools'>('/spot');
@@ -19,7 +21,7 @@ function NavigationBar() {
   useEffect(() => {
     if (pathname === '/') {
       setTabValue('/spot');
-    } else if (pathname !== tabValue) {
+    } else if (pathname !== tabValue && ROUTES.includes(pathname)) {
       setTabValue(pathname as '/balance' | '/spot' | '/pools');
     }
   }, [pathname, setTabValue, tabValue]);
@@ -37,7 +39,7 @@ function NavigationBar() {
         }}
       >
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%' }}>
-          <div className="flex">
+          <div className="flex apollon-navigation-bar">
             <Link href="/" style={{ height: 30 }}>
               <img src="assets/svgs/Apollon_logo_negative.svg" alt="Apollon Logo" height="30" typeof="image/svg+xml" />
             </Link>
