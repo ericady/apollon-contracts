@@ -15,15 +15,16 @@ function DiagramPlaceholder() {
     >
       <div
         style={{
-          borderRadius: 5,
           border: '2px solid #3C3945',
+          backgroundColor: '#282531',
+          borderRadius: 5,
           padding: '3px 10px',
           display: 'flex',
           alignItems: 'center',
         }}
       >
-        <InfoOutlinedIcon sx={{ fontSize: '18px', marginRight: '3px' }} />
-        <Typography>No Data to Show</Typography>
+        <InfoOutlinedIcon sx={{ marginRight: '3px' }} color="primary" fontSize="small" />
+        <Typography variant="titleAlternate">No Data to Show</Typography>
       </div>
     </div>
   );

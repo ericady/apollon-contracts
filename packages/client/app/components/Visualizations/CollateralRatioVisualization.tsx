@@ -1,3 +1,4 @@
+import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 import { Box, Typography } from '@mui/material';
 import { displayPercentage } from '../../utils/math';
 
@@ -22,9 +23,43 @@ type Props = {
    * right scale for all chart values. Defaults to 2.
    */
   scaleMax?: number;
+
+  /**
+   * Shows the loading indicator without any data accessed.
+   */
+  loading?: boolean;
 };
 
-function CollateralRatioVisualization({ criticalRatio, newRatio, oldRatio, scaleMax = 2, scaleMin = 1 }: Props) {
+function CollateralRatioVisualization({
+  criticalRatio,
+  newRatio,
+  oldRatio,
+  scaleMax = 2,
+  scaleMin = 1,
+  loading = false,
+}: Props) {
+  if (loading) {
+    return (
+      <div
+        style={{
+          height: '31px',
+          width: '100%',
+          marginTop: 10,
+          padding: '3px 10px',
+          border: '2px solid #3C3945',
+          borderRadius: 5,
+          backgroundColor: '#282531',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+        }}
+      >
+        <InfoOutlinedIcon sx={{ mr: '3px' }} color="primary" fontSize="small" />
+        <Typography variant="titleAlternate">No Data to Show</Typography>
+      </div>
+    );
+  }
+
   const scaleDelta = scaleMax - scaleMin;
 
   const criticalPosition = (criticalRatio - scaleMin) / scaleDelta;
