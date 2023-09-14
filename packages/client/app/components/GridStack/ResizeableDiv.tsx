@@ -3,7 +3,7 @@
 import DragHandleIcon from '@mui/icons-material/DragHandle';
 import { MouseEventHandler, PropsWithChildren } from 'react';
 
-const minimumHeight = 100;
+const minimumHeight = 60;
 const maximumHeight = 800;
 let originalHeight = 0;
 let originalY = 0;
@@ -45,7 +45,7 @@ function ResizeableDiv({ children }: PropsWithChildren<{}>) {
         </div>
       </div>
 
-      <div id="apollon-drag-queen" style={{ height: 270 }}>
+      <div id="apollon-drag-queen" style={{ height: 330 }}>
         {children}
       </div>
     </>

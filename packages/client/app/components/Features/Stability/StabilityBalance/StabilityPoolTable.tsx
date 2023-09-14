@@ -89,7 +89,7 @@ function StabilityPoolTable() {
                   const noBorder = index === listLength - 1;
 
                   return (
-                    <TableRow key={index}>
+                    <TableRow hover key={index}>
                       <TableCell sx={noBorder ? { borderBottom: 'none', pr: 0 } : { pr: 0 }} align="right">
                         {!isNaN(stabilityLostAmount!) ? roundCurrency(stabilityLostAmount!, 5) : null}
                       </TableCell>

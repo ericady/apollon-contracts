@@ -38,7 +38,7 @@ function TreasuryTable() {
           </TableHead>
           <TableBody>
             {debtTokensInReserve.map(({ token, totalReserve, totalReserve24hAgo }) => (
-              <TableRow key={token.address}>
+              <TableRow hover key={token.address}>
                 <TableCell align="right" sx={{ pr: 0 }}>
                   {stdFormatter.format(totalReserve)}
                 </TableCell>

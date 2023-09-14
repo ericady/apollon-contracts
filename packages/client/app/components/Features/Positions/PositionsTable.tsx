@@ -81,7 +81,7 @@ function PositionsTable() {
               const pnl = totalPriceInStableNow - totalPriceInStable;
 
               return (
-                <TableRow key={id}>
+                <TableRow hover key={id}>
                   <TableCell>{formatUnixTimestamp(openedAt)}</TableCell>
                   <TableCell>
                     {direction === LongShortDirection.Long ? (

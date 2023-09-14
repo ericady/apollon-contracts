@@ -39,166 +39,30 @@ function DebtTokenTableLoader() {
             </TableRow>
           </TableHead>
           <TableBody>
-            <TableRow>
-              <TableCell align="right">
-                <Skeleton variant="text" />
-              </TableCell>
-              <TableCell align="right">
-                <Skeleton variant="text" />
-              </TableCell>
-              <TableCell sx={{ borderRight: '1px solid', borderColor: 'table.border' }} align="right">
-                <Skeleton variant="text" />
-              </TableCell>
-              <TableCell align="right">
-                <Skeleton variant="text" />
-              </TableCell>
-              <TableCell align="right">
-                <Skeleton variant="text" />
-              </TableCell>
-              <TableCell align="right">
-                <Skeleton variant="text" />
-              </TableCell>
-            </TableRow>
-            <TableRow>
-              <TableCell align="right">
-                <Skeleton variant="text" />
-              </TableCell>
-              <TableCell align="right">
-                <Skeleton variant="text" />
-              </TableCell>
-              <TableCell sx={{ borderRight: '1px solid', borderColor: 'table.border' }} align="right">
-                <Skeleton variant="text" />
-              </TableCell>
-              <TableCell align="right">
-                <Skeleton variant="text" />
-              </TableCell>
-              <TableCell align="right">
-                <Skeleton variant="text" />
-              </TableCell>
-              <TableCell align="right">
-                <Skeleton variant="text" />
-              </TableCell>
-            </TableRow>
-            <TableRow>
-              <TableCell align="right">
-                <Skeleton variant="text" />
-              </TableCell>
-              <TableCell align="right">
-                <Skeleton variant="text" />
-              </TableCell>
-              <TableCell sx={{ borderRight: '1px solid', borderColor: 'table.border' }} align="right">
-                <Skeleton variant="text" />
-              </TableCell>
-              <TableCell align="right">
-                <Skeleton variant="text" />
-              </TableCell>
-              <TableCell align="right">
-                <Skeleton variant="text" />
-              </TableCell>
-              <TableCell align="right">
-                <Skeleton variant="text" />
-              </TableCell>
-            </TableRow>
-            <TableRow>
-              <TableCell align="right">
-                <Skeleton variant="text" />
-              </TableCell>
-              <TableCell align="right">
-                <Skeleton variant="text" />
-              </TableCell>
-              <TableCell sx={{ borderRight: '1px solid', borderColor: 'table.border' }} align="right">
-                <Skeleton variant="text" />
-              </TableCell>
-              <TableCell align="right">
-                <Skeleton variant="text" />
-              </TableCell>
-              <TableCell align="right">
-                <Skeleton variant="text" />
-              </TableCell>
-              <TableCell align="right">
-                <Skeleton variant="text" />
-              </TableCell>
-            </TableRow>
-            <TableRow>
-              <TableCell align="right">
-                <Skeleton variant="text" />
-              </TableCell>
-              <TableCell align="right">
-                <Skeleton variant="text" />
-              </TableCell>
-              <TableCell sx={{ borderRight: '1px solid', borderColor: 'table.border' }} align="right">
-                <Skeleton variant="text" />
-              </TableCell>
-              <TableCell align="right">
-                <Skeleton variant="text" />
-              </TableCell>
-              <TableCell align="right">
-                <Skeleton variant="text" />
-              </TableCell>
-              <TableCell align="right">
-                <Skeleton variant="text" />
-              </TableCell>
-            </TableRow>
-            <TableRow>
-              <TableCell align="right">
-                <Skeleton variant="text" />
-              </TableCell>
-              <TableCell align="right">
-                <Skeleton variant="text" />
-              </TableCell>
-              <TableCell sx={{ borderRight: '1px solid', borderColor: 'table.border' }} align="right">
-                <Skeleton variant="text" />
-              </TableCell>
-              <TableCell align="right">
-                <Skeleton variant="text" />
-              </TableCell>
-              <TableCell align="right">
-                <Skeleton variant="text" />
-              </TableCell>
-              <TableCell align="right">
-                <Skeleton variant="text" />
-              </TableCell>
-            </TableRow>
-            <TableRow>
-              <TableCell align="right">
-                <Skeleton variant="text" />
-              </TableCell>
-              <TableCell align="right">
-                <Skeleton variant="text" />
-              </TableCell>
-              <TableCell sx={{ borderRight: '1px solid', borderColor: 'table.border' }} align="right">
-                <Skeleton variant="text" />
-              </TableCell>
-              <TableCell align="right">
-                <Skeleton variant="text" />
-              </TableCell>
-              <TableCell align="right">
-                <Skeleton variant="text" />
-              </TableCell>
-              <TableCell align="right">
-                <Skeleton variant="text" />
-              </TableCell>
-            </TableRow>
-            <TableRow>
-              <TableCell align="right">
-                <Skeleton variant="text" />
-              </TableCell>
-              <TableCell align="right">
-                <Skeleton variant="text" />
-              </TableCell>
-              <TableCell sx={{ borderRight: '1px solid', borderColor: 'table.border' }} align="right">
-                <Skeleton variant="text" />
-              </TableCell>
-              <TableCell align="right">
-                <Skeleton variant="text" />
-              </TableCell>
-              <TableCell align="right">
-                <Skeleton variant="text" />
-              </TableCell>
-              <TableCell align="right">
-                <Skeleton variant="text" />
-              </TableCell>
-            </TableRow>
+            {Array(8)
+              .fill(null)
+              .map((_, index) => (
+                <TableRow key={index}>
+                  <TableCell align="right">
+                    <Skeleton variant="text" />
+                  </TableCell>
+                  <TableCell align="right">
+                    <Skeleton variant="text" />
+                  </TableCell>
+                  <TableCell sx={{ borderRight: '1px solid', borderColor: 'table.border' }} align="right">
+                    <Skeleton variant="text" />
+                  </TableCell>
+                  <TableCell align="right">
+                    <Skeleton variant="text" />
+                  </TableCell>
+                  <TableCell align="right">
+                    <Skeleton variant="text" />
+                  </TableCell>
+                  <TableCell align="right">
+                    <Skeleton variant="text" />
+                  </TableCell>
+                </TableRow>
+              ))}
           </TableBody>
         </Table>
       </TableContainer>

@@ -74,7 +74,7 @@ function TradingView() {
   return (
     <div
       // Must have the height fixed in order to resize properly. We adapt via a CSS custom property.
-      style={{ height: 'calc(100vh - 52px - var(--apollon-drag-queen-height, 270px))', width: '100%' }}
+      style={{ height: 'calc(100vh - 52px - var(--apollon-drag-queen-height, 330px))', width: '100%' }}
       id="apollon-trading-view-container"
     >
       <div style={{ height: '100%' }} id="apollon-trading-view"></div>

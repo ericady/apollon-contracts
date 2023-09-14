@@ -52,7 +52,7 @@ const CollateralTokenTable = () => {
             <TableBody>
               {data.getCollateralTokens.map(
                 ({ token, totalValueLockedUSD, totalValueLockedUSD24hAgo, troveLockedAmount, walletAmount }) => (
-                  <TableRow key={token.address}>
+                  <TableRow hover key={token.address}>
                     <TableCell align="right" sx={{ borderRight: '1px solid', borderColor: 'table.border' }}>
                       {roundCurrency(walletAmount ?? 0, 5)}
                     </TableCell>

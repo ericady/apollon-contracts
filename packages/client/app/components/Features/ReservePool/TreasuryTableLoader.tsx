@@ -20,38 +20,18 @@ function TreasuryTableLoader() {
             </TableRow>
           </TableHead>
           <TableBody>
-            <TableRow>
-              <TableCell align="right">
-                <Skeleton variant="text" />
-              </TableCell>
-              <TableCell align="right">
-                <Skeleton variant="text" />
-              </TableCell>
-            </TableRow>
-            <TableRow>
-              <TableCell align="right">
-                <Skeleton variant="text" />
-              </TableCell>
-              <TableCell align="right">
-                <Skeleton variant="text" />
-              </TableCell>
-            </TableRow>
-            <TableRow>
-              <TableCell align="right">
-                <Skeleton variant="text" />
-              </TableCell>
-              <TableCell align="right">
-                <Skeleton variant="text" />
-              </TableCell>
-            </TableRow>
-            <TableRow>
-              <TableCell align="right">
-                <Skeleton variant="text" />
-              </TableCell>
-              <TableCell align="right">
-                <Skeleton variant="text" />
-              </TableCell>
-            </TableRow>
+            {Array(4)
+              .fill(null)
+              .map((_, index) => (
+                <TableRow key={index}>
+                  <TableCell align="right">
+                    <Skeleton variant="text" />
+                  </TableCell>
+                  <TableCell align="right">
+                    <Skeleton variant="text" />
+                  </TableCell>
+                </TableRow>
+              ))}
           </TableBody>
         </Table>
       </TableContainer>

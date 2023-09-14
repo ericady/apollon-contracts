@@ -43,7 +43,7 @@ function BalanceTable() {
           </TableHead>
           <TableBody>
             {poolToken.map(({ token, walletAmount }) => (
-              <TableRow key={token.address}>
+              <TableRow hover key={token.address}>
                 <TableCell>{displayPercentage((walletAmount! * token.priceUSD) / totalValue)}</TableCell>
                 <TableCell align="right">
                   <Typography sx={{ color: 'primary.contrastText' }}>{stdFormatter.format(walletAmount!)}</Typography>
@@ -72,7 +72,7 @@ function BalanceTable() {
           </TableHead>
           <TableBody>
             {nonPoolToken.map(({ token, walletAmount }) => (
-              <TableRow key={token.address}>
+              <TableRow hover key={token.address}>
                 <TableCell>{displayPercentage((walletAmount! * token.priceUSD) / totalValue)}</TableCell>
                 <TableCell align="right">
                   <Typography sx={{ color: 'primary.contrastText' }}>{stdFormatter.format(walletAmount!)}</Typography>

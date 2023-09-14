@@ -74,7 +74,7 @@ function DebtTokenTable() {
                 totalSupplyUSD,
                 totalSupplyUSD24hAgo,
               }) => (
-                <TableRow key={token.address}>
+                <TableRow hover key={token.address}>
                   <TableCell align="right">{roundCurrency(troveMintedAmount!, 5)}</TableCell>
                   <TableCell align="right">{roundCurrency(stabilityCompoundAmount!, 5)}</TableCell>
                   <TableCell sx={{ borderRight: '1px solid', borderColor: BUTTON_BACKGROUND }}>

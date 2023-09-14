@@ -108,7 +108,7 @@ function CollateralTable() {
             </TableHead>
             <TableBody>
               {borrowerCollateralTokens.map(({ token, walletAmount, troveLockedAmount, chartColor }) => (
-                <TableRow key={token.address}>
+                <TableRow hover key={token.address}>
                   <TableCell align="right">
                     <div style={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center', gap: 10 }}>
                       <svg xmlns="http://www.w3.org/2000/svg" width="8" height="8" fill="none">
