@@ -10,6 +10,7 @@ import { GET_BORROWER_DEBT_TOKENS } from '../../../queries';
 import { displayPercentage, roundCurrency, stdFormatter } from '../../../utils/math';
 import Label from '../../Label/Label';
 import HeaderCell from '../../Table/HeaderCell';
+import BalanceTableLoader from './BalanceTableLoader';
 
 function BalanceTable() {
   const { address } = useEthers();
@@ -18,7 +19,7 @@ function BalanceTable() {
     variables: { borrower: address },
   });
 
-  if (!data) return null;
+  if (!data) return <BalanceTableLoader />;
 
   const poolToken = data.getDebtTokens.filter(({ token }) => token.isPoolToken);
   const nonPoolToken = data.getDebtTokens.filter(({ token }) => !token.isPoolToken);
