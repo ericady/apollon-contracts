@@ -1,3 +1,5 @@
+import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
+import { Typography } from '@mui/material';
 import { Cell, Pie, PieChart } from 'recharts';
 import { GetCollateralTokensQuery } from '../../generated/gql-types';
 import { roundCurrency } from '../../utils/math';
@@ -45,6 +47,25 @@ const renderCustomizedLabel = (svgPropsAndData: any) => {
 };
 
 function CollateralPieVisualization({ borrowerCollateralTokens }: Props) {
+  if (borrowerCollateralTokens.length === 0)
+    return (
+      <div style={{ width: 360, height: 280, display: 'grid', placeItems: 'center' }}>
+        <div
+          style={{
+            border: '2px solid #3C3945',
+            backgroundColor: '#282531',
+            borderRadius: 5,
+            padding: '3px 10px',
+            display: 'flex',
+            alignItems: 'center',
+          }}
+        >
+          <InfoOutlinedIcon sx={{ marginRight: '3px' }} color="primary" fontSize="small" />
+          <Typography variant="titleAlternate">No Data to Show</Typography>
+        </div>
+      </div>
+    );
+
   return (
     <PieChart width={360} height={280} margin={{ top: 0, right: 0, bottom: 0, left: 0 }}>
       <Pie

@@ -1,5 +1,5 @@
 import { useQuery } from '@apollo/client';
-import { Box } from '@mui/material';
+import { Box, Button } from '@mui/material';
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
 import TableCell from '@mui/material/TableCell';
@@ -16,6 +16,7 @@ import Label from '../../Label/Label';
 import HeaderCell from '../../Table/HeaderCell';
 import CollateralPieVisualization from '../../Visualizations/CollateralPieVisualization';
 import CollateralRatioVisualization from '../../Visualizations/CollateralRatioVisualization';
+import CollateralTableLoader from './CollateralTableLoader';
 import CollateralUpdateDialog from './CollateralUpdateDialog';
 
 const generateColorPalette = (paletteLength: number) => {
@@ -60,8 +61,6 @@ function CollateralTable() {
     );
   }, [data]);
 
-  if (!data) return null;
-
   return (
     <div style={{ display: 'flex' }}>
       <Box style={{ width: '40%', display: 'flex', justifyContent: 'center', backgroundColor: '#1e1b27' }}>
@@ -92,45 +91,62 @@ function CollateralTable() {
 
               <Typography variant="h4">Collateral Ratio</Typography>
             </Box>
-            <CollateralUpdateDialog collateralData={data} buttonVariant="outlined" />
+
+            {!data ? (
+              <Button
+                variant="outlined"
+                sx={{
+                  width: 'auto',
+                  padding: '0 50px',
+                }}
+              >
+                Update
+              </Button>
+            ) : (
+              <CollateralUpdateDialog collateralData={data} buttonVariant="outlined" />
+            )}
           </div>
           <CollateralRatioVisualization criticalRatio={1.1} newRatio={1.5} oldRatio={1.74} />
         </div>
 
-        <TableContainer>
-          <Table>
-            <TableHead>
-              <TableRow>
-                <HeaderCell title="Trove" cellProps={{ align: 'right' }} />
-                <HeaderCell title="Wallet" cellProps={{ align: 'right' }} />
-                <HeaderCell title="Symbol" />
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {borrowerCollateralTokens.map(({ token, walletAmount, troveLockedAmount, chartColor }) => (
-                <TableRow hover key={token.address}>
-                  <TableCell align="right">
-                    <div style={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center', gap: 10 }}>
-                      <svg xmlns="http://www.w3.org/2000/svg" width="8" height="8" fill="none">
-                        <path
-                          fill={chartColor}
-                          d="M4 0a6.449 6.449 0 0 0 4 4 6.449 6.449 0 0 0-4 4 6.449 6.449 0 0 0-4-4 6.449 6.449 0 0 0 4-4Z"
-                        />
-                      </svg>
-                      <Typography color="primary.contrastText" fontSize={14.3}>
-                        {roundCurrency(troveLockedAmount!, 5)}
-                      </Typography>
-                    </div>
-                  </TableCell>
-                  <TableCell align="right">{roundCurrency(walletAmount!, 5)}</TableCell>
-                  <TableCell>
-                    <Label variant="none">{token.symbol}</Label>
-                  </TableCell>
+        {!data ? (
+          <CollateralTableLoader />
+        ) : (
+          <TableContainer>
+            <Table>
+              <TableHead>
+                <TableRow>
+                  <HeaderCell title="Trove" cellProps={{ align: 'right' }} />
+                  <HeaderCell title="Wallet" cellProps={{ align: 'right' }} />
+                  <HeaderCell title="Symbol" />
                 </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </TableContainer>
+              </TableHead>
+              <TableBody>
+                {borrowerCollateralTokens.map(({ token, walletAmount, troveLockedAmount, chartColor }) => (
+                  <TableRow hover key={token.address}>
+                    <TableCell align="right">
+                      <div style={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center', gap: 10 }}>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="8" height="8" fill="none">
+                          <path
+                            fill={chartColor}
+                            d="M4 0a6.449 6.449 0 0 0 4 4 6.449 6.449 0 0 0-4 4 6.449 6.449 0 0 0-4-4 6.449 6.449 0 0 0 4-4Z"
+                          />
+                        </svg>
+                        <Typography color="primary.contrastText" fontSize={14.3}>
+                          {roundCurrency(troveLockedAmount!, 5)}
+                        </Typography>
+                      </div>
+                    </TableCell>
+                    <TableCell align="right">{roundCurrency(walletAmount!, 5)}</TableCell>
+                    <TableCell>
+                      <Label variant="none">{token.symbol}</Label>
+                    </TableCell>
+                  </TableRow>
+                ))}
+              </TableBody>
+            </Table>
+          </TableContainer>
+        )}
       </Box>
     </div>
   );
