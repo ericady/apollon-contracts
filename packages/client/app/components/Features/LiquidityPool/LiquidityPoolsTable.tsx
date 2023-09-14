@@ -66,7 +66,7 @@ function LiquidityPoolsTable({ selectedPool, setSelectedPool }: Props) {
               <HeaderCell title="" />
               <HeaderCell title="" cellProps={{ align: 'right' }} />
               <HeaderCell title="" />
-              <HeaderCell title="APY" />
+              <HeaderCell title="APY" cellProps={{ align: 'right' }} />
               <HeaderCell title="" />
               <HeaderCell title="24h Volume" />
             </TableRow>
@@ -141,10 +141,12 @@ function LiquidityPoolsTable({ selectedPool, setSelectedPool }: Props) {
                     <TableCell sx={{ pl: 0 }}>
                       <Label variant="none">{tokenB.token.symbol}</Label>
                     </TableCell>
-                    <TableCell>{displayPercentage(liquidityDepositAPY)}</TableCell>
+                    <TableCell align="right">{displayPercentage(liquidityDepositAPY)}</TableCell>
 
-                    <TableCell align="right" sx={{ pr: 0 }}>
-                      <Typography variant="caption">{stdFormatter.format(volume24hUSD)} $</Typography>
+                    <TableCell align="right" sx={{ pr: 0, pl: 0, width: '50px', maxWidth: '200px' }}>
+                      <Typography variant="caption" noWrap>
+                        {stdFormatter.format(volume24hUSD)} $
+                      </Typography>
                     </TableCell>
                     <TableCell align="left" width={130}>
                       <div className="flex">
