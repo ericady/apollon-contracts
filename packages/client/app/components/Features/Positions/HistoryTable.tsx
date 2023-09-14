@@ -18,6 +18,7 @@ import { displayPercentage, percentageChange, roundCurrency } from '../../../uti
 import DirectionIcon from '../../Icons/DirectionIcon';
 import Label from '../../Label/Label';
 import HeaderCell from '../../Table/HeaderCell';
+import HistoryTableLoader from './HistoryTableLoader';
 
 function HistoryTable() {
   const { address } = useEthers();
@@ -50,6 +51,8 @@ function HistoryTable() {
     });
   };
 
+  if (!data) return <HistoryTableLoader />;
+
   return (
     <TableContainer onScroll={handleScroll} style={{ maxHeight: '100%', overflow: 'auto' }}>
       <Table stickyHeader>
@@ -68,7 +71,7 @@ function HistoryTable() {
         </TableHead>
 
         <TableBody>
-          {data?.getPositions.positions.map(
+          {data.getPositions.positions.map(
             ({ id, direction, feesInStable, openedAt, size, token, profitInStable, totalPriceInStable }) => {
               return (
                 <TableRow hover key={id}>
@@ -102,7 +105,11 @@ function HistoryTable() {
                   <TableCell sx={{ width: 120 }}>
                     <div style={{ display: 'flex', alignItems: 'center' }}>
                       <Typography
-                        sx={{ color: profitInStable! > 0 ? 'success.main' : 'error.main', fontWeight: '400' }}
+                        sx={{
+                          color: profitInStable! > 0 ? 'success.main' : 'error.main',
+                          fontWeight: '400',
+                          mr: '5px',
+                        }}
                       >
                         {displayPercentage(percentageChange(totalPriceInStable + profitInStable!, totalPriceInStable))}
                       </Typography>
