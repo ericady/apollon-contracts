@@ -20,6 +20,7 @@ import { displayPercentage, percentageChange, roundCurrency, stdFormatter } from
 import DirectionIcon from '../../Icons/DirectionIcon';
 import Label from '../../Label/Label';
 import HeaderCell from '../../Table/HeaderCell';
+import PositionsTableLoader from './PositionsTableLoader';
 
 function PositionsTable() {
   const { address } = useEthers();
@@ -53,12 +54,11 @@ function PositionsTable() {
     });
   };
 
-  if (!data) return null;
+  if (!data) return <PositionsTableLoader />;
 
   return (
     <TableContainer onScroll={handleScroll} style={{ maxHeight: '100%', overflow: 'auto' }}>
       <Table stickyHeader>
-        {/* Can not at header border here with sticky header */}
         <TableHead>
           <TableRow>
             <HeaderCell title="Opening" />
@@ -108,7 +108,7 @@ function PositionsTable() {
                       {roundCurrency(pnl)} jUSD
                     </Typography>
                   </TableCell>
-                  <TableCell sx={{ width: 120 }}>
+                  <TableCell width={120}>
                     <div style={{ display: 'flex', alignItems: 'center' }}>
                       <Typography sx={{ color: pnl > 0 ? 'success.main' : 'error.main', fontWeight: '400', mr: '5px' }}>
                         {displayPercentage(percentageChange(totalPriceInStableNow, totalPriceInStable))}
