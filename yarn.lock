@@ -11584,6 +11584,7 @@ __metadata:
     lightweight-charts: 4.0.1
     msw: ^1.2.3
     next: 13.4.13
+    notistack: 3.0.1
     prettier: ^3.0.1
     prettier-plugin-organize-imports: ^3.2.3
     react: 18.2.0
@@ -16345,6 +16346,15 @@ __metadata:
   bin:
     gluegun: bin/gluegun
   checksum: 2c91934b98022018a524a3be32efb3e4567905a618ccb4aca4f19207ff4b37262bc18264b306f1c82757eaab634bac6c06aacff16059b11a38deefd07b6293b6
+  languageName: node
+  linkType: hard
+
+"goober@npm:^2.0.33":
+  version: 2.1.13
+  resolution: "goober@npm:2.1.13"
+  peerDependencies:
+    csstype: ^3.0.10
+  checksum: 0c00b90d26d1a2fad432e311fd4f47bc9fef1eee2a733158d9e2c72a89cf76d414090d063a8d20fe378f2b2b8087df0a83b0f00a3244d1466b97a0d3b14344a7
   languageName: node
   linkType: hard
 
@@ -21797,6 +21807,19 @@ __metadata:
   version: 6.1.0
   resolution: "normalize-url@npm:6.1.0"
   checksum: 4a4944631173e7d521d6b80e4c85ccaeceb2870f315584fa30121f505a6dfd86439c5e3fdd8cd9e0e291290c41d0c3599f0cb12ab356722ed242584c30348e50
+  languageName: node
+  linkType: hard
+
+"notistack@npm:3.0.1":
+  version: 3.0.1
+  resolution: "notistack@npm:3.0.1"
+  dependencies:
+    clsx: ^1.1.0
+    goober: ^2.0.33
+  peerDependencies:
+    react: ^16.8.0 || ^17.0.0 || ^18.0.0
+    react-dom: ^16.8.0 || ^17.0.0 || ^18.0.0
+  checksum: 421c970308690b8c8cb2e275e7f66020db7c1955e104f638e7fa562396a6b9322ff95f0e62492b07f3d36b0ef72adb4de2c2ce9803089c1c8f028d1a3b088e01
   languageName: node
   linkType: hard
 

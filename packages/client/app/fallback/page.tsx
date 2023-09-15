@@ -49,7 +49,7 @@ function DeviceFallbackPage() {
         variant="outlined"
         onClick={() => window.location.replace('/')}
       >
-        Go home
+        Go Home
       </Button>
     </div>
   );
