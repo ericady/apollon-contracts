@@ -1,4 +1,4 @@
-import { Tooltip } from '@mui/material';
+import { Box, Tooltip } from '@mui/material';
 import TableCell from '@mui/material/TableCell';
 import { ComponentProps } from 'react';
 
@@ -26,7 +26,15 @@ function HeaderCell({ title, cellProps = {}, tooltipProps }: Props) {
           title={tooltipProps.title}
           sx={{ backgroundColor: 'background.emphasis', ...tooltipProps.sx }}
         >
-          <span>{title}</span>
+          <Box
+            sx={{
+              textDecorationLine: 'underline',
+              textDecorationStyle: 'dashed',
+              textDecorationColor: 'text.disabled',
+            }}
+          >
+            {title}
+          </Box>
         </Tooltip>
       ) : (
         title

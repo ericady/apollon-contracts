@@ -40,13 +40,7 @@ function DebtTokenTable() {
               <HeaderCell title="" />
               <HeaderCell title="" />
               <HeaderCell title="" />
-
-              <HeaderCell
-                title="Protocol Level"
-                cellProps={{ align: 'right' }}
-                // TODO: Add Tooltip text
-                tooltipProps={{ title: 'TODO: Add Description', arrow: true, placement: 'right' }}
-              />
+              <HeaderCell title="Protocol Level" cellProps={{ align: 'right' }} />
             </TableRow>
           </TableHead>
           <TableHead>
@@ -60,7 +54,11 @@ function DebtTokenTable() {
               <HeaderCell title="" cellProps={{ align: 'right' }} />
               <HeaderCell title="Supply" cellProps={{ align: 'left' }} />
               <HeaderCell title="Stability" cellProps={{ align: 'right' }} />
-              <HeaderCell title="Rewards" cellProps={{ align: 'right' }} />
+              <HeaderCell
+                title="Rewards"
+                cellProps={{ align: 'right' }}
+                tooltipProps={{ title: 'APY based on the last 30 days liquidations.', arrow: true, placement: 'right' }}
+              />
             </TableRow>
           </TableHead>
           <TableBody>

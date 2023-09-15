@@ -34,7 +34,7 @@ function Assets() {
 
   const { data } = useQuery<GetAllPoolsQuery, GetAllPoolsQueryVariables>(GET_ALL_POOLS);
 
-  const tokens = useMemo<SelectedToken[] | undefined>(() => {
+  const tokens = useMemo<SelectedToken[]>(() => {
     const jUSDPools =
       data?.getPools.filter(({ liquidity }) => {
         const [tokenA, tokenB] = liquidity;
@@ -84,7 +84,7 @@ function Assets() {
       border="bottom"
       isDraggable={{ y: '0', gsHeight: '22', gsWidth: '1', id: 'apollon-assets-widget' }}
     >
-      {!tokens ? (
+      {tokens.length === 0 ? (
         <AssetsLoader />
       ) : (
         <TableContainer sx={{ maxHeight: 170, overflowY: 'scroll' }}>
@@ -96,8 +96,11 @@ function Assets() {
                 <HeaderCell
                   title="OF %"
                   cellProps={{ align: 'right', sx: { p: 0.5 } }}
-                  // TODO: Add Tooltip text
-                  tooltipProps={{ title: 'TODO: Add Description', arrow: true, placement: 'right' }}
+                  tooltipProps={{
+                    title: 'Opening Fee, one time fee to open a new position.',
+                    arrow: true,
+                    placement: 'right',
+                  }}
                 />
                 <HeaderCell title="%" cellProps={{ align: 'right', sx: { p: 0.5 } }} />
                 <HeaderCell title="" cellProps={{ sx: { p: 0.5, pr: 2 } }} />
