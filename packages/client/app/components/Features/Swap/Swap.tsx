@@ -1,16 +1,20 @@
 'use client';
 
+import { Skeleton } from '@mui/material';
 import Button from '@mui/material/Button';
 import InputAdornment from '@mui/material/InputAdornment';
 import Typography from '@mui/material/Typography';
 import { ChangeEvent, useState } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
 import { useSelectedToken } from '../../../context/SelectedTokenProvider';
-import { roundCurrency } from '../../../utils/math';
+import { displayPercentage, roundCurrency, roundNumber } from '../../../utils/math';
 import InfoButton from '../../Buttons/InfoButton';
 import FeatureBox from '../../FeatureBox/FeatureBox';
 import NumberInput from '../../FormControls/NumberInput';
 import Label from '../../Label/Label';
+
+export const PROTOCOL_SWAP_FEE = 0.0009;
+export const RESULTING_POOL_SLIPPAGE = 0.02;
 
 type FieldValues = {
   jUSDAmount: string;
@@ -30,16 +34,19 @@ const Swap = () => {
     },
     shouldUnregister: true,
   });
-  const { handleSubmit, setValue } = methods;
+  const { handleSubmit, setValue, watch } = methods;
 
   const { selectedToken, tokenRatio } = useSelectedToken();
 
   const handleSwapValueChange = (variant: 'JUSD' | 'Token', value: string) => {
+    console.log('value: ', value);
     const numericValue = parseFloat(value);
+
+    console.log('numericValue: ', numericValue);
 
     if (variant === 'JUSD') {
       if (!isNaN(numericValue)) {
-        setValue('tokenAmount', roundCurrency(numericValue / tokenRatio).toString());
+        setValue('tokenAmount', roundNumber(numericValue / tokenRatio).toString());
         setTradingDirection('jUSDSpent');
       } else {
         setValue('tokenAmount', '');
@@ -48,7 +55,7 @@ const Swap = () => {
       setValue('jUSDAmount', value);
     } else {
       if (!isNaN(numericValue)) {
-        setValue('jUSDAmount', roundCurrency(numericValue / tokenRatio).toString());
+        setValue('jUSDAmount', roundNumber(numericValue / tokenRatio).toString());
         setTradingDirection('jUSDAquired');
       } else {
         setValue('jUSDAmount', '');
@@ -62,6 +69,8 @@ const Swap = () => {
     console.log('onSubmit called');
     // TODO: Implement contract call
   };
+
+  const jUSDSwapAmount = parseInt(watch('jUSDAmount'));
 
   return (
     <FeatureBox
@@ -144,13 +153,15 @@ const Swap = () => {
 
           <div style={{ padding: '10px 0' }}>
             <Typography variant="titleAlternate" color="primary.contrastText" className="swap-info-paragraph">
-              Price per unit: <span>{roundCurrency(tokenRatio)} jUSD</span>
+              Price per unit:
+              {selectedToken ? <span>{roundCurrency(tokenRatio)} jUSD</span> : <Skeleton width="120px" />}
             </Typography>
             <Typography variant="caption" className="swap-info-paragraph">
               Protocol swap fee:
-              <span>
-                0.09% {/* TODO: issue with next */}
-                {/* <Divider
+              {selectedToken ? (
+                <span>
+                  {displayPercentage(PROTOCOL_SWAP_FEE)} {/* TODO: issue with next */}
+                  {/* <Divider
               orientation="vertical"
               sx={{
                 margin: '0 5px',
@@ -158,11 +169,19 @@ const Swap = () => {
                 height: '15px',
               }}
             /> */}
-                | 0.0022 jUSD
-              </span>
+                  | {!isNaN(jUSDSwapAmount) ? `${roundCurrency(jUSDSwapAmount * PROTOCOL_SWAP_FEE)} jUSD` : '-'}
+                </span>
+              ) : (
+                <div style={{ display: 'flex', alignItems: 'center', gap: 5, width: 120 }}>
+                  <Skeleton width="55px" />
+                  |
+                  <Skeleton width="55px" />
+                </div>
+              )}
             </Typography>
             <Typography variant="caption" className="swap-info-paragraph">
-              Resulting pool slippage: <span>2 %</span>
+              Resulting pool slippage:
+              {selectedToken ? <span>{displayPercentage(RESULTING_POOL_SLIPPAGE)}</span> : <Skeleton width="120px" />}
             </Typography>
           </div>
 

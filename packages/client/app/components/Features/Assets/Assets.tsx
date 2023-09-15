@@ -77,6 +77,13 @@ function Assets() {
     }
   };
 
+  useEffect(() => {
+    if (tokens.length && !selectedToken) {
+      // Selectes the first token which is usually a favorited or just the first
+      setSelectedToken(tokens[0]);
+    }
+  }, [tokens, setSelectedToken, selectedToken]);
+
   return (
     <FeatureBox
       title="Assets"

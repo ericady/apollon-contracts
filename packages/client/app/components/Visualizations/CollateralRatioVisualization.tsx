@@ -136,8 +136,8 @@ function CollateralRatioVisualization({
       </Box>
 
       <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 2 }}>
-        <Typography variant="titleAlternate">{displayPercentage(scaleMin, 'none', 0)}</Typography>
-        <Typography variant="titleAlternate">{displayPercentage(scaleMax, 'none', 0)}</Typography>
+        <Typography variant="titleAlternate">{displayPercentage(scaleMin, 'default', 0)}</Typography>
+        <Typography variant="titleAlternate">{displayPercentage(scaleMax, 'default', 0)}</Typography>
       </div>
     </>
   );

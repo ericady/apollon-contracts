@@ -12,16 +12,20 @@ export const roundCurrency = (value: number, decimals = 2, minDecimals = 2) => {
   return formatter.format(Math.round(value * Math.pow(10, decimals)) / Math.pow(10, decimals));
 };
 
+export const roundNumber = (value: number, decimals = 2) => {
+  return Math.round(value * Math.pow(10, decimals)) / Math.pow(10, decimals);
+};
+
 export const percentageChange = (newValue: number, oldValue: number) => {
   return (newValue - oldValue) / oldValue;
 };
 
 export const displayPercentage = (
   value: number,
-  omitLabel: 'omit' | 'positive' | 'none' = 'none',
+  omitLabel: 'omit' | 'positive' | 'default' = 'default',
   decimals: number = 2,
 ) => {
-  return omitLabel === 'none'
+  return omitLabel === 'omit'
     ? `${roundCurrency(value * 100, decimals, decimals)}`
     : omitLabel === 'positive'
     ? `${value > 0 ? '+' : ''}${roundCurrency(value * 100, decimals, decimals)} %`

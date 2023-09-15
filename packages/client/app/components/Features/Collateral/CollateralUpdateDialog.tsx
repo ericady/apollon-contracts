@@ -243,7 +243,7 @@ const CollateralUpdateDialog = ({ collateralData, buttonVariant, buttonSx = {} }
                         fontSize: '20px',
                       }}
                     >
-                      {displayPercentage(1.56, 'none', 0)}
+                      {displayPercentage(1.56, 'default', 0)}
                     </Typography>
                     <ArrowForwardIosIcon sx={{ color: '#46434F', fontSize: '18px' }} />
                     <Typography
@@ -254,7 +254,7 @@ const CollateralUpdateDialog = ({ collateralData, buttonVariant, buttonSx = {} }
                         fontSize: '20px',
                       }}
                     >
-                      {displayPercentage(1.43, 'none', 0)}
+                      {displayPercentage(1.43, 'default', 0)}
                     </Typography>
                   </div>
                 </Box>

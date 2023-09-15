@@ -1,7 +1,7 @@
 'use client';
 
 import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
-import { Box } from '@mui/material';
+import { Box, Skeleton } from '@mui/material';
 import Button from '@mui/material/Button';
 import InputAdornment from '@mui/material/InputAdornment';
 import Tab from '@mui/material/Tab';
@@ -16,6 +16,9 @@ import FeatureBox from '../../FeatureBox/FeatureBox';
 import NumberInput from '../../FormControls/NumberInput';
 import Label from '../../Label/Label';
 import CollateralRatioVisualization from '../../Visualizations/CollateralRatioVisualization';
+
+export const SLIPPAGE = 0.0053;
+export const PROTOCOL_FEE = 0.02;
 
 type FieldValues = {
   farmShortValue: string;
@@ -105,18 +108,24 @@ const Farm = () => {
             <div style={{ padding: '10px 0' }}>
               <Typography variant="titleAlternate" color="primary.contrastText" className="swap-info-paragraph">
                 Position size:
-                <span>
-                  {!isNaN(watchFarmShortValue) ? `${roundCurrency(watchFarmShortValue * tokenRatio)} jUSD` : '-'}
-                </span>
+                {selectedToken ? (
+                  <span>
+                    {!isNaN(watchFarmShortValue) ? `${roundCurrency(watchFarmShortValue * tokenRatio)} jUSD` : '-'}
+                  </span>
+                ) : (
+                  <Skeleton width="120px" />
+                )}
               </Typography>
               <Typography variant="caption" className="swap-info-paragraph">
-                Price per unit: <span>{selectedToken ? `${roundCurrency(tokenRatio)} jUSD` : '-'}</span>
+                Price per unit:
+                <span>{selectedToken ? `${roundCurrency(tokenRatio)} jUSD` : <Skeleton width="120px" />}</span>
               </Typography>
               <Typography variant="caption" className="swap-info-paragraph">
                 Protocol fee:
-                <span>
-                  0.2% |
-                  {/* <Divider
+                {selectedToken ? (
+                  <span>
+                    {displayPercentage(PROTOCOL_FEE)} |
+                    {/* <Divider
                     orientation="vertical"
                     sx={{
                       margin: '0 5px',
@@ -124,11 +133,20 @@ const Farm = () => {
                       height: '15px',
                     }}
                   /> */}{' '}
-                  423 jUSD
-                </span>
+                    {!isNaN(watchFarmShortValue)
+                      ? `${roundCurrency(watchFarmShortValue * tokenRatio * PROTOCOL_FEE)} jUSD`
+                      : '-'}
+                  </span>
+                ) : (
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 5, width: 120 }}>
+                    <Skeleton width="55px" />
+                    |
+                    <Skeleton width="55px" />
+                  </div>
+                )}
               </Typography>
               <Typography variant="caption" className="swap-info-paragraph">
-                Slippage: <span>0.53 %</span>
+                Slippage: {selectedToken ? <span>{displayPercentage(SLIPPAGE)}</span> : <Skeleton width="120px" />}
               </Typography>
             </div>
 
@@ -155,7 +173,7 @@ const Farm = () => {
               fontSize: '20px',
             }}
           >
-            {displayPercentage(1.56, 'none', 0)}
+            {displayPercentage(1.56, 'default', 0)}
           </Typography>
           <ArrowForwardIosIcon sx={{ color: '#46434F', fontSize: '18px' }} />
           <Typography
@@ -166,7 +184,7 @@ const Farm = () => {
               fontSize: '20px',
             }}
           >
-            {displayPercentage(1.43, 'none', 0)}
+            {displayPercentage(1.43, 'default', 0)}
           </Typography>
         </div>
       </Box>

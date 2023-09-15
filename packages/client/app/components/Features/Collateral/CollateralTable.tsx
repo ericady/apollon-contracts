@@ -11,7 +11,7 @@ import { useMemo } from 'react';
 import { useEthers } from '../../../context/EthersProvider';
 import { GetCollateralTokensQuery, GetCollateralTokensQueryVariables } from '../../../generated/gql-types';
 import { GET_BORROWER_COLLATERAL_TOKENS } from '../../../queries';
-import { displayPercentage, roundCurrency } from '../../../utils/math';
+import { displayPercentage, roundCurrency, roundNumber } from '../../../utils/math';
 import Label from '../../Label/Label';
 import HeaderCell from '../../Table/HeaderCell';
 import CollateralPieVisualization from '../../Visualizations/CollateralPieVisualization';
@@ -56,7 +56,7 @@ function CollateralTable() {
         .map((token) => ({
           ...token,
           chartColor: colorPalette.shift(),
-          troveValueUSD: parseFloat(roundCurrency(token.troveLockedAmount ?? 0 * token.token.priceUSD)),
+          troveValueUSD: roundNumber(token.troveLockedAmount ?? 0 * token.token.priceUSD),
         })) ?? []
     );
   }, [data]);
@@ -79,7 +79,7 @@ function CollateralTable() {
               <Typography
                 sx={{ fontFamily: 'Space Grotesk Variable', color: 'info.main', fontWeight: '700', fontSize: '20px' }}
               >
-                {displayPercentage(1.74, 'none', 0)}
+                {displayPercentage(1.74, 'default', 0)}
               </Typography>
 
               <img
