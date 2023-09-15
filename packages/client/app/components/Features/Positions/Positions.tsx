@@ -27,6 +27,8 @@ const Positions = () => {
         isOpen: true,
         cursor: null,
       },
+      // Guest mode. Avoid hitting the API with invalid parameters.
+      skip: !address,
     },
   );
   const { data: closedPositions } = useQuery<GetBorrowerPositionsQuery, GetBorrowerPositionsQueryVariables>(
@@ -37,6 +39,8 @@ const Positions = () => {
         isOpen: false,
         cursor: null,
       },
+      // Guest mode. Avoid hitting the API with invalid parameters.
+      skip: !address,
     },
   );
 
@@ -70,7 +74,7 @@ const Positions = () => {
       >
         <Tabs value={tabValue} onChange={handleChange}>
           <Tab label="BALANCE" value="BALANCE" disableRipple />
-          <Tab label="COLLATERAL" value="COLLATERAL" disableRipple />
+          <Tab label="COLLATERAL" value="COLLATERAL" disableRipple disabled={!address} />
           <Tab
             value="POSITIONS"
             label={
@@ -80,6 +84,7 @@ const Positions = () => {
               </span>
             }
             disableRipple
+            disabled={!address}
           />
           <Tab
             value="HISTORY"
@@ -90,6 +95,7 @@ const Positions = () => {
               </span>
             }
             disableRipple
+            disabled={!address}
           />
         </Tabs>
       </Box>

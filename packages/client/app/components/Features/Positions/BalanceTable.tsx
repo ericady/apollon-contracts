@@ -43,19 +43,25 @@ function BalanceTable() {
             </TableRow>
           </TableHead>
           <TableBody>
-            {poolToken.map(({ token, walletAmount }) => (
-              <TableRow hover key={token.address}>
-                <TableCell>{displayPercentage((walletAmount! * token.priceUSD) / totalValue)}</TableCell>
-                <TableCell align="right">
-                  <Typography sx={{ color: 'primary.contrastText' }}>{stdFormatter.format(walletAmount!)}</Typography>
-                </TableCell>
-                <TableCell>
-                  <Label variant="none">{token.symbol}</Label>
-                </TableCell>
-                <TableCell align="right">{roundCurrency(walletAmount! * token.priceUSD)} $</TableCell>
-                <TableCell align="right">{stdFormatter.format(token.priceUSD)} $</TableCell>
-              </TableRow>
-            ))}
+            {poolToken.map(({ token, walletAmount }) => {
+              return (
+                <TableRow hover key={token.address}>
+                  <TableCell>
+                    {totalValue !== 0
+                      ? displayPercentage((walletAmount! * token.priceUSD) / totalValue)
+                      : displayPercentage(0)}
+                  </TableCell>
+                  <TableCell align="right">
+                    <Typography sx={{ color: 'primary.contrastText' }}>{stdFormatter.format(walletAmount!)}</Typography>
+                  </TableCell>
+                  <TableCell>
+                    <Label variant="none">{token.symbol}</Label>
+                  </TableCell>
+                  <TableCell align="right">{roundCurrency(walletAmount! * token.priceUSD)} $</TableCell>
+                  <TableCell align="right">{stdFormatter.format(token.priceUSD)} $</TableCell>
+                </TableRow>
+              );
+            })}
           </TableBody>
         </Table>
       </TableContainer>
@@ -74,7 +80,11 @@ function BalanceTable() {
           <TableBody>
             {nonPoolToken.map(({ token, walletAmount }) => (
               <TableRow hover key={token.address}>
-                <TableCell>{displayPercentage((walletAmount! * token.priceUSD) / totalValue)}</TableCell>
+                <TableCell>
+                  {totalValue !== 0
+                    ? displayPercentage((walletAmount! * token.priceUSD) / totalValue)
+                    : displayPercentage(0)}
+                </TableCell>
                 <TableCell align="right">
                   <Typography sx={{ color: 'primary.contrastText' }}>{stdFormatter.format(walletAmount!)}</Typography>
                 </TableCell>

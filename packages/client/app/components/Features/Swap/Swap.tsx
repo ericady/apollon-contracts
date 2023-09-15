@@ -6,6 +6,7 @@ import InputAdornment from '@mui/material/InputAdornment';
 import Typography from '@mui/material/Typography';
 import { ChangeEvent, useState } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
+import { useEthers } from '../../../context/EthersProvider';
 import { useSelectedToken } from '../../../context/SelectedTokenProvider';
 import { displayPercentage, roundCurrency, roundNumber } from '../../../utils/math';
 import InfoButton from '../../Buttons/InfoButton';
@@ -26,6 +27,8 @@ const Swap = () => {
   const [showSlippage, setShowSlippage] = useState(false);
   const [tradingDirection, setTradingDirection] = useState<'jUSDSpent' | 'jUSDAquired'>('jUSDSpent');
 
+  const { address } = useEthers();
+
   const methods = useForm<FieldValues>({
     defaultValues: {
       jUSDAmount: '',
@@ -39,10 +42,7 @@ const Swap = () => {
   const { selectedToken, tokenRatio } = useSelectedToken();
 
   const handleSwapValueChange = (variant: 'JUSD' | 'Token', value: string) => {
-    console.log('value: ', value);
     const numericValue = parseFloat(value);
-
-    console.log('numericValue: ', numericValue);
 
     if (variant === 'JUSD') {
       if (!isNaN(numericValue)) {
@@ -185,7 +185,11 @@ const Swap = () => {
             </Typography>
           </div>
 
-          <InfoButton title="SWAP" description="The final values will be calculated after the swap." />
+          <InfoButton
+            title="SWAP"
+            description="The final values will be calculated after the swap."
+            disabled={!address}
+          />
         </form>
       </FormProvider>
     </FeatureBox>

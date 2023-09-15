@@ -20,13 +20,14 @@ type Props = {
   collateralData: GetCollateralTokensQuery;
   buttonVariant: ButtonProps['variant'];
   buttonSx?: ButtonProps['sx'];
+  disabled?: boolean;
 };
 
 type FieldValues = {
   etherTokenAmount: string;
 };
 
-const CollateralUpdateDialog = ({ collateralData, buttonVariant, buttonSx = {} }: Props) => {
+const CollateralUpdateDialog = ({ collateralData, buttonVariant, buttonSx = {}, disabled = false }: Props) => {
   const [isOpen, setIsOpen] = useState(false);
   const [tabValue, setTabValue] = useState<'DEPOSIT' | 'WITHDRAW'>('DEPOSIT');
 
@@ -73,6 +74,7 @@ const CollateralUpdateDialog = ({ collateralData, buttonVariant, buttonSx = {} }
           ...buttonSx,
         }}
         onClick={() => setIsOpen(true)}
+        disabled={disabled}
       >
         Update
       </Button>

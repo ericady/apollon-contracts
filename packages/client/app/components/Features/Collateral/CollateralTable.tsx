@@ -103,7 +103,7 @@ function CollateralTable() {
                 Update
               </Button>
             ) : (
-              <CollateralUpdateDialog collateralData={data} buttonVariant="outlined" />
+              <CollateralUpdateDialog collateralData={data} buttonVariant="outlined" disabled={!address} />
             )}
           </div>
           <CollateralRatioVisualization criticalRatio={1.1} newRatio={1.5} oldRatio={1.74} />

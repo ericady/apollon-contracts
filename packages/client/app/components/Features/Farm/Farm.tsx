@@ -9,6 +9,7 @@ import Tabs from '@mui/material/Tabs';
 import Typography from '@mui/material/Typography';
 import { useState } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
+import { useEthers } from '../../../context/EthersProvider';
 import { useSelectedToken } from '../../../context/SelectedTokenProvider';
 import { displayPercentage, roundCurrency } from '../../../utils/math';
 import InfoButton from '../../Buttons/InfoButton';
@@ -28,6 +29,8 @@ type FieldValues = {
 const Farm = () => {
   const [tabValue, setTabValue] = useState<'Long' | 'Short'>('Long');
   const [showSlippage, setShowSlippage] = useState(false);
+
+  const { address } = useEthers();
 
   const methods = useForm<FieldValues>({
     defaultValues: {
@@ -150,7 +153,11 @@ const Farm = () => {
               </Typography>
             </div>
 
-            <InfoButton title="EXECUTE" description="The final values will be calculated after the swap." />
+            <InfoButton
+              title="EXECUTE"
+              description="The final values will be calculated after the swap."
+              disabled={!address}
+            />
           </div>
         </form>
       </FormProvider>
@@ -189,7 +196,7 @@ const Farm = () => {
         </div>
       </Box>
 
-      <CollateralRatioVisualization criticalRatio={1.1} newRatio={1.43} oldRatio={1.56} />
+      <CollateralRatioVisualization criticalRatio={1.1} newRatio={1.43} oldRatio={1.56} loading={!address} />
     </FeatureBox>
   );
 };

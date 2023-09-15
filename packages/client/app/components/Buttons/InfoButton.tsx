@@ -3,12 +3,13 @@ import { Button, Typography } from '@mui/material';
 type Props = {
   title: string;
   description: string;
+  disabled?: boolean;
 };
 
-function InfoButton({ title, description }: Props) {
+function InfoButton({ title, description, disabled = false }: Props) {
   return (
     <div>
-      <Button variant="outlined" type="submit">
+      <Button variant="outlined" type="submit" disabled={disabled}>
         {title}
       </Button>
       <Typography

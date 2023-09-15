@@ -285,38 +285,56 @@ export const handlers = [
     GET_BORROWER_DEBT_TOKENS,
     (req, res, ctx) => {
       const { borrower } = req.variables;
-      if (!borrower) {
-        throw new Error('Borrower address is required');
+
+      if (borrower) {
+        // All the usual tokens and the borrower specific debt tokens
+        const borrowerAddresses = debtTokens.map(({ token }) => token.address);
+        const tokensWithBorrowerDebtTokens: Query['getDebtTokens'] = debtTokens.concat(
+          tokens
+            .filter(({ address }) => !borrowerAddresses.includes(address))
+            .map<DebtTokenMeta>((token) => {
+              return {
+                token: token,
+                walletAmount: null,
+                troveMintedAmount: null,
+                stabilityLostAmount: null,
+                stabilityCompoundAmount: null,
+
+                totalDepositedStability: parseFloat(faker.finance.amount(1000, 5000, 2)),
+                totalReserve: parseFloat(faker.finance.amount(1000, 5000, 2)),
+                totalReserve24hAgo: parseFloat(faker.finance.amount(1000, 5000, 2)),
+                totalSupplyUSD: parseFloat(faker.finance.amount(10000, 50000, 2)),
+                totalSupplyUSD24hAgo: parseFloat(faker.finance.amount(10000, 50000, 2)),
+                stabilityDepositAPY: faker.number.float({ min: 0, max: 10, precision: 0.0001 }) / 100,
+              };
+            }),
+        );
+
+        return res(ctx.data({ getDebtTokens: tokensWithBorrowerDebtTokens }));
+      } else {
+        const tokensWithoutBorrower = tokens.map<DebtTokenMeta>((token) => {
+          return {
+            token: token,
+            walletAmount: null,
+            troveMintedAmount: null,
+            stabilityLostAmount: null,
+            stabilityCompoundAmount: null,
+
+            totalDepositedStability: parseFloat(faker.finance.amount(1000, 5000, 2)),
+            totalReserve: parseFloat(faker.finance.amount(1000, 5000, 2)),
+            totalReserve24hAgo: parseFloat(faker.finance.amount(1000, 5000, 2)),
+            totalSupplyUSD: parseFloat(faker.finance.amount(10000, 50000, 2)),
+            totalSupplyUSD24hAgo: parseFloat(faker.finance.amount(10000, 50000, 2)),
+            stabilityDepositAPY: faker.number.float({ min: 0, max: 10, precision: 0.0001 }) / 100,
+          };
+        });
+
+        return res(ctx.data({ getDebtTokens: tokensWithoutBorrower }));
       }
-
-      // All the usual tokens and the borrower specific debt tokens
-      const borrowerAddresses = debtTokens.map(({ token }) => token.address);
-      const tokensWithBorrowerDebtTokens: Query['getDebtTokens'] = debtTokens.concat(
-        tokens
-          .filter(({ address }) => !borrowerAddresses.includes(address))
-          .map<DebtTokenMeta>((token) => {
-            return {
-              token: token,
-              walletAmount: null,
-              troveMintedAmount: null,
-              stabilityLostAmount: null,
-              stabilityCompoundAmount: null,
-
-              totalDepositedStability: parseFloat(faker.finance.amount(1000, 5000, 2)),
-              totalReserve: parseFloat(faker.finance.amount(1000, 5000, 2)),
-              totalReserve24hAgo: parseFloat(faker.finance.amount(1000, 5000, 2)),
-              totalSupplyUSD: parseFloat(faker.finance.amount(10000, 50000, 2)),
-              totalSupplyUSD24hAgo: parseFloat(faker.finance.amount(10000, 50000, 2)),
-              stabilityDepositAPY: faker.number.float({ min: 0, max: 10, precision: 0.0001 }) / 100,
-            };
-          }),
-      );
-
-      return res(ctx.data({ getDebtTokens: tokensWithBorrowerDebtTokens }));
     },
   ),
 
-  // GetBorrowerCollateralTokens
+  // GetCollateralTokens
   graphql.query<{ getCollateralTokens: Query['getCollateralTokens'] }, QueryGetCollateralTokensArgs>(
     GET_BORROWER_COLLATERAL_TOKENS,
     (req, res, ctx) => {
