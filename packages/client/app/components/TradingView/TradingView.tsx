@@ -2,6 +2,7 @@
 
 import { ChartOptions, ColorType, CrosshairMode, LineStyle, createChart } from 'lightweight-charts';
 import { useEffect } from 'react';
+import TradingViewHeader from './TradingViewHeader';
 import areaSeriesDemoData from './areaSeriesDemoData.json';
 import candleStickSeriesDemoData from './candleStickSeriesDemoData.json';
 
@@ -72,13 +73,17 @@ function TradingView() {
   }, []);
 
   return (
-    <div
-      // Must have the height fixed in order to resize properly. We adapt via a CSS custom property.
-      style={{ height: 'calc(100vh - 52px - var(--apollon-drag-queen-height, 330px))', width: '100%' }}
-      id="apollon-trading-view-container"
-    >
-      <div style={{ height: '100%' }} id="apollon-trading-view"></div>
-    </div>
+    <>
+      <TradingViewHeader />
+      <div
+        // Must have the height fixed in order to resize properly. We adapt via a CSS custom property.
+        // Whole screen - navigation - TV header - current table size - resize handler
+        style={{ height: 'calc(100vh - 48px - 74px - var(--apollon-drag-queen-height, 330px) - 25px)', width: '100%' }}
+        id="apollon-trading-view-container"
+      >
+        <div style={{ height: '100%' }} id="apollon-trading-view"></div>
+      </div>
+    </>
   );
 }
 

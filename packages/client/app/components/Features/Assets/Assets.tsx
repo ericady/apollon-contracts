@@ -43,7 +43,7 @@ function Assets() {
 
     // get token address from local storage and set isFavorite if it is present
     return jUSDPools
-      .map(({ liquidity, openingFee }) => {
+      .map(({ liquidity, openingFee, volume24hUSD }) => {
         const [tokenA, tokenB] = liquidity;
         const token = tokenA.token.symbol === JUSD_SYMBOL ? tokenB.token : tokenA.token;
 
@@ -53,12 +53,11 @@ function Assets() {
           // calculate change over last 24h
           change: (token.priceUSD - token.priceUSD24hAgo) / token.priceUSD24hAgo,
           isFavorite: favoritedAssets.find((address) => token.address === address) !== undefined ? true : false,
+          volume24hUSD,
         };
       })
       .sort((a) => (a.isFavorite ? -1 : 1));
   }, [data, favoritedAssets]);
-
-  if (!tokens) return null;
 
   const toggleFavorite = (address: string) => {
     const favoritedAssetsFromLS: string[] = JSON.parse(
@@ -85,7 +84,7 @@ function Assets() {
       border="bottom"
       isDraggable={{ y: '0', gsHeight: '22', gsWidth: '1', id: 'apollon-assets-widget' }}
     >
-      {!data ? (
+      {!tokens ? (
         <AssetsLoader />
       ) : (
         <TableContainer sx={{ maxHeight: 170, overflowY: 'scroll' }}>

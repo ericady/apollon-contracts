@@ -5,6 +5,7 @@ export const GET_ALL_POOLS = gql`
     getPools {
       id
       openingFee
+      volume24hUSD
       liquidity {
         token {
           address

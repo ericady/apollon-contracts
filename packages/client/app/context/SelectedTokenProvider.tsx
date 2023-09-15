@@ -14,6 +14,7 @@ export type SelectedToken = {
   symbol: string;
   priceUSD: number;
   priceUSD24hAgo: number;
+  volume24hUSD: number;
 };
 
 export const SelectedTokenContext = createContext<{
