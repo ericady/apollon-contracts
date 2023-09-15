@@ -124,7 +124,7 @@ function Assets() {
                     </TableCell>
                     <TableCell sx={{ p: 0.5 }} align="right" width={60}>
                       <Typography fontWeight={400} sx={{ color: openingFee > 0 ? 'success.main' : 'error.main' }}>
-                        {displayPercentage(openingFee, true)}
+                        {displayPercentage(openingFee, 'omit')}
                       </Typography>
                     </TableCell>
                     <TableCell sx={{ p: 0.5 }} align="right" width={80}>

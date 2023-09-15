@@ -68,7 +68,7 @@ function LiquidityPoolsTable({ selectedPool, setSelectedPool }: Props) {
               <HeaderCell title="" />
               <HeaderCell title="APY" cellProps={{ align: 'right' }} />
               <HeaderCell title="" />
-              <HeaderCell title="24h Volume" />
+              <HeaderCell title="24h Volume" cellProps={{ align: 'right' }} />
             </TableRow>
           </TableHead>
 
@@ -143,15 +143,15 @@ function LiquidityPoolsTable({ selectedPool, setSelectedPool }: Props) {
                   </TableCell>
                   <TableCell align="right">{displayPercentage(liquidityDepositAPY)}</TableCell>
 
-                  <TableCell align="right" sx={{ pr: 0, pl: 0, width: '50px', maxWidth: '200px' }}>
+                  <TableCell align="right" sx={{ pr: 0, pl: 1, width: '50px', maxWidth: '200px' }}>
                     <Typography variant="caption" noWrap>
                       {stdFormatter.format(volume24hUSD)} $
                     </Typography>
                   </TableCell>
-                  <TableCell align="left" width={130}>
-                    <div className="flex">
+                  <TableCell align="right" width={130}>
+                    <div className="flex" style={{ justifyContent: 'flex-end' }}>
                       <Typography sx={{ color: volumeChange > 0 ? 'success.main' : 'error.main', fontWeight: '400' }}>
-                        {displayPercentage(volumeChange)}
+                        {displayPercentage(volumeChange, 'positive')}
                       </Typography>
                       <DirectionIcon showIncrease={volumeChange > 0} />
                     </div>

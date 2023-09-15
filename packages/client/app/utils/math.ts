@@ -16,8 +16,14 @@ export const percentageChange = (newValue: number, oldValue: number) => {
   return (newValue - oldValue) / oldValue;
 };
 
-export const displayPercentage = (value: number, omitLabel = false, decimals: number = 2) => {
-  return omitLabel
+export const displayPercentage = (
+  value: number,
+  omitLabel: 'omit' | 'positive' | 'none' = 'none',
+  decimals: number = 2,
+) => {
+  return omitLabel === 'none'
     ? `${roundCurrency(value * 100, decimals, decimals)}`
+    : omitLabel === 'positive'
+    ? `${value > 0 ? '+' : ''}${roundCurrency(value * 100, decimals, decimals)} %`
     : `${roundCurrency(value * 100, decimals, decimals)} %`;
 };

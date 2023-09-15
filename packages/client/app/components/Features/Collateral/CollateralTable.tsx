@@ -79,7 +79,7 @@ function CollateralTable() {
               <Typography
                 sx={{ fontFamily: 'Space Grotesk Variable', color: 'info.main', fontWeight: '700', fontSize: '20px' }}
               >
-                {displayPercentage(1.74, false, 0)}
+                {displayPercentage(1.74, 'none', 0)}
               </Typography>
 
               <img
