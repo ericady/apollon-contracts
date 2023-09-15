@@ -102,7 +102,7 @@ const StabilityUpdateDialog = () => {
             >
               <Tabs value={tabValue} onChange={handleChange} variant="fullWidth" sx={{ mt: 2 }}>
                 <Tab label="DEPOSIT" value="DEPOSIT" />
-                <Tab label="WITHDRAW" value="WITHDRAW" />
+                <Tab label="WITHDRAW" value="WITHDRAW" disabled={!address} />
               </Tabs>
 
               <div style={{ overflowY: 'scroll', maxHeight: '60vh' }}>
@@ -221,7 +221,7 @@ const StabilityUpdateDialog = () => {
                 p: '30px 20px',
               }}
             >
-              <Button type="submit" variant="outlined" sx={{ borderColor: '#fff' }}>
+              <Button type="submit" variant="outlined" sx={{ borderColor: 'primary.contrastText' }} disabled={!address}>
                 Update
               </Button>
             </DialogActions>

@@ -109,11 +109,16 @@ function StabilityPoolTable() {
                 <TableCell sx={{ borderBottom: 'none' }}></TableCell>
                 <TableCell sx={{ borderBottom: 'none' }}></TableCell>
                 <TableCell sx={{ borderBottom: 'none' }}></TableCell>
+
                 <TableCell sx={{ borderBottom: 'none' }}>
-                  + {displayPercentage(percentageChange(rewardsTotalInUSD, lossTotalInUSD))}{' '}
-                  <span style={{ whiteSpace: 'nowrap' }}>
-                    (≈ {roundCurrency(rewardsTotalInUSD - lossTotalInUSD)} $)
-                  </span>
+                  {address
+                    ? `+ ${displayPercentage(percentageChange(rewardsTotalInUSD, lossTotalInUSD))}
+                    ${(
+                      <span style={{ whiteSpace: 'nowrap' }}>
+                        (≈ {roundCurrency(rewardsTotalInUSD - lossTotalInUSD)} $)
+                      </span>
+                    )}`
+                    : null}
                 </TableCell>
               </TableRow>
             </TableBody>
@@ -126,7 +131,7 @@ function StabilityPoolTable() {
             <StabilityUpdateDialog />
           </div>
 
-          <Button variant="outlined" sx={{ marginY: '10px' }}>
+          <Button variant="outlined" sx={{ marginY: '10px' }} disabled={!address}>
             CLAIM
           </Button>
         </div>

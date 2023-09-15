@@ -27,19 +27,21 @@ function LiquidityPoolsTable({ selectedPool, setSelectedPool }: Props) {
   const { address } = useEthers();
 
   const { data: allPoolsData } = useQuery<GetLiquidityPoolsQuery, GetLiquidityPoolsQueryVariables>(GET_LIQUIDITY_POOLS);
-  const { data: borrowerPoolsData } = useQuery<GetBorrowerLiquidityPoolsQuery, GetBorrowerLiquidityPoolsQueryVariables>(
-    GET_BORROWER_LIQUIDITY_POOLS,
-    { variables: { borrower: address } },
-  );
+  const { data: borrowerPoolsData, loading } = useQuery<
+    GetBorrowerLiquidityPoolsQuery,
+    GetBorrowerLiquidityPoolsQueryVariables
+  >(GET_BORROWER_LIQUIDITY_POOLS, { variables: { borrower: address }, skip: !address });
 
-  if (!allPoolsData || !borrowerPoolsData) return <LiquidityPoolsTableLoader />;
+  if (!allPoolsData || (!borrowerPoolsData && loading)) return <LiquidityPoolsTableLoader />;
 
   // filter out all the pools in borrowerPoolsData.getPools that are already included in borrowerPoolsData.getPools.
-  const allPoolsCombined = borrowerPoolsData.getPools.concat(
-    allPoolsData.getPools.filter(
-      (allPool) => !borrowerPoolsData.getPools.find((borrowerPool) => allPool.id === borrowerPool.id),
-    ),
-  );
+  const allPoolsCombined: GetBorrowerLiquidityPoolsQuery['getPools'] = borrowerPoolsData
+    ? borrowerPoolsData.getPools.concat(
+        allPoolsData.getPools.filter(
+          (allPool) => !borrowerPoolsData.getPools.find((borrowerPool) => allPool.id === borrowerPool.id),
+        ),
+      )
+    : allPoolsData.getPools;
 
   // Select first pool by default
   if (!selectedPool && allPoolsCombined.length > 0) {
@@ -94,6 +96,7 @@ function LiquidityPoolsTable({ selectedPool, setSelectedPool }: Props) {
                     align="right"
                     sx={{
                       borderLeft: selectedPool?.id === id ? '2px solid #33B6FF' : 'none',
+                      pl: selectedPool?.id === id ? 0 : 2,
                     }}
                   >
                     <Typography fontWeight={400}>

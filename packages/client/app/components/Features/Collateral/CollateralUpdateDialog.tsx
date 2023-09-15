@@ -9,6 +9,7 @@ import Tabs from '@mui/material/Tabs';
 import Typography from '@mui/material/Typography';
 import { SyntheticEvent, useState } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
+import { useEthers } from '../../../context/EthersProvider';
 import { useWallet } from '../../../context/WalletProvider';
 import { GetCollateralTokensQuery } from '../../../generated/gql-types';
 import { displayPercentage, roundCurrency } from '../../../utils/math';
@@ -32,6 +33,7 @@ const CollateralUpdateDialog = ({ collateralData, buttonVariant, buttonSx = {}, 
   const [tabValue, setTabValue] = useState<'DEPOSIT' | 'WITHDRAW'>('DEPOSIT');
 
   const { etherAmount } = useWallet();
+  const { address } = useEthers();
 
   const methods = useForm<FieldValues>({
     defaultValues: {
@@ -74,7 +76,6 @@ const CollateralUpdateDialog = ({ collateralData, buttonVariant, buttonSx = {}, 
           ...buttonSx,
         }}
         onClick={() => setIsOpen(true)}
-        disabled={disabled}
       >
         Update
       </Button>
@@ -123,7 +124,7 @@ const CollateralUpdateDialog = ({ collateralData, buttonVariant, buttonSx = {}, 
             >
               <Tabs value={tabValue} onChange={handleChange} variant="fullWidth" sx={{ mt: 2 }}>
                 <Tab label="DEPOSIT" value="DEPOSIT" />
-                <Tab label="WITHDRAW" value="WITHDRAW" />
+                <Tab label="WITHDRAW" value="WITHDRAW" disabled={!address} />
               </Tabs>
 
               <div style={{ display: 'flex', justifyContent: 'space-between', padding: 20, height: 114 }}>
@@ -261,7 +262,7 @@ const CollateralUpdateDialog = ({ collateralData, buttonVariant, buttonSx = {}, 
                   </div>
                 </Box>
 
-                <CollateralRatioVisualization criticalRatio={1.1} newRatio={1.43} oldRatio={1.56} />
+                <CollateralRatioVisualization criticalRatio={1.1} newRatio={1.43} oldRatio={1.56} loading={!address} />
               </Box>
             </DialogContent>
             <DialogActions
@@ -272,7 +273,7 @@ const CollateralUpdateDialog = ({ collateralData, buttonVariant, buttonSx = {}, 
                 p: '30px 20px',
               }}
             >
-              <Button type="submit" variant="outlined" sx={{ borderColor: '#fff' }}>
+              <Button type="submit" variant="outlined" sx={{ borderColor: 'primary.contrastText' }} disabled={!address}>
                 Update
               </Button>
             </DialogActions>

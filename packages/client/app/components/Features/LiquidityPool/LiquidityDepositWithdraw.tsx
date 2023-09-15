@@ -8,6 +8,7 @@ import Tabs from '@mui/material/Tabs';
 import Typography from '@mui/material/Typography';
 import { SyntheticEvent, useEffect, useState } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
+import { useEthers } from '../../../context/EthersProvider';
 import { GetBorrowerLiquidityPoolsQuery } from '../../../generated/gql-types';
 import { displayPercentage, roundCurrency } from '../../../utils/math';
 import FeatureBox from '../../FeatureBox/FeatureBox';
@@ -27,6 +28,8 @@ type FieldValues = {
 function LiquidityDepositWithdraw({ selectedPool }: Props) {
   const { liquidity } = selectedPool;
   const [tokenA, tokenB] = liquidity;
+
+  const { address } = useEthers();
 
   const [tabValue, setTabValue] = useState<'DEPOSIT' | 'WITHDRAW'>('DEPOSIT');
 
@@ -254,11 +257,11 @@ function LiquidityDepositWithdraw({ selectedPool }: Props) {
                 </Typography>
               </div>
             </Box>
-            <CollateralRatioVisualization criticalRatio={1.1} newRatio={1.43} oldRatio={1.74} />
+            <CollateralRatioVisualization criticalRatio={1.1} newRatio={1.43} oldRatio={1.74} loading={!address} />
           </Box>
 
           <div style={{ padding: '20px' }}>
-            <Button type="submit" variant="outlined" sx={{ borderColor: '#fff' }}>
+            <Button type="submit" variant="outlined" sx={{ borderColor: 'primary.contrastText' }} disabled={!address}>
               UPDATE
             </Button>
           </div>

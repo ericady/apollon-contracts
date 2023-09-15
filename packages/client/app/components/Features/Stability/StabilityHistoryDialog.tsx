@@ -29,6 +29,7 @@ const StabilityHistoryDialog = () => {
       variables: {
         borrower: address,
       },
+      skip: !address,
     },
   );
 
@@ -67,11 +68,9 @@ const StabilityHistoryDialog = () => {
     });
   };
 
-  if (!data) return null;
-
   return (
     <>
-      <Button onClick={() => setOpen(true)} variant="contained">
+      <Button onClick={() => setOpen(true)} variant="contained" disabled={!address}>
         History
       </Button>
 
