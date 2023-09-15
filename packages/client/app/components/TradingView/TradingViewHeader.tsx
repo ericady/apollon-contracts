@@ -1,6 +1,6 @@
 import { Box, Typography } from '@mui/material';
 import { useSelectedToken } from '../../context/SelectedTokenProvider';
-import { roundCurrency } from '../../utils/math';
+import { displayPercentage, roundCurrency } from '../../utils/math';
 
 function TradingViewHeader() {
   const { selectedToken } = useSelectedToken();
@@ -28,16 +28,19 @@ function TradingViewHeader() {
         />
 
         <Typography variant="titleAlternate">
-          O <Box sx={{ color: 'text.primary', display: 'inline' }}>-</Box>
+          Pool <Box sx={{ color: 'text.primary', display: 'inline' }}>-</Box>
         </Typography>
         <Typography variant="titleAlternate">
-          H <Box sx={{ color: 'text.primary', display: 'inline' }}>-</Box>
+          Oracle <Box sx={{ color: 'text.primary', display: 'inline' }}>-</Box>
         </Typography>
         <Typography variant="titleAlternate">
-          L <Box sx={{ color: 'text.primary', display: 'inline' }}>-</Box>
+          Premium <Box sx={{ color: 'text.primary', display: 'inline' }}>-</Box>
         </Typography>
         <Typography variant="titleAlternate">
-          C <Box sx={{ color: 'text.primary', display: 'inline' }}>-</Box>
+          Opening Fee{' '}
+          <Box sx={{ color: 'text.primary', display: 'inline' }}>
+            {selectedToken ? displayPercentage(selectedToken.openingFee, 'positive') : '-'}
+          </Box>
         </Typography>
       </div>
 
