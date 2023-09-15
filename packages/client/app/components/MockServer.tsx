@@ -5,7 +5,8 @@ import { useRouter } from 'next/navigation';
 import { PropsWithChildren, useEffect, useState } from 'react';
 
 function MockServer({ children }: PropsWithChildren<{}>) {
-  const router = useRouter();
+  const { replace } = useRouter();
+
   const [mockStarted, setMockStarted] = useState(false);
 
   useEffect(() => {
@@ -13,7 +14,9 @@ function MockServer({ children }: PropsWithChildren<{}>) {
       import('../../mocks').then(async (module) => {
         await module.default();
         setMockStarted(true);
-        router.replace('/spot');
+        if (location.pathname === '/') {
+          replace('/spot');
+        }
       });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
