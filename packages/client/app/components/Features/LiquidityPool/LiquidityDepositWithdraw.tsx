@@ -74,7 +74,16 @@ function LiquidityDepositWithdraw({ selectedPool }: Props) {
 
           {tabValue === 'DEPOSIT' && (
             <>
-              <div style={{ display: 'flex', justifyContent: 'space-between', padding: 20 }}>
+              <Box
+                sx={{
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  padding: '20px',
+                  gap: '50px',
+                  borderBottom: '1px solid',
+                  borderColor: 'background.paper',
+                }}
+              >
                 <div style={{ marginTop: 6 }}>
                   <Label variant="success">{tokenA.token.symbol}</Label>
 
@@ -83,23 +92,31 @@ function LiquidityDepositWithdraw({ selectedPool }: Props) {
                   </Typography>
                   <Typography variant="label">Deposited</Typography>
                 </div>
-                <div>
-                  <NumberInput
-                    name="tokenAAmount"
-                    placeholder="Value"
-                    fullWidth
-                    rules={{
-                      min: { value: 0, message: 'You can only invest positive amounts.' },
-                      //   TODO: Each stock token must be implemented with etherjs.
-                      max: undefined,
-                    }}
-                  />
 
-                  {/* TODO: Each stock token must be implemented with etherjs. Cant show a prefill button here */}
-                </div>
-              </div>
+                <NumberInput
+                  name="tokenAAmount"
+                  placeholder="Value"
+                  fullWidth
+                  rules={{
+                    min: { value: 0, message: 'You can only invest positive amounts.' },
+                    //   TODO: Each stock token must be implemented with etherjs.
+                    max: undefined,
+                  }}
+                />
 
-              <div style={{ display: 'flex', justifyContent: 'space-between', padding: 20 }}>
+                {/* TODO: Each stock token must be implemented with etherjs. Cant show a prefill button here */}
+              </Box>
+
+              <Box
+                sx={{
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  padding: '20px',
+                  gap: '50px',
+                  borderBottom: '1px solid',
+                  borderColor: 'background.paper',
+                }}
+              >
                 <div style={{ marginTop: 6 }}>
                   <Label variant="success">{tokenB.token.symbol}</Label>
 
@@ -108,21 +125,20 @@ function LiquidityDepositWithdraw({ selectedPool }: Props) {
                   </Typography>
                   <Typography variant="label">Deposited</Typography>
                 </div>
-                <div>
-                  <NumberInput
-                    name="tokenBAmount"
-                    placeholder="Value"
-                    fullWidth
-                    rules={{
-                      min: { value: 0, message: 'You can only invest positive amounts.' },
-                      //   TODO: Each stock token must be implemented with etherjs.
-                      max: undefined,
-                    }}
-                  />
 
-                  {/* TODO: Each stock token must be implemented with etherjs. Cant show a prefill button here */}
-                </div>
-              </div>
+                <NumberInput
+                  name="tokenBAmount"
+                  placeholder="Value"
+                  fullWidth
+                  rules={{
+                    min: { value: 0, message: 'You can only invest positive amounts.' },
+                    //   TODO: Each stock token must be implemented with etherjs.
+                    max: undefined,
+                  }}
+                />
+
+                {/* TODO: Each stock token must be implemented with etherjs. Cant show a prefill button here */}
+              </Box>
             </>
           )}
 

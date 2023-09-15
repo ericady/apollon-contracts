@@ -1,7 +1,12 @@
 import LiquidityPool from '../components/Features/LiquidityPool/LiquidityPool';
+import PageLayout from '../components/Layout/PageLayout';
 
 function Pools() {
-  return <LiquidityPool />;
+  return (
+    <PageLayout>
+      <LiquidityPool />
+    </PageLayout>
+  );
 }
 
 export default Pools;

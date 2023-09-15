@@ -2,7 +2,7 @@
 
 import { useQuery } from '@apollo/client';
 import CloseIcon from '@mui/icons-material/Close';
-import { Dialog, DialogActions, DialogContent, DialogTitle, IconButton } from '@mui/material';
+import { Box, Dialog, DialogActions, DialogContent, DialogTitle, IconButton } from '@mui/material';
 import Button from '@mui/material/Button';
 import Tab from '@mui/material/Tab';
 import Tabs from '@mui/material/Tabs';
@@ -78,7 +78,7 @@ const StabilityUpdateDialog = () => {
               typeof="image/svg+xml"
             />
             <Typography variant="h6" display="inline-block">
-              COLLATERAL UPDATE
+              STABILITY UPDATE
             </Typography>
           </div>
           <IconButton onClick={() => setIsOpen(false)}>
@@ -106,10 +106,17 @@ const StabilityUpdateDialog = () => {
               </Tabs>
 
               <div style={{ overflowY: 'scroll', maxHeight: '60vh' }}>
-                {data?.getDebtTokens.map(({ token, walletAmount = 0, stabilityCompoundAmount = 0 }) => (
-                  <div
+                {data?.getDebtTokens.map(({ token, walletAmount = 0, stabilityCompoundAmount = 0 }, index) => (
+                  <Box
                     key={token.address}
-                    style={{ display: 'flex', justifyContent: 'space-between', padding: 20, height: 114 }}
+                    sx={{
+                      display: 'flex',
+                      justifyContent: 'space-between',
+                      padding: '20px',
+                      height: '114px',
+                      borderBottom: index === data.getDebtTokens.length - 1 ? 'none' : '1px solid',
+                      borderColor: 'background.paper',
+                    }}
                   >
                     {tabValue === 'DEPOSIT' && (
                       <div style={{ marginTop: 6 }}>
@@ -202,7 +209,7 @@ const StabilityUpdateDialog = () => {
                         </Button>
                       </div>
                     </div>
-                  </div>
+                  </Box>
                 ))}
               </div>
             </DialogContent>

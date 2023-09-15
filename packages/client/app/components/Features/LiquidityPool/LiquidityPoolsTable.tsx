@@ -150,7 +150,12 @@ function LiquidityPoolsTable({ selectedPool, setSelectedPool }: Props) {
                   </TableCell>
                   <TableCell align="right" width={130}>
                     <div className="flex" style={{ justifyContent: 'flex-end' }}>
-                      <Typography sx={{ color: volumeChange > 0 ? 'success.main' : 'error.main', fontWeight: '400' }}>
+                      <Typography
+                        sx={{
+                          color: volumeChange > 0 ? 'success.main' : 'error.main',
+                        }}
+                        fontWeight={400}
+                      >
                         {displayPercentage(volumeChange, 'positive')}
                       </Typography>
                       <DirectionIcon showIncrease={volumeChange > 0} />

@@ -8,9 +8,9 @@ type Props = SvgIconProps & {
 
 function DirectionIcon({ showIncrease, ...iconProps }: Props) {
   return showIncrease ? (
-    <KeyboardArrowUpIcon sx={{ color: 'success.main', ml: '-5px' }} {...iconProps} />
+    <KeyboardArrowUpIcon sx={{ color: 'success.main', ml: '-5px' }} {...iconProps} fontSize="small" />
   ) : (
-    <KeyboardArrowDownIcon sx={{ color: 'error.main', ml: '-5px' }} {...iconProps} />
+    <KeyboardArrowDownIcon sx={{ color: 'error.main', ml: '-5px' }} {...iconProps} fontSize="small" />
   );
 }
 
