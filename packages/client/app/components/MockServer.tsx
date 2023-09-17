@@ -18,6 +18,8 @@ function MockServer({ children }: PropsWithChildren<{}>) {
           replace('/spot');
         }
       });
+    } else if (process.env.NEXT_PUBLIC_API_MOCKING === 'e2e') {
+      setMockStarted(true);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
