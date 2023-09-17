@@ -1,10 +1,14 @@
 import { defineConfig, devices } from '@playwright/experimental-ct-react';
 
+// TODO: Cant use MSW for playwright-ct because service workers are not supported :(
+// https://github.com/microsoft/playwright/issues/20659
+// Have to mock network instead via playwright
+
 /**
  * See https://playwright.dev/docs/test-configuration.
  */
 export default defineConfig({
-  // TODO: Hardcode it for now into one directoy because it clashes with the unti tests.
+  // TODO: Hardcode it for now into one directoy because it clashes with the unit tests.
   testDir: './app/components/tests',
   /* The base directory, relative to the config file, for snapshot files created with toMatchSnapshot and toHaveScreenshot. */
   snapshotDir: './__snapshots__',
@@ -44,9 +48,10 @@ export default defineConfig({
       name: 'firefox',
       use: { ...devices['Desktop Firefox'] },
     },
-    {
-      name: 'webkit',
-      use: { ...devices['Desktop Safari'] },
-    },
+    // TODO: Just ignoring it for now because Mint doesnt have the deps. Let samP make the screenshots.
+    // {
+    //   name: 'webkit',
+    //   use: { ...devices['Desktop Safari'] },
+    // },
   ],
 });

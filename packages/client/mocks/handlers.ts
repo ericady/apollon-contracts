@@ -32,7 +32,13 @@ import {
   GET_RESERVE_USD_HISTORY,
 } from '../app/queries';
 
-const favoritedAssets: string[] = JSON.parse(localStorage.getItem(FAVORITE_ASSETS_LOCALSTORAGE_KEY) ?? '[]');
+const getFavoritedAssetsFromLS = () => {
+  return typeof window !== 'undefined'
+    ? JSON.parse(localStorage.getItem(FAVORITE_ASSETS_LOCALSTORAGE_KEY) ?? '[]')
+    : [];
+};
+
+const favoritedAssets: string[] = getFavoritedAssetsFromLS();
 const now = Date.now();
 const oneDayInMs = 24 * 60 * 60 * 1000;
 
@@ -99,7 +105,7 @@ const debtTokens: DebtTokenMeta[] = faker.helpers
   });
 
 // Generate pools once for each pair of tokens
-const pools: Pool[] = [];
+export const pools: Pool[] = [];
 
 for (let i = 0; i < tokens.length; i++) {
   for (let j = i + 1; j < tokens.length; j++) {

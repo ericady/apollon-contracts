@@ -24,6 +24,7 @@ export const IntegrationWrapper = ({ children }: PropsWithChildren<{}>) => (
 );
 
 // https://playwright.dev/docs/test-fixtures#creating-a-fixture
+// https://github.com/microsoft/playwright/issues/27137
 // TODO: Not yet implemented
 // export const test = base.extend<{ testHook: void }>({
 //   testHook: [
