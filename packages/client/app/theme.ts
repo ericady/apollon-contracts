@@ -1,8 +1,5 @@
 import { createTheme } from '@mui/material/styles';
 
-import '@fontsource-variable/inter';
-import '@fontsource-variable/space-grotesk';
-
 const PRIMARY_BACKGROUND = '#14111D';
 const PAPER_BACKGROUND = '#2A2636';
 const PRIMARY_TEXT = '#FFFFFF';

@@ -1,3 +1,5 @@
+import '@fontsource-variable/inter';
+import '@fontsource-variable/space-grotesk';
 import { Metadata } from 'next/types';
 import ContextWrapper from './context/ContextWrapper';
 import './styles.css';
