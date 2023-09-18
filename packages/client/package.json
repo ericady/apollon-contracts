@@ -12,6 +12,7 @@
     "test:unit": "jest",
     "test:unit:watch": "jest --watch",
     "test:component:integration": "playwright test -c playwright-ct.config.ts",
+    "test:component:integration:watch": "PWTEST_WATCH=1 playwright test -c playwright-ct.config.ts",
     "test:e2e": "NEXT_PUBLIC_API_MOCKING=e2e playwright test",
     "codegen": "npx graphql-codegen"
   },

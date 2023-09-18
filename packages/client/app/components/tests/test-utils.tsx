@@ -2,6 +2,7 @@ import { ApolloProvider } from '@apollo/client';
 import { ThemeProvider } from '@emotion/react';
 import { SnackbarProvider } from 'notistack';
 import { PropsWithChildren } from 'react';
+import 'whatwg-fetch';
 import { client } from '../../client';
 import EthersProvider from '../../context/EthersProvider';
 import SelectedTokenProvider from '../../context/SelectedTokenProvider';

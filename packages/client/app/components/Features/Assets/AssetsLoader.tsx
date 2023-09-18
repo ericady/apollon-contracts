@@ -25,7 +25,7 @@ function AssetsLoader() {
             <HeaderCell title="" cellProps={{ sx: { p: 0.5, pr: 2 } }} />
           </TableRow>
         </TableHead>
-        <TableBody>
+        <TableBody data-testid="apollon-assets-loader">
           {Array(5)
             .fill(null)
             .map((_, index) => (

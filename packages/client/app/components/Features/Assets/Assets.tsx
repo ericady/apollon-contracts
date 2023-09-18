@@ -120,10 +120,11 @@ function Assets() {
                 return (
                   <TableRow
                     key={address}
+                    data-testid="apollon-assets-row"
                     hover
                     onClick={() => setSelectedToken(token)}
                     sx={{ cursor: 'pointer', '& .MuiTableCell-root': { borderBottom: 'none' } }}
-                    selected={selectedToken?.symbol === symbol}
+                    selected={selectedToken?.address === address}
                   >
                     <TableCell sx={{ p: 0.5, pl: 2 }}>
                       <Typography fontWeight={400}>{symbol}</Typography>
@@ -151,6 +152,7 @@ function Assets() {
                     </TableCell>
                     <TableCell sx={{ p: 0.5, pr: 2, minWidth: '30px' }} align="right" width={50}>
                       <IconButton
+                        data-testid="apollon-assets-favorite"
                         sx={{ height: 20, width: 20 }}
                         size="small"
                         onClick={() => toggleFavorite(address)}

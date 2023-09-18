@@ -1,45 +1,189 @@
 import { expect, test } from '@playwright/experimental-ct-react';
-import { setupServer } from 'msw/node';
-import 'whatwg-fetch';
-import { handlers } from '../../../mocks/handlers';
+import { SetupServer } from 'msw/node';
 import Assets from '../Features/Assets/Assets';
+import { integrationSuiteSetup, integrationTestSetup } from './integration-test.setup';
 import { IntegrationWrapper } from './test-utils';
 
+let server: SetupServer;
+
 test.beforeAll(() => {
-  const server = setupServer(...handlers);
-  server.listen();
+  server = integrationSuiteSetup();
 });
 
-test('should render Assets', async ({ mount, page }) => {
-  const makeFetchToMSW = async (
-    postData: string | null,
-    headers: {
-      [key: string]: string;
-    },
-  ) => {
-    const response = await fetch('https://flyby-router-demo.herokuapp.com/', {
-      body: postData,
-      method: 'POST',
-      headers,
+test.beforeEach(async ({ page }) => {
+  await integrationTestSetup(page);
+});
+
+test.afterEach(() => {
+  server.resetHandlers();
+});
+
+test.afterAll(() => {
+  server.close();
+});
+
+test.describe('Assets', () => {
+  test('should render Assets with mocked data', async ({ mount }) => {
+    const component = await mount(
+      <IntegrationWrapper>
+        <Assets />
+      </IntegrationWrapper>,
+    );
+
+    await expect(component).toHaveScreenshot({ maxDiffPixelRatio: 0.01 });
+  });
+
+  test('should show a loader if the data is not yet loaded', async ({ mount, page }) => {
+    // We dont show any data so the loader is permanently visible.
+    await page.route('https://flyby-router-demo.herokuapp.com/', async (route) => {
+      return route.abort();
     });
 
-    return response;
-  };
+    const component = await mount(
+      <IntegrationWrapper>
+        <Assets />
+      </IntegrationWrapper>,
+    );
 
-  await page.route('https://flyby-router-demo.herokuapp.com/', async (route) => {
-    const mswResponse = await makeFetchToMSW(route.request().postData(), route.request().headers());
+    // Only the Table headers are shown
+    await expect(component).toHaveText('AssetsType$OF %%');
 
-    return route.fulfill({
-      status: mswResponse.status,
-      body: await mswResponse.text(),
+    const element = page.getByTestId('apollon-assets-loader');
+    expect(element).toBeTruthy();
+  });
+
+  test.describe('Selecting Asset', () => {
+    test('should select the first row of 10 by default', async ({ mount, page }) => {
+      await mount(
+        <IntegrationWrapper>
+          <Assets />
+        </IntegrationWrapper>,
+      );
+
+      await page.waitForSelector('[data-testid="apollon-assets-row"]', {
+        state: 'visible',
+      });
+      await page.waitForSelector('.Mui-selected', {
+        state: 'visible',
+      });
+
+      const rows = page.getByTestId('apollon-assets-row');
+      expect(await rows.count()).toBe(10);
+
+      const selectedRow = page.locator('.Mui-selected');
+      expect(await selectedRow.count()).toBe(1);
+
+      const firstRow = rows.nth(0);
+      await expect(firstRow).toHaveClass(/Mui-selected/);
+    });
+
+    test('should click on an assets and have a selected style then', async ({ mount, page }) => {
+      await mount(
+        <IntegrationWrapper>
+          <Assets />
+        </IntegrationWrapper>,
+      );
+
+      await page.waitForSelector('[data-testid="apollon-assets-row"]', {
+        state: 'visible',
+      });
+      await page.waitForSelector('.Mui-selected', {
+        state: 'visible',
+      });
+
+      const rows = page.getByTestId('apollon-assets-row');
+      const secondRow = rows.nth(1);
+      await secondRow.click();
+
+      await page.waitForTimeout(500);
+      const selectedRow = page.locator('.Mui-selected');
+      expect(await selectedRow.count()).toBe(1);
+
+      const secondRowAfterUpdate = page.getByTestId('apollon-assets-row').nth(1);
+      await expect(secondRowAfterUpdate).toHaveClass(/Mui-selected/);
     });
   });
 
-  const component = await mount(
-    <IntegrationWrapper>
-      <Assets />
-    </IntegrationWrapper>,
-  );
+  test.describe("Favorite Asset's", () => {
+    test('should favorite an asset and shift it to the start. unfavorite returns it to the previous position.', async ({
+      mount,
+      page,
+    }) => {
+      await mount(
+        <IntegrationWrapper>
+          <Assets />
+        </IntegrationWrapper>,
+      );
 
-  await expect(component).toHaveScreenshot({ maxDiffPixelRatio: 0.03 });
+      await page.waitForSelector('[data-testid="apollon-assets-row"]', {
+        state: 'visible',
+      });
+      const rows = page.getByTestId('apollon-assets-row');
+      const secondRow = rows.nth(1);
+      const textSecondRow = await secondRow.textContent();
+
+      const favoriteButtonSecondRow = page.getByTestId('apollon-assets-favorite').nth(1);
+      const unfavoritedImage = favoriteButtonSecondRow.getByAltText('a grey pin icon with a transparant body');
+      await unfavoritedImage.click();
+
+      const firstRow = page.getByTestId('apollon-assets-row').nth(0);
+      const textFirstRow = await firstRow.textContent();
+
+      expect(textFirstRow).toBe(textSecondRow);
+
+      const favoritedImage = firstRow.getByAltText('a white pin icon with a transparant body');
+      await favoritedImage.click();
+
+      const secondRowAfterUpdate = page.getByTestId('apollon-assets-row').nth(1);
+      const textSecondRowAfterUpdate = await secondRowAfterUpdate.textContent();
+      expect(textSecondRow).toBe(textSecondRowAfterUpdate);
+    });
+
+    test('should favorite an asset, write to local storage and persist the changes for a reload', async ({
+      mount,
+      page,
+    }) => {
+      await mount(
+        <IntegrationWrapper>
+          <Assets />
+        </IntegrationWrapper>,
+      );
+
+      await page.waitForSelector('[data-testid="apollon-assets-row"]', {
+        state: 'visible',
+      });
+
+      const rows = page.getByTestId('apollon-assets-row');
+      const secondRow = rows.nth(1);
+      const textSecondRow = await secondRow.textContent();
+
+      const favoriteButtonSecondRow = page.getByTestId('apollon-assets-favorite').nth(1);
+      const unfavoritedImage = favoriteButtonSecondRow.getByAltText('a grey pin icon with a transparant body');
+      await unfavoritedImage.click();
+
+      const favoritedEntryLS = await page.evaluate((key) => localStorage.getItem(key), 'favoriteAssets');
+      const listOfFavoritedAssets = JSON.parse(favoritedEntryLS!);
+
+      expect(Array.isArray(listOfFavoritedAssets)).toBeTruthy();
+      expect(listOfFavoritedAssets).toHaveLength(1);
+
+      await page.reload();
+      await mount(
+        <IntegrationWrapper>
+          <Assets />
+        </IntegrationWrapper>,
+      );
+      await page.waitForSelector('[data-testid="apollon-assets-row"]', {
+        state: 'visible',
+      });
+
+      const rowsAfterReload = page.getByTestId('apollon-assets-row');
+      const firstRowAfterReload = rowsAfterReload.nth(0);
+      const textFirstRowAfterReload = await firstRowAfterReload.textContent();
+      expect(textFirstRowAfterReload).toBe(textSecondRow);
+
+      const favoritedImage = firstRowAfterReload.getByAltText('a white pin icon with a transparant body');
+      await expect(favoritedImage).toBeVisible();
+    });
+  });
 });
