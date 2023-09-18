@@ -50,7 +50,7 @@ const JUSD = {
   priceUSD24hAgo: parseFloat(faker.finance.amount(1, 5000, 2)),
   isPoolToken: faker.datatype.boolean(),
 };
-const tokens: Token[] = Array(10)
+export const tokens: Token[] = Array(10)
   .fill(null)
   .map((_, index) => ({
     address: index <= favoritedAssets.length - 1 ? favoritedAssets[index] : faker.string.uuid(),

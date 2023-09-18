@@ -87,7 +87,7 @@ const StabilityHistoryDialog = () => {
               borderBottom: 'none',
             }}
           >
-            <div className="flex">
+            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
               <img
                 src="assets/svgs/Star24_white.svg"
                 alt="White colored diamond shape"
@@ -147,8 +147,16 @@ function StabilityClaimedRewards({ history }: StabilityWidgetProps) {
 
   return (
     <>
-      <div className="flex" style={{ justifyContent: 'space-between', marginBottom: '20px' }}>
-        <div className="flex">
+      <div
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          gap: '10px',
+          justifyContent: 'space-between',
+          marginBottom: '20px',
+        }}
+      >
+        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
           <Typography variant="titleAlternate" color="primary.contrastText">
             {formatUnixTimestamp(history.timestamp, false)}
           </Typography>
@@ -160,7 +168,7 @@ function StabilityClaimedRewards({ history }: StabilityWidgetProps) {
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '40px' }}>
         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', minWidth: 120, gap: 20 }}>
           {lostTokens.map(({ token, amount }) => (
-            <div className="flex" key={token.address}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }} key={token.address}>
               <Typography fontWeight={400}>{roundCurrency(amount, 5)}</Typography>
               <Label variant="none">{token.symbol}</Label>
             </div>
@@ -178,7 +186,7 @@ function StabilityClaimedRewards({ history }: StabilityWidgetProps) {
             }}
           >
             <Typography
-              className="flex"
+              style={{ display: 'flex', alignItems: 'center', gap: '10px' }}
               variant="titleAlternate"
               color="info.main"
               fontWeight={400}
@@ -192,7 +200,10 @@ function StabilityClaimedRewards({ history }: StabilityWidgetProps) {
 
         <div style={{ display: 'flex', flexDirection: 'column', gap: 20 }}>
           {gainedTokens.map(({ token, amount }) => (
-            <div className="flex" style={{ justifyContent: 'end' }} key={token.address}>
+            <div
+              style={{ display: 'flex', alignItems: 'center', gap: '10px', justifyContent: 'end' }}
+              key={token.address}
+            >
               <Typography fontWeight={400}>{roundCurrency(amount, 5)}</Typography>
               <Label variant="none">{token.symbol}</Label>
             </div>
@@ -206,8 +217,16 @@ function StabilityClaimedRewards({ history }: StabilityWidgetProps) {
 function StabilityDeposit({ history }: StabilityWidgetProps) {
   return (
     <>
-      <div className="flex" style={{ justifyContent: 'space-between', marginBottom: '20px' }}>
-        <div className="flex">
+      <div
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          gap: '10px',
+          justifyContent: 'space-between',
+          marginBottom: '20px',
+        }}
+      >
+        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
           <Typography variant="titleAlternate" color="primary.contrastText">
             {formatUnixTimestamp(history.timestamp, false)}
           </Typography>
@@ -218,7 +237,10 @@ function StabilityDeposit({ history }: StabilityWidgetProps) {
 
       <div style={{ display: 'flex', flexWrap: 'wrap', gap: '20px' }}>
         {history.values.map(({ amount, token }) => (
-          <div className="flex" style={{ width: '100%', justifyContent: 'end' }} key={token.address}>
+          <div
+            style={{ display: 'flex', alignItems: 'center', gap: '10px', width: '100%', justifyContent: 'end' }}
+            key={token.address}
+          >
             <Typography fontWeight={400}>{roundCurrency(amount, 5)}</Typography>
             <Label variant="none">{token.symbol}</Label>
           </div>
@@ -231,8 +253,16 @@ function StabilityDeposit({ history }: StabilityWidgetProps) {
 function StabilityWithdraw({ history }: StabilityWidgetProps) {
   return (
     <>
-      <div className="flex" style={{ justifyContent: 'space-between', marginBottom: '20px' }}>
-        <div className="flex">
+      <div
+        style={{
+          display: 'flex',
+          alignItems: 'center',
+          gap: '10px',
+          justifyContent: 'space-between',
+          marginBottom: '20px',
+        }}
+      >
+        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
           <Typography variant="titleAlternate" color="primary.contrastText">
             {formatUnixTimestamp(history.timestamp, false)}
           </Typography>
@@ -243,7 +273,10 @@ function StabilityWithdraw({ history }: StabilityWidgetProps) {
 
       <div style={{ display: 'flex', flexWrap: 'wrap', gap: '20px' }}>
         {history.values.map(({ amount, token }) => (
-          <div className="flex" style={{ width: '100%', justifyContent: 'end' }} key={token.address}>
+          <div
+            style={{ display: 'flex', alignItems: 'center', gap: '10px', width: '100%', justifyContent: 'end' }}
+            key={token.address}
+          >
             <Typography fontWeight={400}>{roundCurrency(amount, 5)}</Typography>
             <Label variant="none">{token.symbol}</Label>
           </div>

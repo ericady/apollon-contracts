@@ -49,7 +49,7 @@ function TreasuryTable() {
                   {roundCurrency(totalReserve - totalReserve24hAgo, 5)}
                 </TableCell>
                 <TableCell width={120}>
-                  <div className="flex">
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
                     <Typography
                       fontWeight={400}
                       color={percentageChange(totalReserve, totalReserve24hAgo) > 0 ? 'success.main' : 'error.main'}

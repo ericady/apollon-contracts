@@ -84,6 +84,7 @@ const Swap = () => {
             {/* TODO: Add Validation that not more than the wallet amount can be entered. */}
             <NumberInput
               name="jUSDAmount"
+              data-testid="apollon-swap-jusd-amount"
               rules={{
                 required: { value: true, message: 'You need to specify an amount.' },
                 min: { value: 0, message: 'Amount needs to be positive' },
@@ -113,6 +114,7 @@ const Swap = () => {
 
             <NumberInput
               name="tokenAmount"
+              data-testid="apollon-swap-token-amount"
               rules={{
                 required: { value: true, message: 'You need to specify an amount.' },
                 min: { value: 0, message: 'Amount needs to be positive' },
@@ -134,6 +136,7 @@ const Swap = () => {
           {showSlippage && (
             <NumberInput
               name="maxSlippage"
+              data-testid="apollon-swap-slippage-amount"
               rules={{
                 min: { value: 0, message: 'Amount needs to be positive' },
               }}
@@ -152,14 +155,33 @@ const Swap = () => {
           </Button>
 
           <div style={{ padding: '10px 0' }}>
-            <Typography variant="titleAlternate" color="primary.contrastText" className="swap-info-paragraph">
+            <Typography
+              variant="titleAlternate"
+              color="primary.contrastText"
+              style={{
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                marginTop: '12px',
+                marginBottom: '12px',
+              }}
+            >
               Price per unit:
               {selectedToken ? <span>{roundCurrency(tokenRatio)} jUSD</span> : <Skeleton width="120px" />}
             </Typography>
-            <Typography variant="caption" className="swap-info-paragraph">
+            <Typography
+              variant="caption"
+              style={{
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                marginTop: '12px',
+                marginBottom: '12px',
+              }}
+            >
               Protocol swap fee:
               {selectedToken ? (
-                <span>
+                <span data-testid="apollon-swap-protocol-fee">
                   {displayPercentage(PROTOCOL_SWAP_FEE)} {/* TODO: issue with next */}
                   {/* <Divider
               orientation="vertical"
@@ -179,7 +201,16 @@ const Swap = () => {
                 </div>
               )}
             </Typography>
-            <Typography variant="caption" className="swap-info-paragraph">
+            <Typography
+              variant="caption"
+              style={{
+                display: 'flex',
+                justifyContent: 'space-between',
+                alignItems: 'center',
+                marginTop: '12px',
+                marginBottom: '12px',
+              }}
+            >
               Resulting pool slippage:
               {selectedToken ? <span>{displayPercentage(RESULTING_POOL_SLIPPAGE)}</span> : <Skeleton width="120px" />}
             </Typography>

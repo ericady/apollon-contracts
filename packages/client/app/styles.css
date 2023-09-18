@@ -22,29 +22,3 @@
 a {
   text-decoration: none;
 }
-
-/* swap widget css */
-.swap-info-paragraph.swap-info-paragraph {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-top: 12px;
-  margin-bottom: 12px;
-}
-
-/* UTILS */
-.flex {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  /* justify-content: end; */
-}
-
-/* Pool Widget CSS */
-.pool-input {
-  padding: 20px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  border-bottom: 1px solid #25222e;
-}

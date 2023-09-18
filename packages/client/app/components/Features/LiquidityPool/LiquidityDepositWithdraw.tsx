@@ -243,7 +243,7 @@ function LiquidityDepositWithdraw({ selectedPool }: Props) {
               }}
             >
               <Typography variant="titleAlternate">Collateral Ratio</Typography>
-              <div className="flex">
+              <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
                 <Typography
                   sx={{ fontFamily: 'Space Grotesk Variable', color: 'info.main', fontWeight: '700', fontSize: '20px' }}
                 >

@@ -109,7 +109,17 @@ const Farm = () => {
             </div>
 
             <div style={{ padding: '10px 0' }}>
-              <Typography variant="titleAlternate" color="primary.contrastText" className="swap-info-paragraph">
+              <Typography
+                variant="titleAlternate"
+                color="primary.contrastText"
+                style={{
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
+                  marginTop: '12px',
+                  marginBottom: '12px',
+                }}
+              >
                 Position size:
                 {selectedToken ? (
                   <span>
@@ -119,11 +129,29 @@ const Farm = () => {
                   <Skeleton width="120px" />
                 )}
               </Typography>
-              <Typography variant="caption" className="swap-info-paragraph">
+              <Typography
+                variant="caption"
+                style={{
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
+                  marginTop: '12px',
+                  marginBottom: '12px',
+                }}
+              >
                 Price per unit:
                 <span>{selectedToken ? `${roundCurrency(tokenRatio)} jUSD` : <Skeleton width="120px" />}</span>
               </Typography>
-              <Typography variant="caption" className="swap-info-paragraph">
+              <Typography
+                variant="caption"
+                style={{
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
+                  marginTop: '12px',
+                  marginBottom: '12px',
+                }}
+              >
                 Protocol fee:
                 {selectedToken ? (
                   <span>
@@ -148,7 +176,16 @@ const Farm = () => {
                   </div>
                 )}
               </Typography>
-              <Typography variant="caption" className="swap-info-paragraph">
+              <Typography
+                variant="caption"
+                style={{
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
+                  marginTop: '12px',
+                  marginBottom: '12px',
+                }}
+              >
                 Slippage: {selectedToken ? <span>{displayPercentage(SLIPPAGE)}</span> : <Skeleton width="120px" />}
               </Typography>
             </div>
@@ -171,7 +208,7 @@ const Farm = () => {
         }}
       >
         <Typography variant="titleAlternate">Collateral Ratio</Typography>
-        <div className="flex">
+        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
           <Typography
             sx={{
               fontFamily: 'Space Grotesk Variable',

@@ -1,28 +1,74 @@
 import { ApolloProvider } from '@apollo/client';
 import { ThemeProvider } from '@emotion/react';
 import { SnackbarProvider } from 'notistack';
-import { PropsWithChildren } from 'react';
+import { PropsWithChildren, useState } from 'react';
 import 'whatwg-fetch';
+import { tokens } from '../../../mocks/handlers';
 import { client } from '../../client';
-import EthersProvider from '../../context/EthersProvider';
-import SelectedTokenProvider from '../../context/SelectedTokenProvider';
+import { EthersContext } from '../../context/EthersProvider';
+import SelectedTokenProvider, { useSelectedToken } from '../../context/SelectedTokenProvider';
 import WalletProvider from '../../context/WalletProvider';
 import theme from '../../theme';
 
-export const IntegrationWrapper = ({ children }: PropsWithChildren<{}>) => (
+type Props = {
+  shouldPreselectTokens?: boolean;
+  shouldConnectWallet?: boolean;
+};
+
+export const IntegrationWrapper = ({ children, ...stateProps }: PropsWithChildren<Props>) => (
   <ThemeProvider theme={theme}>
     <SnackbarProvider>
-      <EthersProvider>
-        <WalletProvider>
-          {/* Not using MockedProvider as we are using the same dev server for mocking */}
-          <ApolloProvider client={client}>
-            <SelectedTokenProvider>{children}</SelectedTokenProvider>
-          </ApolloProvider>
-        </WalletProvider>
-      </EthersProvider>
+      <WalletProvider>
+        {/* Not using MockedProvider as we are using the same dev server for mocking */}
+        <ApolloProvider client={client}>
+          <SelectedTokenProvider>
+            <SetupState {...stateProps}>{children}</SetupState>
+          </SelectedTokenProvider>
+        </ApolloProvider>
+      </WalletProvider>
     </SnackbarProvider>
   </ThemeProvider>
 );
+
+/**
+ * This component is used as a wrapper to mock library Providers and other Context state.
+ * Actual calls to the modules of these libraries (ethers) must be made as a unit test because jest provides excellent module mocking.
+ */
+function SetupState({ children, shouldPreselectTokens, shouldConnectWallet }: PropsWithChildren<Props>) {
+  const { setSelectedToken, selectedToken } = useSelectedToken();
+  if (shouldPreselectTokens && !selectedToken) {
+    const { address, priceUSD, priceUSD24hAgo, symbol } = tokens[0];
+    setSelectedToken({
+      address,
+      change: 0.01,
+      isFavorite: true,
+      openingFee: 0.05,
+      priceUSD,
+      symbol,
+      priceUSD24hAgo,
+      volume24hUSD: 1000,
+    });
+  }
+
+  const [address, setAddress] = useState<string>('');
+  if (shouldConnectWallet && !address) {
+    setAddress('0x1234');
+  }
+
+  return (
+    <EthersContext.Provider
+      value={{
+        provider: {} as any,
+        signer: {} as any,
+        loginError: null,
+        address,
+        connectWallet: () => console.log('connectWallet was called'),
+      }}
+    >
+      {children}
+    </EthersContext.Provider>
+  );
+}
 
 // https://playwright.dev/docs/test-fixtures#creating-a-fixture
 // https://github.com/microsoft/playwright/issues/27137

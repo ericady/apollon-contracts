@@ -152,7 +152,7 @@ function LiquidityPoolsTable({ selectedPool, setSelectedPool }: Props) {
                     </Typography>
                   </TableCell>
                   <TableCell align="right" width={130}>
-                    <div className="flex" style={{ justifyContent: 'flex-end' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '10px', justifyContent: 'flex-end' }}>
                       <Typography
                         sx={{
                           color: volumeChange > 0 ? 'success.main' : 'error.main',

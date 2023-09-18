@@ -66,7 +66,7 @@ const CollateralTokenTable = () => {
                       {stdFormatter.format(totalValueLockedUSD)}
                     </TableCell>
                     <TableCell align="left" sx={{ width: 120 }}>
-                      <div className="flex">
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
                         <Typography
                           fontWeight={400}
                           color={

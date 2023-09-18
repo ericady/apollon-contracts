@@ -70,7 +70,7 @@ const StabilityUpdateDialog = () => {
             borderBottom: 'none',
           }}
         >
-          <div className="flex">
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
             <img
               src="assets/svgs/Star24_white.svg"
               alt="White colored diamond shape"

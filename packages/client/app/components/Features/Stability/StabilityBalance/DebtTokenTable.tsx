@@ -82,7 +82,7 @@ function DebtTokenTable() {
                     {stdFormatter.format(totalSupplyUSD)}
                   </TableCell>
                   <TableCell>
-                    <div className="flex">
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
                       <Typography
                         fontWeight={400}
                         color={
