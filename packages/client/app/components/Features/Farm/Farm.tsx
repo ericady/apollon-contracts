@@ -74,7 +74,7 @@ const Farm = () => {
                 name="farmShortValue"
                 rules={{
                   required: { value: true, message: 'You need to specify an amount.' },
-                  min: { value: 0, message: 'Amount needs to be positive' },
+                  min: { value: 0, message: 'Amount needs to be positive.' },
                 }}
                 disabled={!selectedToken}
                 fullWidth
@@ -91,7 +91,7 @@ const Farm = () => {
                 <NumberInput
                   name="maxSlippage"
                   rules={{
-                    min: { value: 0, message: 'Amount needs to be positive' },
+                    min: { value: 0, message: 'Amount needs to be positive.' },
                   }}
                   label="Max. Slippage"
                   placeholder="5"

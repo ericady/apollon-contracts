@@ -33,7 +33,7 @@ test.describe('Swap', () => {
     await expect(component).toHaveScreenshot({ maxDiffPixelRatio: 0.01 });
   });
 
-  test.describe('Input behavior', () => {
+  test.describe('Form behavior', () => {
     test('should update token amount when jUSD amount is specified', async ({ mount }) => {
       const component = await mount(
         <IntegrationWrapper shouldPreselectTokens>
@@ -121,6 +121,81 @@ test.describe('Swap', () => {
 
       expect(protocolFeeValueForSmalljUSDValue * 10).toBeCloseTo(protocolFeeValueForBigjUSDValue, 0.01);
     });
+
+    test('should show error if amount is not positive', async ({ mount }) => {
+      const component = await mount(
+        <IntegrationWrapper shouldPreselectTokens shouldConnectWallet>
+          <Swap />
+        </IntegrationWrapper>,
+      );
+
+      const tokenInput = component.getByTestId('apollon-swap-token-amount').locator('input');
+      await tokenInput.fill('-1');
+
+      const swapButton = component.getByRole('button', {
+        name: 'Swap',
+      });
+      await swapButton.click();
+
+      // get the Mui-error class
+      const tokenInputError = component.getByTestId('apollon-swap-token-amount').locator('p.Mui-error');
+      expect(await tokenInputError.count()).toBe(1);
+      const tokenInputErrorMessage = await tokenInputError.textContent();
+      expect(tokenInputErrorMessage).toBe('Amount needs to be positive.');
+
+      const jUSDInputError = component.getByTestId('apollon-swap-jusd-amount').locator('p.Mui-error');
+      expect(await jUSDInputError.count()).toBe(1);
+      const jUSDInputErrorMessage = await jUSDInputError.textContent();
+      expect(jUSDInputErrorMessage).toBe('Amount needs to be positive.');
+    });
+
+    test('should show error if amount is not specified', async ({ mount }) => {
+      const component = await mount(
+        <IntegrationWrapper shouldPreselectTokens shouldConnectWallet>
+          <Swap />
+        </IntegrationWrapper>,
+      );
+
+      const swapButton = component.getByRole('button', {
+        name: 'Swap',
+      });
+      await swapButton.click();
+
+      // get the Mui-error class
+      const tokenInputError = component.getByTestId('apollon-swap-token-amount').locator('p.Mui-error');
+      expect(await tokenInputError.count()).toBe(1);
+      const tokenInputErrorMessage = await tokenInputError.textContent();
+      expect(tokenInputErrorMessage).toBe('You need to specify an amount.');
+
+      const jUSDInputError = component.getByTestId('apollon-swap-jusd-amount').locator('p.Mui-error');
+      expect(await jUSDInputError.count()).toBe(1);
+      const jUSDInputErrorMessage = await jUSDInputError.textContent();
+      expect(jUSDInputErrorMessage).toBe('You need to specify an amount.');
+    });
+
+    test('should hide error only if valid input is submited', async ({ mount }) => {
+      const component = await mount(
+        <IntegrationWrapper shouldPreselectTokens shouldConnectWallet>
+          <Swap />
+        </IntegrationWrapper>,
+      );
+
+      const swapButton = component.getByRole('button', {
+        name: 'Swap',
+      });
+      await swapButton.click();
+
+      const jusdInput = component.getByTestId('apollon-swap-jusd-amount').locator('input');
+      await jusdInput.fill('10');
+
+      const jUSDInputError = component.getByTestId('apollon-swap-jusd-amount').locator('p.Mui-error');
+      expect(await jUSDInputError.count()).toBe(1);
+
+      await swapButton.click();
+
+      const jUSDInputErrorAfterUpdate = component.getByTestId('apollon-swap-jusd-amount').locator('p.Mui-error');
+      expect(await jUSDInputErrorAfterUpdate.count()).toBe(0);
+    });
   });
 
   test.describe('Slippage', () => {
@@ -205,6 +280,7 @@ test.describe('Swap', () => {
       await expect(swapButton).toBeDisabled();
     });
   });
+
   test.describe('Connected mode', () => {
     test('should have "Swap" button disabled as guest', async ({ mount }) => {
       const component = await mount(

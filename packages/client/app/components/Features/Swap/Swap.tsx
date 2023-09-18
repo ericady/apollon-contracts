@@ -87,7 +87,7 @@ const Swap = () => {
               data-testid="apollon-swap-jusd-amount"
               rules={{
                 required: { value: true, message: 'You need to specify an amount.' },
-                min: { value: 0, message: 'Amount needs to be positive' },
+                min: { value: 0, message: 'Amount needs to be positive.' },
               }}
               disabled={!selectedToken}
               onChange={(e: ChangeEvent<HTMLInputElement>) => {
@@ -117,7 +117,7 @@ const Swap = () => {
               data-testid="apollon-swap-token-amount"
               rules={{
                 required: { value: true, message: 'You need to specify an amount.' },
-                min: { value: 0, message: 'Amount needs to be positive' },
+                min: { value: 0, message: 'Amount needs to be positive.' },
               }}
               disabled={!selectedToken}
               onChange={(e: ChangeEvent<HTMLInputElement>) => {
@@ -138,7 +138,7 @@ const Swap = () => {
               name="maxSlippage"
               data-testid="apollon-swap-slippage-amount"
               rules={{
-                min: { value: 0, message: 'Amount needs to be positive' },
+                min: { value: 0, message: 'Amount needs to be positive.' },
               }}
               label="Max. Slippage"
               placeholder="5"
