@@ -39,7 +39,7 @@ function NavigationBar() {
         }}
       >
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', width: '100%' }}>
-          <div className="flex apollon-navigation-bar">
+          <div className="apollon-navigation-bar" style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
             <Link href="/" style={{ height: 30 }}>
               <img src="assets/svgs/Apollon_logo_negative.svg" alt="Apollon Logo" height="30" typeof="image/svg+xml" />
             </Link>
