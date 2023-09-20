@@ -9,13 +9,18 @@ export const makeFetchToMSW = async (
     [key: string]: string;
   },
 ) => {
-  const response = await fetch('https://flyby-router-demo.herokuapp.com/', {
-    body: postData,
-    method: 'POST',
-    headers,
-  });
+  try {
+    const response = await fetch('https://flyby-router-demo.herokuapp.com/', {
+      body: postData,
+      method: 'POST',
+      headers,
+    });
 
-  return response;
+    return response;
+  } catch (error) {
+    // FIXME: This currently fails in Debug mode because the server doesnt seem to be set up properly
+    console.error(error);
+  }
 };
 
 export const integrationSuiteSetup = () => {
@@ -29,9 +34,14 @@ export const integrationTestSetup = async (page: Page) => {
   await page.route('https://flyby-router-demo.herokuapp.com/', async (route) => {
     const mswResponse = await makeFetchToMSW(route.request().postData(), route.request().headers());
 
+    // FIXME: This currently fails in Debug mode because the server doesnt seem to be set up properly
+    if (!mswResponse) {
+      return route.abort();
+    }
+
     return route.fulfill({
-      status: mswResponse.status,
-      body: await mswResponse.text(),
+      status: mswResponse!.status,
+      body: await mswResponse!.text(),
     });
   });
 };

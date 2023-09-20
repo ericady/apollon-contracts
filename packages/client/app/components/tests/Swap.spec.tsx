@@ -2,6 +2,7 @@ import { expect, test } from '@playwright/experimental-ct-react';
 import { SetupServer } from 'msw/node';
 import Swap from '../Features/Swap/Swap';
 import { integrationSuiteSetup, integrationTestSetup } from './integration-test.setup';
+import { parseNumberString } from './test-helpers';
 import { IntegrationWrapper } from './test-utils';
 
 let server: SetupServer;
@@ -106,18 +107,20 @@ test.describe('Swap', () => {
       expect(protocolFeeText).toBe('0.09 % | -');
 
       const jusdInput = component.getByTestId('apollon-swap-jusd-amount').locator('input');
-      await jusdInput.fill('10');
+      await jusdInput.fill('100');
       const protocolFeeValueForSmalljUSDText = await protocolFee.innerText();
       expect(protocolFeeValueForSmalljUSDText).not.toBe(protocolFeeText);
       expect(protocolFeeValueForSmalljUSDText).toContain('0.09 % |');
-      const protocolFeeValueForSmalljUSDValue = parseFloat(
+      const protocolFeeValueForSmalljUSDValue = parseNumberString(
         protocolFeeValueForSmalljUSDText.split(' | ')[1].split(' ')[0],
       );
 
-      await jusdInput.fill('100');
+      await jusdInput.fill('1000');
 
       const protocolFeeValueForBigjUSDText = await protocolFee.innerText();
-      const protocolFeeValueForBigjUSDValue = parseFloat(protocolFeeValueForBigjUSDText.split(' | ')[1].split(' ')[0]);
+      const protocolFeeValueForBigjUSDValue = parseNumberString(
+        protocolFeeValueForBigjUSDText.split(' | ')[1].split(' ')[0],
+      );
 
       expect(protocolFeeValueForSmalljUSDValue * 10).toBeCloseTo(protocolFeeValueForBigjUSDValue, 0.01);
     });
@@ -173,7 +176,7 @@ test.describe('Swap', () => {
       expect(jUSDInputErrorMessage).toBe('You need to specify an amount.');
     });
 
-    test('should hide error only if valid input is submited', async ({ mount }) => {
+    test('should hide error if input is filled with valid value', async ({ mount }) => {
       const component = await mount(
         <IntegrationWrapper shouldPreselectTokens shouldConnectWallet>
           <Swap />
@@ -189,12 +192,9 @@ test.describe('Swap', () => {
       await jusdInput.fill('10');
 
       const jUSDInputError = component.getByTestId('apollon-swap-jusd-amount').locator('p.Mui-error');
-      expect(await jUSDInputError.count()).toBe(1);
+      expect(await jUSDInputError.count()).toBe(0);
 
-      await swapButton.click();
-
-      const jUSDInputErrorAfterUpdate = component.getByTestId('apollon-swap-jusd-amount').locator('p.Mui-error');
-      expect(await jUSDInputErrorAfterUpdate.count()).toBe(0);
+      await expect(swapButton).toBeEnabled();
     });
   });
 

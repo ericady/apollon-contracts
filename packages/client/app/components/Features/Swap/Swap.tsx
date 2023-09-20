@@ -5,7 +5,7 @@ import Button from '@mui/material/Button';
 import InputAdornment from '@mui/material/InputAdornment';
 import Typography from '@mui/material/Typography';
 import { ChangeEvent, useState } from 'react';
-import { FormProvider, useForm } from 'react-hook-form';
+import { FormProvider, useController, useForm } from 'react-hook-form';
 import { useEthers } from '../../../context/EthersProvider';
 import { useSelectedToken } from '../../../context/SelectedTokenProvider';
 import { displayPercentage, roundCurrency, roundNumber } from '../../../utils/math';
@@ -36,8 +36,11 @@ const Swap = () => {
       maxSlippage: '',
     },
     shouldUnregister: true,
+    reValidateMode: 'onChange',
   });
-  const { handleSubmit, setValue, watch } = methods;
+  const { handleSubmit, setValue, watch, control } = methods;
+  const { field: jUSDField } = useController({ name: 'jUSDAmount', control });
+  const { field: tokenAmountField } = useController({ name: 'tokenAmount', control });
 
   const { selectedToken, tokenRatio } = useSelectedToken();
 
@@ -46,7 +49,7 @@ const Swap = () => {
 
     if (variant === 'JUSD') {
       if (!isNaN(numericValue)) {
-        setValue('tokenAmount', roundNumber(numericValue / tokenRatio).toString());
+        setValue('tokenAmount', roundNumber(numericValue / tokenRatio).toString(), { shouldValidate: true });
         setTradingDirection('jUSDSpent');
       } else {
         setValue('tokenAmount', '');
@@ -55,7 +58,7 @@ const Swap = () => {
       setValue('jUSDAmount', value);
     } else {
       if (!isNaN(numericValue)) {
-        setValue('jUSDAmount', roundNumber(numericValue / tokenRatio).toString());
+        setValue('jUSDAmount', roundNumber(numericValue / tokenRatio).toString(), { shouldValidate: true });
         setTradingDirection('jUSDAquired');
       } else {
         setValue('jUSDAmount', '');
@@ -91,6 +94,7 @@ const Swap = () => {
               }}
               disabled={!selectedToken}
               onChange={(e: ChangeEvent<HTMLInputElement>) => {
+                jUSDField.onChange(e);
                 handleSwapValueChange('JUSD', e.target.value);
               }}
               InputProps={{
@@ -121,6 +125,7 @@ const Swap = () => {
               }}
               disabled={!selectedToken}
               onChange={(e: ChangeEvent<HTMLInputElement>) => {
+                tokenAmountField.onChange(e);
                 handleSwapValueChange('Token', e.target.value);
               }}
               InputProps={{

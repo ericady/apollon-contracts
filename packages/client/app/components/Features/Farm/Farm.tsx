@@ -19,7 +19,7 @@ import Label from '../../Label/Label';
 import CollateralRatioVisualization from '../../Visualizations/CollateralRatioVisualization';
 
 export const SLIPPAGE = 0.0053;
-export const PROTOCOL_FEE = 0.02;
+export const PROTOCOL_FEE = 0.002;
 
 type FieldValues = {
   farmShortValue: string;
@@ -38,6 +38,7 @@ const Farm = () => {
       maxSlippage: '',
     },
     shouldUnregister: true,
+    reValidateMode: 'onChange',
   });
   const { handleSubmit, reset, watch } = methods;
 
@@ -71,6 +72,7 @@ const Farm = () => {
           <div style={{ marginTop: '20px' }}>
             <div>
               <NumberInput
+                data-testid="apollon-farm-amount"
                 name="farmShortValue"
                 rules={{
                   required: { value: true, message: 'You need to specify an amount.' },
@@ -89,6 +91,7 @@ const Farm = () => {
 
               {showSlippage && (
                 <NumberInput
+                  data-testid="apollon-farm-slippage-amount"
                   name="maxSlippage"
                   rules={{
                     min: { value: 0, message: 'Amount needs to be positive.' },
@@ -122,7 +125,7 @@ const Farm = () => {
               >
                 Position size:
                 {selectedToken ? (
-                  <span>
+                  <span data-testid="apollon-farm-position-size">
                     {!isNaN(watchFarmShortValue) ? `${roundCurrency(watchFarmShortValue * tokenRatio)} jUSD` : '-'}
                   </span>
                 ) : (
@@ -154,7 +157,7 @@ const Farm = () => {
               >
                 Protocol fee:
                 {selectedToken ? (
-                  <span>
+                  <span data-testid="apollon-farm-protocol-fee">
                     {displayPercentage(PROTOCOL_FEE)} |
                     {/* <Divider
                     orientation="vertical"
