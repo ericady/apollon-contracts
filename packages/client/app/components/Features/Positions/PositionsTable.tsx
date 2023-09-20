@@ -58,7 +58,7 @@ function PositionsTable() {
 
   return (
     <TableContainer onScroll={handleScroll} style={{ maxHeight: '100%', overflow: 'auto' }}>
-      <Table stickyHeader>
+      <Table stickyHeader data-testid="apollon-positions-table">
         <TableHead>
           <TableRow>
             <HeaderCell title="Opening" />

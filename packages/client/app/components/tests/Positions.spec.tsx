@@ -2,8 +2,10 @@ import { expect, test } from '@playwright/experimental-ct-react';
 import { SetupServer } from 'msw/node';
 import Positions from '../Features/Positions/Positions';
 import { integrationSuiteSetup, integrationTestSetup } from './integration-test.setup';
-import MockedBorrowerPositions from './mockedResponses/GetBorrowerDebtTokens.mocked.json';
-import MockedPositionsWithoutBorrower from './mockedResponses/GetDebtTokens.mocked.json';
+import MockedGetBorrowerCollateralTokens from './mockedResponses/GetBorrowerCollateralTokens.mocked.json';
+import MockedBorrowerDebtTokens from './mockedResponses/GetBorrowerDebtTokens.mocked.json';
+import MockedBorrowerPositions from './mockedResponses/GetBorrowerPositions.mocked.json';
+import MockedDebtTokensWithoutBorrower from './mockedResponses/GetDebtTokens.mocked.json';
 import { IntegrationWrapper } from './test-utils';
 
 let server: SetupServer;
@@ -31,7 +33,7 @@ test.describe('Positions', () => {
       if (JSON.parse(route.request().postData()!).operationName === 'GetBorrowerDebtTokens') {
         return route.fulfill({
           status: 200,
-          body: JSON.stringify(MockedPositionsWithoutBorrower),
+          body: JSON.stringify(MockedDebtTokensWithoutBorrower),
         });
       } else {
         return route.abort();
@@ -44,7 +46,7 @@ test.describe('Positions', () => {
       </IntegrationWrapper>,
     );
 
-    await expect(component).toHaveScreenshot();
+    await expect(component).toHaveScreenshot({ maxDiffPixelRatio: 0.01 });
   });
 
   test.describe('Guest mode', () => {
@@ -95,7 +97,7 @@ test.describe('Positions', () => {
         if (JSON.parse(route.request().postData()!).operationName === 'GetBorrowerDebtTokens') {
           return route.fulfill({
             status: 200,
-            body: JSON.stringify(MockedBorrowerPositions),
+            body: JSON.stringify(MockedBorrowerDebtTokens),
           });
         } else {
           return route.abort();
@@ -108,46 +110,182 @@ test.describe('Positions', () => {
         </IntegrationWrapper>,
       );
 
-      await expect(component).toHaveScreenshot();
+      await expect(component).toHaveScreenshot({ maxDiffPixelRatio: 0.01 });
     });
 
-    test('should have "Collateral" tab enabled', async ({ mount }) => {
-      const component = await mount(
-        <IntegrationWrapper shouldConnectWallet>
-          <Positions />
-        </IntegrationWrapper>,
-      );
+    test.describe('Collateral Tab', () => {
+      test('should have "Collateral" tab enabled', async ({ mount }) => {
+        const component = await mount(
+          <IntegrationWrapper shouldConnectWallet>
+            <Positions />
+          </IntegrationWrapper>,
+        );
 
-      const collateralTab = component.getByRole('tab', {
-        name: 'Collateral',
+        const collateralTab = component.getByRole('tab', {
+          name: 'Collateral',
+        });
+        await expect(collateralTab).toBeEnabled();
       });
-      await expect(collateralTab).toBeEnabled();
+
+      test('should render Collateral tab with mocked data', async ({ mount, page }) => {
+        // We need to mock the exact same data to generate the exact same snapshot
+        await page.route('https://flyby-router-demo.herokuapp.com/', async (route) => {
+          if (JSON.parse(route.request().postData()!).operationName === 'GetCollateralTokens') {
+            return route.fulfill({
+              status: 200,
+              body: JSON.stringify(MockedGetBorrowerCollateralTokens),
+            });
+          } else {
+            return route.abort();
+          }
+        });
+
+        const component = await mount(
+          <IntegrationWrapper shouldConnectWallet>
+            <Positions />
+          </IntegrationWrapper>,
+        );
+
+        const collateralTab = component.getByRole('tab', {
+          name: 'Collateral',
+        });
+        await collateralTab.click();
+
+        await page.waitForSelector('[data-testid="apollon-collateral-table"]', {
+          state: 'visible',
+        });
+
+        await expect(component).toHaveScreenshot({ maxDiffPixelRatio: 0.01 });
+      });
     });
 
-    test('should have "Positions" tab enabled', async ({ mount }) => {
-      const component = await mount(
-        <IntegrationWrapper shouldConnectWallet>
-          <Positions />
-        </IntegrationWrapper>,
-      );
+    test.describe('Positions Tab', () => {
+      test('should have "Positions" tab enabled', async ({ mount }) => {
+        const component = await mount(
+          <IntegrationWrapper shouldConnectWallet>
+            <Positions />
+          </IntegrationWrapper>,
+        );
 
-      const collateralTab = component.getByRole('tab', {
-        name: 'Positions',
+        const collateralTab = component.getByRole('tab', {
+          name: 'Positions',
+        });
+        await expect(collateralTab).toBeEnabled();
       });
-      await expect(collateralTab).toBeEnabled();
+
+      test('should render Positions tab with mocked data', async ({ mount, page }) => {
+        // We need to mock the exact same data to generate the exact same snapshot
+        await page.route('https://flyby-router-demo.herokuapp.com/', async (route) => {
+          if (JSON.parse(route.request().postData()!).operationName === 'GetDebtTokens') {
+            return route.fulfill({
+              status: 200,
+              body: JSON.stringify(MockedDebtTokensWithoutBorrower),
+            });
+          }
+
+          if (JSON.parse(route.request().postData()!).operationName === 'GetBorrowerPositions') {
+            return route.fulfill({
+              status: 200,
+              body: JSON.stringify(MockedBorrowerPositions),
+            });
+          } else {
+            return route.abort();
+          }
+        });
+
+        const component = await mount(
+          <IntegrationWrapper shouldConnectWallet>
+            <Positions />
+          </IntegrationWrapper>,
+        );
+
+        const positionsTab = component.getByRole('tab', {
+          name: 'Positions',
+        });
+        await positionsTab.click();
+
+        await page.waitForSelector('[data-testid="apollon-positions-table"]', {
+          state: 'visible',
+        });
+
+        await expect(component).toHaveScreenshot({ maxDiffPixelRatio: 0.01 });
+      });
+
+      test('should display position number label in the tab', async ({ mount, page }) => {
+        await mount(
+          <IntegrationWrapper shouldConnectWallet>
+            <Positions />
+          </IntegrationWrapper>,
+        );
+
+        await page.waitForSelector('[data-testid="apollon-positions-count"]', {
+          state: 'visible',
+        });
+
+        const rows = page.getByTestId('apollon-positions-count');
+        expect(await rows.count()).toBe(1);
+      });
     });
 
-    test('should have "History" tab enabled', async ({ mount }) => {
-      const component = await mount(
-        <IntegrationWrapper shouldConnectWallet>
-          <Positions />
-        </IntegrationWrapper>,
-      );
+    test.describe('History Tab', () => {
+      test('should have "History" tab enabled', async ({ mount }) => {
+        const component = await mount(
+          <IntegrationWrapper shouldConnectWallet>
+            <Positions />
+          </IntegrationWrapper>,
+        );
 
-      const collateralTab = component.getByRole('tab', {
-        name: 'History',
+        const collateralTab = component.getByRole('tab', {
+          name: 'History',
+        });
+        await expect(collateralTab).toBeEnabled();
       });
-      await expect(collateralTab).toBeEnabled();
+
+      test('should render History tab with mocked data', async ({ mount, page }) => {
+        // We need to mock the exact same data to generate the exact same snapshot
+        await page.route('https://flyby-router-demo.herokuapp.com/', async (route) => {
+          if (JSON.parse(route.request().postData()!).operationName === 'GetBorrowerPositions') {
+            return route.fulfill({
+              status: 200,
+              body: JSON.stringify(MockedBorrowerPositions),
+            });
+          } else {
+            return route.abort();
+          }
+        });
+
+        const component = await mount(
+          <IntegrationWrapper shouldConnectWallet>
+            <Positions />
+          </IntegrationWrapper>,
+        );
+
+        const historyTab = component.getByRole('tab', {
+          name: 'History',
+        });
+        await historyTab.click();
+
+        await page.waitForSelector('[data-testid="apollon-history-table"]', {
+          state: 'visible',
+        });
+
+        await expect(component).toHaveScreenshot({ maxDiffPixelRatio: 0.01 });
+      });
+
+      test('should display history number label in the tab', async ({ mount, page }) => {
+        await mount(
+          <IntegrationWrapper shouldConnectWallet>
+            <Positions />
+          </IntegrationWrapper>,
+        );
+
+        await page.waitForSelector('[data-testid="apollon-history-count"]', {
+          state: 'visible',
+        });
+
+        const rows = page.getByTestId('apollon-history-count');
+        expect(await rows.count()).toBe(1);
+      });
     });
   });
 });

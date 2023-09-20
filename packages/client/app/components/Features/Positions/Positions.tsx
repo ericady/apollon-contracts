@@ -80,7 +80,11 @@ const Positions = () => {
             label={
               <span>
                 POSITIONS{'  '}
-                {openPositions && <Label variant="none">{openPositions.getPositions.pageInfo.totalCount}</Label>}
+                {openPositions && (
+                  <Label variant="none">
+                    <span data-testid="apollon-positions-count">{openPositions.getPositions.pageInfo.totalCount}</span>
+                  </Label>
+                )}
               </span>
             }
             disableRipple
@@ -91,7 +95,11 @@ const Positions = () => {
             label={
               <span>
                 HISTORY{'  '}
-                {closedPositions && <Label variant="none">{closedPositions.getPositions.pageInfo.totalCount}</Label>}
+                {closedPositions && (
+                  <Label variant="none">
+                    <span data-testid="apollon-history-count">{closedPositions.getPositions.pageInfo.totalCount}</span>
+                  </Label>
+                )}
               </span>
             }
             disableRipple

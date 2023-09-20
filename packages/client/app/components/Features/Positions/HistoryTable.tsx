@@ -55,7 +55,7 @@ function HistoryTable() {
 
   return (
     <TableContainer onScroll={handleScroll} style={{ maxHeight: '100%', overflow: 'auto' }}>
-      <Table stickyHeader>
+      <Table stickyHeader data-testid="apollon-history-table">
         <TableHead>
           <TableRow>
             <HeaderCell title="Opening" />

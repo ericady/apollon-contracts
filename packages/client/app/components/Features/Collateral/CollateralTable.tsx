@@ -112,7 +112,7 @@ function CollateralTable() {
         {!data ? (
           <CollateralTableLoader />
         ) : (
-          <TableContainer>
+          <TableContainer data-testid="apollon-collateral-table">
             <Table>
               <TableHead>
                 <TableRow>
