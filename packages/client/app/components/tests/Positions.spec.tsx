@@ -2,8 +2,8 @@ import { expect, test } from '@playwright/experimental-ct-react';
 import { SetupServer } from 'msw/node';
 import Positions from '../Features/Positions/Positions';
 import { integrationSuiteSetup, integrationTestSetup } from './integration-test.setup';
-import MockedBorrowerPositions from './mockedResponses/BorrowerPositions.mocked.json';
-import MockedPositionsWithoutBorrower from './mockedResponses/Positions.mocked.json';
+import MockedBorrowerPositions from './mockedResponses/GetBorrowerDebtTokens.mocked.json';
+import MockedPositionsWithoutBorrower from './mockedResponses/GetDebtTokens.mocked.json';
 import { IntegrationWrapper } from './test-utils';
 
 let server: SetupServer;

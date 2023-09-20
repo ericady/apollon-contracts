@@ -3,12 +3,12 @@ import { ThemeProvider } from '@emotion/react';
 import { SnackbarProvider } from 'notistack';
 import { PropsWithChildren, useState } from 'react';
 import 'whatwg-fetch';
-import { tokens } from '../../../mocks/handlers';
 import { client } from '../../client';
 import { EthersContext } from '../../context/EthersProvider';
 import SelectedTokenProvider, { useSelectedToken } from '../../context/SelectedTokenProvider';
 import WalletProvider from '../../context/WalletProvider';
 import theme from '../../theme';
+import MockedPositionsWithoutBorrower from './mockedResponses/GetDebtTokens.mocked.json';
 
 type Props = {
   shouldPreselectTokens?: boolean;
@@ -37,7 +37,7 @@ export const IntegrationWrapper = ({ children, ...stateProps }: PropsWithChildre
 function SetupState({ children, shouldPreselectTokens, shouldConnectWallet }: PropsWithChildren<Props>) {
   const { setSelectedToken, selectedToken } = useSelectedToken();
   if (shouldPreselectTokens && !selectedToken) {
-    const { address, priceUSD, priceUSD24hAgo, symbol } = tokens[0];
+    const { address, priceUSD, priceUSD24hAgo, symbol } = MockedPositionsWithoutBorrower.data.getDebtTokens[0].token;
     setSelectedToken({
       address,
       change: 0.01,

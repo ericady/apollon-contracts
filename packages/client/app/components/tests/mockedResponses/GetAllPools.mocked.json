@@ -1,0 +1,1888 @@
+{
+  "data": {
+    "getPools": [
+      {
+        "id": "515a250f-30da-493f-bb31-a43f60329399",
+        "openingFee": 0.0386,
+        "liquidity": [
+          {
+            "token": {
+              "address": "0df96cfa-ce48-4632-921e-582017ae69f9",
+              "symbol": "ZAR",
+              "createdAt": "2023-09-01T03:25:55.453Z",
+              "priceUSD": 3114.84,
+              "priceUSD24hAgo": 1684.25,
+              "isPoolToken": false
+            },
+            "totalAmount": 159702.75,
+            "borrowerAmount": null
+          },
+          {
+            "token": {
+              "address": "0x6cA13a4ab78dd7D657226b155873A04DB929A3A4",
+              "symbol": "TTD",
+              "createdAt": "2022-12-15T15:27:06.504Z",
+              "priceUSD": 4056.24,
+              "priceUSD24hAgo": 4617.13,
+              "isPoolToken": true
+            },
+            "totalAmount": 320549.3,
+            "borrowerAmount": null
+          }
+        ],
+        "rewards": [],
+        "liquidityDepositAPY": 0.4155,
+        "volume24hUSD": 11174.38,
+        "volume24hUSD24hAgo": 42753.29
+      },
+      {
+        "id": "19fc9868-d49d-4744-9f76-f99e219aff72",
+        "openingFee": 0.035,
+        "liquidity": [
+          {
+            "token": {
+              "address": "0df96cfa-ce48-4632-921e-582017ae69f9",
+              "symbol": "ZAR",
+              "createdAt": "2023-09-01T03:25:55.453Z",
+              "priceUSD": 3114.84,
+              "priceUSD24hAgo": 1684.25,
+              "isPoolToken": false
+            },
+            "totalAmount": 244887.09,
+            "borrowerAmount": null
+          },
+          {
+            "token": {
+              "address": "3cdff5c6-3619-4c3f-8777-62d3e6451900",
+              "symbol": "SGD",
+              "createdAt": "2023-04-02T10:11:29.529Z",
+              "priceUSD": 168.15,
+              "priceUSD24hAgo": 4643.76,
+              "isPoolToken": true
+            },
+            "totalAmount": 558727.42,
+            "borrowerAmount": null
+          }
+        ],
+        "rewards": [],
+        "liquidityDepositAPY": 0.4272,
+        "volume24hUSD": 44772.26,
+        "volume24hUSD24hAgo": 30020.76
+      },
+      {
+        "id": "89832bcb-468f-4c0d-a463-2f7b9f411500",
+        "openingFee": 0.0436,
+        "liquidity": [
+          {
+            "token": {
+              "address": "0df96cfa-ce48-4632-921e-582017ae69f9",
+              "symbol": "ZAR",
+              "createdAt": "2023-09-01T03:25:55.453Z",
+              "priceUSD": 3114.84,
+              "priceUSD24hAgo": 1684.25,
+              "isPoolToken": false
+            },
+            "totalAmount": 924544.48,
+            "borrowerAmount": null
+          },
+          {
+            "token": {
+              "address": "090e19b7-7cd8-4fcf-ab00-b1274e768ea8",
+              "symbol": "BND",
+              "createdAt": "2023-08-12T17:23:20.841Z",
+              "priceUSD": 2249.46,
+              "priceUSD24hAgo": 4845.78,
+              "isPoolToken": false
+            },
+            "totalAmount": 812961.85,
+            "borrowerAmount": null
+          }
+        ],
+        "rewards": [],
+        "liquidityDepositAPY": 0.1701,
+        "volume24hUSD": 19388.97,
+        "volume24hUSD24hAgo": 20117.74
+      },
+      {
+        "id": "35b26ed9-8ab0-436b-a29d-6ddc47f8580d",
+        "openingFee": -0.0303,
+        "liquidity": [
+          {
+            "token": {
+              "address": "0df96cfa-ce48-4632-921e-582017ae69f9",
+              "symbol": "ZAR",
+              "createdAt": "2023-09-01T03:25:55.453Z",
+              "priceUSD": 3114.84,
+              "priceUSD24hAgo": 1684.25,
+              "isPoolToken": false
+            },
+            "totalAmount": 102591.71,
+            "borrowerAmount": null
+          },
+          {
+            "token": {
+              "address": "da428d2f-3d1e-4d88-aecd-387de67eda33",
+              "symbol": "STN",
+              "createdAt": "2023-01-15T20:58:55.006Z",
+              "priceUSD": 3258.74,
+              "priceUSD24hAgo": 1174.37,
+              "isPoolToken": false
+            },
+            "totalAmount": 342077.76,
+            "borrowerAmount": null
+          }
+        ],
+        "rewards": [],
+        "liquidityDepositAPY": 0.4532,
+        "volume24hUSD": 31791.34,
+        "volume24hUSD24hAgo": 20256.66
+      },
+      {
+        "id": "6c0cdfd5-b8bf-4555-900b-3ae2b862a9cd",
+        "openingFee": -0.037,
+        "liquidity": [
+          {
+            "token": {
+              "address": "0df96cfa-ce48-4632-921e-582017ae69f9",
+              "symbol": "ZAR",
+              "createdAt": "2023-09-01T03:25:55.453Z",
+              "priceUSD": 3114.84,
+              "priceUSD24hAgo": 1684.25,
+              "isPoolToken": false
+            },
+            "totalAmount": 701594.06,
+            "borrowerAmount": null
+          },
+          {
+            "token": {
+              "address": "4bf44d6a-210e-4b73-ba03-435253fa3be5",
+              "symbol": "BND",
+              "createdAt": "2023-05-15T10:43:35.283Z",
+              "priceUSD": 686.06,
+              "priceUSD24hAgo": 2733.16,
+              "isPoolToken": false
+            },
+            "totalAmount": 343246.07,
+            "borrowerAmount": null
+          }
+        ],
+        "rewards": [],
+        "liquidityDepositAPY": 0.2428,
+        "volume24hUSD": 10806.53,
+        "volume24hUSD24hAgo": 25279.61
+      },
+      {
+        "id": "ce9728e1-10f7-40c6-8f0b-2d0bb3384461",
+        "openingFee": 0.038,
+        "liquidity": [
+          {
+            "token": {
+              "address": "0df96cfa-ce48-4632-921e-582017ae69f9",
+              "symbol": "ZAR",
+              "createdAt": "2023-09-01T03:25:55.453Z",
+              "priceUSD": 3114.84,
+              "priceUSD24hAgo": 1684.25,
+              "isPoolToken": false
+            },
+            "totalAmount": 300657.63,
+            "borrowerAmount": null
+          },
+          {
+            "token": {
+              "address": "7e587a66-956d-4b26-8935-e00ee50d7a55",
+              "symbol": "BHD",
+              "createdAt": "2023-06-15T19:34:38.362Z",
+              "priceUSD": 1336.83,
+              "priceUSD24hAgo": 3349.06,
+              "isPoolToken": true
+            },
+            "totalAmount": 637785.22,
+            "borrowerAmount": null
+          }
+        ],
+        "rewards": [],
+        "liquidityDepositAPY": 0.2642,
+        "volume24hUSD": 32956.9,
+        "volume24hUSD24hAgo": 15538.26
+      },
+      {
+        "id": "f414fd79-580b-4d19-ab94-4dca549d4a0c",
+        "openingFee": -0.0083,
+        "liquidity": [
+          {
+            "token": {
+              "address": "0df96cfa-ce48-4632-921e-582017ae69f9",
+              "symbol": "ZAR",
+              "createdAt": "2023-09-01T03:25:55.453Z",
+              "priceUSD": 3114.84,
+              "priceUSD24hAgo": 1684.25,
+              "isPoolToken": false
+            },
+            "totalAmount": 132214.84,
+            "borrowerAmount": null
+          },
+          {
+            "token": {
+              "address": "477af6c2-830a-4383-81d2-255300d4183f",
+              "symbol": "QAR",
+              "createdAt": "2023-05-14T19:43:31.409Z",
+              "priceUSD": 3299.98,
+              "priceUSD24hAgo": 4641.49,
+              "isPoolToken": false
+            },
+            "totalAmount": 734841.38,
+            "borrowerAmount": null
+          }
+        ],
+        "rewards": [],
+        "liquidityDepositAPY": 0.1377,
+        "volume24hUSD": 28732.68,
+        "volume24hUSD24hAgo": 30273.33
+      },
+      {
+        "id": "e5d80341-2cff-47fa-b80b-411e9614678d",
+        "openingFee": 0.0267,
+        "liquidity": [
+          {
+            "token": {
+              "address": "0df96cfa-ce48-4632-921e-582017ae69f9",
+              "symbol": "ZAR",
+              "createdAt": "2023-09-01T03:25:55.453Z",
+              "priceUSD": 3114.84,
+              "priceUSD24hAgo": 1684.25,
+              "isPoolToken": false
+            },
+            "totalAmount": 538484.49,
+            "borrowerAmount": null
+          },
+          {
+            "token": {
+              "address": "3a87a447-ffe3-4e39-93f1-8d9096729e7f",
+              "symbol": "WST",
+              "createdAt": "2022-12-19T07:39:23.288Z",
+              "priceUSD": 2729.96,
+              "priceUSD24hAgo": 3942.59,
+              "isPoolToken": true
+            },
+            "totalAmount": 291679.55,
+            "borrowerAmount": null
+          }
+        ],
+        "rewards": [],
+        "liquidityDepositAPY": 0.2028,
+        "volume24hUSD": 40476.06,
+        "volume24hUSD24hAgo": 22962.92
+      },
+      {
+        "id": "238b7784-9436-42f5-b604-ced8dff0c5e3",
+        "openingFee": -0.0301,
+        "liquidity": [
+          {
+            "token": {
+              "address": "0df96cfa-ce48-4632-921e-582017ae69f9",
+              "symbol": "ZAR",
+              "createdAt": "2023-09-01T03:25:55.453Z",
+              "priceUSD": 3114.84,
+              "priceUSD24hAgo": 1684.25,
+              "isPoolToken": false
+            },
+            "totalAmount": 873780.91,
+            "borrowerAmount": null
+          },
+          {
+            "token": {
+              "address": "2946db0b-3732-4256-a5cf-b0923463e22a",
+              "symbol": "NZD",
+              "createdAt": "2022-12-25T23:48:47.455Z",
+              "priceUSD": 1754.22,
+              "priceUSD24hAgo": 3279.57,
+              "isPoolToken": false
+            },
+            "totalAmount": 271189.91,
+            "borrowerAmount": null
+          }
+        ],
+        "rewards": [],
+        "liquidityDepositAPY": 0.0804,
+        "volume24hUSD": 24385.71,
+        "volume24hUSD24hAgo": 43395.22
+      },
+      {
+        "id": "422ee7d8-f90a-4dcc-a48b-4faad173bc80",
+        "openingFee": 0.0225,
+        "liquidity": [
+          {
+            "token": {
+              "address": "0df96cfa-ce48-4632-921e-582017ae69f9",
+              "symbol": "ZAR",
+              "createdAt": "2023-09-01T03:25:55.453Z",
+              "priceUSD": 3114.84,
+              "priceUSD24hAgo": 1684.25,
+              "isPoolToken": false
+            },
+            "totalAmount": 999361.13,
+            "borrowerAmount": null
+          },
+          {
+            "token": {
+              "address": "0x6cA13a4ab78dd7D657226b155873A04DB929AXXX",
+              "symbol": "JUSD",
+              "createdAt": "2023-04-30T18:04:50.993Z",
+              "priceUSD": 2423.78,
+              "priceUSD24hAgo": 2702.58,
+              "isPoolToken": true
+            },
+            "totalAmount": 574370.6,
+            "borrowerAmount": null
+          }
+        ],
+        "rewards": [],
+        "liquidityDepositAPY": 0.4823,
+        "volume24hUSD": 27884.71,
+        "volume24hUSD24hAgo": 13248.76
+      },
+      {
+        "id": "f0457367-0f63-44cd-8279-1567639595b8",
+        "openingFee": -0.0236,
+        "liquidity": [
+          {
+            "token": {
+              "address": "0x6cA13a4ab78dd7D657226b155873A04DB929A3A4",
+              "symbol": "TTD",
+              "createdAt": "2022-12-15T15:27:06.504Z",
+              "priceUSD": 4056.24,
+              "priceUSD24hAgo": 4617.13,
+              "isPoolToken": true
+            },
+            "totalAmount": 831412.84,
+            "borrowerAmount": null
+          },
+          {
+            "token": {
+              "address": "3cdff5c6-3619-4c3f-8777-62d3e6451900",
+              "symbol": "SGD",
+              "createdAt": "2023-04-02T10:11:29.529Z",
+              "priceUSD": 168.15,
+              "priceUSD24hAgo": 4643.76,
+              "isPoolToken": true
+            },
+            "totalAmount": 255090.88,
+            "borrowerAmount": null
+          }
+        ],
+        "rewards": [],
+        "liquidityDepositAPY": 0.2613,
+        "volume24hUSD": 26314.03,
+        "volume24hUSD24hAgo": 39353.26
+      },
+      {
+        "id": "80e33f49-031a-4f11-a074-472222341f60",
+        "openingFee": 0.0111,
+        "liquidity": [
+          {
+            "token": {
+              "address": "0x6cA13a4ab78dd7D657226b155873A04DB929A3A4",
+              "symbol": "TTD",
+              "createdAt": "2022-12-15T15:27:06.504Z",
+              "priceUSD": 4056.24,
+              "priceUSD24hAgo": 4617.13,
+              "isPoolToken": true
+            },
+            "totalAmount": 525837.01,
+            "borrowerAmount": null
+          },
+          {
+            "token": {
+              "address": "090e19b7-7cd8-4fcf-ab00-b1274e768ea8",
+              "symbol": "BND",
+              "createdAt": "2023-08-12T17:23:20.841Z",
+              "priceUSD": 2249.46,
+              "priceUSD24hAgo": 4845.78,
+              "isPoolToken": false
+            },
+            "totalAmount": 751527.19,
+            "borrowerAmount": null
+          }
+        ],
+        "rewards": [],
+        "liquidityDepositAPY": 0.215,
+        "volume24hUSD": 26833.94,
+        "volume24hUSD24hAgo": 17326.89
+      },
+      {
+        "id": "e85f9129-e1e7-47d4-9464-9e9b02f6391c",
+        "openingFee": 0.0028,
+        "liquidity": [
+          {
+            "token": {
+              "address": "0x6cA13a4ab78dd7D657226b155873A04DB929A3A4",
+              "symbol": "TTD",
+              "createdAt": "2022-12-15T15:27:06.504Z",
+              "priceUSD": 4056.24,
+              "priceUSD24hAgo": 4617.13,
+              "isPoolToken": true
+            },
+            "totalAmount": 445550.69,
+            "borrowerAmount": null
+          },
+          {
+            "token": {
+              "address": "da428d2f-3d1e-4d88-aecd-387de67eda33",
+              "symbol": "STN",
+              "createdAt": "2023-01-15T20:58:55.006Z",
+              "priceUSD": 3258.74,
+              "priceUSD24hAgo": 1174.37,
+              "isPoolToken": false
+            },
+            "totalAmount": 936944.82,
+            "borrowerAmount": null
+          }
+        ],
+        "rewards": [],
+        "liquidityDepositAPY": 0.3923,
+        "volume24hUSD": 17710.37,
+        "volume24hUSD24hAgo": 46696.25
+      },
+      {
+        "id": "c3e07551-d019-4997-80c1-9d0073c1e7e3",
+        "openingFee": 0.0148,
+        "liquidity": [
+          {
+            "token": {
+              "address": "0x6cA13a4ab78dd7D657226b155873A04DB929A3A4",
+              "symbol": "TTD",
+              "createdAt": "2022-12-15T15:27:06.504Z",
+              "priceUSD": 4056.24,
+              "priceUSD24hAgo": 4617.13,
+              "isPoolToken": true
+            },
+            "totalAmount": 551929.04,
+            "borrowerAmount": null
+          },
+          {
+            "token": {
+              "address": "4bf44d6a-210e-4b73-ba03-435253fa3be5",
+              "symbol": "BND",
+              "createdAt": "2023-05-15T10:43:35.283Z",
+              "priceUSD": 686.06,
+              "priceUSD24hAgo": 2733.16,
+              "isPoolToken": false
+            },
+            "totalAmount": 581701.62,
+            "borrowerAmount": null
+          }
+        ],
+        "rewards": [],
+        "liquidityDepositAPY": 0.4473,
+        "volume24hUSD": 22515.42,
+        "volume24hUSD24hAgo": 32714.74
+      },
+      {
+        "id": "f3d1c3db-7fc1-4b42-8e4c-5186aefc141b",
+        "openingFee": -0.0352,
+        "liquidity": [
+          {
+            "token": {
+              "address": "0x6cA13a4ab78dd7D657226b155873A04DB929A3A4",
+              "symbol": "TTD",
+              "createdAt": "2022-12-15T15:27:06.504Z",
+              "priceUSD": 4056.24,
+              "priceUSD24hAgo": 4617.13,
+              "isPoolToken": true
+            },
+            "totalAmount": 582059.94,
+            "borrowerAmount": null
+          },
+          {
+            "token": {
+              "address": "7e587a66-956d-4b26-8935-e00ee50d7a55",
+              "symbol": "BHD",
+              "createdAt": "2023-06-15T19:34:38.362Z",
+              "priceUSD": 1336.83,
+              "priceUSD24hAgo": 3349.06,
+              "isPoolToken": true
+            },
+            "totalAmount": 113118.67,
+            "borrowerAmount": null
+          }
+        ],
+        "rewards": [],
+        "liquidityDepositAPY": 0.4338,
+        "volume24hUSD": 25035.33,
+        "volume24hUSD24hAgo": 31229.56
+      },
+      {
+        "id": "185ba84a-540b-4850-9b23-fc5d94d6979a",
+        "openingFee": -0.0148,
+        "liquidity": [
+          {
+            "token": {
+              "address": "0x6cA13a4ab78dd7D657226b155873A04DB929A3A4",
+              "symbol": "TTD",
+              "createdAt": "2022-12-15T15:27:06.504Z",
+              "priceUSD": 4056.24,
+              "priceUSD24hAgo": 4617.13,
+              "isPoolToken": true
+            },
+            "totalAmount": 419188.51,
+            "borrowerAmount": null
+          },
+          {
+            "token": {
+              "address": "477af6c2-830a-4383-81d2-255300d4183f",
+              "symbol": "QAR",
+              "createdAt": "2023-05-14T19:43:31.409Z",
+              "priceUSD": 3299.98,
+              "priceUSD24hAgo": 4641.49,
+              "isPoolToken": false
+            },
+            "totalAmount": 992221.06,
+            "borrowerAmount": null
+          }
+        ],
+        "rewards": [],
+        "liquidityDepositAPY": 0.2236,
+        "volume24hUSD": 43612.48,
+        "volume24hUSD24hAgo": 49599.92
+      },
+      {
+        "id": "307a85b4-25fb-4df2-b88a-40243c943d91",
+        "openingFee": -0.0378,
+        "liquidity": [
+          {
+            "token": {
+              "address": "0x6cA13a4ab78dd7D657226b155873A04DB929A3A4",
+              "symbol": "TTD",
+              "createdAt": "2022-12-15T15:27:06.504Z",
+              "priceUSD": 4056.24,
+              "priceUSD24hAgo": 4617.13,
+              "isPoolToken": true
+            },
+            "totalAmount": 571354,
+            "borrowerAmount": null
+          },
+          {
+            "token": {
+              "address": "3a87a447-ffe3-4e39-93f1-8d9096729e7f",
+              "symbol": "WST",
+              "createdAt": "2022-12-19T07:39:23.288Z",
+              "priceUSD": 2729.96,
+              "priceUSD24hAgo": 3942.59,
+              "isPoolToken": true
+            },
+            "totalAmount": 903601.1,
+            "borrowerAmount": null
+          }
+        ],
+        "rewards": [],
+        "liquidityDepositAPY": 0.3774,
+        "volume24hUSD": 38692.29,
+        "volume24hUSD24hAgo": 40011.39
+      },
+      {
+        "id": "5a4a98a5-9af8-447b-80a1-f587486cfea8",
+        "openingFee": -0.05,
+        "liquidity": [
+          {
+            "token": {
+              "address": "0x6cA13a4ab78dd7D657226b155873A04DB929A3A4",
+              "symbol": "TTD",
+              "createdAt": "2022-12-15T15:27:06.504Z",
+              "priceUSD": 4056.24,
+              "priceUSD24hAgo": 4617.13,
+              "isPoolToken": true
+            },
+            "totalAmount": 547581.24,
+            "borrowerAmount": null
+          },
+          {
+            "token": {
+              "address": "2946db0b-3732-4256-a5cf-b0923463e22a",
+              "symbol": "NZD",
+              "createdAt": "2022-12-25T23:48:47.455Z",
+              "priceUSD": 1754.22,
+              "priceUSD24hAgo": 3279.57,
+              "isPoolToken": false
+            },
+            "totalAmount": 460074.62,
+            "borrowerAmount": null
+          }
+        ],
+        "rewards": [],
+        "liquidityDepositAPY": 0.4703,
+        "volume24hUSD": 32473.64,
+        "volume24hUSD24hAgo": 40194.6
+      },
+      {
+        "id": "e6be15c5-20a6-46b0-9791-06cb20e6390c",
+        "openingFee": -0.0262,
+        "liquidity": [
+          {
+            "token": {
+              "address": "0x6cA13a4ab78dd7D657226b155873A04DB929A3A4",
+              "symbol": "TTD",
+              "createdAt": "2022-12-15T15:27:06.504Z",
+              "priceUSD": 4056.24,
+              "priceUSD24hAgo": 4617.13,
+              "isPoolToken": true
+            },
+            "totalAmount": 775140.25,
+            "borrowerAmount": null
+          },
+          {
+            "token": {
+              "address": "0x6cA13a4ab78dd7D657226b155873A04DB929AXXX",
+              "symbol": "JUSD",
+              "createdAt": "2023-04-30T18:04:50.993Z",
+              "priceUSD": 2423.78,
+              "priceUSD24hAgo": 2702.58,
+              "isPoolToken": true
+            },
+            "totalAmount": 958294.02,
+            "borrowerAmount": null
+          }
+        ],
+        "rewards": [
+          {
+            "token": {
+              "address": "3cdff5c6-3619-4c3f-8777-62d3e6451900",
+              "symbol": "SGD",
+              "createdAt": "2023-04-02T10:11:29.529Z",
+              "priceUSD": 168.15,
+              "priceUSD24hAgo": 4643.76,
+              "isPoolToken": true
+            },
+            "amount": 26.65
+          }
+        ],
+        "liquidityDepositAPY": 0.2813,
+        "volume24hUSD": 42137.47,
+        "volume24hUSD24hAgo": 43180.15
+      },
+      {
+        "id": "cae7e371-60d4-45df-b89f-9c4aa08fddf0",
+        "openingFee": 0.0151,
+        "liquidity": [
+          {
+            "token": {
+              "address": "3cdff5c6-3619-4c3f-8777-62d3e6451900",
+              "symbol": "SGD",
+              "createdAt": "2023-04-02T10:11:29.529Z",
+              "priceUSD": 168.15,
+              "priceUSD24hAgo": 4643.76,
+              "isPoolToken": true
+            },
+            "totalAmount": 424476.14,
+            "borrowerAmount": null
+          },
+          {
+            "token": {
+              "address": "090e19b7-7cd8-4fcf-ab00-b1274e768ea8",
+              "symbol": "BND",
+              "createdAt": "2023-08-12T17:23:20.841Z",
+              "priceUSD": 2249.46,
+              "priceUSD24hAgo": 4845.78,
+              "isPoolToken": false
+            },
+            "totalAmount": 886224.55,
+            "borrowerAmount": null
+          }
+        ],
+        "rewards": [],
+        "liquidityDepositAPY": 0.0283,
+        "volume24hUSD": 38993.83,
+        "volume24hUSD24hAgo": 26097.97
+      },
+      {
+        "id": "2e971f1a-8518-4e21-ab5c-dee830539fad",
+        "openingFee": 0.0202,
+        "liquidity": [
+          {
+            "token": {
+              "address": "3cdff5c6-3619-4c3f-8777-62d3e6451900",
+              "symbol": "SGD",
+              "createdAt": "2023-04-02T10:11:29.529Z",
+              "priceUSD": 168.15,
+              "priceUSD24hAgo": 4643.76,
+              "isPoolToken": true
+            },
+            "totalAmount": 830891.2,
+            "borrowerAmount": null
+          },
+          {
+            "token": {
+              "address": "da428d2f-3d1e-4d88-aecd-387de67eda33",
+              "symbol": "STN",
+              "createdAt": "2023-01-15T20:58:55.006Z",
+              "priceUSD": 3258.74,
+              "priceUSD24hAgo": 1174.37,
+              "isPoolToken": false
+            },
+            "totalAmount": 303341,
+            "borrowerAmount": null
+          }
+        ],
+        "rewards": [],
+        "liquidityDepositAPY": 0.3522,
+        "volume24hUSD": 47939.68,
+        "volume24hUSD24hAgo": 19673.53
+      },
+      {
+        "id": "9df88f8d-6f2d-462b-8183-ead8ddab455c",
+        "openingFee": 0.0212,
+        "liquidity": [
+          {
+            "token": {
+              "address": "3cdff5c6-3619-4c3f-8777-62d3e6451900",
+              "symbol": "SGD",
+              "createdAt": "2023-04-02T10:11:29.529Z",
+              "priceUSD": 168.15,
+              "priceUSD24hAgo": 4643.76,
+              "isPoolToken": true
+            },
+            "totalAmount": 690771.26,
+            "borrowerAmount": null
+          },
+          {
+            "token": {
+              "address": "4bf44d6a-210e-4b73-ba03-435253fa3be5",
+              "symbol": "BND",
+              "createdAt": "2023-05-15T10:43:35.283Z",
+              "priceUSD": 686.06,
+              "priceUSD24hAgo": 2733.16,
+              "isPoolToken": false
+            },
+            "totalAmount": 299359.34,
+            "borrowerAmount": null
+          }
+        ],
+        "rewards": [],
+        "liquidityDepositAPY": 0.1624,
+        "volume24hUSD": 47594.39,
+        "volume24hUSD24hAgo": 45246.67
+      },
+      {
+        "id": "415d575d-003f-4b5b-b410-4b43baf98d6f",
+        "openingFee": 0.0328,
+        "liquidity": [
+          {
+            "token": {
+              "address": "3cdff5c6-3619-4c3f-8777-62d3e6451900",
+              "symbol": "SGD",
+              "createdAt": "2023-04-02T10:11:29.529Z",
+              "priceUSD": 168.15,
+              "priceUSD24hAgo": 4643.76,
+              "isPoolToken": true
+            },
+            "totalAmount": 544228.34,
+            "borrowerAmount": null
+          },
+          {
+            "token": {
+              "address": "7e587a66-956d-4b26-8935-e00ee50d7a55",
+              "symbol": "BHD",
+              "createdAt": "2023-06-15T19:34:38.362Z",
+              "priceUSD": 1336.83,
+              "priceUSD24hAgo": 3349.06,
+              "isPoolToken": true
+            },
+            "totalAmount": 612487.85,
+            "borrowerAmount": null
+          }
+        ],
+        "rewards": [],
+        "liquidityDepositAPY": 0.2942,
+        "volume24hUSD": 20483.89,
+        "volume24hUSD24hAgo": 23190.6
+      },
+      {
+        "id": "88a8d45a-aece-40fc-bbe8-8e882beb21b6",
+        "openingFee": -0.0126,
+        "liquidity": [
+          {
+            "token": {
+              "address": "3cdff5c6-3619-4c3f-8777-62d3e6451900",
+              "symbol": "SGD",
+              "createdAt": "2023-04-02T10:11:29.529Z",
+              "priceUSD": 168.15,
+              "priceUSD24hAgo": 4643.76,
+              "isPoolToken": true
+            },
+            "totalAmount": 786152.6,
+            "borrowerAmount": null
+          },
+          {
+            "token": {
+              "address": "477af6c2-830a-4383-81d2-255300d4183f",
+              "symbol": "QAR",
+              "createdAt": "2023-05-14T19:43:31.409Z",
+              "priceUSD": 3299.98,
+              "priceUSD24hAgo": 4641.49,
+              "isPoolToken": false
+            },
+            "totalAmount": 921482.2,
+            "borrowerAmount": null
+          }
+        ],
+        "rewards": [],
+        "liquidityDepositAPY": 0.0209,
+        "volume24hUSD": 21815.04,
+        "volume24hUSD24hAgo": 17825.42
+      },
+      {
+        "id": "556b6ac8-77c3-4f4d-8b8a-0d231cdd2297",
+        "openingFee": 0.0086,
+        "liquidity": [
+          {
+            "token": {
+              "address": "3cdff5c6-3619-4c3f-8777-62d3e6451900",
+              "symbol": "SGD",
+              "createdAt": "2023-04-02T10:11:29.529Z",
+              "priceUSD": 168.15,
+              "priceUSD24hAgo": 4643.76,
+              "isPoolToken": true
+            },
+            "totalAmount": 409943.49,
+            "borrowerAmount": null
+          },
+          {
+            "token": {
+              "address": "3a87a447-ffe3-4e39-93f1-8d9096729e7f",
+              "symbol": "WST",
+              "createdAt": "2022-12-19T07:39:23.288Z",
+              "priceUSD": 2729.96,
+              "priceUSD24hAgo": 3942.59,
+              "isPoolToken": true
+            },
+            "totalAmount": 951027.4,
+            "borrowerAmount": null
+          }
+        ],
+        "rewards": [],
+        "liquidityDepositAPY": 0.3478,
+        "volume24hUSD": 28271.51,
+        "volume24hUSD24hAgo": 20976.39
+      },
+      {
+        "id": "5d64b669-fda9-4ded-a606-639474ea6215",
+        "openingFee": 0.0153,
+        "liquidity": [
+          {
+            "token": {
+              "address": "3cdff5c6-3619-4c3f-8777-62d3e6451900",
+              "symbol": "SGD",
+              "createdAt": "2023-04-02T10:11:29.529Z",
+              "priceUSD": 168.15,
+              "priceUSD24hAgo": 4643.76,
+              "isPoolToken": true
+            },
+            "totalAmount": 742397.49,
+            "borrowerAmount": null
+          },
+          {
+            "token": {
+              "address": "2946db0b-3732-4256-a5cf-b0923463e22a",
+              "symbol": "NZD",
+              "createdAt": "2022-12-25T23:48:47.455Z",
+              "priceUSD": 1754.22,
+              "priceUSD24hAgo": 3279.57,
+              "isPoolToken": false
+            },
+            "totalAmount": 423259.01,
+            "borrowerAmount": null
+          }
+        ],
+        "rewards": [],
+        "liquidityDepositAPY": 0.081,
+        "volume24hUSD": 46675.21,
+        "volume24hUSD24hAgo": 41689.21
+      },
+      {
+        "id": "f0231764-7e56-4a27-a5f5-87d74fac06ec",
+        "openingFee": -0.0297,
+        "liquidity": [
+          {
+            "token": {
+              "address": "3cdff5c6-3619-4c3f-8777-62d3e6451900",
+              "symbol": "SGD",
+              "createdAt": "2023-04-02T10:11:29.529Z",
+              "priceUSD": 168.15,
+              "priceUSD24hAgo": 4643.76,
+              "isPoolToken": true
+            },
+            "totalAmount": 366731.22,
+            "borrowerAmount": null
+          },
+          {
+            "token": {
+              "address": "0x6cA13a4ab78dd7D657226b155873A04DB929AXXX",
+              "symbol": "JUSD",
+              "createdAt": "2023-04-30T18:04:50.993Z",
+              "priceUSD": 2423.78,
+              "priceUSD24hAgo": 2702.58,
+              "isPoolToken": true
+            },
+            "totalAmount": 585611.94,
+            "borrowerAmount": null
+          }
+        ],
+        "rewards": [],
+        "liquidityDepositAPY": 0.214,
+        "volume24hUSD": 46389.46,
+        "volume24hUSD24hAgo": 39212.29
+      },
+      {
+        "id": "3221de73-05f4-4b83-822d-84a46dd3474d",
+        "openingFee": -0.0185,
+        "liquidity": [
+          {
+            "token": {
+              "address": "090e19b7-7cd8-4fcf-ab00-b1274e768ea8",
+              "symbol": "BND",
+              "createdAt": "2023-08-12T17:23:20.841Z",
+              "priceUSD": 2249.46,
+              "priceUSD24hAgo": 4845.78,
+              "isPoolToken": false
+            },
+            "totalAmount": 501080.59,
+            "borrowerAmount": null
+          },
+          {
+            "token": {
+              "address": "da428d2f-3d1e-4d88-aecd-387de67eda33",
+              "symbol": "STN",
+              "createdAt": "2023-01-15T20:58:55.006Z",
+              "priceUSD": 3258.74,
+              "priceUSD24hAgo": 1174.37,
+              "isPoolToken": false
+            },
+            "totalAmount": 100761.87,
+            "borrowerAmount": null
+          }
+        ],
+        "rewards": [],
+        "liquidityDepositAPY": 0.1537,
+        "volume24hUSD": 35953.63,
+        "volume24hUSD24hAgo": 44060.75
+      },
+      {
+        "id": "5dcd1187-c882-4d2b-a8c9-2ae7c136acbc",
+        "openingFee": -0.021,
+        "liquidity": [
+          {
+            "token": {
+              "address": "090e19b7-7cd8-4fcf-ab00-b1274e768ea8",
+              "symbol": "BND",
+              "createdAt": "2023-08-12T17:23:20.841Z",
+              "priceUSD": 2249.46,
+              "priceUSD24hAgo": 4845.78,
+              "isPoolToken": false
+            },
+            "totalAmount": 436779.69,
+            "borrowerAmount": null
+          },
+          {
+            "token": {
+              "address": "4bf44d6a-210e-4b73-ba03-435253fa3be5",
+              "symbol": "BND",
+              "createdAt": "2023-05-15T10:43:35.283Z",
+              "priceUSD": 686.06,
+              "priceUSD24hAgo": 2733.16,
+              "isPoolToken": false
+            },
+            "totalAmount": 793947.4,
+            "borrowerAmount": null
+          }
+        ],
+        "rewards": [],
+        "liquidityDepositAPY": 0.3834,
+        "volume24hUSD": 17212.6,
+        "volume24hUSD24hAgo": 20552.14
+      },
+      {
+        "id": "d75237e4-3375-4f72-b33e-956dc8cdb1eb",
+        "openingFee": -0.0087,
+        "liquidity": [
+          {
+            "token": {
+              "address": "090e19b7-7cd8-4fcf-ab00-b1274e768ea8",
+              "symbol": "BND",
+              "createdAt": "2023-08-12T17:23:20.841Z",
+              "priceUSD": 2249.46,
+              "priceUSD24hAgo": 4845.78,
+              "isPoolToken": false
+            },
+            "totalAmount": 281563.23,
+            "borrowerAmount": null
+          },
+          {
+            "token": {
+              "address": "7e587a66-956d-4b26-8935-e00ee50d7a55",
+              "symbol": "BHD",
+              "createdAt": "2023-06-15T19:34:38.362Z",
+              "priceUSD": 1336.83,
+              "priceUSD24hAgo": 3349.06,
+              "isPoolToken": true
+            },
+            "totalAmount": 603900.4,
+            "borrowerAmount": null
+          }
+        ],
+        "rewards": [],
+        "liquidityDepositAPY": 0.2083,
+        "volume24hUSD": 33738.66,
+        "volume24hUSD24hAgo": 13370.16
+      },
+      {
+        "id": "e22c46e4-051b-45db-aa04-354280c5e35a",
+        "openingFee": 0.0451,
+        "liquidity": [
+          {
+            "token": {
+              "address": "090e19b7-7cd8-4fcf-ab00-b1274e768ea8",
+              "symbol": "BND",
+              "createdAt": "2023-08-12T17:23:20.841Z",
+              "priceUSD": 2249.46,
+              "priceUSD24hAgo": 4845.78,
+              "isPoolToken": false
+            },
+            "totalAmount": 312496.81,
+            "borrowerAmount": null
+          },
+          {
+            "token": {
+              "address": "477af6c2-830a-4383-81d2-255300d4183f",
+              "symbol": "QAR",
+              "createdAt": "2023-05-14T19:43:31.409Z",
+              "priceUSD": 3299.98,
+              "priceUSD24hAgo": 4641.49,
+              "isPoolToken": false
+            },
+            "totalAmount": 591004.53,
+            "borrowerAmount": null
+          }
+        ],
+        "rewards": [],
+        "liquidityDepositAPY": 0.334,
+        "volume24hUSD": 44233.93,
+        "volume24hUSD24hAgo": 17611.85
+      },
+      {
+        "id": "15cb3f33-cb59-4979-9c4b-71afdc650ad8",
+        "openingFee": -0.0217,
+        "liquidity": [
+          {
+            "token": {
+              "address": "090e19b7-7cd8-4fcf-ab00-b1274e768ea8",
+              "symbol": "BND",
+              "createdAt": "2023-08-12T17:23:20.841Z",
+              "priceUSD": 2249.46,
+              "priceUSD24hAgo": 4845.78,
+              "isPoolToken": false
+            },
+            "totalAmount": 188655.13,
+            "borrowerAmount": null
+          },
+          {
+            "token": {
+              "address": "3a87a447-ffe3-4e39-93f1-8d9096729e7f",
+              "symbol": "WST",
+              "createdAt": "2022-12-19T07:39:23.288Z",
+              "priceUSD": 2729.96,
+              "priceUSD24hAgo": 3942.59,
+              "isPoolToken": true
+            },
+            "totalAmount": 989227.59,
+            "borrowerAmount": null
+          }
+        ],
+        "rewards": [],
+        "liquidityDepositAPY": 0.4941,
+        "volume24hUSD": 23296.86,
+        "volume24hUSD24hAgo": 43267.5
+      },
+      {
+        "id": "f419f303-f9b2-4fba-89fa-49c6a91ea9ae",
+        "openingFee": -0.0173,
+        "liquidity": [
+          {
+            "token": {
+              "address": "090e19b7-7cd8-4fcf-ab00-b1274e768ea8",
+              "symbol": "BND",
+              "createdAt": "2023-08-12T17:23:20.841Z",
+              "priceUSD": 2249.46,
+              "priceUSD24hAgo": 4845.78,
+              "isPoolToken": false
+            },
+            "totalAmount": 914511.12,
+            "borrowerAmount": null
+          },
+          {
+            "token": {
+              "address": "2946db0b-3732-4256-a5cf-b0923463e22a",
+              "symbol": "NZD",
+              "createdAt": "2022-12-25T23:48:47.455Z",
+              "priceUSD": 1754.22,
+              "priceUSD24hAgo": 3279.57,
+              "isPoolToken": false
+            },
+            "totalAmount": 718607.63,
+            "borrowerAmount": null
+          }
+        ],
+        "rewards": [],
+        "liquidityDepositAPY": 0.4851,
+        "volume24hUSD": 41718.25,
+        "volume24hUSD24hAgo": 41985.48
+      },
+      {
+        "id": "1b70560f-5298-4fd3-b7a6-1e042f76714a",
+        "openingFee": -0.0493,
+        "liquidity": [
+          {
+            "token": {
+              "address": "090e19b7-7cd8-4fcf-ab00-b1274e768ea8",
+              "symbol": "BND",
+              "createdAt": "2023-08-12T17:23:20.841Z",
+              "priceUSD": 2249.46,
+              "priceUSD24hAgo": 4845.78,
+              "isPoolToken": false
+            },
+            "totalAmount": 714246.11,
+            "borrowerAmount": null
+          },
+          {
+            "token": {
+              "address": "0x6cA13a4ab78dd7D657226b155873A04DB929AXXX",
+              "symbol": "JUSD",
+              "createdAt": "2023-04-30T18:04:50.993Z",
+              "priceUSD": 2423.78,
+              "priceUSD24hAgo": 2702.58,
+              "isPoolToken": true
+            },
+            "totalAmount": 236984.13,
+            "borrowerAmount": null
+          }
+        ],
+        "rewards": [],
+        "liquidityDepositAPY": 0.1832,
+        "volume24hUSD": 13784.05,
+        "volume24hUSD24hAgo": 37205.03
+      },
+      {
+        "id": "1c8a7661-82f4-486e-98e4-1cc9c7580d67",
+        "openingFee": 0.0423,
+        "liquidity": [
+          {
+            "token": {
+              "address": "da428d2f-3d1e-4d88-aecd-387de67eda33",
+              "symbol": "STN",
+              "createdAt": "2023-01-15T20:58:55.006Z",
+              "priceUSD": 3258.74,
+              "priceUSD24hAgo": 1174.37,
+              "isPoolToken": false
+            },
+            "totalAmount": 272734.34,
+            "borrowerAmount": null
+          },
+          {
+            "token": {
+              "address": "4bf44d6a-210e-4b73-ba03-435253fa3be5",
+              "symbol": "BND",
+              "createdAt": "2023-05-15T10:43:35.283Z",
+              "priceUSD": 686.06,
+              "priceUSD24hAgo": 2733.16,
+              "isPoolToken": false
+            },
+            "totalAmount": 573813.97,
+            "borrowerAmount": null
+          }
+        ],
+        "rewards": [],
+        "liquidityDepositAPY": 0.3759,
+        "volume24hUSD": 37538.91,
+        "volume24hUSD24hAgo": 13908.99
+      },
+      {
+        "id": "a6c13e95-64ed-4c86-9813-b464ec351901",
+        "openingFee": -0.0238,
+        "liquidity": [
+          {
+            "token": {
+              "address": "da428d2f-3d1e-4d88-aecd-387de67eda33",
+              "symbol": "STN",
+              "createdAt": "2023-01-15T20:58:55.006Z",
+              "priceUSD": 3258.74,
+              "priceUSD24hAgo": 1174.37,
+              "isPoolToken": false
+            },
+            "totalAmount": 733939.33,
+            "borrowerAmount": null
+          },
+          {
+            "token": {
+              "address": "7e587a66-956d-4b26-8935-e00ee50d7a55",
+              "symbol": "BHD",
+              "createdAt": "2023-06-15T19:34:38.362Z",
+              "priceUSD": 1336.83,
+              "priceUSD24hAgo": 3349.06,
+              "isPoolToken": true
+            },
+            "totalAmount": 570254.73,
+            "borrowerAmount": null
+          }
+        ],
+        "rewards": [],
+        "liquidityDepositAPY": 0.0237,
+        "volume24hUSD": 10388.05,
+        "volume24hUSD24hAgo": 14424.23
+      },
+      {
+        "id": "8c22d153-7865-4706-95ce-026d21aecec7",
+        "openingFee": 0.0367,
+        "liquidity": [
+          {
+            "token": {
+              "address": "da428d2f-3d1e-4d88-aecd-387de67eda33",
+              "symbol": "STN",
+              "createdAt": "2023-01-15T20:58:55.006Z",
+              "priceUSD": 3258.74,
+              "priceUSD24hAgo": 1174.37,
+              "isPoolToken": false
+            },
+            "totalAmount": 532960.96,
+            "borrowerAmount": null
+          },
+          {
+            "token": {
+              "address": "477af6c2-830a-4383-81d2-255300d4183f",
+              "symbol": "QAR",
+              "createdAt": "2023-05-14T19:43:31.409Z",
+              "priceUSD": 3299.98,
+              "priceUSD24hAgo": 4641.49,
+              "isPoolToken": false
+            },
+            "totalAmount": 965062.95,
+            "borrowerAmount": null
+          }
+        ],
+        "rewards": [],
+        "liquidityDepositAPY": 0.4062,
+        "volume24hUSD": 21854.27,
+        "volume24hUSD24hAgo": 41778.54
+      },
+      {
+        "id": "a1b88c92-a8a7-43bd-af9d-649e9bebafad",
+        "openingFee": 0.0045,
+        "liquidity": [
+          {
+            "token": {
+              "address": "da428d2f-3d1e-4d88-aecd-387de67eda33",
+              "symbol": "STN",
+              "createdAt": "2023-01-15T20:58:55.006Z",
+              "priceUSD": 3258.74,
+              "priceUSD24hAgo": 1174.37,
+              "isPoolToken": false
+            },
+            "totalAmount": 598976.33,
+            "borrowerAmount": null
+          },
+          {
+            "token": {
+              "address": "3a87a447-ffe3-4e39-93f1-8d9096729e7f",
+              "symbol": "WST",
+              "createdAt": "2022-12-19T07:39:23.288Z",
+              "priceUSD": 2729.96,
+              "priceUSD24hAgo": 3942.59,
+              "isPoolToken": true
+            },
+            "totalAmount": 668671.46,
+            "borrowerAmount": null
+          }
+        ],
+        "rewards": [],
+        "liquidityDepositAPY": 0.3636,
+        "volume24hUSD": 45706.79,
+        "volume24hUSD24hAgo": 44379.98
+      },
+      {
+        "id": "0db9764b-56b3-4ba6-b58a-557d10d730a4",
+        "openingFee": 0.0193,
+        "liquidity": [
+          {
+            "token": {
+              "address": "da428d2f-3d1e-4d88-aecd-387de67eda33",
+              "symbol": "STN",
+              "createdAt": "2023-01-15T20:58:55.006Z",
+              "priceUSD": 3258.74,
+              "priceUSD24hAgo": 1174.37,
+              "isPoolToken": false
+            },
+            "totalAmount": 665244.81,
+            "borrowerAmount": null
+          },
+          {
+            "token": {
+              "address": "2946db0b-3732-4256-a5cf-b0923463e22a",
+              "symbol": "NZD",
+              "createdAt": "2022-12-25T23:48:47.455Z",
+              "priceUSD": 1754.22,
+              "priceUSD24hAgo": 3279.57,
+              "isPoolToken": false
+            },
+            "totalAmount": 107584.29,
+            "borrowerAmount": null
+          }
+        ],
+        "rewards": [],
+        "liquidityDepositAPY": 0.4052,
+        "volume24hUSD": 24615.23,
+        "volume24hUSD24hAgo": 47724.79
+      },
+      {
+        "id": "7690aef3-845c-4007-a6ae-f8f3a38fb0b6",
+        "openingFee": 0.0393,
+        "liquidity": [
+          {
+            "token": {
+              "address": "da428d2f-3d1e-4d88-aecd-387de67eda33",
+              "symbol": "STN",
+              "createdAt": "2023-01-15T20:58:55.006Z",
+              "priceUSD": 3258.74,
+              "priceUSD24hAgo": 1174.37,
+              "isPoolToken": false
+            },
+            "totalAmount": 592504.79,
+            "borrowerAmount": null
+          },
+          {
+            "token": {
+              "address": "0x6cA13a4ab78dd7D657226b155873A04DB929AXXX",
+              "symbol": "JUSD",
+              "createdAt": "2023-04-30T18:04:50.993Z",
+              "priceUSD": 2423.78,
+              "priceUSD24hAgo": 2702.58,
+              "isPoolToken": true
+            },
+            "totalAmount": 116721.28,
+            "borrowerAmount": null
+          }
+        ],
+        "rewards": [],
+        "liquidityDepositAPY": 0.0725,
+        "volume24hUSD": 37861.33,
+        "volume24hUSD24hAgo": 41257.97
+      },
+      {
+        "id": "de31ca87-cd7e-46c0-9835-a69394f1503f",
+        "openingFee": 0.0126,
+        "liquidity": [
+          {
+            "token": {
+              "address": "4bf44d6a-210e-4b73-ba03-435253fa3be5",
+              "symbol": "BND",
+              "createdAt": "2023-05-15T10:43:35.283Z",
+              "priceUSD": 686.06,
+              "priceUSD24hAgo": 2733.16,
+              "isPoolToken": false
+            },
+            "totalAmount": 677830.54,
+            "borrowerAmount": null
+          },
+          {
+            "token": {
+              "address": "7e587a66-956d-4b26-8935-e00ee50d7a55",
+              "symbol": "BHD",
+              "createdAt": "2023-06-15T19:34:38.362Z",
+              "priceUSD": 1336.83,
+              "priceUSD24hAgo": 3349.06,
+              "isPoolToken": true
+            },
+            "totalAmount": 685388.3,
+            "borrowerAmount": null
+          }
+        ],
+        "rewards": [],
+        "liquidityDepositAPY": 0.1932,
+        "volume24hUSD": 45717.86,
+        "volume24hUSD24hAgo": 30459.02
+      },
+      {
+        "id": "6c936909-3439-4ad6-a384-a2a7dcecb36c",
+        "openingFee": -0.0009,
+        "liquidity": [
+          {
+            "token": {
+              "address": "4bf44d6a-210e-4b73-ba03-435253fa3be5",
+              "symbol": "BND",
+              "createdAt": "2023-05-15T10:43:35.283Z",
+              "priceUSD": 686.06,
+              "priceUSD24hAgo": 2733.16,
+              "isPoolToken": false
+            },
+            "totalAmount": 130848.43,
+            "borrowerAmount": null
+          },
+          {
+            "token": {
+              "address": "477af6c2-830a-4383-81d2-255300d4183f",
+              "symbol": "QAR",
+              "createdAt": "2023-05-14T19:43:31.409Z",
+              "priceUSD": 3299.98,
+              "priceUSD24hAgo": 4641.49,
+              "isPoolToken": false
+            },
+            "totalAmount": 985660.87,
+            "borrowerAmount": null
+          }
+        ],
+        "rewards": [],
+        "liquidityDepositAPY": 0.3021,
+        "volume24hUSD": 24904.46,
+        "volume24hUSD24hAgo": 34026.81
+      },
+      {
+        "id": "e5f57ea5-b315-424f-9344-930e357eaba4",
+        "openingFee": -0.0419,
+        "liquidity": [
+          {
+            "token": {
+              "address": "4bf44d6a-210e-4b73-ba03-435253fa3be5",
+              "symbol": "BND",
+              "createdAt": "2023-05-15T10:43:35.283Z",
+              "priceUSD": 686.06,
+              "priceUSD24hAgo": 2733.16,
+              "isPoolToken": false
+            },
+            "totalAmount": 809433.02,
+            "borrowerAmount": null
+          },
+          {
+            "token": {
+              "address": "3a87a447-ffe3-4e39-93f1-8d9096729e7f",
+              "symbol": "WST",
+              "createdAt": "2022-12-19T07:39:23.288Z",
+              "priceUSD": 2729.96,
+              "priceUSD24hAgo": 3942.59,
+              "isPoolToken": true
+            },
+            "totalAmount": 719684.88,
+            "borrowerAmount": null
+          }
+        ],
+        "rewards": [],
+        "liquidityDepositAPY": 0.0407,
+        "volume24hUSD": 43256.82,
+        "volume24hUSD24hAgo": 10634.22
+      },
+      {
+        "id": "3bfdda10-3536-436e-a207-0d7612b58f67",
+        "openingFee": 0.0015,
+        "liquidity": [
+          {
+            "token": {
+              "address": "4bf44d6a-210e-4b73-ba03-435253fa3be5",
+              "symbol": "BND",
+              "createdAt": "2023-05-15T10:43:35.283Z",
+              "priceUSD": 686.06,
+              "priceUSD24hAgo": 2733.16,
+              "isPoolToken": false
+            },
+            "totalAmount": 963953.15,
+            "borrowerAmount": null
+          },
+          {
+            "token": {
+              "address": "2946db0b-3732-4256-a5cf-b0923463e22a",
+              "symbol": "NZD",
+              "createdAt": "2022-12-25T23:48:47.455Z",
+              "priceUSD": 1754.22,
+              "priceUSD24hAgo": 3279.57,
+              "isPoolToken": false
+            },
+            "totalAmount": 988845.81,
+            "borrowerAmount": null
+          }
+        ],
+        "rewards": [],
+        "liquidityDepositAPY": 0.4903,
+        "volume24hUSD": 27387.71,
+        "volume24hUSD24hAgo": 45729.82
+      },
+      {
+        "id": "197761f8-4c1a-4306-82d7-f8027e188958",
+        "openingFee": -0.0301,
+        "liquidity": [
+          {
+            "token": {
+              "address": "4bf44d6a-210e-4b73-ba03-435253fa3be5",
+              "symbol": "BND",
+              "createdAt": "2023-05-15T10:43:35.283Z",
+              "priceUSD": 686.06,
+              "priceUSD24hAgo": 2733.16,
+              "isPoolToken": false
+            },
+            "totalAmount": 923767.76,
+            "borrowerAmount": null
+          },
+          {
+            "token": {
+              "address": "0x6cA13a4ab78dd7D657226b155873A04DB929AXXX",
+              "symbol": "JUSD",
+              "createdAt": "2023-04-30T18:04:50.993Z",
+              "priceUSD": 2423.78,
+              "priceUSD24hAgo": 2702.58,
+              "isPoolToken": true
+            },
+            "totalAmount": 148423.4,
+            "borrowerAmount": null
+          }
+        ],
+        "rewards": [],
+        "liquidityDepositAPY": 0.3119,
+        "volume24hUSD": 15097.05,
+        "volume24hUSD24hAgo": 29507.97
+      },
+      {
+        "id": "08eb2210-9430-47bc-99fc-3660c677d704",
+        "openingFee": -0.0302,
+        "liquidity": [
+          {
+            "token": {
+              "address": "7e587a66-956d-4b26-8935-e00ee50d7a55",
+              "symbol": "BHD",
+              "createdAt": "2023-06-15T19:34:38.362Z",
+              "priceUSD": 1336.83,
+              "priceUSD24hAgo": 3349.06,
+              "isPoolToken": true
+            },
+            "totalAmount": 446260.54,
+            "borrowerAmount": null
+          },
+          {
+            "token": {
+              "address": "477af6c2-830a-4383-81d2-255300d4183f",
+              "symbol": "QAR",
+              "createdAt": "2023-05-14T19:43:31.409Z",
+              "priceUSD": 3299.98,
+              "priceUSD24hAgo": 4641.49,
+              "isPoolToken": false
+            },
+            "totalAmount": 602465.3,
+            "borrowerAmount": null
+          }
+        ],
+        "rewards": [],
+        "liquidityDepositAPY": 0.4634,
+        "volume24hUSD": 13364.1,
+        "volume24hUSD24hAgo": 11862.02
+      },
+      {
+        "id": "20538b1d-971b-4b92-a40c-8765895512f6",
+        "openingFee": -0.0418,
+        "liquidity": [
+          {
+            "token": {
+              "address": "7e587a66-956d-4b26-8935-e00ee50d7a55",
+              "symbol": "BHD",
+              "createdAt": "2023-06-15T19:34:38.362Z",
+              "priceUSD": 1336.83,
+              "priceUSD24hAgo": 3349.06,
+              "isPoolToken": true
+            },
+            "totalAmount": 735327.91,
+            "borrowerAmount": null
+          },
+          {
+            "token": {
+              "address": "3a87a447-ffe3-4e39-93f1-8d9096729e7f",
+              "symbol": "WST",
+              "createdAt": "2022-12-19T07:39:23.288Z",
+              "priceUSD": 2729.96,
+              "priceUSD24hAgo": 3942.59,
+              "isPoolToken": true
+            },
+            "totalAmount": 615171.04,
+            "borrowerAmount": null
+          }
+        ],
+        "rewards": [],
+        "liquidityDepositAPY": 0.1811,
+        "volume24hUSD": 46244.25,
+        "volume24hUSD24hAgo": 19301.57
+      },
+      {
+        "id": "1332641f-0526-41e9-819b-d22c1f6b9ea3",
+        "openingFee": 0.0071,
+        "liquidity": [
+          {
+            "token": {
+              "address": "7e587a66-956d-4b26-8935-e00ee50d7a55",
+              "symbol": "BHD",
+              "createdAt": "2023-06-15T19:34:38.362Z",
+              "priceUSD": 1336.83,
+              "priceUSD24hAgo": 3349.06,
+              "isPoolToken": true
+            },
+            "totalAmount": 670458.75,
+            "borrowerAmount": null
+          },
+          {
+            "token": {
+              "address": "2946db0b-3732-4256-a5cf-b0923463e22a",
+              "symbol": "NZD",
+              "createdAt": "2022-12-25T23:48:47.455Z",
+              "priceUSD": 1754.22,
+              "priceUSD24hAgo": 3279.57,
+              "isPoolToken": false
+            },
+            "totalAmount": 807959.02,
+            "borrowerAmount": null
+          }
+        ],
+        "rewards": [],
+        "liquidityDepositAPY": 0.3703,
+        "volume24hUSD": 41554.66,
+        "volume24hUSD24hAgo": 43701.21
+      },
+      {
+        "id": "0502daad-6b2f-4cb3-8396-9a17bac4e642",
+        "openingFee": -0.0373,
+        "liquidity": [
+          {
+            "token": {
+              "address": "7e587a66-956d-4b26-8935-e00ee50d7a55",
+              "symbol": "BHD",
+              "createdAt": "2023-06-15T19:34:38.362Z",
+              "priceUSD": 1336.83,
+              "priceUSD24hAgo": 3349.06,
+              "isPoolToken": true
+            },
+            "totalAmount": 552972.35,
+            "borrowerAmount": null
+          },
+          {
+            "token": {
+              "address": "0x6cA13a4ab78dd7D657226b155873A04DB929AXXX",
+              "symbol": "JUSD",
+              "createdAt": "2023-04-30T18:04:50.993Z",
+              "priceUSD": 2423.78,
+              "priceUSD24hAgo": 2702.58,
+              "isPoolToken": true
+            },
+            "totalAmount": 874023.65,
+            "borrowerAmount": null
+          }
+        ],
+        "rewards": [],
+        "liquidityDepositAPY": 0.1382,
+        "volume24hUSD": 10365.79,
+        "volume24hUSD24hAgo": 18911.59
+      },
+      {
+        "id": "bef01c15-3e57-4bbc-8e05-0417dad976d1",
+        "openingFee": 0.019,
+        "liquidity": [
+          {
+            "token": {
+              "address": "477af6c2-830a-4383-81d2-255300d4183f",
+              "symbol": "QAR",
+              "createdAt": "2023-05-14T19:43:31.409Z",
+              "priceUSD": 3299.98,
+              "priceUSD24hAgo": 4641.49,
+              "isPoolToken": false
+            },
+            "totalAmount": 253272.37,
+            "borrowerAmount": null
+          },
+          {
+            "token": {
+              "address": "3a87a447-ffe3-4e39-93f1-8d9096729e7f",
+              "symbol": "WST",
+              "createdAt": "2022-12-19T07:39:23.288Z",
+              "priceUSD": 2729.96,
+              "priceUSD24hAgo": 3942.59,
+              "isPoolToken": true
+            },
+            "totalAmount": 252883.05,
+            "borrowerAmount": null
+          }
+        ],
+        "rewards": [],
+        "liquidityDepositAPY": 0.3052,
+        "volume24hUSD": 44408.3,
+        "volume24hUSD24hAgo": 24616.86
+      },
+      {
+        "id": "4984dfeb-0a13-4811-951a-12f636ba235c",
+        "openingFee": 0.0483,
+        "liquidity": [
+          {
+            "token": {
+              "address": "477af6c2-830a-4383-81d2-255300d4183f",
+              "symbol": "QAR",
+              "createdAt": "2023-05-14T19:43:31.409Z",
+              "priceUSD": 3299.98,
+              "priceUSD24hAgo": 4641.49,
+              "isPoolToken": false
+            },
+            "totalAmount": 408421.66,
+            "borrowerAmount": null
+          },
+          {
+            "token": {
+              "address": "2946db0b-3732-4256-a5cf-b0923463e22a",
+              "symbol": "NZD",
+              "createdAt": "2022-12-25T23:48:47.455Z",
+              "priceUSD": 1754.22,
+              "priceUSD24hAgo": 3279.57,
+              "isPoolToken": false
+            },
+            "totalAmount": 817624.74,
+            "borrowerAmount": null
+          }
+        ],
+        "rewards": [],
+        "liquidityDepositAPY": 0.1993,
+        "volume24hUSD": 20656.73,
+        "volume24hUSD24hAgo": 29580.89
+      },
+      {
+        "id": "2945856e-f1c0-44b8-8599-c0835e023ef1",
+        "openingFee": -0.0327,
+        "liquidity": [
+          {
+            "token": {
+              "address": "477af6c2-830a-4383-81d2-255300d4183f",
+              "symbol": "QAR",
+              "createdAt": "2023-05-14T19:43:31.409Z",
+              "priceUSD": 3299.98,
+              "priceUSD24hAgo": 4641.49,
+              "isPoolToken": false
+            },
+            "totalAmount": 820629.62,
+            "borrowerAmount": null
+          },
+          {
+            "token": {
+              "address": "0x6cA13a4ab78dd7D657226b155873A04DB929AXXX",
+              "symbol": "JUSD",
+              "createdAt": "2023-04-30T18:04:50.993Z",
+              "priceUSD": 2423.78,
+              "priceUSD24hAgo": 2702.58,
+              "isPoolToken": true
+            },
+            "totalAmount": 590865.95,
+            "borrowerAmount": null
+          }
+        ],
+        "rewards": [],
+        "liquidityDepositAPY": 0.1156,
+        "volume24hUSD": 31819.74,
+        "volume24hUSD24hAgo": 43853.59
+      },
+      {
+        "id": "a173dd55-6752-4f34-8a48-97ca8e5c7a9c",
+        "openingFee": 0.045,
+        "liquidity": [
+          {
+            "token": {
+              "address": "3a87a447-ffe3-4e39-93f1-8d9096729e7f",
+              "symbol": "WST",
+              "createdAt": "2022-12-19T07:39:23.288Z",
+              "priceUSD": 2729.96,
+              "priceUSD24hAgo": 3942.59,
+              "isPoolToken": true
+            },
+            "totalAmount": 238813.47,
+            "borrowerAmount": null
+          },
+          {
+            "token": {
+              "address": "2946db0b-3732-4256-a5cf-b0923463e22a",
+              "symbol": "NZD",
+              "createdAt": "2022-12-25T23:48:47.455Z",
+              "priceUSD": 1754.22,
+              "priceUSD24hAgo": 3279.57,
+              "isPoolToken": false
+            },
+            "totalAmount": 140892.83,
+            "borrowerAmount": null
+          }
+        ],
+        "rewards": [],
+        "liquidityDepositAPY": 0.4863,
+        "volume24hUSD": 32778.01,
+        "volume24hUSD24hAgo": 47125.31
+      },
+      {
+        "id": "93fc3dbb-c777-426e-93df-86fb5992339d",
+        "openingFee": -0.0484,
+        "liquidity": [
+          {
+            "token": {
+              "address": "3a87a447-ffe3-4e39-93f1-8d9096729e7f",
+              "symbol": "WST",
+              "createdAt": "2022-12-19T07:39:23.288Z",
+              "priceUSD": 2729.96,
+              "priceUSD24hAgo": 3942.59,
+              "isPoolToken": true
+            },
+            "totalAmount": 596654.45,
+            "borrowerAmount": null
+          },
+          {
+            "token": {
+              "address": "0x6cA13a4ab78dd7D657226b155873A04DB929AXXX",
+              "symbol": "JUSD",
+              "createdAt": "2023-04-30T18:04:50.993Z",
+              "priceUSD": 2423.78,
+              "priceUSD24hAgo": 2702.58,
+              "isPoolToken": true
+            },
+            "totalAmount": 975209.42,
+            "borrowerAmount": null
+          }
+        ],
+        "rewards": [],
+        "liquidityDepositAPY": 0.381,
+        "volume24hUSD": 40476.24,
+        "volume24hUSD24hAgo": 46598.35
+      },
+      {
+        "id": "459d385e-c2d1-4d47-aae5-0c870b0b33b4",
+        "openingFee": 0.0003,
+        "liquidity": [
+          {
+            "token": {
+              "address": "2946db0b-3732-4256-a5cf-b0923463e22a",
+              "symbol": "NZD",
+              "createdAt": "2022-12-25T23:48:47.455Z",
+              "priceUSD": 1754.22,
+              "priceUSD24hAgo": 3279.57,
+              "isPoolToken": false
+            },
+            "totalAmount": 534640,
+            "borrowerAmount": null
+          },
+          {
+            "token": {
+              "address": "0x6cA13a4ab78dd7D657226b155873A04DB929AXXX",
+              "symbol": "JUSD",
+              "createdAt": "2023-04-30T18:04:50.993Z",
+              "priceUSD": 2423.78,
+              "priceUSD24hAgo": 2702.58,
+              "isPoolToken": true
+            },
+            "totalAmount": 667275.26,
+            "borrowerAmount": null
+          }
+        ],
+        "rewards": [],
+        "liquidityDepositAPY": 0.0193,
+        "volume24hUSD": 19947.23,
+        "volume24hUSD24hAgo": 23645.41
+      }
+    ]
+  }
+}

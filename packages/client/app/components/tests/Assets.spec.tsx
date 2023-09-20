@@ -2,6 +2,7 @@ import { expect, test } from '@playwright/experimental-ct-react';
 import { SetupServer } from 'msw/node';
 import Assets from '../Features/Assets/Assets';
 import { integrationSuiteSetup, integrationTestSetup } from './integration-test.setup';
+import MockedPoolsData from './mockedResponses/GetAllPools.mocked.json';
 import { IntegrationWrapper } from './test-utils';
 
 let server: SetupServer;
@@ -23,14 +24,26 @@ test.afterAll(() => {
 });
 
 test.describe('Assets', () => {
-  test('should render Assets with mocked data', async ({ mount }) => {
+  test('should render Assets with mocked data', async ({ mount, page }) => {
+    // We need to mock the exact same data to generate the exact same snapshot
+    await page.route('https://flyby-router-demo.herokuapp.com/', async (route) => {
+      if (JSON.parse(route.request().postData()!).operationName === 'GetAllPools') {
+        return route.fulfill({
+          status: 200,
+          body: JSON.stringify(MockedPoolsData),
+        });
+      } else {
+        return route.abort();
+      }
+    });
+
     const component = await mount(
       <IntegrationWrapper>
         <Assets />
       </IntegrationWrapper>,
     );
 
-    await expect(component).toHaveScreenshot({ maxDiffPixelRatio: 0.01 });
+    await expect(component).toHaveScreenshot();
   });
 
   test('should show a loader if the data is not yet loaded', async ({ mount, page }) => {

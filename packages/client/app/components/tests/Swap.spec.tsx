@@ -2,6 +2,7 @@ import { expect, test } from '@playwright/experimental-ct-react';
 import { SetupServer } from 'msw/node';
 import Swap from '../Features/Swap/Swap';
 import { integrationSuiteSetup, integrationTestSetup } from './integration-test.setup';
+import MockedPositionsWithoutBorrower from './mockedResponses/GetDebtTokens.mocked.json';
 import { parseNumberString } from './test-helpers';
 import { IntegrationWrapper } from './test-utils';
 
@@ -24,14 +25,26 @@ test.afterAll(() => {
 });
 
 test.describe('Swap', () => {
-  test('should render Swap with mocked data', async ({ mount }) => {
+  test('should render Swap with mocked data', async ({ mount, page }) => {
+    // We need to mock the exact same data to generate the exact same snapshot
+    await page.route('https://flyby-router-demo.herokuapp.com/', async (route) => {
+      if (JSON.parse(route.request().postData()!).operationName === 'GetDebtTokens') {
+        return route.fulfill({
+          status: 200,
+          body: JSON.stringify(MockedPositionsWithoutBorrower),
+        });
+      } else {
+        return route.abort();
+      }
+    });
+
     const component = await mount(
       <IntegrationWrapper shouldPreselectTokens>
         <Swap />
       </IntegrationWrapper>,
     );
 
-    await expect(component).toHaveScreenshot({ maxDiffPixelRatio: 0.01 });
+    await expect(component).toHaveScreenshot();
   });
 
   test.describe('Form behavior', () => {
