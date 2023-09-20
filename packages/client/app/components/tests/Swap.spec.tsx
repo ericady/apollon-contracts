@@ -282,7 +282,7 @@ test.describe('Swap', () => {
   });
 
   test.describe('Connected mode', () => {
-    test('should have "Swap" button disabled as guest', async ({ mount }) => {
+    test('should have "Swap" button enabled when logged in', async ({ mount }) => {
       const component = await mount(
         <IntegrationWrapper shouldPreselectTokens shouldConnectWallet>
           <Swap />

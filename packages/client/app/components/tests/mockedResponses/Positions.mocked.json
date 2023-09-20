@@ -1,0 +1,226 @@
+{
+  "data": {
+    "getDebtTokens": [
+      {
+        "token": {
+          "address": "0df96cfa-ce48-4632-921e-582017ae69f9",
+          "symbol": "XOF",
+          "createdAt": "2023-02-05T11:31:11.339Z",
+          "priceUSD": 2886.37,
+          "priceUSD24hAgo": 1269.29,
+          "isPoolToken": true
+        },
+        "walletAmount": null,
+        "troveMintedAmount": null,
+        "stabilityLostAmount": null,
+        "stabilityCompoundAmount": null,
+        "totalDepositedStability": 4736.49,
+        "totalReserve": 3991.8,
+        "totalReserve24hAgo": 4568.91,
+        "totalSupplyUSD": 13228.62,
+        "totalSupplyUSD24hAgo": 47673.94,
+        "stabilityDepositAPY": 0.051492
+      },
+      {
+        "token": {
+          "address": "0x6cA13a4ab78dd7D657226b155873A04DB929A3A4",
+          "symbol": "TMT",
+          "createdAt": "2022-10-06T14:32:24.487Z",
+          "priceUSD": 2631.27,
+          "priceUSD24hAgo": 4424.56,
+          "isPoolToken": true
+        },
+        "walletAmount": null,
+        "troveMintedAmount": null,
+        "stabilityLostAmount": null,
+        "stabilityCompoundAmount": null,
+        "totalDepositedStability": 3627.64,
+        "totalReserve": 3327.15,
+        "totalReserve24hAgo": 3057.41,
+        "totalSupplyUSD": 21558.31,
+        "totalSupplyUSD24hAgo": 47302.16,
+        "stabilityDepositAPY": 0.08779400000000001
+      },
+      {
+        "token": {
+          "address": "5075bba3-3d94-4638-ad80-61d081fb7eb2",
+          "symbol": "SEK",
+          "createdAt": "2022-10-28T05:24:40.332Z",
+          "priceUSD": 290.34,
+          "priceUSD24hAgo": 967.54,
+          "isPoolToken": false
+        },
+        "walletAmount": null,
+        "troveMintedAmount": null,
+        "stabilityLostAmount": null,
+        "stabilityCompoundAmount": null,
+        "totalDepositedStability": 2201.33,
+        "totalReserve": 4421.74,
+        "totalReserve24hAgo": 2833.04,
+        "totalSupplyUSD": 35157.37,
+        "totalSupplyUSD24hAgo": 37867.83,
+        "stabilityDepositAPY": 0.020338
+      },
+      {
+        "token": {
+          "address": "5c25fcef-4ce8-4fdb-a804-98bb87c93d93",
+          "symbol": "TWD",
+          "createdAt": "2023-07-26T09:16:53.539Z",
+          "priceUSD": 235.69,
+          "priceUSD24hAgo": 376.19,
+          "isPoolToken": false
+        },
+        "walletAmount": null,
+        "troveMintedAmount": null,
+        "stabilityLostAmount": null,
+        "stabilityCompoundAmount": null,
+        "totalDepositedStability": 3958.39,
+        "totalReserve": 4810.86,
+        "totalReserve24hAgo": 4549.52,
+        "totalSupplyUSD": 19543.64,
+        "totalSupplyUSD24hAgo": 34048.56,
+        "stabilityDepositAPY": 0.07014300000000001
+      },
+      {
+        "token": {
+          "address": "9f9d0e89-e7c2-4d77-b755-b53985c399c0",
+          "symbol": "AED",
+          "createdAt": "2023-07-31T11:59:14.431Z",
+          "priceUSD": 3825.47,
+          "priceUSD24hAgo": 1802.23,
+          "isPoolToken": true
+        },
+        "walletAmount": null,
+        "troveMintedAmount": null,
+        "stabilityLostAmount": null,
+        "stabilityCompoundAmount": null,
+        "totalDepositedStability": 3588.49,
+        "totalReserve": 1285.19,
+        "totalReserve24hAgo": 4545.86,
+        "totalSupplyUSD": 35425.87,
+        "totalSupplyUSD24hAgo": 27026.35,
+        "stabilityDepositAPY": 0.009326
+      },
+      {
+        "token": {
+          "address": "f1834650-c2bf-46ee-a942-826853073311",
+          "symbol": "TJS",
+          "createdAt": "2023-02-07T10:55:14.129Z",
+          "priceUSD": 2900.48,
+          "priceUSD24hAgo": 140.96,
+          "isPoolToken": true
+        },
+        "walletAmount": null,
+        "troveMintedAmount": null,
+        "stabilityLostAmount": null,
+        "stabilityCompoundAmount": null,
+        "totalDepositedStability": 3646.67,
+        "totalReserve": 2902.85,
+        "totalReserve24hAgo": 4504.24,
+        "totalSupplyUSD": 11531.37,
+        "totalSupplyUSD24hAgo": 36090.63,
+        "stabilityDepositAPY": 0.078119
+      },
+      {
+        "token": {
+          "address": "92781f3b-b753-4e2d-acee-73a835baf8ec",
+          "symbol": "PEN",
+          "createdAt": "2023-01-14T11:20:14.185Z",
+          "priceUSD": 3278.83,
+          "priceUSD24hAgo": 4271.29,
+          "isPoolToken": false
+        },
+        "walletAmount": null,
+        "troveMintedAmount": null,
+        "stabilityLostAmount": null,
+        "stabilityCompoundAmount": null,
+        "totalDepositedStability": 2950.05,
+        "totalReserve": 3420.2,
+        "totalReserve24hAgo": 1684.88,
+        "totalSupplyUSD": 32218.64,
+        "totalSupplyUSD24hAgo": 39031.78,
+        "stabilityDepositAPY": 0.041291
+      },
+      {
+        "token": {
+          "address": "b8e4b75f-795d-4433-9322-b9f9f0c5ae74",
+          "symbol": "FJD",
+          "createdAt": "2023-09-01T09:38:46.818Z",
+          "priceUSD": 4791.19,
+          "priceUSD24hAgo": 2135.89,
+          "isPoolToken": true
+        },
+        "walletAmount": null,
+        "troveMintedAmount": null,
+        "stabilityLostAmount": null,
+        "stabilityCompoundAmount": null,
+        "totalDepositedStability": 1960.1,
+        "totalReserve": 4344.66,
+        "totalReserve24hAgo": 2257.29,
+        "totalSupplyUSD": 25783.67,
+        "totalSupplyUSD24hAgo": 32834.9,
+        "stabilityDepositAPY": 0.031076000000000003
+      },
+      {
+        "token": {
+          "address": "4a1f6ec6-e4d3-4aa6-ac63-2c0cb9a004c6",
+          "symbol": "IRR",
+          "createdAt": "2023-05-10T13:09:19.611Z",
+          "priceUSD": 1635.68,
+          "priceUSD24hAgo": 1944.9,
+          "isPoolToken": false
+        },
+        "walletAmount": null,
+        "troveMintedAmount": null,
+        "stabilityLostAmount": null,
+        "stabilityCompoundAmount": null,
+        "totalDepositedStability": 4152.31,
+        "totalReserve": 3528.05,
+        "totalReserve24hAgo": 2137.9,
+        "totalSupplyUSD": 38287.56,
+        "totalSupplyUSD24hAgo": 36060.5,
+        "stabilityDepositAPY": 0.020192
+      },
+      {
+        "token": {
+          "address": "ffb8eec8-d259-40ec-ba2f-684cf55c902a",
+          "symbol": "AUD",
+          "createdAt": "2023-05-02T16:26:40.463Z",
+          "priceUSD": 4750.53,
+          "priceUSD24hAgo": 39.28,
+          "isPoolToken": false
+        },
+        "walletAmount": null,
+        "troveMintedAmount": null,
+        "stabilityLostAmount": null,
+        "stabilityCompoundAmount": null,
+        "totalDepositedStability": 2874.55,
+        "totalReserve": 1069.61,
+        "totalReserve24hAgo": 4678.23,
+        "totalSupplyUSD": 10754.16,
+        "totalSupplyUSD24hAgo": 33431.57,
+        "stabilityDepositAPY": 0.083717
+      },
+      {
+        "token": {
+          "address": "0x6cA13a4ab78dd7D657226b155873A04DB929AXXX",
+          "symbol": "JUSD",
+          "createdAt": "2022-10-11T03:55:38.474Z",
+          "priceUSD": 4236.74,
+          "priceUSD24hAgo": 344.58,
+          "isPoolToken": true
+        },
+        "walletAmount": null,
+        "troveMintedAmount": null,
+        "stabilityLostAmount": null,
+        "stabilityCompoundAmount": null,
+        "totalDepositedStability": 2266.81,
+        "totalReserve": 2185.35,
+        "totalReserve24hAgo": 2894.61,
+        "totalSupplyUSD": 39155.53,
+        "totalSupplyUSD24hAgo": 38276.57,
+        "stabilityDepositAPY": 0.021471
+      }
+    ]
+  }
+}

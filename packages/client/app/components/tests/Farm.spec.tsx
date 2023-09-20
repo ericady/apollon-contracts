@@ -436,7 +436,7 @@ test.describe('Farm', () => {
   });
 
   test.describe('Connected mode', () => {
-    test('should have "Execute" button disabled as guest', async ({ mount }) => {
+    test('should have "Execute" button enabled when logged in', async ({ mount }) => {
       const component = await mount(
         <IntegrationWrapper shouldPreselectTokens shouldConnectWallet>
           <Farm />
