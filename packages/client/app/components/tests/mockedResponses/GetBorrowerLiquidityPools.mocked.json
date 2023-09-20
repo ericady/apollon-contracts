@@ -1,0 +1,40 @@
+{
+  "data": {
+    "getPools": [
+      {
+        "id": "344b8e7c-2aca-4f4d-a6d0-347db601d248",
+        "openingFee": -0.0373,
+        "liquidity": [
+          {
+            "token": {
+              "address": "ffaedabb-0eb8-4403-97e1-d82eeea7bf0c",
+              "symbol": "SDG",
+              "createdAt": "2023-04-09T18:48:49.496Z",
+              "priceUSD": 1094.04,
+              "priceUSD24hAgo": 2750.49,
+              "isPoolToken": true
+            },
+            "totalAmount": 564407.19,
+            "borrowerAmount": 6897.13
+          },
+          {
+            "token": {
+              "address": "0x6cA13a4ab78dd7D657226b155873A04DB929AXXX",
+              "symbol": "JUSD",
+              "createdAt": "2023-08-17T08:15:26.698Z",
+              "priceUSD": 3981.26,
+              "priceUSD24hAgo": 122.09,
+              "isPoolToken": true
+            },
+            "totalAmount": 226889.16,
+            "borrowerAmount": 8286.38
+          }
+        ],
+        "rewards": [],
+        "liquidityDepositAPY": 0.0222,
+        "volume24hUSD": 31181.39,
+        "volume24hUSD24hAgo": 38359.65
+      }
+    ]
+  }
+}

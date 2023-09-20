@@ -83,6 +83,7 @@ function LiquidityPoolsTable({ selectedPool, setSelectedPool }: Props) {
               return (
                 <TableRow
                   key={id}
+                  data-testid="apollon-liquidity-pool-table-row"
                   hover
                   selected={selectedPool?.id === id}
                   sx={{
