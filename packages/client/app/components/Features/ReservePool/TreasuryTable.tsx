@@ -27,7 +27,7 @@ function TreasuryTable() {
   return (
     <FeatureBox title="Treasury" noPadding border="full" borderRadius>
       <TableContainer>
-        <Table>
+        <Table data-testid="apollon-treasury-table">
           <TableHead>
             <TableRow>
               <HeaderCell title="" />
