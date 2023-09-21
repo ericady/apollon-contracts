@@ -25,31 +25,35 @@ import StabilityPoolTableLoader from './StabilityPoolTableLoader';
 function StabilityPoolTable() {
   const { address } = useEthers();
 
-  const { data: collateralData } = useQuery<GetCollateralTokensQuery, GetCollateralTokensQueryVariables>(
-    GET_BORROWER_COLLATERAL_TOKENS,
-    {
-      variables: { borrower: address },
+  const { data: collateralData, loading: collateralDataLoading } = useQuery<
+    GetCollateralTokensQuery,
+    GetCollateralTokensQueryVariables
+  >(GET_BORROWER_COLLATERAL_TOKENS, {
+    variables: { borrower: address },
+    skip: !address,
+  });
+  const { data: debtData, loading: debtDataLoading } = useQuery<
+    GetBorrowerDebtTokensQuery,
+    GetBorrowerDebtTokensQueryVariables
+  >(GET_BORROWER_DEBT_TOKENS, {
+    variables: {
+      borrower: address,
     },
-  );
-  const { data: debtData } = useQuery<GetBorrowerDebtTokensQuery, GetBorrowerDebtTokensQueryVariables>(
-    GET_BORROWER_DEBT_TOKENS,
-    {
-      variables: {
-        borrower: address,
-      },
-    },
-  );
+    skip: !address,
+  });
 
-  if (!collateralData || !debtData) {
+  if ((!collateralData && collateralDataLoading) || (!debtData && debtDataLoading)) {
     return <StabilityPoolTableLoader />;
   }
 
   // Sort both arrays for common tokens and in same alphabetical order.
-  const rewards = collateralData.getCollateralTokens.filter(({ stabilityGainedAmount }) => stabilityGainedAmount! > 0);
-  const stabilityLostSorted = debtData.getDebtTokens
-    .filter(({ stabilityLostAmount }) => stabilityLostAmount! > 0)
-    .sort((a, b) => a.token.symbol.localeCompare(b.token.symbol))
-    .sort((a, b) => (rewards.find(({ token }) => token.address === a.token.address) ? -1 : 1));
+  const rewards =
+    collateralData?.getCollateralTokens.filter(({ stabilityGainedAmount }) => stabilityGainedAmount! > 0) ?? [];
+  const stabilityLostSorted =
+    debtData?.getDebtTokens
+      .filter(({ stabilityLostAmount }) => stabilityLostAmount! > 0)
+      .sort((a, b) => a.token.symbol.localeCompare(b.token.symbol))
+      .sort((a, b) => (rewards.find(({ token }) => token.address === a.token.address) ? -1 : 1)) ?? [];
 
   const rewardsSorted = rewards
     .slice()
@@ -71,7 +75,10 @@ function StabilityPoolTable() {
     <FeatureBox title="Stability Pool" noPadding border="full" borderRadius>
       <div style={{ display: 'flex', alignItems: 'center' }}>
         <TableContainer>
-          <Table sx={{ borderRight: '1px solid', borderColor: 'background.emphasis' }}>
+          <Table
+            sx={{ borderRight: '1px solid', borderColor: 'background.emphasis' }}
+            data-testid="apollon-stability-pool-table"
+          >
             <TableHead>
               <TableRow>
                 <HeaderCell title="" />
@@ -93,13 +100,19 @@ function StabilityPoolTable() {
                       <TableCell sx={noBorder ? { borderBottom: 'none', pr: 0 } : { pr: 0 }} align="right">
                         {!isNaN(stabilityLostAmount!) ? roundCurrency(stabilityLostAmount!, 5) : null}
                       </TableCell>
-                      <TableCell sx={noBorder ? { borderBottom: 'none' } : {}}>
+                      <TableCell
+                        sx={noBorder ? { borderBottom: 'none' } : {}}
+                        data-testid="apollon-stability-pool-table-lost-token"
+                      >
                         {lostToken && <Label variant="error">{lostToken.symbol}</Label>}
                       </TableCell>
                       <TableCell sx={noBorder ? { borderBottom: 'none', pr: 0 } : { pr: 0 }} align="right">
                         {!isNaN(stabilityGainedAmount!) ? roundCurrency(stabilityGainedAmount!, 5) : null}
                       </TableCell>
-                      <TableCell sx={noBorder ? { borderBottom: 'none' } : {}}>
+                      <TableCell
+                        sx={noBorder ? { borderBottom: 'none' } : {}}
+                        data-testid="apollon-stability-pool-table-reward-token"
+                      >
                         {rewardToken && <Label variant="success">{rewardToken.symbol}</Label>}
                       </TableCell>
                     </TableRow>
@@ -111,14 +124,13 @@ function StabilityPoolTable() {
                 <TableCell sx={{ borderBottom: 'none' }}></TableCell>
 
                 <TableCell sx={{ borderBottom: 'none' }}>
-                  {address
-                    ? `+ ${displayPercentage(percentageChange(rewardsTotalInUSD, lossTotalInUSD))}
-                    ${(
-                      <span style={{ whiteSpace: 'nowrap' }}>
-                        (≈ {roundCurrency(rewardsTotalInUSD - lossTotalInUSD)} $)
-                      </span>
-                    )}`
-                    : null}
+                  {address ? `+ ${displayPercentage(percentageChange(rewardsTotalInUSD, lossTotalInUSD))}` : null}
+
+                  {address ? (
+                    <span style={{ whiteSpace: 'nowrap' }}>
+                      (≈ {roundCurrency(rewardsTotalInUSD - lossTotalInUSD)} $)
+                    </span>
+                  ) : null}
                 </TableCell>
               </TableRow>
             </TableBody>

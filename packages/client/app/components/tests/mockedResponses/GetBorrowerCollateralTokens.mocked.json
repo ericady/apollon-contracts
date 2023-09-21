@@ -3,165 +3,165 @@
     "getCollateralTokens": [
       {
         "token": {
-          "address": "477af6c2-830a-4383-81d2-255300d4183f",
-          "symbol": "QAR",
-          "createdAt": "2023-05-14T19:43:31.409Z",
-          "priceUSD": 3299.98,
-          "priceUSD24hAgo": 4641.49,
-          "isPoolToken": false
-        },
-        "walletAmount": 876.0496091564,
-        "troveLockedAmount": 0.3095203894,
-        "stabilityGainedAmount": 434.2329111649,
-        "totalValueLockedUSD": 24353.07,
-        "totalValueLockedUSD24hAgo": 25603.49
-      },
-      {
-        "token": {
-          "address": "0df96cfa-ce48-4632-921e-582017ae69f9",
-          "symbol": "ZAR",
-          "createdAt": "2023-09-01T03:25:55.453Z",
-          "priceUSD": 3114.84,
-          "priceUSD24hAgo": 1684.25,
-          "isPoolToken": false
-        },
-        "walletAmount": 782.7715543099,
-        "troveLockedAmount": 16.715595976,
-        "stabilityGainedAmount": 283.8610239676,
-        "totalValueLockedUSD": 29340.87,
-        "totalValueLockedUSD24hAgo": 29047.61
-      },
-      {
-        "token": {
-          "address": "da428d2f-3d1e-4d88-aecd-387de67eda33",
-          "symbol": "STN",
-          "createdAt": "2023-01-15T20:58:55.006Z",
-          "priceUSD": 3258.74,
-          "priceUSD24hAgo": 1174.37,
-          "isPoolToken": false
-        },
-        "walletAmount": 970.9745999426,
-        "troveLockedAmount": 26.2718576239,
-        "stabilityGainedAmount": 201.1850052513,
-        "totalValueLockedUSD": 49226.33,
-        "totalValueLockedUSD24hAgo": 49404.08
-      },
-      {
-        "token": {
-          "address": "3cdff5c6-3619-4c3f-8777-62d3e6451900",
-          "symbol": "SGD",
-          "createdAt": "2023-04-02T10:11:29.529Z",
-          "priceUSD": 168.15,
-          "priceUSD24hAgo": 4643.76,
+          "address": "a280d058-79b7-4903-9f2f-820455ffacfd",
+          "symbol": "TRY",
+          "createdAt": "2022-11-15T23:18:01.142Z",
+          "priceUSD": 536.08,
+          "priceUSD24hAgo": 2024.28,
           "isPoolToken": true
         },
-        "walletAmount": 301.474121632,
-        "troveLockedAmount": 4.5370597275,
-        "stabilityGainedAmount": 55.7228615274,
-        "totalValueLockedUSD": 27163.75,
-        "totalValueLockedUSD24hAgo": 28923.25
+        "walletAmount": 943.8454385382,
+        "troveLockedAmount": 40.8060667455,
+        "stabilityGainedAmount": 270.3212759225,
+        "totalValueLockedUSD": 18080.47,
+        "totalValueLockedUSD24hAgo": 17420.37
+      },
+      {
+        "token": {
+          "address": "b3214f91-ddbf-46cc-a772-e56ff6eb7a53",
+          "symbol": "CVE",
+          "createdAt": "2023-08-03T00:45:24.985Z",
+          "priceUSD": 1964.67,
+          "priceUSD24hAgo": 2460.58,
+          "isPoolToken": true
+        },
+        "walletAmount": 583.5804909002,
+        "troveLockedAmount": 12.498451001,
+        "stabilityGainedAmount": 168.8277369598,
+        "totalValueLockedUSD": 29699.87,
+        "totalValueLockedUSD24hAgo": 27353.78
+      },
+      {
+        "token": {
+          "address": "e07c0a9e-0f39-44c7-8ab8-7cdfe608d8d1",
+          "symbol": "TWD",
+          "createdAt": "2023-06-13T05:55:45.017Z",
+          "priceUSD": 3082.03,
+          "priceUSD24hAgo": 2215.27,
+          "isPoolToken": true
+        },
+        "walletAmount": 460.8270414174,
+        "troveLockedAmount": 18.2037473074,
+        "stabilityGainedAmount": 171.0906714434,
+        "totalValueLockedUSD": 30164.55,
+        "totalValueLockedUSD24hAgo": 32025.13
+      },
+      {
+        "token": {
+          "address": "6624005f-5b16-4562-8a75-215da520b75e",
+          "symbol": "MWK",
+          "createdAt": "2023-01-16T12:16:56.308Z",
+          "priceUSD": 2642.62,
+          "priceUSD24hAgo": 4606,
+          "isPoolToken": false
+        },
+        "walletAmount": 611.6738282144,
+        "troveLockedAmount": 39.1804030515,
+        "stabilityGainedAmount": 470.9853578941,
+        "totalValueLockedUSD": 47102.83,
+        "totalValueLockedUSD24hAgo": 55738.71
       },
       {
         "token": {
           "address": "0x6cA13a4ab78dd7D657226b155873A04DB929AXXX",
           "symbol": "JUSD",
-          "createdAt": "2023-04-30T18:04:50.993Z",
-          "priceUSD": 2423.78,
-          "priceUSD24hAgo": 2702.58,
+          "createdAt": "2023-07-28T10:49:35.897Z",
+          "priceUSD": 2576.97,
+          "priceUSD24hAgo": 3373.27,
           "isPoolToken": true
         },
-        "walletAmount": 181.134432787,
-        "troveLockedAmount": 30.2020192612,
-        "stabilityGainedAmount": 245.50120848,
-        "totalValueLockedUSD": 40369.42,
-        "totalValueLockedUSD24hAgo": 47647.96
+        "walletAmount": 457.3481811676,
+        "troveLockedAmount": 2.1458446397,
+        "stabilityGainedAmount": 176.5330394963,
+        "totalValueLockedUSD": 10511.12,
+        "totalValueLockedUSD24hAgo": 11925.49
+      },
+      {
+        "token": {
+          "address": "0df96cfa-ce48-4632-921e-582017ae69f9",
+          "symbol": "SGD",
+          "createdAt": "2022-12-02T14:37:37.621Z",
+          "priceUSD": 3052.76,
+          "priceUSD24hAgo": 3614.79,
+          "isPoolToken": true
+        },
+        "totalValueLockedUSD": 28039.35,
+        "totalValueLockedUSD24hAgo": 27102.33,
+        "walletAmount": null,
+        "troveLockedAmount": null,
+        "stabilityGainedAmount": null
       },
       {
         "token": {
           "address": "0x6cA13a4ab78dd7D657226b155873A04DB929A3A4",
+          "symbol": "SSP",
+          "createdAt": "2023-01-07T01:55:04.947Z",
+          "priceUSD": 4621.26,
+          "priceUSD24hAgo": 2313.08,
+          "isPoolToken": false
+        },
+        "totalValueLockedUSD": 47376.09,
+        "totalValueLockedUSD24hAgo": 51184.01,
+        "walletAmount": null,
+        "troveLockedAmount": null,
+        "stabilityGainedAmount": null
+      },
+      {
+        "token": {
+          "address": "e19b00fc-3983-4936-a256-7427c0401bb9",
+          "symbol": "PKR",
+          "createdAt": "2023-07-16T19:00:38.997Z",
+          "priceUSD": 583.92,
+          "priceUSD24hAgo": 4134.75,
+          "isPoolToken": false
+        },
+        "totalValueLockedUSD": 33176.99,
+        "totalValueLockedUSD24hAgo": 39123.21,
+        "walletAmount": null,
+        "troveLockedAmount": null,
+        "stabilityGainedAmount": null
+      },
+      {
+        "token": {
+          "address": "486ec106-ceda-4a0b-98d6-24eef4fa850a",
+          "symbol": "KWD",
+          "createdAt": "2022-12-28T01:09:37.416Z",
+          "priceUSD": 2015.97,
+          "priceUSD24hAgo": 3973.73,
+          "isPoolToken": false
+        },
+        "totalValueLockedUSD": 33675.65,
+        "totalValueLockedUSD24hAgo": 33452.56,
+        "walletAmount": null,
+        "troveLockedAmount": null,
+        "stabilityGainedAmount": null
+      },
+      {
+        "token": {
+          "address": "09ec1dbf-0fd2-46c4-86a4-33eda506684f",
+          "symbol": "ANG",
+          "createdAt": "2023-06-26T04:27:02.288Z",
+          "priceUSD": 1201.38,
+          "priceUSD24hAgo": 75.82,
+          "isPoolToken": true
+        },
+        "totalValueLockedUSD": 23840.04,
+        "totalValueLockedUSD24hAgo": 25547.26,
+        "walletAmount": null,
+        "troveLockedAmount": null,
+        "stabilityGainedAmount": null
+      },
+      {
+        "token": {
+          "address": "7478534b-1691-4237-9b16-8749c12f3c32",
           "symbol": "TTD",
-          "createdAt": "2022-12-15T15:27:06.504Z",
-          "priceUSD": 4056.24,
-          "priceUSD24hAgo": 4617.13,
+          "createdAt": "2023-08-07T02:17:00.256Z",
+          "priceUSD": 2328.51,
+          "priceUSD24hAgo": 982.01,
           "isPoolToken": true
         },
-        "totalValueLockedUSD": 31473.61,
-        "totalValueLockedUSD24hAgo": 34648.04,
-        "walletAmount": null,
-        "troveLockedAmount": null,
-        "stabilityGainedAmount": null
-      },
-      {
-        "token": {
-          "address": "090e19b7-7cd8-4fcf-ab00-b1274e768ea8",
-          "symbol": "BND",
-          "createdAt": "2023-08-12T17:23:20.841Z",
-          "priceUSD": 2249.46,
-          "priceUSD24hAgo": 4845.78,
-          "isPoolToken": false
-        },
-        "totalValueLockedUSD": 46482.69,
-        "totalValueLockedUSD24hAgo": 52718.01,
-        "walletAmount": null,
-        "troveLockedAmount": null,
-        "stabilityGainedAmount": null
-      },
-      {
-        "token": {
-          "address": "4bf44d6a-210e-4b73-ba03-435253fa3be5",
-          "symbol": "BND",
-          "createdAt": "2023-05-15T10:43:35.283Z",
-          "priceUSD": 686.06,
-          "priceUSD24hAgo": 2733.16,
-          "isPoolToken": false
-        },
-        "totalValueLockedUSD": 46258.92,
-        "totalValueLockedUSD24hAgo": 48157.03,
-        "walletAmount": null,
-        "troveLockedAmount": null,
-        "stabilityGainedAmount": null
-      },
-      {
-        "token": {
-          "address": "7e587a66-956d-4b26-8935-e00ee50d7a55",
-          "symbol": "BHD",
-          "createdAt": "2023-06-15T19:34:38.362Z",
-          "priceUSD": 1336.83,
-          "priceUSD24hAgo": 3349.06,
-          "isPoolToken": true
-        },
-        "totalValueLockedUSD": 20806.23,
-        "totalValueLockedUSD24hAgo": 22727.34,
-        "walletAmount": null,
-        "troveLockedAmount": null,
-        "stabilityGainedAmount": null
-      },
-      {
-        "token": {
-          "address": "3a87a447-ffe3-4e39-93f1-8d9096729e7f",
-          "symbol": "WST",
-          "createdAt": "2022-12-19T07:39:23.288Z",
-          "priceUSD": 2729.96,
-          "priceUSD24hAgo": 3942.59,
-          "isPoolToken": true
-        },
-        "totalValueLockedUSD": 24223.41,
-        "totalValueLockedUSD24hAgo": 24311.9,
-        "walletAmount": null,
-        "troveLockedAmount": null,
-        "stabilityGainedAmount": null
-      },
-      {
-        "token": {
-          "address": "2946db0b-3732-4256-a5cf-b0923463e22a",
-          "symbol": "NZD",
-          "createdAt": "2022-12-25T23:48:47.455Z",
-          "priceUSD": 1754.22,
-          "priceUSD24hAgo": 3279.57,
-          "isPoolToken": false
-        },
-        "totalValueLockedUSD": 38601.31,
-        "totalValueLockedUSD24hAgo": 36336.14,
+        "totalValueLockedUSD": 28162.43,
+        "totalValueLockedUSD24hAgo": 30008.65,
         "walletAmount": null,
         "troveLockedAmount": null,
         "stabilityGainedAmount": null

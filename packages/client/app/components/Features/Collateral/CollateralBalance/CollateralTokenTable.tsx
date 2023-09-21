@@ -39,7 +39,7 @@ const CollateralTokenTable = () => {
     <FeatureBox title="Collateral Token" noPadding border="full" borderRadius>
       <div>
         <TableContainer>
-          <Table size="small">
+          <Table size="small" data-testid="apollon-collateral-token-table">
             <TableHead>
               <TableRow>
                 <HeaderCell title="Wallet" cellProps={{ align: 'right', sx: { borderRight: '1px solid' } }} />

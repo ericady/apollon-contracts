@@ -46,7 +46,7 @@ test.describe('LiquidityPool', () => {
     });
 
     const component = await mount(
-      <IntegrationWrapper shouldPreselectTokens shouldConnectWallet>
+      <IntegrationWrapper shouldConnectWallet>
         <LiquidityPool />
       </IntegrationWrapper>,
     );
@@ -57,7 +57,7 @@ test.describe('LiquidityPool', () => {
   test.describe('LiquidityPools Table', () => {
     test('should preselect first pool if not loged in', async ({ mount, page }) => {
       await mount(
-        <IntegrationWrapper shouldPreselectTokens>
+        <IntegrationWrapper>
           <LiquidityPool />
         </IntegrationWrapper>,
       );
@@ -81,7 +81,7 @@ test.describe('LiquidityPool', () => {
 
     test('should preselect first pool but borrower pool if the user logs in between', async ({ mount, page }) => {
       await mount(
-        <IntegrationWrapper shouldPreselectTokens shouldConnectWalletDelayed>
+        <IntegrationWrapper shouldConnectWalletDelayed>
           <LiquidityPool />
         </IntegrationWrapper>,
       );
@@ -103,7 +103,7 @@ test.describe('LiquidityPool', () => {
 
     test('should select a pool when clicked', async ({ mount, page }) => {
       await mount(
-        <IntegrationWrapper shouldPreselectTokens>
+        <IntegrationWrapper>
           <LiquidityPool />
         </IntegrationWrapper>,
       );
@@ -129,7 +129,7 @@ test.describe('LiquidityPool', () => {
 
     test('should show selected table rows as default', async ({ mount, page }) => {
       await mount(
-        <IntegrationWrapper shouldPreselectTokens>
+        <IntegrationWrapper>
           <LiquidityPool />
         </IntegrationWrapper>,
       );
@@ -147,7 +147,7 @@ test.describe('LiquidityPool', () => {
 
     test('should show unselected table rows as selectable', async ({ mount, page }) => {
       await mount(
-        <IntegrationWrapper shouldPreselectTokens>
+        <IntegrationWrapper>
           <LiquidityPool />
         </IntegrationWrapper>,
       );
@@ -165,7 +165,7 @@ test.describe('LiquidityPool', () => {
 
     test('should order borrower pools to the top of the table', async ({ mount, page }) => {
       await mount(
-        <IntegrationWrapper shouldPreselectTokens shouldConnectWallet>
+        <IntegrationWrapper shouldConnectWallet>
           <LiquidityPool />
         </IntegrationWrapper>,
       );
@@ -197,7 +197,7 @@ test.describe('LiquidityPool', () => {
     test.describe('LiquidityPool Form behavior', () => {
       test('should reset input value after tab change', async ({ mount, page }) => {
         const component = await mount(
-          <IntegrationWrapper shouldPreselectTokens shouldConnectWallet>
+          <IntegrationWrapper shouldConnectWallet>
             <LiquidityPool />
           </IntegrationWrapper>,
         );
@@ -235,7 +235,7 @@ test.describe('LiquidityPool', () => {
 
       test('should have the borrower amount on deposit tab as labels', async ({ mount, page }) => {
         const component = await mount(
-          <IntegrationWrapper shouldPreselectTokens shouldConnectWallet>
+          <IntegrationWrapper shouldConnectWallet>
             <LiquidityPool />
           </IntegrationWrapper>,
         );
@@ -270,7 +270,7 @@ test.describe('LiquidityPool', () => {
 
       test('should have the borrower amount on withdraw tab as labels', async ({ mount, page }) => {
         const component = await mount(
-          <IntegrationWrapper shouldPreselectTokens shouldConnectWallet>
+          <IntegrationWrapper shouldConnectWallet>
             <LiquidityPool />
           </IntegrationWrapper>,
         );
@@ -308,7 +308,7 @@ test.describe('LiquidityPool', () => {
 
       test('should fill withdraw input with borrower on "max"', async ({ mount, page }) => {
         const component = await mount(
-          <IntegrationWrapper shouldPreselectTokens shouldConnectWallet>
+          <IntegrationWrapper shouldConnectWallet>
             <LiquidityPool />
           </IntegrationWrapper>,
         );
@@ -349,7 +349,7 @@ test.describe('LiquidityPool', () => {
           page,
         }) => {
           const component = await mount(
-            <IntegrationWrapper shouldPreselectTokens shouldConnectWallet>
+            <IntegrationWrapper shouldConnectWallet>
               <LiquidityPool />
             </IntegrationWrapper>,
           );
@@ -384,7 +384,7 @@ test.describe('LiquidityPool', () => {
           page,
         }) => {
           const component = await mount(
-            <IntegrationWrapper shouldPreselectTokens shouldConnectWallet>
+            <IntegrationWrapper shouldConnectWallet>
               <LiquidityPool />
             </IntegrationWrapper>,
           );
@@ -419,7 +419,7 @@ test.describe('LiquidityPool', () => {
           page,
         }) => {
           const component = await mount(
-            <IntegrationWrapper shouldPreselectTokens shouldConnectWallet>
+            <IntegrationWrapper shouldConnectWallet>
               <LiquidityPool />
             </IntegrationWrapper>,
           );
@@ -457,7 +457,7 @@ test.describe('LiquidityPool', () => {
           page,
         }) => {
           const component = await mount(
-            <IntegrationWrapper shouldPreselectTokens shouldConnectWallet>
+            <IntegrationWrapper shouldConnectWallet>
               <LiquidityPool />
             </IntegrationWrapper>,
           );
@@ -495,7 +495,7 @@ test.describe('LiquidityPool', () => {
           page,
         }) => {
           const component = await mount(
-            <IntegrationWrapper shouldPreselectTokens shouldConnectWallet>
+            <IntegrationWrapper shouldConnectWallet>
               <LiquidityPool />
             </IntegrationWrapper>,
           );
@@ -533,7 +533,7 @@ test.describe('LiquidityPool', () => {
           page,
         }) => {
           const component = await mount(
-            <IntegrationWrapper shouldPreselectTokens shouldConnectWallet>
+            <IntegrationWrapper shouldConnectWallet>
               <LiquidityPool />
             </IntegrationWrapper>,
           );
@@ -570,7 +570,7 @@ test.describe('LiquidityPool', () => {
       test.describe('Connected mode', () => {
         test('should have "Execute" button enabled when logged in', async ({ mount }) => {
           const component = await mount(
-            <IntegrationWrapper shouldPreselectTokens shouldConnectWallet>
+            <IntegrationWrapper shouldConnectWallet>
               <LiquidityPool />
             </IntegrationWrapper>,
           );
@@ -585,7 +585,7 @@ test.describe('LiquidityPool', () => {
       test.describe('Guest mode', () => {
         test('should have "Swap" button disabled as guest', async ({ mount }) => {
           const component = await mount(
-            <IntegrationWrapper shouldPreselectTokens>
+            <IntegrationWrapper>
               <LiquidityPool />
             </IntegrationWrapper>,
           );
