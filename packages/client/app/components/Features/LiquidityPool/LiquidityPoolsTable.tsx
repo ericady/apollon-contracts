@@ -3,6 +3,7 @@
 import { useQuery } from '@apollo/client';
 import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from '@mui/material';
 import Typography from '@mui/material/Typography';
+import { useEffect, useMemo } from 'react';
 import { useEthers } from '../../../context/EthersProvider';
 import {
   GetBorrowerLiquidityPoolsQuery,
@@ -32,21 +33,27 @@ function LiquidityPoolsTable({ selectedPool, setSelectedPool }: Props) {
     GetBorrowerLiquidityPoolsQueryVariables
   >(GET_BORROWER_LIQUIDITY_POOLS, { variables: { borrower: address }, skip: !address });
 
-  if (!allPoolsData || (!borrowerPoolsData && loading)) return <LiquidityPoolsTableLoader />;
-
   // filter out all the pools in borrowerPoolsData.getPools that are already included in borrowerPoolsData.getPools.
-  const allPoolsCombined: GetBorrowerLiquidityPoolsQuery['getPools'] = borrowerPoolsData
-    ? borrowerPoolsData.getPools.concat(
-        allPoolsData.getPools.filter(
-          (allPool) => !borrowerPoolsData.getPools.find((borrowerPool) => allPool.id === borrowerPool.id),
-        ),
-      )
-    : allPoolsData.getPools;
+  const allPoolsCombined: GetBorrowerLiquidityPoolsQuery['getPools'] = useMemo(
+    () =>
+      borrowerPoolsData
+        ? borrowerPoolsData.getPools.concat(
+            allPoolsData?.getPools.filter(
+              (allPool) => !borrowerPoolsData.getPools.find((borrowerPool) => allPool.id === borrowerPool.id),
+            ) ?? [],
+          )
+        : allPoolsData?.getPools ?? [],
+    [allPoolsData, borrowerPoolsData],
+  );
 
-  // Select first pool by default
-  if (!selectedPool && allPoolsCombined.length > 0) {
-    setSelectedPool(allPoolsCombined[0]);
-  }
+  useEffect(() => {
+    // Select first pool by default
+    if (allPoolsCombined.length > 0) {
+      setSelectedPool(allPoolsCombined[0]);
+    }
+  }, [allPoolsCombined, setSelectedPool]);
+
+  if (!allPoolsData || (!borrowerPoolsData && loading)) return <LiquidityPoolsTableLoader />;
 
   return (
     <FeatureBox title="Pools" noPadding headBorder="full">
@@ -104,6 +111,7 @@ function LiquidityPoolsTable({ selectedPool, setSelectedPool }: Props) {
                       {roundCurrency(tokenA.totalAmount, 5)}
                       <br />
                       <span
+                        data-testid="apollon-liquidity-pool-table-row-borrower-amount-token-a"
                         style={{
                           color: '#827F8B',
                           fontSize: '11.7px',
@@ -132,6 +140,7 @@ function LiquidityPoolsTable({ selectedPool, setSelectedPool }: Props) {
                       {roundCurrency(tokenB.totalAmount, 5)}
                       <br />
                       <span
+                        data-testid="apollon-liquidity-pool-table-row-borrower-amount-token-b"
                         style={{
                           color: '#827F8B',
                           fontSize: '11.7px',

@@ -90,7 +90,10 @@ function LiquidityDepositWithdraw({ selectedPool }: Props) {
                 <div style={{ marginTop: 6 }}>
                   <Label variant="success">{tokenA.token.symbol}</Label>
 
-                  <Typography sx={{ fontWeight: '400', marginTop: '10px' }}>
+                  <Typography
+                    sx={{ fontWeight: '400', marginTop: '10px' }}
+                    data-testid="apollon-liquidity-pool-deposit-token-a-funds-label"
+                  >
                     {roundCurrency(tokenA.borrowerAmount ?? 0, 5)}
                   </Typography>
                   <Typography variant="label">Deposited</Typography>
@@ -98,6 +101,7 @@ function LiquidityDepositWithdraw({ selectedPool }: Props) {
 
                 <NumberInput
                   name="tokenAAmount"
+                  data-testid="apollon-liquidity-pool-deposit-token-a-amount"
                   placeholder="Value"
                   fullWidth
                   rules={{
@@ -123,7 +127,10 @@ function LiquidityDepositWithdraw({ selectedPool }: Props) {
                 <div style={{ marginTop: 6 }}>
                   <Label variant="success">{tokenB.token.symbol}</Label>
 
-                  <Typography sx={{ fontWeight: '400', marginTop: '10px' }}>
+                  <Typography
+                    sx={{ fontWeight: '400', marginTop: '10px' }}
+                    data-testid="apollon-liquidity-pool-deposit-token-b-funds-label"
+                  >
                     {roundCurrency(tokenB.borrowerAmount ?? 0, 5)}
                   </Typography>
                   <Typography variant="label">Deposited</Typography>
@@ -131,6 +138,7 @@ function LiquidityDepositWithdraw({ selectedPool }: Props) {
 
                 <NumberInput
                   name="tokenBAmount"
+                  data-testid="apollon-liquidity-pool-deposit-token-b-amount"
                   placeholder="Value"
                   fullWidth
                   rules={{
@@ -157,19 +165,22 @@ function LiquidityDepositWithdraw({ selectedPool }: Props) {
               <div>
                 <NumberInput
                   name="tokenAAmount"
+                  data-testid="apollon-liquidity-pool-withdraw-token-a-amount"
                   placeholder="Value"
                   fullWidth
                   rules={{
                     min: { value: 0, message: 'You can only invest positive amounts.' },
                     max: {
                       value: tokenA.borrowerAmount!,
-                      message: 'This amount is greater than your deposited amount',
+                      message: 'This amount is greater than your deposited amount.',
                     },
                   }}
                 />
                 <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                   <div>
-                    <Typography variant="caption">{roundCurrency(tokenA.borrowerAmount!, 5)}</Typography>
+                    <Typography variant="caption" data-testid="apollon-liquidity-pool-withdraw-token-a-funds-label">
+                      {roundCurrency(tokenA.borrowerAmount!, 5)}
+                    </Typography>
                     <br />
                     <Typography variant="label">Deposited</Typography>
                   </div>
@@ -197,20 +208,23 @@ function LiquidityDepositWithdraw({ selectedPool }: Props) {
               <div>
                 <NumberInput
                   name="tokenBAmount"
+                  data-testid="apollon-liquidity-pool-withdraw-token-b-amount"
                   placeholder="Value"
                   fullWidth
                   rules={{
                     min: { value: 0, message: 'You can only invest positive amounts.' },
                     max: {
                       value: tokenB.borrowerAmount!,
-                      message: 'This amount is greater than your deposited amount',
+                      message: 'This amount is greater than your deposited amount.',
                     },
                   }}
                 />
 
                 <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                   <div>
-                    <Typography variant="caption">{roundCurrency(tokenB.borrowerAmount!, 5)}</Typography>
+                    <Typography variant="caption" data-testid="apollon-liquidity-pool-withdraw-token-b-funds-label">
+                      {roundCurrency(tokenB.borrowerAmount!, 5)}
+                    </Typography>
                     <br />
                     <Typography variant="label">Deposited</Typography>
                   </div>
@@ -262,7 +276,7 @@ function LiquidityDepositWithdraw({ selectedPool }: Props) {
 
           <div style={{ padding: '20px' }}>
             <Button type="submit" variant="outlined" sx={{ borderColor: 'primary.contrastText' }} disabled={!address}>
-              UPDATE
+              Update
             </Button>
           </div>
         </form>

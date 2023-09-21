@@ -13,6 +13,7 @@ import MockedPositionsWithoutBorrower from './mockedResponses/GetDebtTokens.mock
 type Props = {
   shouldPreselectTokens?: boolean;
   shouldConnectWallet?: boolean;
+  shouldConnectWalletDelayed?: boolean;
 };
 
 export const IntegrationWrapper = ({ children, ...stateProps }: PropsWithChildren<Props>) => (
@@ -34,7 +35,12 @@ export const IntegrationWrapper = ({ children, ...stateProps }: PropsWithChildre
  * This component is used as a wrapper to mock library Providers and other Context state.
  * Actual calls to the modules of these libraries (ethers) must be made as a unit test because jest provides excellent module mocking.
  */
-function SetupState({ children, shouldPreselectTokens, shouldConnectWallet }: PropsWithChildren<Props>) {
+function SetupState({
+  children,
+  shouldPreselectTokens,
+  shouldConnectWallet,
+  shouldConnectWalletDelayed,
+}: PropsWithChildren<Props>) {
   const { setSelectedToken, selectedToken } = useSelectedToken();
   if (shouldPreselectTokens && !selectedToken) {
     const { address, priceUSD, priceUSD24hAgo, symbol } = MockedPositionsWithoutBorrower.data.getDebtTokens[0].token;
@@ -53,6 +59,12 @@ function SetupState({ children, shouldPreselectTokens, shouldConnectWallet }: Pr
   const [address, setAddress] = useState<string>('');
   if (shouldConnectWallet && !address) {
     setAddress('0x1234');
+  }
+
+  if (shouldConnectWalletDelayed && !address) {
+    setTimeout(() => {
+      setAddress('0x1234');
+    }, 500);
   }
 
   return (
