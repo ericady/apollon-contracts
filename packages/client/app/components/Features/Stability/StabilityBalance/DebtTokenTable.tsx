@@ -31,7 +31,7 @@ function DebtTokenTable() {
   return (
     <FeatureBox title="Debt Token" noPadding border="full" borderRadius>
       <TableContainer>
-        <Table>
+        <Table data-testid="apollon-debt-token-table">
           <TableHead>
             <TableRow>
               <HeaderCell title="Personal" cellProps={{ align: 'right' }} />

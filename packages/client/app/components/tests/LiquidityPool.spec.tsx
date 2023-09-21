@@ -568,7 +568,7 @@ test.describe('LiquidityPool', () => {
       });
 
       test.describe('Connected mode', () => {
-        test('should have "Execute" button enabled when logged in', async ({ mount }) => {
+        test('should have "Update" button enabled when logged in', async ({ mount }) => {
           const component = await mount(
             <IntegrationWrapper shouldConnectWallet>
               <LiquidityPool />
@@ -583,7 +583,7 @@ test.describe('LiquidityPool', () => {
       });
 
       test.describe('Guest mode', () => {
-        test('should have "Swap" button disabled as guest', async ({ mount }) => {
+        test('should have "Update" button disabled as guest', async ({ mount }) => {
           const component = await mount(
             <IntegrationWrapper>
               <LiquidityPool />

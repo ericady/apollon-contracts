@@ -25,7 +25,7 @@ test.afterAll(() => {
 });
 
 test.describe('StabilityPoolTable', () => {
-  test('should render CollateralTokenTable with mocked data when not logged in', async ({ mount, page }) => {
+  test('should render StabilityPoolTable with mocked data', async ({ mount, page }) => {
     // We need to mock the exact same data to generate the exact same snapshot
     await page.route('https://flyby-router-demo.herokuapp.com/', async (route) => {
       if (JSON.parse(route.request().postData()!).operationName === 'GetCollateralTokens') {
@@ -57,6 +57,20 @@ test.describe('StabilityPoolTable', () => {
     await expect(component).toHaveScreenshot();
   });
 
+  test('should render StabilityPoolTable empty when not logged in', async ({ mount, page }) => {
+    const component = await mount(
+      <IntegrationWrapper>
+        <StabilityPoolTable />
+      </IntegrationWrapper>,
+    );
+
+    await page.waitForSelector('[data-testid="apollon-stability-pool-table"]', {
+      state: 'visible',
+    });
+
+    await expect(component).toHaveScreenshot();
+  });
+
   test('should have same assets on same table row', async ({ mount, page }) => {
     const component = await mount(
       <IntegrationWrapper shouldConnectWallet>
@@ -76,5 +90,61 @@ test.describe('StabilityPoolTable', () => {
       .innerText();
 
     expect(firstLostToken).toBe(firstRewardToken);
+  });
+
+  test.describe('Connected mode', () => {
+    test('should have "History" button enabled when logged in', async ({ mount }) => {
+      const component = await mount(
+        <IntegrationWrapper shouldConnectWallet>
+          <StabilityPoolTable />
+        </IntegrationWrapper>,
+      );
+
+      const updateButton = component.getByRole('button', {
+        name: 'History',
+      });
+      await expect(updateButton).toBeEnabled();
+    });
+
+    test('should have "Claim" button enabled when logged in', async ({ mount }) => {
+      const component = await mount(
+        <IntegrationWrapper shouldConnectWallet>
+          <StabilityPoolTable />
+        </IntegrationWrapper>,
+      );
+
+      const updateButton = component.getByRole('button', {
+        name: 'Claim',
+      });
+      await expect(updateButton).toBeEnabled();
+    });
+  });
+
+  test.describe('Guest mode', () => {
+    test('should have "History" button disabled as guest', async ({ mount }) => {
+      const component = await mount(
+        <IntegrationWrapper>
+          <StabilityPoolTable />
+        </IntegrationWrapper>,
+      );
+
+      const updateButton = component.getByRole('button', {
+        name: 'History',
+      });
+      await expect(updateButton).toBeDisabled();
+    });
+
+    test('should have "Claim" button disabled as guest', async ({ mount }) => {
+      const component = await mount(
+        <IntegrationWrapper>
+          <StabilityPoolTable />
+        </IntegrationWrapper>,
+      );
+
+      const updateButton = component.getByRole('button', {
+        name: 'Claim',
+      });
+      await expect(updateButton).toBeDisabled();
+    });
   });
 });
