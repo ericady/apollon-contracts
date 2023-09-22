@@ -37,7 +37,7 @@ test.describe('StabilityHistoryDialog', () => {
       }
     });
 
-    const component = await mount(
+    await mount(
       <IntegrationWrapper shouldConnectWallet>
         <StabilityHistoryDialog />
       </IntegrationWrapper>,

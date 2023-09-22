@@ -163,7 +163,7 @@ const CollateralUpdateDialog = ({ collateralData, buttonVariant, buttonSx = {}, 
                       min: { value: 0, message: 'You can only invest positive amounts.' },
                       max:
                         tabValue === 'DEPOSIT'
-                          ? { value: etherAmount, message: 'Your wallet does not contain the specified amount' }
+                          ? { value: etherAmount, message: 'Your wallet does not contain the specified amount.' }
                           : {
                               value: depositedCollateralToDeposit[0].walletAmount!,
                               message: 'Your trove does not contain the specified amount',

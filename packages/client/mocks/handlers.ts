@@ -93,7 +93,7 @@ const debtTokens: DebtTokenMeta[] = faker.helpers
       walletAmount: parseFloat(faker.finance.amount(0, 1000, 2)),
       troveMintedAmount: parseFloat(faker.finance.amount(0, 500, 2)),
       stabilityLostAmount: faker.number.float({ min: 0, max: stabilityGainedAmount!, precision: 0.0001 }),
-      stabilityCompoundAmount: faker.number.float({ min: 0, max: 5, precision: 0.00001 }),
+      stabilityCompoundAmount: faker.number.float({ min: 0, max: 5, precision: 0.0001 }),
 
       totalDepositedStability: parseFloat(faker.finance.amount(1000, 5000, 2)),
       totalReserve,

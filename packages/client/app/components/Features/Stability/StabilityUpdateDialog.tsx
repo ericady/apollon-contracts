@@ -2,7 +2,7 @@
 
 import { useQuery } from '@apollo/client';
 import CloseIcon from '@mui/icons-material/Close';
-import { Box, Dialog, DialogActions, DialogContent, DialogTitle, IconButton } from '@mui/material';
+import { Box, Dialog, DialogActions, DialogContent, DialogTitle, FormHelperText, IconButton } from '@mui/material';
 import Button from '@mui/material/Button';
 import Tab from '@mui/material/Tab';
 import Tabs from '@mui/material/Tabs';
@@ -30,8 +30,8 @@ const StabilityUpdateDialog = () => {
     },
   });
 
-  const methods = useForm<FieldValues>();
-  const { handleSubmit, setValue, reset } = methods;
+  const methods = useForm<FieldValues>({ reValidateMode: 'onChange' });
+  const { handleSubmit, setValue, reset, formState } = methods;
 
   const handleChange = (_: SyntheticEvent, newValue: 'DEPOSIT' | 'WITHDRAW') => {
     setTabValue(newValue);
@@ -58,7 +58,13 @@ const StabilityUpdateDialog = () => {
         Update
       </Button>
 
-      <Dialog open={isOpen} onClose={() => setIsOpen(false)} fullWidth>
+      <Dialog
+        open={isOpen}
+        onClose={() => setIsOpen(false)}
+        fullWidth
+        // @ts-ignore
+        componentsProps={{ backdrop: { 'data-testid': 'apollon-stability-update-dialog-backdrop' } }}
+      >
         <DialogTitle
           sx={{
             display: 'flex',
@@ -81,7 +87,7 @@ const StabilityUpdateDialog = () => {
               STABILITY UPDATE
             </Typography>
           </div>
-          <IconButton onClick={() => setIsOpen(false)}>
+          <IconButton onClick={() => setIsOpen(false)} aria-label="close stability update dialog">
             <CloseIcon
               sx={{
                 color: '#64616D',
@@ -109,6 +115,7 @@ const StabilityUpdateDialog = () => {
                 {data?.getDebtTokens.map(({ token, walletAmount = 0, stabilityCompoundAmount = 0 }, index) => (
                   <Box
                     key={token.address}
+                    data-testid="apollon-stability-update-dialog"
                     sx={{
                       display: 'flex',
                       justifyContent: 'space-between',
@@ -147,17 +154,18 @@ const StabilityUpdateDialog = () => {
                     <div>
                       <NumberInput
                         name={token.address}
+                        data-testid="apollon-stability-update-dialog-input"
                         defaultValue=""
                         placeholder="Value"
                         fullWidth
                         rules={{
-                          min: { value: 0, message: 'You can only invest positive amounts.' },
+                          min: { value: 0, message: 'Amount needs to be positive.' },
                           max:
                             tabValue === 'DEPOSIT'
-                              ? { value: walletAmount!, message: 'Your wallet does not contain the specified amount' }
+                              ? { value: walletAmount!, message: 'Your wallet does not contain the specified amount.' }
                               : {
                                   value: stabilityCompoundAmount!,
-                                  message: 'Your deposited stability does not contain the specified amount',
+                                  message: 'Your deposited stability does not contain the specified amount.',
                                 },
                         }}
                       />
@@ -166,7 +174,12 @@ const StabilityUpdateDialog = () => {
                         <div>
                           {tabValue === 'DEPOSIT' && (
                             <>
-                              <Typography variant="caption">{roundCurrency(walletAmount!, 5)}</Typography>
+                              <Typography
+                                variant="caption"
+                                data-testid="apollon-stability-update-dialog-deposit-funds-label"
+                              >
+                                {roundCurrency(walletAmount!, 5)}
+                              </Typography>
                               <Typography
                                 sx={{
                                   color: '#3C3945',
@@ -183,7 +196,12 @@ const StabilityUpdateDialog = () => {
                           )}
                           {tabValue === 'WITHDRAW' && (
                             <>
-                              <Typography variant="caption">{roundCurrency(stabilityCompoundAmount!, 5)}</Typography>
+                              <Typography
+                                variant="caption"
+                                data-testid="apollon-stability-update-dialog-withdraw-funds-label"
+                              >
+                                {roundCurrency(stabilityCompoundAmount!, 5)}
+                              </Typography>
                               <Typography
                                 sx={{
                                   color: '#3C3945',
@@ -221,9 +239,21 @@ const StabilityUpdateDialog = () => {
                 p: '30px 20px',
               }}
             >
-              <Button type="submit" variant="outlined" sx={{ borderColor: 'primary.contrastText' }} disabled={!address}>
-                Update
-              </Button>
+              <div style={{ width: '100%' }}>
+                <Button
+                  type="submit"
+                  variant="outlined"
+                  sx={{ borderColor: 'primary.contrastText' }}
+                  disabled={!address}
+                >
+                  Update
+                </Button>
+                {formState.isSubmitted && !formState.isDirty && (
+                  <FormHelperText error sx={{ mt: '10px' }} data-testid="apollon-stability-update-dialog-error">
+                    You must specify at least one token to update.
+                  </FormHelperText>
+                )}
+              </div>
             </DialogActions>
           </form>
         </FormProvider>

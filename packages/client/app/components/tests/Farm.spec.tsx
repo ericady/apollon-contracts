@@ -58,8 +58,8 @@ test.describe('Farm', () => {
       const amountInput = component.getByTestId('apollon-farm-amount').locator('input');
       await amountInput.fill('1000');
 
-      const shortButton = component.getByRole('tab', { name: 'Short' });
-      await shortButton.click();
+      const shortTab = component.getByRole('tab', { name: 'Short' });
+      await shortTab.click();
 
       await expect(amountInput).toHaveValue('');
 
@@ -89,8 +89,8 @@ test.describe('Farm', () => {
       const slippageInput = component.getByTestId('apollon-farm-slippage-amount').locator('input');
       await slippageInput.fill('10');
 
-      const shortButton = component.getByRole('tab', { name: 'Short' });
-      await shortButton.click();
+      const shortTab = component.getByRole('tab', { name: 'Short' });
+      await shortTab.click();
 
       await expect(slippageInput).toHaveValue('');
       await slippageInput.fill('10');
@@ -233,8 +233,8 @@ test.describe('Farm', () => {
           </IntegrationWrapper>,
         );
 
-        const shortButton = component.getByRole('tab', { name: 'Short' });
-        await shortButton.click();
+        const shortTab = component.getByRole('tab', { name: 'Short' });
+        await shortTab.click();
 
         const positionSize = component.getByTestId('apollon-farm-position-size');
         const positionSizeText = await positionSize.innerText();
@@ -266,8 +266,8 @@ test.describe('Farm', () => {
           </IntegrationWrapper>,
         );
 
-        const shortButton = component.getByRole('tab', { name: 'Short' });
-        await shortButton.click();
+        const shortTab = component.getByRole('tab', { name: 'Short' });
+        await shortTab.click();
 
         const protocolFee = component.getByTestId('apollon-farm-protocol-fee');
         const protocolFeeText = await protocolFee.innerText();
@@ -299,8 +299,8 @@ test.describe('Farm', () => {
           </IntegrationWrapper>,
         );
 
-        const shortButton = component.getByRole('tab', { name: 'Short' });
-        await shortButton.click();
+        const shortTab = component.getByRole('tab', { name: 'Short' });
+        await shortTab.click();
 
         const tokenInput = component.getByTestId('apollon-farm-amount').locator('input');
         await tokenInput.fill('-1');
@@ -324,8 +324,8 @@ test.describe('Farm', () => {
           </IntegrationWrapper>,
         );
 
-        const shortButton = component.getByRole('tab', { name: 'Short' });
-        await shortButton.click();
+        const shortTab = component.getByRole('tab', { name: 'Short' });
+        await shortTab.click();
 
         const executeButton = component.getByRole('button', {
           name: 'Execute',
@@ -346,8 +346,8 @@ test.describe('Farm', () => {
           </IntegrationWrapper>,
         );
 
-        const shortButton = component.getByRole('tab', { name: 'Short' });
-        await shortButton.click();
+        const shortTab = component.getByRole('tab', { name: 'Short' });
+        await shortTab.click();
 
         const executeButton = component.getByRole('button', {
           name: 'Execute',
