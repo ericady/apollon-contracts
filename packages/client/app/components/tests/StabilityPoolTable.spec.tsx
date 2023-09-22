@@ -93,19 +93,6 @@ test.describe('StabilityPoolTable', () => {
   });
 
   test.describe('Connected mode', () => {
-    test('should have "History" button enabled when logged in', async ({ mount }) => {
-      const component = await mount(
-        <IntegrationWrapper shouldConnectWallet>
-          <StabilityPoolTable />
-        </IntegrationWrapper>,
-      );
-
-      const updateButton = component.getByRole('button', {
-        name: 'History',
-      });
-      await expect(updateButton).toBeEnabled();
-    });
-
     test('should have "Claim" button enabled when logged in', async ({ mount }) => {
       const component = await mount(
         <IntegrationWrapper shouldConnectWallet>
@@ -113,27 +100,14 @@ test.describe('StabilityPoolTable', () => {
         </IntegrationWrapper>,
       );
 
-      const updateButton = component.getByRole('button', {
+      const claimButton = component.getByRole('button', {
         name: 'Claim',
       });
-      await expect(updateButton).toBeEnabled();
+      await expect(claimButton).toBeEnabled();
     });
   });
 
   test.describe('Guest mode', () => {
-    test('should have "History" button disabled as guest', async ({ mount }) => {
-      const component = await mount(
-        <IntegrationWrapper>
-          <StabilityPoolTable />
-        </IntegrationWrapper>,
-      );
-
-      const updateButton = component.getByRole('button', {
-        name: 'History',
-      });
-      await expect(updateButton).toBeDisabled();
-    });
-
     test('should have "Claim" button disabled as guest', async ({ mount }) => {
       const component = await mount(
         <IntegrationWrapper>
@@ -141,10 +115,10 @@ test.describe('StabilityPoolTable', () => {
         </IntegrationWrapper>,
       );
 
-      const updateButton = component.getByRole('button', {
+      const claimButton = component.getByRole('button', {
         name: 'Claim',
       });
-      await expect(updateButton).toBeDisabled();
+      await expect(claimButton).toBeDisabled();
     });
   });
 });

@@ -1,0 +1,1515 @@
+{
+  "data": {
+    "getBorrowerStabilityHistory": {
+      "history": [
+        {
+          "id": "7e4812e9-f3b4-4211-bc1a-bc16414eac7e",
+          "timestamp": 1695361175248,
+          "type": "WITHDRAWN",
+          "values": [
+            {
+              "token": {
+                "address": "167cae89-613a-4add-8935-a1940c9d6c67",
+                "symbol": "HNL",
+                "createdAt": "2023-06-01T03:04:40.353Z",
+                "priceUSD": 4582.48,
+                "priceUSD24hAgo": 2465.6,
+                "isPoolToken": false
+              },
+              "amount": 0.06709030917756324
+            },
+            {
+              "token": {
+                "address": "a0424c8b-73c7-465f-84a1-00ee9aea9028",
+                "symbol": "LBP",
+                "createdAt": "2023-08-19T20:00:34.303Z",
+                "priceUSD": 3196.86,
+                "priceUSD24hAgo": 4086.95,
+                "isPoolToken": false
+              },
+              "amount": 696.3699999999999
+            }
+          ],
+          "resultInUSD": 1003.81,
+          "claimInUSD": null
+        },
+        {
+          "id": "85163ed8-5e97-4231-a231-85f9231e2b95",
+          "timestamp": 1695361175248,
+          "type": "CLAIMED_REWARDS",
+          "values": [
+            {
+              "token": {
+                "address": "0x6cA13a4ab78dd7D657226b155873A04DB929AXXX",
+                "symbol": "JUSD",
+                "createdAt": "2023-05-22T21:21:24.064Z",
+                "priceUSD": 700.72,
+                "priceUSD24hAgo": 3533.46,
+                "isPoolToken": true
+              },
+              "amount": -0.06514727708642538
+            },
+            {
+              "token": {
+                "address": "a0424c8b-73c7-465f-84a1-00ee9aea9028",
+                "symbol": "LBP",
+                "createdAt": "2023-08-19T20:00:34.303Z",
+                "priceUSD": 3196.86,
+                "priceUSD24hAgo": 4086.95,
+                "isPoolToken": false
+              },
+              "amount": -0.008198669944883417
+            },
+            {
+              "token": {
+                "address": "d3347ace-22c9-4c12-9b31-cecf6080ec72",
+                "symbol": "ZMW",
+                "createdAt": "2023-08-12T14:47:26.755Z",
+                "priceUSD": 992.71,
+                "priceUSD24hAgo": 3758.13,
+                "isPoolToken": true
+              },
+              "amount": 0
+            },
+            {
+              "token": {
+                "address": "0df96cfa-ce48-4632-921e-582017ae69f9",
+                "symbol": "NPR",
+                "createdAt": "2022-11-27T17:49:41.919Z",
+                "priceUSD": 4584.21,
+                "priceUSD24hAgo": 1973.45,
+                "isPoolToken": true
+              },
+              "amount": -0.00045809419725536133
+            },
+            {
+              "token": {
+                "address": "167cae89-613a-4add-8935-a1940c9d6c67",
+                "symbol": "HNL",
+                "createdAt": "2023-06-01T03:04:40.353Z",
+                "priceUSD": 4582.48,
+                "priceUSD24hAgo": 2465.6,
+                "isPoolToken": false
+              },
+              "amount": -1.3200000000000016
+            },
+            {
+              "token": {
+                "address": "a0424c8b-73c7-465f-84a1-00ee9aea9028",
+                "symbol": "LBP",
+                "createdAt": "2023-08-19T20:00:34.303Z",
+                "priceUSD": 3196.86,
+                "priceUSD24hAgo": 4086.95,
+                "isPoolToken": false
+              },
+              "amount": 75.96
+            }
+          ],
+          "resultInUSD": 75.96,
+          "claimInUSD": 75.28
+        },
+        {
+          "id": "e0cf65ab-8779-4b67-893c-62195c71f155",
+          "timestamp": 1695274775248,
+          "type": "CLAIMED_REWARDS",
+          "values": [
+            {
+              "token": {
+                "address": "d3347ace-22c9-4c12-9b31-cecf6080ec72",
+                "symbol": "ZMW",
+                "createdAt": "2023-08-12T14:47:26.755Z",
+                "priceUSD": 992.71,
+                "priceUSD24hAgo": 3758.13,
+                "isPoolToken": true
+              },
+              "amount": -890.5
+            },
+            {
+              "token": {
+                "address": "64aafa66-74c0-4b5e-9c81-9b5fdeba8952",
+                "symbol": "TJS",
+                "createdAt": "2022-11-11T03:03:42.173Z",
+                "priceUSD": 1868.35,
+                "priceUSD24hAgo": 3883.23,
+                "isPoolToken": true
+              },
+              "amount": 0.4228062193914417
+            },
+            {
+              "token": {
+                "address": "0df96cfa-ce48-4632-921e-582017ae69f9",
+                "symbol": "NPR",
+                "createdAt": "2022-11-27T17:49:41.919Z",
+                "priceUSD": 4584.21,
+                "priceUSD24hAgo": 1973.45,
+                "isPoolToken": true
+              },
+              "amount": 102.40999999999997
+            }
+          ],
+          "resultInUSD": 892.36,
+          "claimInUSD": 890.5
+        },
+        {
+          "id": "351715a3-5866-4ff0-80a5-0cff31263f01",
+          "timestamp": 1695188375248,
+          "type": "DEPOSITED",
+          "values": [
+            {
+              "token": {
+                "address": "64aafa66-74c0-4b5e-9c81-9b5fdeba8952",
+                "symbol": "TJS",
+                "createdAt": "2022-11-11T03:03:42.173Z",
+                "priceUSD": 1868.35,
+                "priceUSD24hAgo": 3883.23,
+                "isPoolToken": true
+              },
+              "amount": 0.09051837182540745
+            },
+            {
+              "token": {
+                "address": "94920dc6-2f8d-4ff5-a3fe-690b66970fe5",
+                "symbol": "UAH",
+                "createdAt": "2023-04-15T20:47:27.325Z",
+                "priceUSD": 2241.49,
+                "priceUSD24hAgo": 336.43,
+                "isPoolToken": false
+              },
+              "amount": 0.19722595237989018
+            },
+            {
+              "token": {
+                "address": "0df96cfa-ce48-4632-921e-582017ae69f9",
+                "symbol": "NPR",
+                "createdAt": "2022-11-27T17:49:41.919Z",
+                "priceUSD": 4584.21,
+                "priceUSD24hAgo": 1973.45,
+                "isPoolToken": true
+              },
+              "amount": 0.003638576766771156
+            },
+            {
+              "token": {
+                "address": "a0424c8b-73c7-465f-84a1-00ee9aea9028",
+                "symbol": "LBP",
+                "createdAt": "2023-08-19T20:00:34.303Z",
+                "priceUSD": 3196.86,
+                "priceUSD24hAgo": 4086.95,
+                "isPoolToken": false
+              },
+              "amount": 102.36000000000001
+            }
+          ],
+          "resultInUSD": 730.24,
+          "claimInUSD": null
+        },
+        {
+          "id": "2652d42b-9d54-4ba9-90c6-98732cfe81f9",
+          "timestamp": 1695188375248,
+          "type": "CLAIMED_REWARDS",
+          "values": [
+            {
+              "token": {
+                "address": "cd8c8190-03c1-48f0-aec4-f4cb12bf9210",
+                "symbol": "MNT",
+                "createdAt": "2023-09-19T11:27:01.695Z",
+                "priceUSD": 4049.65,
+                "priceUSD24hAgo": 2361.03,
+                "isPoolToken": true
+              },
+              "amount": -321.6
+            },
+            {
+              "token": {
+                "address": "0df96cfa-ce48-4632-921e-582017ae69f9",
+                "symbol": "NPR",
+                "createdAt": "2022-11-27T17:49:41.919Z",
+                "priceUSD": 4584.21,
+                "priceUSD24hAgo": 1973.45,
+                "isPoolToken": true
+              },
+              "amount": 0.05682767586999723
+            },
+            {
+              "token": {
+                "address": "94920dc6-2f8d-4ff5-a3fe-690b66970fe5",
+                "symbol": "UAH",
+                "createdAt": "2023-04-15T20:47:27.325Z",
+                "priceUSD": 2241.49,
+                "priceUSD24hAgo": 336.43,
+                "isPoolToken": false
+              },
+              "amount": 71.43
+            }
+          ],
+          "resultInUSD": 331.94,
+          "claimInUSD": 321.6
+        },
+        {
+          "id": "115cd08e-d3a3-468e-82a4-52d97575695f",
+          "timestamp": 1695188375248,
+          "type": "WITHDRAWN",
+          "values": [
+            {
+              "token": {
+                "address": "537c231d-cf19-47ed-88df-deaa67cf5fb4",
+                "symbol": "NIO",
+                "createdAt": "2023-06-13T21:46:42.223Z",
+                "priceUSD": 432.06,
+                "priceUSD24hAgo": 4855.19,
+                "isPoolToken": true
+              },
+              "amount": 0.7951673378697404
+            },
+            {
+              "token": {
+                "address": "0df96cfa-ce48-4632-921e-582017ae69f9",
+                "symbol": "NPR",
+                "createdAt": "2022-11-27T17:49:41.919Z",
+                "priceUSD": 4584.21,
+                "priceUSD24hAgo": 1973.45,
+                "isPoolToken": true
+              },
+              "amount": 0.006391504752181946
+            },
+            {
+              "token": {
+                "address": "0x6cA13a4ab78dd7D657226b155873A04DB929A3A4",
+                "symbol": "LRD",
+                "createdAt": "2022-10-20T03:12:14.413Z",
+                "priceUSD": 4827.48,
+                "priceUSD24hAgo": 520.58,
+                "isPoolToken": false
+              },
+              "amount": 0.008138821911224906
+            },
+            {
+              "token": {
+                "address": "64aafa66-74c0-4b5e-9c81-9b5fdeba8952",
+                "symbol": "TJS",
+                "createdAt": "2022-11-11T03:03:42.173Z",
+                "priceUSD": 1868.35,
+                "priceUSD24hAgo": 3883.23,
+                "isPoolToken": true
+              },
+              "amount": 0.012128348542831912
+            },
+            {
+              "token": {
+                "address": "167cae89-613a-4add-8935-a1940c9d6c67",
+                "symbol": "HNL",
+                "createdAt": "2023-06-01T03:04:40.353Z",
+                "priceUSD": 4582.48,
+                "priceUSD24hAgo": 2465.6,
+                "isPoolToken": false
+              },
+              "amount": 31.16000000000003
+            }
+          ],
+          "resultInUSD": 465.97,
+          "claimInUSD": null
+        },
+        {
+          "id": "b2941e62-063b-481c-98a9-967c6e433083",
+          "timestamp": 1695015575248,
+          "type": "WITHDRAWN",
+          "values": [
+            {
+              "token": {
+                "address": "92c28816-4466-4562-8958-e85c60037212",
+                "symbol": "BOB",
+                "createdAt": "2023-04-25T09:58:48.701Z",
+                "priceUSD": 1429.84,
+                "priceUSD24hAgo": 4149.94,
+                "isPoolToken": false
+              },
+              "amount": 0.0004895652660437532
+            },
+            {
+              "token": {
+                "address": "94920dc6-2f8d-4ff5-a3fe-690b66970fe5",
+                "symbol": "UAH",
+                "createdAt": "2023-04-15T20:47:27.325Z",
+                "priceUSD": 2241.49,
+                "priceUSD24hAgo": 336.43,
+                "isPoolToken": false
+              },
+              "amount": 0.0023555759784786015
+            },
+            {
+              "token": {
+                "address": "0x6cA13a4ab78dd7D657226b155873A04DB929AXXX",
+                "symbol": "JUSD",
+                "createdAt": "2023-05-22T21:21:24.064Z",
+                "priceUSD": 700.72,
+                "priceUSD24hAgo": 3533.46,
+                "isPoolToken": true
+              },
+              "amount": 0.005665601096015527
+            },
+            {
+              "token": {
+                "address": "a0424c8b-73c7-465f-84a1-00ee9aea9028",
+                "symbol": "LBP",
+                "createdAt": "2023-08-19T20:00:34.303Z",
+                "priceUSD": 3196.86,
+                "priceUSD24hAgo": 4086.95,
+                "isPoolToken": false
+              },
+              "amount": 14.229999999999999
+            }
+          ],
+          "resultInUSD": 24.18,
+          "claimInUSD": null
+        },
+        {
+          "id": "bb3307b4-219a-428c-bbe3-55793532b943",
+          "timestamp": 1695015575248,
+          "type": "CLAIMED_REWARDS",
+          "values": [
+            {
+              "token": {
+                "address": "167cae89-613a-4add-8935-a1940c9d6c67",
+                "symbol": "HNL",
+                "createdAt": "2023-06-01T03:04:40.353Z",
+                "priceUSD": 4582.48,
+                "priceUSD24hAgo": 2465.6,
+                "isPoolToken": false
+              },
+              "amount": -89.05
+            },
+            {
+              "token": {
+                "address": "167cae89-613a-4add-8935-a1940c9d6c67",
+                "symbol": "HNL",
+                "createdAt": "2023-06-01T03:04:40.353Z",
+                "priceUSD": 4582.48,
+                "priceUSD24hAgo": 2465.6,
+                "isPoolToken": false
+              },
+              "amount": 0.0020054642900787347
+            },
+            {
+              "token": {
+                "address": "92c28816-4466-4562-8958-e85c60037212",
+                "symbol": "BOB",
+                "createdAt": "2023-04-25T09:58:48.701Z",
+                "priceUSD": 1429.84,
+                "priceUSD24hAgo": 4149.94,
+                "isPoolToken": false
+              },
+              "amount": 82.76
+            }
+          ],
+          "resultInUSD": 91.95,
+          "claimInUSD": 89.05
+        },
+        {
+          "id": "cc43d29e-1742-4080-8bf7-335ada1234b4",
+          "timestamp": 1695015575248,
+          "type": "DEPOSITED",
+          "values": [
+            {
+              "token": {
+                "address": "cd8c8190-03c1-48f0-aec4-f4cb12bf9210",
+                "symbol": "MNT",
+                "createdAt": "2023-09-19T11:27:01.695Z",
+                "priceUSD": 4049.65,
+                "priceUSD24hAgo": 2361.03,
+                "isPoolToken": true
+              },
+              "amount": 0.114004914004914
+            },
+            {
+              "token": {
+                "address": "64aafa66-74c0-4b5e-9c81-9b5fdeba8952",
+                "symbol": "TJS",
+                "createdAt": "2022-11-11T03:03:42.173Z",
+                "priceUSD": 1868.35,
+                "priceUSD24hAgo": 3883.23,
+                "isPoolToken": true
+              },
+              "amount": 0.018492252522279016
+            },
+            {
+              "token": {
+                "address": "0x6cA13a4ab78dd7D657226b155873A04DB929AXXX",
+                "symbol": "JUSD",
+                "createdAt": "2023-05-22T21:21:24.064Z",
+                "priceUSD": 700.72,
+                "priceUSD24hAgo": 3533.46,
+                "isPoolToken": true
+              },
+              "amount": 0.18599440575408152
+            },
+            {
+              "token": {
+                "address": "167cae89-613a-4add-8935-a1940c9d6c67",
+                "symbol": "HNL",
+                "createdAt": "2023-06-01T03:04:40.353Z",
+                "priceUSD": 4582.48,
+                "priceUSD24hAgo": 2465.6,
+                "isPoolToken": false
+              },
+              "amount": 89.92999999999998
+            }
+          ],
+          "resultInUSD": 716.49,
+          "claimInUSD": null
+        },
+        {
+          "id": "0e496181-a2fc-43bd-8fbf-65df8f1773f5",
+          "timestamp": 1695015575248,
+          "type": "WITHDRAWN",
+          "values": [
+            {
+              "token": {
+                "address": "537c231d-cf19-47ed-88df-deaa67cf5fb4",
+                "symbol": "NIO",
+                "createdAt": "2023-06-13T21:46:42.223Z",
+                "priceUSD": 432.06,
+                "priceUSD24hAgo": 4855.19,
+                "isPoolToken": true
+              },
+              "amount": 0.14639170485580708
+            },
+            {
+              "token": {
+                "address": "d3347ace-22c9-4c12-9b31-cecf6080ec72",
+                "symbol": "ZMW",
+                "createdAt": "2023-08-12T14:47:26.755Z",
+                "priceUSD": 992.71,
+                "priceUSD24hAgo": 3758.13,
+                "isPoolToken": true
+              },
+              "amount": 0.18273211713390616
+            },
+            {
+              "token": {
+                "address": "64aafa66-74c0-4b5e-9c81-9b5fdeba8952",
+                "symbol": "TJS",
+                "createdAt": "2022-11-11T03:03:42.173Z",
+                "priceUSD": 1868.35,
+                "priceUSD24hAgo": 3883.23,
+                "isPoolToken": true
+              },
+              "amount": 0.00558781812829502
+            },
+            {
+              "token": {
+                "address": "92c28816-4466-4562-8958-e85c60037212",
+                "symbol": "BOB",
+                "createdAt": "2023-04-25T09:58:48.701Z",
+                "priceUSD": 1429.84,
+                "priceUSD24hAgo": 4149.94,
+                "isPoolToken": false
+              },
+              "amount": 25.82000000000002
+            }
+          ],
+          "resultInUSD": 280.91,
+          "claimInUSD": null
+        },
+        {
+          "id": "dde5e3fc-12ea-4965-a2d4-3a1cb032d381",
+          "timestamp": 1694929175248,
+          "type": "CLAIMED_REWARDS",
+          "values": [
+            {
+              "token": {
+                "address": "64aafa66-74c0-4b5e-9c81-9b5fdeba8952",
+                "symbol": "TJS",
+                "createdAt": "2022-11-11T03:03:42.173Z",
+                "priceUSD": 1868.35,
+                "priceUSD24hAgo": 3883.23,
+                "isPoolToken": true
+              },
+              "amount": -0.09265929831134424
+            },
+            {
+              "token": {
+                "address": "a0424c8b-73c7-465f-84a1-00ee9aea9028",
+                "symbol": "LBP",
+                "createdAt": "2023-08-19T20:00:34.303Z",
+                "priceUSD": 3196.86,
+                "priceUSD24hAgo": 4086.95,
+                "isPoolToken": false
+              },
+              "amount": -0.00014389119323336024
+            },
+            {
+              "token": {
+                "address": "167cae89-613a-4add-8935-a1940c9d6c67",
+                "symbol": "HNL",
+                "createdAt": "2023-06-01T03:04:40.353Z",
+                "priceUSD": 4582.48,
+                "priceUSD24hAgo": 2465.6,
+                "isPoolToken": false
+              },
+              "amount": -0.0000021822244723381227
+            },
+            {
+              "token": {
+                "address": "0df96cfa-ce48-4632-921e-582017ae69f9",
+                "symbol": "NPR",
+                "createdAt": "2022-11-27T17:49:41.919Z",
+                "priceUSD": 4584.21,
+                "priceUSD24hAgo": 1973.45,
+                "isPoolToken": true
+              },
+              "amount": -0.020000000000009073
+            },
+            {
+              "token": {
+                "address": "cd8c8190-03c1-48f0-aec4-f4cb12bf9210",
+                "symbol": "MNT",
+                "createdAt": "2023-09-19T11:27:01.695Z",
+                "priceUSD": 4049.65,
+                "priceUSD24hAgo": 2361.03,
+                "isPoolToken": true
+              },
+              "amount": 173.7
+            }
+          ],
+          "resultInUSD": 173.7,
+          "claimInUSD": 173.61
+        },
+        {
+          "id": "077316e5-f4bc-42ab-935c-cd3aaefa9dc4",
+          "timestamp": 1694929175248,
+          "type": "WITHDRAWN",
+          "values": [
+            {
+              "token": {
+                "address": "167cae89-613a-4add-8935-a1940c9d6c67",
+                "symbol": "HNL",
+                "createdAt": "2023-06-01T03:04:40.353Z",
+                "priceUSD": 4582.48,
+                "priceUSD24hAgo": 2465.6,
+                "isPoolToken": false
+              },
+              "amount": 0.18247979260138616
+            },
+            {
+              "token": {
+                "address": "92c28816-4466-4562-8958-e85c60037212",
+                "symbol": "BOB",
+                "createdAt": "2023-04-25T09:58:48.701Z",
+                "priceUSD": 1429.84,
+                "priceUSD24hAgo": 4149.94,
+                "isPoolToken": false
+              },
+              "amount": 0.042808985620768764
+            },
+            {
+              "token": {
+                "address": "64aafa66-74c0-4b5e-9c81-9b5fdeba8952",
+                "symbol": "TJS",
+                "createdAt": "2022-11-11T03:03:42.173Z",
+                "priceUSD": 1868.35,
+                "priceUSD24hAgo": 3883.23,
+                "isPoolToken": true
+              },
+              "amount": 0.0001231032729413654
+            },
+            {
+              "token": {
+                "address": "cd8c8190-03c1-48f0-aec4-f4cb12bf9210",
+                "symbol": "MNT",
+                "createdAt": "2023-09-19T11:27:01.695Z",
+                "priceUSD": 4049.65,
+                "priceUSD24hAgo": 2361.03,
+                "isPoolToken": true
+              },
+              "amount": 0.0006519081895966318
+            },
+            {
+              "token": {
+                "address": "0x6cA13a4ab78dd7D657226b155873A04DB929AXXX",
+                "symbol": "JUSD",
+                "createdAt": "2023-05-22T21:21:24.064Z",
+                "priceUSD": 700.72,
+                "priceUSD24hAgo": 3533.46,
+                "isPoolToken": true
+              },
+              "amount": 27.319999999999975
+            }
+          ],
+          "resultInUSD": 927.61,
+          "claimInUSD": null
+        },
+        {
+          "id": "b8fbdfc6-10a8-485e-b1b0-c6c8c74aa41b",
+          "timestamp": 1694669975248,
+          "type": "CLAIMED_REWARDS",
+          "values": [
+            {
+              "token": {
+                "address": "cd8c8190-03c1-48f0-aec4-f4cb12bf9210",
+                "symbol": "MNT",
+                "createdAt": "2023-09-19T11:27:01.695Z",
+                "priceUSD": 4049.65,
+                "priceUSD24hAgo": 2361.03,
+                "isPoolToken": true
+              },
+              "amount": -0.019853567592261062
+            },
+            {
+              "token": {
+                "address": "167cae89-613a-4add-8935-a1940c9d6c67",
+                "symbol": "HNL",
+                "createdAt": "2023-06-01T03:04:40.353Z",
+                "priceUSD": 4582.48,
+                "priceUSD24hAgo": 2465.6,
+                "isPoolToken": false
+              },
+              "amount": -0.00044517379235697706
+            },
+            {
+              "token": {
+                "address": "537c231d-cf19-47ed-88df-deaa67cf5fb4",
+                "symbol": "NIO",
+                "createdAt": "2023-06-13T21:46:42.223Z",
+                "priceUSD": 432.06,
+                "priceUSD24hAgo": 4855.19,
+                "isPoolToken": true
+              },
+              "amount": -0.006712030736471786
+            },
+            {
+              "token": {
+                "address": "0x6cA13a4ab78dd7D657226b155873A04DB929AXXX",
+                "symbol": "JUSD",
+                "createdAt": "2023-05-22T21:21:24.064Z",
+                "priceUSD": 700.72,
+                "priceUSD24hAgo": 3533.46,
+                "isPoolToken": true
+              },
+              "amount": -0.0013700194086082886
+            },
+            {
+              "token": {
+                "address": "a0424c8b-73c7-465f-84a1-00ee9aea9028",
+                "symbol": "LBP",
+                "createdAt": "2023-08-19T20:00:34.303Z",
+                "priceUSD": 3196.86,
+                "priceUSD24hAgo": 4086.95,
+                "isPoolToken": false
+              },
+              "amount": -0.24000000000000066
+            },
+            {
+              "token": {
+                "address": "0x6cA13a4ab78dd7D657226b155873A04DB929AXXX",
+                "symbol": "JUSD",
+                "createdAt": "2023-05-22T21:21:24.064Z",
+                "priceUSD": 700.72,
+                "priceUSD24hAgo": 3533.46,
+                "isPoolToken": true
+              },
+              "amount": 0.06932869048978194
+            },
+            {
+              "token": {
+                "address": "d3347ace-22c9-4c12-9b31-cecf6080ec72",
+                "symbol": "ZMW",
+                "createdAt": "2023-08-12T14:47:26.755Z",
+                "priceUSD": 992.71,
+                "priceUSD24hAgo": 3758.13,
+                "isPoolToken": true
+              },
+              "amount": 0.019884961368375455
+            },
+            {
+              "token": {
+                "address": "537c231d-cf19-47ed-88df-deaa67cf5fb4",
+                "symbol": "NIO",
+                "createdAt": "2023-06-13T21:46:42.223Z",
+                "priceUSD": 432.06,
+                "priceUSD24hAgo": 4855.19,
+                "isPoolToken": true
+              },
+              "amount": 0.025667731333611072
+            },
+            {
+              "token": {
+                "address": "0df96cfa-ce48-4632-921e-582017ae69f9",
+                "symbol": "NPR",
+                "createdAt": "2022-11-27T17:49:41.919Z",
+                "priceUSD": 4584.21,
+                "priceUSD24hAgo": 1973.45,
+                "isPoolToken": true
+              },
+              "amount": 9.13000000000001
+            }
+          ],
+          "resultInUSD": 88.54,
+          "claimInUSD": 86.54
+        },
+        {
+          "id": "6326089f-0ce9-4953-a373-dba2b0e6099e",
+          "timestamp": 1694669975248,
+          "type": "CLAIMED_REWARDS",
+          "values": [
+            {
+              "token": {
+                "address": "cd8c8190-03c1-48f0-aec4-f4cb12bf9210",
+                "symbol": "MNT",
+                "createdAt": "2023-09-19T11:27:01.695Z",
+                "priceUSD": 4049.65,
+                "priceUSD24hAgo": 2361.03,
+                "isPoolToken": true
+              },
+              "amount": -0.12618621362339955
+            },
+            {
+              "token": {
+                "address": "64aafa66-74c0-4b5e-9c81-9b5fdeba8952",
+                "symbol": "TJS",
+                "createdAt": "2022-11-11T03:03:42.173Z",
+                "priceUSD": 1868.35,
+                "priceUSD24hAgo": 3883.23,
+                "isPoolToken": true
+              },
+              "amount": -166.86
+            },
+            {
+              "token": {
+                "address": "0df96cfa-ce48-4632-921e-582017ae69f9",
+                "symbol": "NPR",
+                "createdAt": "2022-11-27T17:49:41.919Z",
+                "priceUSD": 4584.21,
+                "priceUSD24hAgo": 1973.45,
+                "isPoolToken": true
+              },
+              "amount": 0.009449828869096311
+            },
+            {
+              "token": {
+                "address": "167cae89-613a-4add-8935-a1940c9d6c67",
+                "symbol": "HNL",
+                "createdAt": "2023-06-01T03:04:40.353Z",
+                "priceUSD": 4582.48,
+                "priceUSD24hAgo": 2465.6,
+                "isPoolToken": false
+              },
+              "amount": 0.09356505647596935
+            },
+            {
+              "token": {
+                "address": "537c231d-cf19-47ed-88df-deaa67cf5fb4",
+                "symbol": "NIO",
+                "createdAt": "2023-06-13T21:46:42.223Z",
+                "priceUSD": 432.06,
+                "priceUSD24hAgo": 4855.19,
+                "isPoolToken": true
+              },
+              "amount": 0.4057538304865065
+            },
+            {
+              "token": {
+                "address": "94920dc6-2f8d-4ff5-a3fe-690b66970fe5",
+                "symbol": "UAH",
+                "createdAt": "2023-04-15T20:47:27.325Z",
+                "priceUSD": 2241.49,
+                "priceUSD24hAgo": 336.43,
+                "isPoolToken": false
+              },
+              "amount": 46.69
+            }
+          ],
+          "resultInUSD": 694.08,
+          "claimInUSD": 677.87
+        },
+        {
+          "id": "08e710c7-ab1c-47da-a3e7-d9c9cfd5a714",
+          "timestamp": 1694669975248,
+          "type": "WITHDRAWN",
+          "values": [
+            {
+              "token": {
+                "address": "167cae89-613a-4add-8935-a1940c9d6c67",
+                "symbol": "HNL",
+                "createdAt": "2023-06-01T03:04:40.353Z",
+                "priceUSD": 4582.48,
+                "priceUSD24hAgo": 2465.6,
+                "isPoolToken": false
+              },
+              "amount": 0.00523079206019448
+            },
+            {
+              "token": {
+                "address": "537c231d-cf19-47ed-88df-deaa67cf5fb4",
+                "symbol": "NIO",
+                "createdAt": "2023-06-13T21:46:42.223Z",
+                "priceUSD": 432.06,
+                "priceUSD24hAgo": 4855.19,
+                "isPoolToken": true
+              },
+              "amount": 0.02166365782530204
+            },
+            {
+              "token": {
+                "address": "0x6cA13a4ab78dd7D657226b155873A04DB929AXXX",
+                "symbol": "JUSD",
+                "createdAt": "2023-05-22T21:21:24.064Z",
+                "priceUSD": 700.72,
+                "priceUSD24hAgo": 3533.46,
+                "isPoolToken": true
+              },
+              "amount": 9.480000000000004
+            }
+          ],
+          "resultInUSD": 42.81,
+          "claimInUSD": null
+        },
+        {
+          "id": "2dba7d2a-2aff-4dd5-aad4-63a21dcaa1ac",
+          "timestamp": 1694497175248,
+          "type": "DEPOSITED",
+          "values": [
+            {
+              "token": {
+                "address": "94920dc6-2f8d-4ff5-a3fe-690b66970fe5",
+                "symbol": "UAH",
+                "createdAt": "2023-04-15T20:47:27.325Z",
+                "priceUSD": 2241.49,
+                "priceUSD24hAgo": 336.43,
+                "isPoolToken": false
+              },
+              "amount": 86.77
+            }
+          ],
+          "resultInUSD": 86.77,
+          "claimInUSD": null
+        },
+        {
+          "id": "4e85df2c-d475-4916-a61b-21d65be1c8e2",
+          "timestamp": 1694497175248,
+          "type": "WITHDRAWN",
+          "values": [
+            {
+              "token": {
+                "address": "0x6cA13a4ab78dd7D657226b155873A04DB929A3A4",
+                "symbol": "LRD",
+                "createdAt": "2022-10-20T03:12:14.413Z",
+                "priceUSD": 4827.48,
+                "priceUSD24hAgo": 520.58,
+                "isPoolToken": false
+              },
+              "amount": 0.01886491502813062
+            },
+            {
+              "token": {
+                "address": "cd8c8190-03c1-48f0-aec4-f4cb12bf9210",
+                "symbol": "MNT",
+                "createdAt": "2023-09-19T11:27:01.695Z",
+                "priceUSD": 4049.65,
+                "priceUSD24hAgo": 2361.03,
+                "isPoolToken": true
+              },
+              "amount": 0.011126887508797057
+            },
+            {
+              "token": {
+                "address": "92c28816-4466-4562-8958-e85c60037212",
+                "symbol": "BOB",
+                "createdAt": "2023-04-25T09:58:48.701Z",
+                "priceUSD": 1429.84,
+                "priceUSD24hAgo": 4149.94,
+                "isPoolToken": false
+              },
+              "amount": 0.009448609634644436
+            },
+            {
+              "token": {
+                "address": "64aafa66-74c0-4b5e-9c81-9b5fdeba8952",
+                "symbol": "TJS",
+                "createdAt": "2022-11-11T03:03:42.173Z",
+                "priceUSD": 1868.35,
+                "priceUSD24hAgo": 3883.23,
+                "isPoolToken": true
+              },
+              "amount": 50.38000000000002
+            }
+          ],
+          "resultInUSD": 200.02,
+          "claimInUSD": null
+        },
+        {
+          "id": "8b7d75db-d27e-477b-9dc0-806d1d7d2a30",
+          "timestamp": 1694497175248,
+          "type": "CLAIMED_REWARDS",
+          "values": [
+            {
+              "token": {
+                "address": "0df96cfa-ce48-4632-921e-582017ae69f9",
+                "symbol": "NPR",
+                "createdAt": "2022-11-27T17:49:41.919Z",
+                "priceUSD": 4584.21,
+                "priceUSD24hAgo": 1973.45,
+                "isPoolToken": true
+              },
+              "amount": -202.02
+            },
+            {
+              "token": {
+                "address": "0x6cA13a4ab78dd7D657226b155873A04DB929A3A4",
+                "symbol": "LRD",
+                "createdAt": "2022-10-20T03:12:14.413Z",
+                "priceUSD": 4827.48,
+                "priceUSD24hAgo": 520.58,
+                "isPoolToken": false
+              },
+              "amount": 202.64
+            }
+          ],
+          "resultInUSD": 202.64,
+          "claimInUSD": 202.02
+        },
+        {
+          "id": "1e129a58-134a-4a54-ac62-060b1aa9628a",
+          "timestamp": 1694410775248,
+          "type": "DEPOSITED",
+          "values": [
+            {
+              "token": {
+                "address": "167cae89-613a-4add-8935-a1940c9d6c67",
+                "symbol": "HNL",
+                "createdAt": "2023-06-01T03:04:40.353Z",
+                "priceUSD": 4582.48,
+                "priceUSD24hAgo": 2465.6,
+                "isPoolToken": false
+              },
+              "amount": 0.008711440093573787
+            },
+            {
+              "token": {
+                "address": "a0424c8b-73c7-465f-84a1-00ee9aea9028",
+                "symbol": "LBP",
+                "createdAt": "2023-08-19T20:00:34.303Z",
+                "priceUSD": 3196.86,
+                "priceUSD24hAgo": 4086.95,
+                "isPoolToken": false
+              },
+              "amount": 0.031327615222437016
+            },
+            {
+              "token": {
+                "address": "64aafa66-74c0-4b5e-9c81-9b5fdeba8952",
+                "symbol": "TJS",
+                "createdAt": "2022-11-11T03:03:42.173Z",
+                "priceUSD": 1868.35,
+                "priceUSD24hAgo": 3883.23,
+                "isPoolToken": true
+              },
+              "amount": 15.269999999999996
+            }
+          ],
+          "resultInUSD": 155.34,
+          "claimInUSD": null
+        },
+        {
+          "id": "3be93c16-c078-45ff-b47d-f5f3abc93505",
+          "timestamp": 1694324375248,
+          "type": "DEPOSITED",
+          "values": [
+            {
+              "token": {
+                "address": "0x6cA13a4ab78dd7D657226b155873A04DB929AXXX",
+                "symbol": "JUSD",
+                "createdAt": "2023-05-22T21:21:24.064Z",
+                "priceUSD": 700.72,
+                "priceUSD24hAgo": 3533.46,
+                "isPoolToken": true
+              },
+              "amount": 790.68
+            }
+          ],
+          "resultInUSD": 790.68,
+          "claimInUSD": null
+        },
+        {
+          "id": "0e6d5f75-1ff2-4df7-987c-65cc6ba6acb7",
+          "timestamp": 1694324375248,
+          "type": "DEPOSITED",
+          "values": [
+            {
+              "token": {
+                "address": "537c231d-cf19-47ed-88df-deaa67cf5fb4",
+                "symbol": "NIO",
+                "createdAt": "2023-06-13T21:46:42.223Z",
+                "priceUSD": 432.06,
+                "priceUSD24hAgo": 4855.19,
+                "isPoolToken": true
+              },
+              "amount": 0.028884877100402724
+            },
+            {
+              "token": {
+                "address": "d3347ace-22c9-4c12-9b31-cecf6080ec72",
+                "symbol": "ZMW",
+                "createdAt": "2023-08-12T14:47:26.755Z",
+                "priceUSD": 992.71,
+                "priceUSD24hAgo": 3758.13,
+                "isPoolToken": true
+              },
+              "amount": 10.419999999999998
+            }
+          ],
+          "resultInUSD": 22.9,
+          "claimInUSD": null
+        },
+        {
+          "id": "a21e784b-45ef-41e1-b482-6b9f2746901f",
+          "timestamp": 1694237975248,
+          "type": "WITHDRAWN",
+          "values": [
+            {
+              "token": {
+                "address": "a0424c8b-73c7-465f-84a1-00ee9aea9028",
+                "symbol": "LBP",
+                "createdAt": "2023-08-19T20:00:34.303Z",
+                "priceUSD": 3196.86,
+                "priceUSD24hAgo": 4086.95,
+                "isPoolToken": false
+              },
+              "amount": 0.009299750380060434
+            },
+            {
+              "token": {
+                "address": "167cae89-613a-4add-8935-a1940c9d6c67",
+                "symbol": "HNL",
+                "createdAt": "2023-06-01T03:04:40.353Z",
+                "priceUSD": 4582.48,
+                "priceUSD24hAgo": 2465.6,
+                "isPoolToken": false
+              },
+              "amount": 0.07028945025401094
+            },
+            {
+              "token": {
+                "address": "cd8c8190-03c1-48f0-aec4-f4cb12bf9210",
+                "symbol": "MNT",
+                "createdAt": "2023-09-19T11:27:01.695Z",
+                "priceUSD": 4049.65,
+                "priceUSD24hAgo": 2361.03,
+                "isPoolToken": true
+              },
+              "amount": 0.008889657130863161
+            },
+            {
+              "token": {
+                "address": "0x6cA13a4ab78dd7D657226b155873A04DB929A3A4",
+                "symbol": "LRD",
+                "createdAt": "2022-10-20T03:12:14.413Z",
+                "priceUSD": 4827.48,
+                "priceUSD24hAgo": 520.58,
+                "isPoolToken": false
+              },
+              "amount": 5.2099999999999795
+            }
+          ],
+          "resultInUSD": 393.04,
+          "claimInUSD": null
+        },
+        {
+          "id": "92be76bb-488d-45e7-b39a-b04794378e4d",
+          "timestamp": 1694237975248,
+          "type": "DEPOSITED",
+          "values": [
+            {
+              "token": {
+                "address": "0df96cfa-ce48-4632-921e-582017ae69f9",
+                "symbol": "NPR",
+                "createdAt": "2022-11-27T17:49:41.919Z",
+                "priceUSD": 4584.21,
+                "priceUSD24hAgo": 1973.45,
+                "isPoolToken": true
+              },
+              "amount": 0.07309656407538048
+            },
+            {
+              "token": {
+                "address": "a0424c8b-73c7-465f-84a1-00ee9aea9028",
+                "symbol": "LBP",
+                "createdAt": "2023-08-19T20:00:34.303Z",
+                "priceUSD": 3196.86,
+                "priceUSD24hAgo": 4086.95,
+                "isPoolToken": false
+              },
+              "amount": 0.04397439987988214
+            },
+            {
+              "token": {
+                "address": "537c231d-cf19-47ed-88df-deaa67cf5fb4",
+                "symbol": "NIO",
+                "createdAt": "2023-06-13T21:46:42.223Z",
+                "priceUSD": 432.06,
+                "priceUSD24hAgo": 4855.19,
+                "isPoolToken": true
+              },
+              "amount": 0.11915011803916122
+            },
+            {
+              "token": {
+                "address": "0x6cA13a4ab78dd7D657226b155873A04DB929A3A4",
+                "symbol": "LRD",
+                "createdAt": "2022-10-20T03:12:14.413Z",
+                "priceUSD": 4827.48,
+                "priceUSD24hAgo": 520.58,
+                "isPoolToken": false
+              },
+              "amount": 350.93999999999994
+            }
+          ],
+          "resultInUSD": 878.09,
+          "claimInUSD": null
+        },
+        {
+          "id": "d667b39b-c225-48d6-9304-7522063c4848",
+          "timestamp": 1694237975248,
+          "type": "CLAIMED_REWARDS",
+          "values": [
+            {
+              "token": {
+                "address": "0df96cfa-ce48-4632-921e-582017ae69f9",
+                "symbol": "NPR",
+                "createdAt": "2022-11-27T17:49:41.919Z",
+                "priceUSD": 4584.21,
+                "priceUSD24hAgo": 1973.45,
+                "isPoolToken": true
+              },
+              "amount": -0.0011430540921990922
+            },
+            {
+              "token": {
+                "address": "94920dc6-2f8d-4ff5-a3fe-690b66970fe5",
+                "symbol": "UAH",
+                "createdAt": "2023-04-15T20:47:27.325Z",
+                "priceUSD": 2241.49,
+                "priceUSD24hAgo": 336.43,
+                "isPoolToken": false
+              },
+              "amount": -0.0048048396379194195
+            },
+            {
+              "token": {
+                "address": "537c231d-cf19-47ed-88df-deaa67cf5fb4",
+                "symbol": "NIO",
+                "createdAt": "2023-06-13T21:46:42.223Z",
+                "priceUSD": 432.06,
+                "priceUSD24hAgo": 4855.19,
+                "isPoolToken": true
+              },
+              "amount": -0.0025227977595704302
+            },
+            {
+              "token": {
+                "address": "64aafa66-74c0-4b5e-9c81-9b5fdeba8952",
+                "symbol": "TJS",
+                "createdAt": "2022-11-11T03:03:42.173Z",
+                "priceUSD": 1868.35,
+                "priceUSD24hAgo": 3883.23,
+                "isPoolToken": true
+              },
+              "amount": -0.6800000000000013
+            },
+            {
+              "token": {
+                "address": "0x6cA13a4ab78dd7D657226b155873A04DB929A3A4",
+                "symbol": "LRD",
+                "createdAt": "2022-10-20T03:12:14.413Z",
+                "priceUSD": 4827.48,
+                "priceUSD24hAgo": 520.58,
+                "isPoolToken": false
+              },
+              "amount": 0.0015204620215930466
+            },
+            {
+              "token": {
+                "address": "537c231d-cf19-47ed-88df-deaa67cf5fb4",
+                "symbol": "NIO",
+                "createdAt": "2023-06-13T21:46:42.223Z",
+                "priceUSD": 432.06,
+                "priceUSD24hAgo": 4855.19,
+                "isPoolToken": true
+              },
+              "amount": 0.010484654909040412
+            },
+            {
+              "token": {
+                "address": "167cae89-613a-4add-8935-a1940c9d6c67",
+                "symbol": "HNL",
+                "createdAt": "2023-06-01T03:04:40.353Z",
+                "priceUSD": 4582.48,
+                "priceUSD24hAgo": 2465.6,
+                "isPoolToken": false
+              },
+              "amount": 6.759999999999999
+            }
+          ],
+          "resultInUSD": 18.63,
+          "claimInUSD": 17.78
+        },
+        {
+          "id": "bf913d95-93b4-4dab-a1dc-27581634ba4b",
+          "timestamp": 1694151575248,
+          "type": "WITHDRAWN",
+          "values": [
+            {
+              "token": {
+                "address": "0x6cA13a4ab78dd7D657226b155873A04DB929AXXX",
+                "symbol": "JUSD",
+                "createdAt": "2023-05-22T21:21:24.064Z",
+                "priceUSD": 700.72,
+                "priceUSD24hAgo": 3533.46,
+                "isPoolToken": true
+              },
+              "amount": 0.007263957072725196
+            },
+            {
+              "token": {
+                "address": "94920dc6-2f8d-4ff5-a3fe-690b66970fe5",
+                "symbol": "UAH",
+                "createdAt": "2023-04-15T20:47:27.325Z",
+                "priceUSD": 2241.49,
+                "priceUSD24hAgo": 336.43,
+                "isPoolToken": false
+              },
+              "amount": 0.008338203605637322
+            },
+            {
+              "token": {
+                "address": "64aafa66-74c0-4b5e-9c81-9b5fdeba8952",
+                "symbol": "TJS",
+                "createdAt": "2022-11-11T03:03:42.173Z",
+                "priceUSD": 1868.35,
+                "priceUSD24hAgo": 3883.23,
+                "isPoolToken": true
+              },
+              "amount": 0.038392164209061476
+            },
+            {
+              "token": {
+                "address": "0df96cfa-ce48-4632-921e-582017ae69f9",
+                "symbol": "NPR",
+                "createdAt": "2022-11-27T17:49:41.919Z",
+                "priceUSD": 4584.21,
+                "priceUSD24hAgo": 1973.45,
+                "isPoolToken": true
+              },
+              "amount": 9.989999999999995
+            }
+          ],
+          "resultInUSD": 105.5,
+          "claimInUSD": null
+        },
+        {
+          "id": "1a9e8e6f-5d3e-468a-8a8c-4efa4d3d4e90",
+          "timestamp": 1694151575248,
+          "type": "CLAIMED_REWARDS",
+          "values": [
+            {
+              "token": {
+                "address": "64aafa66-74c0-4b5e-9c81-9b5fdeba8952",
+                "symbol": "TJS",
+                "createdAt": "2022-11-11T03:03:42.173Z",
+                "priceUSD": 1868.35,
+                "priceUSD24hAgo": 3883.23,
+                "isPoolToken": true
+              },
+              "amount": -0.02598014290684294
+            },
+            {
+              "token": {
+                "address": "d3347ace-22c9-4c12-9b31-cecf6080ec72",
+                "symbol": "ZMW",
+                "createdAt": "2023-08-12T14:47:26.755Z",
+                "priceUSD": 992.71,
+                "priceUSD24hAgo": 3758.13,
+                "isPoolToken": true
+              },
+              "amount": -0.0022262292109478093
+            },
+            {
+              "token": {
+                "address": "0x6cA13a4ab78dd7D657226b155873A04DB929AXXX",
+                "symbol": "JUSD",
+                "createdAt": "2023-05-22T21:21:24.064Z",
+                "priceUSD": 700.72,
+                "priceUSD24hAgo": 3533.46,
+                "isPoolToken": true
+              },
+              "amount": -0.549999999999998
+            },
+            {
+              "token": {
+                "address": "167cae89-613a-4add-8935-a1940c9d6c67",
+                "symbol": "HNL",
+                "createdAt": "2023-06-01T03:04:40.353Z",
+                "priceUSD": 4582.48,
+                "priceUSD24hAgo": 2465.6,
+                "isPoolToken": false
+              },
+              "amount": 0.0013791658665176937
+            },
+            {
+              "token": {
+                "address": "a0424c8b-73c7-465f-84a1-00ee9aea9028",
+                "symbol": "LBP",
+                "createdAt": "2023-08-19T20:00:34.303Z",
+                "priceUSD": 3196.86,
+                "priceUSD24hAgo": 4086.95,
+                "isPoolToken": false
+              },
+              "amount": 0.004957990027714695
+            },
+            {
+              "token": {
+                "address": "d3347ace-22c9-4c12-9b31-cecf6080ec72",
+                "symbol": "ZMW",
+                "createdAt": "2023-08-12T14:47:26.755Z",
+                "priceUSD": 992.71,
+                "priceUSD24hAgo": 3758.13,
+                "isPoolToken": true
+              },
+              "amount": 30.78
+            }
+          ],
+          "resultInUSD": 52.95,
+          "claimInUSD": 51.3
+        },
+        {
+          "id": "76f3f6e5-eccc-46e9-8bec-0008c06ea2b5",
+          "timestamp": 1694151575248,
+          "type": "DEPOSITED",
+          "values": [
+            {
+              "token": {
+                "address": "a0424c8b-73c7-465f-84a1-00ee9aea9028",
+                "symbol": "LBP",
+                "createdAt": "2023-08-19T20:00:34.303Z",
+                "priceUSD": 3196.86,
+                "priceUSD24hAgo": 4086.95,
+                "isPoolToken": false
+              },
+              "amount": 0.04513178556458525
+            },
+            {
+              "token": {
+                "address": "64aafa66-74c0-4b5e-9c81-9b5fdeba8952",
+                "symbol": "TJS",
+                "createdAt": "2022-11-11T03:03:42.173Z",
+                "priceUSD": 1868.35,
+                "priceUSD24hAgo": 3883.23,
+                "isPoolToken": true
+              },
+              "amount": 0.06977279417667998
+            },
+            {
+              "token": {
+                "address": "cd8c8190-03c1-48f0-aec4-f4cb12bf9210",
+                "symbol": "MNT",
+                "createdAt": "2023-09-19T11:27:01.695Z",
+                "priceUSD": 4049.65,
+                "priceUSD24hAgo": 2361.03,
+                "isPoolToken": true
+              },
+              "amount": 0.0020470904893015443
+            },
+            {
+              "token": {
+                "address": "167cae89-613a-4add-8935-a1940c9d6c67",
+                "symbol": "HNL",
+                "createdAt": "2023-06-01T03:04:40.353Z",
+                "priceUSD": 4582.48,
+                "priceUSD24hAgo": 2465.6,
+                "isPoolToken": false
+              },
+              "amount": 69.25
+            }
+          ],
+          "resultInUSD": 352.18,
+          "claimInUSD": null
+        },
+        {
+          "id": "4cf33f99-3dd2-45a1-a6d4-de6b46ca1558",
+          "timestamp": 1694151575248,
+          "type": "DEPOSITED",
+          "values": [
+            {
+              "token": {
+                "address": "64aafa66-74c0-4b5e-9c81-9b5fdeba8952",
+                "symbol": "TJS",
+                "createdAt": "2022-11-11T03:03:42.173Z",
+                "priceUSD": 1868.35,
+                "priceUSD24hAgo": 3883.23,
+                "isPoolToken": true
+              },
+              "amount": 334.44
+            }
+          ],
+          "resultInUSD": 334.44,
+          "claimInUSD": null
+        },
+        {
+          "id": "54bb7f67-e26e-4fb7-a288-c42e10323309",
+          "timestamp": 1694151575248,
+          "type": "WITHDRAWN",
+          "values": [
+            {
+              "token": {
+                "address": "0x6cA13a4ab78dd7D657226b155873A04DB929AXXX",
+                "symbol": "JUSD",
+                "createdAt": "2023-05-22T21:21:24.064Z",
+                "priceUSD": 700.72,
+                "priceUSD24hAgo": 3533.46,
+                "isPoolToken": true
+              },
+              "amount": 701.93
+            }
+          ],
+          "resultInUSD": 701.93,
+          "claimInUSD": null
+        },
+        {
+          "id": "8c20e281-6322-4708-9f46-03bb0a49627b",
+          "timestamp": 1694151575248,
+          "type": "DEPOSITED",
+          "values": [
+            {
+              "token": {
+                "address": "0x6cA13a4ab78dd7D657226b155873A04DB929A3A4",
+                "symbol": "LRD",
+                "createdAt": "2022-10-20T03:12:14.413Z",
+                "priceUSD": 4827.48,
+                "priceUSD24hAgo": 520.58,
+                "isPoolToken": false
+              },
+              "amount": 0.14756146063784834
+            },
+            {
+              "token": {
+                "address": "a0424c8b-73c7-465f-84a1-00ee9aea9028",
+                "symbol": "LBP",
+                "createdAt": "2023-08-19T20:00:34.303Z",
+                "priceUSD": 3196.86,
+                "priceUSD24hAgo": 4086.95,
+                "isPoolToken": false
+              },
+              "amount": 106.82999999999993
+            }
+          ],
+          "resultInUSD": 819.18,
+          "claimInUSD": null
+        }
+      ],
+      "pageInfo": {
+        "totalCount": 57,
+        "hasNextPage": true,
+        "endCursor": "8c20e281-6322-4708-9f46-03bb0a49627b"
+      }
+    }
+  }
+}

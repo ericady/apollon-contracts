@@ -75,7 +75,13 @@ const StabilityHistoryDialog = () => {
       </Button>
 
       {data && (
-        <Dialog open={open} onClose={() => setOpen(false)} fullWidth>
+        <Dialog
+          open={open}
+          onClose={() => setOpen(false)}
+          fullWidth
+          // @ts-ignore
+          componentsProps={{ backdrop: { 'data-testid': 'apollon-stability-history-dialog-backdrop' } }}
+        >
           <DialogTitle
             sx={{
               display: 'flex',
@@ -98,7 +104,7 @@ const StabilityHistoryDialog = () => {
                 STABILITY PER HISTORY
               </Typography>
             </div>
-            <IconButton onClick={() => setOpen(false)}>
+            <IconButton onClick={() => setOpen(false)} aria-label="close stability history dialog">
               <CloseIcon
                 sx={{
                   color: '#64616D',
@@ -117,6 +123,7 @@ const StabilityHistoryDialog = () => {
           >
             {data.getBorrowerStabilityHistory.history.map((history, index) => (
               <div
+                data-testid="apollon-stability-history-dialog-history"
                 style={{
                   borderBottom:
                     index === data.getBorrowerStabilityHistory.pageInfo.totalCount - 1
