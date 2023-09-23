@@ -24,14 +24,12 @@ export const EthersContext = createContext<{
   connectWallet: () => {},
 });
 
-type LoginError = 'User rejected permissions' | 'MetaMask is not installed' | 'Authentication closed';
-
 export default function EthersProvider({ children }: { children: React.ReactNode }): JSX.Element {
   const { enqueueSnackbar } = useSnackbar();
 
   const [provider, setProvider] = useState<BrowserProvider | null>(null);
   const [signer, setSigner] = useState<JsonRpcSigner | null>(null);
-  const [address, setAddress] = useState<string>('');
+  const [address, setAddress] = useState('');
 
   const connectWallet = async () => {
     try {

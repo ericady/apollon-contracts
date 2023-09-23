@@ -58,12 +58,12 @@ function SetupState({
 
   const [address, setAddress] = useState<string>('');
   if (shouldConnectWallet && !address) {
-    setAddress('0x1234');
+    setAddress('0xbE8F15C2db5Fc2AFc4e17B4Dd578Fbc6e5aA9591');
   }
 
   if (shouldConnectWalletDelayed && !address) {
     setTimeout(() => {
-      setAddress('0x1234');
+      setAddress('0xbE8F15C2db5Fc2AFc4e17B4Dd578Fbc6e5aA9591');
     }, 500);
   }
 
@@ -72,7 +72,6 @@ function SetupState({
       value={{
         provider: {} as any,
         signer: {} as any,
-        loginError: null,
         address,
         connectWallet: () => console.log('connectWallet was called'),
       }}
