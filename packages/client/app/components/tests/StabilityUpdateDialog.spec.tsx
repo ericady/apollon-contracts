@@ -48,7 +48,6 @@ test.describe('StabilityUpdateDialog', () => {
     const updateButton = page.getByRole('button', {
       name: 'Update',
     });
-
     await updateButton.click();
 
     await page.waitForSelector('[data-testid="apollon-stability-update-dialog"]', {
@@ -80,7 +79,6 @@ test.describe('StabilityUpdateDialog', () => {
     const updateButton = page.getByRole('button', {
       name: 'Update',
     });
-
     await updateButton.click();
 
     await page.waitForSelector('[data-testid="apollon-stability-update-dialog"]', {
@@ -693,6 +691,24 @@ test.describe('StabilityUpdateDialog', () => {
         .nth(1);
       await expect(formSubmissionButton).toBeEnabled();
     });
+
+    test('should have "Withdraw" tab disabled', async ({ mount, page }) => {
+      await mount(
+        <IntegrationWrapper shouldConnectWallet>
+          <StabilityUpdateDialog />
+        </IntegrationWrapper>,
+      );
+
+      const updateButton = page.getByRole('button', {
+        name: 'Update',
+      });
+      await updateButton.click();
+
+      const formSubmissionButton = page.getByRole('tab', {
+        name: 'Withdraw',
+      });
+      await expect(formSubmissionButton).toBeEnabled();
+    });
   });
 
   test.describe('Guest mode', () => {
@@ -726,6 +742,24 @@ test.describe('StabilityUpdateDialog', () => {
           name: 'Update',
         })
         .nth(1);
+      await expect(formSubmissionButton).toBeDisabled();
+    });
+
+    test('should have "Withdraw" tab disabled', async ({ mount, page }) => {
+      await mount(
+        <IntegrationWrapper>
+          <StabilityUpdateDialog />
+        </IntegrationWrapper>,
+      );
+
+      const updateButton = page.getByRole('button', {
+        name: 'Update',
+      });
+      await updateButton.click();
+
+      const formSubmissionButton = page.getByRole('tab', {
+        name: 'Withdraw',
+      });
       await expect(formSubmissionButton).toBeDisabled();
     });
   });

@@ -1,8 +1,9 @@
 'use client';
 
+import { useQuery } from '@apollo/client';
 import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
 import CloseIcon from '@mui/icons-material/Close';
-import { Box, Dialog, DialogActions, DialogContent, DialogTitle, IconButton } from '@mui/material';
+import { Box, Dialog, DialogActions, DialogContent, DialogTitle, FormHelperText, IconButton } from '@mui/material';
 import Button, { ButtonProps } from '@mui/material/Button';
 import Tab from '@mui/material/Tab';
 import Tabs from '@mui/material/Tabs';
@@ -11,36 +12,45 @@ import { SyntheticEvent, useState } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
 import { useEthers } from '../../../context/EthersProvider';
 import { useWallet } from '../../../context/WalletProvider';
-import { GetCollateralTokensQuery } from '../../../generated/gql-types';
+import { GetCollateralTokensQuery, GetCollateralTokensQueryVariables } from '../../../generated/gql-types';
+import { GET_BORROWER_COLLATERAL_TOKENS } from '../../../queries';
 import { displayPercentage, roundCurrency } from '../../../utils/math';
 import NumberInput from '../../FormControls/NumberInput';
 import Label from '../../Label/Label';
 import CollateralRatioVisualization from '../../Visualizations/CollateralRatioVisualization';
 
 type Props = {
-  collateralData: GetCollateralTokensQuery;
   buttonVariant: ButtonProps['variant'];
   buttonSx?: ButtonProps['sx'];
-  disabled?: boolean;
 };
 
 type FieldValues = {
   etherTokenAmount: string;
 };
 
-const CollateralUpdateDialog = ({ collateralData, buttonVariant, buttonSx = {}, disabled = false }: Props) => {
+const CollateralUpdateDialog = ({ buttonVariant, buttonSx = {} }: Props) => {
   const [isOpen, setIsOpen] = useState(false);
   const [tabValue, setTabValue] = useState<'DEPOSIT' | 'WITHDRAW'>('DEPOSIT');
 
   const { etherAmount } = useWallet();
   const { address } = useEthers();
 
+  const { data } = useQuery<GetCollateralTokensQuery, GetCollateralTokensQueryVariables>(
+    GET_BORROWER_COLLATERAL_TOKENS,
+    {
+      variables: {
+        borrower: address,
+      },
+    },
+  );
+
   const methods = useForm<FieldValues>({
     defaultValues: {
       etherTokenAmount: '',
     },
+    reValidateMode: 'onChange',
   });
-  const { handleSubmit, setValue, reset } = methods;
+  const { handleSubmit, setValue, reset, formState } = methods;
 
   const handleChange = (_: SyntheticEvent, newValue: 'DEPOSIT' | 'WITHDRAW') => {
     setTabValue(newValue);
@@ -49,9 +59,8 @@ const CollateralUpdateDialog = ({ collateralData, buttonVariant, buttonSx = {}, 
 
   // TODO: Add ETH address
   // TODO: Add ETH, BTC, YLT, jUSD
-  const depositedCollateralToDeposit = collateralData.getCollateralTokens.filter(
-    ({ token }, index) => token.address && index === 0,
-  );
+  const depositedCollateralToDeposit: GetCollateralTokensQuery['getCollateralTokens'] =
+    data?.getCollateralTokens.filter(({ token }, index) => token.address && index === 0) ?? [];
 
   const fillMaxInputValue = (fieldName: keyof FieldValues) => {
     if (tabValue === 'DEPOSIT') {
@@ -79,8 +88,13 @@ const CollateralUpdateDialog = ({ collateralData, buttonVariant, buttonSx = {}, 
       >
         Update
       </Button>
-
-      <Dialog open={isOpen} onClose={() => setIsOpen(false)} fullWidth>
+      <Dialog
+        open={isOpen}
+        onClose={() => setIsOpen(false)}
+        fullWidth
+        // @ts-ignore
+        componentsProps={{ backdrop: { 'data-testid': 'apollon-collateral-update-dialog-backdrop' } }}
+      >
         <DialogTitle
           sx={{
             display: 'flex',
@@ -103,7 +117,7 @@ const CollateralUpdateDialog = ({ collateralData, buttonVariant, buttonSx = {}, 
               COLLATERAL UPDATE
             </Typography>
           </div>
-          <IconButton onClick={() => setIsOpen(false)}>
+          <IconButton onClick={() => setIsOpen(false)} aria-label="close collateral update dialog">
             <CloseIcon
               sx={{
                 color: '#64616D',
@@ -132,7 +146,7 @@ const CollateralUpdateDialog = ({ collateralData, buttonVariant, buttonSx = {}, 
                   <div style={{ marginTop: 6 }}>
                     <Label variant="success">ETH</Label>
                     <Typography sx={{ fontWeight: '400', marginTop: '10px' }}>
-                      {roundCurrency(depositedCollateralToDeposit[0].walletAmount!, 5)}
+                      {roundCurrency(depositedCollateralToDeposit[0]?.walletAmount ?? 0, 5)}
                     </Typography>
                     <Typography
                       sx={{
@@ -157,16 +171,17 @@ const CollateralUpdateDialog = ({ collateralData, buttonVariant, buttonSx = {}, 
                 <div>
                   <NumberInput
                     name="etherTokenAmount"
+                    data-testid="apollon-collateral-update-dialog-ether-amount"
                     placeholder="Value"
                     fullWidth
                     rules={{
-                      min: { value: 0, message: 'You can only invest positive amounts.' },
+                      min: { value: 0, message: 'Amount needs to be positive.' },
                       max:
                         tabValue === 'DEPOSIT'
                           ? { value: etherAmount, message: 'Your wallet does not contain the specified amount.' }
                           : {
-                              value: depositedCollateralToDeposit[0].walletAmount!,
-                              message: 'Your trove does not contain the specified amount',
+                              value: depositedCollateralToDeposit[0]?.walletAmount ?? 0,
+                              message: 'Your trove does not contain the specified amount.',
                             },
                     }}
                   />
@@ -175,7 +190,12 @@ const CollateralUpdateDialog = ({ collateralData, buttonVariant, buttonSx = {}, 
                     <div>
                       {tabValue === 'DEPOSIT' && (
                         <>
-                          <Typography variant="caption">{roundCurrency(etherAmount, 5)}</Typography>
+                          <Typography
+                            variant="caption"
+                            data-testid="apollon-collateral-update-dialog-deposit-ether-funds-label"
+                          >
+                            {roundCurrency(etherAmount, 5)}
+                          </Typography>
                           <Typography
                             sx={{
                               color: '#3C3945',
@@ -192,8 +212,11 @@ const CollateralUpdateDialog = ({ collateralData, buttonVariant, buttonSx = {}, 
                       )}
                       {tabValue === 'WITHDRAW' && (
                         <>
-                          <Typography variant="caption">
-                            {roundCurrency(depositedCollateralToDeposit[0].walletAmount!, 5)}
+                          <Typography
+                            variant="caption"
+                            data-testid="apollon-collateral-update-dialog-withdraw-ether-funds-label"
+                          >
+                            {roundCurrency(depositedCollateralToDeposit[0]?.walletAmount ?? 0, 5)}
                           </Typography>
                           <Typography
                             sx={{
@@ -273,9 +296,21 @@ const CollateralUpdateDialog = ({ collateralData, buttonVariant, buttonSx = {}, 
                 p: '30px 20px',
               }}
             >
-              <Button type="submit" variant="outlined" sx={{ borderColor: 'primary.contrastText' }} disabled={!address}>
-                Update
-              </Button>
+              <div style={{ width: '100%' }}>
+                <Button
+                  type="submit"
+                  variant="outlined"
+                  sx={{ borderColor: 'primary.contrastText' }}
+                  disabled={!address}
+                >
+                  Update
+                </Button>
+                {formState.isSubmitted && !formState.isDirty && (
+                  <FormHelperText error sx={{ mt: '10px' }} data-testid="apollon-collateral-update-dialog-error">
+                    You must specify at least one token to update.
+                  </FormHelperText>
+                )}
+              </div>
             </DialogActions>
           </form>
         </FormProvider>
