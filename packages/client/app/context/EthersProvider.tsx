@@ -1,6 +1,9 @@
 'use client';
 
+import { Button } from '@mui/material';
 import { BrowserProvider, Eip1193Provider, JsonRpcSigner } from 'ethers';
+import Link from 'next/link';
+import { useSnackbar } from 'notistack';
 import { createContext, useContext, useState } from 'react';
 
 declare global {
@@ -12,13 +15,11 @@ declare global {
 export const EthersContext = createContext<{
   provider: BrowserProvider | null;
   signer: JsonRpcSigner | null;
-  loginError: LoginError | null;
   address: string;
   connectWallet: () => void;
 }>({
   provider: null,
   signer: null,
-  loginError: null,
   address: '',
   connectWallet: () => {},
 });
@@ -26,10 +27,11 @@ export const EthersContext = createContext<{
 type LoginError = 'User rejected permissions' | 'MetaMask is not installed' | 'Authentication closed';
 
 export default function EthersProvider({ children }: { children: React.ReactNode }): JSX.Element {
+  const { enqueueSnackbar } = useSnackbar();
+
   const [provider, setProvider] = useState<BrowserProvider | null>(null);
   const [signer, setSigner] = useState<JsonRpcSigner | null>(null);
   const [address, setAddress] = useState<string>('');
-  const [loginError, setLoginError] = useState<LoginError | null>(null);
 
   const connectWallet = async () => {
     try {
@@ -47,29 +49,39 @@ export default function EthersProvider({ children }: { children: React.ReactNode
           });
           setAddress(accounts[0]);
         } catch (error) {
-          setLoginError('User rejected permissions');
+          enqueueSnackbar('You rejected necessary permissions. Please try again.', { variant: 'error' });
         }
       } else {
         // TODO: Handle this default case but its not documented correctly...
         // setProvider(ethers.getDefaultProvider())
-        setLoginError('MetaMask is not installed');
+        enqueueSnackbar('MetaMask extension is not installed. Please install and try again.', {
+          variant: 'error',
+          action: (
+            <Button
+              LinkComponent={Link}
+              href="https://metamask.io/"
+              variant="contained"
+              target="_blank"
+              rel="noreferrer"
+            >
+              Install
+            </Button>
+          ),
+        });
       }
     } catch {
-      setLoginError('Authentication closed');
+      enqueueSnackbar('You closed the authentication window. Please try loging in again.', { variant: 'error' });
     }
   };
 
   return (
-    <EthersContext.Provider value={{ provider, signer, loginError, address, connectWallet }}>
-      {children}
-    </EthersContext.Provider>
+    <EthersContext.Provider value={{ provider, signer, address, connectWallet }}>{children}</EthersContext.Provider>
   );
 }
 
 export function useEthers(): {
   provider: BrowserProvider | null;
   signer: JsonRpcSigner | null;
-  loginError: LoginError | null;
   address: string;
   connectWallet: () => void;
 } {
