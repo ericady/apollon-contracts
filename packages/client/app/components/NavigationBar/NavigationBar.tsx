@@ -8,7 +8,7 @@ import { usePathname } from 'next/navigation';
 import { SyntheticEvent, useEffect, useState } from 'react';
 import EthersAddressLabel from '../EthersAddressLabel/EthersAddressLabel';
 
-const ROUTES = ['/balance', '/spot', '/pools', '/'];
+export const ROUTES = ['/balance', '/spot', '/pools', '/'];
 
 function NavigationBar() {
   const pathname = usePathname();
