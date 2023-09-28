@@ -14,6 +14,10 @@ type Props = {
   shouldPreselectTokens?: boolean;
   shouldConnectWallet?: boolean;
   shouldConnectWalletDelayed?: boolean;
+  mockEthers?: {
+    contractMock?: Record<string, jest.Mock>;
+    connectWalletMock?: jest.Mock;
+  };
 };
 
 export const IntegrationWrapper = ({ children, ...stateProps }: PropsWithChildren<Props>) => (
@@ -40,6 +44,7 @@ function SetupState({
   shouldPreselectTokens,
   shouldConnectWallet,
   shouldConnectWalletDelayed,
+  mockEthers,
 }: PropsWithChildren<Props>) {
   const { setSelectedToken, selectedToken } = useSelectedToken();
   if (shouldPreselectTokens && !selectedToken) {
@@ -70,10 +75,11 @@ function SetupState({
   return (
     <EthersContext.Provider
       value={{
+        contract: (mockEthers?.contractMock ?? {}) as any,
         provider: {} as any,
         signer: {} as any,
         address,
-        connectWallet: () => console.log('connectWallet was called'),
+        connectWallet: () => mockEthers?.connectWalletMock,
       }}
     >
       {children}

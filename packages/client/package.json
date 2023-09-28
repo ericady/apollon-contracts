@@ -14,7 +14,7 @@
     "test:component:integration": "playwright test -c playwright-ct.config.ts",
     "test:component:integration:watch": "PWTEST_WATCH=1 playwright test -c playwright-ct.config.ts",
     "test:e2e": "NEXT_PUBLIC_API_MOCKING=e2e playwright test",
-    "codegen": "npx graphql-codegen"
+    "codegen": "npx graphql-codegen && npx typechain --target=ethers-v6 **/*.abi.json"
   },
   "dependencies": {
     "@apollo/client": "3.8.1",
@@ -44,6 +44,7 @@
     "@playwright/test": "1.37.0",
     "@testing-library/jest-dom": "^5.17.0",
     "@testing-library/react": "^14.0.0",
+    "@typechain/ethers-v6": "^0.5.0",
     "@types/node": "20.4.8",
     "@types/react": "18.2.19",
     "@types/react-dom": "18.2.7",
@@ -55,6 +56,7 @@
     "playwright-msw": "^2.2.1",
     "prettier": "^3.0.1",
     "prettier-plugin-organize-imports": "^3.2.3",
+    "typechain": "^8.3.1",
     "typescript": "5.1.6",
     "whatwg-fetch": "^3.6.19"
   },

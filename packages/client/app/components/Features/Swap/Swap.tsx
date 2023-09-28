@@ -27,7 +27,7 @@ const Swap = () => {
   const [showSlippage, setShowSlippage] = useState(false);
   const [tradingDirection, setTradingDirection] = useState<'jUSDSpent' | 'jUSDAquired'>('jUSDSpent');
 
-  const { address } = useEthers();
+  const { address, contract } = useEthers();
 
   const methods = useForm<FieldValues>({
     defaultValues: {
@@ -68,9 +68,12 @@ const Swap = () => {
     }
   };
 
-  const onSubmit = () => {
+  const onSubmit = async () => {
     console.log('onSubmit called');
-    // TODO: Implement contract call
+
+    // TODO: Implement contract call. This is how you do a typesafe read/write call
+    // const totalSupply = await contract!.totalSupply();
+    // const approvement = await contract!.approve('0xbE8F15C2db5Fc2AFc4e17B4Dd578Fbc6e5aA9591', 0);
   };
 
   const jUSDSwapAmount = parseInt(watch('jUSDAmount'));
