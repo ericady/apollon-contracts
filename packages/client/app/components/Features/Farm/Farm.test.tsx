@@ -1,13 +1,12 @@
 import { fireEvent, render, waitFor } from '@testing-library/react';
 import { IntegrationWrapper } from '../../tests/test-utils';
-import Swap from './Swap';
+import Farm from './Farm';
 
 // TODO: Write tests to expect arguments in the contract call once they are concluded
 
-describe('Swap', () => {
+describe('Farm', () => {
   it.skip('should call function of mocked contract', async () => {
     const contractMock = {
-      approve: jest.fn(),
       totalSupply: jest.fn(),
     };
     const { getByRole, container } = render(
@@ -17,15 +16,15 @@ describe('Swap', () => {
           contractMock,
         }}
       >
-        <Swap />
+        <Farm />
       </IntegrationWrapper>,
     );
 
-    const inputJUSD = container.querySelector<HTMLInputElement>('input[name="jUSDAmount"]')!;
+    const inputToken = container.querySelector<HTMLInputElement>('input[name="farmShortValue"]')!;
 
-    fireEvent.change(inputJUSD, { target: { value: '100' } });
+    fireEvent.change(inputToken, { target: { value: '100' } });
 
-    const submitButton = getByRole('button', { name: 'SWAP' });
+    const submitButton = getByRole('button', { name: 'EXECUTE' });
     fireEvent(
       submitButton,
       new MouseEvent('click', {
@@ -34,7 +33,7 @@ describe('Swap', () => {
     );
 
     await waitFor(() => {
-      expect(contractMock.approve).toHaveBeenCalled();
+      expect(contractMock.totalSupply).toHaveBeenCalled();
     });
   });
 });
