@@ -79,7 +79,7 @@ function SetupState({
         provider: {} as any,
         signer: {} as any,
         address,
-        connectWallet: () => mockEthers?.connectWalletMock,
+        connectWallet: () => mockEthers?.connectWalletMock?.(),
       }}
     >
       {children}

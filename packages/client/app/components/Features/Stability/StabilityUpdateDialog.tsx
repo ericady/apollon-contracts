@@ -155,7 +155,6 @@ const StabilityUpdateDialog = () => {
                       <NumberInput
                         name={token.address}
                         data-testid="apollon-stability-update-dialog-input"
-                        defaultValue=""
                         placeholder="Value"
                         fullWidth
                         rules={{

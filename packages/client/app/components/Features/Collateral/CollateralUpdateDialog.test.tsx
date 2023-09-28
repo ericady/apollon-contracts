@@ -1,22 +1,22 @@
-import { fireEvent, getAllByTestId, render, waitFor } from '@testing-library/react';
+import { fireEvent, render, waitFor } from '@testing-library/react';
 import { IntegrationWrapper } from '../../tests/test-utils';
-import StabilityUpdateDialog from './StabilityUpdateDialog';
+import CollateralUpdateDialog from './CollateralUpdateDialog';
 
 // TODO: Write tests to expect arguments in the contract call once they are concluded
 
-describe('StabilityUpdateDialog', () => {
+describe('CollateralUpdateDialog', () => {
   it.skip('should call function of mocked contract', async () => {
     const contractMock = {
       totalSupply: jest.fn(),
     };
-    const { getByRole } = render(
+    const { getByRole, getByTestId } = render(
       <IntegrationWrapper
         shouldConnectWallet
         mockEthers={{
           contractMock,
         }}
       >
-        <StabilityUpdateDialog />
+        <CollateralUpdateDialog buttonVariant="contained" />
       </IntegrationWrapper>,
     );
 
@@ -29,21 +29,13 @@ describe('StabilityUpdateDialog', () => {
     );
 
     await waitFor(() => {
-      const firstTokenFormControl = getAllByTestId(
-        document.querySelector('body')!,
-        'apollon-stability-update-dialog-input',
-      )[0];
+      const firstTokenFormControl = getByTestId('apollon-collateral-update-dialog-ether-amount');
       expect(firstTokenFormControl).toBeDefined();
     });
 
-    const firstTokenFormControl = getAllByTestId(
-      document.querySelector('body')!,
-      'apollon-stability-update-dialog-input',
-    )[0];
+    const inputToken = document.querySelector<HTMLInputElement>('input[name="etherTokenAmount"]')!;
 
-    const inputToken = firstTokenFormControl.querySelector<HTMLInputElement>('input')!;
-
-    fireEvent.change(inputToken, { target: { value: '100' } });
+    fireEvent.change(inputToken, { target: { value: '0' } });
 
     const submitButton = getByRole('button', { name: 'Update' });
     fireEvent(
