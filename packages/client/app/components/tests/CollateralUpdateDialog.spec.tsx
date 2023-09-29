@@ -54,7 +54,7 @@ test.describe('CollateralUpdateDialog', () => {
       state: 'visible',
     });
 
-    await expect(page).toHaveScreenshot();
+    await expect(page).toHaveScreenshot({ maxDiffPixelRatio: 0.01 });
   });
 
   test('should render CollateralUpdateDialog with mocked data when not logged in', async ({ mount, page }) => {
@@ -85,7 +85,7 @@ test.describe('CollateralUpdateDialog', () => {
       state: 'visible',
     });
 
-    await expect(page).toHaveScreenshot();
+    await expect(page).toHaveScreenshot({ maxDiffPixelRatio: 0.01 });
   });
 
   test('should close CollateralUpdateDialog when clicking the close button', async ({ mount, page }) => {

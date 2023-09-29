@@ -31,6 +31,7 @@ export default defineConfig({
 
     /* Port to use for Playwright component endpoint. */
     ctPort: 3100,
+    timezoneId: 'Europe/London',
 
     viewport: {
       height: 500,

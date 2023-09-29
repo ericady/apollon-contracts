@@ -216,7 +216,7 @@ const generateTokenValues = (maxValue: number, tokens: Token[]) => {
   });
 };
 
-const borrowerHistory: BorrowerHistory[] = Array(faker.number.int({ min: 0, max: 90 }))
+const borrowerHistory: BorrowerHistory[] = Array(faker.number.int({ min: 5, max: 90 }))
   .fill(null)
   .map(() => {
     const type = faker.helpers.enumValue(BorrowerHistoryType);

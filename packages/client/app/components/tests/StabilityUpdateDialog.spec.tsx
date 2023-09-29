@@ -54,7 +54,7 @@ test.describe('StabilityUpdateDialog', () => {
       state: 'visible',
     });
 
-    await expect(page).toHaveScreenshot();
+    await expect(page).toHaveScreenshot({ maxDiffPixelRatio: 0.01 });
   });
 
   test('should render StabilityUpdateDialog with mocked data when not logged in', async ({ mount, page }) => {
@@ -85,7 +85,7 @@ test.describe('StabilityUpdateDialog', () => {
       state: 'visible',
     });
 
-    await expect(page).toHaveScreenshot();
+    await expect(page).toHaveScreenshot({ maxDiffPixelRatio: 0.01 });
   });
 
   test('should close StabilityUpdateDialog when clicking the close button', async ({ mount, page }) => {

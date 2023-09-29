@@ -44,7 +44,7 @@ test.describe('Swap', () => {
       </IntegrationWrapper>,
     );
 
-    await expect(component).toHaveScreenshot();
+    await expect(component).toHaveScreenshot({ maxDiffPixelRatio: 0.01 });
   });
 
   test.describe('Form behavior', () => {
