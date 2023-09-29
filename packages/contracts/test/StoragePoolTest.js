@@ -16,7 +16,7 @@ contract('StoragePool', async accounts => {
     let stabilityPoolManager
     let borrowerOperations
 
-    let [reciever, alice] = accounts
+    let [reciever, alice, bob] = accounts
 
     beforeEach('Deploy contracts', async () => {
         contracts = await deploymentHelper.deployCore();
@@ -98,28 +98,34 @@ contract('StoragePool', async accounts => {
     })
 
     it('OpenTorve Test ActivePool', async () => {
-        const collAmount = th.dec(1, 18)
-        const debtAmount = th.dec(68, 18)
+        const collAmountAlice = th.dec(1, 18)
+        const debtAmountAlice = th.dec(68, 18)
 
         await openTrove({
             collToken: contracts.collToken.BTC,
-            collAmount: collAmount,
-            debts: [{ tokenAddress: STOCK, amount: debtAmount }],
-            extraParams: { from:  alice},
+            collAmount: collAmountAlice,
+            debts: [{ tokenAddress: STOCK, amount: debtAmountAlice }],
+            extraParams: { from: alice },
         });
 
-        const value = await storagePool.getValue(BTC, true, 0)
-        th.logBN('aaaa', value)
-        const value1 = await storagePool.getValue(BTC, true, 3)
-        th.logBN('bbbb', value1)
+        let value = await storagePool.getValue(BTC, true, 0)
+        assert.equal(value.toString(), th.toBN(collAmountAlice).toString())
+
+        const collAmountBob = th.dec(3, 18)
+        const debtAmountBob = th.dec(68, 18)
+
+        await openTrove({
+            collToken: contracts.collToken.BTC,
+            collAmount: collAmountBob,
+            debts: [{ tokenAddress: STOCK, amount: debtAmountBob }],
+            extraParams: { from: bob },
+        });
+
+        value = await storagePool.getValue(BTC, true, 0)
+        const addedColl = th.toBN(collAmountAlice).add(th.toBN(collAmountBob))
+
+        assert.equal(value.toString(), addedColl.toString()) // 4 BTC
     })
-
-
-
-
-
-
-
 
 })
 
