@@ -1,5 +1,3 @@
-'use client';
-
 import { Button, Typography } from '@mui/material';
 
 function DeviceFallbackPage() {
