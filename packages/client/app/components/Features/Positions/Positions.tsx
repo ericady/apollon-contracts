@@ -66,12 +66,7 @@ const Positions = () => {
 
   return (
     <>
-      <Box
-        sx={{
-          borderBottom: '1px solid',
-          borderColor: 'background.paper',
-        }}
-      >
+      <Box>
         <Tabs value={tabValue} onChange={handleChange}>
           <Tab label="BALANCE" value="BALANCE" disableRipple />
           <Tab label="COLLATERAL" value="COLLATERAL" disableRipple disabled={!address} />

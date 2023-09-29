@@ -81,10 +81,8 @@ function StabilityPoolTable() {
           >
             <TableHead>
               <TableRow>
-                <HeaderCell title="" />
-                <HeaderCell title="Lost Stability" />
-                <HeaderCell title="" />
-                <HeaderCell title="Gained collateral" />
+                <HeaderCell title="Lost Stability" cellProps={{ align: 'right', colSpan: 2 }} />
+                <HeaderCell title="Gained collateral" cellProps={{ align: 'right', colSpan: 2 }} />
               </TableRow>
             </TableHead>
             <TableBody>
@@ -101,6 +99,8 @@ function StabilityPoolTable() {
                         {!isNaN(stabilityLostAmount!) ? roundCurrency(stabilityLostAmount!, 5) : null}
                       </TableCell>
                       <TableCell
+                        width={50}
+                        align="right"
                         sx={noBorder ? { borderBottom: 'none' } : {}}
                         data-testid="apollon-stability-pool-table-lost-token"
                       >
@@ -110,6 +110,8 @@ function StabilityPoolTable() {
                         {!isNaN(stabilityGainedAmount!) ? roundCurrency(stabilityGainedAmount!, 5) : null}
                       </TableCell>
                       <TableCell
+                        width={50}
+                        align="right"
                         sx={noBorder ? { borderBottom: 'none' } : {}}
                         data-testid="apollon-stability-pool-table-reward-token"
                       >
@@ -121,16 +123,13 @@ function StabilityPoolTable() {
               <TableRow>
                 <TableCell sx={{ borderBottom: 'none' }}></TableCell>
                 <TableCell sx={{ borderBottom: 'none' }}></TableCell>
-                <TableCell sx={{ borderBottom: 'none' }}></TableCell>
 
-                <TableCell sx={{ borderBottom: 'none' }}>
-                  {address ? `+ ${displayPercentage(percentageChange(rewardsTotalInUSD, lossTotalInUSD))}` : null}
-
-                  {address ? (
-                    <span style={{ whiteSpace: 'nowrap' }}>
-                      (≈ {roundCurrency(rewardsTotalInUSD - lossTotalInUSD)} $)
-                    </span>
-                  ) : null}
+                <TableCell sx={{ borderBottom: 'none' }} colSpan={2} align="right">
+                  {address
+                    ? `+ ${displayPercentage(percentageChange(rewardsTotalInUSD, lossTotalInUSD))} (≈ ${roundCurrency(
+                        rewardsTotalInUSD - lossTotalInUSD,
+                      )} $)`
+                    : null}
                 </TableCell>
               </TableRow>
             </TableBody>

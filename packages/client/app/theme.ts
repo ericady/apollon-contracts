@@ -220,7 +220,8 @@ const theme = createTheme({
     MuiTabs: {
       styleOverrides: {
         flexContainer: {
-          borderBottom: 'none',
+          borderBottom: '1px solid',
+          borderBottomColor: BACKGROUND_EMPHASIS,
         },
         indicator: {
           backgroundColor: PRIMARY_TEXT,

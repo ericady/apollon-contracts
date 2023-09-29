@@ -60,8 +60,7 @@ function HistoryTable() {
           <TableRow>
             <HeaderCell title="Opening" />
             <HeaderCell title="Type" />
-            <HeaderCell title="Size" cellProps={{ align: 'right' }} />
-            <HeaderCell title="" />
+            <HeaderCell title="Size" cellProps={{ align: 'right', colSpan: 2 }} />
             <HeaderCell title="Price" cellProps={{ align: 'right' }} />
             <HeaderCell title="Price per unit" cellProps={{ align: 'right' }} />
             <HeaderCell title="Fee" cellProps={{ align: 'right' }} />
@@ -90,7 +89,7 @@ function HistoryTable() {
                   <TableCell align="right">
                     <Typography>{size}</Typography>
                   </TableCell>
-                  <TableCell sx={{ pl: 0 }}>
+                  <TableCell sx={{ pl: 0 }} width={50}>
                     <Label variant="none">{token.symbol}</Label>
                   </TableCell>
 

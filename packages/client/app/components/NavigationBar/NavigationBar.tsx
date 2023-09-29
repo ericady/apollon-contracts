@@ -43,7 +43,13 @@ function NavigationBar() {
             <Link href="/" style={{ height: 30 }}>
               <img src="assets/svgs/Apollon_logo_negative.svg" alt="Apollon Logo" height="30" typeof="image/svg+xml" />
             </Link>
-            <Tabs value={tabValue} onChange={handleChange}>
+            <Tabs
+              value={tabValue}
+              onChange={handleChange}
+              sx={{
+                '.MuiTabs-flexContainer': { border: 'none' },
+              }}
+            >
               <Tab
                 sx={{ p: 0 }}
                 label={

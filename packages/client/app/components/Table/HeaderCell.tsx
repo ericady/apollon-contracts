@@ -17,7 +17,7 @@ function HeaderCell({ title, cellProps = {}, tooltipProps }: Props) {
         color: 'text.disabled',
         font: '14.3px Space Grotesk Variable',
         fontWeight: 700,
-        borderColor: 'background.paper',
+        borderColor: 'table.border',
       }}
     >
       {tooltipProps ? (

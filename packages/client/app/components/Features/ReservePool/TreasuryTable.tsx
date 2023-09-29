@@ -30,8 +30,7 @@ function TreasuryTable() {
         <Table data-testid="apollon-treasury-table">
           <TableHead>
             <TableRow>
-              <HeaderCell title="" />
-              <HeaderCell title="Deposited Token" />
+              <HeaderCell title="Deposited Token" cellProps={{ colSpan: 2, align: 'right' }} />
               <HeaderCell title="Last 24h Difference" cellProps={{ colSpan: 2, align: 'right' }} />
             </TableRow>
           </TableHead>
@@ -41,7 +40,7 @@ function TreasuryTable() {
                 <TableCell align="right" sx={{ pr: 0 }}>
                   {stdFormatter.format(totalReserve)}
                 </TableCell>
-                <TableCell>
+                <TableCell width={50}>
                   <Label variant="none">{token.symbol}</Label>
                 </TableCell>
                 <TableCell align="right" sx={{ pr: 0 }}>
