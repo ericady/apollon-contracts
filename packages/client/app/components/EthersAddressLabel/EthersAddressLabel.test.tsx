@@ -6,7 +6,7 @@ import EthersAddressLabel from './EthersAddressLabel';
 // TODO: Write tests to expect arguments in the contract call once they are concluded
 
 describe('EthersAddressLabel', () => {
-  it.only('should call "connectWallet" function of ethersjs', async () => {
+  it('should call "connectWallet" function of ethers.js', async () => {
     const connectWalletMock = jest.fn();
     const { getByRole } = render(
       <IntegrationWrapper

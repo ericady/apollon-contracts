@@ -1,7 +1,11 @@
 import { PropsWithChildren } from 'react';
 
 function PageLayout({ children }: PropsWithChildren<{}>) {
-  return <div style={{ width: '100%', padding: '20px 15% 0 15%' }}>{children}</div>;
+  return (
+    <div style={{ display: 'flex', justifyContent: 'center', paddingTop: '20px' }}>
+      <div style={{ width: '1350px' }}>{children}</div>
+    </div>
+  );
 }
 
 export default PageLayout;
