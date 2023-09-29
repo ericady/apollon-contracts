@@ -76,16 +76,7 @@ test.describe('CollateralUpdateDialog', () => {
       </IntegrationWrapper>,
     );
 
-    const updateButton = page.getByRole('button', {
-      name: 'Update',
-    });
-    await updateButton.click();
-
-    await page.waitForSelector('[data-testid="apollon-collateral-update-dialog-ether-amount"]', {
-      state: 'visible',
-    });
-
-    await expect(page).toHaveScreenshot({ maxDiffPixelRatio: 0.01 });
+    await expect(page).toHaveScreenshot();
   });
 
   test('should close CollateralUpdateDialog when clicking the close button', async ({ mount, page }) => {
@@ -693,24 +684,6 @@ test.describe('CollateralUpdateDialog', () => {
         .nth(1);
       await expect(formSubmissionButton).toBeEnabled();
     });
-
-    test('should have "Withdraw" tab enabled', async ({ mount, page }) => {
-      await mount(
-        <IntegrationWrapper shouldConnectWallet>
-          <CollateralUpdateDialog buttonVariant="contained" />
-        </IntegrationWrapper>,
-      );
-
-      const updateButton = page.getByRole('button', {
-        name: 'Update',
-      });
-      await updateButton.click();
-
-      const withdrawTab = page.getByRole('tab', {
-        name: 'Withdraw',
-      });
-      await expect(withdrawTab).toBeEnabled();
-    });
   });
 
   test.describe('Guest mode', () => {
@@ -724,45 +697,7 @@ test.describe('CollateralUpdateDialog', () => {
       const updateButton = page.getByRole('button', {
         name: 'Update',
       });
-      await expect(updateButton).toBeEnabled();
-    });
-
-    test('should have inner "Update" button for form disabled', async ({ mount, page }) => {
-      await mount(
-        <IntegrationWrapper>
-          <CollateralUpdateDialog buttonVariant="contained" />
-        </IntegrationWrapper>,
-      );
-
-      const updateButton = page.getByRole('button', {
-        name: 'Update',
-      });
-      await updateButton.click();
-
-      const formSubmissionButton = page
-        .getByRole('button', {
-          name: 'Update',
-        })
-        .nth(1);
-      await expect(formSubmissionButton).toBeDisabled();
-    });
-
-    test('should have "Withdraw" tab disabled', async ({ mount, page }) => {
-      await mount(
-        <IntegrationWrapper>
-          <CollateralUpdateDialog buttonVariant="contained" />
-        </IntegrationWrapper>,
-      );
-
-      const updateButton = page.getByRole('button', {
-        name: 'Update',
-      });
-      await updateButton.click();
-
-      const withdrawTab = page.getByRole('tab', {
-        name: 'Withdraw',
-      });
-      await expect(withdrawTab).toBeDisabled();
+      await expect(updateButton).toBeDisabled();
     });
   });
 });

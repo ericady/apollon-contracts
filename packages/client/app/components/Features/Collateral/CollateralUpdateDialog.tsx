@@ -85,6 +85,7 @@ const CollateralUpdateDialog = ({ buttonVariant, buttonSx = {} }: Props) => {
           ...buttonSx,
         }}
         onClick={() => setIsOpen(true)}
+        disabled={!address}
       >
         Update
       </Button>
@@ -138,7 +139,7 @@ const CollateralUpdateDialog = ({ buttonVariant, buttonSx = {} }: Props) => {
             >
               <Tabs value={tabValue} onChange={handleChange} variant="fullWidth" sx={{ mt: 2 }}>
                 <Tab label="DEPOSIT" value="DEPOSIT" />
-                <Tab label="WITHDRAW" value="WITHDRAW" disabled={!address} />
+                <Tab label="WITHDRAW" value="WITHDRAW" />
               </Tabs>
 
               <div style={{ display: 'flex', justifyContent: 'space-between', padding: 20, height: 114 }}>
@@ -297,12 +298,7 @@ const CollateralUpdateDialog = ({ buttonVariant, buttonSx = {} }: Props) => {
               }}
             >
               <div style={{ width: '100%' }}>
-                <Button
-                  type="submit"
-                  variant="outlined"
-                  sx={{ borderColor: 'primary.contrastText' }}
-                  disabled={!address}
-                >
+                <Button type="submit" variant="outlined" sx={{ borderColor: 'primary.contrastText' }}>
                   Update
                 </Button>
                 {formState.isSubmitted && !formState.isDirty && (

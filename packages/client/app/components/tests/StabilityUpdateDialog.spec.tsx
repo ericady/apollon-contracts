@@ -76,16 +76,7 @@ test.describe('StabilityUpdateDialog', () => {
       </IntegrationWrapper>,
     );
 
-    const updateButton = page.getByRole('button', {
-      name: 'Update',
-    });
-    await updateButton.click();
-
-    await page.waitForSelector('[data-testid="apollon-stability-update-dialog"]', {
-      state: 'visible',
-    });
-
-    await expect(page).toHaveScreenshot({ maxDiffPixelRatio: 0.01 });
+    await expect(page).toHaveScreenshot();
   });
 
   test('should close StabilityUpdateDialog when clicking the close button', async ({ mount, page }) => {
@@ -691,28 +682,10 @@ test.describe('StabilityUpdateDialog', () => {
         .nth(1);
       await expect(formSubmissionButton).toBeEnabled();
     });
-
-    test('should have "Withdraw" tab disabled', async ({ mount, page }) => {
-      await mount(
-        <IntegrationWrapper shouldConnectWallet>
-          <StabilityUpdateDialog />
-        </IntegrationWrapper>,
-      );
-
-      const updateButton = page.getByRole('button', {
-        name: 'Update',
-      });
-      await updateButton.click();
-
-      const formSubmissionButton = page.getByRole('tab', {
-        name: 'Withdraw',
-      });
-      await expect(formSubmissionButton).toBeEnabled();
-    });
   });
 
   test.describe('Guest mode', () => {
-    test('should have "Update" button enabled', async ({ mount, page }) => {
+    test('should have "Update" button disabled', async ({ mount, page }) => {
       await mount(
         <IntegrationWrapper>
           <StabilityUpdateDialog />
@@ -722,45 +695,7 @@ test.describe('StabilityUpdateDialog', () => {
       const updateButton = page.getByRole('button', {
         name: 'Update',
       });
-      await expect(updateButton).toBeEnabled();
-    });
-
-    test('should have inner "Update" button for form disabled', async ({ mount, page }) => {
-      await mount(
-        <IntegrationWrapper>
-          <StabilityUpdateDialog />
-        </IntegrationWrapper>,
-      );
-
-      const updateButton = page.getByRole('button', {
-        name: 'Update',
-      });
-      await updateButton.click();
-
-      const formSubmissionButton = page
-        .getByRole('button', {
-          name: 'Update',
-        })
-        .nth(1);
-      await expect(formSubmissionButton).toBeDisabled();
-    });
-
-    test('should have "Withdraw" tab disabled', async ({ mount, page }) => {
-      await mount(
-        <IntegrationWrapper>
-          <StabilityUpdateDialog />
-        </IntegrationWrapper>,
-      );
-
-      const updateButton = page.getByRole('button', {
-        name: 'Update',
-      });
-      await updateButton.click();
-
-      const formSubmissionButton = page.getByRole('tab', {
-        name: 'Withdraw',
-      });
-      await expect(formSubmissionButton).toBeDisabled();
+      await expect(updateButton).toBeDisabled();
     });
   });
 });

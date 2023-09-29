@@ -54,7 +54,7 @@ const StabilityUpdateDialog = () => {
 
   return (
     <>
-      <Button onClick={() => setIsOpen(true)} variant="outlined">
+      <Button onClick={() => setIsOpen(true)} variant="outlined" disabled={!address}>
         Update
       </Button>
 
@@ -108,7 +108,7 @@ const StabilityUpdateDialog = () => {
             >
               <Tabs value={tabValue} onChange={handleChange} variant="fullWidth" sx={{ mt: 2 }}>
                 <Tab label="DEPOSIT" value="DEPOSIT" />
-                <Tab label="WITHDRAW" value="WITHDRAW" disabled={!address} />
+                <Tab label="WITHDRAW" value="WITHDRAW" />
               </Tabs>
 
               <div style={{ overflowY: 'scroll', maxHeight: '60vh' }}>
@@ -243,7 +243,6 @@ const StabilityUpdateDialog = () => {
                   type="submit"
                   variant="outlined"
                   sx={{ borderColor: 'primary.contrastText' }}
-                  disabled={!address}
                 >
                   Update
                 </Button>
