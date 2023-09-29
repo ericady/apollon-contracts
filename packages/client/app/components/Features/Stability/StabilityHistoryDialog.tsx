@@ -169,7 +169,9 @@ function StabilityClaimedRewards({ history }: StabilityWidgetProps) {
           </Typography>
         </div>
 
-        <Label variant="success">Claimed Collateral</Label>
+        <Label variant="success" fixedWidth={false}>
+          Claimed Collateral
+        </Label>
       </div>
 
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '40px' }}>
@@ -239,7 +241,9 @@ function StabilityDeposit({ history }: StabilityWidgetProps) {
           </Typography>
         </div>
 
-        <Label variant="none">Deposited token</Label>
+        <Label variant="none" fixedWidth={false}>
+          Deposited token
+        </Label>
       </div>
 
       <div style={{ display: 'flex', flexWrap: 'wrap', gap: '20px' }}>
@@ -275,7 +279,9 @@ function StabilityWithdraw({ history }: StabilityWidgetProps) {
           </Typography>
         </div>
 
-        <Label variant="info">Withdrawn token</Label>
+        <Label variant="info" fixedWidth={false}>
+          Withdrawn token
+        </Label>
       </div>
 
       <div style={{ display: 'flex', flexWrap: 'wrap', gap: '20px' }}>

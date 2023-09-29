@@ -65,8 +65,7 @@ function HistoryTable() {
             <HeaderCell title="Price" cellProps={{ align: 'right' }} />
             <HeaderCell title="Price per unit" cellProps={{ align: 'right' }} />
             <HeaderCell title="Fee" cellProps={{ align: 'right' }} />
-            <HeaderCell title="" />
-            <HeaderCell title="PNL" />
+            <HeaderCell title="PNL" cellProps={{ align: 'right', colSpan: 2 }} />
           </TableRow>
         </TableHead>
 
@@ -78,9 +77,13 @@ function HistoryTable() {
                   <TableCell>{formatUnixTimestamp(openedAt)}</TableCell>
                   <TableCell>
                     {direction === LongShortDirection.Long ? (
-                      <Label variant="success">Long</Label>
+                      <Label variant="success" fixedWidth={false}>
+                        Long
+                      </Label>
                     ) : (
-                      <Label variant="error">Short</Label>
+                      <Label variant="error" fixedWidth={false}>
+                        Short
+                      </Label>
                     )}
                   </TableCell>
 
@@ -102,8 +105,8 @@ function HistoryTable() {
                       {roundCurrency(profitInStable!)} jUSD
                     </Typography>
                   </TableCell>
-                  <TableCell sx={{ width: 120 }}>
-                    <div style={{ display: 'flex', alignItems: 'center' }}>
+                  <TableCell width={125}>
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                       <Typography
                         sx={{
                           color: profitInStable! > 0 ? 'success.main' : 'error.main',
@@ -111,7 +114,10 @@ function HistoryTable() {
                           mr: '5px',
                         }}
                       >
-                        {displayPercentage(percentageChange(totalPriceInStable + profitInStable!, totalPriceInStable))}
+                        {displayPercentage(
+                          percentageChange(totalPriceInStable + profitInStable!, totalPriceInStable),
+                          'positive',
+                        )}
                       </Typography>
                       <DirectionIcon showIncrease={profitInStable! > 0} />
                     </div>

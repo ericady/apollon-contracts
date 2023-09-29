@@ -3,9 +3,10 @@ import { PropsWithChildren } from 'react';
 
 type Props = {
   variant: 'success' | 'error' | 'info' | 'none';
+  fixedWidth?: boolean;
 };
 
-function Label({ variant, children }: PropsWithChildren<Props>) {
+function Label({ variant, fixedWidth = true, children }: PropsWithChildren<Props>) {
   switch (variant) {
     case 'success':
       return (
@@ -18,6 +19,7 @@ function Label({ variant, children }: PropsWithChildren<Props>) {
               backgroundColor: 'success.background',
               padding: '6px',
               borderRadius: '3px',
+              width: fixedWidth ? '50px' : 'auto',
             }}
           >
             <Typography variant="titleAlternate" color="success.main">
@@ -37,6 +39,7 @@ function Label({ variant, children }: PropsWithChildren<Props>) {
               backgroundColor: 'error.background',
               padding: '6px',
               borderRadius: '3px',
+              width: fixedWidth ? '50px' : 'auto',
             }}
           >
             <Typography variant="titleAlternate" color="error.main">
@@ -56,6 +59,7 @@ function Label({ variant, children }: PropsWithChildren<Props>) {
               backgroundColor: 'info.background',
               padding: '6px',
               borderRadius: '3px',
+              width: fixedWidth ? '50px' : 'auto',
             }}
           >
             <Typography variant="titleAlternate" color="info.main">
@@ -75,6 +79,7 @@ function Label({ variant, children }: PropsWithChildren<Props>) {
               backgroundColor: 'background.emphasis',
               padding: '6px 4px',
               borderRadius: '3px',
+              width: fixedWidth ? '50px' : 'auto',
             }}
           >
             <Typography variant="titleAlternate">{children}</Typography>

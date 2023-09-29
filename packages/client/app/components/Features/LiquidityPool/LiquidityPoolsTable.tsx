@@ -160,7 +160,7 @@ function LiquidityPoolsTable({ selectedPool, setSelectedPool }: Props) {
                       {stdFormatter.format(volume24hUSD)} $
                     </Typography>
                   </TableCell>
-                  <TableCell align="right" width={120}>
+                  <TableCell align="right" width={125}>
                     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                       <Typography
                         sx={{
