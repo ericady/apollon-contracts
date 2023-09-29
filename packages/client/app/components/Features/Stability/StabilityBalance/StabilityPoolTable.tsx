@@ -17,6 +17,7 @@ import { GET_BORROWER_COLLATERAL_TOKENS, GET_BORROWER_DEBT_TOKENS } from '../../
 import { displayPercentage, percentageChange, roundCurrency } from '../../../../utils/math';
 import FeatureBox from '../../../FeatureBox/FeatureBox';
 import Label from '../../../Label/Label';
+import DiagramPlaceholder from '../../../Loader/DiagramPlaceholder';
 import HeaderCell from '../../../Table/HeaderCell';
 import StabilityHistoryDialog from '../StabilityHistoryDialog';
 import StabilityUpdateDialog from '../StabilityUpdateDialog';
@@ -86,52 +87,62 @@ function StabilityPoolTable() {
               </TableRow>
             </TableHead>
             <TableBody>
-              {Array(listLength)
-                .fill(null)
-                .map((_, index) => {
-                  const { stabilityLostAmount, token: lostToken } = stabilityLostSorted[index] ?? {};
-                  const { stabilityGainedAmount, token: rewardToken } = rewardsSorted[index] ?? {};
-                  const noBorder = index === listLength - 1;
+              {address ? (
+                <>
+                  {Array(listLength)
+                    .fill(null)
+                    .map((_, index) => {
+                      const { stabilityLostAmount, token: lostToken } = stabilityLostSorted[index] ?? {};
+                      const { stabilityGainedAmount, token: rewardToken } = rewardsSorted[index] ?? {};
+                      const noBorder = index === listLength - 1;
 
-                  return (
-                    <TableRow hover key={index}>
-                      <TableCell sx={noBorder ? { borderBottom: 'none', pr: 0 } : { pr: 0 }} align="right">
-                        {!isNaN(stabilityLostAmount!) ? roundCurrency(stabilityLostAmount!, 5) : null}
-                      </TableCell>
-                      <TableCell
-                        width={50}
-                        align="right"
-                        sx={noBorder ? { borderBottom: 'none' } : {}}
-                        data-testid="apollon-stability-pool-table-lost-token"
-                      >
-                        {lostToken && <Label variant="error">{lostToken.symbol}</Label>}
-                      </TableCell>
-                      <TableCell sx={noBorder ? { borderBottom: 'none', pr: 0 } : { pr: 0 }} align="right">
-                        {!isNaN(stabilityGainedAmount!) ? roundCurrency(stabilityGainedAmount!, 5) : null}
-                      </TableCell>
-                      <TableCell
-                        width={50}
-                        align="right"
-                        sx={noBorder ? { borderBottom: 'none' } : {}}
-                        data-testid="apollon-stability-pool-table-reward-token"
-                      >
-                        {rewardToken && <Label variant="success">{rewardToken.symbol}</Label>}
-                      </TableCell>
-                    </TableRow>
-                  );
-                })}
-              <TableRow>
-                <TableCell sx={{ borderBottom: 'none' }}></TableCell>
-                <TableCell sx={{ borderBottom: 'none' }}></TableCell>
+                      return (
+                        <TableRow hover key={index}>
+                          <TableCell sx={noBorder ? { borderBottom: 'none', pr: 0 } : { pr: 0 }} align="right">
+                            {!isNaN(stabilityLostAmount!) ? roundCurrency(stabilityLostAmount!, 5) : null}
+                          </TableCell>
+                          <TableCell
+                            width={50}
+                            align="right"
+                            sx={noBorder ? { borderBottom: 'none' } : {}}
+                            data-testid="apollon-stability-pool-table-lost-token"
+                          >
+                            {lostToken && <Label variant="error">{lostToken.symbol}</Label>}
+                          </TableCell>
+                          <TableCell sx={noBorder ? { borderBottom: 'none', pr: 0 } : { pr: 0 }} align="right">
+                            {!isNaN(stabilityGainedAmount!) ? roundCurrency(stabilityGainedAmount!, 5) : null}
+                          </TableCell>
+                          <TableCell
+                            width={50}
+                            align="right"
+                            sx={noBorder ? { borderBottom: 'none' } : {}}
+                            data-testid="apollon-stability-pool-table-reward-token"
+                          >
+                            {rewardToken && <Label variant="success">{rewardToken.symbol}</Label>}
+                          </TableCell>
+                        </TableRow>
+                      );
+                    })}
+                  <TableRow>
+                    <TableCell sx={{ borderBottom: 'none' }}></TableCell>
+                    <TableCell sx={{ borderBottom: 'none' }}></TableCell>
 
-                <TableCell sx={{ borderBottom: 'none' }} colSpan={2} align="right">
-                  {address
-                    ? `+ ${displayPercentage(percentageChange(rewardsTotalInUSD, lossTotalInUSD))} (≈ ${roundCurrency(
-                        rewardsTotalInUSD - lossTotalInUSD,
-                      )} $)`
-                    : null}
-                </TableCell>
-              </TableRow>
+                    <TableCell sx={{ borderBottom: 'none' }} colSpan={2} align="right">
+                      {address
+                        ? `+ ${displayPercentage(
+                            percentageChange(rewardsTotalInUSD, lossTotalInUSD),
+                          )} (≈ ${roundCurrency(rewardsTotalInUSD - lossTotalInUSD)} $)`
+                        : null}
+                    </TableCell>
+                  </TableRow>
+                </>
+              ) : (
+                <TableRow>
+                  <TableCell sx={{ borderBottom: 'none' }} colSpan={4}>
+                    <DiagramPlaceholder fullWidth />
+                  </TableCell>
+                </TableRow>
+              )}
             </TableBody>
           </Table>
         </TableContainer>

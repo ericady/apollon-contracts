@@ -176,6 +176,7 @@ const StabilityUpdateDialog = () => {
                               <Typography
                                 variant="caption"
                                 data-testid="apollon-stability-update-dialog-deposit-funds-label"
+                                color="info.main"
                               >
                                 {roundCurrency(walletAmount!, 5)}
                               </Typography>
@@ -198,6 +199,7 @@ const StabilityUpdateDialog = () => {
                               <Typography
                                 variant="caption"
                                 data-testid="apollon-stability-update-dialog-withdraw-funds-label"
+                                color="info.main"
                               >
                                 {roundCurrency(stabilityCompoundAmount!, 5)}
                               </Typography>
@@ -239,11 +241,7 @@ const StabilityUpdateDialog = () => {
               }}
             >
               <div style={{ width: '100%' }}>
-                <Button
-                  type="submit"
-                  variant="outlined"
-                  sx={{ borderColor: 'primary.contrastText' }}
-                >
+                <Button type="submit" variant="outlined" sx={{ borderColor: 'primary.contrastText' }}>
                   Update
                 </Button>
                 {formState.isSubmitted && !formState.isDirty && (

@@ -194,6 +194,7 @@ const CollateralUpdateDialog = ({ buttonVariant, buttonSx = {} }: Props) => {
                           <Typography
                             variant="caption"
                             data-testid="apollon-collateral-update-dialog-deposit-ether-funds-label"
+                            color="info.main"
                           >
                             {roundCurrency(etherAmount, 5)}
                           </Typography>
@@ -216,6 +217,7 @@ const CollateralUpdateDialog = ({ buttonVariant, buttonSx = {} }: Props) => {
                           <Typography
                             variant="caption"
                             data-testid="apollon-collateral-update-dialog-withdraw-ether-funds-label"
+                            color="info.main"
                           >
                             {roundCurrency(depositedCollateralToDeposit[0]?.walletAmount ?? 0, 5)}
                           </Typography>

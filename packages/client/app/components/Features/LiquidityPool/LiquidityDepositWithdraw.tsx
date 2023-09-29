@@ -178,7 +178,11 @@ function LiquidityDepositWithdraw({ selectedPool }: Props) {
                 />
                 <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                   <div>
-                    <Typography variant="caption" data-testid="apollon-liquidity-pool-withdraw-token-a-funds-label">
+                    <Typography
+                      variant="caption"
+                      data-testid="apollon-liquidity-pool-withdraw-token-a-funds-label"
+                      color="info.main"
+                    >
                       {roundCurrency(tokenA.borrowerAmount!, 5)}
                     </Typography>
                     <br />
@@ -222,7 +226,11 @@ function LiquidityDepositWithdraw({ selectedPool }: Props) {
 
                 <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                   <div>
-                    <Typography variant="caption" data-testid="apollon-liquidity-pool-withdraw-token-b-funds-label">
+                    <Typography
+                      variant="caption"
+                      data-testid="apollon-liquidity-pool-withdraw-token-b-funds-label"
+                      color="info.main"
+                    >
                       {roundCurrency(tokenB.borrowerAmount!, 5)}
                     </Typography>
                     <br />

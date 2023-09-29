@@ -1,13 +1,17 @@
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 import { Typography } from '@mui/material';
 
-function DiagramPlaceholder() {
+type Props = {
+  fullWidth?: boolean;
+};
+
+function DiagramPlaceholder({ fullWidth = false }: Props) {
   return (
     <div
       style={{
         background: '#1e1b27',
         height: '216px',
-        width: '320px',
+        width: fullWidth ? '100%' : '320px',
         display: 'flex',
         alignItems: 'center',
         justifyContent: 'center',

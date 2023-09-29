@@ -148,6 +148,16 @@ const theme = createTheme({
       },
     },
 
+    MuiFormHelperText: {
+      styleOverrides: {
+        root: {
+          marginTop: '6px',
+          marginBottom: '2px',
+          marginLeft: 0,
+        },
+      },
+    },
+
     MuiButton: {
       variants: [
         {
