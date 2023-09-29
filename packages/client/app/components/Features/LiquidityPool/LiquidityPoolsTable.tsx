@@ -76,8 +76,7 @@ function LiquidityPoolsTable({ selectedPool, setSelectedPool }: Props) {
               <HeaderCell title="" cellProps={{ align: 'right' }} />
               <HeaderCell title="" />
               <HeaderCell title="APY" cellProps={{ align: 'right' }} />
-              <HeaderCell title="" />
-              <HeaderCell title="24h Volume" cellProps={{ align: 'right' }} />
+              <HeaderCell title="24h Volume" cellProps={{ align: 'right', colSpan: 2 }} />
             </TableRow>
           </TableHead>
 
@@ -161,8 +160,8 @@ function LiquidityPoolsTable({ selectedPool, setSelectedPool }: Props) {
                       {stdFormatter.format(volume24hUSD)} $
                     </Typography>
                   </TableCell>
-                  <TableCell align="right" width={130}>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '10px', justifyContent: 'flex-end' }}>
+                  <TableCell align="right" width={120}>
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                       <Typography
                         sx={{
                           color: volumeChange > 0 ? 'success.main' : 'error.main',

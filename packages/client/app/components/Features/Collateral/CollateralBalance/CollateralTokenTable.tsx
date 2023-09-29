@@ -45,8 +45,7 @@ const CollateralTokenTable = () => {
                 <HeaderCell title="Wallet" cellProps={{ align: 'right', sx: { borderRight: '1px solid' } }} />
                 <HeaderCell title="Your Trove" cellProps={{ align: 'right', sx: { borderRight: '1px solid' } }} />
                 <HeaderCell title="Token" />
-                <HeaderCell title="" />
-                <HeaderCell title="TVL" cellProps={{ align: 'left' }} />
+                <HeaderCell title="TVL" cellProps={{ align: 'right', colSpan: 2 }} />
               </TableRow>
             </TableHead>
             <TableBody>
@@ -66,7 +65,7 @@ const CollateralTokenTable = () => {
                       {stdFormatter.format(totalValueLockedUSD)}
                     </TableCell>
                     <TableCell align="left" sx={{ width: 120 }}>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                         <Typography
                           fontWeight={400}
                           color={
@@ -75,7 +74,10 @@ const CollateralTokenTable = () => {
                               : 'error.main'
                           }
                         >
-                          {displayPercentage(percentageChange(totalValueLockedUSD, totalValueLockedUSD24hAgo))}
+                          {displayPercentage(
+                            percentageChange(totalValueLockedUSD, totalValueLockedUSD24hAgo),
+                            'positive',
+                          )}
                         </Typography>
                         <DirectionIcon
                           showIncrease={percentageChange(totalValueLockedUSD, totalValueLockedUSD24hAgo) > 0}

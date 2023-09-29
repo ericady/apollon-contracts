@@ -51,8 +51,7 @@ function DebtTokenTable() {
                 title="Token"
                 cellProps={{ sx: { borderRight: '1px solid', borderColor: 'background.paper' } }}
               />
-              <HeaderCell title="" cellProps={{ align: 'right' }} />
-              <HeaderCell title="Supply" cellProps={{ align: 'left' }} />
+              <HeaderCell title="Supply" cellProps={{ align: 'right', colSpan: 2 }} />
               <HeaderCell title="Stability" cellProps={{ align: 'right' }} />
               <HeaderCell
                 title="Rewards"
@@ -81,15 +80,15 @@ function DebtTokenTable() {
                   <TableCell align="right" sx={{ pr: 0 }}>
                     {stdFormatter.format(totalSupplyUSD)}
                   </TableCell>
-                  <TableCell>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                  <TableCell width={130}>
+                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                       <Typography
                         fontWeight={400}
                         color={
                           percentageChange(totalSupplyUSD, totalSupplyUSD24hAgo) > 0 ? 'success.main' : 'error.main'
                         }
                       >
-                        {displayPercentage(percentageChange(totalSupplyUSD, totalSupplyUSD24hAgo))}
+                        {displayPercentage(percentageChange(totalSupplyUSD, totalSupplyUSD24hAgo), 'positive')}
                       </Typography>
 
                       <DirectionIcon showIncrease={percentageChange(totalSupplyUSD, totalSupplyUSD24hAgo) > 0} />

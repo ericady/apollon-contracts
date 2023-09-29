@@ -32,8 +32,7 @@ function TreasuryTable() {
             <TableRow>
               <HeaderCell title="" />
               <HeaderCell title="Deposited Token" />
-              <HeaderCell title="" />
-              <HeaderCell title="Last 24h Difference" />
+              <HeaderCell title="Last 24h Difference" cellProps={{ colSpan: 2, align: 'right' }} />
             </TableRow>
           </TableHead>
           <TableBody>
@@ -49,12 +48,12 @@ function TreasuryTable() {
                   {roundCurrency(totalReserve - totalReserve24hAgo, 5)}
                 </TableCell>
                 <TableCell width={120}>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                     <Typography
                       fontWeight={400}
                       color={percentageChange(totalReserve, totalReserve24hAgo) > 0 ? 'success.main' : 'error.main'}
                     >
-                      {displayPercentage(percentageChange(totalReserve, totalReserve24hAgo))}
+                      {displayPercentage(percentageChange(totalReserve, totalReserve24hAgo), 'positive')}
                     </Typography>
 
                     <DirectionIcon showIncrease={percentageChange(totalReserve, totalReserve24hAgo) > 0} />
