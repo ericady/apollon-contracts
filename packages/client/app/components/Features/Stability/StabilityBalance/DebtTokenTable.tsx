@@ -80,7 +80,7 @@ function DebtTokenTable() {
                   <TableCell align="right" sx={{ pr: 0 }}>
                     {stdFormatter.format(totalSupplyUSD)}
                   </TableCell>
-                  <TableCell width={130}>
+                  <TableCell width={120}>
                     <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                       <Typography
                         fontWeight={400}

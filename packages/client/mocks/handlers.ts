@@ -92,8 +92,8 @@ const debtTokens: DebtTokenMeta[] = faker.helpers
       token: token,
       walletAmount: parseFloat(faker.finance.amount(0, 1000, 2)),
       troveMintedAmount: parseFloat(faker.finance.amount(0, 500, 2)),
-      stabilityLostAmount: faker.number.float({ min: 0, max: stabilityGainedAmount!, precision: 0.0001 }),
-      stabilityCompoundAmount: faker.number.float({ min: 0, max: 5, precision: 0.0001 }),
+      stabilityLostAmount: faker.number.float({ min: 1, max: stabilityGainedAmount!, precision: 0.0001 }),
+      stabilityCompoundAmount: faker.number.float({ min: 1, max: 5, precision: 0.0001 }),
 
       totalDepositedStability: parseFloat(faker.finance.amount(1000, 5000, 2)),
       totalReserve,
@@ -135,7 +135,7 @@ for (let i = 0; i < tokens.length; i++) {
 
 const liquidityPools = pools;
 
-const totalOpenPositions = faker.number.int({ min: 0, max: 90 });
+const totalOpenPositions = faker.number.int({ min: 5, max: 90 });
 const openPositions = Array(totalOpenPositions)
   .fill(null)
   .map(() => {
@@ -160,7 +160,7 @@ const openPositions = Array(totalOpenPositions)
   })
   .sort((a, b) => b.openedAt - a.openedAt);
 
-const totalClosedPositions = faker.number.int({ min: 0, max: 90 });
+const totalClosedPositions = faker.number.int({ min: 5, max: 90 });
 const closedPositions = Array(totalClosedPositions)
   .fill(null)
   .map(() => {
