@@ -610,7 +610,7 @@ test.describe('CollateralUpdateDialog', () => {
       const withdrawTab = page.getByRole('tab', { name: 'Withdraw' });
       await withdrawTab.click();
 
-      await page.waitForSelector('[data-testid="apollon-stability-update-dialog-error"]', {
+      await page.waitForSelector('[data-testid="apollon-collateral-update-dialog-error"]', {
         state: 'detached',
       });
     });

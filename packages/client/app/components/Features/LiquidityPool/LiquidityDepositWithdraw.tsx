@@ -1,7 +1,7 @@
 'use client';
 
 import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
-import { Box } from '@mui/material';
+import { Box, FormHelperText } from '@mui/material';
 import Button from '@mui/material/Button';
 import Tab from '@mui/material/Tab';
 import Tabs from '@mui/material/Tabs';
@@ -44,7 +44,7 @@ function LiquidityDepositWithdraw({ selectedPool }: Props) {
       tokenBAmount: '',
     },
   });
-  const { handleSubmit, setValue, reset } = methods;
+  const { handleSubmit, setValue, reset, formState } = methods;
 
   const onSubmit = () => {
     console.log('onSubmit called');
@@ -282,10 +282,15 @@ function LiquidityDepositWithdraw({ selectedPool }: Props) {
             <CollateralRatioVisualization criticalRatio={1.1} newRatio={1.43} oldRatio={1.74} loading={!address} />
           </Box>
 
-          <div style={{ padding: '20px' }}>
+          <div style={{ width: '100%', padding: '20px' }}>
             <Button type="submit" variant="outlined" sx={{ borderColor: 'primary.contrastText' }} disabled={!address}>
               Update
             </Button>
+            {formState.isSubmitted && !formState.isDirty && (
+              <FormHelperText error sx={{ mt: '10px' }} data-testid="apollon-liquidity-deposit-withdraw-error">
+                You must specify at least one token to update.
+              </FormHelperText>
+            )}
           </div>
         </form>
       </FormProvider>

@@ -565,6 +565,36 @@ test.describe('LiquidityPool', () => {
           const tokenInputErrorMessage = await tokenInputError.textContent();
           expect(tokenInputErrorMessage).toBe('This amount is greater than your deposited amount.');
         });
+
+        test('should show form error when no input has been filled', async ({ mount, page }) => {
+          const component = await mount(
+            <IntegrationWrapper shouldConnectWallet>
+              <LiquidityPool />
+            </IntegrationWrapper>,
+          );
+
+          await page.waitForSelector('[data-testid="apollon-liquidity-pool-deposit-token-a-amount"]', {
+            state: 'visible',
+          });
+
+          const formSubmissionButton = page.getByRole('button', {
+            name: 'Update',
+          });
+          await formSubmissionButton.click();
+
+          const formError = page.getByTestId('apollon-liquidity-deposit-withdraw-error');
+          expect(await formError.innerText()).toBe('You must specify at least one token to update.');
+
+          const liquidityDepositInput = component
+            .getByTestId('apollon-liquidity-pool-deposit-token-a-amount')
+            .locator('input');
+
+          await liquidityDepositInput.fill('0');
+
+          await page.waitForSelector('[data-testid="apollon-liquidity-deposit-withdraw-error"]', {
+            state: 'detached',
+          });
+        });
       });
 
       test.describe('Connected mode', () => {

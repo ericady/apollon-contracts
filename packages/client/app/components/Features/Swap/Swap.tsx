@@ -38,7 +38,7 @@ const Swap = () => {
     shouldUnregister: true,
     reValidateMode: 'onChange',
   });
-  const { handleSubmit, setValue, watch, control } = methods;
+  const { handleSubmit, setValue, watch, control, trigger } = methods;
   const { field: jUSDField } = useController({ name: 'jUSDAmount', control });
   const { field: tokenAmountField } = useController({ name: 'tokenAmount', control });
 
@@ -49,7 +49,7 @@ const Swap = () => {
 
     if (variant === 'JUSD') {
       if (!isNaN(numericValue)) {
-        setValue('tokenAmount', roundNumber(numericValue / tokenRatio).toString(), { shouldValidate: true });
+        setValue('tokenAmount', roundNumber(numericValue / tokenRatio).toString());
         setTradingDirection('jUSDSpent');
       } else {
         setValue('tokenAmount', '');
@@ -58,7 +58,7 @@ const Swap = () => {
       setValue('jUSDAmount', value);
     } else {
       if (!isNaN(numericValue)) {
-        setValue('jUSDAmount', roundNumber(numericValue / tokenRatio).toString(), { shouldValidate: true });
+        setValue('jUSDAmount', roundNumber(numericValue / tokenRatio).toString());
         setTradingDirection('jUSDAquired');
       } else {
         setValue('jUSDAmount', '');
@@ -66,6 +66,8 @@ const Swap = () => {
 
       setValue('tokenAmount', value);
     }
+
+    trigger();
   };
 
   const onSubmit = async () => {
@@ -86,7 +88,7 @@ const Swap = () => {
     >
       <FormProvider {...methods}>
         <form onSubmit={handleSubmit(onSubmit)}>
-          <div style={{ display: 'flex', alignItems: 'center' }}>
+          <div style={{ display: 'flex' }}>
             {/* TODO: Add Validation that not more than the wallet amount can be entered. */}
             <NumberInput
               name="jUSDAmount"
@@ -116,6 +118,7 @@ const Swap = () => {
               typeof="image/svg+xml"
               style={{
                 transform: tradingDirection === 'jUSDAquired' ? 'rotate(180deg)' : 'rotate(0deg)',
+                margin: '10px 10px 0 10px',
               }}
             />
 
