@@ -11,11 +11,11 @@ import { useState } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
 import { useEthers } from '../../../context/EthersProvider';
 import { useSelectedToken } from '../../../context/SelectedTokenProvider';
+import { WIDGET_HEIGHTS } from '../../../utils/contants';
 import { displayPercentage, roundCurrency } from '../../../utils/math';
 import InfoButton from '../../Buttons/InfoButton';
 import FeatureBox from '../../FeatureBox/FeatureBox';
 import NumberInput from '../../FormControls/NumberInput';
-import { WIDGET_HEIGHTS } from '../../GridStack/SpotWidgetGridStack';
 import Label from '../../Label/Label';
 import CollateralRatioVisualization from '../../Visualizations/CollateralRatioVisualization';
 

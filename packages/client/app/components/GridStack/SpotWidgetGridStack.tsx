@@ -5,12 +5,6 @@ import { PropsWithChildren, useEffect } from 'react';
 
 const SPOT_PAGE_GRID_STATE_KEY = 'apollon-spot-page-grid-state';
 
-export const WIDGET_HEIGHTS = {
-  'apollon-assets-widget': 22,
-  'apollon-farm-widget': 51,
-  'apollon-swap-widget': 32,
-};
-
 function SpotWidgetGridStack({ children }: PropsWithChildren<{}>) {
   useEffect(() => {
     const grid = GridStack.init({

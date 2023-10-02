@@ -8,11 +8,11 @@ import { ChangeEvent, useState } from 'react';
 import { FormProvider, useController, useForm } from 'react-hook-form';
 import { useEthers } from '../../../context/EthersProvider';
 import { useSelectedToken } from '../../../context/SelectedTokenProvider';
+import { WIDGET_HEIGHTS } from '../../../utils/contants';
 import { displayPercentage, roundCurrency, roundNumber } from '../../../utils/math';
 import InfoButton from '../../Buttons/InfoButton';
 import FeatureBox from '../../FeatureBox/FeatureBox';
 import NumberInput from '../../FormControls/NumberInput';
-import { WIDGET_HEIGHTS } from '../../GridStack/SpotWidgetGridStack';
 import Label from '../../Label/Label';
 
 export const PROTOCOL_SWAP_FEE = 0.0009;
