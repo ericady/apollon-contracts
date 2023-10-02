@@ -14,6 +14,7 @@ import { GetAllPoolsQuery, GetAllPoolsQueryVariables } from '../../../generated/
 import { GET_ALL_POOLS } from '../../../queries';
 import { displayPercentage, roundCurrency, stdFormatter } from '../../../utils/math';
 import FeatureBox from '../../FeatureBox/FeatureBox';
+import { WIDGET_HEIGHTS } from '../../GridStack/SpotWidgetGridStack';
 import DirectionIcon from '../../Icons/DirectionIcon';
 import HeaderCell from '../../Table/HeaderCell';
 import AssetsLoader from './AssetsLoader';
@@ -89,7 +90,12 @@ function Assets() {
       title="Assets"
       noPadding
       border="bottom"
-      isDraggable={{ y: '0', gsHeight: '22', gsWidth: '1', id: 'apollon-assets-widget' }}
+      isDraggable={{
+        y: '0',
+        gsHeight: WIDGET_HEIGHTS['apollon-assets-widget'].toString(),
+        gsWidth: '1',
+        id: 'apollon-assets-widget',
+      }}
     >
       {tokens.length === 0 ? (
         <AssetsLoader />

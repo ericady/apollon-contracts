@@ -12,6 +12,7 @@ import { displayPercentage, roundCurrency, roundNumber } from '../../../utils/ma
 import InfoButton from '../../Buttons/InfoButton';
 import FeatureBox from '../../FeatureBox/FeatureBox';
 import NumberInput from '../../FormControls/NumberInput';
+import { WIDGET_HEIGHTS } from '../../GridStack/SpotWidgetGridStack';
 import Label from '../../Label/Label';
 
 export const PROTOCOL_SWAP_FEE = 0.0009;
@@ -27,7 +28,7 @@ const Swap = () => {
   const [showSlippage, setShowSlippage] = useState(false);
   const [tradingDirection, setTradingDirection] = useState<'jUSDSpent' | 'jUSDAquired'>('jUSDSpent');
 
-  const { address, contract } = useEthers();
+  const { address } = useEthers();
 
   const methods = useForm<FieldValues>({
     defaultValues: {
@@ -84,7 +85,12 @@ const Swap = () => {
     <FeatureBox
       title="Swap"
       border="bottom"
-      isDraggable={{ y: '1', gsHeight: '32', gsWidth: '1', id: 'apollon-swap-widget' }}
+      isDraggable={{
+        y: '1',
+        gsHeight: WIDGET_HEIGHTS['apollon-swap-widget'].toString(),
+        gsWidth: '1',
+        id: 'apollon-swap-widget',
+      }}
     >
       <FormProvider {...methods}>
         <form onSubmit={handleSubmit(onSubmit)}>

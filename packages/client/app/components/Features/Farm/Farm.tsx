@@ -15,6 +15,7 @@ import { displayPercentage, roundCurrency } from '../../../utils/math';
 import InfoButton from '../../Buttons/InfoButton';
 import FeatureBox from '../../FeatureBox/FeatureBox';
 import NumberInput from '../../FormControls/NumberInput';
+import { WIDGET_HEIGHTS } from '../../GridStack/SpotWidgetGridStack';
 import Label from '../../Label/Label';
 import CollateralRatioVisualization from '../../Visualizations/CollateralRatioVisualization';
 
@@ -60,7 +61,12 @@ const Farm = () => {
     <FeatureBox
       title="Farm"
       border="bottom"
-      isDraggable={{ y: '2', gsHeight: '51', gsWidth: '1', id: 'apollon-farm-widget' }}
+      isDraggable={{
+        y: '2',
+        gsHeight: WIDGET_HEIGHTS['apollon-farm-widget'].toString(),
+        gsWidth: '1',
+        id: 'apollon-farm-widget',
+      }}
     >
       <Tabs value={tabValue} onChange={handleTabChange} variant="fullWidth" sx={{ mx: '-15px' }}>
         <Tab label="LONG" value="Long" />

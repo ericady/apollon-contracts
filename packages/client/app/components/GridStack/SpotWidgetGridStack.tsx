@@ -5,6 +5,12 @@ import { PropsWithChildren, useEffect } from 'react';
 
 const SPOT_PAGE_GRID_STATE_KEY = 'apollon-spot-page-grid-state';
 
+export const WIDGET_HEIGHTS = {
+  'apollon-assets-widget': 22,
+  'apollon-farm-widget': 51,
+  'apollon-swap-widget': 32,
+};
+
 function SpotWidgetGridStack({ children }: PropsWithChildren<{}>) {
   useEffect(() => {
     const grid = GridStack.init({
@@ -30,8 +36,11 @@ function SpotWidgetGridStack({ children }: PropsWithChildren<{}>) {
     // Save grid state to local storage on unmount
     grid.on('change', () => {
       const gridSavePoint: { id: string; y: number }[] = [];
-      grid.save(false, false, ({ y, el }) => {
-        gridSavePoint.push({ id: el!.id, y: y as number });
+      let y = 0;
+      grid.save(false, false, ({ el }) => {
+        gridSavePoint.push({ id: el!.id, y: y });
+        // @ts-ignore
+        y += WIDGET_HEIGHTS[el!.id];
       });
       localStorage.setItem(SPOT_PAGE_GRID_STATE_KEY, JSON.stringify(gridSavePoint));
     });
