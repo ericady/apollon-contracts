@@ -1,0 +1,149 @@
+type Token {
+  address: String! # contract address, used as id
+  symbol: String!
+  createdAt: String!
+  #
+  priceUSD: Float!
+  priceUSD24hAgo: Float!
+  #
+  isPoolToken: Boolean!
+}
+
+type DebtTokenMeta {
+  token: Token!
+  # borrower specific
+  walletAmount: Float
+  troveMintedAmount: Float
+  stabilityLostAmount: Float
+  stabilityCompoundAmount: Float
+
+  # global
+  stabilityDepositAPY: Float!
+  totalDepositedStability: Float!
+  totalReserve: Float!
+  totalReserve24hAgo: Float!
+  totalSupplyUSD: Float!
+  totalSupplyUSD24hAgo: Float!
+}
+
+type CollateralTokenMeta {
+  token: Token!
+  # borrower specific
+  walletAmount: Float
+  troveLockedAmount: Float
+  stabilityGainedAmount: Float
+  # global
+  totalValueLockedUSD: Float!
+  totalValueLockedUSD24hAgo: Float!
+}
+
+type Query {
+  # without borrower address troveAmount and walletAmount are always undefined
+  # every token is returned, even if it is not used by the borrower (troveAmount, walletAmount = 0)
+  # the same token can be returned twice, if it is used as debt and collateral
+  getDebtTokens(borrower: String): [DebtTokenMeta!]!
+  getCollateralTokens(borrower: String): [CollateralTokenMeta!]!
+}
+
+enum LongShortDirection {
+  LONG
+  SHORT
+}
+
+type Position {
+  id: String!
+  openedAt: Int!
+  closedAt: Int # undefined until closed
+  #
+  token: Token!
+  direction: LongShortDirection!
+  size: Float! # always positive, applied by direction
+  #
+  totalPriceInStable: Float!
+  feesInStable: Float! # protocol fees, without gas
+  profitInStable: Float # undefined until closed
+}
+
+type PositionsPage {
+  positions: [Position!]!
+  pageInfo: PageInfo!
+}
+
+# General meta info for pagination
+type PageInfo {
+  totalCount: Int!
+  hasNextPage: Boolean!
+  endCursor: String!
+}
+
+type Query {
+  # returns 30 elements, cursor based pagination
+  # sorted by position.openedAt DESC
+  getPositions(borrower: String!, isOpen: Boolean!, cursor: String): PositionsPage!
+}
+
+type PoolLiquidity {
+  token: Token!
+  totalAmount: Float!
+  borrowerAmount: Float
+}
+
+type PoolReward {
+  token: Token!
+  amount: Float!
+}
+
+type Pool {
+  id: String!
+  # Percent value applied when opening the first position for this pool. Can be negative and positive.
+  openingFee: Float!
+  liquidity: [PoolLiquidity!]!
+  rewards: [PoolReward!]!
+  liquidityDepositAPY: Float!
+  volume24hUSD: Float!
+  volume24hUSD24hAgo: Float!
+}
+
+type Query {
+  # every pool is returned, even if it is empty
+  # without borrower address borrowerLiquidity and borrowerRewards are always undefined
+  # with borrower address only the pools are returned, where the borrower has liquidity or rewards
+  getPools(borrower: String): [Pool!]!
+  getPoolPriceHistory(poolId: String!): [[Int!]!]! # [[timestamp, value], [...], ...] todo time range filter needed?
+  #
+  getCollateralUSDHistory: [[Int!]!]! # [[timestamp, value], [...], ...]
+  getDebtUSDHistory: [[Int!]!]! # [[timestamp, value], [...], ...]
+  getCollateralRatioHistory: [[Int!]!]! # [[timestamp, value], [...], ...]
+  getReserveUSDHistory: [[Int!]!]! # [[timestamp, value], [...], ...]
+}
+
+type TokenAmount {
+  token: Token!
+  amount: Float!
+}
+
+enum BorrowerHistoryType {
+  DEPOSITED
+  WITHDRAWN
+  CLAIMED_REWARDS
+}
+
+type BorrowerHistory {
+  id: String!
+  timestamp: Int!
+  type: BorrowerHistoryType!
+  values: [TokenAmount!]!
+  # worth of the claimed tokens in USD at the time of the event, only set on CLAIMED_REWARDS
+  claimInUSD: Float
+  resultInUSD: Float!
+}
+
+type PoolHistoryPage {
+  history: [BorrowerHistory!]!
+  pageInfo: PageInfo!
+}
+
+type Query {
+  getBorrowerPoolHistory(poolId: String!, borrower: String!, cursor: String): PoolHistoryPage!
+  getBorrowerStabilityHistory(borrower: String!, cursor: String): PoolHistoryPage!
+}
