@@ -153,14 +153,15 @@ contract StabilityPoolManager is Ownable, CheckContract, IStabilityPoolManager {
       remainingStability.stabilityPool.getDepositToken().burn(stabilityPoolAddress, remainingStability.debtToOffset);
 
       // move the coll from the active pool into the stability pool
-      for (uint i = 0; i < remainingStability.collGained.length; i++) {
-        if (remainingStability.collGained[i].amount == 0) continue;
+      for (uint ii = 0; ii < remainingStability.collGained.length; ii++) {
+        // todo there is no coll gained on stability pool offset -> has to be a bug!
+        if (remainingStability.collGained[ii].amount == 0) continue;
         storagePoolCached.withdrawalValue(
           stabilityPoolAddress,
-          remainingStability.collGained[i].tokenAddress,
+          remainingStability.collGained[ii].tokenAddress,
           true,
           PoolType.Active,
-          remainingStability.collGained[i].amount
+          remainingStability.collGained[ii].amount
         );
       }
     }
