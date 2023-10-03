@@ -2,13 +2,11 @@
 
 pragma solidity ^0.8.9;
 
-import './Dependencies/IERC20.sol';
-import './Interfaces/IStoragePool.sol';
-import './Dependencies/SafeMath.sol';
 import './Dependencies/Ownable.sol';
 import './Dependencies/CheckContract.sol';
-import './Dependencies/console.sol';
 import './Dependencies/LiquityBase.sol';
+import './Dependencies/IERC20.sol';
+import './Interfaces/IStoragePool.sol';
 import './Interfaces/IPriceFeed.sol';
 import './Interfaces/IStabilityPoolManager.sol';
 
@@ -20,8 +18,6 @@ import './Interfaces/IStabilityPoolManager.sol';
  *
  */
 contract StoragePool is LiquityBase, Ownable, CheckContract, IStoragePool {
-  using SafeMath for uint256;
-
   string public constant NAME = 'StoragePool';
 
   address public borrowerOperationsAddress;
@@ -88,8 +84,8 @@ contract StoragePool is LiquityBase, Ownable, CheckContract, IStoragePool {
       else debtTokenAddresses.push(_tokenAddress);
     }
 
-    entry.poolTypes[_poolType] = entry.poolTypes[_poolType].add(_amount);
-    entry.totalAmount = entry.totalAmount.add(_amount);
+    entry.poolTypes[_poolType] += _amount;
+    entry.totalAmount += _amount;
     emit PoolValueUpdated(_tokenAddress, _isColl, _poolType, entry.poolTypes[_poolType]);
   }
 
@@ -114,8 +110,8 @@ contract StoragePool is LiquityBase, Ownable, CheckContract, IStoragePool {
     PoolEntry storage entry = poolEntries[_tokenAddress][_isColl];
     require(entry.exists, 'StoragePool: PoolEntry does not exist');
 
-    entry.poolTypes[_poolType] = entry.poolTypes[_poolType].sub(_amount);
-    entry.totalAmount = entry.totalAmount.sub(_amount);
+    entry.poolTypes[_poolType] -= _amount;
+    entry.totalAmount -= _amount;
     emit PoolValueUpdated(_tokenAddress, _isColl, _poolType, entry.poolTypes[_poolType]);
   }
 
@@ -131,10 +127,10 @@ contract StoragePool is LiquityBase, Ownable, CheckContract, IStoragePool {
 
     PoolEntry storage entry = poolEntries[_tokenAddress][_isColl];
 
-    entry.poolTypes[_fromType] = entry.poolTypes[_fromType].sub(_amount);
+    entry.poolTypes[_fromType] -= _amount;
     emit PoolValueUpdated(_tokenAddress, _isColl, _fromType, entry.poolTypes[_fromType]);
 
-    entry.poolTypes[_toType] = entry.poolTypes[_toType].add(_amount);
+    entry.poolTypes[_toType] += _amount;
     emit PoolValueUpdated(_tokenAddress, _isColl, _toType, entry.poolTypes[_toType]);
   }
 
@@ -142,7 +138,8 @@ contract StoragePool is LiquityBase, Ownable, CheckContract, IStoragePool {
     IPriceFeed priceFeedCached = priceFeed;
     for (uint i = 0; i < collTokenAddresses.length; i++) {
       uint price = priceFeedCached.getPrice(_priceCache, collTokenAddresses[i]);
-      entireSystemColl = entireSystemColl.add(poolEntries[collTokenAddresses[i]][true].totalAmount.mul(price)); // todo should surplus or gas be excluded?
+      // TODO: should surplus or gas be excluded?
+      entireSystemColl += poolEntries[collTokenAddresses[i]][true].totalAmount * price;
     }
     return entireSystemColl;
   }
@@ -151,7 +148,8 @@ contract StoragePool is LiquityBase, Ownable, CheckContract, IStoragePool {
     IPriceFeed priceFeedCached = priceFeed;
     for (uint i = 0; i < debtTokenAddresses.length; i++) {
       uint price = priceFeedCached.getPrice(_priceCache, debtTokenAddresses[i]);
-      entireSystemDebt = entireSystemDebt.add(poolEntries[debtTokenAddresses[i]][false].totalAmount.mul(price)); // todo should surplus or gas be excluded?
+      // TODO: should surplus or gas be excluded?
+      entireSystemDebt += poolEntries[debtTokenAddresses[i]][false].totalAmount * price;
     }
     return entireSystemDebt;
   }

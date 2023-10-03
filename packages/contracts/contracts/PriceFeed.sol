@@ -5,7 +5,6 @@ pragma solidity ^0.8.9;
 import './Interfaces/IPriceFeed.sol';
 import './Interfaces/ITellorCaller.sol';
 import './Dependencies/AggregatorV3Interface.sol';
-import './Dependencies/SafeMath.sol';
 import './Dependencies/Ownable.sol';
 import './Dependencies/CheckContract.sol';
 import './Dependencies/LiquityMath.sol';
@@ -20,8 +19,6 @@ import './Dependencies/console.sol';
  * Chainlink oracle.
  */
 contract PriceFeed is Ownable, CheckContract, IPriceFeed {
-  using SafeMath for uint256;
-
   string public constant NAME = 'PriceFeed';
 
   AggregatorV3Interface public priceAggregator; // Mainnet Chainlink aggregator
@@ -386,7 +383,7 @@ contract PriceFeed is Ownable, CheckContract, IPriceFeed {
   }
 
   function _chainlinkIsFrozen(ChainlinkResponse memory _response) internal view returns (bool) {
-    return block.timestamp.sub(_response.timestamp) > TIMEOUT;
+    return (block.timestamp - _response.timestamp) > TIMEOUT;
   }
 
   function _chainlinkPriceChangeAboveMax(
@@ -404,7 +401,7 @@ contract PriceFeed is Ownable, CheckContract, IPriceFeed {
      * - If price decreased, the percentage deviation is in relation to the the previous price.
      * - If price increased, the percentage deviation is in relation to the current price.
      */
-    uint percentDeviation = maxPrice.sub(minPrice).mul(DECIMAL_PRECISION).div(maxPrice);
+    uint percentDeviation = ((maxPrice - minPrice) * DECIMAL_PRECISION) / maxPrice;
 
     // Return true if price has more than doubled, or more than halved.
     return percentDeviation > MAX_PRICE_DEVIATION_FROM_PREVIOUS_ROUND;
@@ -428,7 +425,7 @@ contract PriceFeed is Ownable, CheckContract, IPriceFeed {
   }
 
   function _tellorIsFrozen(TellorResponse memory _tellorResponse) internal view returns (bool) {
-    return block.timestamp.sub(_tellorResponse.timestamp) > TIMEOUT;
+    return (block.timestamp - _tellorResponse.timestamp) > TIMEOUT;
   }
 
   function _bothOraclesLiveAndUnbrokenAndSimilarPrice(
@@ -462,7 +459,7 @@ contract PriceFeed is Ownable, CheckContract, IPriceFeed {
     // Get the relative price difference between the oracles. Use the lower price as the denominator, i.e. the reference for the calculation.
     uint minPrice = LiquityMath._min(scaledTellorPrice, scaledChainlinkPrice);
     uint maxPrice = LiquityMath._max(scaledTellorPrice, scaledChainlinkPrice);
-    uint percentPriceDifference = maxPrice.sub(minPrice).mul(DECIMAL_PRECISION).div(minPrice);
+    uint percentPriceDifference = ((maxPrice - minPrice) * DECIMAL_PRECISION) / minPrice;
 
     /*
      * Return true if the relative price difference is <= 3%: if so, we assume both oracles are probably reporting
@@ -481,16 +478,16 @@ contract PriceFeed is Ownable, CheckContract, IPriceFeed {
     uint price;
     if (_answerDigits >= TARGET_DIGITS) {
       // Scale the returned price value down to Liquity's target precision
-      price = _price.div(10 ** (_answerDigits - TARGET_DIGITS));
+      price = _price / 10 ** (_answerDigits - TARGET_DIGITS);
     } else if (_answerDigits < TARGET_DIGITS) {
       // Scale the returned price value up to Liquity's target precision
-      price = _price.mul(10 ** (TARGET_DIGITS - _answerDigits));
+      price = _price * 10 ** (TARGET_DIGITS - _answerDigits);
     }
     return price;
   }
 
   function _scaleTellorPriceByDigits(uint _price) internal pure returns (uint) {
-    return _price.mul(10 ** (TARGET_DIGITS - TELLOR_DIGITS));
+    return _price * 10 ** (TARGET_DIGITS - TELLOR_DIGITS);
   }
 
   function _changeStatus(Status _status) internal {

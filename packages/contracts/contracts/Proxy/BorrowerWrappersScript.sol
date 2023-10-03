@@ -2,7 +2,6 @@
 
 pragma solidity ^0.8.9;
 
-import '../Dependencies/SafeMath.sol';
 import '../Dependencies/LiquityMath.sol';
 import '../Dependencies/IERC20.sol';
 import '../Interfaces/IBorrowerOperations.sol';
@@ -14,8 +13,6 @@ import './ETHTransferScript.sol';
 import '../Dependencies/console.sol';
 
 contract BorrowerWrappersScript is BorrowerOperationsScript, ETHTransferScript {
-  using SafeMath for uint;
-
   string public constant NAME = 'BorrowerWrappersScript';
 
   ITroveManager immutable troveManager;
@@ -27,7 +24,7 @@ contract BorrowerWrappersScript is BorrowerOperationsScript, ETHTransferScript {
     address _borrowerOperationsAddress,
     address _troveManagerAddress,
     address _priceFeedAddress
-  ) public BorrowerOperationsScript(IBorrowerOperations(_borrowerOperationsAddress)) {
+  ) BorrowerOperationsScript(IBorrowerOperations(_borrowerOperationsAddress)) {
     checkContract(_troveManagerAddress);
     ITroveManager troveManagerCached = ITroveManager(_troveManagerAddress);
     troveManager = troveManagerCached;

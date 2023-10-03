@@ -16,7 +16,6 @@ import './Interfaces/IBBase.sol';
 import './Interfaces/ICollTokenManager.sol';
 
 contract BorrowerOperations is LiquityBase, Ownable, CheckContract, IBorrowerOperations {
-  using SafeMath for uint256;
   string public constant NAME = 'BorrowerOperations';
 
   // --- Connected contract declarations ---
@@ -335,7 +334,7 @@ contract BorrowerOperations is LiquityBase, Ownable, CheckContract, IBorrowerOpe
         contractsCache.storagePool,
         debtTokenAmount.debtToken,
         debtTokenAmount.netDebt,
-        debtTokenAmount.netDebt.sub(debtTokenAmount.borrowingFee)
+        debtTokenAmount.netDebt - debtTokenAmount.borrowingFee
       );
     }
 
@@ -370,7 +369,7 @@ contract BorrowerOperations is LiquityBase, Ownable, CheckContract, IBorrowerOpe
         existingDebt = vars.debts[ii];
         break;
       }
-      _requireAtLeastMinNetDebt(existingDebt.netDebt.sub(debtTokenAmount.netDebt));
+      _requireAtLeastMinNetDebt(existingDebt.netDebt - debtTokenAmount.netDebt);
       if (debtTokenAmount.debtToken.isStableCoin())
         _requireValidStableCoinRepayment(existingDebt.netDebt, debtTokenAmount.netDebt);
 
@@ -409,7 +408,7 @@ contract BorrowerOperations is LiquityBase, Ownable, CheckContract, IBorrowerOpe
       DebtTokenAmount memory debtTokenAmount = vars.debts[i];
 
       uint toRepay;
-      if (debtTokenAmount.debtToken.isStableCoin()) toRepay = debtTokenAmount.netDebt.sub(STABLE_COIN_GAS_COMPENSATION);
+      if (debtTokenAmount.debtToken.isStableCoin()) toRepay = debtTokenAmount.netDebt - STABLE_COIN_GAS_COMPENSATION;
       else toRepay = debtTokenAmount.netDebt;
       if (toRepay == 0) continue;
 
@@ -512,8 +511,8 @@ contract BorrowerOperations is LiquityBase, Ownable, CheckContract, IBorrowerOpe
     uint entireSystemColl,
     uint entireSystemDebt
   ) internal pure returns (uint) {
-    uint totalColl = _isCollIncrease ? entireSystemColl.add(_collChange) : entireSystemColl.sub(_collChange);
-    uint totalDebt = _isDebtIncrease ? entireSystemDebt.add(_debtChange) : entireSystemDebt.sub(_debtChange);
+    uint totalColl = _isCollIncrease ? entireSystemColl + _collChange : entireSystemColl - _collChange;
+    uint totalDebt = _isDebtIncrease ? entireSystemDebt + _debtChange : entireSystemDebt - _debtChange;
 
     uint newTCR = LiquityMath._computeCR(totalColl, totalDebt);
     return newTCR;
@@ -530,7 +529,7 @@ contract BorrowerOperations is LiquityBase, Ownable, CheckContract, IBorrowerOpe
     _troveManager.decayBaseRateFromBorrowing(); // decay the baseRate state variable
     borrowingFee = _troveManager.getBorrowingFee(compositeDebtInStable); // calculated in stable price
     _requireUserAcceptsFee(borrowingFee, compositeDebtInStable, _maxFeePercentage);
-    borrowingFee = borrowingFee.div(_stableCoinAmount.price);
+    borrowingFee /= _stableCoinAmount.price;
 
     // todo...
     // Send fee to staking contract
@@ -538,14 +537,14 @@ contract BorrowerOperations is LiquityBase, Ownable, CheckContract, IBorrowerOpe
     //        stableCoinAmount.debtToken.mint(address(lqtyStaking), borrowingFee);
 
     // update troves debts
-    _stableCoinAmount.netDebt = _stableCoinAmount.netDebt.add(borrowingFee);
-    _stableCoinAmount.borrowingFee = _stableCoinAmount.borrowingFee.add(borrowingFee);
+    _stableCoinAmount.netDebt += borrowingFee;
+    _stableCoinAmount.borrowingFee += borrowingFee;
 
     return borrowingFee;
   }
 
   function _getUSDValue(uint _coll, uint _price) internal pure returns (uint) {
-    uint usdValue = _price.mul(_coll).div(DECIMAL_PRECISION);
+    uint usdValue = (_price * _coll) / DECIMAL_PRECISION;
     return usdValue;
   }
 
@@ -704,9 +703,9 @@ contract BorrowerOperations is LiquityBase, Ownable, CheckContract, IBorrowerOpe
       _requireICRisAboveMCR(_vars.newICR);
 
       _vars.newTCR = _getNewTCRFromTroveChange(
-        _vars.newCompositeCollInStable.sub(_vars.oldCompositeCollInStable), // todo needs to be positiy every time -> add / sub change...
+        _vars.newCompositeCollInStable - _vars.oldCompositeCollInStable, // todo needs to be positiy every time -> add / sub change...
         !_isCollWithdrawal,
-        _vars.newCompositeDebtInStable.sub(_vars.oldCompositeDebtInStable), // todo needs to be positiy every time -> add / sub change...
+        _vars.newCompositeDebtInStable - _vars.oldCompositeDebtInStable, // todo needs to be positiy every time -> add / sub change...
         _isDebtIncrease,
         _vars.entireSystemColl,
         _vars.entireSystemDebt
@@ -741,7 +740,7 @@ contract BorrowerOperations is LiquityBase, Ownable, CheckContract, IBorrowerOpe
 
   function _requireValidStableCoinRepayment(uint _currentDebt, uint _debtRepayment) internal pure {
     require(
-      _debtRepayment <= _currentDebt.sub(STABLE_COIN_GAS_COMPENSATION),
+      _debtRepayment <= (_currentDebt - STABLE_COIN_GAS_COMPENSATION),
       "BorrowerOps: Amount repaid must not be larger than the Trove's debt"
     );
   }
@@ -766,22 +765,16 @@ contract BorrowerOperations is LiquityBase, Ownable, CheckContract, IBorrowerOpe
     return _getCompositeDebt(_debts);
   }
 
+  function _getNetDebt(DebtTokenAmount[] memory _debts) internal pure returns (uint) {
+    return _getCompositeDebt(_debts) - STABLE_COIN_GAS_COMPENSATION;
+  }
+
   // Returns the composite debt (drawn debt + gas compensation) of a trove, for the purpose of ICR calculation
   function _getCompositeDebt(DebtTokenAmount[] memory _debts) internal pure returns (uint debtInStable) {
-    for (uint i = 0; i < _debts.length; i++) debtInStable = debtInStable.add(_debts[i].netDebt.mul(_debts[i].price));
-    return debtInStable;
+    for (uint i = 0; i < _debts.length; i++) debtInStable += _debts[i].netDebt * _debts[i].price;
   }
 
   function _getCompositeColl(PriceTokenAmount[] memory _colls) internal pure returns (uint collInStable) {
-    for (uint i = 0; i < _colls.length; i++) collInStable = collInStable.add(_colls[i].amount.mul(_colls[i].price));
-    return collInStable;
-  }
-
-  function _getNetDebt(DebtTokenAmount[] memory _newDebts) internal pure returns (uint debtInStable) {
-    for (uint i = 0; i < _newDebts.length; i++) {
-      DebtTokenAmount memory debtTokenAmount = _newDebts[i];
-      debtInStable = debtInStable.add(debtTokenAmount.netDebt.mul(debtTokenAmount.price));
-    }
-    return debtInStable.sub(STABLE_COIN_GAS_COMPENSATION);
+    for (uint i = 0; i < _colls.length; i++) collInStable += _colls[i].amount * _colls[i].price;
   }
 }

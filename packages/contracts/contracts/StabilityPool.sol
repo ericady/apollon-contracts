@@ -8,8 +8,6 @@ import './Interfaces/IBorrowerOperations.sol';
 import './Interfaces/ITroveManager.sol';
 import './Interfaces/IDebtToken.sol';
 import './Dependencies/LiquityBase.sol';
-import './Dependencies/SafeMath.sol';
-import './Dependencies/LiquitySafeMath128.sol';
 import './Dependencies/Ownable.sol';
 import './Dependencies/CheckContract.sol';
 import './Dependencies/console.sol';
@@ -147,9 +145,6 @@ import './Interfaces/IStoragePool.sol';
  *
  */
 contract StabilityPool is LiquityBase, Ownable, CheckContract, IStabilityPool {
-  using SafeMath for uint256;
-  using LiquitySafeMath128 for uint128;
-
   string public constant NAME = 'StabilityPool';
 
   ITroveManager public troveManager;
@@ -273,14 +268,14 @@ contract StabilityPool is LiquityBase, Ownable, CheckContract, IStabilityPool {
 
     uint initialDeposit = deposits[depositor];
     uint remainingDeposit = this.getCompoundedDebtDeposit(depositor);
-    uint depositLoss = initialDeposit.sub(remainingDeposit); // Needed only for event log
+    uint depositLoss = initialDeposit - remainingDeposit; // Needed only for event log
     //        emit DepositLoss(depositor, depositLoss); todo
 
     _payoutCollGains(depositor);
 
     // update deposit snapshots
     _sendDepositToStabilityPool(depositor, _amount);
-    uint newDeposit = remainingDeposit.add(_amount);
+    uint newDeposit = remainingDeposit + _amount;
     _updateDepositAndSnapshots(depositor, newDeposit);
     //        emit UserDepositChanged(user, newDeposit); todo
 
@@ -308,7 +303,7 @@ contract StabilityPool is LiquityBase, Ownable, CheckContract, IStabilityPool {
     _requireUserHasDeposit(initialDeposit);
 
     uint remainingDeposit = this.getCompoundedDebtDeposit(msg.sender);
-    uint depositLoss = initialDeposit.sub(remainingDeposit); // Needed only for event log
+    uint depositLoss = initialDeposit - remainingDeposit; // Needed only for event log
     //        emit DepositLoss(msg.sender, depositLoss); todo
     debtToWithdrawal = LiquityMath._min(debtToWithdrawal, remainingDeposit);
 
@@ -316,7 +311,7 @@ contract StabilityPool is LiquityBase, Ownable, CheckContract, IStabilityPool {
 
     // update deposit snapshots
     _sendDepositToDepositor(msg.sender, debtToWithdrawal);
-    uint newDeposit = remainingDeposit.sub(debtToWithdrawal);
+    uint newDeposit = remainingDeposit - debtToWithdrawal;
     _updateDepositAndSnapshots(msg.sender, newDeposit);
     //        emit UserDepositChanged(msg.sender, newDeposit); todo
 
@@ -338,7 +333,7 @@ contract StabilityPool is LiquityBase, Ownable, CheckContract, IStabilityPool {
     _requireUserHasDeposit(initialDeposit);
 
     uint remainingDeposit = this.getCompoundedDebtDeposit(msg.sender);
-    uint depositLoss = initialDeposit.sub(remainingDeposit); // Needed only for event log
+    uint depositLoss = initialDeposit - remainingDeposit; // Needed only for event log
     //        emit DepositLoss(msg.sender, depositLoss); todo
 
     _payoutCollGains(msg.sender);
@@ -473,7 +468,7 @@ contract StabilityPool is LiquityBase, Ownable, CheckContract, IStabilityPool {
 
     _updateRewardSumAndProduct(collGainPerUnitStaked, depositLossPerUnitStaked); // updates S and P
 
-    uint newTotalDeposit = totalDeposits.sub(_debtToOffset);
+    uint newTotalDeposit = totalDeposits - _debtToOffset;
     totalDeposits = newTotalDeposit;
     // todo
     //    emit StabilityPoolDepositBalanceUpdated(newTotalDeposit);
@@ -503,24 +498,24 @@ contract StabilityPool is LiquityBase, Ownable, CheckContract, IStabilityPool {
       address tokenAddress = _collToAdd[i].tokenAddress;
       collGainPerUnitStaked[i].tokenAddress = tokenAddress;
 
-      uint collNumerator = _collToAdd[i].amount.mul(DECIMAL_PRECISION).add(lastErrorOffset[tokenAddress]);
-      collGainPerUnitStaked[i].amount = collNumerator.div(_totalDeposits);
-      lastErrorOffset[tokenAddress] = collNumerator.sub(collGainPerUnitStaked[i].amount.mul(_totalDeposits));
+      uint collNumerator = _collToAdd[i].amount * DECIMAL_PRECISION + lastErrorOffset[tokenAddress];
+      collGainPerUnitStaked[i].amount = collNumerator / _totalDeposits;
+      lastErrorOffset[tokenAddress] = collNumerator - (collGainPerUnitStaked[i].amount * _totalDeposits);
 
-      totalGainedColl[tokenAddress] = totalGainedColl[tokenAddress].add(_collToAdd[i].amount);
+      totalGainedColl[tokenAddress] += _collToAdd[i].amount;
     }
 
     if (_depositToOffset == _totalDeposits) {
       depositLossPerUnitStaked = DECIMAL_PRECISION; // When the Pool depletes to 0, so does each deposit
       lastErrorOffset[address(depositToken)] = 0;
     } else {
-      uint depositLossNumerator = _depositToOffset.mul(DECIMAL_PRECISION).sub(lastErrorOffset[address(depositToken)]);
+      uint depositLossNumerator = _depositToOffset * DECIMAL_PRECISION - lastErrorOffset[address(depositToken)];
       /*
        * Add 1 to make error in quotient positive. We want "slightly too much" deposit loss,
        * which ensures the error in any given compoundedLUSDDeposit favors the Stability Pool.
        */
-      depositLossPerUnitStaked = (depositLossNumerator.div(_totalDeposits)).add(1);
-      lastErrorOffset[address(depositToken)] = (depositLossPerUnitStaked.mul(_totalDeposits)).sub(depositLossNumerator);
+      depositLossPerUnitStaked = depositLossNumerator / _totalDeposits + 1;
+      lastErrorOffset[address(depositToken)] = depositLossPerUnitStaked * _totalDeposits - depositLossNumerator;
     }
 
     return (collGainPerUnitStaked, depositLossPerUnitStaked);
@@ -554,28 +549,28 @@ contract StabilityPool is LiquityBase, Ownable, CheckContract, IStabilityPool {
     for (uint i = 0; i < collGainPerUnitStaked.length; i++) {
       address tokenAddress = collGainPerUnitStaked[i].tokenAddress;
       uint currentS = epochToScaleToCollTokenToSum[currentEpochCached][currentScaleCached][tokenAddress];
-      uint marginalCollGain = collGainPerUnitStaked[i].amount.mul(currentP);
-      uint newS = currentS.add(marginalCollGain);
+      uint marginalCollGain = collGainPerUnitStaked[i].amount * currentP;
+      uint newS = currentS + marginalCollGain;
       epochToScaleToCollTokenToSum[currentEpochCached][currentScaleCached][tokenAddress] = newS;
       emit S_Updated(tokenAddress, newS, currentEpochCached, currentScaleCached);
     }
 
     // If the Stability Pool was emptied, increment the epoch, and reset the scale and product P
-    uint newProductFactor = uint(DECIMAL_PRECISION).sub(depositLossPerUnitStaked);
+    uint newProductFactor = uint(DECIMAL_PRECISION) - depositLossPerUnitStaked;
     if (newProductFactor == 0) {
-      currentEpoch = currentEpochCached.add(1);
+      currentEpoch = currentEpochCached + 1;
       emit EpochUpdated(currentEpoch);
       currentScale = 0;
       emit ScaleUpdated(currentScale);
       newP = DECIMAL_PRECISION;
 
       // If multiplying P by a non-zero product factor would reduce P below the scale boundary, increment the scale
-    } else if (currentP.mul(newProductFactor).div(DECIMAL_PRECISION) < SCALE_FACTOR) {
-      newP = currentP.mul(newProductFactor).mul(SCALE_FACTOR).div(DECIMAL_PRECISION);
-      currentScale = currentScaleCached.add(1);
+    } else if ((currentP * newProductFactor) / DECIMAL_PRECISION < SCALE_FACTOR) {
+      newP = (currentP * newProductFactor * SCALE_FACTOR) / DECIMAL_PRECISION;
+      currentScale = currentScaleCached + 1;
       emit ScaleUpdated(currentScale);
     } else {
-      newP = currentP.mul(newProductFactor).div(DECIMAL_PRECISION);
+      newP = (currentP * newProductFactor) / DECIMAL_PRECISION;
     }
 
     assert(newP > 0);
@@ -619,12 +614,11 @@ contract StabilityPool is LiquityBase, Ownable, CheckContract, IStabilityPool {
      */
     uint128 epochSnapshot = snapshots.epoch;
     uint128 scaleSnapshot = snapshots.scale;
-    uint firstPortion = epochToScaleToCollTokenToSum[epochSnapshot][scaleSnapshot][collToken].sub(
-      snapshots.sums[collToken]
-    );
-    uint secondPortion = epochToScaleToCollTokenToSum[epochSnapshot][scaleSnapshot.add(1)][collToken].div(SCALE_FACTOR);
+    uint firstPortion = epochToScaleToCollTokenToSum[epochSnapshot][scaleSnapshot][collToken] -
+      snapshots.sums[collToken];
+    uint secondPortion = epochToScaleToCollTokenToSum[epochSnapshot][scaleSnapshot + 1][collToken] / SCALE_FACTOR;
 
-    uint collGain = initialDeposit.mul(firstPortion.add(secondPortion)).div(snapshots.P).div(DECIMAL_PRECISION);
+    uint collGain = (initialDeposit * (firstPortion + secondPortion)) / snapshots.P / DECIMAL_PRECISION;
     return collGain;
   }
 
@@ -654,16 +648,16 @@ contract StabilityPool is LiquityBase, Ownable, CheckContract, IStabilityPool {
     }
 
     uint compoundedStake;
-    uint128 scaleDiff = currentScale.sub(_snapshots.scale);
+    uint128 scaleDiff = currentScale - _snapshots.scale;
 
     /* Compute the compounded stake. If a scale change in P was made during the stake's lifetime,
      * account for it. If more than one scale change was made, then the stake has decreased by a factor of
      * at least 1e-9 -- so return 0.
      */
     if (scaleDiff == 0) {
-      compoundedStake = _initialStake.mul(P).div(_snapshots.P);
+      compoundedStake = (_initialStake * P) / _snapshots.P;
     } else if (scaleDiff == 1) {
-      compoundedStake = _initialStake.mul(P).div(_snapshots.P).div(SCALE_FACTOR);
+      compoundedStake = (_initialStake * P) / _snapshots.P / SCALE_FACTOR;
     } else {
       // if scaleDiff >= 2
       compoundedStake = 0;
@@ -678,7 +672,7 @@ contract StabilityPool is LiquityBase, Ownable, CheckContract, IStabilityPool {
      *
      * Thus it's unclear whether this line is still really needed.
      */
-    if (compoundedStake < _initialStake.div(1e9)) {
+    if (compoundedStake < _initialStake / 1e9) {
       return 0;
     }
 
@@ -690,24 +684,22 @@ contract StabilityPool is LiquityBase, Ownable, CheckContract, IStabilityPool {
   // Transfer the debt tokens from the user to the Stability Pool's address, and update its records
   function _sendDepositToStabilityPool(address _address, uint _amount) internal {
     depositToken.sendToPool(_address, address(this), _amount);
-    uint newTotalTokenDeposit = totalDeposits.add(_amount);
-    totalDeposits = newTotalTokenDeposit;
-    emit StabilityPoolDepositBalanceUpdated(newTotalTokenDeposit);
+    totalDeposits += _amount;
+    emit StabilityPoolDepositBalanceUpdated(totalDeposits);
   }
 
   function _sendDepositToDepositor(address _depositor, uint _amount) internal {
     if (_amount == 0) return;
 
     depositToken.returnFromPool(address(this), _depositor, _amount);
-    uint newTotalDeposits = totalDeposits.sub(_amount);
-    totalDeposits = newTotalDeposits;
-    emit StabilityPoolDepositBalanceUpdated(newTotalDeposits);
+    totalDeposits -= _amount;
+    emit StabilityPoolDepositBalanceUpdated(totalDeposits);
   }
 
   function _sendCollGainToDepositor(address _collToken, uint _amount) internal {
     if (_amount == 0) return;
 
-    uint newColl = totalGainedColl[_collToken].sub(_amount);
+    uint newColl = totalGainedColl[_collToken] - _amount;
     totalGainedColl[_collToken] = newColl;
     emit StabilityPoolCollBalanceUpdates(_collToken, newColl);
 

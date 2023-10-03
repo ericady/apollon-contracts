@@ -10,8 +10,6 @@ import '../Interfaces/IBase.sol';
  * common functions.
  */
 contract LiquityBase is IBase {
-  using SafeMath for uint;
-
   uint internal constant DECIMAL_PRECISION = 1e18;
   uint public constant _100pct = 1000000000000000000; // 1e18 == 100%
   uint public constant MCR = 1100000000000000000; // 110%, Minimum collateral ratio for individual troves
@@ -26,7 +24,7 @@ contract LiquityBase is IBase {
   }
 
   function _requireUserAcceptsFee(uint _fee, uint _amount, uint _maxFeePercentage) internal pure {
-    uint feePercentage = _fee.mul(DECIMAL_PRECISION).div(_amount);
+    uint feePercentage = (_fee * DECIMAL_PRECISION) / _amount;
     require(feePercentage <= _maxFeePercentage, 'Fee exceeded provided maximum');
   }
 }
