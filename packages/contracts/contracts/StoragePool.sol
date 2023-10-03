@@ -176,7 +176,7 @@ contract StoragePool is LiquityBase, Ownable, CheckContract, IStoragePool {
     );
   }
 
-  function _requirePositiveAmount(uint _amount) internal view {
+  function _requirePositiveAmount(uint _amount) internal pure {
     require(_amount >= 0, 'DefaultPool: Amount must be positive');
   }
 }

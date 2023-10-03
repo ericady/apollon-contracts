@@ -17,7 +17,6 @@ contract DebtTokenTester is DebtToken {
     string memory _version,
     bool _isStableCoin
   )
-    public
     DebtToken(
       _troveManagerAddress,
       _borrowerOperationsAddress,

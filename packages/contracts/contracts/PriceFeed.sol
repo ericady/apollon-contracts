@@ -102,7 +102,7 @@ contract PriceFeed is Ownable, CheckContract, IPriceFeed {
 
   // --- Functions ---
 
-  function getPrice(PriceCache memory _priceCache, address _tokenAddress) external view override returns (uint price) {
+  function getPrice(PriceCache memory _priceCache, address _tokenAddress) external pure override returns (uint price) {
     // first try to get the price from the cache
     for (uint i = 0; i < _priceCache.prices.length; i++) {
       if (_priceCache.prices[i].tokenAddress != _tokenAddress) continue;

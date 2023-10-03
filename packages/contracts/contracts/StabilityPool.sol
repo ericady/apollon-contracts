@@ -217,7 +217,7 @@ contract StabilityPool is LiquityBase, Ownable, CheckContract, IStabilityPool {
     address _priceFeedAddress,
     address _storagePoolAddress,
     address _depositTokenAddress
-  ) public {
+  ) {
     checkContract(_stabilityPoolManagerAddress);
     checkContract(_troveManagerAddress);
     checkContract(_priceFeedAddress);

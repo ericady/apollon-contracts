@@ -511,7 +511,7 @@ contract BorrowerOperations is LiquityBase, Ownable, CheckContract, IBorrowerOpe
     bool _isDebtIncrease,
     uint entireSystemColl,
     uint entireSystemDebt
-  ) internal view returns (uint) {
+  ) internal pure returns (uint) {
     uint totalColl = _isCollIncrease ? entireSystemColl.add(_collChange) : entireSystemColl.sub(_collChange);
     uint totalDebt = _isDebtIncrease ? entireSystemDebt.add(_debtChange) : entireSystemDebt.sub(_debtChange);
 
@@ -622,7 +622,7 @@ contract BorrowerOperations is LiquityBase, Ownable, CheckContract, IBorrowerOpe
     IDebtTokenManager _dTokenManager,
     PriceCache memory _priceCache,
     TokenAmount[] memory _debts
-  ) internal returns (DebtTokenAmount[] memory debtTokenAmounts, DebtTokenAmount memory stableCoinEntry) {
+  ) internal view returns (DebtTokenAmount[] memory debtTokenAmounts, DebtTokenAmount memory stableCoinEntry) {
     address stableCoinAddress = address(_dTokenManager.getStableCoin());
 
     bool stableCoinIncluded = false;
@@ -655,7 +655,7 @@ contract BorrowerOperations is LiquityBase, Ownable, CheckContract, IBorrowerOpe
   function _getCollTokenAmountsWithFetchedPrices(
     PriceCache memory _priceCache,
     TokenAmount[] memory _colls
-  ) internal returns (PriceTokenAmount[] memory collTokenAmounts) {
+  ) internal view returns (PriceTokenAmount[] memory collTokenAmounts) {
     IPriceFeed _priceFeedCached = priceFeed;
 
     collTokenAmounts = new PriceTokenAmount[](_colls.length);
@@ -682,7 +682,7 @@ contract BorrowerOperations is LiquityBase, Ownable, CheckContract, IBorrowerOpe
     bool _isCollWithdrawal,
     bool _isDebtIncrease,
     LocalVariables_adjustTrove memory _vars
-  ) internal view {
+  ) internal pure {
     /*
      *In Recovery Mode, only allow:
      *

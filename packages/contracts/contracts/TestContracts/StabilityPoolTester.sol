@@ -12,7 +12,6 @@ contract StabilityPoolTester is StabilityPool {
     address _storagePoolAddress,
     address _depositTokenAddress
   )
-    public
     StabilityPool(
       _stabilityPoolManagerAddress,
       _troveManagerAddress,

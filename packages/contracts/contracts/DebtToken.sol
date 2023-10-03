@@ -72,7 +72,7 @@ contract DebtToken is CheckContract, IDebtToken {
     string memory _name,
     string memory _version,
     bool _isStableCoin
-  ) public {
+  ) {
     checkContract(_troveManagerAddress);
     checkContract(_borrowerOperationsAddress);
     checkContract(_stabilityPoolManagerAddress);
@@ -125,7 +125,7 @@ contract DebtToken is CheckContract, IDebtToken {
   }
 
   function sendToPool(address _sender, address _poolAddress, uint256 _amount) external override {
-    //    _requireCallerIsStabilityPoolManager(); todo! needs to be called from the manager, not the pool itself...
+    //TODO:    _requireCallerIsStabilityPoolManager(); todo! needs to be called from the manager, not the pool itself...
     _transfer(_sender, _poolAddress, _amount);
   }
 
@@ -229,8 +229,8 @@ contract DebtToken is CheckContract, IDebtToken {
     }
   }
 
-  function _buildDomainSeparator(bytes32 typeHash, bytes32 name, bytes32 version) private view returns (bytes32) {
-    return keccak256(abi.encode(typeHash, name, version, _chainID(), address(this)));
+  function _buildDomainSeparator(bytes32 typeHash, bytes32 newName, bytes32 newVersion) private view returns (bytes32) {
+    return keccak256(abi.encode(typeHash, newName, newVersion, _chainID(), address(this)));
   }
 
   // --- Internal operations ---
@@ -318,7 +318,7 @@ contract DebtToken is CheckContract, IDebtToken {
     return _SYMBOL;
   }
 
-  function decimals() external view override returns (uint8) {
+  function decimals() external pure override returns (uint8) {
     return _DECIMALS;
   }
 
@@ -326,7 +326,7 @@ contract DebtToken is CheckContract, IDebtToken {
     return _VERSION;
   }
 
-  function permitTypeHash() external view override returns (bytes32) {
+  function permitTypeHash() external pure override returns (bytes32) {
     return _PERMIT_TYPEHASH;
   }
 }
