@@ -272,6 +272,11 @@ class TestHelper {
     console.log(`${label}:`, integerPart + '.' + x.slice(-18));
   }
 
+  static async getStabilityPool(contracts, debtTokenAddress) {
+    const poolAddress = await contracts.stabilityPoolManager.getStabilityPoolByAddress(debtTokenAddress);
+    return contracts.artifacts.StabilityPool.at(poolAddress);
+  }
+
   // --- TCR and Recovery Mode functions ---
 
   // These functions use the PriceFeedTestNet view price function getPrice() which is sufficient for testing.

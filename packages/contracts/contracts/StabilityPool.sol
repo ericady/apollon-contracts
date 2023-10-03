@@ -316,7 +316,7 @@ contract StabilityPool is LiquityBase, Ownable, CheckContract, IStabilityPool {
 
     // update deposit snapshots
     _sendDepositToDepositor(msg.sender, debtToWithdrawal);
-    uint newDeposit = remainingDeposit.sub(remainingDeposit);
+    uint newDeposit = remainingDeposit.sub(debtToWithdrawal);
     _updateDepositAndSnapshots(msg.sender, newDeposit);
     //        emit UserDepositChanged(msg.sender, newDeposit); todo
 
@@ -451,6 +451,17 @@ contract StabilityPool is LiquityBase, Ownable, CheckContract, IStabilityPool {
     uint _totalDeposits = totalDeposits;
     if (_totalDeposits == 0 || _debtToOffset == 0) return;
 
+    // adding coll token address into the usedCollTokens array, if they are not already there
+    for (uint i = 0; i < _collToAdd.length; i++) {
+      bool found = false;
+      for (uint ii = 0; ii < usedCollTokens.length; ii++) {
+        if (usedCollTokens[ii] != _collToAdd[i].tokenAddress) continue;
+        found = true;
+        break;
+      }
+      if (!found) usedCollTokens.push(_collToAdd[i].tokenAddress);
+    }
+
     // todo gov...
     // _triggerLQTYIssuance(communityIssuance);
 
@@ -459,6 +470,7 @@ contract StabilityPool is LiquityBase, Ownable, CheckContract, IStabilityPool {
       _debtToOffset,
       _totalDeposits
     );
+
     _updateRewardSumAndProduct(collGainPerUnitStaked, depositLossPerUnitStaked); // updates S and P
 
     uint newTotalDeposit = totalDeposits.sub(_debtToOffset);
@@ -494,6 +506,8 @@ contract StabilityPool is LiquityBase, Ownable, CheckContract, IStabilityPool {
       uint collNumerator = _collToAdd[i].amount.mul(DECIMAL_PRECISION).add(lastErrorOffset[tokenAddress]);
       collGainPerUnitStaked[i].amount = collNumerator.div(_totalDeposits);
       lastErrorOffset[tokenAddress] = collNumerator.sub(collGainPerUnitStaked[i].amount.mul(_totalDeposits));
+
+      totalGainedColl[tokenAddress] = totalGainedColl[tokenAddress].add(_collToAdd[i].amount);
     }
 
     if (_depositToOffset == _totalDeposits) {
@@ -525,6 +539,7 @@ contract StabilityPool is LiquityBase, Ownable, CheckContract, IStabilityPool {
      */
 
     uint currentP = P;
+
     uint newP;
     uint128 currentScaleCached = currentScale;
     uint128 currentEpochCached = currentEpoch;
@@ -690,15 +705,13 @@ contract StabilityPool is LiquityBase, Ownable, CheckContract, IStabilityPool {
   }
 
   function _sendCollGainToDepositor(address _collToken, uint _amount) internal {
-    if (_amount == 0) {
-      return;
-    }
+    if (_amount == 0) return;
 
     uint newColl = totalGainedColl[_collToken].sub(_amount);
     totalGainedColl[_collToken] = newColl;
     emit StabilityPoolCollBalanceUpdates(_collToken, newColl);
 
-    IERC20(_collToken).transferFrom(address(this), address(msg.sender), _amount);
+    IERC20(_collToken).transfer(address(msg.sender), _amount);
   }
 
   // --- Stability Pool Deposit Functionality ---

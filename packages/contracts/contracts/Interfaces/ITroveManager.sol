@@ -74,7 +74,15 @@ interface ITroveManager is IBBase {
     PriceCache memory _priceCache,
     address[] memory _collTokenAddresses,
     address _borrower
-  ) external view returns (RAmount[] memory amounts, uint troveCollInStable, uint troveDebtInStable);
+  )
+    external
+    view
+    returns (
+      RAmount[] memory amounts,
+      uint troveCollInStable,
+      uint troveDebtInStable,
+      uint troveDebtInStableWithoutGasCompensation
+    );
 
   function closeTrove(address[] memory collTokenAddresses, address _borrower) external;
 

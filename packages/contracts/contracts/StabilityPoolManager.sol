@@ -63,6 +63,12 @@ contract StabilityPoolManager is Ownable, CheckContract, IStabilityPoolManager {
     return stabilityPool;
   }
 
+  function getStabilityPoolByAddress(address _debtTokenAddress) external view override returns (IStabilityPool) {
+    IStabilityPool stabilityPool = stabilityPools[IDebtToken(_debtTokenAddress)];
+    require(address(stabilityPool) != address(0), 'pool does not exist');
+    return stabilityPool;
+  }
+
   function getStabilityPools() external view returns (IStabilityPool[] memory) {
     return stabilityPoolsArray;
   }
@@ -148,7 +154,6 @@ contract StabilityPoolManager is Ownable, CheckContract, IStabilityPoolManager {
 
       // move the coll from the active pool into the stability pool
       for (uint i = 0; i < remainingStability.collGained.length; i++) {
-        // todo there is no coll gained on stability pool offset -> has to be a bug!
         if (remainingStability.collGained[i].amount == 0) continue;
         storagePoolCached.withdrawalValue(
           stabilityPoolAddress,

@@ -14,6 +14,8 @@ interface IStabilityPoolManager is IBBase {
 
   function getStabilityPool(IDebtToken _debtToken) external view returns (IStabilityPool);
 
+  function getStabilityPoolByAddress(address _debtTokenAddress) external view returns (IStabilityPool);
+
   function getRemainingStability(
     address[] memory collTokenAddresses
   ) external view returns (RemainingStability[] memory);

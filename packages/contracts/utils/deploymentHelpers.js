@@ -44,6 +44,10 @@ class DeploymentHelper {
       stabilityPoolManager: await StabilityPoolManager.new(),
       collTokenManager: await CollTokenManager.new(),
       debtTokenManager: await DebtTokenManager.new(),
+      artifacts: {
+        DebtToken,
+        StabilityPool,
+      },
     };
 
     const cmdLineArgs = process.argv;
