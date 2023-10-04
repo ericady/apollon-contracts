@@ -16,22 +16,34 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Login to AWS ECR
-        uses: docker/login-action@v3
+      # Setup node to use the graph project version
+      - uses: actions/setup-node@v3
         with:
-          registry: ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ vars.AWS_REGION }}.amazonaws.com
-          username: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          password: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          
-      -
-        name: Set up Docker Buildx
-        uses: docker/setup-buildx-action@v3
-      -
-        name: Build and push
-        uses: docker/build-push-action@v5
-        with:
-          context: .
-          file: ./Dockerfile
-          push: true
-          tags: ${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ vars.AWS_REGION }}.amazonaws.com/graph:latest
-          platforms: linux/arm64
+          node-version: 18.17.0
+          # Already optimized for caching, nice. Only caches yarn not node_modules as these could change with node version.
+          cache: yarn
+
+      - name: Log Yarn Version
+        run: yarn --version
+
+      - name: Install dependencies 📦
+        run: yarn workspace graph install
+
+      # BUILD
+      - name: Build 🔨
+        run: yarn workspace graph build
+
+      # LINT
+      - name: Linting ☕
+        run: yarn workspace graph lint
+
+      # PRETTIER FORMAT CHECK
+      - name: Formatting 🌹
+        run: yarn workspace graph prettier:check
+
+      # TEST
+      - name: Test - Unit 🧪
+        run: yarn workspace graph test:unit
+
+      - name: Test - Integration 🧪
+        run: yarn workspace graph test:integration

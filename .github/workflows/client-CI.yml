@@ -37,6 +37,10 @@ jobs:
       - name: Formatting 🌹
         run: yarn workspace client prettier:check
 
+      # BUILD
+      - name: Build 🔨
+        run: yarn workspace client build
+
       # TEST
       - name: Test - Unit 🧪
         run: yarn workspace client test:unit
@@ -101,6 +105,7 @@ jobs:
           name: playwright-report-integration
           path: packages/client/playwright-report-integration/
           retention-days: 2
+
       - name: Test - E2E 🧪
         run: yarn workspace client test:e2e
       # https://playwright.dev/docs/ci-intro#html-report
