@@ -454,7 +454,7 @@ contract BorrowerOperations is LiquityBase, Ownable, CheckContract, IBorrowerOpe
       .checkRecoveryMode(priceCache);
 
     _requireTroveisActive(contractsCache.troveManager, _borrower);
-    contractsCache.troveManager.applyPendingRewards(priceFeed, priceCache, vars.collTokenAddresses, _borrower); // from redistributions
+    contractsCache.troveManager.applyPendingRewards(priceCache, vars.collTokenAddresses, _borrower); // from redistributions
 
     // fetching old/current debts and colls including prices + calc ICR
     (vars.debts, vars.stableCoinEntry) = _getDebtTokenAmountsWithFetchedPrices(
