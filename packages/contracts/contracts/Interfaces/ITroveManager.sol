@@ -38,6 +38,19 @@ interface ITroveManager is IBBase {
   event TroveSnapshotsUpdated(uint _L_ETH, uint _L_LUSDDebt);
   event TroveIndexUpdated(address _borrower, uint _newIndex);
 
+  error NotFromBorrowerOps();
+  error InvalidTrove();
+  error ExceedDebtBalance();
+  error OnlyOneTrove();
+  error ZeroAmount();
+  error LessThanMCR();
+  error GreaterThanTCR();
+  error InvalidMaxFeePercent();
+  error NoLiquidatableTrove();
+  error NoRedeems();
+  error TooHighRedeemFee();
+  error EmptyArray();
+
   // --- Functions ---
 
   function getTroveOwnersCount() external view returns (uint);

@@ -238,7 +238,7 @@ contract TroveManager is LiquityBase, Ownable, CheckContract, ITroveManager {
    * Attempt to liquidate a custom list of troves provided by the caller.
    */
   function batchLiquidateTroves(address[] memory _troveArray) public override {
-    require(_troveArray.length != 0, 'TroveManager: Calldata address array must not be empty');
+    if (_troveArray.length == 0) revert EmptyArray();
 
     LocalVariables_OuterLiquidationFunction memory vars;
     vars.storagePoolCached = storagePool;
@@ -505,14 +505,15 @@ contract TroveManager is LiquityBase, Ownable, CheckContract, ITroveManager {
         remainingStability.debtToOffset += rAmountDebt.toOffset;
         remainingStability.remaining -= rAmountDebt.toOffset;
 
-        uint offsetPercentage = rAmountDebt.toOffset * DECIMAL_PRECISION * rAmountDebt.price / troveDebtInStableWithoutGasCompensation; // relative to the troves total debt
+        uint offsetPercentage = (rAmountDebt.toOffset * DECIMAL_PRECISION * rAmountDebt.price) /
+          troveDebtInStableWithoutGasCompensation; // relative to the troves total debt
 
         // moving the offsetPercentage of each coll into the stable pool
         for (uint ii = 0; ii < troveAmountsIncludingRewards.length; ii++) {
           RAmount memory rAmountColl = troveAmountsIncludingRewards[ii];
           if (!rAmountColl.isColl) continue; // debt already handled one step above
 
-          rAmountColl.toOffset = rAmountColl.toLiquidate * offsetPercentage / DECIMAL_PRECISION;
+          rAmountColl.toOffset = (rAmountColl.toLiquidate * offsetPercentage) / DECIMAL_PRECISION;
           rAmountColl.toRedistribute -= rAmountColl.toOffset;
 
           // find the right collGained entry and add the value
@@ -693,7 +694,7 @@ contract TroveManager is LiquityBase, Ownable, CheckContract, ITroveManager {
     bool atLeastOneTroveLiquidated,
     LocalVariables_OuterLiquidationFunction memory vars
   ) internal {
-    require(atLeastOneTroveLiquidated, 'TroveManager: nothing to liquidate');
+    if (!atLeastOneTroveLiquidated) revert NoLiquidatableTrove();
 
     // move tokens into the stability pools
     vars.stabilityPoolManagerCached.offset(vars.remainingStabilities);
@@ -785,14 +786,16 @@ contract TroveManager is LiquityBase, Ownable, CheckContract, ITroveManager {
     vars.remainingStableToRedeem = _stableCoinAmount;
     vars.priceFeedCached = priceFeed;
 
-    _requireAmountGreaterThanZero(vars.remainingStableToRedeem);
-    _requireValidMaxFeePercentage(_maxFeePercentage);
+    if (_stableCoinAmount == 0) revert ZeroAmount();
+    if (_maxFeePercentage < REDEMPTION_FEE_FLOOR || _maxFeePercentage > DECIMAL_PRECISION)
+      revert InvalidMaxFeePercent();
     _requireDebtTokenBalanceCoversRedemption(vars.stableCoinCached, msg.sender, vars.remainingStableToRedeem);
-    _requireTCRoverMCR(vars.storagePoolCached, vars.priceCache);
+    (, uint TCR, , ) = storagePool.checkRecoveryMode(vars.priceCache);
+    if (TCR < MCR) revert LessThanMCR();
 
     vars.totalStableSupplyAtStart =
-      vars.storagePoolCached.getValue(address(vars.stableCoinCached), false, PoolType.Active) +
-      vars.storagePoolCached.getValue(address(vars.stableCoinCached), false, PoolType.Default);
+      storagePool.getValue(address(vars.stableCoinCached), false, PoolType.Active) +
+      storagePool.getValue(address(vars.stableCoinCached), false, PoolType.Default);
 
     // Confirm redeemer's balance is less than total stable coin supply
     assert(vars.stableCoinCached.balanceOf(msg.sender) <= vars.totalStableSupplyAtStart);
@@ -827,7 +830,7 @@ contract TroveManager is LiquityBase, Ownable, CheckContract, ITroveManager {
       }
     }
 
-    require(vars.totalRedeemedStable > 0, 'TroveManager: Unable to redeem any amount');
+    if (vars.totalRedeemedStable == 0) revert NoRedeems();
 
     // Decay the baseRate due to time passed, and then increase it according to the size of this redemption.
     // Use the saved total LUSD supply value, from before it was reduced by the redemption.
@@ -896,7 +899,8 @@ contract TroveManager is LiquityBase, Ownable, CheckContract, ITroveManager {
     // also just < TCR is not enough, if the user whats to redeem more then 50% of the stable coin supply...
     uint preCR = LiquityMath._computeCR(vars.troveCollInStable, vars.troveDebtInStable);
     (, uint TCR, , ) = outerVars.storagePoolCached.checkRecoveryMode(outerVars.priceCache);
-    require(preCR < TCR, 'TroveManager: Source troves CR is not under the TCR.');
+    // TroveManager: Source troves CR is not under the TCR.
+    if (preCR >= TCR) revert GreaterThanTCR();
 
     // Determine the remaining amount (lot) to be redeemed, capped by the entire debt of the Trove minus the liquidation reserve
     vars.stableCoinLot = LiquityMath._min(_redeemMaxAmount, vars.stableCoinEntry.amount - STABLE_COIN_GAS_COMPENSATION);
@@ -1192,10 +1196,10 @@ contract TroveManager is LiquityBase, Ownable, CheckContract, ITroveManager {
         if (i == stableCoinIndex) {
           // stable coin gas compensation should not be liquidated, it will be paid out as reward for the liquidator
           amountEntry.toLiquidate = totalAmount - STABLE_COIN_GAS_COMPENSATION;
-          troveDebtInStableWithoutGasCompensation = troveDebtInStableWithoutGasCompensation + (amountEntry.toLiquidate * amountEntry.price);
+          troveDebtInStableWithoutGasCompensation += amountEntry.toLiquidate * amountEntry.price;
         } else {
           amountEntry.toLiquidate = totalAmount;
-          troveDebtInStableWithoutGasCompensation = troveDebtInStableWithoutGasCompensation + inStable;
+          troveDebtInStableWithoutGasCompensation += inStable;
         }
 
         troveDebtInStable = troveDebtInStable + inStable;
@@ -1367,8 +1371,8 @@ contract TroveManager is LiquityBase, Ownable, CheckContract, ITroveManager {
   function _closeTrove(address[] memory collTokenAddresses, address _borrower, Status closedStatus) internal {
     assert(closedStatus != Status.nonExistent && closedStatus != Status.active);
 
-    uint TroveOwnersArrayLength = TroveOwners.length;
-    _requireMoreThanOneTroveInSystem(TroveOwnersArrayLength);
+    uint numOfOwners = TroveOwners.length;
+    if (numOfOwners <= 1) revert OnlyOneTrove();
 
     Trove storage trove = Troves[_borrower];
     trove.status = closedStatus;
@@ -1376,7 +1380,7 @@ contract TroveManager is LiquityBase, Ownable, CheckContract, ITroveManager {
     for (uint i = 0; i < trove.collTokens.length; i++) trove.colls[trove.collTokens[i]] = 0;
     for (uint i = 0; i < collTokenAddresses.length; i++) trove.stakes[collTokenAddresses[i]] = 0;
 
-    _removeTroveOwner(_borrower, TroveOwnersArrayLength);
+    _removeTroveOwner(_borrower, numOfOwners);
   }
 
   /*
@@ -1422,18 +1426,16 @@ contract TroveManager is LiquityBase, Ownable, CheckContract, ITroveManager {
    * Remove a Trove owner from the TroveOwners array, not preserving array order. Removing owner 'B' does the following:
    * [A B C D E] => [A E C D], and updates E's Trove struct to point to its new array index.
    */
-  function _removeTroveOwner(address _borrower, uint TroveOwnersArrayLength) internal {
+  function _removeTroveOwner(address _borrower, uint _length) internal {
     Status troveStatus = Troves[_borrower].status;
     // It’s set in caller function `_closeTrove`
     assert(troveStatus != Status.nonExistent && troveStatus != Status.active);
 
     uint128 index = Troves[_borrower].arrayIndex;
-    uint length = TroveOwnersArrayLength;
-    uint idxLast = length - 1;
 
-    assert(index <= idxLast);
+    assert(index <= _length - 1);
 
-    address addressToMove = TroveOwners[idxLast];
+    address addressToMove = TroveOwners[_length - 1];
 
     TroveOwners[index] = addressToMove;
     Troves[addressToMove].arrayIndex = index;
@@ -1508,7 +1510,8 @@ contract TroveManager is LiquityBase, Ownable, CheckContract, ITroveManager {
 
   function _calcRedemptionFee(uint _redemptionRate, uint _collDrawn) internal pure returns (uint) {
     uint redemptionFee = (_redemptionRate * _collDrawn) / DECIMAL_PRECISION;
-    require(redemptionFee < _collDrawn, 'TroveManager: Fee would eat up all returned collateral');
+    // TroveManager: Fee would eat up all returned collateral
+    if (redemptionFee >= _collDrawn) revert TooHighRedeemFee();
     return redemptionFee;
   }
 
@@ -1577,11 +1580,11 @@ contract TroveManager is LiquityBase, Ownable, CheckContract, ITroveManager {
   // --- 'require' wrapper functions ---
 
   function _requireCallerIsBorrowerOperations() internal view {
-    require(msg.sender == borrowerOperationsAddress, 'TroveManager: Caller is not the BorrowerOperations contract');
+    if (msg.sender != borrowerOperationsAddress) revert NotFromBorrowerOps();
   }
 
   function _requireTroveIsActive(address _borrower) internal view {
-    require(Troves[_borrower].status == Status.active, 'TroveManager: Trove does not exist or is closed');
+    if (Troves[_borrower].status != Status.active) revert InvalidTrove();
   }
 
   function _requireDebtTokenBalanceCoversRedemption(
@@ -1589,30 +1592,7 @@ contract TroveManager is LiquityBase, Ownable, CheckContract, ITroveManager {
     address _redeemer,
     uint _amount
   ) internal view {
-    require(
-      _debtToken.balanceOf(_redeemer) >= _amount,
-      "TroveManager: Requested redemption amount must be <= user's debt token balance"
-    );
-  }
-
-  function _requireMoreThanOneTroveInSystem(uint TroveOwnersArrayLength) internal pure {
-    require(TroveOwnersArrayLength > 1, 'TroveManager: Only one trove in the system');
-  }
-
-  function _requireAmountGreaterThanZero(uint _amount) internal pure {
-    require(_amount > 0, 'TroveManager: Amount must be greater than zero');
-  }
-
-  function _requireTCRoverMCR(IStoragePool _storagePool, PriceCache memory priceCache) internal view {
-    (, uint TCR, , ) = _storagePool.checkRecoveryMode(priceCache);
-    require(TCR >= MCR, 'TroveManager: Cannot redeem when TCR < MCR');
-  }
-
-  function _requireValidMaxFeePercentage(uint _maxFeePercentage) internal pure {
-    require(
-      _maxFeePercentage >= REDEMPTION_FEE_FLOOR && _maxFeePercentage <= DECIMAL_PRECISION,
-      'Max fee percentage must be between 0.5% and 100%'
-    );
+    if (_amount > _debtToken.balanceOf(_redeemer)) revert ExceedDebtBalance();
   }
 
   // --- Trove property getters ---
