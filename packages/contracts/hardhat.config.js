@@ -3,7 +3,9 @@ require('@nomiclabs/hardhat-ethers');
 require('@nomiclabs/hardhat-etherscan');
 require('solidity-coverage');
 require('hardhat-gas-reporter');
-require('hardhat-contract-sizer');
+
+// todo removed because of too large troveManager
+// require('hardhat-contract-sizer');
 
 // todo tmp, ignores all contracts with _hardhatIgnore in the name
 const { subtask } = require('hardhat/config');
