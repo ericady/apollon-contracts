@@ -107,8 +107,8 @@ contract DebtToken is CheckContract, IDebtToken {
     return _IS_STABLE_COIN;
   }
 
-  function getPrice(PriceCache memory _priceCache) external view override returns (uint) {
-    return priceFeed.getPrice(_priceCache, address(this));
+  function getPrice() external view override returns (uint) {
+    return priceFeed.getPrice(address(this));
   }
 
   function mint(address _account, uint256 _amount) external override {

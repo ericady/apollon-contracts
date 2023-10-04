@@ -75,14 +75,9 @@ interface ITroveManager is IBBase {
 
   function addTroveOwnerToArray(address _borrower) external returns (uint index);
 
-  function applyPendingRewards(
-    PriceCache memory _priceCache,
-    address[] memory _collTokenAddresses,
-    address _borrower
-  ) external;
+  function applyPendingRewards(address[] memory _collTokenAddresses, address _borrower) external;
 
   function getEntireDebtAndColl(
-    PriceCache memory _priceCache,
     address[] memory _collTokenAddresses,
     address _borrower
   )

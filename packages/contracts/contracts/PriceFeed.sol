@@ -49,6 +49,8 @@ contract PriceFeed is Ownable, CheckContract, IPriceFeed {
 
   // The last good price seen from an oracle by Liquity
   uint public lastGoodPrice;
+  // The last good prices seen from an oracle by Liquity
+  mapping(address => uint) public lastGoodPrices;
 
   struct ChainlinkResponse {
     uint80 roundId;
@@ -99,18 +101,12 @@ contract PriceFeed is Ownable, CheckContract, IPriceFeed {
 
   // --- Functions ---
 
-  function getPrice(PriceCache memory _priceCache, address _tokenAddress) external pure override returns (uint price) {
-    // first try to get the price from the cache
-    for (uint i = 0; i < _priceCache.prices.length; i++) {
-      if (_priceCache.prices[i].tokenAddress != _tokenAddress) continue;
+  function getPrice(address _tokenAddress) external view returns (uint price) {
+    price = lastGoodPrices[_tokenAddress];
 
-      price = _priceCache.prices[i].amount;
-      if (price != 0) return price;
+    if (price == 0) {
+      // TODO: fetch price
     }
-
-    price = 1; // fetchPrice(_tokenAddress); // todo (flat) hier kommt die token adresse als parameter rein...
-    //        _priceCache.push(TokenAmount(_tokenAddress, price)); todo der price feed array muss initiert werden, mit allen token die wir im system haben...
-    return price;
   }
 
   /*

@@ -15,7 +15,7 @@ contract PriceFeedTestnet is IPriceFeed {
   // --- Functions ---
 
   // View price getter for simplicity in tests
-  function getPrice(PriceCache memory _priceCache, address _tokenAddress) external view override returns (uint price) {
+  function getPrice(address _tokenAddress) external view override returns (uint price) {
     // todo include priceCache into tests
     //    // first try to get the price from the cache
     //    for (uint i = 0; i < _priceCache.prices.length; i++) {

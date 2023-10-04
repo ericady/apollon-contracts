@@ -134,31 +134,31 @@ contract StoragePool is LiquityBase, Ownable, CheckContract, IStoragePool {
     emit PoolValueUpdated(_tokenAddress, _isColl, _toType, entry.poolTypes[_toType]);
   }
 
-  function getEntireSystemColl(PriceCache memory _priceCache) external view override returns (uint entireSystemColl) {
+  function getEntireSystemColl() external view returns (uint entireSystemColl) {
     IPriceFeed priceFeedCached = priceFeed;
     for (uint i = 0; i < collTokenAddresses.length; i++) {
-      uint price = priceFeedCached.getPrice(_priceCache, collTokenAddresses[i]);
+      uint price = priceFeedCached.getPrice(collTokenAddresses[i]);
       // TODO: should surplus or gas be excluded?
       entireSystemColl += poolEntries[collTokenAddresses[i]][true].totalAmount * price;
     }
-    return entireSystemColl;
   }
 
-  function getEntireSystemDebt(PriceCache memory _priceCache) external view override returns (uint entireSystemDebt) {
+  function getEntireSystemDebt() external view returns (uint entireSystemDebt) {
     IPriceFeed priceFeedCached = priceFeed;
     for (uint i = 0; i < debtTokenAddresses.length; i++) {
-      uint price = priceFeedCached.getPrice(_priceCache, debtTokenAddresses[i]);
+      uint price = priceFeedCached.getPrice(debtTokenAddresses[i]);
       // TODO: should surplus or gas be excluded?
       entireSystemDebt += poolEntries[debtTokenAddresses[i]][false].totalAmount * price;
     }
-    return entireSystemDebt;
   }
 
-  function checkRecoveryMode(
-    PriceCache memory _priceCache
-  ) external view override returns (bool isInRecoveryMode, uint TCR, uint entireSystemColl, uint entireSystemDebt) {
-    entireSystemColl = this.getEntireSystemColl(_priceCache);
-    entireSystemDebt = this.getEntireSystemDebt(_priceCache);
+  function checkRecoveryMode()
+    external
+    view
+    returns (bool isInRecoveryMode, uint TCR, uint entireSystemColl, uint entireSystemDebt)
+  {
+    entireSystemColl = this.getEntireSystemColl();
+    entireSystemDebt = this.getEntireSystemDebt();
     TCR = LiquityMath._computeCR(entireSystemColl, entireSystemDebt);
     isInRecoveryMode = TCR < CCR;
   }

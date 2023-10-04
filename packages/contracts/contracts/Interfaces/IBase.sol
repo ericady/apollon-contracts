@@ -39,8 +39,4 @@ interface IBase {
     uint price;
     uint amount;
   }
-
-  struct PriceCache {
-    TokenAmount[] prices;
-  }
 }
