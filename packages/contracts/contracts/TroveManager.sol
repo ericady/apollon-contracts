@@ -144,7 +144,6 @@ contract TroveManager is LiquityBase, Ownable, CheckContract, ITroveManager {
     //
     uint totalStableSupplyAtStart;
     uint totalRedeemedStable;
-    RedemptionCollAmount[] totalCollDrawn;
     //
     uint totalETHDrawn;
     uint ETHFee;
@@ -153,7 +152,6 @@ contract TroveManager is LiquityBase, Ownable, CheckContract, ITroveManager {
   }
 
   struct RedemptionCollAmount {
-    address tokenAddress;
     uint drawn;
     uint redemptionFee;
     uint sendToRedeemer;
@@ -752,9 +750,9 @@ contract TroveManager is LiquityBase, Ownable, CheckContract, ITroveManager {
     assert(vars.stableCoinCached.balanceOf(msg.sender) <= vars.totalStableSupplyAtStart);
 
     // seed drawn coll
-    vars.totalCollDrawn = new RedemptionCollAmount[](vars.collTokenAddresses.length);
-    for (uint i = 0; i < vars.collTokenAddresses.length; i++)
-      vars.totalCollDrawn[i].tokenAddress = vars.collTokenAddresses[i];
+    RedemptionCollAmount[] memory totalCollDrawn = new RedemptionCollAmount[](vars.collTokenAddresses.length);
+    // for (uint i = 0; i < vars.collTokenAddresses.length; i++)
+    //   totalCollDrawn[i].tokenAddress = vars.collTokenAddresses[i];
 
     // Loop through the stable coin source troves
     assert(_sourceTroves.length >= 1);
@@ -772,10 +770,10 @@ contract TroveManager is LiquityBase, Ownable, CheckContract, ITroveManager {
       vars.totalRedeemedStable += singleRedemption.stableCoinLot;
       _stableCoinAmount -= singleRedemption.stableCoinLot;
       for (uint a = 0; a < singleRedemption.collLots.length; a++) {
-        for (uint b = 0; b < vars.totalCollDrawn.length; b++) {
-          if (singleRedemption.collLots[a].tokenAddress != vars.totalCollDrawn[b].tokenAddress) continue;
+        for (uint b = 0; b < vars.collTokenAddresses.length; b++) {
+          if (singleRedemption.collLots[a].tokenAddress != vars.collTokenAddresses[b]) continue;
 
-          vars.totalCollDrawn[b].drawn += singleRedemption.collLots[a].amount;
+          totalCollDrawn[b].drawn += singleRedemption.collLots[a].amount;
           break;
         }
       }
@@ -788,8 +786,8 @@ contract TroveManager is LiquityBase, Ownable, CheckContract, ITroveManager {
     _updateBaseRateFromRedemption(vars.totalRedeemedStable, vars.totalStableSupplyAtStart);
 
     // Calculate the redemption fee
-    for (uint i = 0; i < vars.totalCollDrawn.length; i++) {
-      RedemptionCollAmount memory collEntry = vars.totalCollDrawn[i];
+    for (uint i = 0; i < totalCollDrawn.length; i++) {
+      RedemptionCollAmount memory collEntry = totalCollDrawn[i];
       collEntry.redemptionFee = _getRedemptionFee(collEntry.drawn);
       collEntry.sendToRedeemer = collEntry.drawn - collEntry.redemptionFee;
       _requireUserAcceptsFee(collEntry.redemptionFee, collEntry.drawn, _maxFeePercentage);
@@ -803,11 +801,11 @@ contract TroveManager is LiquityBase, Ownable, CheckContract, ITroveManager {
     vars.stableCoinCached.burn(msg.sender, vars.totalRedeemedStable);
 
     // transfer the drawn collateral to account
-    for (uint i = 0; i < vars.totalCollDrawn.length; i++) {
-      RedemptionCollAmount memory collEntry = vars.totalCollDrawn[i];
+    for (uint i = 0; i < totalCollDrawn.length; i++) {
+      RedemptionCollAmount memory collEntry = totalCollDrawn[i];
       if (collEntry.sendToRedeemer == 0) continue;
 
-      storagePool.withdrawalValue(msg.sender, collEntry.tokenAddress, true, PoolType.Active, collEntry.drawn);
+      storagePool.withdrawalValue(msg.sender, vars.collTokenAddresses[i], true, PoolType.Active, collEntry.drawn);
 
       // todo jelly handover
       //    // Send the fee to the gov token staking contract

@@ -9,6 +9,8 @@ interface IBase {
     GasCompensation // stableCoin from gas compensation
   }
 
+  error FeeExceedMaxPercentage();
+
   struct RAmount {
     address tokenAddress;
     uint price;

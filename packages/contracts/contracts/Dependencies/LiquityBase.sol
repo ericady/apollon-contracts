@@ -25,6 +25,7 @@ contract LiquityBase is IBase {
 
   function _requireUserAcceptsFee(uint _fee, uint _amount, uint _maxFeePercentage) internal pure {
     uint feePercentage = (_fee * DECIMAL_PRECISION) / _amount;
-    require(feePercentage <= _maxFeePercentage, 'Fee exceeded provided maximum');
+    // Fee exceeded provided maximum
+    if (feePercentage > _maxFeePercentage) revert FeeExceedMaxPercentage();
   }
 }
