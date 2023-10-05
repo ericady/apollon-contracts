@@ -67,18 +67,13 @@ interface ITroveManager is IBBase {
 
   function updateStakeAndTotalStakes(address[] memory collTokenAddresses, address _borrower) external;
 
-  function updateTroveRewardSnapshots(
-    address[] memory collTokenAddresses,
-    IDebtTokenManager _debtTokenManager,
-    address _borrower
-  ) external;
+  function updateTroveRewardSnapshots(address[] memory collTokenAddresses, address _borrower) external;
 
   function addTroveOwnerToArray(address _borrower) external returns (uint index);
 
-  function applyPendingRewards(address[] memory _collTokenAddresses, address _borrower) external;
+  function applyPendingRewards(address _borrower) external;
 
   function getEntireDebtAndColl(
-    address[] memory _collTokenAddresses,
     address _borrower
   )
     external

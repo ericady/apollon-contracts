@@ -194,11 +194,7 @@ contract BorrowerOperations is LiquityBase, Ownable, CheckContract, IBorrowerOpe
     contractsCache.troveManager.setTroveStatus(borrower, 1); // active
     contractsCache.troveManager.increaseTroveColl(borrower, vars.colls);
     contractsCache.troveManager.increaseTroveDebt(borrower, vars.debts);
-    contractsCache.troveManager.updateTroveRewardSnapshots(
-      vars.collTokenAddresses,
-      contractsCache.debtTokenManager,
-      borrower
-    );
+    contractsCache.troveManager.updateTroveRewardSnapshots(vars.collTokenAddresses, borrower);
     contractsCache.troveManager.updateStakeAndTotalStakes(vars.collTokenAddresses, borrower);
 
     vars.arrayIndex = contractsCache.troveManager.addTroveOwnerToArray(borrower);
@@ -431,7 +427,7 @@ contract BorrowerOperations is LiquityBase, Ownable, CheckContract, IBorrowerOpe
       .checkRecoveryMode();
 
     _requireTroveisActive(contractsCache.troveManager, _borrower);
-    contractsCache.troveManager.applyPendingRewards(vars.collTokenAddresses, _borrower); // from redistributions
+    contractsCache.troveManager.applyPendingRewards(_borrower); // from redistributions
 
     // fetching old/current debts and colls including prices + calc ICR
     (vars.debts, vars.stableCoinEntry) = _getDebtTokenAmountsWithFetchedPrices(
