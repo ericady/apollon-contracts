@@ -78,7 +78,7 @@ contract('Access Control: Apollon functions with the caller restricted to Apollo
     it('applyPendingRewards(): reverts when called by an account that is not BorrowerOperations', async () => {
       // Attempt call from alice
       try {
-        const txAlice = await troveManager.applyPendingRewards(bob, { prices: [] }, [], bob, {
+        const txAlice = await troveManager.applyPendingRewards(bob, {
           from: alice,
         });
       } catch (err) {
@@ -91,7 +91,7 @@ contract('Access Control: Apollon functions with the caller restricted to Apollo
     it('updateRewardSnapshots(): reverts when called by an account that is not BorrowerOperations', async () => {
       // Attempt call from alice
       try {
-        const txAlice = await troveManager.updateTroveRewardSnapshots([], bob, bob, {
+        const txAlice = await troveManager.updateTroveRewardSnapshots([], bob, {
           from: alice,
         });
       } catch (err) {
