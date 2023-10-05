@@ -258,7 +258,8 @@ contract TroveManager is LiquityBase, Ownable, CheckContract, ITroveManager {
 
   // Liquidate one trove, in Recovery Mode.
   function _liquidateRecoveryMode(
-    LocalVariables_OuterLiquidationFunction memory outerVars,
+    RemainingStability[] memory remainingStabilities,
+    address[] memory collTokenAddresses,
     address _borrower,
     uint _ICR,
     uint _troveCollInStable,
@@ -269,12 +270,12 @@ contract TroveManager is LiquityBase, Ownable, CheckContract, ITroveManager {
     // If ICR <= 100%, purely redistribute the Trove across all active Troves
     if (_ICR <= _100pct) {
       _movePendingTroveRewardsToActivePool(troveAmountsIncludingRewards);
-      _removeStake(outerVars.collTokenAddresses, _borrower);
+      _removeStake(collTokenAddresses, _borrower);
       for (uint i = 0; i < troveAmountsIncludingRewards.length; i++) {
         RAmount memory rAmount = troveAmountsIncludingRewards[i];
         rAmount.toRedistribute = rAmount.toLiquidate;
       }
-      _closeTrove(outerVars.collTokenAddresses, _borrower, Status.closedByLiquidation);
+      _closeTrove(collTokenAddresses, _borrower, Status.closedByLiquidation);
       // todo no coll gas comb in that case?
 
       // todo
@@ -290,13 +291,13 @@ contract TroveManager is LiquityBase, Ownable, CheckContract, ITroveManager {
       // If 100% < ICR < MCR, offset as much as possible, and redistribute the remainder
     } else if ((_ICR > _100pct) && (_ICR < MCR)) {
       _movePendingTroveRewardsToActivePool(troveAmountsIncludingRewards);
-      _removeStake(outerVars.collTokenAddresses, _borrower);
+      _removeStake(collTokenAddresses, _borrower);
       _getOffsetAndRedistributionVals(
         _troveDebtInStableWithoutGasCompensation,
         troveAmountsIncludingRewards,
-        outerVars.remainingStabilities
+        remainingStabilities
       );
-      _closeTrove(outerVars.collTokenAddresses, _borrower, Status.closedByLiquidation);
+      _closeTrove(collTokenAddresses, _borrower, Status.closedByLiquidation);
 
       // todo
       //      emit TroveLiquidated(
@@ -315,14 +316,14 @@ contract TroveManager is LiquityBase, Ownable, CheckContract, ITroveManager {
        */
     } else if ((_ICR >= MCR) && (_ICR < _TCR)) {
       _movePendingTroveRewardsToActivePool(troveAmountsIncludingRewards);
-      _removeStake(outerVars.collTokenAddresses, _borrower);
+      _removeStake(collTokenAddresses, _borrower);
       _getCappedOffsetVals(
         _troveCollInStable,
         _troveDebtInStableWithoutGasCompensation,
         troveAmountsIncludingRewards,
-        outerVars.remainingStabilities
+        remainingStabilities
       );
-      _closeTrove(outerVars.collTokenAddresses, _borrower, Status.closedByLiquidation);
+      _closeTrove(collTokenAddresses, _borrower, Status.closedByLiquidation);
 
       // todo
       //      emit TroveLiquidated(
@@ -502,7 +503,8 @@ contract TroveManager is LiquityBase, Ownable, CheckContract, ITroveManager {
 
       uint TCR = LiquityMath._computeCR(outerVars.entireSystemCollInStable, outerVars.entireSystemDebtInStable);
       _liquidateRecoveryMode(
-        outerVars,
+        outerVars.remainingStabilities,
+        outerVars.collTokenAddresses,
         vars.user,
         vars.ICR,
         vars.troveCollInStable,
