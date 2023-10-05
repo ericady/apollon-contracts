@@ -55,8 +55,6 @@ interface ITroveManager is IBBase {
 
   function getTroveOwnersCount() external view returns (uint);
 
-  function getTroveFromTroveOwnersArray(uint _index) external view returns (address);
-
   function getNominalICR(address _borrower) external returns (uint);
 
   function getCurrentICR(address _borrower) external view returns (uint ICR, uint currentDebtInStable);
