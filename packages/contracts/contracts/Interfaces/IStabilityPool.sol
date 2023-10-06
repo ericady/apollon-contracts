@@ -25,6 +25,10 @@ interface IStabilityPool is IBase {
   event EpochUpdated(uint128 _currentEpoch);
   event ScaleUpdated(uint128 _currentScale);
 
+  error NotFromStabilityPoolManager();
+  error ZeroAmount();
+  error NotOneTrove();
+
   // --- Functions ---
 
   function getTotalGainedColl() external view returns (TokenAmount[] memory coll);

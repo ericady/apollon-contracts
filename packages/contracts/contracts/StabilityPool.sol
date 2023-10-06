@@ -741,21 +741,18 @@ contract StabilityPool is LiquityBase, Ownable, CheckContract, IStabilityPool {
   // --- 'require' functions ---
 
   function _requireCallerIsStabilityPoolManager() internal view {
-    require(msg.sender == stabilityPoolManagerAddress, 'StabilityPool: Caller is not StabilityPoolManager');
+    if (msg.sender != stabilityPoolManagerAddress) revert NotFromStabilityPoolManager();
   }
 
   function _requireUserHasDeposit(uint _initialDeposit) internal pure {
-    require(_initialDeposit > 0, 'StabilityPool: User must have a non-zero deposit');
+    if (_initialDeposit == 0) revert ZeroAmount();
   }
 
   function _requireNonZeroAmount(uint _amount) internal pure {
-    require(_amount > 0, 'StabilityPool: Amount must be non-zero');
+    if (_amount == 0) revert ZeroAmount();
   }
 
   function _requireUserHasTrove(address _depositor) internal view {
-    require(
-      troveManager.getTroveStatus(_depositor) == 1,
-      'StabilityPool: caller must have an active trove to withdraw ETHGain to'
-    );
+    if (troveManager.getTroveStatus(_depositor) != 1) revert NotOneTrove();
   }
 }

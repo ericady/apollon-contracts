@@ -19,6 +19,16 @@ interface IBorrowerOperations is IBBase {
   event TroveUpdated(address indexed _borrower, uint _debt, uint _coll, uint stake);
   event LUSDBorrowingFeePaid(address indexed _borrower, uint _LUSDFee);
 
+  error NotFromStabilityPool();
+  error CollWithdrawPermittedInRM();
+  error ICR_lt_MCR();
+  error ICR_lt_CCR();
+  error TCR_lt_CCR();
+  error ICRDecreasedInRM();
+  error MaxFee_gt_100_InRM();
+  error MaxFee_out_Range();
+  error Repaid_gt_CurrentDebt();
+
   // --- Functions ---
 
   function openTrove(TokenAmount[] memory _colls) external;

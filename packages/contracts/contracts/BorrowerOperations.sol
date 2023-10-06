@@ -665,7 +665,8 @@ contract BorrowerOperations is LiquityBase, Ownable, CheckContract, IBorrowerOpe
      * - The adjustment won't pull the TCR below CCR
      */
     if (_vars.isInRecoveryMode) {
-      _requireNoCollWithdrawal(!_isCollWithdrawal);
+      // BorrowerOps: Collateral withdrawal not permitted Recovery Mode
+      if (_isCollWithdrawal) revert CollWithdrawPermittedInRM();
       if (_isDebtIncrease) _requireICRisAboveCCR(_vars.newICR);
     } else {
       // if Normal Mode
@@ -683,49 +684,42 @@ contract BorrowerOperations is LiquityBase, Ownable, CheckContract, IBorrowerOpe
     }
   }
 
-  function _requireNoCollWithdrawal(bool _isCollWithdrawal) internal pure {
-    require(!_isCollWithdrawal, 'BorrowerOps: Collateral withdrawal not permitted Recovery Mode');
-  }
-
   function _requireICRisAboveMCR(uint _newICR) internal pure {
-    require(_newICR >= MCR, 'BorrowerOps: An operation that would result in ICR < MCR is not permitted');
+    // BorrowerOps: An operation that would result in ICR < MCR is not permitted
+    if (_newICR < MCR) revert ICR_lt_MCR();
   }
 
   function _requireICRisAboveCCR(uint _newICR) internal pure {
-    require(_newICR >= CCR, 'BorrowerOps: Operation must leave trove with ICR >= CCR');
+    // BorrowerOps: Operation must leave trove with ICR >= CCR
+    if (_newICR < CCR) revert ICR_lt_CCR();
   }
 
   function _requireNewICRisAboveOldICR(uint _newICR, uint _oldICR) internal pure {
-    require(_newICR >= _oldICR, "BorrowerOps: Cannot decrease your Trove's ICR in Recovery Mode");
+    // BorrowerOps: Cannot decrease your Trove's ICR in Recovery Mode
+    if (_newICR < _oldICR) revert ICRDecreasedInRM();
   }
 
   function _requireNewTCRisAboveCCR(uint _newTCR) internal pure {
-    require(_newTCR >= CCR, 'BorrowerOps: An operation that would result in TCR < CCR is not permitted');
+    // BorrowerOps: An operation that would result in TCR < CCR is not permitted
+    if (_newTCR < CCR) revert TCR_lt_CCR();
   }
 
   function _requireAtLeastMinNetDebt(uint _netDebt) internal pure {
+    // TODO: this will never happen from solidity 8.0
     require(_netDebt >= 0, "BorrowerOps: Trove's net debt must be greater than minimum");
   }
 
   function _requireValidStableCoinRepayment(uint _currentDebt, uint _debtRepayment) internal pure {
-    require(
-      _debtRepayment <= (_currentDebt - STABLE_COIN_GAS_COMPENSATION),
-      "BorrowerOps: Amount repaid must not be larger than the Trove's debt"
-    );
-  }
-
-  function _requireCallerIsStabilityPool() internal view {
-    require(msg.sender == stabilityPoolAddress, 'BorrowerOps: Caller is not Stability Pool');
+    // BorrowerOps: Amount repaid must not be larger than the Trove's debt
+    if (_debtRepayment > (_currentDebt - STABLE_COIN_GAS_COMPENSATION)) revert Repaid_gt_CurrentDebt();
   }
 
   function _requireValidMaxFeePercentage(uint _maxFeePercentage, bool _isInRecoveryMode) internal pure {
-    if (_isInRecoveryMode)
-      require(_maxFeePercentage <= DECIMAL_PRECISION, 'Max fee percentage must less than or equal to 100%');
-    else
-      require(
-        _maxFeePercentage >= BORROWING_FEE_FLOOR && _maxFeePercentage <= DECIMAL_PRECISION,
-        'Max fee percentage must be between 0.5% and 100%'
-      );
+    if (_isInRecoveryMode) {
+      if (_maxFeePercentage > DECIMAL_PRECISION) revert MaxFee_gt_100_InRM();
+    } else {
+      if (_maxFeePercentage < BORROWING_FEE_FLOOR || _maxFeePercentage > DECIMAL_PRECISION) revert MaxFee_out_Range();
+    }
   }
 
   // --- ICR and TCR getters ---
