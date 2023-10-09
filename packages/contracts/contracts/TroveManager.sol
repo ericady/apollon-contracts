@@ -730,7 +730,7 @@ contract TroveManager is LiquityBase, Ownable, CheckContract, ITroveManager {
       vars.totalRedeemedStable += singleRedemption.stableCoinLot;
       _stableCoinAmount -= singleRedemption.stableCoinLot;
       for (uint a = 0; a < singleRedemption.collLots.length; a++) {
-        for (uint b = 0; b < vars.collTokenAddresses.length; b++) {
+        for (uint b = 0; b < totalCollDrawn.length; b++) {
           if (singleRedemption.collLots[a].tokenAddress != vars.collTokenAddresses[b]) continue;
 
           totalCollDrawn[b].drawn += singleRedemption.collLots[a].amount;
