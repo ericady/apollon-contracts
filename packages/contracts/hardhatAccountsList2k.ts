@@ -8003,6 +8003,4 @@ const accountsList = [
   },
 ];
 
-module.exports = {
-  accountsList: accountsList,
-};
+export default accountsList;

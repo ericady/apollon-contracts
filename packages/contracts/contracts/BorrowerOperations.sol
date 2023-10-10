@@ -379,7 +379,6 @@ contract BorrowerOperations is LiquityBase, Ownable, CheckContract, IBorrowerOpe
     _requireNewTCRisAboveCCR(newTCR);
 
     // repay any open debts
-    DebtTokenAmount memory existingDebt;
     for (uint i = 0; i < vars.debts.length; i++) {
       DebtTokenAmount memory debtTokenAmount = vars.debts[i];
 

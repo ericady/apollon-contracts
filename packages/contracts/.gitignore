@@ -35,11 +35,12 @@ yarn-error.log
 # echidna
 /crytic-export
 
-# brownie
-__pycache__
-.pytest_cache
-.history
-.hypothesis/
-build/
-reports/
-tests/simulation.csv
+build
+typechain
+typechain-types
+artifacts
+cache
+coverage
+coverage.json
+
+.env

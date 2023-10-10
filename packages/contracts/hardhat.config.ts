@@ -1,23 +1,24 @@
-require('@nomiclabs/hardhat-truffle5');
-require('@nomiclabs/hardhat-ethers');
-require('@nomiclabs/hardhat-etherscan');
-require('solidity-coverage');
-require('hardhat-gas-reporter');
-require('hardhat-contract-sizer');
+import '@nomicfoundation/hardhat-ethers';
+import '@nomicfoundation/hardhat-verify';
+import '@nomicfoundation/hardhat-toolbox';
+import '@nomicfoundation/hardhat-network-helpers';
+import 'hardhat-abi-exporter';
+// import 'hardhat-gas-reporter';
+import 'hardhat-contract-sizer';
+import 'hardhat-deploy';
+import { HardhatUserConfig, subtask } from 'hardhat/config';
+import { TASK_COMPILE_SOLIDITY_GET_SOURCE_PATHS } from 'hardhat/builtin-tasks/task-names';
 
 // todo tmp, ignores all contracts with _hardhatIgnore in the name
-const { subtask } = require('hardhat/config');
-const { TASK_COMPILE_SOLIDITY_GET_SOURCE_PATHS } = require('hardhat/builtin-tasks/task-names');
 subtask(TASK_COMPILE_SOLIDITY_GET_SOURCE_PATHS).setAction(async (_, __, runSuper) => {
   const paths = await runSuper();
-  return paths.filter(p => !p.includes('_hardhatIgnore'));
+  return paths.filter((p: any) => !p.includes('_hardhatIgnore'));
 });
 
-const accounts = require('./hardhatAccountsList2k.js');
-const accountsList = accounts.accountsList;
+import accountsList from './hardhatAccountsList2k';
 
-const fs = require('fs');
-const getSecret = (secretKey, defaultValue = '') => {
+import fs from 'fs';
+const getSecret = (secretKey: string, defaultValue = '') => {
   const SECRETS_FILE = './secrets.js';
   let secret = defaultValue;
   if (fs.existsSync(SECRETS_FILE)) {
@@ -37,10 +38,14 @@ const alchemyUrlRinkeby = () => {
   return `https://eth-rinkeby.alchemyapi.io/v2/${getSecret('alchemyAPIKeyRinkeby')}`;
 };
 
-module.exports = {
+const config: HardhatUserConfig = {
   paths: {
-    // contracts: "./contracts",
-    // artifacts: "./artifacts"
+    sources: './contracts',
+    tests: './test',
+    cache: './cache',
+    artifacts: './artifacts',
+    // deploy: './scripts/deployment/deploy',
+    // deployments: './deployments',
   },
   solidity: {
     compilers: [
@@ -83,7 +88,7 @@ module.exports = {
   },
   etherscan: { apiKey: getSecret('ETHERSCAN_API_KEY') },
   mocha: { timeout: 12000000 },
-  rpc: { host: 'localhost', port: 8545 },
+  // rpc: { host: 'localhost', port: 8545 },
   gasReporter: { enabled: process.env.REPORT_GAS ? true : false },
   contractSizer: {
     alphaSort: true,
@@ -91,4 +96,18 @@ module.exports = {
     runOnCompile: false,
     strict: true,
   },
+  // abiExporter: {
+  //   path: './abi',
+  //   clear: true,
+  //   runOnCompile: true,
+  //   flat: true,
+  //   spacing: 4,
+  //   pretty: false,
+  // },
+  typechain: {
+    outDir: 'typechain-types',
+    target: 'ethers-v6',
+  },
 };
+
+export default config;
