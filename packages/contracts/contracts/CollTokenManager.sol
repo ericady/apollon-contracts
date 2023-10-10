@@ -2,7 +2,7 @@
 
 pragma solidity ^0.8.9;
 
-import './Dependencies/Ownable.sol';
+import '@openzeppelin/contracts/access/Ownable.sol';
 import './Dependencies/CheckContract.sol';
 import './Interfaces/ICollTokenManager.sol';
 

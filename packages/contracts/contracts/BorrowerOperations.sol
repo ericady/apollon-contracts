@@ -2,12 +2,12 @@
 
 pragma solidity ^0.8.9;
 
+import '@openzeppelin/contracts/token/ERC20/IERC20.sol';
+import '@openzeppelin/contracts/access/Ownable.sol';
 import './Interfaces/IBorrowerOperations.sol';
 import './Interfaces/ITroveManager.sol';
-import './Dependencies/IERC20.sol';
 import './Interfaces/IDebtToken.sol';
 import './Dependencies/LiquityBase.sol';
-import './Dependencies/Ownable.sol';
 import './Dependencies/CheckContract.sol';
 import './Interfaces/IDebtTokenManager.sol';
 import './Interfaces/IStoragePool.sol';
@@ -131,7 +131,7 @@ contract BorrowerOperations is LiquityBase, Ownable, CheckContract, IBorrowerOpe
     collTokenManager = ICollTokenManager(_collTokenManagerAddress);
     emit CollTokenManagerAddressChanged(_collTokenManagerAddress);
 
-    _renounceOwnership();
+    renounceOwnership();
   }
 
   // --- Borrower Trove Operations ---

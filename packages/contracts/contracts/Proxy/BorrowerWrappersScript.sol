@@ -2,15 +2,14 @@
 
 pragma solidity ^0.8.9;
 
+import '@openzeppelin/contracts/token/ERC20/IERC20.sol';
 import '../Dependencies/LiquityMath.sol';
-import '../Dependencies/IERC20.sol';
 import '../Interfaces/IBorrowerOperations.sol';
 import '../Interfaces/ITroveManager.sol';
 import '../Interfaces/IStabilityPool.sol';
 import '../Interfaces/IPriceFeed.sol';
 import './BorrowerOperationsScript.sol';
 import './ETHTransferScript.sol';
-import '../Dependencies/console.sol';
 
 contract BorrowerWrappersScript is BorrowerOperationsScript, ETHTransferScript {
   string public constant NAME = 'BorrowerWrappersScript';

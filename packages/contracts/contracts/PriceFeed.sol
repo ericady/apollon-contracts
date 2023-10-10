@@ -2,13 +2,12 @@
 
 pragma solidity ^0.8.9;
 
+import '@openzeppelin/contracts/access/Ownable.sol';
 import './Interfaces/IPriceFeed.sol';
 import './Interfaces/ITellorCaller.sol';
 import './Dependencies/AggregatorV3Interface.sol';
-import './Dependencies/Ownable.sol';
 import './Dependencies/CheckContract.sol';
 import './Dependencies/LiquityMath.sol';
-import './Dependencies/console.sol';
 
 /*
  * PriceFeed for mainnet deployment, to be connected to Chainlink's live ETH:USD aggregator reference
@@ -96,7 +95,7 @@ contract PriceFeed is Ownable, CheckContract, IPriceFeed {
 
     _storeChainlinkPrice(chainlinkResponse);
 
-    _renounceOwnership();
+    renounceOwnership();
   }
 
   // --- Functions ---

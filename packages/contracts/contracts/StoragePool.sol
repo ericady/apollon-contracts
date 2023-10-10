@@ -2,10 +2,10 @@
 
 pragma solidity ^0.8.9;
 
-import './Dependencies/Ownable.sol';
+import '@openzeppelin/contracts/token/ERC20/IERC20.sol';
+import '@openzeppelin/contracts/access/Ownable.sol';
 import './Dependencies/CheckContract.sol';
 import './Dependencies/LiquityBase.sol';
-import './Dependencies/IERC20.sol';
 import './Interfaces/IStoragePool.sol';
 import './Interfaces/IPriceFeed.sol';
 import './Interfaces/IStabilityPoolManager.sol';
@@ -61,7 +61,7 @@ contract StoragePool is LiquityBase, Ownable, CheckContract, IStoragePool {
     priceFeed = IPriceFeed(_priceFeedAddress);
     emit PriceFeedAddressChanged(_priceFeedAddress);
 
-    _renounceOwnership();
+    renounceOwnership();
   }
 
   // --- Getters for public variables. Required by IPool interface ---

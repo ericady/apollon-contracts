@@ -10,8 +10,6 @@ import '../DebtToken.sol';
 import '../PriceFeedTestnet.sol';
 import './EchidnaProxy.sol';
 
-//import "../Dependencies/console.sol";
-
 // Run with:
 // rm -f fuzzTests/corpus/* # (optional)
 // ~/.local/bin/echidna-test contracts/TestContracts/EchidnaTester.sol --contract EchidnaTester --config fuzzTests/echidna_config.yaml

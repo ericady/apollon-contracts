@@ -3,7 +3,6 @@
 pragma solidity ^0.8.9;
 
 import './Interfaces/IDebtToken.sol';
-import './Dependencies/Ownable.sol';
 import './Dependencies/CheckContract.sol';
 import './Interfaces/IDebtTokenManager.sol';
 import './Dependencies/LiquityBase.sol';

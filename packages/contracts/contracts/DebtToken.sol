@@ -2,9 +2,8 @@
 
 pragma solidity ^0.8.9;
 
-import './Interfaces/IDebtToken.sol';
 import './Dependencies/CheckContract.sol';
-import './Dependencies/console.sol';
+import './Interfaces/IDebtToken.sol';
 import './Interfaces/IPriceFeed.sol';
 
 /*

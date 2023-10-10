@@ -2,8 +2,8 @@
 
 pragma solidity ^0.8.9;
 
+import '@openzeppelin/contracts/access/Ownable.sol';
 import './Dependencies/LiquityBase.sol';
-import './Dependencies/Ownable.sol';
 import './Dependencies/CheckContract.sol';
 import './Interfaces/ITroveManager.sol';
 import './Interfaces/IStabilityPool.sol';
@@ -192,7 +192,7 @@ contract TroveManager is LiquityBase, Ownable, CheckContract, ITroveManager {
     collTokenManager = ICollTokenManager(_collTokenManagerAddress);
     emit CollTokenManagerAddressChanged(_collTokenManagerAddress);
 
-    _renounceOwnership();
+    renounceOwnership();
   }
 
   // --- Getters ---

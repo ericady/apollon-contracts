@@ -2,8 +2,8 @@
 
 pragma solidity ^0.8.9;
 
+import '@openzeppelin/contracts/access/Ownable.sol';
 import './Interfaces/IDebtToken.sol';
-import './Dependencies/Ownable.sol';
 import './Dependencies/CheckContract.sol';
 import './Interfaces/IDebtTokenManager.sol';
 import './Dependencies/LiquityBase.sol';
@@ -74,9 +74,7 @@ contract DebtTokenManager is Ownable, CheckContract, IDebtTokenManager {
   // --- Setters ---
 
   // todo price oracle id missing...
-  function addDebtToken(
-  address _debtTokenAddress
-  ) external override onlyOwner {
+  function addDebtToken(address _debtTokenAddress) external override onlyOwner {
     checkContract(_debtTokenAddress);
 
     IDebtToken debtToken = IDebtToken(_debtTokenAddress);

@@ -2,15 +2,14 @@
 
 pragma solidity ^0.8.9;
 
+import '@openzeppelin/contracts/access/Ownable.sol';
 import './Interfaces/IBorrowerOperations.sol';
 import './Interfaces/IStabilityPool.sol';
 import './Interfaces/IBorrowerOperations.sol';
 import './Interfaces/ITroveManager.sol';
 import './Interfaces/IDebtToken.sol';
 import './Dependencies/LiquityBase.sol';
-import './Dependencies/Ownable.sol';
 import './Dependencies/CheckContract.sol';
-import './Dependencies/console.sol';
 import './Interfaces/IPriceFeed.sol';
 import './Interfaces/IStoragePool.sol';
 
@@ -234,7 +233,7 @@ contract StabilityPool is LiquityBase, Ownable, CheckContract, IStabilityPool {
     depositToken = IDebtToken(_depositTokenAddress);
     emit DepositTokenAddressChanged(_depositTokenAddress);
 
-    _renounceOwnership();
+    renounceOwnership();
   }
 
   // --- Getters for public variables. Required by IPool interface ---

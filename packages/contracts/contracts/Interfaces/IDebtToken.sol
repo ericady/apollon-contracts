@@ -2,11 +2,12 @@
 
 pragma solidity ^0.8.9;
 
-import '../Dependencies/IERC20.sol';
+import '@openzeppelin/contracts/token/ERC20/IERC20.sol';
+import '@openzeppelin/contracts/token/ERC20/extensions/IERC20Metadata.sol';
 import '../Dependencies/IERC2612.sol';
 import './IBase.sol';
 
-interface IDebtToken is IERC20, IERC2612, IBase {
+interface IDebtToken is IERC20, IERC20Metadata, IERC2612, IBase {
   // --- Events ---
 
   event TroveManagerAddressChanged(address _troveManagerAddress);
@@ -49,9 +50,9 @@ interface IDebtToken is IERC20, IERC2612, IBase {
 
   function transferFrom(address sender, address recipient, uint256 amount) external override returns (bool);
 
-  function increaseAllowance(address spender, uint256 addedValue) external override returns (bool);
+  function increaseAllowance(address spender, uint256 addedValue) external returns (bool);
 
-  function decreaseAllowance(address spender, uint256 subtractedValue) external override returns (bool);
+  function decreaseAllowance(address spender, uint256 subtractedValue) external returns (bool);
 
   function domainSeparator() external view override returns (bytes32);
 

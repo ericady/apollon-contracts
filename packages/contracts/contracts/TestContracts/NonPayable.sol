@@ -2,8 +2,6 @@
 
 pragma solidity ^0.8.9;
 
-//import "../Dependencies/console.sol";
-
 contract NonPayable {
   bool isPayable;
 
