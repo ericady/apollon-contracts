@@ -3,9 +3,8 @@ import '@nomicfoundation/hardhat-verify';
 import '@nomicfoundation/hardhat-toolbox';
 import '@nomicfoundation/hardhat-network-helpers';
 import 'hardhat-abi-exporter';
-// import 'hardhat-gas-reporter';
+import 'hardhat-gas-reporter';
 import 'hardhat-contract-sizer';
-import 'hardhat-deploy';
 import { HardhatUserConfig, subtask } from 'hardhat/config';
 import { TASK_COMPILE_SOLIDITY_GET_SOURCE_PATHS } from 'hardhat/builtin-tasks/task-names';
 
@@ -96,16 +95,16 @@ const config: HardhatUserConfig = {
     runOnCompile: false,
     strict: true,
   },
-  // abiExporter: {
-  //   path: './abi',
-  //   clear: true,
-  //   runOnCompile: true,
-  //   flat: true,
-  //   spacing: 4,
-  //   pretty: false,
-  // },
+  abiExporter: {
+    path: './abi',
+    clear: true,
+    runOnCompile: true,
+    flat: true,
+    spacing: 4,
+    pretty: false,
+  },
   typechain: {
-    outDir: 'typechain-types',
+    outDir: './typechain',
     target: 'ethers-v6',
   },
 };

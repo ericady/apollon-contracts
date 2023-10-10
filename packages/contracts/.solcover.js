@@ -25,12 +25,8 @@ module.exports = {
     'Interfaces/',
     'LPRewards/Dependencies/',
     'LPRewards/TestContracts/',
-    'Dependencies/Context.sol',
-    'Dependencies/IERC20.sol',
     'Dependencies/IERC2612.sol',
     'Dependencies/Math.sol',
-    'Dependencies/Ownable.sol',
-    'Dependencies/console.sol',
   ],
   // https://github.com/sc-forks/solidity-coverage/blob/master/docs/advanced.md#skipping-tests
   mocha: {
