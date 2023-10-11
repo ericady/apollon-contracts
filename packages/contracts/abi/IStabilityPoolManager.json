@@ -5,6 +5,26 @@
         "type": "error"
     },
     {
+        "inputs": [],
+        "name": "NotFromTroveManager",
+        "type": "error"
+    },
+    {
+        "inputs": [],
+        "name": "PoolExist",
+        "type": "error"
+    },
+    {
+        "inputs": [],
+        "name": "PoolNotExist",
+        "type": "error"
+    },
+    {
+        "inputs": [],
+        "name": "Unauthorized",
+        "type": "error"
+    },
+    {
         "anonymous": false,
         "inputs": [
             {
@@ -174,25 +194,6 @@
             }
         ],
         "name": "getStabilityPool",
-        "outputs": [
-            {
-                "internalType": "contract IStabilityPool",
-                "name": "",
-                "type": "address"
-            }
-        ],
-        "stateMutability": "view",
-        "type": "function"
-    },
-    {
-        "inputs": [
-            {
-                "internalType": "address",
-                "name": "_debtTokenAddress",
-                "type": "address"
-            }
-        ],
-        "name": "getStabilityPoolByAddress",
         "outputs": [
             {
                 "internalType": "contract IStabilityPool",

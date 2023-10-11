@@ -1,6 +1,11 @@
 [
     {
         "inputs": [],
+        "name": "ActiveTrove",
+        "type": "error"
+    },
+    {
+        "inputs": [],
         "name": "CollWithdrawPermittedInRM",
         "type": "error"
     },
@@ -36,6 +41,16 @@
     },
     {
         "inputs": [],
+        "name": "NotAllowedInRecoveryMode",
+        "type": "error"
+    },
+    {
+        "inputs": [],
+        "name": "NotBorrower",
+        "type": "error"
+    },
+    {
+        "inputs": [],
         "name": "NotContract",
         "type": "error"
     },
@@ -52,6 +67,11 @@
     {
         "inputs": [],
         "name": "TCR_lt_CCR",
+        "type": "error"
+    },
+    {
+        "inputs": [],
+        "name": "TroveClosedOrNotExist",
         "type": "error"
     },
     {

@@ -1,7 +1,42 @@
 [
     {
         "inputs": [],
+        "name": "ExpiredDeadline",
+        "type": "error"
+    },
+    {
+        "inputs": [],
         "name": "FeeExceedMaxPercentage",
+        "type": "error"
+    },
+    {
+        "inputs": [],
+        "name": "InvalidSignature",
+        "type": "error"
+    },
+    {
+        "inputs": [],
+        "name": "NotAllowedDirectTransfer",
+        "type": "error"
+    },
+    {
+        "inputs": [],
+        "name": "NotFromBOorTroveMorSP",
+        "type": "error"
+    },
+    {
+        "inputs": [],
+        "name": "NotFromBorrowerOps",
+        "type": "error"
+    },
+    {
+        "inputs": [],
+        "name": "NotFromSPManager",
+        "type": "error"
+    },
+    {
+        "inputs": [],
+        "name": "NotFromTroveMorSP",
         "type": "error"
     },
     {
