@@ -1,26 +1,28 @@
-const BorrowerOperations = artifacts.require('./BorrowerOperations.sol');
-const CollTokenManager = artifacts.require('./CollTokenManager.sol');
-const DebtToken = artifacts.require('./DebtToken.sol');
-const DebtTokenManager = artifacts.require('./DebtTokenManager.sol');
-const PriceFeedTestnet = artifacts.require('./PriceFeedTestnet.sol');
-const StabilityPool = artifacts.require('./StabilityPool.sol');
-const StabilityPoolManager = artifacts.require('./StabilityPoolManager.sol');
-const StoragePool = artifacts.require('./StoragePool.sol');
-const TroveManager = artifacts.require('./TroveManager.sol');
+import { ethers } from 'hardhat';
 
-const StoragePoolTester = artifacts.require('./StoragePoolTester.sol');
-const StabilityPoolTester = artifacts.require('./StabilityPoolTester.sol');
-const LiquityMathTester = artifacts.require('./LiquityMathTester.sol');
-const BorrowerOperationsTester = artifacts.require('./BorrowerOperationsTester.sol');
-const DebtTokenTester = artifacts.require('./DebtTokenTester.sol');
-const AnyTokenTester = artifacts.require('./AnyTokenTester.sol');
+// const BorrowerOperations = artifacts.require('./BorrowerOperations.sol');
+// const CollTokenManager = artifacts.require('./CollTokenManager.sol');
+// const DebtToken = artifacts.require('./DebtToken.sol');
+// const DebtTokenManager = artifacts.require('./DebtTokenManager.sol');
+// const PriceFeedTestnet = artifacts.require('./PriceFeedTestnet.sol');
+// const StabilityPool = artifacts.require('./StabilityPool.sol');
+// const StabilityPoolManager = artifacts.require('./StabilityPoolManager.sol');
+// const StoragePool = artifacts.require('./StoragePool.sol');
+// const TroveManager = artifacts.require('./TroveManager.sol');
 
-// Proxy scripts
-const BorrowerOperationsScript = artifacts.require('BorrowerOperationsScript');
-const BorrowerWrappersScript = artifacts.require('BorrowerWrappersScript');
-const TroveManagerScript = artifacts.require('TroveManagerScript');
-const StabilityPoolScript = artifacts.require('StabilityPoolScript');
-const TokenScript = artifacts.require('TokenScript');
+// const StoragePoolTester = artifacts.require('./StoragePoolTester.sol');
+// const StabilityPoolTester = artifacts.require('./StabilityPoolTester.sol');
+// const LiquityMathTester = artifacts.require('./LiquityMathTester.sol');
+// const BorrowerOperationsTester = artifacts.require('./BorrowerOperationsTester.sol');
+// const DebtTokenTester = artifacts.require('./DebtTokenTester.sol');
+// const AnyTokenTester = artifacts.require('./AnyTokenTester.sol');
+
+// // Proxy scripts
+// const BorrowerOperationsScript = artifacts.require('BorrowerOperationsScript');
+// const BorrowerWrappersScript = artifacts.require('BorrowerWrappersScript');
+// const TroveManagerScript = artifacts.require('TroveManagerScript');
+// const StabilityPoolScript = artifacts.require('StabilityPoolScript');
+// const TokenScript = artifacts.require('TokenScript');
 const {
   buildUserProxies,
   BorrowerOperationsProxy,
@@ -33,6 +35,13 @@ const { TestHelper: th } = require('../utils/testHelpers.js');
 
 const ZERO_ADDRESS = '0x' + '0'.repeat(40);
 const maxBytes32 = '0x' + 'f'.repeat(64);
+
+export const deployCore = async () => {
+  const priceFeedFactory = await ethers.getContractFactory('PriceFeedTestnet');
+  const priceFeed = await priceFeedFactory.deploy();
+
+  const troveManagerFactory = await ethers.getContractFactory('TroveManager');
+};
 
 class DeploymentHelper {
   static async deployCore() {
