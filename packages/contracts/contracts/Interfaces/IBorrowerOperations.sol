@@ -19,6 +19,8 @@ interface IBorrowerOperations is IBBase {
   event TroveUpdated(address indexed _borrower, uint _debt, uint _coll, uint stake);
   event LUSDBorrowingFeePaid(address indexed _borrower, uint _LUSDFee);
 
+  // --- Custom Errors ---
+
   error NotFromStabilityPool();
   error CollWithdrawPermittedInRM();
   error ICR_lt_MCR();
@@ -28,6 +30,10 @@ interface IBorrowerOperations is IBBase {
   error MaxFee_gt_100_InRM();
   error MaxFee_out_Range();
   error Repaid_gt_CurrentDebt();
+  error TroveClosedOrNotExist();
+  error ActiveTrove();
+  error NotAllowedInRecoveryMode();
+  error NotBorrower();
 
   // --- Functions ---
 

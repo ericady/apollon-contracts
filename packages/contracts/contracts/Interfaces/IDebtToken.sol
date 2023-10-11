@@ -14,6 +14,15 @@ interface IDebtToken is IERC20, IERC2612, IBase {
   event StabilityPoolManagerAddressChanged(address _stabilityPoolManagerAddress);
   event PriceFeedAddressChanged(address _newPriceFeedAddress);
 
+  // --- Custom Errors ---
+  error NotFromBorrowerOps();
+  error NotFromBOorTroveMorSP();
+  error NotFromSPManager();
+  error NotFromTroveMorSP();
+  error NotAllowedDirectTransfer();
+  error InvalidSignature();
+  error ExpiredDeadline();
+
   // --- Functions ---
 
   function isStableCoin() external view returns (bool);

@@ -570,21 +570,21 @@ contract BorrowerOperations is LiquityBase, Ownable, CheckContract, IBorrowerOpe
   // --- 'Require' wrapper functions ---
 
   function _requireCallerIsBorrower(address _borrower) internal view {
-    require(msg.sender == _borrower, 'BorrowerOps: Caller must be the borrower for a withdrawal');
+    if (msg.sender != _borrower) revert NotBorrower();
   }
 
   function _requireTroveisActive(ITroveManager _troveManager, address _borrower) internal view {
     uint status = _troveManager.getTroveStatus(_borrower);
-    require(status == 1, 'BorrowerOps: Trove does not exist or is closed');
+    if (status != 1) revert TroveClosedOrNotExist();
   }
 
   function _requireNotInRecoveryMode(bool _isInRecoveryMode) internal pure {
-    require(!_isInRecoveryMode, 'BorrowerOps: Operation not allowed during Recovery Mode');
+    if (_isInRecoveryMode) revert NotAllowedInRecoveryMode();
   }
 
   function _requireTroveIsNotActive(ITroveManager _troveManager, address _borrower) internal view {
     uint status = _troveManager.getTroveStatus(_borrower);
-    require(status != 1, 'BorrowerOps: Trove is active');
+    if (status == 1) revert ActiveTrove();
   }
 
   // adds stableCoin debt including gas compensation if not already included

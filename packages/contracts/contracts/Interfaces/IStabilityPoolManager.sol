@@ -5,16 +5,21 @@ pragma solidity ^0.8.9;
 import './IBBase.sol';
 
 interface IStabilityPoolManager is IBBase {
+  // --- Events ---
   event TroveManagerAddressChanged(address _newTroveManagerAddress);
   event PriceFeedAddressChanged(address _newPriceFeedAddress);
   event StoragePoolAddressChanged(address _newStoragePoolAddress);
   event DebtTokenManagerAddressChanged(address _debtTokenManagerAddress);
-
   event StabilityPoolAdded(IStabilityPool _stabilityPool);
 
-  function getStabilityPool(IDebtToken _debtToken) external view returns (IStabilityPool);
+  // --- Custom Errors ---
+  error NotFromTroveManager();
+  error PoolNotExist();
+  error PoolExist();
+  error Unauthorized();
 
-  function getStabilityPoolByAddress(address _debtTokenAddress) external view returns (IStabilityPool);
+  // --- Functions ---
+  function getStabilityPool(IDebtToken _debtToken) external view returns (IStabilityPool);
 
   function getRemainingStability(
     address[] memory collTokenAddresses

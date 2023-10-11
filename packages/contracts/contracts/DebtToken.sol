@@ -192,7 +192,7 @@ contract DebtToken is CheckContract, IDebtToken {
     bytes32 r,
     bytes32 s
   ) external override {
-    require(deadline >= block.timestamp, 'dToken: expired deadline');
+    if (deadline < block.timestamp) revert ExpiredDeadline();
     bytes32 digest = keccak256(
       abi.encodePacked(
         '\x19\x01',
@@ -201,7 +201,7 @@ contract DebtToken is CheckContract, IDebtToken {
       )
     );
     address recoveredAddress = ecrecover(digest, v, r, s);
-    require(recoveredAddress == owner, 'dToken: invalid signature');
+    if (recoveredAddress != owner) revert InvalidSignature();
     _approve(owner, spender, amount);
   }
 
@@ -261,40 +261,32 @@ contract DebtToken is CheckContract, IDebtToken {
   // --- 'require' functions ---
 
   function _requireValidRecipient(address _recipient) internal view {
-    require(
-      _recipient != address(0) && _recipient != address(this),
-      'dToken: Cannot transfer tokens directly to the dToken token contract or the zero address'
-    );
-    require(
-      _recipient != stabilityPoolManagerAddress &&
-        _recipient != troveManagerAddress &&
-        _recipient != borrowerOperationsAddress,
-      'dToken: Cannot transfer tokens directly to the StabilityPool, TroveManager or BorrowerOps'
-    );
+    if (_recipient == address(0) || _recipient == address(this)) revert ZeroAddress();
+    if (
+      _recipient == stabilityPoolManagerAddress ||
+      _recipient == troveManagerAddress ||
+      _recipient == borrowerOperationsAddress
+    ) revert NotAllowedDirectTransfer();
   }
 
   function _requireCallerIsBorrowerOperations() internal view {
-    require(msg.sender == borrowerOperationsAddress, 'dToken: Caller is not BorrowerOperations');
+    if (msg.sender != borrowerOperationsAddress) revert NotFromBorrowerOps();
   }
 
   function _requireCallerIsBOorTroveMorSP() internal view {
-    require(
-      msg.sender == borrowerOperationsAddress ||
-        msg.sender == troveManagerAddress ||
-        msg.sender == stabilityPoolManagerAddress,
-      'dToken: Caller is neither BorrowerOperations nor TroveManager nor StabilityPoolManager'
-    );
+    if (
+      msg.sender != borrowerOperationsAddress &&
+      msg.sender != troveManagerAddress &&
+      msg.sender != stabilityPoolManagerAddress
+    ) revert NotFromBOorTroveMorSP();
   }
 
   function _requireCallerIsStabilityPoolManager() internal view {
-    require(msg.sender == stabilityPoolManagerAddress, 'dToken: Caller is not the StabilityPoolManager');
+    if (msg.sender != stabilityPoolManagerAddress) revert NotFromSPManager();
   }
 
   function _requireCallerIsTroveMorSP() internal view {
-    require(
-      msg.sender == troveManagerAddress || msg.sender == stabilityPoolManagerAddress,
-      'dToken: Caller is neither TroveManager nor StabilityPoolManager'
-    );
+    if (msg.sender != troveManagerAddress && msg.sender != stabilityPoolManagerAddress) revert NotFromTroveMorSP();
   }
 
   // --- Optional functions ---

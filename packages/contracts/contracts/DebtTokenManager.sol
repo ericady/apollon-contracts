@@ -9,7 +9,6 @@ import './Interfaces/IDebtTokenManager.sol';
 import './Dependencies/LiquityBase.sol';
 import './DebtToken.sol';
 import './Interfaces/IStabilityPoolManager.sol';
-import "./TestContracts/DebtTokenTester.sol";
 
 contract DebtTokenManager is Ownable, CheckContract, IDebtTokenManager {
   string public constant NAME = 'DTokenManager';

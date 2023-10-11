@@ -123,7 +123,6 @@ contract StoragePool is LiquityBase, Ownable, CheckContract, IStoragePool {
     uint _amount
   ) external override {
     _requireCallerIsBOorTroveMorSP();
-    _requirePositiveAmount(_amount);
 
     PoolEntry storage entry = poolEntries[_tokenAddress][_isColl];
 
@@ -166,15 +165,10 @@ contract StoragePool is LiquityBase, Ownable, CheckContract, IStoragePool {
   // --- 'require' functions ---
 
   function _requireCallerIsBOorTroveMorSP() internal view {
-    require(
-      msg.sender == borrowerOperationsAddress ||
-        msg.sender == troveManagerAddress ||
-        msg.sender == stabilityPoolManagerAddress,
-      'ActivePool: Caller is neither BorrowerOperations nor TroveManager nor StabilityPool'
-    );
-  }
-
-  function _requirePositiveAmount(uint _amount) internal pure {
-    require(_amount >= 0, 'DefaultPool: Amount must be positive');
+    if (
+      msg.sender != borrowerOperationsAddress &&
+      msg.sender != troveManagerAddress &&
+      msg.sender != stabilityPoolManagerAddress
+    ) revert NotFromBOorTroveMorSP();
   }
 }

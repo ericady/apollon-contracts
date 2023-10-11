@@ -8,6 +8,9 @@ interface ICollTokenManager {
   event CollTokenAdded(address _collTokenAddress);
   event PriceFeedAddressChanged(address _newPriceFeedAddress);
 
+  // --- Custom Errors ---
+  error TokenAlreadyAdded();
+
   // --- Functions ---
 
   function getCollTokenAddresses() external view returns (address[] memory);

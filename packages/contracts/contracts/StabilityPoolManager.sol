@@ -59,13 +59,7 @@ contract StabilityPoolManager is Ownable, CheckContract, IStabilityPoolManager {
 
   function getStabilityPool(IDebtToken _debtToken) external view override returns (IStabilityPool) {
     IStabilityPool stabilityPool = stabilityPools[_debtToken];
-    require(address(stabilityPool) != address(0), 'pool does not exist');
-    return stabilityPool;
-  }
-
-  function getStabilityPoolByAddress(address _debtTokenAddress) external view override returns (IStabilityPool) {
-    IStabilityPool stabilityPool = stabilityPools[IDebtToken(_debtTokenAddress)];
-    require(address(stabilityPool) != address(0), 'pool does not exist');
+    if (address(stabilityPool) == address(0)) revert PoolNotExist();
     return stabilityPool;
   }
 
@@ -124,7 +118,7 @@ contract StabilityPoolManager is Ownable, CheckContract, IStabilityPoolManager {
     for (uint i = 0; i < _debts.length; i++) {
       IDebtToken debtToken = IDebtToken(_debts[i].tokenAddress);
       IStabilityPool stabilityPool = stabilityPools[debtToken];
-      require(address(stabilityPool) != address(0), 'pool does not exist');
+      if (address(stabilityPool) == address(0)) revert PoolNotExist();
 
       stabilityPool.provideToSP(msg.sender, _debts[i].amount);
     }
@@ -168,8 +162,8 @@ contract StabilityPoolManager is Ownable, CheckContract, IStabilityPoolManager {
   }
 
   function addStabilityPool(IDebtToken _debtToken) external override {
-    require(msg.sender == debtTokenManagerAddress, 'unauthorized');
-    require(address(stabilityPools[_debtToken]) == address(0), 'pool already exists');
+    if (msg.sender != debtTokenManagerAddress) revert Unauthorized();
+    if (address(stabilityPools[_debtToken]) != address(0)) revert PoolExist();
 
     IStabilityPool stabilityPool = new StabilityPool(
       address(this),
@@ -185,6 +179,6 @@ contract StabilityPoolManager is Ownable, CheckContract, IStabilityPoolManager {
   }
 
   function _requireCallerIsTroveManager() internal view {
-    require(msg.sender == troveManagerAddress, 'StabilityPool: Caller is not TroveManager');
+    if (msg.sender != troveManagerAddress) revert NotFromTroveManager();
   }
 }

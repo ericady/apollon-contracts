@@ -38,7 +38,7 @@ contract CollTokenManager is Ownable, CheckContract, ICollTokenManager {
   // todo oracle id missing
   function addCollToken(address _tokenAddress) external override onlyOwner {
     for (uint i = 0; i < collTokenAddresses.length; i++)
-      require(collTokenAddresses[i] != _tokenAddress, 'CollTokenManager: token already added');
+      if (collTokenAddresses[i] == _tokenAddress) revert TokenAlreadyAdded();
 
     collTokenAddresses.push(_tokenAddress);
     emit CollTokenAdded(_tokenAddress);

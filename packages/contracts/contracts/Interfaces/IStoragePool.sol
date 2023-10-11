@@ -14,6 +14,10 @@ interface IStoragePool is IBase {
   event StabilityPoolManagerAddressChanged(address _newStabilityPoolAddress);
   event PriceFeedAddressChanged(address _priceFeedAddress);
 
+  // --- Custom Errors ---
+
+  error NotFromBOorTroveMorSP();
+
   // --- Functions ---
 
   function getValue(address _tokenAddress, bool _isColl, PoolType _poolType) external view returns (uint);
