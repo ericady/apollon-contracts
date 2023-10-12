@@ -11,10 +11,11 @@ import {
   TroveManager,
 } from '../typechain';
 import { expect } from 'chai';
-import { getStabilityPool, openTrove } from '../utils/testHelper';
+import { getStabilityPool, openTrove, assertRevert, whaleShrimpTroveInit } from '../utils/testHelper';
 import { parseUnits } from 'ethers';
 
 describe('StabilityPool', () => {
+  let signers: SignerWithAddress[];
   let owner: SignerWithAddress;
   let alice: SignerWithAddress;
   let bob: SignerWithAddress;
@@ -46,8 +47,8 @@ describe('StabilityPool', () => {
   // const assertRevert = th.assertRevert;
 
   before(async () => {
-    [owner, defaulter_1, defaulter_2, defaulter_3, whale, alice, bob, carol, dennis, erin, flyn] =
-      await ethers.getSigners();
+    signers = await ethers.getSigners();
+    [owner, defaulter_1, defaulter_2, defaulter_3, whale, alice, bob, carol, dennis, erin, flyn] = signers;
   });
 
   describe('Stability Pool Mechanisms', async () => {
@@ -323,6 +324,175 @@ describe('StabilityPool', () => {
       const alice_Snapshot_P_2 = (await stockPool.depositSnapshots(alice)).P;
       // TODO: assert.isTrue(alice_Snapshot_S_2.eq(S_2));
       expect(alice_Snapshot_P_2).to.be.eq(P_2);
+    });
+
+    it('provideToSP(): reverts if user tries to provide more than their STOCK balance', async () => {
+      await STOCK.unprotectedMint(alice, 200n);
+      await STOCK.unprotectedMint(bob, 200n);
+      const aliceBalance = await STOCK.balanceOf(alice);
+      const bobBalance = await STOCK.balanceOf(bob);
+
+      // Alice, attempts to deposit 1 wei more than her balance
+      const aliceTxPromise = stabilityPoolManager
+        .connect(alice)
+        .provideStability([{ tokenAddress: STOCK, amount: aliceBalance + 1n }]);
+      await assertRevert(aliceTxPromise);
+
+      // Bob, attempts to deposit 23000n more than his balance
+      const bobTxPromise = stabilityPoolManager
+        .connect(alice)
+        .provideStability([{ tokenAddress: STOCK, amount: bobBalance + 23000n }]);
+      await assertRevert(bobTxPromise);
+    });
+
+    it('provideToSP(): reverts if user tries to provide 2^256-1 STABLE, which exceeds their balance', async () => {
+      await STOCK.unprotectedMint(alice, 200n);
+
+      // Alice attempts to deposit 2^256-1
+      const aliceTxPromise = stabilityPoolManager
+        .connect(alice)
+        .provideStability([{ tokenAddress: STOCK, amount: 2 ^ 256 }]);
+      await assertRevert(aliceTxPromise);
+    });
+
+    // not relevant, only working with erc20 currently
+    // it('provideToSP(): reverts if cannot receive coll Gain', async () => {
+    //   // --- SETUP ---
+    //
+    //   // Whale opens Trove and deposits to SP
+    //   await openTrove({
+    //     from: whale,
+    //     contracts,
+    //     collToken: contracts.collToken.BTC,
+    //     collAmount: parseUnits('1'),
+    //     debts: [{ tokenAddress: STABLE, amount: parseUnits('1850') }],
+    //   });
+    //   await stabilityPoolManager.connect(whale).provideStability([{ tokenAddress: STOCK, amount: parseUnits('1850') }]);
+    //
+    //   // 2 Troves opened
+    //   await openTrove({
+    //     from: defaulter_1,
+    //     contracts,
+    //     collToken: BTC,
+    //     collAmount: parseUnits('0.02'), // 0.02 BTC
+    //     debts: [{ tokenAddress: STOCK, amount: parseUnits('1', 5) }],
+    //   });
+    //   await openTrove({
+    //     from: defaulter_2,
+    //     contracts,
+    //     collToken: BTC,
+    //     collAmount: parseUnits('0.02'), // 0.02 BTC
+    //     debts: [{ tokenAddress: STOCK, amount: parseUnits('1', 5) }],
+    //   });
+    //
+    //   // --- TEST ---
+    //
+    //   await STABLE.transfer(defaulter_3.address, parseUnits('250'), { from: whale });
+    //   await stabilityPoolManager
+    //     .connect(defaulter_3)
+    //     .provideStability([{ tokenAddress: STOCK, amount: parseUnits('150') }]);
+    //
+    //   const gain_0 = await stabilityPool.getDepositorETHGain(nonPayable.address);
+    //   assert.isTrue(gain_0.eq(toBN(0)), 'NonPayable should not have accumulated gains');
+    //
+    //   // price drops: defaulters' Troves fall below MCR, nonPayable and whale Trove remain active
+    //   await priceFeed.setTokenPrice(BTC, parseUnits('9500'));
+    //
+    //   // 2 defaulters are closed
+    //   await troveManager.connect(owner).liquidate(defaulter_1);
+    //   await troveManager.connect(owner).liquidate(defaulter_2);
+    //
+    //   const gain_1 = await stabilityPool.getDepositorETHGain(nonPayable.address);
+    //   assert.isTrue(gain_1.gt(toBN(0)), 'NonPayable should have some accumulated gains');
+    //
+    //   // NonPayable tries to make deposit #2: 100 stable (which also attempts to withdraw ETH gain)
+    //   await stabilityPoolManager
+    //     .connect(defaulter_3)
+    //     .provideStability([{ tokenAddress: STOCK, amount: parseUnits('100') }]);
+    //   await th.assertRevert(nonPayable.forward(stabilityPool.address, txData2), 'StabilityPool: sending ETH failed');
+    // });
+
+    it("provideToSP(): doesn't impact other users' deposits or coll gains", async () => {
+      await whaleShrimpTroveInit(contracts, signers);
+
+      // Price drops
+      await priceFeed.setTokenPrice(BTC, parseUnits('9500'));
+
+      // 2 defaulters are closed
+      await troveManager.connect(owner).liquidate(defaulter_1);
+      await troveManager.connect(owner).liquidate(defaulter_2);
+
+      const stockPool = await getStabilityPool(contracts, STABLE);
+      const alice_stableDeposit_Before = await stockPool.getCompoundedDebtDeposit(alice);
+      const bob_stableDeposit_Before = await stockPool.getCompoundedDebtDeposit(bob);
+      const carol_stableDeposit_Before = await stockPool.getCompoundedDebtDeposit(carol);
+
+      const alice_btc_gain_before = await stockPool.getDepositorCollGain(alice, BTC);
+      const bob_btc_gain_before = await stockPool.getDepositorCollGain(bob, BTC);
+      const carol_btc_gain_before = await stockPool.getDepositorCollGain(carol, BTC);
+
+      //check non-zero stock and coll Gain in the Stability Pool
+      const stockInPool = await stockPool.getTotalDeposit();
+      const btcInPool = (await stockPool.getTotalGainedColl()).find(d => d.tokenAddress === BTC.target)?.amount;
+      expect(stockInPool).to.be.gt(0);
+      expect(btcInPool).to.be.gt(0);
+
+      // D makes an SP deposit
+      await stabilityPoolManager
+        .connect(dennis)
+        .provideStability([{ tokenAddress: STABLE, amount: parseUnits('300') }]);
+
+      const alice_stableDeposit_after = await stockPool.getCompoundedDebtDeposit(alice);
+      const bob_stableDeposit_after = await stockPool.getCompoundedDebtDeposit(bob);
+      const carol_stableDeposit_after = await stockPool.getCompoundedDebtDeposit(carol);
+
+      const alice_btc_gain_after = await stockPool.getDepositorCollGain(alice, BTC);
+      const bob_btc_gain_after = await stockPool.getDepositorCollGain(bob, BTC);
+      const carol_btc_gain_after = await stockPool.getDepositorCollGain(carol, BTC);
+
+      // Check compounded deposits and ETH gains for A, B and C have not changed
+      expect(alice_stableDeposit_Before).to.be.equal(alice_stableDeposit_after);
+      expect(bob_stableDeposit_Before).to.be.equal(bob_stableDeposit_after);
+      expect(carol_stableDeposit_Before).to.be.equal(carol_stableDeposit_after);
+
+      expect(alice_btc_gain_before).to.be.equal(alice_btc_gain_after);
+      expect(bob_btc_gain_before).to.be.equal(bob_btc_gain_after);
+      expect(carol_btc_gain_before).to.be.equal(carol_btc_gain_after);
+    });
+
+    it("provideToSP(): doesn't impact system debt, collateral or TCR", async () => {
+      await whaleShrimpTroveInit(contracts, signers);
+
+      // Price drops
+      await priceFeed.setTokenPrice(BTC, parseUnits('9500'));
+
+      // Defaulters are liquidated
+      await troveManager.connect(owner).liquidate(defaulter_1);
+      await troveManager.connect(owner).liquidate(defaulter_2);
+
+      const activeDebt_Before = await storagePool.getValue(STABLE.target, false, 0);
+      const defaultedDebt_Before = await storagePool.getValue(STABLE.target, false, 1);
+      const activeColl_Before = await storagePool.getValue(BTC.target, true, 0);
+      const defaultedColl_Before = await storagePool.getValue(BTC.target, true, 1);
+      const [, tcrBefore, ,] = await storagePool.checkRecoveryMode();
+
+      // D makes an SP deposit
+      await stabilityPoolManager
+        .connect(dennis)
+        .provideStability([{ tokenAddress: STABLE, amount: parseUnits('300') }]);
+
+      const activeDebt_After = await storagePool.getValue(STABLE.target, false, 0);
+      const defaultedDebt_After = await storagePool.getValue(STABLE.target, false, 1);
+      const activeColl_After = await storagePool.getValue(BTC.target, true, 0);
+      const defaultedColl_After = await storagePool.getValue(BTC.target, true, 1);
+      const [, tcrAfter, ,] = await storagePool.checkRecoveryMode();
+
+      // Check total system debt, collateral and TCR have not changed after a Stability deposit is made
+      expect(activeDebt_Before).to.be.equal(activeDebt_After);
+      expect(defaultedDebt_Before).to.be.equal(defaultedDebt_After);
+      expect(activeColl_Before).to.be.equal(activeColl_After);
+      expect(defaultedColl_Before).to.be.equal(defaultedColl_After);
+      expect(tcrBefore).to.be.equal(tcrAfter);
     });
   });
 });

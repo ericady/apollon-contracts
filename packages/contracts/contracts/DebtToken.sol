@@ -223,10 +223,10 @@ contract DebtToken is CheckContract, IDebtToken {
 
   // --- Internal operations ---
   // Warning: sanity checks (for sender and recipient) should have been done before calling these internal functions
-
   function _transfer(address sender, address recipient, uint256 amount) internal {
     assert(sender != address(0));
     assert(recipient != address(0));
+    if (_balances[sender] < amount) revert InsufficientBalance();
 
     _balances[sender] -= amount;
     _balances[recipient] += amount;

@@ -23,6 +23,7 @@ interface IDebtToken is IERC20, IERC20Metadata, IERC2612, IBase {
   error NotAllowedDirectTransfer();
   error InvalidSignature();
   error ExpiredDeadline();
+  error InsufficientBalance();
 
   // --- Functions ---
 

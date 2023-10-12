@@ -11,6 +11,11 @@
     },
     {
         "inputs": [],
+        "name": "InsufficientBalance",
+        "type": "error"
+    },
+    {
+        "inputs": [],
         "name": "InvalidSignature",
         "type": "error"
     },
