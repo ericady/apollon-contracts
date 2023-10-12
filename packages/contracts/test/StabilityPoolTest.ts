@@ -89,7 +89,7 @@ describe('StabilityPool', () => {
 
       // --- TEST ---
       // check user's deposit record before
-      const depositBefore = (await stabilityPoolManager.getCompoundedDeposits()).find(
+      const depositBefore = (await stabilityPoolManager.connect(alice).getCompoundedDeposits()).find(
         d => d.tokenAddress === STOCK.target
       )?.amount;
       expect(depositBefore).to.be.equal(0n);
@@ -97,7 +97,7 @@ describe('StabilityPool', () => {
       await stabilityPoolManager.connect(alice).provideStability([{ tokenAddress: STOCK, amount: 200n }]);
 
       // check user's deposit record after
-      const depositAfter = (await stabilityPoolManager.getCompoundedDeposits()).find(
+      const depositAfter = (await stabilityPoolManager.connect(alice).getCompoundedDeposits()).find(
         d => d.tokenAddress === STOCK.target
       )?.amount;
       expect(depositAfter).to.be.equal(200n);
