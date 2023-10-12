@@ -9,7 +9,6 @@ import './IStabilityPool.sol';
 interface IBBase is IBase {
   struct DebtTokenAmount {
     IDebtToken debtToken;
-    uint price;
     uint netDebt;
     uint borrowingFee; // only in case of stable coin
   }

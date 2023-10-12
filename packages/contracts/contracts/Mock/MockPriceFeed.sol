@@ -3,6 +3,7 @@
 pragma solidity ^0.8.9;
 
 import '../Interfaces/IPriceFeed.sol';
+import '@openzeppelin/contracts/token/ERC20/extensions/IERC20Metadata.sol';
 
 /*
  * PriceFeed placeholder for testnet and development. The price is simply set manually and saved in a state
@@ -39,14 +40,14 @@ contract MockPriceFeed is IPriceFeed {
     return _price;
   }
 
-  // Manual external price setter.
-  function setPrice(uint256 price) external returns (bool) {
-    _price = price;
-    return true;
-  }
-
   function setTokenPrice(address tokenAddress, uint256 price) external returns (bool) {
     tokenPrices[tokenAddress] = price;
     return true;
+  }
+
+  function getUSDValue(address _token, uint256 _amount) external view returns (uint usdValue) {
+    uint price = tokenPrices[_token];
+    uint8 decimals = IERC20Metadata(_token).decimals();
+    usdValue = (price * _amount) / 10 ** decimals;
   }
 }

@@ -150,9 +150,9 @@ contract TroveManager is LiquityBase, Ownable, CheckContract, ITroveManager {
 
   struct SingleRedemptionVariables {
     uint stableCoinLot;
-    PriceTokenAmount[] collLots;
+    TokenAmount[] collLots;
     //
-    PriceTokenAmount stableCoinEntry;
+    TokenAmount stableCoinEntry;
     uint troveCollInStable;
     uint troveDebtInStable;
   }
@@ -383,7 +383,7 @@ contract TroveManager is LiquityBase, Ownable, CheckContract, ITroveManager {
     uint troveDebtInStableWithoutGasCompensation,
     RAmount[] memory troveAmountsIncludingRewards,
     RemainingStability[] memory remainingStabilities
-  ) internal pure {
+  ) internal view {
     /*
      * Offset as much debt & collateral as possible against the Stability Pool, and redistribute the remainder
      * between all active troves.
@@ -411,15 +411,14 @@ contract TroveManager is LiquityBase, Ownable, CheckContract, ITroveManager {
     uint troveDebtInStableWithoutGasCompensation,
     RAmount[] memory troveAmountsIncludingRewards,
     RemainingStability[] memory remainingStabilities
-  ) internal pure {
+  ) internal view {
     // capping the to be liquidated collateral to 1.1 * the total debts value
     uint cappedLimit = troveDebtInStableWithoutGasCompensation * MCR; // total debt * 1.1
     for (uint i = 0; i < troveAmountsIncludingRewards.length; i++) {
       RAmount memory rAmount = troveAmountsIncludingRewards[i];
       if (!rAmount.isColl) continue; // coll will be handled later in the debts loop
-
-      uint collPercentage = (rAmount.toLiquidate * rAmount.price) / troveCollInStable;
-      uint cappedColl = (cappedLimit * collPercentage) / rAmount.price;
+      // priceFeed.getUSDValue(rAmount.tokenAddress, rAmount.toLiquidate)
+      uint cappedColl = (cappedLimit * rAmount.toLiquidate) / troveCollInStable;
       rAmount.toLiquidate = LiquityMath._min(cappedColl, rAmount.toLiquidate);
     }
 
@@ -430,7 +429,7 @@ contract TroveManager is LiquityBase, Ownable, CheckContract, ITroveManager {
     uint troveDebtInStableWithoutGasCompensation,
     RAmount[] memory troveAmountsIncludingRewards,
     RemainingStability[] memory remainingStabilities
-  ) internal pure {
+  ) internal view {
     // checking if some debt can be offset by the matching stability pool
     for (uint i = 0; i < troveAmountsIncludingRewards.length; i++) {
       RAmount memory rAmountDebt = troveAmountsIncludingRewards[i];
@@ -450,8 +449,8 @@ contract TroveManager is LiquityBase, Ownable, CheckContract, ITroveManager {
         remainingStability.debtToOffset += rAmountDebt.toOffset;
         remainingStability.remaining -= rAmountDebt.toOffset;
 
-        uint offsetPercentage = (rAmountDebt.toOffset * DECIMAL_PRECISION * rAmountDebt.price) /
-          troveDebtInStableWithoutGasCompensation; // relative to the troves total debt
+        uint offsetPercentage = (priceFeed.getUSDValue(rAmountDebt.tokenAddress, rAmountDebt.toOffset) *
+          DECIMAL_PRECISION) / troveDebtInStableWithoutGasCompensation; // relative to the troves total debt
 
         // moving the offsetPercentage of each coll into the stable pool
         for (uint ii = 0; ii < troveAmountsIncludingRewards.length; ii++) {
@@ -516,9 +515,10 @@ contract TroveManager is LiquityBase, Ownable, CheckContract, ITroveManager {
       // updating total system debt and collateral
       for (uint a = 0; a < vars.troveAmountsIncludingRewards.length; a++) {
         RAmount memory rAmount = vars.troveAmountsIncludingRewards[a];
-        outerVars.entireSystemCollInStable -= rAmount.gasCompensation * rAmount.price;
-        if (rAmount.isColl) outerVars.entireSystemCollInStable -= rAmount.toOffset * rAmount.price;
-        else outerVars.entireSystemDebtInStable -= rAmount.toOffset * rAmount.price;
+        outerVars.entireSystemCollInStable -= priceFeed.getUSDValue(rAmount.tokenAddress, rAmount.gasCompensation);
+        if (rAmount.isColl)
+          outerVars.entireSystemCollInStable -= priceFeed.getUSDValue(rAmount.tokenAddress, rAmount.toOffset);
+        else outerVars.entireSystemDebtInStable -= priceFeed.getUSDValue(rAmount.tokenAddress, rAmount.toOffset);
       }
 
       vars.backToNormalMode = !_checkPotentialRecoveryMode(
@@ -798,11 +798,13 @@ contract TroveManager is LiquityBase, Ownable, CheckContract, ITroveManager {
     // calculate the coll lot
     uint newCollInStable = vars.troveCollInStable;
     for (uint i = 0; i < vars.collLots.length; i++) {
-      PriceTokenAmount memory collEntry = vars.collLots[i];
+      TokenAmount memory collEntry = vars.collLots[i];
 
-      uint collPercent = (collEntry.amount * collEntry.price) / vars.troveCollInStable;
+      // TODO: check percent decimal again
+      uint collPrice = priceFeed.getPrice(collEntry.tokenAddress);
+      uint collPercent = (collPrice * collEntry.amount) / vars.troveCollInStable;
       uint collToRedeemInStable = vars.stableCoinLot * collPercent;
-      collEntry.amount = collToRedeemInStable / collEntry.price;
+      collEntry.amount = collToRedeemInStable / collPrice;
       newCollInStable -= collToRedeemInStable;
     }
 
@@ -821,7 +823,7 @@ contract TroveManager is LiquityBase, Ownable, CheckContract, ITroveManager {
     // updating the troves coll and debt
     Troves[_borrower].debts[debtTokenManager.getStableCoin()] -= vars.stableCoinLot;
     for (uint i = 0; i < vars.collLots.length; i++) {
-      PriceTokenAmount memory collAmount = vars.collLots[i];
+      TokenAmount memory collAmount = vars.collLots[i];
       Troves[_borrower].colls[collAmount.tokenAddress] -= collAmount.amount;
     }
 
@@ -864,17 +866,15 @@ contract TroveManager is LiquityBase, Ownable, CheckContract, ITroveManager {
     for (uint i = 0; i < _trove.collTokens.length; i++) {
       address token = _trove.collTokens[i];
 
-      uint tokenPrice = priceFeed.getPrice(token);
       uint pendingRewards = _getPendingReward(_borrower, token, true);
-      currentCollInStable += (_trove.colls[token] + pendingRewards) * tokenPrice;
+      currentCollInStable += priceFeed.getUSDValue(token, _trove.colls[token] + pendingRewards);
     }
 
     for (uint i = 0; i < _trove.debtTokens.length; i++) {
       IDebtToken token = _trove.debtTokens[i];
 
-      uint tokenPrice = token.getPrice();
       uint pendingRewards = _getPendingReward(_borrower, address(token), true);
-      currentDebtInStable += (_trove.debts[token] + pendingRewards) * tokenPrice;
+      currentDebtInStable += priceFeed.getUSDValue(address(token), _trove.debts[token] + pendingRewards);
     }
 
     return (currentCollInStable, currentDebtInStable);
@@ -975,36 +975,16 @@ contract TroveManager is LiquityBase, Ownable, CheckContract, ITroveManager {
     amounts = new RAmount[](trove.collTokens.length + trove.debtTokens.length);
 
     for (uint i = 0; i < trove.collTokens.length; i++) {
-      address tokenAddress = address(trove.collTokens[i]);
-      amounts[i] = RAmount(
-        tokenAddress,
-        priceFeed.getPrice(tokenAddress),
-        true,
-        trove.colls[trove.collTokens[i]],
-        0,
-        0,
-        0,
-        0,
-        0
-      );
+      address token = address(trove.collTokens[i]);
+      amounts[i] = RAmount(token, true, trove.colls[trove.collTokens[i]], 0, 0, 0, 0, 0);
     }
 
     uint stableCoinIndex;
     for (uint i = 0; i < trove.debtTokens.length; i++) {
       if (trove.debtTokens[i].isStableCoin()) stableCoinIndex = i + trove.collTokens.length;
 
-      address tokenAddress = address(trove.debtTokens[i]);
-      amounts[i + trove.collTokens.length] = RAmount(
-        tokenAddress,
-        trove.debtTokens[i].getPrice(),
-        false,
-        trove.debts[trove.debtTokens[i]],
-        0,
-        0,
-        0,
-        0,
-        0
-      );
+      address token = address(trove.debtTokens[i]);
+      amounts[i + trove.collTokens.length] = RAmount(token, false, trove.debts[trove.debtTokens[i]], 0, 0, 0, 0, 0);
     }
 
     // adding gas compensation + toLiquidate
@@ -1013,7 +993,7 @@ contract TroveManager is LiquityBase, Ownable, CheckContract, ITroveManager {
 
       amountEntry.pendingReward = _getPendingReward(_borrower, amountEntry.tokenAddress, amountEntry.isColl);
       uint totalAmount = amountEntry.amount + amountEntry.pendingReward;
-      uint inStable = totalAmount * amountEntry.price;
+      uint inStable = priceFeed.getUSDValue(amountEntry.tokenAddress, totalAmount);
 
       if (amountEntry.isColl) {
         amountEntry.gasCompensation = _getCollGasCompensation(totalAmount);
@@ -1023,7 +1003,10 @@ contract TroveManager is LiquityBase, Ownable, CheckContract, ITroveManager {
         if (i == stableCoinIndex) {
           // stable coin gas compensation should not be liquidated, it will be paid out as reward for the liquidator
           amountEntry.toLiquidate = totalAmount - STABLE_COIN_GAS_COMPENSATION;
-          troveDebtInStableWithoutGasCompensation += amountEntry.toLiquidate * amountEntry.price;
+          troveDebtInStableWithoutGasCompensation += priceFeed.getUSDValue(
+            amountEntry.tokenAddress,
+            amountEntry.toLiquidate
+          );
         } else {
           amountEntry.toLiquidate = totalAmount;
           troveDebtInStableWithoutGasCompensation += inStable;
@@ -1042,8 +1025,8 @@ contract TroveManager is LiquityBase, Ownable, CheckContract, ITroveManager {
     internal
     view
     returns (
-      PriceTokenAmount[] memory amounts,
-      PriceTokenAmount memory stableCoinEntry,
+      TokenAmount[] memory amounts,
+      TokenAmount memory stableCoinEntry,
       uint troveCollInStable,
       uint troveDebtInStable
     )
@@ -1054,17 +1037,16 @@ contract TroveManager is LiquityBase, Ownable, CheckContract, ITroveManager {
     for (uint i = 0; i < trove.debtTokens.length; i++) {
       IDebtToken debtToken = trove.debtTokens[i];
       uint amount = trove.debts[debtToken];
-      uint price = debtToken.getPrice();
 
-      if (debtToken.isStableCoin()) stableCoinEntry = PriceTokenAmount(address(debtToken), price, amount);
-      troveDebtInStable += amount * price;
+      if (debtToken.isStableCoin()) stableCoinEntry = TokenAmount(address(debtToken), amount);
+      troveDebtInStable += priceFeed.getUSDValue(address(debtToken), amount);
     }
 
-    amounts = new PriceTokenAmount[](trove.collTokens.length);
+    amounts = new TokenAmount[](trove.collTokens.length);
     for (uint i = 0; i < amounts.length; i++) {
       address tokenAddress = trove.collTokens[i];
-      amounts[i] = PriceTokenAmount(tokenAddress, priceFeed.getPrice(tokenAddress), trove.colls[tokenAddress]);
-      troveCollInStable += amounts[i].amount * amounts[i].price;
+      amounts[i] = TokenAmount(tokenAddress, trove.colls[tokenAddress]);
+      troveCollInStable += priceFeed.getUSDValue(tokenAddress, amounts[i].amount);
     }
 
     return (amounts, stableCoinEntry, troveCollInStable, troveDebtInStable);
@@ -1167,7 +1149,7 @@ contract TroveManager is LiquityBase, Ownable, CheckContract, ITroveManager {
   function _calculateTotalStake(address[] memory collTokenAddresses) internal view returns (uint stake) {
     for (uint i = 0; i < collTokenAddresses.length; i++) {
       address tokenAddress = collTokenAddresses[i];
-      stake += totalStakes[tokenAddress] * priceFeed.getPrice(tokenAddress);
+      stake += priceFeed.getUSDValue(tokenAddress, totalStakes[tokenAddress]);
     }
   }
 
@@ -1407,7 +1389,7 @@ contract TroveManager is LiquityBase, Ownable, CheckContract, ITroveManager {
 
     for (uint i = 0; i < trove.collTokens.length; i++) {
       address tokenAddress = trove.collTokens[i];
-      stake += trove.stakes[tokenAddress] * priceFeed.getPrice(tokenAddress);
+      stake += priceFeed.getUSDValue(tokenAddress, trove.stakes[tokenAddress]);
     }
 
     return stake;
@@ -1440,7 +1422,7 @@ contract TroveManager is LiquityBase, Ownable, CheckContract, ITroveManager {
     Troves[_borrower].status = Status(_num);
   }
 
-  function increaseTroveColl(address _borrower, PriceTokenAmount[] memory _collTokenAmounts) external override {
+  function increaseTroveColl(address _borrower, TokenAmount[] memory _collTokenAmounts) external override {
     _requireCallerIsBorrowerOperations();
 
     Trove storage trove = Troves[_borrower];
@@ -1455,7 +1437,7 @@ contract TroveManager is LiquityBase, Ownable, CheckContract, ITroveManager {
     }
   }
 
-  function decreaseTroveColl(address _borrower, PriceTokenAmount[] memory _collTokenAmounts) external override {
+  function decreaseTroveColl(address _borrower, TokenAmount[] memory _collTokenAmounts) external override {
     _requireCallerIsBorrowerOperations();
 
     Trove storage trove = Troves[_borrower];

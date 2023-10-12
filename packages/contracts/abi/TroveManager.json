@@ -766,16 +766,11 @@
                     },
                     {
                         "internalType": "uint256",
-                        "name": "price",
-                        "type": "uint256"
-                    },
-                    {
-                        "internalType": "uint256",
                         "name": "amount",
                         "type": "uint256"
                     }
                 ],
-                "internalType": "struct IBase.PriceTokenAmount[]",
+                "internalType": "struct IBase.TokenAmount[]",
                 "name": "_collTokenAmounts",
                 "type": "tuple[]"
             }
@@ -798,11 +793,6 @@
                         "internalType": "contract IDebtToken",
                         "name": "debtToken",
                         "type": "address"
-                    },
-                    {
-                        "internalType": "uint256",
-                        "name": "price",
-                        "type": "uint256"
                     },
                     {
                         "internalType": "uint256",
@@ -929,11 +919,6 @@
                         "internalType": "address",
                         "name": "tokenAddress",
                         "type": "address"
-                    },
-                    {
-                        "internalType": "uint256",
-                        "name": "price",
-                        "type": "uint256"
                     },
                     {
                         "internalType": "bool",
@@ -1187,16 +1172,11 @@
                     },
                     {
                         "internalType": "uint256",
-                        "name": "price",
-                        "type": "uint256"
-                    },
-                    {
-                        "internalType": "uint256",
                         "name": "amount",
                         "type": "uint256"
                     }
                 ],
-                "internalType": "struct IBase.PriceTokenAmount[]",
+                "internalType": "struct IBase.TokenAmount[]",
                 "name": "_collTokenAmounts",
                 "type": "tuple[]"
             }
@@ -1219,11 +1199,6 @@
                         "internalType": "contract IDebtToken",
                         "name": "debtToken",
                         "type": "address"
-                    },
-                    {
-                        "internalType": "uint256",
-                        "name": "price",
-                        "type": "uint256"
                     },
                     {
                         "internalType": "uint256",

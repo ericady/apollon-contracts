@@ -38,7 +38,7 @@ contract BorrowerOperations is LiquityBase, Ownable, CheckContract, IBorrowerOpe
   struct LocalVariables_openTrove {
     address[] collTokenAddresses;
     //
-    PriceTokenAmount[] colls;
+    TokenAmount[] colls;
     DebtTokenAmount[] debts;
     uint compositeDebtInStable;
     uint compositeCollInStable;
@@ -55,7 +55,7 @@ contract BorrowerOperations is LiquityBase, Ownable, CheckContract, IBorrowerOpe
   struct LocalVariables_adjustTrove {
     address[] collTokenAddresses;
     //
-    PriceTokenAmount[] colls;
+    TokenAmount[] colls;
     DebtTokenAmount[] debts;
     DebtTokenAmount stableCoinEntry;
     //
@@ -152,7 +152,6 @@ contract BorrowerOperations is LiquityBase, Ownable, CheckContract, IBorrowerOpe
     // adding gas compensation to the net debt
     DebtTokenAmount memory stableCoinAmount = DebtTokenAmount(
       contractsCache.debtTokenManager.getStableCoin(),
-      contractsCache.debtTokenManager.getStableCoin().getPrice(),
       STABLE_COIN_GAS_COMPENSATION,
       0
     );
@@ -161,7 +160,7 @@ contract BorrowerOperations is LiquityBase, Ownable, CheckContract, IBorrowerOpe
 
     vars.compositeDebtInStable = _getCompositeDebt(vars.debts); // ICR is based on the composite debt, i.e. the requested debt amount + borrowing fee + debt gas comp.
 
-    vars.colls = _getCollTokenAmountsWithFetchedPrices(_colls);
+    vars.colls = _colls;
     vars.compositeCollInStable = _getCompositeColl(vars.colls);
 
     vars.ICR = LiquityMath._computeCR(vars.compositeCollInStable, vars.compositeDebtInStable);
@@ -202,7 +201,7 @@ contract BorrowerOperations is LiquityBase, Ownable, CheckContract, IBorrowerOpe
 
     // Move the coll to the active pool
     for (uint i = 0; i < vars.colls.length; i++) {
-      PriceTokenAmount memory collTokenAmount = vars.colls[i];
+      TokenAmount memory collTokenAmount = vars.colls[i];
       _poolAddColl(
         borrower,
         contractsCache.storagePool,
@@ -230,13 +229,12 @@ contract BorrowerOperations is LiquityBase, Ownable, CheckContract, IBorrowerOpe
     address borrower = msg.sender;
     (ContractsCache memory contractsCache, LocalVariables_adjustTrove memory vars) = _prepareTroveAdjustment(borrower);
 
-    PriceTokenAmount[] memory addedColls = _getCollTokenAmountsWithFetchedPrices(_colls);
-    vars.newCompositeCollInStable += _getCompositeColl(addedColls);
+    vars.newCompositeCollInStable += _getCompositeColl(_colls);
 
-    contractsCache.troveManager.increaseTroveColl(borrower, addedColls);
+    contractsCache.troveManager.increaseTroveColl(borrower, _colls);
 
-    for (uint i = 0; i < addedColls.length; i++) {
-      PriceTokenAmount memory collTokenAmount = addedColls[i];
+    for (uint i = 0; i < _colls.length; i++) {
+      TokenAmount memory collTokenAmount = _colls[i];
       _poolAddColl(
         borrower,
         contractsCache.storagePool,
@@ -254,16 +252,15 @@ contract BorrowerOperations is LiquityBase, Ownable, CheckContract, IBorrowerOpe
     address borrower = msg.sender;
     (ContractsCache memory contractsCache, LocalVariables_adjustTrove memory vars) = _prepareTroveAdjustment(borrower);
 
-    PriceTokenAmount[] memory removedColls = _getCollTokenAmountsWithFetchedPrices(_colls);
-    vars.newCompositeCollInStable -= _getCompositeColl(removedColls);
+    vars.newCompositeCollInStable -= _getCompositeColl(_colls);
 
-    contractsCache.troveManager.decreaseTroveColl(borrower, removedColls);
+    contractsCache.troveManager.decreaseTroveColl(borrower, _colls);
 
-    for (uint i = 0; i < removedColls.length; i++) {
-      PriceTokenAmount memory collTokenAmount = removedColls[i];
+    for (uint i = 0; i < _colls.length; i++) {
+      TokenAmount memory collTokenAmount = _colls[i];
 
       // checking is the trove has enough coll for the withdrawal
-      PriceTokenAmount memory existingColl;
+      TokenAmount memory existingColl;
       for (uint ii = 0; ii < vars.colls.length; ii++) {
         if (vars.colls[ii].tokenAddress != collTokenAmount.tokenAddress) continue;
         existingColl = vars.colls[ii];
@@ -395,7 +392,7 @@ contract BorrowerOperations is LiquityBase, Ownable, CheckContract, IBorrowerOpe
 
     // Send the collateral back to the user
     for (uint i = 0; i < vars.colls.length; i++) {
-      PriceTokenAmount memory collTokenAmount = vars.colls[i];
+      TokenAmount memory collTokenAmount = vars.colls[i];
 
       _poolSubtractColl(
         borrower,
@@ -436,7 +433,7 @@ contract BorrowerOperations is LiquityBase, Ownable, CheckContract, IBorrowerOpe
     vars.oldCompositeDebtInStable = _getCompositeDebt(vars.debts);
     vars.newCompositeDebtInStable = vars.oldCompositeDebtInStable;
 
-    vars.colls = _getCollTokenAmountsWithFetchedPrices(contractsCache.troveManager.getTroveColl(_borrower));
+    vars.colls = contractsCache.troveManager.getTroveColl(_borrower);
     vars.oldCompositeCollInStable = _getCompositeColl(vars.colls);
     vars.newCompositeCollInStable = vars.oldCompositeCollInStable;
 
@@ -499,7 +496,8 @@ contract BorrowerOperations is LiquityBase, Ownable, CheckContract, IBorrowerOpe
     _troveManager.decayBaseRateFromBorrowing(); // decay the baseRate state variable
     borrowingFee = _troveManager.getBorrowingFee(compositeDebtInStable); // calculated in stable price
     _requireUserAcceptsFee(borrowingFee, compositeDebtInStable, _maxFeePercentage);
-    borrowingFee /= _stableCoinAmount.price;
+    uint stableCoinPrice = priceFeed.getPrice(address(_stableCoinAmount.debtToken));
+    borrowingFee /= stableCoinPrice;
 
     // todo...
     // Send fee to staking contract
@@ -511,11 +509,6 @@ contract BorrowerOperations is LiquityBase, Ownable, CheckContract, IBorrowerOpe
     _stableCoinAmount.borrowingFee += borrowingFee;
 
     return borrowingFee;
-  }
-
-  function _getUSDValue(uint _coll, uint _price) internal pure returns (uint) {
-    uint usdValue = (_price * _coll) / DECIMAL_PRECISION;
-    return usdValue;
   }
 
   function _poolAddColl(
@@ -606,32 +599,18 @@ contract BorrowerOperations is LiquityBase, Ownable, CheckContract, IBorrowerOpe
 
     for (uint i = 0; i < _debts.length; i++) {
       IDebtToken debtToken = _dTokenManager.getDebtToken(_debts[i].tokenAddress);
-      debtTokenAmounts[i] = DebtTokenAmount(debtToken, debtToken.getPrice(), _debts[i].amount, 0);
+      debtTokenAmounts[i] = DebtTokenAmount(debtToken, _debts[i].amount, 0);
 
       if (stableCoinIncluded && debtToken.isStableCoin()) stableCoinEntry = debtTokenAmounts[i];
     }
 
     if (!stableCoinIncluded) {
       IDebtToken debtToken = _dTokenManager.getStableCoin();
-      debtTokenAmounts[_debts.length] = DebtTokenAmount(debtToken, debtToken.getPrice(), 0, 0);
+      debtTokenAmounts[_debts.length] = DebtTokenAmount(debtToken, 0, 0);
       stableCoinEntry = debtTokenAmounts[_debts.length];
     }
 
     return (debtTokenAmounts, stableCoinEntry);
-  }
-
-  function _getCollTokenAmountsWithFetchedPrices(
-    TokenAmount[] memory _colls
-  ) internal view returns (PriceTokenAmount[] memory collTokenAmounts) {
-    IPriceFeed _priceFeedCached = priceFeed;
-
-    collTokenAmounts = new PriceTokenAmount[](_colls.length);
-    for (uint i = 0; i < _colls.length; i++) {
-      collTokenAmounts[i].tokenAddress = _colls[i].tokenAddress;
-      collTokenAmounts[i].amount = _colls[i].amount;
-      collTokenAmounts[i].price = _priceFeedCached.getPrice(_colls[i].tokenAddress);
-    }
-    return collTokenAmounts;
   }
 
   function _requireNonZeroDebtChange(uint _LUSDChange) internal pure {
@@ -723,20 +702,24 @@ contract BorrowerOperations is LiquityBase, Ownable, CheckContract, IBorrowerOpe
 
   // --- ICR and TCR getters ---
 
-  function getCompositeDebt(DebtTokenAmount[] memory _debts) external pure override returns (uint) {
+  function getCompositeDebt(DebtTokenAmount[] memory _debts) external view override returns (uint) {
     return _getCompositeDebt(_debts);
   }
 
-  function _getNetDebt(DebtTokenAmount[] memory _debts) internal pure returns (uint) {
+  function _getNetDebt(DebtTokenAmount[] memory _debts) internal view returns (uint) {
     return _getCompositeDebt(_debts) - STABLE_COIN_GAS_COMPENSATION;
   }
 
   // Returns the composite debt (drawn debt + gas compensation) of a trove, for the purpose of ICR calculation
-  function _getCompositeDebt(DebtTokenAmount[] memory _debts) internal pure returns (uint debtInStable) {
-    for (uint i = 0; i < _debts.length; i++) debtInStable += _debts[i].netDebt * _debts[i].price;
+  function _getCompositeDebt(DebtTokenAmount[] memory _debts) internal view returns (uint debtInStable) {
+    for (uint i = 0; i < _debts.length; i++) {
+      debtInStable += priceFeed.getUSDValue(address(_debts[i].debtToken), _debts[i].netDebt);
+    }
   }
 
-  function _getCompositeColl(PriceTokenAmount[] memory _colls) internal pure returns (uint collInStable) {
-    for (uint i = 0; i < _colls.length; i++) collInStable += _colls[i].amount * _colls[i].price;
+  function _getCompositeColl(TokenAmount[] memory _colls) internal view returns (uint collInStable) {
+    for (uint i = 0; i < _colls.length; i++) {
+      collInStable += priceFeed.getUSDValue(_colls[i].tokenAddress, _colls[i].amount);
+    }
   }
 }

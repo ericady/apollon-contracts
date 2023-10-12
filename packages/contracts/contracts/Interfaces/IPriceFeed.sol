@@ -20,5 +20,7 @@ interface IPriceFeed is IBase {
   // --- Function ---
   function getPrice(address _tokenAddress) external view returns (uint price);
 
+  function getUSDValue(address _token, uint _amount) external view returns (uint usdValue);
+
   function fetchPrice() external returns (uint);
 }

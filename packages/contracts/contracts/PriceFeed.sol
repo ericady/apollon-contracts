@@ -3,6 +3,7 @@
 pragma solidity ^0.8.9;
 
 import '@openzeppelin/contracts/access/Ownable.sol';
+import '@openzeppelin/contracts/token/ERC20/extensions/IERC20Metadata.sol';
 import './Interfaces/IPriceFeed.sol';
 import './Interfaces/ITellorCaller.sol';
 import './Dependencies/AggregatorV3Interface.sol';
@@ -48,7 +49,7 @@ contract PriceFeed is Ownable, CheckContract, IPriceFeed {
 
   // The last good price seen from an oracle by Liquity
   uint public lastGoodPrice;
-  // The last good prices seen from an oracle by Liquity
+  /// @dev The last good prices seen from an oracle by Apollon, prices in 18 decimals
   mapping(address => uint) public lastGoodPrices;
 
   struct ChainlinkResponse {
@@ -108,6 +109,18 @@ contract PriceFeed is Ownable, CheckContract, IPriceFeed {
     }
   }
 
+  /**
+   * @notice Get USD value of given amount of token in 18 decimals
+   * @param _token Token Address to get USD value of
+   * @param _amount Amount of token to get USD value of
+   * @return usdValue USD value of given amount in 18 decimals
+   */
+  function getUSDValue(address _token, uint256 _amount) external view returns (uint usdValue) {
+    uint price = lastGoodPrices[_token];
+    uint8 decimals = IERC20Metadata(_token).decimals();
+    usdValue = (price * _amount) / 10 ** decimals;
+  }
+
   /*
    * fetchPrice():
    * Returns the latest price obtained from the Oracle. Called by Liquity functions that require a current price.
@@ -121,6 +134,7 @@ contract PriceFeed is Ownable, CheckContract, IPriceFeed {
    *
    */
   function fetchPrice() external override returns (uint) {
+    // TODO: Check again to store fetched price in 18 decimals
     // Get current and previous price data from Chainlink, and current price data from Tellor
     ChainlinkResponse memory chainlinkResponse = _getCurrentChainlinkResponse();
     ChainlinkResponse memory prevChainlinkResponse = _getPrevChainlinkResponse(

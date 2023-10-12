@@ -13,7 +13,6 @@ interface IBase {
 
   struct RAmount {
     address tokenAddress;
-    uint price;
     bool isColl; // coll or debt token
     uint amount; // initial value in trove
     uint pendingReward; // gained rewards since deposit
@@ -31,12 +30,6 @@ interface IBase {
 
   struct TokenAmount {
     address tokenAddress;
-    uint amount;
-  }
-
-  struct PriceTokenAmount {
-    address tokenAddress;
-    uint price;
     uint amount;
   }
 }

@@ -136,18 +136,22 @@ contract StoragePool is LiquityBase, Ownable, CheckContract, IStoragePool {
   function getEntireSystemColl() external view returns (uint entireSystemColl) {
     IPriceFeed priceFeedCached = priceFeed;
     for (uint i = 0; i < collTokenAddresses.length; i++) {
-      uint price = priceFeedCached.getPrice(collTokenAddresses[i]);
       // TODO: should surplus or gas be excluded?
-      entireSystemColl += poolEntries[collTokenAddresses[i]][true].totalAmount * price;
+      entireSystemColl += priceFeedCached.getUSDValue(
+        collTokenAddresses[i],
+        poolEntries[collTokenAddresses[i]][true].totalAmount
+      );
     }
   }
 
   function getEntireSystemDebt() external view returns (uint entireSystemDebt) {
     IPriceFeed priceFeedCached = priceFeed;
     for (uint i = 0; i < debtTokenAddresses.length; i++) {
-      uint price = priceFeedCached.getPrice(debtTokenAddresses[i]);
       // TODO: should surplus or gas be excluded?
-      entireSystemDebt += poolEntries[debtTokenAddresses[i]][false].totalAmount * price;
+      entireSystemDebt += priceFeedCached.getUSDValue(
+        debtTokenAddresses[i],
+        poolEntries[debtTokenAddresses[i]][false].totalAmount
+      );
     }
   }
 
