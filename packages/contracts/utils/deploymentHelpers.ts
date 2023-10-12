@@ -1,199 +1,189 @@
 import { ethers } from 'hardhat';
+import {
+  BorrowerOperations,
+  CollTokenManager,
+  DebtTokenManager,
+  MockDebtToken,
+  MockERC20,
+  MockPriceFeed,
+  StabilityPoolManager,
+  StoragePool,
+  TroveManager,
+} from '../typechain';
+import { parseUnits } from 'ethers';
 
-// const BorrowerOperations = artifacts.require('./BorrowerOperations.sol');
-// const CollTokenManager = artifacts.require('./CollTokenManager.sol');
-// const DebtToken = artifacts.require('./DebtToken.sol');
-// const DebtTokenManager = artifacts.require('./DebtTokenManager.sol');
-// const PriceFeedTestnet = artifacts.require('./PriceFeedTestnet.sol');
-// const StabilityPool = artifacts.require('./StabilityPool.sol');
-// const StabilityPoolManager = artifacts.require('./StabilityPoolManager.sol');
-// const StoragePool = artifacts.require('./StoragePool.sol');
-// const TroveManager = artifacts.require('./TroveManager.sol');
+export interface Contracts {
+  borrowerOperations: BorrowerOperations;
+  troveManager: TroveManager;
+  stabilityPoolManager: StabilityPoolManager;
+  storagePool: StoragePool;
+  collTokenManager: CollTokenManager;
+  debtTokenManager: DebtTokenManager;
+  priceFeed: MockPriceFeed;
+  collToken: any;
+  debtToken: any;
+}
 
-// const StoragePoolTester = artifacts.require('./StoragePoolTester.sol');
-// const StabilityPoolTester = artifacts.require('./StabilityPoolTester.sol');
-// const LiquityMathTester = artifacts.require('./LiquityMathTester.sol');
-// const BorrowerOperationsTester = artifacts.require('./BorrowerOperationsTester.sol');
-// const DebtTokenTester = artifacts.require('./DebtTokenTester.sol');
-// const AnyTokenTester = artifacts.require('./AnyTokenTester.sol');
-
-// // Proxy scripts
-// const BorrowerOperationsScript = artifacts.require('BorrowerOperationsScript');
-// const BorrowerWrappersScript = artifacts.require('BorrowerWrappersScript');
-// const TroveManagerScript = artifacts.require('TroveManagerScript');
-// const StabilityPoolScript = artifacts.require('StabilityPoolScript');
-// const TokenScript = artifacts.require('TokenScript');
-const {
-  buildUserProxies,
-  BorrowerOperationsProxy,
-  BorrowerWrappersProxy,
-  TroveManagerProxy,
-  StabilityPoolProxy,
-  TokenProxy,
-} = require('../utils/proxyHelpers.js');
-const { TestHelper: th } = require('../utils/testHelpers.js');
-
-const ZERO_ADDRESS = '0x' + '0'.repeat(40);
-const maxBytes32 = '0x' + 'f'.repeat(64);
-
-export const deployCore = async () => {
-  const priceFeedFactory = await ethers.getContractFactory('PriceFeedTestnet');
-  const priceFeed = await priceFeedFactory.deploy();
+export const deployCore = async (): Promise<Contracts> => {
+  const borrowerOperationsFactory = await ethers.getContractFactory('BorrowerOperations');
+  const borrowerOperations = await borrowerOperationsFactory.deploy();
 
   const troveManagerFactory = await ethers.getContractFactory('TroveManager');
+  const troveManager = await troveManagerFactory.deploy();
+
+  const stabilityPoolManagerFactory = await ethers.getContractFactory('StabilityPoolManager');
+  const stabilityPoolManager = await stabilityPoolManagerFactory.deploy();
+
+  const storagePoolFactory = await ethers.getContractFactory('StoragePool');
+  const storagePool = await storagePoolFactory.deploy();
+
+  const collTokenManagerFactory = await ethers.getContractFactory('CollTokenManager');
+  const collTokenManager = await collTokenManagerFactory.deploy();
+
+  const debtTokenManagerFactory = await ethers.getContractFactory('DebtTokenManager');
+  const debtTokenManager = await debtTokenManagerFactory.deploy();
+
+  const priceFeedFactory = await ethers.getContractFactory('MockPriceFeed');
+  const priceFeed = await priceFeedFactory.deploy();
+
+  return {
+    borrowerOperations,
+    troveManager,
+    stabilityPoolManager,
+    storagePool,
+    collTokenManager,
+    debtTokenManager,
+    priceFeed,
+    collToken: undefined,
+    debtToken: undefined,
+  };
 };
 
-class DeploymentHelper {
-  static async deployCore() {
-    const core = {
-      priceFeedTestnet: await PriceFeedTestnet.new(),
-      troveManager: await TroveManager.new(),
-      borrowerOperations: await BorrowerOperations.new(),
-      storagePool: await StoragePool.new(),
-      stabilityPoolManager: await StabilityPoolManager.new(),
-      collTokenManager: await CollTokenManager.new(),
-      debtTokenManager: await DebtTokenManager.new(),
-      artifacts: {
-        DebtToken,
-        StabilityPool,
-      },
-    };
+// Connect contracts to their dependencies
+export const connectCoreContracts = async (contracts: Contracts) => {
+  await contracts.troveManager.setAddresses(
+    contracts.borrowerOperations,
+    contracts.storagePool,
+    contracts.stabilityPoolManager,
+    contracts.priceFeed,
+    contracts.debtTokenManager,
+    contracts.collTokenManager
+  );
 
-    const cmdLineArgs = process.argv;
-    const frameworkPath = cmdLineArgs[1];
-    if (frameworkPath.includes('hardhat')) await this.extendHardhatCore(core);
+  await contracts.borrowerOperations.setAddresses(
+    contracts.troveManager,
+    contracts.storagePool,
+    contracts.stabilityPoolManager,
+    contracts.priceFeed,
+    contracts.debtTokenManager,
+    contracts.collTokenManager
+  );
 
-    return core;
-  }
+  await contracts.storagePool.setAddresses(
+    contracts.borrowerOperations,
+    contracts.troveManager,
+    contracts.stabilityPoolManager,
+    contracts.priceFeed
+  );
 
-  static async extendHardhatCore(core) {
-    PriceFeedTestnet.setAsDeployed(core.priceFeedTestnet);
-    TroveManager.setAsDeployed(core.troveManager);
-    StoragePool.setAsDeployed(core.storagePool);
-    StabilityPoolManager.setAsDeployed(core.stabilityPoolManager);
-    BorrowerOperations.setAsDeployed(core.borrowerOperations);
-    CollTokenManager.setAsDeployed(core.collTokenManager);
-    DebtTokenManager.setAsDeployed(core.debtTokenManager);
-  }
+  await contracts.debtTokenManager.setAddresses(
+    contracts.troveManager,
+    contracts.borrowerOperations,
+    contracts.stabilityPoolManager,
+    contracts.priceFeed
+  );
 
-  static async deployTesterContracts() {
-    const testerContracts = {
-      priceFeedTestnet: await PriceFeedTestnet.new(),
-      troveManager: await TroveManager.new(),
-      functionCaller: await FunctionCaller.new(),
-      stabilityPoolManager: await StabilityPoolManager.new(),
-      collTokenManager: await CollTokenManager.new(),
-      debtTokenManager: await DebtTokenManager.new(),
-      // Actual tester contract
-      storagePool: await StoragePoolTester.new(),
-      borrowerOperations: await BorrowerOperationsTester.new(),
-      math: await LiquityMathTester.new(),
-    };
+  await contracts.collTokenManager.setAddresses(contracts.priceFeed);
 
-    return testerContracts;
-  }
+  await contracts.stabilityPoolManager.setAddresses(
+    contracts.troveManager,
+    contracts.priceFeed,
+    contracts.storagePool,
+    contracts.debtTokenManager
+  );
+};
 
-  // Connect contracts to their dependencies
-  static async connectCoreContracts(contracts) {
-    await contracts.troveManager.setAddresses(
-      contracts.borrowerOperations.address,
-      contracts.storagePool.address,
-      contracts.stabilityPoolManager.address,
-      contracts.priceFeedTestnet.address,
-      contracts.debtTokenManager.address,
-      contracts.collTokenManager.address
-    );
+export const deployAndLinkToken = async (contracts: Contracts) => {
+  const mockTokenFactory = await ethers.getContractFactory('MockERC20');
+  const BTC = await mockTokenFactory.deploy('Bitcoin', 'BTC');
+  const USDT = await mockTokenFactory.deploy('USDT', 'USDT');
+  // coll tokens
+  contracts.collToken = {
+    BTC,
+    USDT,
+  };
+  await contracts.collTokenManager.addCollToken(USDT);
+  await contracts.collTokenManager.addCollToken(BTC);
+  await contracts.priceFeed.setTokenPrice(BTC, parseUnits('21000', 18));
 
-    await contracts.borrowerOperations.setAddresses(
-      contracts.troveManager.address,
-      contracts.storagePool.address,
-      contracts.stabilityPoolManager.address,
-      contracts.priceFeedTestnet.address,
-      contracts.debtTokenManager.address,
-      contracts.collTokenManager.address
-    );
+  const mockDebtTokenFactory = await ethers.getContractFactory('MockDebtToken');
+  const STABLE = await mockDebtTokenFactory.deploy(
+    contracts.troveManager,
+    contracts.borrowerOperations,
+    contracts.stabilityPoolManager,
+    contracts.priceFeed,
+    'STABLE',
+    'STABLE',
+    '1',
+    true
+  );
+  const STOCK = await mockDebtTokenFactory.deploy(
+    contracts.troveManager,
+    contracts.borrowerOperations,
+    contracts.stabilityPoolManager,
+    contracts.priceFeed,
+    'STOCK',
+    'STOCK',
+    '1',
+    false
+  );
 
-    await contracts.storagePool.setAddresses(
-      contracts.borrowerOperations.address,
-      contracts.troveManager.address,
-      contracts.stabilityPoolManager.address,
-      contracts.priceFeedTestnet.address
-    );
+  // debt tokens
+  contracts.debtToken = {
+    STABLE,
+    STOCK,
+  };
+  await contracts.debtTokenManager.addDebtToken(STABLE);
+  await contracts.debtTokenManager.addDebtToken(STOCK);
+  await contracts.priceFeed.setTokenPrice(STOCK, parseUnits('150'));
+};
 
-    await contracts.debtTokenManager.setAddresses(
-      contracts.troveManager.address,
-      contracts.borrowerOperations.address,
-      contracts.stabilityPoolManager.address,
-      contracts.priceFeedTestnet.address
-    );
+// class DeploymentHelper {
+//   static async deployTesterContracts() {
+//     const testerContracts = {
+//       priceFeedTestnet: await PriceFeedTestnet.new(),
+//       troveManager: await TroveManager.new(),
+//       functionCaller: await FunctionCaller.new(),
+//       stabilityPoolManager: await StabilityPoolManager.new(),
+//       collTokenManager: await CollTokenManager.new(),
+//       debtTokenManager: await DebtTokenManager.new(),
+//       // Actual tester contract
+//       storagePool: await StoragePoolTester.new(),
+//       borrowerOperations: await BorrowerOperationsTester.new(),
+//       math: await LiquityMathTester.new(),
+//     };
 
-    await contracts.collTokenManager.setAddresses(contracts.priceFeedTestnet.address);
+//     return testerContracts;
+//   }
 
-    await contracts.stabilityPoolManager.setAddresses(
-      contracts.troveManager.address,
-      contracts.priceFeedTestnet.address,
-      contracts.storagePool.address,
-      contracts.debtTokenManager.address
-    );
-  }
+//   static async deployProxyScripts(contracts, owner, users) {
+//     const proxies = await buildUserProxies(users);
 
-  static async deployAndLinkToken(contracts) {
-    // coll tokens
-    contracts.collToken = {
-      USDT: await AnyTokenTester.new('USDT', 'USDT'),
-      BTC: await AnyTokenTester.new('Bitcoin', 'BTC'),
-    };
-    await contracts.collTokenManager.addCollToken(contracts.collToken.USDT.address);
-    await contracts.collTokenManager.addCollToken(contracts.collToken.BTC.address);
-    await contracts.priceFeedTestnet.setTokenPrice(contracts.collToken.BTC.address, th.toBN(th.dec(21000, 18)));
+//     const borrowerWrappersScript = await BorrowerWrappersScript.new(
+//       contracts.borrowerOperations.address,
+//       contracts.troveManager.address
+//     );
+//     contracts.borrowerWrappers = new BorrowerWrappersProxy(owner, proxies, borrowerWrappersScript.address);
 
-    // debt tokens
-    contracts.debtToken = {
-      STABLE: await DebtTokenTester.new(
-        contracts.troveManager.address,
-        contracts.borrowerOperations.address,
-        contracts.stabilityPoolManager.address,
-        contracts.priceFeedTestnet.address,
-        'STABLE',
-        'STABLE',
-        '1',
-        true
-      ),
-      STOCK: await DebtTokenTester.new(
-        contracts.troveManager.address,
-        contracts.borrowerOperations.address,
-        contracts.stabilityPoolManager.address,
-        contracts.priceFeedTestnet.address,
-        'STOCK',
-        'STOCK',
-        '1',
-        false
-      ),
-    };
-    await contracts.debtTokenManager.addDebtToken(contracts.debtToken.STABLE.address);
-    await contracts.debtTokenManager.addDebtToken(contracts.debtToken.STOCK.address);
-    await contracts.priceFeedTestnet.setTokenPrice(contracts.debtToken.STOCK.address, th.toBN(th.dec(150, 18)));
-  }
+//     const borrowerOperationsScript = await BorrowerOperationsScript.new(contracts.borrowerOperations.address);
+//     contracts.borrowerOperations = new BorrowerOperationsProxy(
+//       owner,
+//       proxies,
+//       borrowerOperationsScript.address,
+//       contracts.borrowerOperations
+//     );
 
-  static async deployProxyScripts(contracts, owner, users) {
-    const proxies = await buildUserProxies(users);
-
-    const borrowerWrappersScript = await BorrowerWrappersScript.new(
-      contracts.borrowerOperations.address,
-      contracts.troveManager.address
-    );
-    contracts.borrowerWrappers = new BorrowerWrappersProxy(owner, proxies, borrowerWrappersScript.address);
-
-    const borrowerOperationsScript = await BorrowerOperationsScript.new(contracts.borrowerOperations.address);
-    contracts.borrowerOperations = new BorrowerOperationsProxy(
-      owner,
-      proxies,
-      borrowerOperationsScript.address,
-      contracts.borrowerOperations
-    );
-
-    const troveManagerScript = await TroveManagerScript.new(contracts.troveManager.address);
-    contracts.troveManager = new TroveManagerProxy(owner, proxies, troveManagerScript.address, contracts.troveManager);
-  }
-}
-module.exports = DeploymentHelper;
+//     const troveManagerScript = await TroveManagerScript.new(contracts.troveManager.address);
+//     contracts.troveManager = new TroveManagerProxy(owner, proxies, troveManagerScript.address, contracts.troveManager);
+//   }
+// }

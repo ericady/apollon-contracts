@@ -11,5 +11,5 @@
     "skipDefaultLibCheck": true,
     "skipLibCheck": true
   },
-  "include": ["hardhat.config.ts", "./scripts", "./deploy", "./test", "./typechain", "deploy", "utils"]
+  "include": ["hardhat.config.ts", "./scripts", "./deploy", "./test", "./typechain", "deploy", "./utils"]
 }
