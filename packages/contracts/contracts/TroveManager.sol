@@ -800,10 +800,9 @@ contract TroveManager is LiquityBase, Ownable, CheckContract, ITroveManager {
     for (uint i = 0; i < vars.collLots.length; i++) {
       TokenAmount memory collEntry = vars.collLots[i];
 
-      // TODO: check percent decimal again
       uint collPrice = priceFeed.getPrice(collEntry.tokenAddress);
-      uint collPercent = (collPrice * collEntry.amount) / vars.troveCollInStable;
-      uint collToRedeemInStable = vars.stableCoinLot * collPercent;
+      uint collInStable = priceFeed.getUSDValue(collEntry.tokenAddress, collEntry.amount);
+      uint collToRedeemInStable = (vars.stableCoinLot * collInStable) / vars.troveCollInStable;
       collEntry.amount = collToRedeemInStable / collPrice;
       newCollInStable -= collToRedeemInStable;
     }
