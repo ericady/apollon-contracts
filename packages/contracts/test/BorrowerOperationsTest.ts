@@ -151,8 +151,8 @@ describe('BorrowerOperations', () => {
     });
 
     const alice_Trove_Before = await troveManager.Troves(alice);
-    const alice_DebtAndColl_Before = await troveManager.getEntireDebtAndColl(alice);
-    const alice_Coll_Before = await alice_DebtAndColl_Before.amounts[0].amount;
+    const alice_DebtAndColl_Before = await troveManager.getTroveColl(alice);
+    const alice_Coll_Before = await alice_DebtAndColl_Before[0].amount;
     const status_Before = alice_Trove_Before.status;
 
     // check status before
@@ -170,12 +170,47 @@ describe('BorrowerOperations', () => {
     ]);
 
     const alice_Trove_After = await troveManager.Troves(alice);
-    const alice_DebtAndColl_After = await troveManager.getEntireDebtAndColl(alice);
-    const alice_Coll_After = await alice_DebtAndColl_After.amounts[0].amount;
+    const alice_DebtAndColl_After = await troveManager.getTroveColl(alice);
+    const alice_Coll_After = await alice_DebtAndColl_After[0].amount;
     const status_After = alice_Trove_After.status;
 
     // check coll increases by correct amount,and status remains active
     expect(alice_Coll_After).to.be.equal(alice_Coll_Before + collTopUp);
     expect(status_After).to.be.equal(1);
+  });
+
+  it('addColl(), active Trove: updates the stake and updates the total stakes', async () => {
+    //  Alice creates initial Trove with 1 ether
+    const aliceColl = parseUnits('0.05', 9);
+    await openTrove({
+      from: alice,
+      contracts,
+      collToken: BTC,
+      collAmount: aliceColl,
+      debts: [{ tokenAddress: STOCK, amount: parseUnits('1') }],
+    });
+    const BTC_Price = await priceFeed.getPrice(BTC);
+
+    const alice_Stake_Before = await troveManager.getTroveStake(alice);
+    const totalStakes_Before = await troveManager.totalStakes(BTC);
+
+    expect(alice_Stake_Before).to.be.equal((totalStakes_Before * BTC_Price) / 1_000_000_000n);
+
+    // Alice tops up Trove collateral with 2 ether
+    const collTopUp = parseUnits('1', 9);
+    await BTC.unprotectedMint(alice, collTopUp);
+    await BTC.connect(alice).approve(borrowerOperations, collTopUp);
+    await borrowerOperations.connect(alice).addColl([
+      {
+        tokenAddress: BTC,
+        amount: collTopUp,
+      },
+    ]);
+
+    // Check stake and total stakes get updated
+    const alice_Stake_After = await troveManager.getTroveStake(alice);
+    const totalStakes_After = await troveManager.totalStakes(BTC);
+    expect(alice_Stake_After).to.be.equal(alice_Stake_Before + (collTopUp * BTC_Price) / 1_000_000_000n);
+    expect(totalStakes_After).to.be.equal(totalStakes_Before + collTopUp);
   });
 });

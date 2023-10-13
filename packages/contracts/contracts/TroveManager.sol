@@ -1377,6 +1377,11 @@ contract TroveManager is LiquityBase, Ownable, CheckContract, ITroveManager {
     return uint(Troves[_borrower].status);
   }
 
+  /**
+   * @notice Return borrowers staked value in USD
+   * @param _borrower Borrower
+   * @return stakedUSDValue
+   */
   function getTroveStake(address _borrower) external view override returns (uint) {
     return _calculateTrovesStake(_borrower);
   }
@@ -1384,7 +1389,6 @@ contract TroveManager is LiquityBase, Ownable, CheckContract, ITroveManager {
   // the current stake of the trove is depended on the current collateral prices
   function _calculateTrovesStake(address _borrower) internal view returns (uint stake) {
     Trove storage trove = Troves[_borrower];
-    // address[] memory collTokenAddresses = collTokenManager.getCollTokenAddresses();
 
     for (uint i = 0; i < trove.collTokens.length; i++) {
       address tokenAddress = trove.collTokens[i];
