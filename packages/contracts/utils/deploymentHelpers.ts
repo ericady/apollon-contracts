@@ -3,8 +3,6 @@ import {
   BorrowerOperations,
   CollTokenManager,
   DebtTokenManager,
-  MockDebtToken,
-  MockERC20,
   MockPriceFeed,
   StabilityPoolManager,
   StoragePool,

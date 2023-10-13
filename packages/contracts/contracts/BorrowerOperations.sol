@@ -157,8 +157,8 @@ contract BorrowerOperations is LiquityBase, Ownable, CheckContract, IBorrowerOpe
     );
     vars.debts = new DebtTokenAmount[](1);
     vars.debts[0] = stableCoinAmount;
-
-    vars.compositeDebtInStable = _getCompositeDebt(vars.debts); // ICR is based on the composite debt, i.e. the requested debt amount + borrowing fee + debt gas comp.
+    // ICR is based on the composite debt, i.e. the requested debt amount + borrowing fee + debt gas comp.
+    vars.compositeDebtInStable = _getCompositeDebt(vars.debts);
 
     vars.colls = _colls;
     vars.compositeCollInStable = _getCompositeColl(vars.colls);
