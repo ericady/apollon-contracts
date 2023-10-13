@@ -40,11 +40,6 @@ describe('BorrowerOperations', () => {
   let storagePool: StoragePool;
   let stabilityPoolManager: StabilityPoolManager;
 
-  // const getOpenTroveLUSDAmount = async totalDebt => th.getOpenTroveLUSDAmount(contracts, totalDebt);
-  // const openTrove = async params => th.openTrove(contracts, params);
-  // const increaseDebt = async params => th.increaseDebt(contracts, params);
-  // const assertRevert = th.assertRevert;
-
   before(async () => {
     [owner, defaulter_1, defaulter_2, defaulter_3, whale, alice, bob, carol, dennis, erin, flyn] =
       await ethers.getSigners();
@@ -143,5 +138,44 @@ describe('BorrowerOperations', () => {
     const pool_RawBTC_After = await BTC.balanceOf(storagePool);
     expect(pool_BTC_After).to.be.equal(pool_BTC_Before + collTopUp);
     expect(pool_RawBTC_After).to.be.equal(pool_RawBTC_Before + collTopUp);
+  });
+  it('addColl(), active Trove: adds the correct collateral amount to the Trove', async () => {
+    // alice creates a Trove and adds first collateral
+    const aliceColl = parseUnits('0.05', 9);
+    await openTrove({
+      from: alice,
+      contracts,
+      collToken: BTC,
+      collAmount: aliceColl,
+      debts: [{ tokenAddress: STOCK, amount: parseUnits('1') }],
+    });
+
+    const alice_Trove_Before = await troveManager.Troves(alice);
+    const alice_DebtAndColl_Before = await troveManager.getEntireDebtAndColl(alice);
+    const alice_Coll_Before = await alice_DebtAndColl_Before.amounts[0].amount;
+    const status_Before = alice_Trove_Before.status;
+
+    // check status before
+    expect(status_Before).to.be.equal(1);
+
+    // Alice adds second collateral
+    const collTopUp = parseUnits('1', 9);
+    await BTC.unprotectedMint(alice, collTopUp);
+    await BTC.connect(alice).approve(borrowerOperations, collTopUp);
+    await borrowerOperations.connect(alice).addColl([
+      {
+        tokenAddress: BTC,
+        amount: collTopUp,
+      },
+    ]);
+
+    const alice_Trove_After = await troveManager.Troves(alice);
+    const alice_DebtAndColl_After = await troveManager.getEntireDebtAndColl(alice);
+    const alice_Coll_After = await alice_DebtAndColl_After.amounts[0].amount;
+    const status_After = alice_Trove_After.status;
+
+    // check coll increases by correct amount,and status remains active
+    expect(alice_Coll_After).to.be.equal(alice_Coll_Before + collTopUp);
+    expect(status_After).to.be.equal(1);
   });
 });
