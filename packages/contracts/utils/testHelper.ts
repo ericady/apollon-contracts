@@ -75,7 +75,7 @@ export const whaleShrimpTroveInit = async (contracts: Contracts, signers: Signer
     from: whale,
     contracts,
     collToken: contracts.collToken.BTC,
-    collAmount: parseUnits('1'),
+    collAmount: parseUnits('1', 9),
     debts: [{ tokenAddress: STABLE, amount: parseUnits('1850') }],
   });
 
@@ -84,7 +84,7 @@ export const whaleShrimpTroveInit = async (contracts: Contracts, signers: Signer
     from: alice,
     contracts,
     collToken: BTC,
-    collAmount: parseUnits('1'),
+    collAmount: parseUnits('1', 9),
     debts: [{ tokenAddress: STABLE, amount: parseUnits('1000') }],
   });
   await stabilityPoolManager.connect(alice).provideStability([{ tokenAddress: STABLE, amount: parseUnits('1000') }]);
@@ -92,7 +92,7 @@ export const whaleShrimpTroveInit = async (contracts: Contracts, signers: Signer
     from: bob,
     contracts,
     collToken: BTC,
-    collAmount: parseUnits('1'),
+    collAmount: parseUnits('1', 9),
     debts: [{ tokenAddress: STABLE, amount: parseUnits('2000') }],
   });
   await stabilityPoolManager.connect(bob).provideStability([{ tokenAddress: STABLE, amount: parseUnits('2000') }]);
@@ -100,7 +100,7 @@ export const whaleShrimpTroveInit = async (contracts: Contracts, signers: Signer
     from: carol,
     contracts,
     collToken: BTC,
-    collAmount: parseUnits('1'),
+    collAmount: parseUnits('1', 9),
     debts: [{ tokenAddress: STABLE, amount: parseUnits('3000') }],
   });
   await stabilityPoolManager.connect(carol).provideStability([{ tokenAddress: STABLE, amount: parseUnits('3000') }]);
@@ -110,7 +110,7 @@ export const whaleShrimpTroveInit = async (contracts: Contracts, signers: Signer
     from: dennis,
     contracts,
     collToken: BTC,
-    collAmount: parseUnits('1'),
+    collAmount: parseUnits('1', 9),
     debts: [{ tokenAddress: STABLE, amount: parseUnits('300') }],
   });
 
@@ -119,14 +119,14 @@ export const whaleShrimpTroveInit = async (contracts: Contracts, signers: Signer
     from: defaulter_1,
     contracts,
     collToken: BTC,
-    collAmount: parseUnits('0.02'), // 0.02 BTC
-    debts: [{ tokenAddress: STABLE, amount: parseUnits('1', 5) }],
+    collAmount: parseUnits('0.02', 9), // 0.02 BTC
+    debts: [{ tokenAddress: STABLE, amount: parseUnits('1') }],
   });
   await openTrove({
     from: defaulter_2,
     contracts,
     collToken: BTC,
-    collAmount: parseUnits('0.02'), // 0.02 BTC
-    debts: [{ tokenAddress: STABLE, amount: parseUnits('1', 5) }],
+    collAmount: parseUnits('0.02', 9), // 0.02 BTC
+    debts: [{ tokenAddress: STABLE, amount: parseUnits('1') }],
   });
 };

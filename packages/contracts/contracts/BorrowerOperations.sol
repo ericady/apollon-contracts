@@ -496,7 +496,7 @@ contract BorrowerOperations is LiquityBase, Ownable, CheckContract, IBorrowerOpe
     _troveManager.decayBaseRateFromBorrowing(); // decay the baseRate state variable
     borrowingFee = _troveManager.getBorrowingFee(compositeDebtInStable); // calculated in stable price
     _requireUserAcceptsFee(borrowingFee, compositeDebtInStable, _maxFeePercentage);
-    uint stableCoinPrice = priceFeed.getPrice(address(_stableCoinAmount.debtToken));
+    uint stableCoinPrice = _stableCoinAmount.debtToken.getPrice();
     borrowingFee /= stableCoinPrice;
 
     // todo...

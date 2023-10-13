@@ -45,7 +45,7 @@ describe('Access Control: Apollon functions with the caller restricted to Apollo
     priceFeed = await priceFeedFactory.deploy();
 
     const mockTokenFactory = await ethers.getContractFactory('MockERC20');
-    BTC = await mockTokenFactory.deploy('Bitcoin', 'BTC');
+    BTC = await mockTokenFactory.deploy('Bitcoin', 'BTC', 9);
 
     const mockDebtTokenFactory = await ethers.getContractFactory('MockDebtToken');
     stableDebt = await mockDebtTokenFactory.deploy(

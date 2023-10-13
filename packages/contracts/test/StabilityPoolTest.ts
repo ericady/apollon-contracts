@@ -128,7 +128,7 @@ describe('StabilityPool', () => {
         from: whale,
         contracts,
         collToken: BTC,
-        collAmount: parseUnits('1'),
+        collAmount: parseUnits('1', 9),
         debts: [{ tokenAddress: STOCK, amount: parseUnits('1') }],
       });
       await stabilityPoolManager.connect(whale).provideStability([{ tokenAddress: STOCK, amount: parseUnits('1') }]);
@@ -138,15 +138,15 @@ describe('StabilityPool', () => {
         from: defaulter_1,
         contracts,
         collToken: BTC,
-        collAmount: parseUnits('0.02'), // 0.02 BTC
-        debts: [{ tokenAddress: STOCK, amount: parseUnits('1', 5) }],
+        collAmount: parseUnits('0.02', 9), // 0.02 BTC
+        debts: [{ tokenAddress: STOCK, amount: parseUnits('1') }],
       });
       await openTrove({
         from: defaulter_2,
         contracts,
         collToken: BTC,
-        collAmount: parseUnits('0.02'), // 0.02 BTC
-        debts: [{ tokenAddress: STOCK, amount: parseUnits('1', 5) }],
+        collAmount: parseUnits('0.02', 9), // 0.02 BTC
+        debts: [{ tokenAddress: STOCK, amount: parseUnits('1') }],
       });
 
       // Alice makes Trove and withdraws 1 stock
@@ -154,7 +154,7 @@ describe('StabilityPool', () => {
         from: alice,
         contracts,
         collToken: BTC,
-        collAmount: parseUnits('1'),
+        collAmount: parseUnits('1', 9),
         debts: [{ tokenAddress: STOCK, amount: parseUnits('1') }],
       });
 
@@ -220,7 +220,7 @@ describe('StabilityPool', () => {
         from: whale,
         contracts,
         collToken: contracts.collToken.BTC,
-        collAmount: parseUnits('1'),
+        collAmount: parseUnits('1', 9),
         debts: [{ tokenAddress: STOCK, amount: parseUnits('1') }],
       });
       await stabilityPoolManager.connect(whale).provideStability([{ tokenAddress: STOCK, amount: parseUnits('1', 5) }]);
@@ -230,22 +230,22 @@ describe('StabilityPool', () => {
         from: defaulter_1,
         contracts,
         collToken: BTC,
-        collAmount: parseUnits('0.02'), // 0.02 BTC
-        debts: [{ tokenAddress: STOCK, amount: parseUnits('1', 5) }],
+        collAmount: parseUnits('0.02', 9), // 0.02 BTC
+        debts: [{ tokenAddress: STOCK, amount: parseUnits('1') }],
       });
       await openTrove({
         from: defaulter_2,
         contracts,
         collToken: BTC,
-        collAmount: parseUnits('0.02'), // 0.02 BTC
-        debts: [{ tokenAddress: STOCK, amount: parseUnits('1', 5) }],
+        collAmount: parseUnits('0.02', 9), // 0.02 BTC
+        debts: [{ tokenAddress: STOCK, amount: parseUnits('1') }],
       });
       await openTrove({
         from: defaulter_3,
         contracts,
         collToken: BTC,
-        collAmount: parseUnits('0.02'), // 0.02 BTC
-        debts: [{ tokenAddress: STOCK, amount: parseUnits('1', 5) }],
+        collAmount: parseUnits('0.02', 9), // 0.02 BTC
+        debts: [{ tokenAddress: STOCK, amount: parseUnits('1') }],
       });
 
       // --- TEST ---
@@ -255,7 +255,7 @@ describe('StabilityPool', () => {
         from: alice,
         contracts,
         collToken: BTC,
-        collAmount: parseUnits('1'),
+        collAmount: parseUnits('1', 9),
         debts: [{ tokenAddress: STOCK, amount: parseUnits('1') }],
       });
       await stabilityPoolManager.connect(alice).provideStability([{ tokenAddress: STOCK, amount: 100000n }]);
@@ -272,8 +272,8 @@ describe('StabilityPool', () => {
       // 2 users with Trove with 200 STOCK drawn are closed
       // 0.04 BTC -> 50% to the whale, 50% to alice
       // pool is empty after that
-      await troveManager.connect(owner).liquidate(defaulter_1);
-      await troveManager.connect(owner).liquidate(defaulter_2);
+      await troveManager.liquidate(defaulter_1);
+      await troveManager.liquidate(defaulter_2);
 
       const alice_compoundedDeposit_1 = await stockPool.getCompoundedDebtDeposit(alice);
       expect(alice_compoundedDeposit_1).to.be.equal(0n); // all debt was consumed
@@ -301,8 +301,8 @@ describe('StabilityPool', () => {
       await openTrove({
         from: bob,
         contracts,
-        collToken: contracts.collToken.BTC,
-        collAmount: parseUnits('1'),
+        collToken: BTC,
+        collAmount: parseUnits('1', 9),
         debts: [{ tokenAddress: STOCK, amount: parseUnits('1') }],
       });
       await stabilityPoolManager.connect(bob).provideStability([{ tokenAddress: STOCK, amount: 100000 }]);
@@ -470,10 +470,10 @@ describe('StabilityPool', () => {
       await troveManager.connect(owner).liquidate(defaulter_1);
       await troveManager.connect(owner).liquidate(defaulter_2);
 
-      const activeDebt_Before = await storagePool.getValue(STABLE.target, false, 0);
-      const defaultedDebt_Before = await storagePool.getValue(STABLE.target, false, 1);
-      const activeColl_Before = await storagePool.getValue(BTC.target, true, 0);
-      const defaultedColl_Before = await storagePool.getValue(BTC.target, true, 1);
+      const activeDebt_Before = await storagePool.getValue(STABLE, false, 0);
+      const defaultedDebt_Before = await storagePool.getValue(STABLE, false, 1);
+      const activeColl_Before = await storagePool.getValue(BTC, true, 0);
+      const defaultedColl_Before = await storagePool.getValue(BTC, true, 1);
       const [, tcrBefore, ,] = await storagePool.checkRecoveryMode();
 
       // D makes an SP deposit
@@ -481,10 +481,10 @@ describe('StabilityPool', () => {
         .connect(dennis)
         .provideStability([{ tokenAddress: STABLE, amount: parseUnits('300') }]);
 
-      const activeDebt_After = await storagePool.getValue(STABLE.target, false, 0);
-      const defaultedDebt_After = await storagePool.getValue(STABLE.target, false, 1);
-      const activeColl_After = await storagePool.getValue(BTC.target, true, 0);
-      const defaultedColl_After = await storagePool.getValue(BTC.target, true, 1);
+      const activeDebt_After = await storagePool.getValue(STABLE, false, 0);
+      const defaultedDebt_After = await storagePool.getValue(STABLE, false, 1);
+      const activeColl_After = await storagePool.getValue(BTC, true, 0);
+      const defaultedColl_After = await storagePool.getValue(BTC, true, 1);
       const [, tcrAfter, ,] = await storagePool.checkRecoveryMode();
 
       // Check total system debt, collateral and TCR have not changed after a Stability deposit is made

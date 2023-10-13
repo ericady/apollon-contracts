@@ -4,7 +4,15 @@ pragma solidity ^0.8.9;
 import '@openzeppelin/contracts/token/ERC20/ERC20.sol';
 
 contract MockERC20 is ERC20 {
-  constructor(string memory _name, string memory _symbol) ERC20(_name, _symbol) {}
+  uint8 private _decimals;
+
+  constructor(string memory name, string memory symbol, uint8 decimals_) ERC20(name, symbol) {
+    _decimals = decimals_;
+  }
+
+  function decimals() public view override returns (uint8) {
+    return _decimals;
+  }
 
   function unprotectedMint(address _account, uint256 _amount) external {
     _mint(_account, _amount);

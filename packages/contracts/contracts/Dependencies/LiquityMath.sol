@@ -100,7 +100,7 @@ library LiquityMath {
   }
 
   function _computeCR(uint _coll, uint _debt) internal pure returns (uint) {
-    if (_debt > 0) return (_coll / _debt) * DECIMAL_PRECISION;
+    if (_debt > 0) return (_coll * DECIMAL_PRECISION) / _debt;
 
     // Return the maximal value for uint256 if the Trove has a debt of 0. Represents "infinite" CR.
     // if (_debt == 0)
