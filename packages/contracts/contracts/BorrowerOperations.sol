@@ -497,7 +497,7 @@ contract BorrowerOperations is LiquityBase, Ownable, CheckContract, IBorrowerOpe
     borrowingFee = _troveManager.getBorrowingFee(compositeDebtInStable); // calculated in stable price
     _requireUserAcceptsFee(borrowingFee, compositeDebtInStable, _maxFeePercentage);
     uint stableCoinPrice = _stableCoinAmount.debtToken.getPrice();
-    borrowingFee /= stableCoinPrice;
+    borrowingFee = (borrowingFee * DECIMAL_PRECISION) / stableCoinPrice;
 
     // todo...
     // Send fee to staking contract
