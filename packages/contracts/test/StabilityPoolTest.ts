@@ -223,7 +223,7 @@ describe('StabilityPool', () => {
         collAmount: parseUnits('1', 9),
         debts: [{ tokenAddress: STOCK, amount: parseUnits('1') }],
       });
-      await stabilityPoolManager.connect(whale).provideStability([{ tokenAddress: STOCK, amount: parseUnits('1', 5) }]);
+      await stabilityPoolManager.connect(whale).provideStability([{ tokenAddress: STOCK, amount: parseUnits('1') }]);
 
       // 2 Troves opened, each withdraws minimum debt
       await openTrove({
@@ -256,9 +256,9 @@ describe('StabilityPool', () => {
         contracts,
         collToken: BTC,
         collAmount: parseUnits('1', 9),
-        debts: [{ tokenAddress: STOCK, amount: parseUnits('1') }],
+        debts: [{ tokenAddress: STOCK, amount: parseUnits('3') }],
       });
-      await stabilityPoolManager.connect(alice).provideStability([{ tokenAddress: STOCK, amount: 100000n }]);
+      await stabilityPoolManager.connect(alice).provideStability([{ tokenAddress: STOCK, amount: parseUnits('1') }]);
 
       const stockPool = await getStabilityPool(contracts, STOCK);
       const alice_Snapshot_S_0 = await stockPool.getDepositorCollGain(alice, BTC);
@@ -269,7 +269,7 @@ describe('StabilityPool', () => {
       // price drops: defaulters' Troves fall below MCR, alice and whale Trove remain active
       await priceFeed.setTokenPrice(BTC, parseUnits('9500'));
 
-      // 2 users with Trove with 200 STOCK drawn are closed
+      // 2 users with Trove with 2 STOCK drawn are closed
       // 0.04 BTC -> 50% to the whale, 50% to alice
       // pool is empty after that
       await troveManager.liquidate(defaulter_1);
@@ -280,20 +280,22 @@ describe('StabilityPool', () => {
 
       // Alice makes deposit #2
       // 0.02 BTC will be paid out to alice
-      const alice_topUp_1 = 100000n;
+      const alice_topUp_1 = parseUnits('1');
       await stabilityPoolManager.connect(alice).provideStability([{ tokenAddress: STOCK, amount: alice_topUp_1 }]);
       const alice_newDeposit_1 = await stockPool.getCompoundedDebtDeposit(alice);
       expect(alice_newDeposit_1).to.be.equal(alice_topUp_1);
+      const alice_btc_balance = await BTC.balanceOf(alice.address);
+      expect(alice_btc_balance).to.be.equal(19899999n);
 
       // get system reward terms
       const S_1 = await stockPool.epochToScaleToCollTokenToSum(1, 0, BTC);
-      expect(S_1).to.be.equal(0n);
+      expect(S_1).to.be.equal(0n); // pool is empty...
       const P_1 = await stockPool.P();
       expect(P_1).to.be.equal(parseUnits('1'));
 
       // check Alice's new snapshot is correct
-      const alice_Snapshot_S_1 = await stockPool.getDepositorCollGain(alice, BTC); // is 0, becuase alice claimed all coll rewards by providing more stability
-      expect(alice_Snapshot_S_1).to.be.equal(S_1);
+      const alice_Snapshot_S_1 = await stockPool.getDepositorCollGain(alice, BTC);
+      expect(alice_Snapshot_S_1).to.be.equal(0n); // is 0, because alice claimed all coll rewards by providing more stability
       const alice_Snapshot_P_1 = (await stockPool.depositSnapshots(alice)).P;
       expect(alice_Snapshot_P_1).to.be.equal(P_1);
 
@@ -305,7 +307,7 @@ describe('StabilityPool', () => {
         collAmount: parseUnits('1', 9),
         debts: [{ tokenAddress: STOCK, amount: parseUnits('1') }],
       });
-      await stabilityPoolManager.connect(bob).provideStability([{ tokenAddress: STOCK, amount: 100000 }]);
+      await stabilityPoolManager.connect(bob).provideStability([{ tokenAddress: STOCK, amount: parseUnits('1', 5) }]);
 
       // Defaulter 3 Trove is closed
       // 0.02 BTC, 50% alice, 50% bob
@@ -314,10 +316,10 @@ describe('StabilityPool', () => {
       const P_2 = await stockPool.P();
       expect(P_2).to.be.lt(P_1);
       const S_2 = await stockPool.epochToScaleToCollTokenToSum(1, 0, BTC);
-      expect(S_2).to.be.gt(S_1); // should be larger because some btc is added throw the defaulter 3 liqudiation
+      expect(S_2).to.be.gt(S_1); // should be larger because some btc is added throw the defaulter 3 liquidation
 
       // Alice makes deposit #3:
-      await stabilityPoolManager.connect(alice).provideStability([{ tokenAddress: STOCK, amount: 100000 }]);
+      await stabilityPoolManager.connect(alice).provideStability([{ tokenAddress: STOCK, amount: parseUnits('1', 5) }]);
 
       // check Alice's new snapshot is correct
       const alice_Snapshot_S_2 = await stockPool.getDepositorCollGain(alice, BTC);

@@ -582,7 +582,7 @@ contract StabilityPool is LiquityBase, Ownable, CheckContract, IStabilityPool {
   function _payoutCollGains(address _depositor) internal {
     for (uint i = 0; i < usedCollTokens.length; i++) {
       uint collGain = this.getDepositorCollGain(_depositor, usedCollTokens[i]);
-      _sendCollGainToDepositor(usedCollTokens[i], collGain);
+      _sendCollGainToDepositor(_depositor, usedCollTokens[i], collGain);
       //            emit CollateralGainWithdrawn(_depositor, usedCollTokens[i], collGain); todo
     }
   }
@@ -695,14 +695,14 @@ contract StabilityPool is LiquityBase, Ownable, CheckContract, IStabilityPool {
     emit StabilityPoolDepositBalanceUpdated(totalDeposits);
   }
 
-  function _sendCollGainToDepositor(address _collToken, uint _amount) internal {
+  function _sendCollGainToDepositor(address _depositor, address _collToken, uint _amount) internal {
     if (_amount == 0) return;
 
     uint newColl = totalGainedColl[_collToken] - _amount;
     totalGainedColl[_collToken] = newColl;
     emit StabilityPoolCollBalanceUpdates(_collToken, newColl);
 
-    IERC20(_collToken).transfer(address(msg.sender), _amount);
+    IERC20(_collToken).transfer(_depositor, _amount);
   }
 
   // --- Stability Pool Deposit Functionality ---
