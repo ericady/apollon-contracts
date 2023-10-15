@@ -71,6 +71,12 @@ interface ITroveManager is IBBase {
 
   function applyPendingRewards(address _borrower) external;
 
+  function getPendingReward(
+    address _borrower,
+    address _tokenAddress,
+    bool _isColl
+  ) external view returns (uint pendingReward);
+
   function getEntireDebtAndColl(
     address _borrower
   )

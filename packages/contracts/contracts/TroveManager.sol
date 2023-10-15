@@ -865,14 +865,14 @@ contract TroveManager is LiquityBase, Ownable, CheckContract, ITroveManager {
     for (uint i = 0; i < _trove.collTokens.length; i++) {
       address token = _trove.collTokens[i];
 
-      uint pendingRewards = _getPendingReward(_borrower, token, true);
+      uint pendingRewards = getPendingReward(_borrower, token, true);
       currentCollInStable += priceFeed.getUSDValue(token, _trove.colls[token] + pendingRewards);
     }
 
     for (uint i = 0; i < _trove.debtTokens.length; i++) {
       IDebtToken token = _trove.debtTokens[i];
 
-      uint pendingRewards = _getPendingReward(_borrower, address(token), true);
+      uint pendingRewards = getPendingReward(_borrower, address(token), true);
       currentDebtInStable += priceFeed.getUSDValue(address(token), _trove.debts[token] + pendingRewards);
     }
 
@@ -892,7 +892,7 @@ contract TroveManager is LiquityBase, Ownable, CheckContract, ITroveManager {
     for (uint i = 0; i < _trove.collTokens.length; i++) {
       address token = _trove.collTokens[i];
 
-      uint pendingRewards = _getPendingReward(_borrower, token, true);
+      uint pendingRewards = getPendingReward(_borrower, token, true);
       if (pendingRewards == 0) continue;
 
       _trove.colls[token] += pendingRewards;
@@ -903,7 +903,7 @@ contract TroveManager is LiquityBase, Ownable, CheckContract, ITroveManager {
       IDebtToken token = _trove.debtTokens[i];
       address tokenAddress = address(token);
 
-      uint pendingRewards = _getPendingReward(_borrower, tokenAddress, false);
+      uint pendingRewards = getPendingReward(_borrower, tokenAddress, false);
       if (pendingRewards == 0) continue;
 
       _trove.debts[token] += pendingRewards;
@@ -943,11 +943,11 @@ contract TroveManager is LiquityBase, Ownable, CheckContract, ITroveManager {
   }
 
   // Get the borrower's pending accumulated rewards, earned by their stake through their redistribution
-  function _getPendingReward(
+  function getPendingReward(
     address _borrower,
     address _tokenAddress,
     bool _isColl
-  ) internal view returns (uint pendingReward) {
+  ) public view returns (uint pendingReward) {
     uint snapshotValue = rewardSnapshots[_borrower][_tokenAddress][_isColl];
     uint rewardPerUnitStaked = liquidatedTokens[_tokenAddress][_isColl] - snapshotValue;
     if (rewardPerUnitStaked == 0 || Troves[_borrower].status != Status.active) return 0;
@@ -990,7 +990,7 @@ contract TroveManager is LiquityBase, Ownable, CheckContract, ITroveManager {
     for (uint i = 0; i < amounts.length; i++) {
       RAmount memory amountEntry = amounts[i];
 
-      amountEntry.pendingReward = _getPendingReward(_borrower, amountEntry.tokenAddress, amountEntry.isColl);
+      amountEntry.pendingReward = getPendingReward(_borrower, amountEntry.tokenAddress, amountEntry.isColl);
       uint totalAmount = amountEntry.amount + amountEntry.pendingReward;
       uint inStable = priceFeed.getUSDValue(amountEntry.tokenAddress, totalAmount);
 

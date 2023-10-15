@@ -1089,6 +1089,35 @@
     {
         "inputs": [
             {
+                "internalType": "address",
+                "name": "_borrower",
+                "type": "address"
+            },
+            {
+                "internalType": "address",
+                "name": "_tokenAddress",
+                "type": "address"
+            },
+            {
+                "internalType": "bool",
+                "name": "_isColl",
+                "type": "bool"
+            }
+        ],
+        "name": "getPendingReward",
+        "outputs": [
+            {
+                "internalType": "uint256",
+                "name": "pendingReward",
+                "type": "uint256"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
                 "internalType": "uint256",
                 "name": "_ETHDrawn",
                 "type": "uint256"
