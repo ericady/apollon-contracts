@@ -41,9 +41,9 @@ const StabilityUpdateDialog = () => {
 
   const fillMaxInputValue = (tokenAddress: string, walletAmount: number, stabilityCompoundAmount: number) => {
     if (tabValue === 'DEPOSIT') {
-      setValue(tokenAddress, walletAmount.toString(), { shouldValidate: true });
+      setValue(tokenAddress, walletAmount.toString(), { shouldValidate: true, shouldDirty: true });
     } else {
-      setValue(tokenAddress, stabilityCompoundAmount.toString(), { shouldValidate: true });
+      setValue(tokenAddress, stabilityCompoundAmount.toString(), { shouldValidate: true, shouldDirty: true });
     }
   };
 

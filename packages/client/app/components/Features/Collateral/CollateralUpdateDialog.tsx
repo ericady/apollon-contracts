@@ -83,9 +83,12 @@ const CollateralUpdateDialog = ({ buttonVariant, buttonSx = {} }: Props) => {
 
   const fillMaxInputValue = (fieldName: keyof FieldValues) => {
     if (tabValue === 'DEPOSIT') {
-      setValue(fieldName, etherAmount.toString(), { shouldValidate: true });
+      setValue(fieldName, etherAmount.toString(), { shouldValidate: true, shouldDirty: true });
     } else {
-      setValue(fieldName, depositedCollateralToDeposit[0].walletAmount!.toString(), { shouldValidate: true });
+      setValue(fieldName, depositedCollateralToDeposit[0].walletAmount!.toString(), {
+        shouldValidate: true,
+        shouldDirty: true,
+      });
     }
   };
 

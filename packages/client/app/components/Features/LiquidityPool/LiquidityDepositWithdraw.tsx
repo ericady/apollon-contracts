@@ -45,6 +45,7 @@ function LiquidityDepositWithdraw({ selectedPool }: Props) {
       tokenAAmount: '',
       tokenBAmount: '',
     },
+    reValidateMode: 'onChange',
   });
   const { handleSubmit, setValue, reset, formState, watch } = methods;
 
@@ -210,7 +211,10 @@ function LiquidityDepositWithdraw({ selectedPool }: Props) {
                     variant="undercover"
                     sx={{ textDecoration: 'underline', p: 0, mt: 0.25, height: 25 }}
                     onClick={() =>
-                      setValue('tokenAAmount', tokenA.borrowerAmount!.toString(), { shouldValidate: true })
+                      setValue('tokenAAmount', tokenA.borrowerAmount!.toString(), {
+                        shouldValidate: true,
+                        shouldDirty: true,
+                      })
                     }
                   >
                     max
@@ -258,7 +262,10 @@ function LiquidityDepositWithdraw({ selectedPool }: Props) {
                     variant="undercover"
                     sx={{ textDecoration: 'underline', p: 0, mt: 0.25, height: 25 }}
                     onClick={() =>
-                      setValue('tokenBAmount', tokenB.borrowerAmount!.toString(), { shouldValidate: true })
+                      setValue('tokenBAmount', tokenB.borrowerAmount!.toString(), {
+                        shouldValidate: true,
+                        shouldDirty: true,
+                      })
                     }
                   >
                     max

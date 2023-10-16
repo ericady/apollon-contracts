@@ -25,6 +25,8 @@ test.afterAll(() => {
   server.close();
 });
 
+// TODO: Write test for error message on filling max input (dirty => error message disappear)
+
 test.describe('CollateralUpdateDialog', () => {
   test('should render CollateralUpdateDialog with mocked data', async ({ mount, page }) => {
     // We need to mock the exact same data to generate the exact same snapshot
