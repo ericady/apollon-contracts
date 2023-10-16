@@ -62,26 +62,48 @@ function DebtTokenTable() {
           </TableHead>
           <TableBody>
             {data.getDebtTokens.map(
-              ({
-                stabilityDepositAPY,
-                totalDepositedStability,
-                token,
-                troveMintedAmount,
-                stabilityCompoundAmount,
-                totalSupplyUSD,
-                totalSupplyUSD24hAgo,
-              }) => (
+              (
+                {
+                  stabilityDepositAPY,
+                  totalDepositedStability,
+                  token,
+                  troveMintedAmount,
+                  stabilityCompoundAmount,
+                  totalSupplyUSD,
+                  totalSupplyUSD24hAgo,
+                },
+                index,
+              ) => (
                 <TableRow hover key={token.address}>
-                  <TableCell align="right">{roundCurrency(troveMintedAmount!, 5)}</TableCell>
-                  <TableCell align="right">{roundCurrency(stabilityCompoundAmount!, 5)}</TableCell>
-                  <TableCell sx={{ borderRight: '1px solid', borderColor: BUTTON_BACKGROUND }}>
+                  <TableCell align="right" sx={{ borderBottom: index === data.getDebtTokens.length - 1 ? 'none' : '' }}>
+                    {roundCurrency(troveMintedAmount!, 5)}
+                  </TableCell>
+                  <TableCell align="right" sx={{ borderBottom: index === data.getDebtTokens.length - 1 ? 'none' : '' }}>
+                    {roundCurrency(stabilityCompoundAmount!, 5)}
+                  </TableCell>
+                  <TableCell
+                    sx={{
+                      borderBottom: index === data.getDebtTokens.length - 1 ? 'none' : '',
+                      borderRight: '1px solid',
+                      borderColor: BUTTON_BACKGROUND,
+                    }}
+                  >
                     <Label variant="none">{token.symbol}</Label>
                   </TableCell>
-                  <TableCell align="right" sx={{ pr: 0 }}>
+                  <TableCell
+                    align="right"
+                    sx={{ borderBottom: index === data.getDebtTokens.length - 1 ? 'none' : '', pr: 0 }}
+                  >
                     {stdFormatter.format(totalSupplyUSD)}
                   </TableCell>
-                  <TableCell width={125}>
-                    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                  <TableCell width={125} sx={{ borderBottom: index === data.getDebtTokens.length - 1 ? 'none' : '' }}>
+                    <div
+                      style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'space-between',
+                      }}
+                    >
                       <Typography
                         fontWeight={400}
                         color={
@@ -94,8 +116,12 @@ function DebtTokenTable() {
                       <DirectionIcon showIncrease={percentageChange(totalSupplyUSD, totalSupplyUSD24hAgo) > 0} />
                     </div>
                   </TableCell>
-                  <TableCell align="right">{roundCurrency(totalDepositedStability)}</TableCell>
-                  <TableCell align="right">{displayPercentage(stabilityDepositAPY)}</TableCell>
+                  <TableCell align="right" sx={{ borderBottom: index === data.getDebtTokens.length - 1 ? 'none' : '' }}>
+                    {roundCurrency(totalDepositedStability)}
+                  </TableCell>
+                  <TableCell align="right" sx={{ borderBottom: index === data.getDebtTokens.length - 1 ? 'none' : '' }}>
+                    {displayPercentage(stabilityDepositAPY)}
+                  </TableCell>
                 </TableRow>
               ),
             )}

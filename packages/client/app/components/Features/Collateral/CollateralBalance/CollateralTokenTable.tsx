@@ -91,13 +91,16 @@ const CollateralTokenTable = () => {
               <TableRow>
                 <TableCell
                   align="right"
-                  sx={{ borderRight: '1px solid', borderColor: 'table.border', padding: '2px' }}
+                  sx={{ borderBottom: 'none', borderRight: '1px solid', borderColor: 'table.border', padding: '2px' }}
                 ></TableCell>
-                <TableCell align="right" sx={{ borderRight: '1px solid', borderColor: 'table.border', padding: '2px' }}>
+                <TableCell
+                  align="right"
+                  sx={{ borderBottom: 'none', borderRight: '1px solid', borderColor: 'table.border', padding: '2px' }}
+                >
                   <CollateralUpdateDialog buttonVariant="text" buttonSx={{ p: '6px 8px', width: '100%' }} />
                 </TableCell>
-                <TableCell align="right" style={{ padding: '2px' }}></TableCell>
-                <TableCell align="right" style={{ padding: '2px' }}></TableCell>
+                <TableCell align="right" style={{ borderBottom: 'none', padding: '2px' }}></TableCell>
+                <TableCell align="right" style={{ borderBottom: 'none', padding: '2px' }}></TableCell>
               </TableRow>
             </TableBody>
           </Table>

@@ -35,18 +35,24 @@ function TreasuryTable() {
             </TableRow>
           </TableHead>
           <TableBody>
-            {debtTokensInReserve.map(({ token, totalReserve, totalReserve24hAgo }) => (
+            {debtTokensInReserve.map(({ token, totalReserve, totalReserve24hAgo }, index) => (
               <TableRow hover key={token.address}>
-                <TableCell align="right" sx={{ pr: 0 }}>
+                <TableCell
+                  align="right"
+                  sx={{ borderBottom: index === debtTokensInReserve.length - 1 ? 'none' : '', pr: 0 }}
+                >
                   {stdFormatter.format(totalReserve)}
                 </TableCell>
-                <TableCell width={50}>
+                <TableCell width={50} sx={{ borderBottom: index === debtTokensInReserve.length - 1 ? 'none' : '' }}>
                   <Label variant="none">{token.symbol}</Label>
                 </TableCell>
-                <TableCell align="right" sx={{ pr: 0 }}>
+                <TableCell
+                  align="right"
+                  sx={{ borderBottom: index === debtTokensInReserve.length - 1 ? 'none' : '', pr: 0 }}
+                >
                   {roundCurrency(totalReserve - totalReserve24hAgo, 5)}
                 </TableCell>
-                <TableCell width={125}>
+                <TableCell width={125} sx={{ borderBottom: index === debtTokensInReserve.length - 1 ? 'none' : '' }}>
                   <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                     <Typography
                       fontWeight={400}

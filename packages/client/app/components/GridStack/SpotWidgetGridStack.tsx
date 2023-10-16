@@ -2,6 +2,7 @@
 
 import { GridStack } from 'gridstack';
 import { PropsWithChildren, useEffect } from 'react';
+import { WIDGET_HEIGHTS } from '../../utils/contants';
 
 const SPOT_PAGE_GRID_STATE_KEY = 'apollon-spot-page-grid-state';
 
