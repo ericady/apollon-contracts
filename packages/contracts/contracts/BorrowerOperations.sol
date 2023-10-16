@@ -193,7 +193,7 @@ contract BorrowerOperations is LiquityBase, Ownable, CheckContract, IBorrowerOpe
     contractsCache.troveManager.setTroveStatus(borrower, 1); // active
     contractsCache.troveManager.increaseTroveColl(borrower, vars.colls);
     contractsCache.troveManager.increaseTroveDebt(borrower, vars.debts);
-    contractsCache.troveManager.updateTroveRewardSnapshots(vars.collTokenAddresses, borrower);
+    contractsCache.troveManager.updateTroveRewardSnapshots(borrower);
     contractsCache.troveManager.updateStakeAndTotalStakes(vars.collTokenAddresses, borrower);
 
     vars.arrayIndex = contractsCache.troveManager.addTroveOwnerToArray(borrower);

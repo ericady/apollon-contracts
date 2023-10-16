@@ -3,6 +3,7 @@
 pragma solidity ^0.8.9;
 
 import '@openzeppelin/contracts/access/Ownable.sol';
+import '@openzeppelin/contracts/token/ERC20/extensions/IERC20Metadata.sol';
 import './Dependencies/LiquityBase.sol';
 import './Dependencies/CheckContract.sol';
 import './Interfaces/ITroveManager.sol';
@@ -14,6 +15,7 @@ import './Interfaces/IStoragePool.sol';
 import './Interfaces/IStabilityPoolManager.sol';
 import './Interfaces/IBBase.sol';
 import './Interfaces/ICollTokenManager.sol';
+import 'hardhat/console.sol';
 
 contract TroveManager is LiquityBase, Ownable, CheckContract, ITroveManager {
   string public constant NAME = 'TroveManager';
@@ -907,8 +909,10 @@ contract TroveManager is LiquityBase, Ownable, CheckContract, ITroveManager {
       if (pendingRewards == 0) continue;
 
       _trove.debts[token] += pendingRewards;
-      storagePool.transferBetweenTypes(tokenAddress, true, PoolType.Default, PoolType.Active, pendingRewards);
+      storagePool.transferBetweenTypes(tokenAddress, false, PoolType.Default, PoolType.Active, pendingRewards);
     }
+
+    _updateTroveRewardSnapshots(_borrower);
 
     // todo
     //    emit TroveUpdated(
@@ -921,20 +925,21 @@ contract TroveManager is LiquityBase, Ownable, CheckContract, ITroveManager {
   }
 
   // Update borrower's snapshots to reflect the current values
-  function updateTroveRewardSnapshots(address[] memory collTokenAddresses, address _borrower) external override {
+  function updateTroveRewardSnapshots(address _borrower) external override {
     _requireCallerIsBorrowerOperations();
-    return _updateTroveRewardSnapshots(collTokenAddresses, _borrower);
+    return _updateTroveRewardSnapshots(_borrower);
   }
 
-  function _updateTroveRewardSnapshots(address[] memory collTokenAddresses, address _borrower) internal {
+  function _updateTroveRewardSnapshots(address _borrower) internal {
+    Trove storage _trove = Troves[_borrower];
     address[] memory debtTokenAddresses = debtTokenManager.getDebtTokenAddresses();
-    for (uint i = 0; i < debtTokenAddresses.length; i++) {
+    for (uint i = 0; i < _trove.debtTokens.length; i++) {
       address token = debtTokenAddresses[i];
       rewardSnapshots[_borrower][token][false] = liquidatedTokens[token][false];
     }
 
-    for (uint i = 0; i < collTokenAddresses.length; i++) {
-      address token = collTokenAddresses[i];
+    for (uint i = 0; i < _trove.collTokens.length; i++) {
+      address token = _trove.collTokens[i];
       rewardSnapshots[_borrower][token][true] = liquidatedTokens[token][true];
     }
 

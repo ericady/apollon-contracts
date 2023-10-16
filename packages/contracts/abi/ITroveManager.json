@@ -1050,11 +1050,6 @@
     {
         "inputs": [
             {
-                "internalType": "address[]",
-                "name": "collTokenAddresses",
-                "type": "address[]"
-            },
-            {
                 "internalType": "address",
                 "name": "_borrower",
                 "type": "address"

@@ -29,7 +29,13 @@ export const openTrove = async ({
 
   if (debts) await increaseDebt(from, contracts, debts);
 
-  return { tx: openingTx };
+  const collateral = await contracts.troveManager.getTroveColl(from);
+  const debtInStable = await getTroveEntireDebt(contracts, from);
+
+  return {
+    collateral,
+    debtInStable,
+  };
 };
 
 export const increaseDebt = async (
@@ -129,4 +135,12 @@ export const whaleShrimpTroveInit = async (contracts: Contracts, signers: Signer
     collAmount: parseUnits('0.02', 9), // 0.02 BTC
     debts: [{ tokenAddress: STABLE, amount: parseUnits('1') }],
   });
+};
+
+export const getTroveEntireColl = async (contracts: Contracts, trove: SignerWithAddress) => {
+  return (await contracts.troveManager.getEntireDebtAndColl(trove)).troveCollInStable;
+};
+
+export const getTroveEntireDebt = async (contracts: Contracts, trove: SignerWithAddress) => {
+  return (await contracts.troveManager.getEntireDebtAndColl(trove)).troveDebtInStable;
 };
