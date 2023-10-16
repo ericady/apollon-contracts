@@ -40,8 +40,16 @@ type Props = {
    */
   loading?: boolean;
 
+  /**
+   * Used to update the ratio values outside of the component.
+   *
+   * @param newRatio is always updated on addedDebtUSD prop change. If all the debt can be extinguished it will be 0.
+   * @param oldRatio will never change as long as the debt stays the same.
+   */
   callback?: (newRatio: number, oldRatio: number) => void;
 };
+
+// TODO: Maybe move text into this component to have more efficient state updates and uniform loading state
 
 function CollateralRatioVisualization({
   addedDebtUSD = 0,
@@ -82,7 +90,9 @@ function CollateralRatioVisualization({
       ) ?? 0;
 
     const oldRatio = collateralValue / debtValue;
-    const newRatio = collateralValue / (debtValue + addedDebtUSD);
+
+    const depositFillsDebt = addedDebtUSD <= -debtValue;
+    const newRatio = depositFillsDebt ? 0 : collateralValue / (debtValue + addedDebtUSD);
 
     return [oldRatio, newRatio];
   }, [addedDebtUSD, collateralData, debtData]);
@@ -161,7 +171,8 @@ function CollateralRatioVisualization({
             borderColor: 'error.main',
           }}
         ></Box>
-        {addedDebtUSD !== 0 && (
+        {/* Just show indicator if a change is showns and not all debt can be extinguished */}
+        {addedDebtUSD !== 0 && newRatio !== 0 && (
           <Box
             sx={{
               position: 'absolute',

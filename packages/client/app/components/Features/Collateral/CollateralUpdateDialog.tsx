@@ -3,7 +3,16 @@
 import { useQuery } from '@apollo/client';
 import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
 import CloseIcon from '@mui/icons-material/Close';
-import { Box, Dialog, DialogActions, DialogContent, DialogTitle, FormHelperText, IconButton } from '@mui/material';
+import {
+  Box,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
+  FormHelperText,
+  IconButton,
+  Skeleton,
+} from '@mui/material';
 import Button, { ButtonProps } from '@mui/material/Button';
 import Tab from '@mui/material/Tab';
 import Tabs from '@mui/material/Tabs';
@@ -286,7 +295,11 @@ const CollateralUpdateDialog = ({ buttonVariant, buttonSx = {} }: Props) => {
                         fontSize: '20px',
                       }}
                     >
-                      {displayPercentage(oldRatio, 'default', 0)}
+                      {oldRatio !== null ? (
+                        displayPercentage(oldRatio, 'default', 0)
+                      ) : (
+                        <Skeleton variant="text" width={50} />
+                      )}
                     </Typography>
                     <ArrowForwardIosIcon sx={{ color: '#46434F', fontSize: '18px' }} />
                     <Typography
@@ -297,7 +310,13 @@ const CollateralUpdateDialog = ({ buttonVariant, buttonSx = {} }: Props) => {
                         fontSize: '20px',
                       }}
                     >
-                      {displayPercentage(newRatio, 'default', 0)}
+                      {newRatio === 0 ? (
+                        '∞'
+                      ) : newRatio !== null ? (
+                        displayPercentage(newRatio, 'default', 0)
+                      ) : (
+                        <Skeleton variant="text" width={50} />
+                      )}
                     </Typography>
                   </div>
                 </Box>

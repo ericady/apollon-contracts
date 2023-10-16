@@ -1,5 +1,5 @@
 import { useQuery } from '@apollo/client';
-import { Box, Button } from '@mui/material';
+import { Box, Button, Skeleton } from '@mui/material';
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
 import TableCell from '@mui/material/TableCell';
@@ -7,7 +7,7 @@ import TableContainer from '@mui/material/TableContainer';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import Typography from '@mui/material/Typography';
-import { useMemo } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import { useEthers } from '../../../context/EthersProvider';
 import { GetCollateralTokensQuery, GetCollateralTokensQueryVariables } from '../../../generated/gql-types';
 import { GET_BORROWER_COLLATERAL_TOKENS } from '../../../queries';
@@ -40,6 +40,8 @@ const generateColorPalette = (paletteLength: number) => {
 function CollateralTable() {
   const { address } = useEthers();
 
+  const [oldRatio, setOldRatio] = useState<null | number>(null);
+
   const { data } = useQuery<GetCollateralTokensQuery, GetCollateralTokensQueryVariables>(
     GET_BORROWER_COLLATERAL_TOKENS,
     {
@@ -61,6 +63,13 @@ function CollateralTable() {
     );
   }, [data]);
 
+  const ratioChangeCallback = useCallback(
+    (_: number, oldRatio: number) => {
+      setOldRatio(oldRatio);
+    },
+    [setOldRatio],
+  );
+
   return (
     <div style={{ display: 'flex' }}>
       <Box style={{ width: '40%', display: 'flex', justifyContent: 'center', backgroundColor: '#1e1b27' }}>
@@ -79,7 +88,7 @@ function CollateralTable() {
               <Typography
                 sx={{ fontFamily: 'Space Grotesk Variable', color: 'info.main', fontWeight: '700', fontSize: '20px' }}
               >
-                {displayPercentage(1.74, 'default', 0)}
+                {oldRatio !== null ? displayPercentage(oldRatio, 'default', 0) : <Skeleton variant="text" width={50} />}
               </Typography>
 
               <img
@@ -106,7 +115,7 @@ function CollateralTable() {
               <CollateralUpdateDialog buttonVariant="outlined" />
             )}
           </div>
-          <CollateralRatioVisualization />
+          <CollateralRatioVisualization callback={ratioChangeCallback} />
         </div>
 
         {!data ? (

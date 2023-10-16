@@ -1,7 +1,7 @@
 'use client';
 
 import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
-import { Box, FormHelperText } from '@mui/material';
+import { Box, FormHelperText, Skeleton } from '@mui/material';
 import Button from '@mui/material/Button';
 import Tab from '@mui/material/Tab';
 import Tabs from '@mui/material/Tabs';
@@ -32,8 +32,8 @@ function LiquidityDepositWithdraw({ selectedPool }: Props) {
   const { address } = useEthers();
 
   const [tabValue, setTabValue] = useState<'DEPOSIT' | 'WITHDRAW'>('DEPOSIT');
-  const [oldRatio, setOldRatio] = useState(0);
-  const [newRatio, setNewRatio] = useState(0);
+  const [oldRatio, setOldRatio] = useState<number | null>(null);
+  const [newRatio, setNewRatio] = useState<number | null>(null);
 
   const handleChange = (_: SyntheticEvent, newValue: 'DEPOSIT' | 'WITHDRAW') => {
     setTabValue(newValue);
@@ -287,13 +287,23 @@ function LiquidityDepositWithdraw({ selectedPool }: Props) {
                 <Typography
                   sx={{ fontFamily: 'Space Grotesk Variable', color: 'info.main', fontWeight: '700', fontSize: '20px' }}
                 >
-                  {displayPercentage(oldRatio, 'default', 0)}
+                  {oldRatio !== null ? (
+                    displayPercentage(oldRatio, 'default', 0)
+                  ) : (
+                    <Skeleton variant="text" width={50} />
+                  )}
                 </Typography>
                 <ArrowForwardIosIcon sx={{ color: '#46434F', fontSize: '18px' }} />
                 <Typography
                   sx={{ fontFamily: 'Space Grotesk Variable', color: 'info.main', fontWeight: '700', fontSize: '20px' }}
                 >
-                  {displayPercentage(newRatio, 'default', 0)}
+                  {newRatio === 0 ? (
+                    '∞'
+                  ) : newRatio !== null ? (
+                    displayPercentage(newRatio, 'default', 0)
+                  ) : (
+                    <Skeleton variant="text" width={50} />
+                  )}
                 </Typography>
               </div>
             </Box>

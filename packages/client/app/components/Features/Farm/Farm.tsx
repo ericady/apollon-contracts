@@ -30,8 +30,8 @@ type FieldValues = {
 const Farm = () => {
   const [tabValue, setTabValue] = useState<'Long' | 'Short'>('Long');
   const [showSlippage, setShowSlippage] = useState(false);
-  const [oldRatio, setOldRatio] = useState(0);
-  const [newRatio, setNewRatio] = useState(0);
+  const [oldRatio, setOldRatio] = useState<number | null>(null);
+  const [newRatio, setNewRatio] = useState<number | null>(null);
 
   const { address } = useEthers();
 
@@ -80,7 +80,7 @@ const Farm = () => {
         id: 'apollon-farm-widget',
       }}
     >
-      <div style={{ height: '432px', overflowY: 'scroll' }}>
+      <div style={{ height: '439px', overflowY: 'scroll' }}>
         <Tabs value={tabValue} onChange={handleTabChange} variant="fullWidth" sx={{ mx: '-15px' }}>
           <Tab label="LONG" value="Long" />
           <Tab label="SHORT" value="Short" />
@@ -239,8 +239,9 @@ const Farm = () => {
                 fontSize: '20px',
               }}
             >
-              {displayPercentage(oldRatio, 'default', 0)}
+              {oldRatio !== null ? displayPercentage(1, 'default', 0) : <Skeleton variant="text" width={50} />}
             </Typography>
+
             <ArrowForwardIosIcon sx={{ color: '#46434F', fontSize: '18px' }} />
             <Typography
               sx={{
@@ -250,7 +251,7 @@ const Farm = () => {
                 fontSize: '20px',
               }}
             >
-              {displayPercentage(newRatio, 'default', 0)}
+              {newRatio !== null ? displayPercentage(1, 'default', 0) : <Skeleton variant="text" width={50} />}
             </Typography>
           </div>
         </Box>
