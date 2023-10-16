@@ -8,7 +8,7 @@ import Button, { ButtonProps } from '@mui/material/Button';
 import Tab from '@mui/material/Tab';
 import Tabs from '@mui/material/Tabs';
 import Typography from '@mui/material/Typography';
-import { SyntheticEvent, useState } from 'react';
+import { SyntheticEvent, useCallback, useState } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
 import { useEthers } from '../../../context/EthersProvider';
 import { useWallet } from '../../../context/WalletProvider';
@@ -31,8 +31,10 @@ type FieldValues = {
 const CollateralUpdateDialog = ({ buttonVariant, buttonSx = {} }: Props) => {
   const [isOpen, setIsOpen] = useState(false);
   const [tabValue, setTabValue] = useState<'DEPOSIT' | 'WITHDRAW'>('DEPOSIT');
+  const [oldRatio, setOldRatio] = useState(0);
+  const [newRatio, setNewRatio] = useState(0);
 
-  const { etherAmount } = useWallet();
+  const { etherAmount, etherValueUSD } = useWallet();
   const { address } = useEthers();
 
   const { data } = useQuery<GetCollateralTokensQuery, GetCollateralTokensQueryVariables>(
@@ -50,7 +52,15 @@ const CollateralUpdateDialog = ({ buttonVariant, buttonSx = {} }: Props) => {
     },
     reValidateMode: 'onChange',
   });
-  const { handleSubmit, setValue, reset, formState } = methods;
+  const { handleSubmit, setValue, reset, formState, watch } = methods;
+
+  const ratioChangeCallback = useCallback(
+    (newRatio: number, oldRatio: number) => {
+      setNewRatio(newRatio);
+      setOldRatio(oldRatio);
+    },
+    [setNewRatio, setOldRatio],
+  );
 
   const handleChange = (_: SyntheticEvent, newValue: 'DEPOSIT' | 'WITHDRAW') => {
     setTabValue(newValue);
@@ -74,6 +84,10 @@ const CollateralUpdateDialog = ({ buttonVariant, buttonSx = {} }: Props) => {
     console.log('onSubmit called');
     // TODO: Implement contract call
   };
+
+  const etherTokenAmount = watch('etherTokenAmount');
+  const etherTokenAmountUSD =
+    (etherTokenAmount ? parseFloat(etherTokenAmount) * etherValueUSD : 0) * (tabValue === 'DEPOSIT' ? -1 : 1);
 
   return (
     <>
@@ -272,7 +286,7 @@ const CollateralUpdateDialog = ({ buttonVariant, buttonSx = {} }: Props) => {
                         fontSize: '20px',
                       }}
                     >
-                      {displayPercentage(1.56, 'default', 0)}
+                      {displayPercentage(oldRatio, 'default', 0)}
                     </Typography>
                     <ArrowForwardIosIcon sx={{ color: '#46434F', fontSize: '18px' }} />
                     <Typography
@@ -283,12 +297,16 @@ const CollateralUpdateDialog = ({ buttonVariant, buttonSx = {} }: Props) => {
                         fontSize: '20px',
                       }}
                     >
-                      {displayPercentage(1.43, 'default', 0)}
+                      {displayPercentage(newRatio, 'default', 0)}
                     </Typography>
                   </div>
                 </Box>
 
-                <CollateralRatioVisualization criticalRatio={1.1} newRatio={1.43} oldRatio={1.56} loading={!address} />
+                <CollateralRatioVisualization
+                  addedDebtUSD={etherTokenAmountUSD}
+                  callback={ratioChangeCallback}
+                  loading={parseInt(etherTokenAmount) < 0}
+                />
               </Box>
             </DialogContent>
             <DialogActions

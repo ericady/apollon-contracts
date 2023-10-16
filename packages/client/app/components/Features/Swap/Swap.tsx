@@ -92,115 +92,121 @@ const Swap = () => {
         id: 'apollon-swap-widget',
       }}
     >
-      <FormProvider {...methods}>
-        <form onSubmit={handleSubmit(onSubmit)}>
-          <div style={{ display: 'flex' }}>
-            {/* TODO: Add Validation that not more than the wallet amount can be entered. */}
-            <NumberInput
-              name="jUSDAmount"
-              data-testid="apollon-swap-jusd-amount"
-              rules={{
-                required: { value: true, message: 'You need to specify an amount.' },
-                min: { value: 0, message: 'Amount needs to be positive.' },
-              }}
-              disabled={!selectedToken}
-              onChange={(e: ChangeEvent<HTMLInputElement>) => {
-                jUSDField.onChange(e);
-                handleSwapValueChange('JUSD', e.target.value);
-              }}
-              InputProps={{
-                endAdornment: (
-                  <InputAdornment position="end">
-                    <Label variant="none">jUSD</Label>
-                  </InputAdornment>
-                ),
-              }}
-            />
+      <div
+        style={{
+          height: '247px',
+          overflowY: 'scroll',
+        }}
+      >
+        <FormProvider {...methods}>
+          <form onSubmit={handleSubmit(onSubmit)}>
+            <div style={{ display: 'flex' }}>
+              {/* TODO: Add Validation that not more than the wallet amount can be entered. */}
+              <NumberInput
+                name="jUSDAmount"
+                data-testid="apollon-swap-jusd-amount"
+                rules={{
+                  required: { value: true, message: 'You need to specify an amount.' },
+                  min: { value: 0, message: 'Amount needs to be positive.' },
+                }}
+                disabled={!selectedToken}
+                onChange={(e: ChangeEvent<HTMLInputElement>) => {
+                  jUSDField.onChange(e);
+                  handleSwapValueChange('JUSD', e.target.value);
+                }}
+                InputProps={{
+                  endAdornment: (
+                    <InputAdornment position="end">
+                      <Label variant="none">jUSD</Label>
+                    </InputAdornment>
+                  ),
+                }}
+              />
 
-            <img
-              src="assets/svgs/Exchange.svg"
-              alt="Arrow indicating trading direction"
-              height="21"
-              typeof="image/svg+xml"
-              style={{
-                transform: tradingDirection === 'jUSDAquired' ? 'rotate(180deg)' : 'rotate(0deg)',
-                margin: '10px 10px 0 10px',
-              }}
-            />
+              <img
+                src="assets/svgs/Exchange.svg"
+                alt="Arrow indicating trading direction"
+                height="21"
+                typeof="image/svg+xml"
+                style={{
+                  transform: tradingDirection === 'jUSDAquired' ? 'rotate(180deg)' : 'rotate(0deg)',
+                  margin: '10px 10px 0 10px',
+                }}
+              />
 
-            <NumberInput
-              name="tokenAmount"
-              data-testid="apollon-swap-token-amount"
-              rules={{
-                required: { value: true, message: 'You need to specify an amount.' },
-                min: { value: 0, message: 'Amount needs to be positive.' },
-              }}
-              disabled={!selectedToken}
-              onChange={(e: ChangeEvent<HTMLInputElement>) => {
-                tokenAmountField.onChange(e);
-                handleSwapValueChange('Token', e.target.value);
-              }}
-              InputProps={{
-                endAdornment: selectedToken && (
-                  <InputAdornment position="end">
-                    <Label variant="none">{selectedToken.symbol}</Label>
-                  </InputAdornment>
-                ),
-              }}
-            />
-          </div>
+              <NumberInput
+                name="tokenAmount"
+                data-testid="apollon-swap-token-amount"
+                rules={{
+                  required: { value: true, message: 'You need to specify an amount.' },
+                  min: { value: 0, message: 'Amount needs to be positive.' },
+                }}
+                disabled={!selectedToken}
+                onChange={(e: ChangeEvent<HTMLInputElement>) => {
+                  tokenAmountField.onChange(e);
+                  handleSwapValueChange('Token', e.target.value);
+                }}
+                InputProps={{
+                  endAdornment: selectedToken && (
+                    <InputAdornment position="end">
+                      <Label variant="none">{selectedToken.symbol}</Label>
+                    </InputAdornment>
+                  ),
+                }}
+              />
+            </div>
 
-          {showSlippage && (
-            <NumberInput
-              name="maxSlippage"
-              data-testid="apollon-swap-slippage-amount"
-              rules={{
-                min: { value: 0, message: 'Amount needs to be positive.' },
-              }}
-              label="Max. Slippage"
-              placeholder="5"
-              fullWidth
-              InputProps={{
-                endAdornment: <InputAdornment position="end">%</InputAdornment>,
-              }}
-              sx={{ marginTop: '15px' }}
-            />
-          )}
+            {showSlippage && (
+              <NumberInput
+                name="maxSlippage"
+                data-testid="apollon-swap-slippage-amount"
+                rules={{
+                  min: { value: 0, message: 'Amount needs to be positive.' },
+                }}
+                label="Max. Slippage"
+                placeholder="5"
+                fullWidth
+                InputProps={{
+                  endAdornment: <InputAdornment position="end">%</InputAdornment>,
+                }}
+                sx={{ marginTop: '15px' }}
+              />
+            )}
 
-          <Button variant="contained" onClick={() => setShowSlippage(!showSlippage)} sx={{ marginTop: '10px' }}>
-            {showSlippage ? 'Less' : 'More'}
-          </Button>
+            <Button variant="contained" onClick={() => setShowSlippage(!showSlippage)} sx={{ marginTop: '10px' }}>
+              {showSlippage ? 'Less' : 'More'}
+            </Button>
 
-          <div style={{ padding: '10px 0' }}>
-            <Typography
-              variant="titleAlternate"
-              color="primary.contrastText"
-              style={{
-                display: 'flex',
-                justifyContent: 'space-between',
-                alignItems: 'center',
-                marginTop: '12px',
-                marginBottom: '12px',
-              }}
-            >
-              Price per unit:
-              {selectedToken ? <span>{roundCurrency(tokenRatio)} jUSD</span> : <Skeleton width="120px" />}
-            </Typography>
-            <Typography
-              variant="caption"
-              style={{
-                display: 'flex',
-                justifyContent: 'space-between',
-                alignItems: 'center',
-                marginTop: '12px',
-                marginBottom: '12px',
-              }}
-            >
-              Protocol swap fee:
-              {selectedToken ? (
-                <span data-testid="apollon-swap-protocol-fee">
-                  {displayPercentage(PROTOCOL_SWAP_FEE)} {/* TODO: issue with next */}
-                  {/* <Divider
+            <div style={{ padding: '10px 0' }}>
+              <Typography
+                variant="titleAlternate"
+                color="primary.contrastText"
+                style={{
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
+                  marginTop: '12px',
+                  marginBottom: '12px',
+                }}
+              >
+                Price per unit:
+                {selectedToken ? <span>{roundCurrency(tokenRatio)} jUSD</span> : <Skeleton width="120px" />}
+              </Typography>
+              <Typography
+                variant="caption"
+                style={{
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
+                  marginTop: '12px',
+                  marginBottom: '12px',
+                }}
+              >
+                Protocol swap fee:
+                {selectedToken ? (
+                  <span data-testid="apollon-swap-protocol-fee">
+                    {displayPercentage(PROTOCOL_SWAP_FEE)} {/* TODO: issue with next */}
+                    {/* <Divider
               orientation="vertical"
               sx={{
                 margin: '0 5px',
@@ -208,38 +214,39 @@ const Swap = () => {
                 height: '15px',
               }}
             /> */}
-                  | {!isNaN(jUSDSwapAmount) ? `${roundCurrency(jUSDSwapAmount * PROTOCOL_SWAP_FEE)} jUSD` : '-'}
-                </span>
-              ) : (
-                <div style={{ display: 'flex', alignItems: 'center', gap: 5, width: 120 }}>
-                  <Skeleton width="55px" />
-                  |
-                  <Skeleton width="55px" />
-                </div>
-              )}
-            </Typography>
-            <Typography
-              variant="caption"
-              style={{
-                display: 'flex',
-                justifyContent: 'space-between',
-                alignItems: 'center',
-                marginTop: '12px',
-                marginBottom: '12px',
-              }}
-            >
-              Resulting pool slippage:
-              {selectedToken ? <span>{displayPercentage(RESULTING_POOL_SLIPPAGE)}</span> : <Skeleton width="120px" />}
-            </Typography>
-          </div>
+                    | {!isNaN(jUSDSwapAmount) ? `${roundCurrency(jUSDSwapAmount * PROTOCOL_SWAP_FEE)} jUSD` : '-'}
+                  </span>
+                ) : (
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 5, width: 120 }}>
+                    <Skeleton width="55px" />
+                    |
+                    <Skeleton width="55px" />
+                  </div>
+                )}
+              </Typography>
+              <Typography
+                variant="caption"
+                style={{
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
+                  marginTop: '12px',
+                  marginBottom: '12px',
+                }}
+              >
+                Resulting pool slippage:
+                {selectedToken ? <span>{displayPercentage(RESULTING_POOL_SLIPPAGE)}</span> : <Skeleton width="120px" />}
+              </Typography>
+            </div>
 
-          <InfoButton
-            title="SWAP"
-            description="The final values will be calculated after the swap."
-            disabled={!address}
-          />
-        </form>
-      </FormProvider>
+            <InfoButton
+              title="SWAP"
+              description="The final values will be calculated after the swap."
+              disabled={!address}
+            />
+          </form>
+        </FormProvider>
+      </div>
     </FeatureBox>
   );
 };

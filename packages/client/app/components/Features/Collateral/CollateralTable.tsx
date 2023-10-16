@@ -106,7 +106,7 @@ function CollateralTable() {
               <CollateralUpdateDialog buttonVariant="outlined" />
             )}
           </div>
-          <CollateralRatioVisualization criticalRatio={1.1} newRatio={1.5} oldRatio={1.74} />
+          <CollateralRatioVisualization />
         </div>
 
         {!data ? (

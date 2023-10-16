@@ -6,7 +6,7 @@ import Button from '@mui/material/Button';
 import Tab from '@mui/material/Tab';
 import Tabs from '@mui/material/Tabs';
 import Typography from '@mui/material/Typography';
-import { SyntheticEvent, useEffect, useState } from 'react';
+import { SyntheticEvent, useCallback, useEffect, useState } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
 import { useEthers } from '../../../context/EthersProvider';
 import { GetBorrowerLiquidityPoolsQuery } from '../../../generated/gql-types';
@@ -32,6 +32,8 @@ function LiquidityDepositWithdraw({ selectedPool }: Props) {
   const { address } = useEthers();
 
   const [tabValue, setTabValue] = useState<'DEPOSIT' | 'WITHDRAW'>('DEPOSIT');
+  const [oldRatio, setOldRatio] = useState(0);
+  const [newRatio, setNewRatio] = useState(0);
 
   const handleChange = (_: SyntheticEvent, newValue: 'DEPOSIT' | 'WITHDRAW') => {
     setTabValue(newValue);
@@ -44,12 +46,20 @@ function LiquidityDepositWithdraw({ selectedPool }: Props) {
       tokenBAmount: '',
     },
   });
-  const { handleSubmit, setValue, reset, formState } = methods;
+  const { handleSubmit, setValue, reset, formState, watch } = methods;
 
   const onSubmit = () => {
     console.log('onSubmit called');
     // TODO: Implement contract call
   };
+
+  const ratioChangeCallback = useCallback(
+    (newRatio: number, oldRatio: number) => {
+      setNewRatio(newRatio);
+      setOldRatio(oldRatio);
+    },
+    [setNewRatio, setOldRatio],
+  );
 
   useEffect(() => {
     if (!tokenA.borrowerAmount && !tokenB.borrowerAmount) {
@@ -59,6 +69,14 @@ function LiquidityDepositWithdraw({ selectedPool }: Props) {
     reset();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedPool]);
+
+  const tokenAAmount = watch('tokenAAmount');
+  const tokenBAmount = watch('tokenBAmount');
+
+  const addedDebtUSD =
+    ((tokenAAmount ? parseInt(tokenAAmount) * tokenA.token.priceUSD : 0) +
+      (tokenBAmount ? parseInt(tokenBAmount) * tokenB.token.priceUSD : 0)) *
+    (tabValue === 'DEPOSIT' ? -1 : 1);
 
   return (
     <FeatureBox title="Your Liquidity" noPadding headBorder="bottom" border="full">
@@ -269,17 +287,17 @@ function LiquidityDepositWithdraw({ selectedPool }: Props) {
                 <Typography
                   sx={{ fontFamily: 'Space Grotesk Variable', color: 'info.main', fontWeight: '700', fontSize: '20px' }}
                 >
-                  {displayPercentage(1.74, 'default', 0)}
+                  {displayPercentage(oldRatio, 'default', 0)}
                 </Typography>
                 <ArrowForwardIosIcon sx={{ color: '#46434F', fontSize: '18px' }} />
                 <Typography
                   sx={{ fontFamily: 'Space Grotesk Variable', color: 'info.main', fontWeight: '700', fontSize: '20px' }}
                 >
-                  {displayPercentage(1.43, 'default', 0)}
+                  {displayPercentage(newRatio, 'default', 0)}
                 </Typography>
               </div>
             </Box>
-            <CollateralRatioVisualization criticalRatio={1.1} newRatio={1.43} oldRatio={1.74} loading={!address} />
+            <CollateralRatioVisualization addedDebtUSD={addedDebtUSD} callback={ratioChangeCallback} />
           </Box>
 
           <div style={{ width: '100%', padding: '20px' }}>

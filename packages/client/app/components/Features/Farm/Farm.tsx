@@ -7,7 +7,7 @@ import InputAdornment from '@mui/material/InputAdornment';
 import Tab from '@mui/material/Tab';
 import Tabs from '@mui/material/Tabs';
 import Typography from '@mui/material/Typography';
-import { useState } from 'react';
+import { useCallback, useState } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
 import { useEthers } from '../../../context/EthersProvider';
 import { useSelectedToken } from '../../../context/SelectedTokenProvider';
@@ -30,6 +30,8 @@ type FieldValues = {
 const Farm = () => {
   const [tabValue, setTabValue] = useState<'Long' | 'Short'>('Long');
   const [showSlippage, setShowSlippage] = useState(false);
+  const [oldRatio, setOldRatio] = useState(0);
+  const [newRatio, setNewRatio] = useState(0);
 
   const { address } = useEthers();
 
@@ -45,6 +47,14 @@ const Farm = () => {
 
   const { selectedToken, tokenRatio } = useSelectedToken();
 
+  const ratioChangeCallback = useCallback(
+    (newRatio: number, oldRatio: number) => {
+      setNewRatio(newRatio);
+      setOldRatio(oldRatio);
+    },
+    [setNewRatio, setOldRatio],
+  );
+
   const handleTabChange = (_: React.SyntheticEvent, newValue: 'Long' | 'Short') => {
     setTabValue(newValue);
     reset();
@@ -57,6 +67,8 @@ const Farm = () => {
 
   const watchFarmShortValue = parseInt(watch('farmShortValue'));
 
+  const addedDebtUSD = !isNaN(watchFarmShortValue) ? watchFarmShortValue * selectedToken!.priceUSD : 0;
+
   return (
     <FeatureBox
       title="Farm"
@@ -68,104 +80,105 @@ const Farm = () => {
         id: 'apollon-farm-widget',
       }}
     >
-      <Tabs value={tabValue} onChange={handleTabChange} variant="fullWidth" sx={{ mx: '-15px' }}>
-        <Tab label="LONG" value="Long" />
-        <Tab label="SHORT" value="Short" />
-      </Tabs>
+      <div style={{ height: '432px', overflowY: 'scroll' }}>
+        <Tabs value={tabValue} onChange={handleTabChange} variant="fullWidth" sx={{ mx: '-15px' }}>
+          <Tab label="LONG" value="Long" />
+          <Tab label="SHORT" value="Short" />
+        </Tabs>
 
-      <FormProvider {...methods}>
-        <form onSubmit={handleSubmit(onSubmit)}>
-          <div style={{ marginTop: '20px' }}>
-            <div>
-              <NumberInput
-                data-testid="apollon-farm-amount"
-                name="farmShortValue"
-                rules={{
-                  required: { value: true, message: 'You need to specify an amount.' },
-                  min: { value: 0, message: 'Amount needs to be positive.' },
-                }}
-                disabled={!selectedToken}
-                fullWidth
-                InputProps={{
-                  endAdornment: selectedToken && (
-                    <InputAdornment position="end">
-                      <Label variant="none">{selectedToken.symbol}</Label>
-                    </InputAdornment>
-                  ),
-                }}
-              />
-
-              {showSlippage && (
+        <FormProvider {...methods}>
+          <form onSubmit={handleSubmit(onSubmit)}>
+            <div style={{ marginTop: '20px' }}>
+              <div>
                 <NumberInput
-                  data-testid="apollon-farm-slippage-amount"
-                  name="maxSlippage"
+                  data-testid="apollon-farm-amount"
+                  name="farmShortValue"
                   rules={{
+                    required: { value: true, message: 'You need to specify an amount.' },
                     min: { value: 0, message: 'Amount needs to be positive.' },
                   }}
-                  label="Max. Slippage"
-                  placeholder="5"
+                  disabled={!selectedToken}
                   fullWidth
                   InputProps={{
-                    endAdornment: <InputAdornment position="end">%</InputAdornment>,
+                    endAdornment: selectedToken && (
+                      <InputAdornment position="end">
+                        <Label variant="none">{selectedToken.symbol}</Label>
+                      </InputAdornment>
+                    ),
                   }}
-                  sx={{ marginTop: '15px' }}
                 />
-              )}
 
-              <Button variant="contained" onClick={() => setShowSlippage(!showSlippage)} sx={{ marginTop: '10px' }}>
-                {showSlippage ? 'Less' : 'More'}
-              </Button>
-            </div>
-
-            <div style={{ padding: '10px 0' }}>
-              <Typography
-                variant="titleAlternate"
-                color="primary.contrastText"
-                style={{
-                  display: 'flex',
-                  justifyContent: 'space-between',
-                  alignItems: 'center',
-                  marginTop: '12px',
-                  marginBottom: '12px',
-                }}
-              >
-                Position size:
-                {selectedToken ? (
-                  <span data-testid="apollon-farm-position-size">
-                    {!isNaN(watchFarmShortValue) ? `${roundCurrency(watchFarmShortValue * tokenRatio)} jUSD` : '-'}
-                  </span>
-                ) : (
-                  <Skeleton width="120px" />
+                {showSlippage && (
+                  <NumberInput
+                    data-testid="apollon-farm-slippage-amount"
+                    name="maxSlippage"
+                    rules={{
+                      min: { value: 0, message: 'Amount needs to be positive.' },
+                    }}
+                    label="Max. Slippage"
+                    placeholder="5"
+                    fullWidth
+                    InputProps={{
+                      endAdornment: <InputAdornment position="end">%</InputAdornment>,
+                    }}
+                    sx={{ marginTop: '15px' }}
+                  />
                 )}
-              </Typography>
-              <Typography
-                variant="caption"
-                style={{
-                  display: 'flex',
-                  justifyContent: 'space-between',
-                  alignItems: 'center',
-                  marginTop: '12px',
-                  marginBottom: '12px',
-                }}
-              >
-                Price per unit:
-                <span>{selectedToken ? `${roundCurrency(tokenRatio)} jUSD` : <Skeleton width="120px" />}</span>
-              </Typography>
-              <Typography
-                variant="caption"
-                style={{
-                  display: 'flex',
-                  justifyContent: 'space-between',
-                  alignItems: 'center',
-                  marginTop: '12px',
-                  marginBottom: '12px',
-                }}
-              >
-                Protocol fee:
-                {selectedToken ? (
-                  <span data-testid="apollon-farm-protocol-fee">
-                    {displayPercentage(PROTOCOL_FEE)} |
-                    {/* <Divider
+
+                <Button variant="contained" onClick={() => setShowSlippage(!showSlippage)} sx={{ marginTop: '10px' }}>
+                  {showSlippage ? 'Less' : 'More'}
+                </Button>
+              </div>
+
+              <div style={{ padding: '10px 0' }}>
+                <Typography
+                  variant="titleAlternate"
+                  color="primary.contrastText"
+                  style={{
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
+                    marginTop: '12px',
+                    marginBottom: '12px',
+                  }}
+                >
+                  Position size:
+                  {selectedToken ? (
+                    <span data-testid="apollon-farm-position-size">
+                      {!isNaN(watchFarmShortValue) ? `${roundCurrency(watchFarmShortValue * tokenRatio)} jUSD` : '-'}
+                    </span>
+                  ) : (
+                    <Skeleton width="120px" />
+                  )}
+                </Typography>
+                <Typography
+                  variant="caption"
+                  style={{
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
+                    marginTop: '12px',
+                    marginBottom: '12px',
+                  }}
+                >
+                  Price per unit:
+                  <span>{selectedToken ? `${roundCurrency(tokenRatio)} jUSD` : <Skeleton width="120px" />}</span>
+                </Typography>
+                <Typography
+                  variant="caption"
+                  style={{
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
+                    marginTop: '12px',
+                    marginBottom: '12px',
+                  }}
+                >
+                  Protocol fee:
+                  {selectedToken ? (
+                    <span data-testid="apollon-farm-protocol-fee">
+                      {displayPercentage(PROTOCOL_FEE)} |
+                      {/* <Divider
                     orientation="vertical"
                     sx={{
                       margin: '0 5px',
@@ -173,76 +186,77 @@ const Farm = () => {
                       height: '15px',
                     }}
                   /> */}{' '}
-                    {!isNaN(watchFarmShortValue)
-                      ? `${roundCurrency(watchFarmShortValue * tokenRatio * PROTOCOL_FEE)} jUSD`
-                      : '-'}
-                  </span>
-                ) : (
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 5, width: 120 }}>
-                    <Skeleton width="55px" />
-                    |
-                    <Skeleton width="55px" />
-                  </div>
-                )}
-              </Typography>
-              <Typography
-                variant="caption"
-                style={{
-                  display: 'flex',
-                  justifyContent: 'space-between',
-                  alignItems: 'center',
-                  marginTop: '12px',
-                  marginBottom: '12px',
-                }}
-              >
-                Slippage: {selectedToken ? <span>{displayPercentage(SLIPPAGE)}</span> : <Skeleton width="120px" />}
-              </Typography>
+                      {!isNaN(watchFarmShortValue)
+                        ? `${roundCurrency(watchFarmShortValue * tokenRatio * PROTOCOL_FEE)} jUSD`
+                        : '-'}
+                    </span>
+                  ) : (
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 5, width: 120 }}>
+                      <Skeleton width="55px" />
+                      |
+                      <Skeleton width="55px" />
+                    </div>
+                  )}
+                </Typography>
+                <Typography
+                  variant="caption"
+                  style={{
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
+                    marginTop: '12px',
+                    marginBottom: '12px',
+                  }}
+                >
+                  Slippage: {selectedToken ? <span>{displayPercentage(SLIPPAGE)}</span> : <Skeleton width="120px" />}
+                </Typography>
+              </div>
+
+              <InfoButton
+                title="EXECUTE"
+                description="The final values will be calculated after the swap."
+                disabled={!address}
+              />
             </div>
+          </form>
+        </FormProvider>
 
-            <InfoButton
-              title="EXECUTE"
-              description="The final values will be calculated after the swap."
-              disabled={!address}
-            />
+        <Box
+          sx={{
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            marginTop: '20px',
+          }}
+        >
+          <Typography variant="titleAlternate">Collateral Ratio</Typography>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+            <Typography
+              sx={{
+                fontFamily: 'Space Grotesk Variable',
+                color: 'info.main',
+                fontWeight: '700',
+                fontSize: '20px',
+              }}
+            >
+              {displayPercentage(oldRatio, 'default', 0)}
+            </Typography>
+            <ArrowForwardIosIcon sx={{ color: '#46434F', fontSize: '18px' }} />
+            <Typography
+              sx={{
+                fontFamily: 'Space Grotesk Variable',
+                color: 'info.main',
+                fontWeight: '700',
+                fontSize: '20px',
+              }}
+            >
+              {displayPercentage(newRatio, 'default', 0)}
+            </Typography>
           </div>
-        </form>
-      </FormProvider>
+        </Box>
 
-      <Box
-        sx={{
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-          marginTop: '20px',
-        }}
-      >
-        <Typography variant="titleAlternate">Collateral Ratio</Typography>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-          <Typography
-            sx={{
-              fontFamily: 'Space Grotesk Variable',
-              color: 'info.main',
-              fontWeight: '700',
-              fontSize: '20px',
-            }}
-          >
-            {displayPercentage(1.56, 'default', 0)}
-          </Typography>
-          <ArrowForwardIosIcon sx={{ color: '#46434F', fontSize: '18px' }} />
-          <Typography
-            sx={{
-              fontFamily: 'Space Grotesk Variable',
-              color: 'info.main',
-              fontWeight: '700',
-              fontSize: '20px',
-            }}
-          >
-            {displayPercentage(1.43, 'default', 0)}
-          </Typography>
-        </div>
-      </Box>
-
-      <CollateralRatioVisualization criticalRatio={1.1} newRatio={1.43} oldRatio={1.56} loading={!address} />
+        <CollateralRatioVisualization addedDebtUSD={addedDebtUSD} callback={ratioChangeCallback} />
+      </div>
     </FeatureBox>
   );
 };

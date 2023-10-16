@@ -6,12 +6,17 @@ import { useEthers } from './EthersProvider';
 
 export const WalletContext = createContext<{
   etherAmount: number;
+  etherValueUSD: number;
 }>({
   etherAmount: 0,
+  etherValueUSD: 0,
 });
 
 export default function WalletProvider({ children }: { children: React.ReactNode }): JSX.Element {
-  const [etherAmount, setEtherAmount] = useState<number>(0);
+  const [etherAmount, setEtherAmount] = useState(0);
+
+  // FIXME: HARDCODED, exchange for oracle or exchange data
+  const etherValueUSD = 1583.47;
 
   const { address, provider } = useEthers();
 
@@ -27,11 +32,12 @@ export default function WalletProvider({ children }: { children: React.ReactNode
     }
   }, [address, provider, setEtherAmount]);
 
-  return <WalletContext.Provider value={{ etherAmount }}>{children}</WalletContext.Provider>;
+  return <WalletContext.Provider value={{ etherAmount, etherValueUSD }}>{children}</WalletContext.Provider>;
 }
 
 export function useWallet(): {
   etherAmount: number;
+  etherValueUSD: number;
 } {
   const context = useContext(WalletContext);
   if (context === undefined) {

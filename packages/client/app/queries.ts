@@ -111,6 +111,7 @@ export const GET_BORROWER_LIQUIDITY_POOLS = gql`
         token {
           address
           symbol
+          priceUSD
         }
         totalAmount
         borrowerAmount

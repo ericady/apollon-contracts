@@ -1,24 +1,35 @@
+import { useQuery } from '@apollo/client';
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 import { Box, Typography } from '@mui/material';
+import { useCallback, useEffect } from 'react';
+import { useEthers } from '../../context/EthersProvider';
+import {
+  GetBorrowerDebtTokensQuery,
+  GetBorrowerDebtTokensQueryVariables,
+  GetCollateralTokensQuery,
+  GetCollateralTokensQueryVariables,
+} from '../../generated/gql-types';
+import { GET_BORROWER_COLLATERAL_TOKENS, GET_BORROWER_DEBT_TOKENS } from '../../queries';
 import { displayPercentage } from '../../utils/math';
 
 type Props = {
   /**
-   * white indicator marking the ratio after the action on the chart
+   * is used to calculate the white indicator marking the ratio after the action on the chart
+   * value in USD that is added to the existing debt
+   * In case this value is not specified the indicator for the new ratio will be dismissed.
    */
-  newRatio: number;
-  /**
-   * blue indicator marking the ratio before the action on the chart. Area is marked with a gradient.
-   */
-  oldRatio: number;
+  addedDebtUSD?: number;
+
   /**
    * red indicator marking the critical ratio on the chart. PUT THIS BETWEEN THE MIN AND MAX VALUES.
    */
-  criticalRatio: number;
+  criticalRatio?: number;
+
   /**
    * left scale for all chart values. Defaults to 1.
    */
   scaleMin?: number;
+
   /**
    * right scale for all chart values. Defaults to 2.
    */
@@ -28,17 +39,65 @@ type Props = {
    * Shows the loading indicator without any data accessed.
    */
   loading?: boolean;
+
+  callback?: (newRatio: number, oldRatio: number) => void;
 };
 
 function CollateralRatioVisualization({
-  criticalRatio,
-  newRatio,
-  oldRatio,
+  addedDebtUSD = 0,
+  callback,
+  criticalRatio = 1.1,
   scaleMax = 2,
   scaleMin = 1,
   loading = false,
 }: Props) {
-  if (loading) {
+  const { address } = useEthers();
+
+  const { data: debtData } = useQuery<GetBorrowerDebtTokensQuery, GetBorrowerDebtTokensQueryVariables>(
+    GET_BORROWER_DEBT_TOKENS,
+    {
+      variables: { borrower: address },
+      skip: !address,
+    },
+  );
+
+  const { data: collateralData } = useQuery<GetCollateralTokensQuery, GetCollateralTokensQueryVariables>(
+    GET_BORROWER_COLLATERAL_TOKENS,
+    {
+      variables: { borrower: address },
+      skip: !address,
+    },
+  );
+
+  const getRatios = useCallback(() => {
+    const debtValue =
+      debtData?.getDebtTokens.reduce(
+        (acc, { troveMintedAmount, token }) => acc + troveMintedAmount! * token.priceUSD,
+        0,
+      ) ?? 0;
+    const collateralValue =
+      collateralData?.getCollateralTokens.reduce(
+        (acc, { troveLockedAmount, token }) => acc + troveLockedAmount! * token.priceUSD,
+        0,
+      ) ?? 0;
+
+    const oldRatio = collateralValue / debtValue;
+    const newRatio = collateralValue / (debtValue + addedDebtUSD);
+
+    return [oldRatio, newRatio];
+  }, [addedDebtUSD, collateralData, debtData]);
+
+  const isProcessing = loading || !debtData || !collateralData;
+
+  useEffect(() => {
+    if (!isProcessing && callback) {
+      const [oldRatio, newRatio] = getRatios();
+
+      callback(newRatio, oldRatio);
+    }
+  }, [isProcessing, getRatios, callback]);
+
+  if (isProcessing) {
     return (
       <div
         style={{
@@ -59,6 +118,8 @@ function CollateralRatioVisualization({
       </div>
     );
   }
+
+  const [oldRatio, newRatio] = getRatios();
 
   const scaleDelta = scaleMax - scaleMin;
 
@@ -100,15 +161,17 @@ function CollateralRatioVisualization({
             borderColor: 'error.main',
           }}
         ></Box>
-        <Box
-          sx={{
-            position: 'absolute',
-            width: `${newPosition * 100}%`,
-            height: '100%',
-            borderRight: '2px solid',
-            borderColor: 'primary.contrastText',
-          }}
-        ></Box>
+        {addedDebtUSD !== 0 && (
+          <Box
+            sx={{
+              position: 'absolute',
+              width: `${newPosition * 100}%`,
+              height: '100%',
+              borderRight: '2px solid',
+              borderColor: 'primary.contrastText',
+            }}
+          ></Box>
+        )}
         <div
           style={{
             marginTop: -20,

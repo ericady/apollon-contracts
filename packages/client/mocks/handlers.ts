@@ -71,8 +71,8 @@ const collateralTokens: CollateralTokenMeta[] = faker.helpers
 
     return {
       token: token,
-      walletAmount: parseFloat(faker.finance.amount(0, 1000, 10)),
-      troveLockedAmount: parseFloat(faker.finance.amount(0, 50, 10)),
+      walletAmount: faker.number.float({ min: 0, max: 1000, precision: 0.0001 }),
+      troveLockedAmount: faker.number.float({ min: 100, max: 110, precision: 0.0001 }),
       stabilityGainedAmount: parseFloat(faker.finance.amount(50, 500, 10)),
       totalValueLockedUSD,
       totalValueLockedUSD24hAgo: parseFloat(
@@ -90,8 +90,8 @@ const debtTokens: DebtTokenMeta[] = faker.helpers
 
     return {
       token: token,
-      walletAmount: parseFloat(faker.finance.amount(0, 1000, 2)),
-      troveMintedAmount: parseFloat(faker.finance.amount(0, 500, 2)),
+      walletAmount: faker.number.float({ min: 0, max: 1000, precision: 0.0001 }),
+      troveMintedAmount: faker.number.float({ min: 90, max: 100, precision: 0.0001 }),
       stabilityLostAmount: faker.number.float({ min: 1, max: stabilityGainedAmount!, precision: 0.0001 }),
       stabilityCompoundAmount: faker.number.float({ min: 1, max: 5, precision: 0.0001 }),
 
