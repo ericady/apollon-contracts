@@ -76,15 +76,15 @@ describe('BorrowerOperations', () => {
       contracts,
       collToken: BTC,
       collAmount: parseUnits('1', 9),
-      debts: [{ tokenAddress: STOCK, amount: parseUnits('1') }],
+      debts: [{ tokenAddress: STOCK, amount: parseUnits('0.9') }],
     });
 
     // Price drops
     await priceFeed.setTokenPrice(BTC, parseUnits('1000', 18));
     // System debt status,
     // Collateral:  1.05 BTC  ($1050)
-    // Debt:        2 STOCK ($700 = $300 + $400 gas lock)
-    // TCR:         150%
+    // Debt:        2 STOCK ($688.5 = $285 + $400 gas lock + $3.5 borrowing fee)
+    // TCR:         152%
 
     const poolStats = await storagePool.checkRecoveryMode();
     expect(poolStats.isInRecoveryMode).to.be.false;
