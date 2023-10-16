@@ -157,8 +157,8 @@ contract BorrowerOperations is LiquityBase, Ownable, CheckContract, IBorrowerOpe
     );
     vars.debts = new DebtTokenAmount[](1);
     vars.debts[0] = stableCoinAmount;
-
-    vars.compositeDebtInStable = _getCompositeDebt(vars.debts); // ICR is based on the composite debt, i.e. the requested debt amount + borrowing fee + debt gas comp.
+    // ICR is based on the composite debt, i.e. the requested debt amount + borrowing fee + debt gas comp.
+    vars.compositeDebtInStable = _getCompositeDebt(vars.debts);
 
     vars.colls = _colls;
     vars.compositeCollInStable = _getCompositeColl(vars.colls);
@@ -193,7 +193,7 @@ contract BorrowerOperations is LiquityBase, Ownable, CheckContract, IBorrowerOpe
     contractsCache.troveManager.setTroveStatus(borrower, 1); // active
     contractsCache.troveManager.increaseTroveColl(borrower, vars.colls);
     contractsCache.troveManager.increaseTroveDebt(borrower, vars.debts);
-    contractsCache.troveManager.updateTroveRewardSnapshots(vars.collTokenAddresses, borrower);
+    contractsCache.troveManager.updateTroveRewardSnapshots(borrower);
     contractsCache.troveManager.updateStakeAndTotalStakes(vars.collTokenAddresses, borrower);
 
     vars.arrayIndex = contractsCache.troveManager.addTroveOwnerToArray(borrower);
@@ -497,7 +497,7 @@ contract BorrowerOperations is LiquityBase, Ownable, CheckContract, IBorrowerOpe
     borrowingFee = _troveManager.getBorrowingFee(compositeDebtInStable); // calculated in stable price
     _requireUserAcceptsFee(borrowingFee, compositeDebtInStable, _maxFeePercentage);
     uint stableCoinPrice = _stableCoinAmount.debtToken.getPrice();
-    borrowingFee /= stableCoinPrice;
+    borrowingFee = (borrowingFee * DECIMAL_PRECISION) / stableCoinPrice;
 
     // todo...
     // Send fee to staking contract

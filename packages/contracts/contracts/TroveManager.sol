@@ -3,6 +3,7 @@
 pragma solidity ^0.8.9;
 
 import '@openzeppelin/contracts/access/Ownable.sol';
+import '@openzeppelin/contracts/token/ERC20/extensions/IERC20Metadata.sol';
 import './Dependencies/LiquityBase.sol';
 import './Dependencies/CheckContract.sol';
 import './Interfaces/ITroveManager.sol';
@@ -14,6 +15,7 @@ import './Interfaces/IStoragePool.sol';
 import './Interfaces/IStabilityPoolManager.sol';
 import './Interfaces/IBBase.sol';
 import './Interfaces/ICollTokenManager.sol';
+import 'hardhat/console.sol';
 
 contract TroveManager is LiquityBase, Ownable, CheckContract, ITroveManager {
   string public constant NAME = 'TroveManager';
@@ -865,14 +867,14 @@ contract TroveManager is LiquityBase, Ownable, CheckContract, ITroveManager {
     for (uint i = 0; i < _trove.collTokens.length; i++) {
       address token = _trove.collTokens[i];
 
-      uint pendingRewards = _getPendingReward(_borrower, token, true);
+      uint pendingRewards = getPendingReward(_borrower, token, true);
       currentCollInStable += priceFeed.getUSDValue(token, _trove.colls[token] + pendingRewards);
     }
 
     for (uint i = 0; i < _trove.debtTokens.length; i++) {
       IDebtToken token = _trove.debtTokens[i];
 
-      uint pendingRewards = _getPendingReward(_borrower, address(token), true);
+      uint pendingRewards = getPendingReward(_borrower, address(token), true);
       currentDebtInStable += priceFeed.getUSDValue(address(token), _trove.debts[token] + pendingRewards);
     }
 
@@ -892,7 +894,7 @@ contract TroveManager is LiquityBase, Ownable, CheckContract, ITroveManager {
     for (uint i = 0; i < _trove.collTokens.length; i++) {
       address token = _trove.collTokens[i];
 
-      uint pendingRewards = _getPendingReward(_borrower, token, true);
+      uint pendingRewards = getPendingReward(_borrower, token, true);
       if (pendingRewards == 0) continue;
 
       _trove.colls[token] += pendingRewards;
@@ -903,12 +905,14 @@ contract TroveManager is LiquityBase, Ownable, CheckContract, ITroveManager {
       IDebtToken token = _trove.debtTokens[i];
       address tokenAddress = address(token);
 
-      uint pendingRewards = _getPendingReward(_borrower, tokenAddress, false);
+      uint pendingRewards = getPendingReward(_borrower, tokenAddress, false);
       if (pendingRewards == 0) continue;
 
       _trove.debts[token] += pendingRewards;
-      storagePool.transferBetweenTypes(tokenAddress, true, PoolType.Default, PoolType.Active, pendingRewards);
+      storagePool.transferBetweenTypes(tokenAddress, false, PoolType.Default, PoolType.Active, pendingRewards);
     }
+
+    _updateTroveRewardSnapshots(_borrower);
 
     // todo
     //    emit TroveUpdated(
@@ -921,20 +925,21 @@ contract TroveManager is LiquityBase, Ownable, CheckContract, ITroveManager {
   }
 
   // Update borrower's snapshots to reflect the current values
-  function updateTroveRewardSnapshots(address[] memory collTokenAddresses, address _borrower) external override {
+  function updateTroveRewardSnapshots(address _borrower) external override {
     _requireCallerIsBorrowerOperations();
-    return _updateTroveRewardSnapshots(collTokenAddresses, _borrower);
+    return _updateTroveRewardSnapshots(_borrower);
   }
 
-  function _updateTroveRewardSnapshots(address[] memory collTokenAddresses, address _borrower) internal {
+  function _updateTroveRewardSnapshots(address _borrower) internal {
+    Trove storage _trove = Troves[_borrower];
     address[] memory debtTokenAddresses = debtTokenManager.getDebtTokenAddresses();
-    for (uint i = 0; i < debtTokenAddresses.length; i++) {
+    for (uint i = 0; i < _trove.debtTokens.length; i++) {
       address token = debtTokenAddresses[i];
       rewardSnapshots[_borrower][token][false] = liquidatedTokens[token][false];
     }
 
-    for (uint i = 0; i < collTokenAddresses.length; i++) {
-      address token = collTokenAddresses[i];
+    for (uint i = 0; i < _trove.collTokens.length; i++) {
+      address token = _trove.collTokens[i];
       rewardSnapshots[_borrower][token][true] = liquidatedTokens[token][true];
     }
 
@@ -943,11 +948,11 @@ contract TroveManager is LiquityBase, Ownable, CheckContract, ITroveManager {
   }
 
   // Get the borrower's pending accumulated rewards, earned by their stake through their redistribution
-  function _getPendingReward(
+  function getPendingReward(
     address _borrower,
     address _tokenAddress,
     bool _isColl
-  ) internal view returns (uint pendingReward) {
+  ) public view returns (uint pendingReward) {
     uint snapshotValue = rewardSnapshots[_borrower][_tokenAddress][_isColl];
     uint rewardPerUnitStaked = liquidatedTokens[_tokenAddress][_isColl] - snapshotValue;
     if (rewardPerUnitStaked == 0 || Troves[_borrower].status != Status.active) return 0;
@@ -990,7 +995,7 @@ contract TroveManager is LiquityBase, Ownable, CheckContract, ITroveManager {
     for (uint i = 0; i < amounts.length; i++) {
       RAmount memory amountEntry = amounts[i];
 
-      amountEntry.pendingReward = _getPendingReward(_borrower, amountEntry.tokenAddress, amountEntry.isColl);
+      amountEntry.pendingReward = getPendingReward(_borrower, amountEntry.tokenAddress, amountEntry.isColl);
       uint totalAmount = amountEntry.amount + amountEntry.pendingReward;
       uint inStable = priceFeed.getUSDValue(amountEntry.tokenAddress, totalAmount);
 
@@ -1377,6 +1382,11 @@ contract TroveManager is LiquityBase, Ownable, CheckContract, ITroveManager {
     return uint(Troves[_borrower].status);
   }
 
+  /**
+   * @notice Return borrowers staked value in USD
+   * @param _borrower Borrower
+   * @return stakedUSDValue
+   */
   function getTroveStake(address _borrower) external view override returns (uint) {
     return _calculateTrovesStake(_borrower);
   }
@@ -1384,7 +1394,6 @@ contract TroveManager is LiquityBase, Ownable, CheckContract, ITroveManager {
   // the current stake of the trove is depended on the current collateral prices
   function _calculateTrovesStake(address _borrower) internal view returns (uint stake) {
     Trove storage trove = Troves[_borrower];
-    // address[] memory collTokenAddresses = collTokenManager.getCollTokenAddresses();
 
     for (uint i = 0; i < trove.collTokens.length; i++) {
       address tokenAddress = trove.collTokens[i];
