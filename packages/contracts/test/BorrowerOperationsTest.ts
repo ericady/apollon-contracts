@@ -12,6 +12,7 @@ import {
 } from '../typechain';
 import { expect } from 'chai';
 import {
+  _100pct,
   checkRecoveryMode,
   getStabilityPool,
   getTCR,
@@ -954,5 +955,47 @@ describe('BorrowerOperations', () => {
     expect(alice_StableDebtRewardSnapshot_After).to.be.closeTo(alice_StableDebtRewardSnapshot_Before + L_STABLE, 100n);
     expect(bob_BTCrewardSnapshot_After).to.be.closeTo(bob_BTCrewardSnapshot_Before + L_BTC, 100n);
     expect(bob_StableDebtRewardSnapshot_After).to.be.closeTo(bob_StableDebtRewardSnapshot_Before + L_STABLE, 100n);
+  });
+
+  // --- increaseDebt() ---
+  it('increaseDebt(): reverts when withdrawal would leave trove with ICR < MCR', async () => {
+    // alice creates a Trove and adds first collateral
+    const aliceColl = parseUnits('1.5', 9);
+    const aliceDebt = parseUnits('1000');
+    await openTrove({
+      from: alice,
+      contracts,
+      collToken: BTC,
+      collAmount: aliceColl,
+      debts: [{ tokenAddress: STABLE, amount: aliceDebt }],
+    });
+    const bobColl = parseUnits('1', 9);
+    const bobDebt = parseUnits('5000');
+    await openTrove({
+      from: bob,
+      contracts,
+      collToken: BTC,
+      collAmount: bobColl,
+      debts: [{ tokenAddress: STABLE, amount: bobDebt }],
+    });
+    // Price drops
+    await priceFeed.setTokenPrice(BTC, parseUnits('5000'));
+
+    expect(await checkRecoveryMode(contracts)).to.be.false;
+    expect((await troveManager.getCurrentICR(bob)).ICR).to.be.lt(parseUnits('1.1'));
+
+    const stableMint = 1; // withdraw 1 wei LUSD
+
+    await expect(
+      borrowerOperations.connect(bob).increaseDebt(
+        [
+          {
+            tokenAddress: STABLE,
+            amount: stableMint,
+          },
+        ],
+        _100pct
+      )
+    ).to.be.revertedWithCustomError(borrowerOperations, 'ICR_lt_MCR');
   });
 });
