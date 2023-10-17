@@ -1,6 +1,6 @@
 import { SignerWithAddress } from '@nomicfoundation/hardhat-ethers/signers';
 import { time } from '@nomicfoundation/hardhat-network-helpers';
-import { MockDebtToken, MockERC20, StabilityPoolManager } from '../typechain';
+import { MockDebtToken, MockERC20, StabilityPoolManager, contracts } from '../typechain';
 import { Contracts } from './deploymentHelpers';
 import { ethers } from 'hardhat';
 import { expect } from 'chai';
@@ -153,6 +153,10 @@ export const getTroveEntireDebt = async (contracts: Contracts, trove: SignerWith
 
 export const checkRecoveryMode = async (contracts: Contracts) => {
   return (await contracts.storagePool.checkRecoveryMode()).isInRecoveryMode;
+};
+
+export const getTCR = async (contracts: Contracts) => {
+  return (await contracts.storagePool.checkRecoveryMode()).TCR;
 };
 
 export const fastForwardTime = async (seconds: number) => {
