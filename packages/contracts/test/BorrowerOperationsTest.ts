@@ -11,7 +11,13 @@ import {
   TroveManager,
 } from '../typechain';
 import { expect } from 'chai';
-import { getStabilityPool, getTroveEntireColl, getTroveEntireDebt, openTrove } from '../utils/testHelper';
+import {
+  checkRecoveryMode,
+  getStabilityPool,
+  getTroveEntireColl,
+  getTroveEntireDebt,
+  openTrove,
+} from '../utils/testHelper';
 import { parseUnits } from 'ethers';
 
 describe('BorrowerOperations', () => {
@@ -61,6 +67,8 @@ describe('BorrowerOperations', () => {
     BTC = contracts.collToken.BTC;
     USDT = contracts.collToken.USDT;
   });
+
+  // --- addColl() ---
 
   it('addColl(): reverts when top-up would leave trove with ICR < MCR', async () => {
     // alice creates a Trove and adds first collateral
@@ -178,7 +186,6 @@ describe('BorrowerOperations', () => {
     expect(alice_Coll_After).to.be.equal(alice_Coll_Before + collTopUp);
     expect(status_After).to.be.equal(1);
   });
-
   it('addColl(), active Trove: updates the stake and updates the total stakes', async () => {
     //  Alice creates initial Trove with 1 ether
     const aliceColl = parseUnits('0.05', 9);
@@ -335,5 +342,127 @@ describe('BorrowerOperations', () => {
     expect(alice_StableDebtRewardSnapshot_After).to.be.closeTo(L_STABLE, 100n);
     expect(bob_BTCrewardSnapshot_After).to.be.closeTo(L_BTC, 100n);
     expect(bob_StableDebtRewardSnapshot_After).to.be.closeTo(L_STABLE, 100n);
+  });
+  it('addColl(), reverts if trove is non-existent or closed', async () => {
+    // A, B open troves
+    const aliceColl = parseUnits('1.5', 9);
+    const aliceDebt = parseUnits('15000');
+    await openTrove({
+      from: alice,
+      contracts,
+      collToken: BTC,
+      collAmount: aliceColl,
+      debts: [{ tokenAddress: STABLE, amount: aliceDebt }],
+    });
+    const bobColl = parseUnits('1.5', 9);
+    const bobDebt = parseUnits('15000');
+    await openTrove({
+      from: bob,
+      contracts,
+      collToken: BTC,
+      collAmount: bobColl,
+      debts: [{ tokenAddress: STABLE, amount: bobDebt }],
+    });
+
+    // Carol attempts to add collateral to her non-existent trove
+    await expect(
+      borrowerOperations.connect(carol).addColl([
+        {
+          tokenAddress: BTC,
+          amount: parseUnits('1', 9),
+        },
+      ])
+    ).to.be.revertedWithCustomError(borrowerOperations, 'TroveClosedOrNotExist');
+
+    // Price drops
+    await priceFeed.setTokenPrice(BTC, parseUnits('1000'));
+
+    // Bob gets liquidated
+    await troveManager.liquidate(bob);
+
+    // Bob attempts to add collateral to his closed trove
+    await expect(
+      borrowerOperations.connect(bob).addColl([
+        {
+          tokenAddress: BTC,
+          amount: parseUnits('1', 9),
+        },
+      ])
+    ).to.be.revertedWithCustomError(borrowerOperations, 'TroveClosedOrNotExist');
+  });
+  it('addColl(): can add collateral in Recovery Mode', async () => {
+    const aliceColl = parseUnits('1.5', 9);
+    const aliceDebt = parseUnits('15000');
+    await openTrove({
+      from: alice,
+      contracts,
+      collToken: BTC,
+      collAmount: aliceColl,
+      debts: [{ tokenAddress: STABLE, amount: aliceDebt }],
+    });
+    const aliceCollBefore = await troveManager.getTroveColl(alice);
+
+    expect(await checkRecoveryMode(contracts)).to.be.false;
+
+    await priceFeed.setTokenPrice(BTC, parseUnits('1000'));
+
+    expect(await checkRecoveryMode(contracts)).to.be.true;
+
+    const collTopUp = parseUnits('1', 9);
+    await BTC.unprotectedMint(alice, collTopUp);
+    await BTC.connect(alice).approve(borrowerOperations, collTopUp);
+    await borrowerOperations.connect(alice).addColl([
+      {
+        tokenAddress: BTC,
+        amount: collTopUp,
+      },
+    ]);
+
+    // Check Alice's collateral
+    const aliceCollAfter = await troveManager.getTroveColl(alice);
+    // const aliceCollAfter = (await troveManager.Troves(alice)).;
+    expect(aliceCollAfter[0].amount).to.be.equal(aliceCollBefore[0].amount + collTopUp);
+  });
+
+  // --- withdrawColl() ---
+
+  it('withdrawColl(): reverts when withdrawal would leave trove with ICR < MCR', async () => {
+    // alice creates a Trove and adds first collateral
+    const aliceColl = parseUnits('1.5', 9);
+    const aliceDebt = parseUnits('1500');
+    await openTrove({
+      from: alice,
+      contracts,
+      collToken: BTC,
+      collAmount: aliceColl,
+      debts: [{ tokenAddress: STABLE, amount: aliceDebt }],
+    });
+
+    const bobColl = parseUnits('1', 9);
+    const bobDebt = parseUnits('1');
+    await openTrove({
+      from: bob,
+      contracts,
+      collToken: BTC,
+      collAmount: bobColl,
+      debts: [{ tokenAddress: STABLE, amount: bobDebt }],
+    });
+
+    // Price drops
+    await priceFeed.setTokenPrice(BTC, parseUnits('1200'));
+
+    expect((await storagePool.checkRecoveryMode()).isInRecoveryMode).to.be.false;
+    expect((await troveManager.getCurrentICR(alice)).ICR).to.be.lt(parseUnits('1.1')); // less than 110%
+
+    const collWithdrawal = 1; // 1 wei withdrawal
+
+    await expect(
+      borrowerOperations.connect(alice).withdrawColl([
+        {
+          tokenAddress: BTC,
+          amount: collWithdrawal,
+        },
+      ])
+    ).to.be.revertedWithCustomError(borrowerOperations, 'ICR_lt_MCR');
   });
 });

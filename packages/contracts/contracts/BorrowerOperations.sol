@@ -530,7 +530,7 @@ contract BorrowerOperations is LiquityBase, Ownable, CheckContract, IBorrowerOpe
     PoolType _poolType
   ) internal {
     _pool.subtractValue(_collAddress, true, _poolType, _amount);
-    IERC20(_collAddress).transferFrom(address(_pool), _borrower, _amount);
+    _pool.refundValue(_borrower, _collAddress, _amount);
   }
 
   function _poolAddDebt(

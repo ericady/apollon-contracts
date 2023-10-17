@@ -144,3 +144,7 @@ export const getTroveEntireColl = async (contracts: Contracts, trove: SignerWith
 export const getTroveEntireDebt = async (contracts: Contracts, trove: SignerWithAddress) => {
   return (await contracts.troveManager.getEntireDebtAndColl(trove)).troveDebtInStable;
 };
+
+export const checkRecoveryMode = async (contracts: Contracts) => {
+  return (await contracts.storagePool.checkRecoveryMode()).isInRecoveryMode;
+};

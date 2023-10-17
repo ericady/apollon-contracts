@@ -94,6 +94,10 @@ contract StoragePool is LiquityBase, Ownable, CheckContract, IStoragePool {
     _subtractValue(_tokenAddress, _isColl, _poolType, _amount);
   }
 
+  function refundValue(address _account, address _token, uint _amount) external override {
+    IERC20(_token).transfer(_account, _amount);
+  }
+
   function withdrawalValue(
     address _receiver,
     address _tokenAddress,
