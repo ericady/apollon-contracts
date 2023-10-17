@@ -95,6 +95,7 @@ contract StoragePool is LiquityBase, Ownable, CheckContract, IStoragePool {
   }
 
   function refundValue(address _account, address _token, uint _amount) external override {
+    _requireCallerIsBOorTroveMorSP();
     IERC20(_token).transfer(_account, _amount);
   }
 
