@@ -597,4 +597,32 @@ describe('BorrowerOperations', () => {
       ])
     ).to.be.revertedWithCustomError(borrowerOperations, 'WithdrawAmount_gt_Coll');
   });
+  it("withdrawColl(): reverts when withdrawal would bring the user's ICR < MCR", async () => {
+    await priceFeed.setTokenPrice(BTC, parseUnits('11000'));
+    await openTrove({
+      from: whale,
+      contracts,
+      collToken: BTC,
+      collAmount: parseUnits('1.5', 9),
+      debts: [{ tokenAddress: STABLE, amount: parseUnits('1000') }],
+    });
+    // BOB ICR = 110%
+    await openTrove({
+      from: bob,
+      contracts,
+      collToken: BTC,
+      collAmount: parseUnits('1', 9),
+      debts: [{ tokenAddress: STABLE, amount: parseUnits('9750') }],
+    });
+
+    // Bob attempts to withdraws 1 wei, Which would leave him with < 110% ICR.
+    await expect(
+      borrowerOperations.connect(bob).withdrawColl([
+        {
+          tokenAddress: BTC,
+          amount: parseUnits('0.1', 9),
+        },
+      ])
+    ).to.be.revertedWithCustomError(borrowerOperations, 'ICR_lt_MCR');
+  });
 });
