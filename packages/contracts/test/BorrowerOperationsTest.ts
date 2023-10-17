@@ -840,4 +840,119 @@ describe('BorrowerOperations', () => {
     const alice_BTC_Bal_After = await BTC.balanceOf(alice);
     expect(alice_BTC_Bal_After).to.be.equal(alice_BTC_Bal_Before + withdrawColl);
   });
+  it("withdrawColl(): applies pending rewards and updates user's L_ETH, L_LUSDDebt snapshots", async () => {
+    // --- SETUP ---
+    // Alice adds 15 ether, Bob adds 5 ether, Carol adds 1 ether
+    await openTrove({
+      from: whale,
+      contracts,
+      collToken: BTC,
+      collAmount: parseUnits('10', 9),
+      debts: [{ tokenAddress: STABLE, amount: parseUnits('1') }],
+    });
+    const aliceColl = parseUnits('1.5', 9);
+    const aliceDebt = parseUnits('1000');
+    await openTrove({
+      from: alice,
+      contracts,
+      collToken: BTC,
+      collAmount: aliceColl,
+      debts: [{ tokenAddress: STABLE, amount: aliceDebt }],
+    });
+    const bobColl = parseUnits('1', 9);
+    const bobDebt = parseUnits('1000');
+    await openTrove({
+      from: bob,
+      contracts,
+      collToken: BTC,
+      collAmount: bobColl,
+      debts: [{ tokenAddress: STABLE, amount: bobDebt }],
+    });
+    const carolColl = parseUnits('0.1', 9);
+    const carolDebt = parseUnits('1200');
+    await openTrove({
+      from: carol,
+      contracts,
+      collToken: BTC,
+      collAmount: carolColl,
+      debts: [{ tokenAddress: STABLE, amount: carolDebt }],
+    });
+
+    const aliceDebtBefore = (await troveManager.getTroveDebt(alice))[0].amount;
+    const bobDebtBefore = (await troveManager.getTroveDebt(bob))[0].amount;
+
+    // --- TEST ---
+
+    // price drops to 1ETH:100LUSD, reducing Carol's ICR below MCR
+    await priceFeed.setTokenPrice(BTC, parseUnits('5000'));
+
+    // close Carol's Trove, liquidating her 1 ether and 180LUSD.
+    await troveManager.liquidate(carol);
+
+    const L_BTC = await troveManager.liquidatedTokens(BTC, true);
+    const L_STABLE = await troveManager.liquidatedTokens(STABLE, false);
+
+    // check Alice and Bob's reward snapshots are zero before they alter their Troves
+    const alice_BTCrewardSnapshot_Before = await troveManager.rewardSnapshots(alice, BTC, true);
+    const alice_StableDebtRewardSnapshot_Before = await troveManager.rewardSnapshots(alice, STABLE, false);
+    const bob_BTCrewardSnapshot_Before = await troveManager.rewardSnapshots(bob, BTC, true);
+    const bob_StableDebtRewardSnapshot_Before = await troveManager.rewardSnapshots(bob, STABLE, false);
+
+    expect(alice_BTCrewardSnapshot_Before).to.be.equal(0n);
+    expect(alice_StableDebtRewardSnapshot_Before).to.be.equal(0n);
+    expect(bob_BTCrewardSnapshot_Before).to.be.equal(0n);
+    expect(bob_StableDebtRewardSnapshot_Before).to.be.equal(0n);
+
+    // Check A and B have pending rewards
+    const pendingCollReward_A = await troveManager.getPendingReward(alice, BTC, true);
+    const pendingDebtReward_A = await troveManager.getPendingReward(alice, STABLE, false);
+    const pendingCollReward_B = await troveManager.getPendingReward(bob, BTC, true);
+    const pendingDebtReward_B = await troveManager.getPendingReward(bob, STABLE, false);
+
+    // TODO: Check pending rewards again
+    // for (reward of [pendingCollReward_A, pendingDebtReward_A, pendingCollReward_B, pendingDebtReward_B]) {
+    //   assert.isTrue(reward.gt(toBN('0')));
+    // }
+
+    // Alice and Bob withdraw from their Troves
+    const aliceCollWithdrawal = parseUnits('0.2', 9);
+    const bobCollWithdrawal = parseUnits('0.1', 9);
+
+    await borrowerOperations.connect(alice).withdrawColl([
+      {
+        tokenAddress: BTC,
+        amount: aliceCollWithdrawal,
+      },
+    ]);
+    await borrowerOperations.connect(bob).withdrawColl([
+      {
+        tokenAddress: BTC,
+        amount: bobCollWithdrawal,
+      },
+    ]);
+
+    // Check that both alice and Bob have had pending rewards applied in addition to their top-ups.
+    const aliceCollAfter = (await troveManager.getTroveColl(alice))[0].amount;
+    const aliceDebtAfter = (await troveManager.getTroveDebt(alice))[0].amount;
+    const bobCollAfter = (await troveManager.getTroveColl(bob))[0].amount;
+    const bobDebtAfter = (await troveManager.getTroveDebt(bob))[0].amount;
+
+    // Check rewards have been applied to troves
+    expect(aliceCollAfter).to.be.closeTo(aliceColl - aliceCollWithdrawal + pendingCollReward_A, 10000n);
+    expect(aliceDebtAfter).to.be.closeTo(aliceDebtBefore + pendingDebtReward_A, 10000n);
+    expect(bobCollAfter).to.be.closeTo(bobColl - bobCollWithdrawal + pendingCollReward_B, 10000n);
+    expect(bobDebtAfter).to.be.closeTo(bobDebtBefore + pendingDebtReward_B, 10000n);
+
+    /* After top up, both Alice and Bob's snapshots of the rewards-per-unit-staked metrics should be updated
+       to the latest values of L_ETH and L_LUSDDebt */
+    const alice_BTCrewardSnapshot_After = await troveManager.rewardSnapshots(alice, BTC, true);
+    const alice_StableDebtRewardSnapshot_After = await troveManager.rewardSnapshots(alice, STABLE, false);
+    const bob_BTCrewardSnapshot_After = await troveManager.rewardSnapshots(bob, BTC, true);
+    const bob_StableDebtRewardSnapshot_After = await troveManager.rewardSnapshots(bob, STABLE, false);
+
+    expect(alice_BTCrewardSnapshot_After).to.be.closeTo(alice_BTCrewardSnapshot_Before + L_BTC, 100n);
+    expect(alice_StableDebtRewardSnapshot_After).to.be.closeTo(alice_StableDebtRewardSnapshot_Before + L_STABLE, 100n);
+    expect(bob_BTCrewardSnapshot_After).to.be.closeTo(bob_BTCrewardSnapshot_Before + L_BTC, 100n);
+    expect(bob_StableDebtRewardSnapshot_After).to.be.closeTo(bob_StableDebtRewardSnapshot_Before + L_STABLE, 100n);
+  });
 });
