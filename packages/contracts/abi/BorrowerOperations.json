@@ -76,6 +76,11 @@
     },
     {
         "inputs": [],
+        "name": "WithdrawAmount_gt_Coll",
+        "type": "error"
+    },
+    {
+        "inputs": [],
         "name": "ZeroAddress",
         "type": "error"
     },

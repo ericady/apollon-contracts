@@ -34,6 +34,7 @@ interface IBorrowerOperations is IBBase {
   error ActiveTrove();
   error NotAllowedInRecoveryMode();
   error NotBorrower();
+  error WithdrawAmount_gt_Coll();
 
   // --- Functions ---
 

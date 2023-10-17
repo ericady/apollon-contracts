@@ -503,4 +503,98 @@ describe('BorrowerOperations', () => {
       ])
     ).to.be.revertedWithCustomError(borrowerOperations, 'TroveClosedOrNotExist');
   });
+  it('withdrawColl(): reverts when system is in Recovery Mode', async () => {
+    const aliceColl = parseUnits('1.5', 9);
+    const aliceDebt = parseUnits('10000');
+    await openTrove({
+      from: alice,
+      contracts,
+      collToken: BTC,
+      collAmount: aliceColl,
+      debts: [{ tokenAddress: STABLE, amount: aliceDebt }],
+    });
+    const bobColl = parseUnits('1.5', 9);
+    const bobDebt = parseUnits('10000');
+    await openTrove({
+      from: bob,
+      contracts,
+      collToken: BTC,
+      collAmount: bobColl,
+      debts: [{ tokenAddress: STABLE, amount: bobDebt }],
+    });
+
+    expect(await checkRecoveryMode(contracts)).to.be.false;
+
+    // Withdrawal possible when recoveryMode == false
+    await borrowerOperations.connect(alice).withdrawColl([
+      {
+        tokenAddress: BTC,
+        amount: 1000,
+      },
+    ]);
+
+    await priceFeed.setTokenPrice(BTC, parseUnits('1000'));
+
+    expect(await checkRecoveryMode(contracts)).to.be.true;
+
+    //Check withdrawal impossible when recoveryMode == true
+    await expect(
+      borrowerOperations.connect(alice).withdrawColl([
+        {
+          tokenAddress: BTC,
+          amount: 1000,
+        },
+      ])
+    ).to.be.revertedWithCustomError(borrowerOperations, 'CollWithdrawPermittedInRM');
+  });
+  it("withdrawColl(): reverts when requested ETH withdrawal is > the trove's collateral", async () => {
+    const aliceColl = parseUnits('1.5', 9);
+    const aliceDebt = parseUnits('10000');
+    await openTrove({
+      from: alice,
+      contracts,
+      collToken: BTC,
+      collAmount: aliceColl,
+      debts: [{ tokenAddress: STABLE, amount: aliceDebt }],
+    });
+    const bobColl = parseUnits('1', 9);
+    const bobDebt = parseUnits('10000');
+    await openTrove({
+      from: bob,
+      contracts,
+      collToken: BTC,
+      collAmount: bobColl,
+      debts: [{ tokenAddress: STABLE, amount: bobDebt }],
+    });
+    const carolColl = parseUnits('1.5', 9);
+    const carolDebt = parseUnits('10000');
+    await openTrove({
+      from: carol,
+      contracts,
+      collToken: BTC,
+      collAmount: carolColl,
+      debts: [{ tokenAddress: STABLE, amount: carolDebt }],
+    });
+
+    // Carol withdraws exactly all her collateral
+    await expect(
+      borrowerOperations.connect(carol).withdrawColl([
+        {
+          tokenAddress: BTC,
+          amount: carolColl,
+        },
+      ])
+    ).to.be.revertedWithCustomError(borrowerOperations, 'ICR_lt_MCR');
+
+    console.log('bob withdraw');
+    // Bob attempts to withdraw 1 wei more than his collateral
+    await expect(
+      borrowerOperations.connect(bob).withdrawColl([
+        {
+          tokenAddress: BTC,
+          amount: bobColl + 1n,
+        },
+      ])
+    ).to.be.revertedWithCustomError(borrowerOperations, 'WithdrawAmount_gt_Coll');
+  });
 });

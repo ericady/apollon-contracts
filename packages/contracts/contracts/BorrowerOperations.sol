@@ -252,7 +252,9 @@ contract BorrowerOperations is LiquityBase, Ownable, CheckContract, IBorrowerOpe
     address borrower = msg.sender;
     (ContractsCache memory contractsCache, LocalVariables_adjustTrove memory vars) = _prepareTroveAdjustment(borrower);
 
-    vars.newCompositeCollInStable -= _getCompositeColl(_colls);
+    uint withdrawCompositeInStable = _getCompositeColl(_colls);
+    if (withdrawCompositeInStable > vars.newCompositeCollInStable) revert WithdrawAmount_gt_Coll();
+    vars.newCompositeCollInStable -= withdrawCompositeInStable;
 
     contractsCache.troveManager.decreaseTroveColl(borrower, _colls);
 

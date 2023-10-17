@@ -70,6 +70,11 @@
         "type": "error"
     },
     {
+        "inputs": [],
+        "name": "WithdrawAmount_gt_Coll",
+        "type": "error"
+    },
+    {
         "anonymous": false,
         "inputs": [
             {
