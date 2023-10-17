@@ -650,10 +650,16 @@ contract BorrowerOperations is LiquityBase, Ownable, CheckContract, IBorrowerOpe
       // if Normal Mode
       _requireICRisAboveMCR(_vars.newICR);
 
+      uint collChange = _vars.newCompositeCollInStable > _vars.oldCompositeCollInStable
+        ? _vars.newCompositeCollInStable - _vars.oldCompositeCollInStable
+        : _vars.oldCompositeCollInStable - _vars.newCompositeCollInStable;
+      uint debtChange = _vars.newCompositeDebtInStable > _vars.oldCompositeDebtInStable
+        ? _vars.newCompositeDebtInStable - _vars.oldCompositeDebtInStable
+        : _vars.oldCompositeDebtInStable - _vars.newCompositeDebtInStable;
       _vars.newTCR = _getNewTCRFromTroveChange(
-        _vars.newCompositeCollInStable - _vars.oldCompositeCollInStable, // todo needs to be positiy every time -> add / sub change...
+        collChange,
         !_isCollWithdrawal,
-        _vars.newCompositeDebtInStable - _vars.oldCompositeDebtInStable, // todo needs to be positiy every time -> add / sub change...
+        debtChange,
         _isDebtIncrease,
         _vars.entireSystemColl,
         _vars.entireSystemDebt

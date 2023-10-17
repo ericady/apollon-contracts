@@ -465,4 +465,42 @@ describe('BorrowerOperations', () => {
       ])
     ).to.be.revertedWithCustomError(borrowerOperations, 'ICR_lt_MCR');
   });
+  it('withdrawColl(): reverts when calling address does not have active trove', async () => {
+    const aliceColl = parseUnits('1.5', 9);
+    const aliceDebt = parseUnits('1000');
+    await openTrove({
+      from: alice,
+      contracts,
+      collToken: BTC,
+      collAmount: aliceColl,
+      debts: [{ tokenAddress: STABLE, amount: aliceDebt }],
+    });
+    const bobColl = parseUnits('1', 9);
+    const bobDebt = parseUnits('10000');
+    await openTrove({
+      from: bob,
+      contracts,
+      collToken: BTC,
+      collAmount: bobColl,
+      debts: [{ tokenAddress: STABLE, amount: bobDebt }],
+    });
+
+    // Bob successfully withdraws some coll
+    const txBob = await borrowerOperations.connect(bob).withdrawColl([
+      {
+        tokenAddress: BTC,
+        amount: parseUnits('0.1', 9),
+      },
+    ]);
+
+    // Carol with no active trove attempts to withdraw
+    await expect(
+      borrowerOperations.connect(carol).withdrawColl([
+        {
+          tokenAddress: BTC,
+          amount: parseUnits('0.1', 9),
+        },
+      ])
+    ).to.be.revertedWithCustomError(borrowerOperations, 'TroveClosedOrNotExist');
+  });
 });
