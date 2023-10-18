@@ -1,17 +1,23 @@
 'use client';
 
-import { Tab, Tabs, Typography } from '@mui/material';
+import { PaletteMode, Tab, Tabs, Typography } from '@mui/material';
 import AppBar from '@mui/material/AppBar';
 import Toolbar from '@mui/material/Toolbar';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { SyntheticEvent, useEffect, useState } from 'react';
+import { Dispatch, SetStateAction, SyntheticEvent, useEffect, useState } from 'react';
+import ThemeSwitch from '../Buttons/ThemeSwitch';
 import EthersAddressLabel from '../EthersAddressLabel/EthersAddressLabel';
 import ApollonLogo from '../Icons/ApollonLogo';
 
 export const ROUTES = ['/balance', '/spot', '/pools', '/'];
 
-function NavigationBar() {
+type Props = {
+  themeMode: PaletteMode;
+  setThemeMode: Dispatch<SetStateAction<PaletteMode>>;
+};
+
+function NavigationBar({ themeMode, setThemeMode }: Props) {
   const pathname = usePathname();
   const [tabValue, setTabValue] = useState<'/balance' | '/spot' | '/pools'>('/spot');
 
@@ -84,7 +90,11 @@ function NavigationBar() {
             </Tabs>
           </div>
 
-          <EthersAddressLabel />
+          <div>
+            <EthersAddressLabel />
+
+            <ThemeSwitch themeMode={themeMode} setThemeMode={setThemeMode} />
+          </div>
         </div>
       </Toolbar>
     </AppBar>
