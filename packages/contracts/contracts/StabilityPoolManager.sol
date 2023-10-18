@@ -120,6 +120,17 @@ contract StabilityPoolManager is Ownable, CheckContract, IStabilityPoolManager {
       if (address(stabilityPool) == address(0)) revert PoolNotExist();
 
       stabilityPool.provideToSP(msg.sender, _debts[i].amount);
+      debtToken.sendToPool(msg.sender, address(stabilityPool), _debts[i].amount);
+    }
+  }
+
+  function withdrawalStability(TokenAmount[] memory _debts) external override {
+    for (uint i = 0; i < _debts.length; i++) {
+      IDebtToken debtToken = IDebtToken(_debts[i].tokenAddress);
+      IStabilityPool stabilityPool = stabilityPools[debtToken];
+      if (address(stabilityPool) == address(0)) revert PoolNotExist();
+
+      stabilityPool.withdrawFromSP(msg.sender, _debts[i].amount);
     }
   }
 

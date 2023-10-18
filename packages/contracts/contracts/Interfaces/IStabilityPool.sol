@@ -39,7 +39,7 @@ interface IStabilityPool is IBase {
 
   function provideToSP(address user, uint _amount) external;
 
-  function withdrawFromSP(uint _amount) external;
+  function withdrawFromSP(address user, uint _amount) external;
 
   function withdrawGains() external;
 

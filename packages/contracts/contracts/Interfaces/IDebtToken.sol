@@ -37,8 +37,6 @@ interface IDebtToken is IERC20, IERC20Metadata, IERC2612, IBase {
 
   function sendToPool(address _sender, address _poolAddress, uint256 _amount) external;
 
-  function returnFromPool(address _poolAddress, address _receiver, uint256 _amount) external;
-
   function totalSupply() external view override returns (uint256);
 
   function balanceOf(address account) external view override returns (uint256);

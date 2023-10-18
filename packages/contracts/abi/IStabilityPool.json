@@ -356,6 +356,11 @@
     {
         "inputs": [
             {
+                "internalType": "address",
+                "name": "user",
+                "type": "address"
+            },
+            {
                 "internalType": "uint256",
                 "name": "_amount",
                 "type": "uint256"

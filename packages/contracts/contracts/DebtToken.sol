@@ -21,7 +21,7 @@ import './Interfaces/IPriceFeed.sol';
  * transfer() and transferFrom() calls. The purpose is to protect users from losing tokens by mistakenly sending dToken directly to a Liquity
  * core contract, when they should rather call the right function.
  *
- * 2) sendToPool() and returnFromPool(): functions callable only Liquity core contracts, which move dTokens between Liquity <-> user.
+ * 2) sendToPool(): functions callable only Liquity core contracts, which move dTokens between Liquity <-> user.
  */
 
 contract DebtToken is CheckContract, IDebtToken {
@@ -121,13 +121,8 @@ contract DebtToken is CheckContract, IDebtToken {
   }
 
   function sendToPool(address _sender, address _poolAddress, uint256 _amount) external override {
-    //TODO:    _requireCallerIsStabilityPoolManager(); todo! needs to be called from the manager, not the pool itself...
+    _requireCallerIsStabilityPoolManager();
     _transfer(_sender, _poolAddress, _amount);
-  }
-
-  function returnFromPool(address _poolAddress, address _receiver, uint256 _amount) external override {
-    _requireCallerIsTroveMorSP();
-    _transfer(_poolAddress, _receiver, _amount);
   }
 
   // --- External functions ---

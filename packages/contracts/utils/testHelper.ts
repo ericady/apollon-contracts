@@ -1,4 +1,5 @@
 import { SignerWithAddress } from '@nomicfoundation/hardhat-ethers/signers';
+import { time } from '@nomicfoundation/hardhat-network-helpers';
 import { MockDebtToken, MockERC20, StabilityPoolManager } from '../typechain';
 import { Contracts } from './deploymentHelpers';
 import { ethers } from 'hardhat';
@@ -61,6 +62,11 @@ export const assertRevert = async (txPromise: Promise<ContractTransactionRespons
     expect(err.message).include('revert');
     if (message) expect(err.message).include(message);
   }
+};
+
+export const gasUsed = async (tx: ContractTransactionResponse) => {
+  const receipt = await tx.wait();
+  return BigInt(receipt?.cumulativeGasUsed ?? 0) * BigInt(receipt?.gasPrice ?? 0);
 };
 
 export const whaleShrimpTroveInit = async (contracts: Contracts, signers: SignerWithAddress[]) => {
@@ -147,4 +153,21 @@ export const getTroveEntireDebt = async (contracts: Contracts, trove: SignerWith
 
 export const checkRecoveryMode = async (contracts: Contracts) => {
   return (await contracts.storagePool.checkRecoveryMode()).isInRecoveryMode;
+};
+
+export const fastForwardTime = async (seconds: number) => {
+  await time.increase(seconds);
+};
+
+export const TimeValues = {
+  SECONDS_IN_ONE_MINUTE: 60,
+  SECONDS_IN_ONE_HOUR: 60 * 60,
+  SECONDS_IN_ONE_DAY: 60 * 60 * 24,
+  SECONDS_IN_ONE_WEEK: 60 * 60 * 24 * 7,
+  SECONDS_IN_SIX_WEEKS: 60 * 60 * 24 * 7 * 6,
+  SECONDS_IN_ONE_MONTH: 60 * 60 * 24 * 30,
+  SECONDS_IN_ONE_YEAR: 60 * 60 * 24 * 365,
+  MINUTES_IN_ONE_WEEK: 60 * 24 * 7,
+  MINUTES_IN_ONE_MONTH: 60 * 24 * 30,
+  MINUTES_IN_ONE_YEAR: 60 * 24 * 365,
 };

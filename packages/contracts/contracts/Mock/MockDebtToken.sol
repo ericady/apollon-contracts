@@ -44,11 +44,6 @@ contract MockDebtToken is DebtToken {
     _transfer(_sender, _poolAddress, _amount);
   }
 
-  function unprotectedReturnFromPool(address _poolAddress, address _receiver, uint256 _amount) external {
-    // No check on caller here
-    _transfer(_poolAddress, _receiver, _amount);
-  }
-
   function callInternalApprove(address owner, address spender, uint256 amount) external returns (bool) {
     _approve(owner, spender, amount);
   }

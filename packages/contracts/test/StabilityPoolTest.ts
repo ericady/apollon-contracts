@@ -11,7 +11,15 @@ import {
   TroveManager,
 } from '../typechain';
 import { expect } from 'chai';
-import { getStabilityPool, openTrove, assertRevert, whaleShrimpTroveInit } from '../utils/testHelper';
+import {
+  getStabilityPool,
+  openTrove,
+  assertRevert,
+  whaleShrimpTroveInit,
+  fastForwardTime,
+  TimeValues,
+  gasUsed,
+} from '../utils/testHelper';
 import { parseUnits } from 'ethers';
 
 describe('StabilityPool', () => {
@@ -41,11 +49,6 @@ describe('StabilityPool', () => {
   let storagePool: StoragePool;
   let stabilityPoolManager: StabilityPoolManager;
 
-  // const getOpenTroveLUSDAmount = async totalDebt => th.getOpenTroveLUSDAmount(contracts, totalDebt);
-  // const openTrove = async params => th.openTrove(contracts, params);
-  // const increaseDebt = async params => th.increaseDebt(contracts, params);
-  // const assertRevert = th.assertRevert;
-
   before(async () => {
     signers = await ethers.getSigners();
     [owner, defaulter_1, defaulter_2, defaulter_3, whale, alice, bob, carol, dennis, erin, flyn] = signers;
@@ -68,6 +71,13 @@ describe('StabilityPool', () => {
       BTC = contracts.collToken.BTC;
       USDT = contracts.collToken.USDT;
     });
+
+    // todo gov token tests missing
+    // it("provideToSP(), new deposit: when SP > 0, triggers LQTY reward event - increases the sum G", async () => {
+    // it("provideToSP(), new deposit: when SP is empty, doesn't update G", async () => {
+    // it("provideToSP(), new deposit: depositor does not receive any LQTY rewards", async () => {
+    // it("provideToSP(), new deposit after past full withdrawal: depositor does not receive any LQTY rewards", async () => {
+    // it("provideToSP(), new eligible deposit: tagged front end receives LQTY rewards", async () => {
 
     // --- provideToSP() ---
 
@@ -285,7 +295,7 @@ describe('StabilityPool', () => {
       const alice_newDeposit_1 = await stockPool.getCompoundedDebtDeposit(alice);
       expect(alice_newDeposit_1).to.be.equal(alice_topUp_1);
       const alice_btc_balance = await BTC.balanceOf(alice.address);
-      expect(alice_btc_balance).to.be.equal(19899999n);
+      expect(alice_btc_balance).to.be.equal(19800982n); // 0.02 BTC - liquidation fee
 
       // get system reward terms
       const S_1 = await stockPool.epochToScaleToCollTokenToSum(1, 0, BTC);
@@ -342,7 +352,7 @@ describe('StabilityPool', () => {
 
       // Bob, attempts to deposit 23000n more than his balance
       const bobTxPromise = stabilityPoolManager
-        .connect(alice)
+        .connect(bob)
         .provideStability([{ tokenAddress: STOCK, amount: bobBalance + 23000n }]);
       await assertRevert(bobTxPromise);
     });
@@ -469,8 +479,8 @@ describe('StabilityPool', () => {
       await priceFeed.setTokenPrice(BTC, parseUnits('9500'));
 
       // Defaulters are liquidated
-      await troveManager.connect(owner).liquidate(defaulter_1);
-      await troveManager.connect(owner).liquidate(defaulter_2);
+      await troveManager.liquidate(defaulter_1);
+      await troveManager.liquidate(defaulter_2);
 
       const activeDebt_Before = await storagePool.getValue(STABLE, false, 0);
       const defaultedDebt_Before = await storagePool.getValue(STABLE, false, 1);
@@ -495,6 +505,155 @@ describe('StabilityPool', () => {
       expect(activeColl_Before).to.be.equal(activeColl_After);
       expect(defaultedColl_Before).to.be.equal(defaultedColl_After);
       expect(tcrBefore).to.be.equal(tcrAfter);
+    });
+
+    it("provideToSP(): doesn't impact any troves, including the caller's trove", async () => {
+      await whaleShrimpTroveInit(contracts, signers);
+
+      // Price drops
+      await priceFeed.setTokenPrice(BTC, parseUnits('9500'));
+
+      // Get debt, collateral and ICR of all existing troves
+      const whale_Debt_Before = (await troveManager.getTroveDebt(whale))[0][1];
+      const alice_Debt_Before = (await troveManager.getTroveDebt(alice))[0][1];
+      const bob_Debt_Before = (await troveManager.getTroveDebt(bob))[0][1];
+      const carol_Debt_Before = (await troveManager.getTroveDebt(carol))[0][1];
+      const dennis_Debt_Before = (await troveManager.getTroveDebt(dennis))[0][1];
+
+      const whale_Coll_Before = (await troveManager.getTroveColl(whale))[0][1];
+      const alice_Coll_Before = (await troveManager.getTroveColl(alice))[0][1];
+      const bob_Coll_Before = (await troveManager.getTroveColl(bob))[0][1];
+      const carol_Coll_Before = (await troveManager.getTroveColl(carol))[0][1];
+      const dennis_Coll_Before = (await troveManager.getTroveColl(dennis))[0][1];
+
+      const whale_ICR_Before = (await troveManager.getCurrentICR(whale))[0];
+      const alice_ICR_Before = (await troveManager.getCurrentICR(alice))[0];
+      const bob_ICR_Before = (await troveManager.getCurrentICR(bob))[0];
+      const carol_ICR_Before = (await troveManager.getCurrentICR(carol))[0];
+      const dennis_ICR_Before = (await troveManager.getCurrentICR(dennis))[0];
+
+      // D makes an SP deposit
+      await stabilityPoolManager
+        .connect(dennis)
+        .provideStability([{ tokenAddress: STABLE, amount: parseUnits('300') }]);
+
+      const whale_Debt_After = (await troveManager.getTroveDebt(whale))[0][1];
+      const alice_Debt_After = (await troveManager.getTroveDebt(alice))[0][1];
+      const bob_Debt_After = (await troveManager.getTroveDebt(bob))[0][1];
+      const carol_Debt_After = (await troveManager.getTroveDebt(carol))[0][1];
+      const dennis_Debt_After = (await troveManager.getTroveDebt(dennis))[0][1];
+
+      const whale_Coll_After = (await troveManager.getTroveColl(whale))[0][1];
+      const alice_Coll_After = (await troveManager.getTroveColl(alice))[0][1];
+      const bob_Coll_After = (await troveManager.getTroveColl(bob))[0][1];
+      const carol_Coll_After = (await troveManager.getTroveColl(carol))[0][1];
+      const dennis_Coll_After = (await troveManager.getTroveColl(dennis))[0][1];
+
+      const whale_ICR_After = (await troveManager.getCurrentICR(whale))[0];
+      const alice_ICR_After = (await troveManager.getCurrentICR(alice))[0];
+      const bob_ICR_After = (await troveManager.getCurrentICR(bob))[0];
+      const carol_ICR_After = (await troveManager.getCurrentICR(carol))[0];
+      const dennis_ICR_After = (await troveManager.getCurrentICR(dennis))[0];
+
+      expect(whale_Debt_Before).to.be.equal(whale_Debt_After);
+      expect(alice_Debt_Before).to.be.equal(alice_Debt_After);
+      expect(bob_Debt_Before).to.be.equal(bob_Debt_After);
+      expect(carol_Debt_Before).to.be.equal(carol_Debt_After);
+      expect(dennis_Debt_Before).to.be.equal(dennis_Debt_After);
+
+      expect(whale_Coll_Before).to.be.equal(whale_Coll_After);
+      expect(alice_Coll_Before).to.be.equal(alice_Coll_After);
+      expect(bob_Coll_Before).to.be.equal(bob_Coll_After);
+      expect(carol_Coll_Before).to.be.equal(carol_Coll_After);
+      expect(dennis_Coll_Before).to.be.equal(dennis_Coll_After);
+
+      expect(whale_ICR_Before).to.be.equal(whale_ICR_After);
+      expect(alice_ICR_Before).to.be.equal(alice_ICR_After);
+      expect(bob_ICR_Before).to.be.equal(bob_ICR_After);
+      expect(carol_ICR_Before).to.be.equal(carol_ICR_After);
+      expect(dennis_ICR_Before).to.be.equal(dennis_ICR_After);
+    });
+
+    it("provideToSP(): doesn't protect the depositor's trove from liquidation", async () => {
+      await whaleShrimpTroveInit(contracts, signers);
+
+      // Confirm Bob has a Stability deposit
+      expect(
+        (await stabilityPoolManager.connect(bob).getCompoundedDeposits()).find(d => d.tokenAddress === STABLE.target)
+          ?.amount
+      ).to.be.equal(parseUnits('2000'));
+
+      // Price drops
+      await priceFeed.setTokenPrice(BTC, parseUnits('100'));
+
+      // Liquidate bob
+      await troveManager.liquidate(bob);
+
+      // Check Bob's trove has been removed from the system
+      expect(await troveManager.getTroveStatus(bob)).to.be.equal(3n); // check Bob's trove status was closed by liquidation
+    });
+
+    it('provideToSP(): providing 0 stable reverts', async () => {
+      await whaleShrimpTroveInit(contracts, signers);
+
+      const StableInSP_Before = (await stabilityPoolManager.getTotalDeposits()).find(
+        d => d.tokenAddress === STABLE.target
+      )?.[1];
+      expect(StableInSP_Before).to.be.equal(parseUnits('6000'));
+
+      // Bob provides 0 stable to the Stability Pool
+      const bobTxPromise = stabilityPoolManager.connect(alice).provideStability([{ tokenAddress: STOCK, amount: 0n }]);
+      await assertRevert(bobTxPromise);
+    });
+
+    it('provideToSP(), new deposit: depositor does not receive ETH gains', async () => {
+      await openTrove({
+        from: whale,
+        contracts,
+        collToken: contracts.collToken.BTC,
+        collAmount: parseUnits('1', 9),
+        debts: [{ tokenAddress: STABLE, amount: parseUnits('5000') }],
+      });
+
+      // Whale transfers stable to A
+      await STABLE.connect(whale).transfer(alice, parseUnits('500'));
+
+      // B open troves
+      await openTrove({
+        from: bob,
+        contracts,
+        collToken: BTC,
+        collAmount: parseUnits('1', 9),
+        debts: [{ tokenAddress: STABLE, amount: parseUnits('2000') }],
+      });
+
+      // --- TEST ---
+
+      // get current ETH balances
+      const A_ETHBalance_Before = await ethers.provider.getBalance(alice);
+      const B_ETHBalance_Before = await ethers.provider.getBalance(bob);
+
+      // A, B, C, D provide to SP
+      const A_GAS_Used = await gasUsed(
+        await stabilityPoolManager
+          .connect(alice)
+          .provideStability([{ tokenAddress: STABLE, amount: parseUnits('500') }])
+      );
+      const B_GAS_Used = await gasUsed(
+        await stabilityPoolManager.connect(bob).provideStability([{ tokenAddress: STABLE, amount: parseUnits('2000') }])
+      );
+
+      // ETH balances before minus gas used
+      const A_expectedBalance = A_ETHBalance_Before - A_GAS_Used;
+      const B_expectedBalance = B_ETHBalance_Before - B_GAS_Used;
+
+      // Get  ETH balances after
+      const A_ETHBalance_After = await ethers.provider.getBalance(alice);
+      const B_ETHBalance_After = await ethers.provider.getBalance(bob);
+
+      // Check ETH balances have not changed
+      expect(A_expectedBalance).to.be.equal(A_ETHBalance_After);
+      expect(B_expectedBalance).to.be.equal(B_ETHBalance_After);
     });
   });
 });

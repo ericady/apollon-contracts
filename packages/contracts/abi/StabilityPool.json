@@ -804,6 +804,11 @@
     {
         "inputs": [
             {
+                "internalType": "address",
+                "name": "user",
+                "type": "address"
+            },
+            {
                 "internalType": "uint256",
                 "name": "debtToWithdrawal",
                 "type": "uint256"

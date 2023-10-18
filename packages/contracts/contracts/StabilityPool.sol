@@ -272,8 +272,10 @@ contract StabilityPool is LiquityBase, Ownable, CheckContract, IStabilityPool {
 
     _payoutCollGains(depositor);
 
+    totalDeposits += _amount;
+    emit StabilityPoolDepositBalanceUpdated(totalDeposits);
+
     // update deposit snapshots
-    _sendDepositToStabilityPool(depositor, _amount);
     uint newDeposit = remainingDeposit + _amount;
     _updateDepositAndSnapshots(depositor, newDeposit);
     //        emit UserDepositChanged(user, newDeposit); todo
@@ -289,29 +291,27 @@ contract StabilityPool is LiquityBase, Ownable, CheckContract, IStabilityPool {
    * - Decreases deposit and takes new snapshots.
    * - If _amount > userDeposit, the user withdraws all of their compounded deposit.
    */
-  function withdrawFromSP(uint debtToWithdrawal) external override {
-    // todo will be called from the manager -> user instead of msg.sender
-
+  function withdrawFromSP(address user, uint debtToWithdrawal) external override {
     // todo removed this check, because we do not know about potential under collateralized loans
     // (sorted troves is not anymore sorted by runtime cr, its the cr on creation time)
     // this check is not required for any security reasons
     // but it prevented users from withdrawing their deposit out of the stability pool in case of an <100% CR trove (to avoid the loss)
     //    if (debtToWithdrawal != 0) _requireNoUnderCollateralizedTroves();
 
-    uint initialDeposit = deposits[msg.sender];
+    uint initialDeposit = deposits[user];
     _requireUserHasDeposit(initialDeposit);
 
-    uint remainingDeposit = this.getCompoundedDebtDeposit(msg.sender);
+    uint remainingDeposit = this.getCompoundedDebtDeposit(user);
     uint depositLoss = initialDeposit - remainingDeposit; // Needed only for event log
     //        emit DepositLoss(msg.sender, depositLoss); todo
     debtToWithdrawal = LiquityMath._min(debtToWithdrawal, remainingDeposit);
 
-    _payoutCollGains(msg.sender);
+    _payoutCollGains(user);
 
     // update deposit snapshots
-    _sendDepositToDepositor(msg.sender, debtToWithdrawal);
+    _sendDepositToDepositor(user, debtToWithdrawal);
     uint newDeposit = remainingDeposit - debtToWithdrawal;
-    _updateDepositAndSnapshots(msg.sender, newDeposit);
+    _updateDepositAndSnapshots(user, newDeposit);
     //        emit UserDepositChanged(msg.sender, newDeposit); todo
 
     // todo gov token...
@@ -680,17 +680,10 @@ contract StabilityPool is LiquityBase, Ownable, CheckContract, IStabilityPool {
 
   // --- Sender functions ---
 
-  // Transfer the debt tokens from the user to the Stability Pool's address, and update its records
-  function _sendDepositToStabilityPool(address _address, uint _amount) internal {
-    depositToken.sendToPool(_address, address(this), _amount);
-    totalDeposits += _amount;
-    emit StabilityPoolDepositBalanceUpdated(totalDeposits);
-  }
-
   function _sendDepositToDepositor(address _depositor, uint _amount) internal {
     if (_amount == 0) return;
 
-    depositToken.returnFromPool(address(this), _depositor, _amount);
+    depositToken.transfer(_depositor, _amount);
     totalDeposits -= _amount;
     emit StabilityPoolDepositBalanceUpdated(totalDeposits);
   }
