@@ -1155,4 +1155,84 @@ describe('BorrowerOperations', () => {
       )
     ).to.be.revertedWithCustomError(borrowerOperations, 'MaxFee_out_Range');
   });
+  it('increaseDebt(): succeeds when fee is less than max fee percentage', async () => {
+    await openTrove({
+      from: alice,
+      contracts,
+      collToken: BTC,
+      collAmount: parseUnits('1', 9),
+      debts: [{ tokenAddress: STABLE, amount: parseUnits('10000') }],
+    });
+
+    // Artificially make baseRate 5%
+    await troveManager.setBaseRate(parseUnits('0.05'));
+    await troveManager.setLastFeeOpTimeToNow();
+
+    let baseRate = await troveManager.baseRate(); // expect 5% base rate
+    expect(baseRate).to.be.equal(parseUnits('0.05'));
+
+    // Attempt with maxFee > 5%
+    const moreThan5pct = parseUnits('0.05') + 1n;
+    await borrowerOperations.connect(alice).increaseDebt(
+      [
+        {
+          tokenAddress: STABLE,
+          amount: parseUnits('1'),
+        },
+      ],
+      moreThan5pct
+    );
+
+    baseRate = await troveManager.baseRate(); // expect 5% base rate
+    expect(baseRate).to.be.equal(parseUnits('0.05'));
+
+    // Attempt with maxFee = 5%
+    await borrowerOperations.connect(alice).increaseDebt(
+      [
+        {
+          tokenAddress: STABLE,
+          amount: parseUnits('1'),
+        },
+      ],
+      parseUnits('0.05')
+    );
+
+    baseRate = await troveManager.baseRate(); // expect 5% base rate
+    expect(baseRate).to.be.equal(parseUnits('0.05'));
+
+    // Attempt with maxFee 10%
+    await borrowerOperations.connect(alice).increaseDebt(
+      [
+        {
+          tokenAddress: STABLE,
+          amount: parseUnits('1'),
+        },
+      ],
+      parseUnits('0.1')
+    );
+
+    baseRate = await troveManager.baseRate(); // expect 5% base rate
+    expect(baseRate).to.be.equal(parseUnits('0.05'));
+
+    // Attempt with maxFee 37.659%
+    await borrowerOperations.connect(alice).increaseDebt(
+      [
+        {
+          tokenAddress: STABLE,
+          amount: parseUnits('1'),
+        },
+      ],
+      parseUnits('0.37659')
+    );
+    // Attempt with maxFee 100%
+    await borrowerOperations.connect(alice).increaseDebt(
+      [
+        {
+          tokenAddress: STABLE,
+          amount: parseUnits('1'),
+        },
+      ],
+      parseUnits('1')
+    );
+  });
 });
