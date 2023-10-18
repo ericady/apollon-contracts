@@ -1,6 +1,5 @@
 'use client';
 
-import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
 import { Box, Skeleton } from '@mui/material';
 import Button from '@mui/material/Button';
 import InputAdornment from '@mui/material/InputAdornment';
@@ -16,6 +15,7 @@ import { displayPercentage, roundCurrency } from '../../../utils/math';
 import InfoButton from '../../Buttons/InfoButton';
 import FeatureBox from '../../FeatureBox/FeatureBox';
 import NumberInput from '../../FormControls/NumberInput';
+import ForwardIcon from '../../Icons/ForwardIcon';
 import Label from '../../Label/Label';
 import CollateralRatioVisualization from '../../Visualizations/CollateralRatioVisualization';
 
@@ -242,7 +242,8 @@ const Farm = () => {
               {oldRatio !== null ? displayPercentage(1, 'default', 0) : <Skeleton variant="text" width={50} />}
             </Typography>
 
-            <ArrowForwardIosIcon sx={{ color: '#46434F', fontSize: '18px' }} />
+            <ForwardIcon />
+
             <Typography
               sx={{
                 fontFamily: 'Space Grotesk Variable',

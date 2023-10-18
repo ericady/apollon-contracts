@@ -1,7 +1,6 @@
 'use client';
 
 import { useQuery } from '@apollo/client';
-import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
 import CloseIcon from '@mui/icons-material/Close';
 import {
   Box,
@@ -25,6 +24,8 @@ import { GetCollateralTokensQuery, GetCollateralTokensQueryVariables } from '../
 import { GET_BORROWER_COLLATERAL_TOKENS } from '../../../queries';
 import { displayPercentage, roundCurrency } from '../../../utils/math';
 import NumberInput from '../../FormControls/NumberInput';
+import DiamondIcon from '../../Icons/DiamondIcon';
+import ForwardIcon from '../../Icons/ForwardIcon';
 import Label from '../../Label/Label';
 import CollateralRatioVisualization from '../../Visualizations/CollateralRatioVisualization';
 
@@ -134,12 +135,7 @@ const CollateralUpdateDialog = ({ buttonVariant, buttonSx = {} }: Props) => {
           }}
         >
           <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-            <img
-              src="assets/svgs/Star24_white.svg"
-              alt="White colored diamond shape"
-              height="11"
-              typeof="image/svg+xml"
-            />
+            <DiamondIcon />
             <Typography variant="h6" display="inline-block">
               COLLATERAL UPDATE
             </Typography>
@@ -304,7 +300,7 @@ const CollateralUpdateDialog = ({ buttonVariant, buttonSx = {} }: Props) => {
                         <Skeleton variant="text" width={50} />
                       )}
                     </Typography>
-                    <ArrowForwardIosIcon sx={{ color: '#46434F', fontSize: '18px' }} />
+                    <ForwardIcon />
                     <Typography
                       sx={{
                         fontFamily: 'Space Grotesk Variable',

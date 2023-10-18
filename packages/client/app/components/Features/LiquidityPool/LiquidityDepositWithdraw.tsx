@@ -1,6 +1,5 @@
 'use client';
 
-import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
 import { Box, FormHelperText, Skeleton } from '@mui/material';
 import Button from '@mui/material/Button';
 import Tab from '@mui/material/Tab';
@@ -13,6 +12,7 @@ import { GetBorrowerLiquidityPoolsQuery } from '../../../generated/gql-types';
 import { displayPercentage, roundCurrency } from '../../../utils/math';
 import FeatureBox from '../../FeatureBox/FeatureBox';
 import NumberInput from '../../FormControls/NumberInput';
+import ForwardIcon from '../../Icons/ForwardIcon';
 import Label from '../../Label/Label';
 import CollateralRatioVisualization from '../../Visualizations/CollateralRatioVisualization';
 
@@ -300,7 +300,7 @@ function LiquidityDepositWithdraw({ selectedPool }: Props) {
                     <Skeleton variant="text" width={50} />
                   )}
                 </Typography>
-                <ArrowForwardIosIcon sx={{ color: '#46434F', fontSize: '18px' }} />
+                <ForwardIcon />
                 <Typography
                   sx={{ fontFamily: 'Space Grotesk Variable', color: 'info.main', fontWeight: '700', fontSize: '20px' }}
                 >
@@ -318,7 +318,7 @@ function LiquidityDepositWithdraw({ selectedPool }: Props) {
           </Box>
 
           <div style={{ width: '100%', padding: '20px' }}>
-            <Button type="submit" variant="outlined" sx={{ borderColor: 'primary.contrastText' }} disabled={!address}>
+            <Button type="submit" variant="outlined" disabled={!address}>
               Update
             </Button>
             {formState.isSubmitted && !formState.isDirty && (

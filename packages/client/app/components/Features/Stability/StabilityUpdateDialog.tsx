@@ -14,6 +14,7 @@ import { GetBorrowerDebtTokensQuery, GetBorrowerDebtTokensQueryVariables } from 
 import { GET_BORROWER_DEBT_TOKENS } from '../../../queries';
 import { roundCurrency } from '../../../utils/math';
 import NumberInput from '../../FormControls/NumberInput';
+import DiamondIcon from '../../Icons/DiamondIcon';
 import Label from '../../Label/Label';
 
 type FieldValues = Record<string, string>;
@@ -77,12 +78,7 @@ const StabilityUpdateDialog = () => {
           }}
         >
           <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-            <img
-              src="assets/svgs/Star24_white.svg"
-              alt="White colored diamond shape"
-              height="11"
-              typeof="image/svg+xml"
-            />
+            <DiamondIcon />
             <Typography variant="h6" display="inline-block">
               STABILITY UPDATE
             </Typography>

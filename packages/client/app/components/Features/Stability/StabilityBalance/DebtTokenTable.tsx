@@ -1,5 +1,5 @@
 import { useQuery } from '@apollo/client';
-import { Typography } from '@mui/material';
+import { Typography, useTheme } from '@mui/material';
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
 import TableCell from '@mui/material/TableCell';
@@ -9,7 +9,6 @@ import TableRow from '@mui/material/TableRow';
 import { useEthers } from '../../../../context/EthersProvider';
 import { GetBorrowerDebtTokensQuery, GetBorrowerDebtTokensQueryVariables } from '../../../../generated/gql-types';
 import { GET_BORROWER_DEBT_TOKENS } from '../../../../queries';
-import { BUTTON_BACKGROUND } from '../../../../theme';
 import { displayPercentage, percentageChange, roundCurrency, stdFormatter } from '../../../../utils/math';
 import FeatureBox from '../../../FeatureBox/FeatureBox';
 import DirectionIcon from '../../../Icons/DirectionIcon';
@@ -18,6 +17,9 @@ import HeaderCell from '../../../Table/HeaderCell';
 import DebtTokenTableLoader from './DebtTokenTableLoader';
 
 function DebtTokenTable() {
+  const theme = useTheme();
+  const isDarkMode = theme.palette.mode === 'dark';
+
   const { address } = useEthers();
 
   const { data } = useQuery<GetBorrowerDebtTokensQuery, GetBorrowerDebtTokensQueryVariables>(GET_BORROWER_DEBT_TOKENS, {
@@ -85,7 +87,7 @@ function DebtTokenTable() {
                     sx={{
                       borderBottom: index === data.getDebtTokens.length - 1 ? 'none' : '',
                       borderRight: '1px solid',
-                      borderColor: BUTTON_BACKGROUND,
+                      borderColor: 'table.border',
                     }}
                   >
                     <Label variant="none">{token.symbol}</Label>

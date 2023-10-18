@@ -10,18 +10,21 @@ const DARK_BUTTON_BACKGROUND_HOVER = '#1D202F';
 const DARK_FIELDSET_COLOR = '#46434F';
 
 const LIGHT_PRIMARY_BACKGROUND = '#ffffff';
-const LIGHT_PAPER_BACKGROUND = '#ffffff';
+const LIGHT_PAPER_BACKGROUND = '#ECECEC';
 const LIGHT_PRIMARY_TEXT = '#14111D';
 const LIGHT_SECONDARY_TEXT = '#5A5A5A';
 const LIGHT_DISABLED_TEXT = '#939393';
-const LIGHT_BUTTON_2_BORDER = '#ECECEC';
+const LIGHT_BUTTON_2_BORDER = '#14111D';
 // TODO: Not sure
 const LIGHT_BUTTON_BACKGROUND_HOVER = '#ECECEC';
 const LIGHT_FIELDSET_COLOR = '#AEAEAE';
 
 // TODO: Adjust these base on mode
-export const BUTTON_BACKGROUND = '#1E1B27';
-export const BACKGROUND_EMPHASIS = '#282531';
+export const DARK_BUTTON_BACKGROUND = '#1E1B27';
+export const DARK_BACKGROUND_EMPHASIS = '#282531';
+
+export const LIGHT_BUTTON_BACKGROUND = '#F8F8F8';
+export const LIGHT_BACKGROUND_EMPHASIS = '#ECECEC';
 
 const buildTheme = (mode: PaletteOptions['mode']) =>
   createTheme({
@@ -34,7 +37,7 @@ const buildTheme = (mode: PaletteOptions['mode']) =>
       background: {
         default: mode === 'dark' ? DARK_PRIMARY_BACKGROUND : LIGHT_PRIMARY_BACKGROUND,
         paper: mode === 'dark' ? DARK_PAPER_BACKGROUND : LIGHT_PAPER_BACKGROUND,
-        emphasis: BACKGROUND_EMPHASIS,
+        emphasis: mode === 'dark' ? DARK_BACKGROUND_EMPHASIS : LIGHT_BACKGROUND_EMPHASIS,
       },
       text: {
         primary: mode === 'dark' ? DARK_PRIMARY_TEXT : LIGHT_PRIMARY_TEXT,
@@ -57,7 +60,7 @@ const buildTheme = (mode: PaletteOptions['mode']) =>
         contrastText: '#1E1B27',
       },
       table: {
-        border: BUTTON_BACKGROUND,
+        border: mode === 'dark' ? DARK_BUTTON_BACKGROUND : LIGHT_BUTTON_BACKGROUND,
       },
     },
 
@@ -131,7 +134,7 @@ const buildTheme = (mode: PaletteOptions['mode']) =>
             color: mode === 'dark' ? DARK_SECONDARY_TEXT : LIGHT_SECONDARY_TEXT,
             fontSize: '14.3px',
             borderBottom: '1px solid',
-            borderColor: BUTTON_BACKGROUND,
+            borderColor: mode === 'dark' ? DARK_BUTTON_BACKGROUND : LIGHT_BUTTON_BACKGROUND,
             padding: '10px 15px',
           },
         },
@@ -176,9 +179,9 @@ const buildTheme = (mode: PaletteOptions['mode']) =>
           {
             props: { variant: 'rounded' },
             style: {
-              backgroundColor: BUTTON_BACKGROUND,
+              backgroundColor: mode === 'dark' ? DARK_BUTTON_BACKGROUND : LIGHT_BUTTON_BACKGROUND,
               color: mode === 'dark' ? DARK_PRIMARY_TEXT : LIGHT_PRIMARY_TEXT,
-              border: `2px solid ${BACKGROUND_EMPHASIS}`,
+              border: `2px solid ${mode === 'dark' ? DARK_BACKGROUND_EMPHASIS : LIGHT_BACKGROUND_EMPHASIS}`,
               fontWeight: '700',
               padding: '0px',
               height: '30px',
@@ -212,9 +215,9 @@ const buildTheme = (mode: PaletteOptions['mode']) =>
 
         styleOverrides: {
           contained: {
-            backgroundColor: BUTTON_BACKGROUND,
+            backgroundColor: mode === 'dark' ? DARK_BUTTON_BACKGROUND : LIGHT_BUTTON_BACKGROUND,
             color: mode === 'dark' ? DARK_SECONDARY_TEXT : LIGHT_SECONDARY_TEXT,
-            border: `2px solid ${BACKGROUND_EMPHASIS}`,
+            border: `2px solid ${mode === 'dark' ? DARK_BACKGROUND_EMPHASIS : LIGHT_BACKGROUND_EMPHASIS}`,
             fontWeight: '700',
             width: '100%',
             height: '30px',
@@ -244,7 +247,7 @@ const buildTheme = (mode: PaletteOptions['mode']) =>
         styleOverrides: {
           flexContainer: {
             borderBottom: '1px solid',
-            borderBottomColor: BACKGROUND_EMPHASIS,
+            borderBottomColor: mode === 'dark' ? DARK_BACKGROUND_EMPHASIS : LIGHT_BACKGROUND_EMPHASIS,
           },
           indicator: {
             backgroundColor: mode === 'dark' ? DARK_PRIMARY_TEXT : LIGHT_PRIMARY_TEXT,
@@ -269,11 +272,11 @@ const buildTheme = (mode: PaletteOptions['mode']) =>
       MuiTooltip: {
         styleOverrides: {
           tooltip: {
-            backgroundColor: BACKGROUND_EMPHASIS,
+            backgroundColor: mode === 'dark' ? DARK_BACKGROUND_EMPHASIS : LIGHT_BACKGROUND_EMPHASIS,
             color: mode === 'dark' ? DARK_SECONDARY_TEXT : LIGHT_SECONDARY_TEXT,
           },
           arrow: {
-            color: BACKGROUND_EMPHASIS,
+            color: mode === 'dark' ? DARK_BACKGROUND_EMPHASIS : LIGHT_BACKGROUND_EMPHASIS,
           },
         },
       },

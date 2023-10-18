@@ -1,6 +1,6 @@
 import { useQuery } from '@apollo/client';
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
-import { Box, Typography } from '@mui/material';
+import { Box, Typography, useTheme } from '@mui/material';
 import { useCallback, useEffect } from 'react';
 import { useEthers } from '../../context/EthersProvider';
 import {
@@ -59,6 +59,9 @@ function CollateralRatioVisualization({
   scaleMin = 1,
   loading = false,
 }: Props) {
+  const theme = useTheme();
+  const isDarkMode = theme.palette.mode === 'dark';
+
   const { address } = useEthers();
 
   const { data: debtData } = useQuery<GetBorrowerDebtTokensQuery, GetBorrowerDebtTokensQueryVariables>(
@@ -115,9 +118,9 @@ function CollateralRatioVisualization({
           width: '100%',
           marginTop: 10,
           padding: '3px 10px',
-          border: '2px solid #3C3945',
+          border: `2px solid ${isDarkMode ? '#3C3945' : '#CBCBCB'}`,
+          backgroundColor: isDarkMode ? '#282531' : '#ECECEC',
           borderRadius: 5,
-          backgroundColor: '#282531',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
@@ -180,6 +183,7 @@ function CollateralRatioVisualization({
               height: '100%',
               borderRight: '2px solid',
               borderColor: 'primary.contrastText',
+              borderColor: isDarkMode ? '#FFFFFF' : '#14111D',
             }}
           ></Box>
         )}

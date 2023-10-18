@@ -12,6 +12,7 @@ import { useEthers } from '../../../context/EthersProvider';
 import { GetCollateralTokensQuery, GetCollateralTokensQueryVariables } from '../../../generated/gql-types';
 import { GET_BORROWER_COLLATERAL_TOKENS } from '../../../queries';
 import { displayPercentage, roundCurrency, roundNumber } from '../../../utils/math';
+import DiamondIcon from '../../Icons/DiamondIcon';
 import Label from '../../Label/Label';
 import HeaderCell from '../../Table/HeaderCell';
 import CollateralPieVisualization from '../../Visualizations/CollateralPieVisualization';
@@ -91,12 +92,7 @@ function CollateralTable() {
                 {oldRatio !== null ? displayPercentage(oldRatio, 'default', 0) : <Skeleton variant="text" width={50} />}
               </Typography>
 
-              <img
-                src="assets/svgs/Star24_white.svg"
-                alt="White colored diamond shape"
-                height="11"
-                typeof="image/svg+xml"
-              />
+              <DiamondIcon />
 
               <Typography variant="h4">Collateral Ratio</Typography>
             </Box>

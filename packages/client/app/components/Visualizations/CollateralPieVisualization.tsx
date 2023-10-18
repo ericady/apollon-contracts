@@ -1,5 +1,5 @@
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
-import { Typography } from '@mui/material';
+import { Typography, useTheme } from '@mui/material';
 import { Cell, Pie, PieChart } from 'recharts';
 import { GetCollateralTokensQuery } from '../../generated/gql-types';
 import { roundCurrency } from '../../utils/math';
@@ -47,13 +47,16 @@ const renderCustomizedLabel = (svgPropsAndData: any) => {
 };
 
 function CollateralPieVisualization({ borrowerCollateralTokens }: Props) {
+  const theme = useTheme();
+  const isDarkMode = theme.palette.mode === 'dark';
+
   if (borrowerCollateralTokens.length === 0)
     return (
       <div style={{ width: 360, height: 280, display: 'grid', placeItems: 'center' }}>
         <div
           style={{
-            border: '2px solid #3C3945',
-            backgroundColor: '#282531',
+            border: `2px solid ${isDarkMode ? '#3C3945' : '#CBCBCB'}`,
+            backgroundColor: isDarkMode ? '#282531' : '#ECECEC',
             borderRadius: 5,
             padding: '3px 10px',
             display: 'flex',

@@ -13,9 +13,10 @@ import {
   GetBorrowerStabilityHistoryQueryVariables,
 } from '../../../generated/gql-types';
 import { GET_BORROWER_STABILITY_HISTORY } from '../../../queries';
-import { BACKGROUND_EMPHASIS } from '../../../theme';
+import { DARK_BACKGROUND_EMPHASIS } from '../../../theme';
 import { formatUnixTimestamp } from '../../../utils/date';
 import { roundCurrency } from '../../../utils/math';
+import DiamondIcon from '../../Icons/DiamondIcon';
 import Label from '../../Label/Label';
 
 const StabilityHistoryDialog = () => {
@@ -94,12 +95,7 @@ const StabilityHistoryDialog = () => {
             }}
           >
             <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-              <img
-                src="assets/svgs/Star24_white.svg"
-                alt="White colored diamond shape"
-                height="11"
-                typeof="image/svg+xml"
-              />
+              <DiamondIcon />
               <Typography variant="h6" display="inline-block">
                 STABILITY PER HISTORY
               </Typography>
@@ -128,7 +124,7 @@ const StabilityHistoryDialog = () => {
                   borderBottom:
                     index === data.getBorrowerStabilityHistory.pageInfo.totalCount - 1
                       ? 'none'
-                      : `1px solid ${BACKGROUND_EMPHASIS}`,
+                      : `1px solid ${DARK_BACKGROUND_EMPHASIS}`,
 
                   padding: '20px',
                 }}

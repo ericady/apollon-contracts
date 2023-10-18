@@ -3,6 +3,7 @@
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import { PropsWithChildren } from 'react';
+import DiamondIcon from '../Icons/DiamondIcon';
 
 type Props = {
   title: string;
@@ -33,7 +34,6 @@ function FeatureBox({
   return (
     <div
       className={isDraggable ? 'grid-stack-item' : ''}
-      // style={{ border: '2px solid red' }}
       id={isDraggable?.id}
       gs-y={isDraggable?.y}
       gs-w={isDraggable?.gsWidth}
@@ -49,10 +49,7 @@ function FeatureBox({
           p: noPadding ? 0 : 2,
         }}
       >
-        <div
-          className={isDraggable ? 'grid-stack-item-content' : ''}
-          // style={{ border: '2px solid green' }}
-        >
+        <div className={isDraggable ? 'grid-stack-item-content' : ''}>
           <Box
             sx={{
               display: 'flex',
@@ -81,12 +78,7 @@ function FeatureBox({
                   typeof="image/svg+xml"
                 />
               ) : (
-                <img
-                  src="assets/svgs/Star24_white.svg"
-                  alt="White colored diamond shape"
-                  height="11"
-                  typeof="image/svg+xml"
-                />
+                <DiamondIcon />
               )}
               <Typography variant="titleAlternate" component="h5" textTransform="uppercase">
                 {title}

@@ -7,7 +7,7 @@ import {
   GetCollateralRatioHistoryQueryVariables,
 } from '../../../../generated/gql-types';
 import { GET_COLLATERAL_RATIO_HISTORY } from '../../../../queries';
-import { BACKGROUND_EMPHASIS, BUTTON_BACKGROUND } from '../../../../theme';
+import { DARK_BACKGROUND_EMPHASIS, DARK_BUTTON_BACKGROUND } from '../../../../theme';
 import { stdFormatter } from '../../../../utils/math';
 import DiagramPlaceholder from '../../../Loader/DiagramPlaceholder';
 
@@ -32,11 +32,11 @@ function SystemCollateralRatioChart() {
   const systemCollateralRatio = chartData[chartData.length - 1].value;
 
   return (
-    <div style={{ background: BUTTON_BACKGROUND }}>
+    <div style={{ background: DARK_BUTTON_BACKGROUND }}>
       <LineChart width={320} height={190} data={chartData}>
         <Tooltip />
 
-        <CartesianGrid stroke={BACKGROUND_EMPHASIS} />
+        <CartesianGrid stroke={DARK_BACKGROUND_EMPHASIS} />
 
         <Line type="linear" dataKey="value" stroke={theme.palette.info.main} dot={false} isAnimationActive={false} />
       </LineChart>
