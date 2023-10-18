@@ -93,6 +93,7 @@ export const GET_LIQUIDITY_POOLS = gql`
         token {
           address
           symbol
+          priceUSD
         }
         totalAmount
       }
