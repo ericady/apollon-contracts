@@ -1,13 +1,13 @@
 import { ApolloProvider } from '@apollo/client';
 import { ThemeProvider } from '@emotion/react';
 import { SnackbarProvider } from 'notistack';
-import { PropsWithChildren, useState } from 'react';
+import { PropsWithChildren, useMemo, useState } from 'react';
 import 'whatwg-fetch';
 import { client } from '../../client';
 import { EthersContext } from '../../context/EthersProvider';
 import SelectedTokenProvider, { useSelectedToken } from '../../context/SelectedTokenProvider';
 import WalletProvider from '../../context/WalletProvider';
-import theme from '../../theme';
+import buildTheme from '../../theme';
 import MockedPositionsWithoutBorrower from './mockedResponses/GetDebtTokens.mocked.json';
 
 type Props = {
@@ -20,20 +20,24 @@ type Props = {
   };
 };
 
-export const IntegrationWrapper = ({ children, ...stateProps }: PropsWithChildren<Props>) => (
-  <ThemeProvider theme={theme}>
-    <SnackbarProvider>
-      <WalletProvider>
-        {/* Not using MockedProvider as we are using the same dev server for mocking */}
-        <ApolloProvider client={client}>
-          <SelectedTokenProvider>
-            <SetupState {...stateProps}>{children}</SetupState>
-          </SelectedTokenProvider>
-        </ApolloProvider>
-      </WalletProvider>
-    </SnackbarProvider>
-  </ThemeProvider>
-);
+export const IntegrationWrapper = ({ children, ...stateProps }: PropsWithChildren<Props>) => {
+  const theme = useMemo(() => buildTheme('dark'), []);
+
+  return (
+    <ThemeProvider theme={theme}>
+      <SnackbarProvider>
+        <WalletProvider>
+          {/* Not using MockedProvider as we are using the same dev server for mocking */}
+          <ApolloProvider client={client}>
+            <SelectedTokenProvider>
+              <SetupState {...stateProps}>{children}</SetupState>
+            </SelectedTokenProvider>
+          </ApolloProvider>
+        </WalletProvider>
+      </SnackbarProvider>
+    </ThemeProvider>
+  );
+};
 
 /**
  * This component is used as a wrapper to mock library Providers and other Context state.
