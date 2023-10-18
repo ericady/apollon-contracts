@@ -1080,4 +1080,79 @@ describe('BorrowerOperations', () => {
     const baseRate_3 = await troveManager.baseRate();
     expect(baseRate_3).to.be.lt(baseRate_2);
   });
+  it('increaseDebt(): reverts if max fee > 100%', async () => {
+    await openTrove({
+      from: alice,
+      contracts,
+      collToken: BTC,
+      collAmount: parseUnits('1', 9),
+      debts: [{ tokenAddress: STABLE, amount: parseUnits('10000') }],
+    });
+
+    await expect(
+      borrowerOperations.connect(alice).increaseDebt(
+        [
+          {
+            tokenAddress: STABLE,
+            amount: parseUnits('1'),
+          },
+        ],
+        parseUnits('2')
+      )
+    ).to.be.revertedWithCustomError(borrowerOperations, 'MaxFee_out_Range');
+    await expect(
+      borrowerOperations.connect(alice).increaseDebt(
+        [
+          {
+            tokenAddress: STABLE,
+            amount: parseUnits('1'),
+          },
+        ],
+        parseUnits('1') + 1n
+      )
+    ).to.be.revertedWithCustomError(borrowerOperations, 'MaxFee_out_Range');
+  });
+  it('increaseDebt(): reverts if max fee < 0.5% in Normal mode', async () => {
+    await openTrove({
+      from: alice,
+      contracts,
+      collToken: BTC,
+      collAmount: parseUnits('1', 9),
+      debts: [{ tokenAddress: STABLE, amount: parseUnits('10000') }],
+    });
+
+    await expect(
+      borrowerOperations.connect(alice).increaseDebt(
+        [
+          {
+            tokenAddress: STABLE,
+            amount: parseUnits('1'),
+          },
+        ],
+        0
+      )
+    ).to.be.revertedWithCustomError(borrowerOperations, 'MaxFee_out_Range');
+    await expect(
+      borrowerOperations.connect(alice).increaseDebt(
+        [
+          {
+            tokenAddress: STABLE,
+            amount: parseUnits('1'),
+          },
+        ],
+        1
+      )
+    ).to.be.revertedWithCustomError(borrowerOperations, 'MaxFee_out_Range');
+    await expect(
+      borrowerOperations.connect(alice).increaseDebt(
+        [
+          {
+            tokenAddress: STABLE,
+            amount: parseUnits('1'),
+          },
+        ],
+        parseUnits('0.005') - 1n
+      )
+    ).to.be.revertedWithCustomError(borrowerOperations, 'MaxFee_out_Range');
+  });
 });
