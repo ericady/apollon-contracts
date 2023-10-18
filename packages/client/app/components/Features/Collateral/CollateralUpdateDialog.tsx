@@ -1,7 +1,6 @@
 'use client';
 
 import { useQuery } from '@apollo/client';
-import CloseIcon from '@mui/icons-material/Close';
 import {
   Box,
   Dialog,
@@ -24,6 +23,7 @@ import { GetCollateralTokensQuery, GetCollateralTokensQueryVariables } from '../
 import { GET_BORROWER_COLLATERAL_TOKENS } from '../../../queries';
 import { displayPercentage, roundCurrency } from '../../../utils/math';
 import NumberInput from '../../FormControls/NumberInput';
+import CrossIcon from '../../Icons/CrossIcon';
 import DiamondIcon from '../../Icons/DiamondIcon';
 import ForwardIcon from '../../Icons/ForwardIcon';
 import Label from '../../Label/Label';
@@ -135,17 +135,13 @@ const CollateralUpdateDialog = ({ buttonVariant, buttonSx = {} }: Props) => {
           }}
         >
           <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-            <DiamondIcon />
+            <DiamondIcon isDialog />
             <Typography variant="h6" display="inline-block">
               COLLATERAL UPDATE
             </Typography>
           </div>
           <IconButton onClick={() => setIsOpen(false)} aria-label="close collateral update dialog">
-            <CloseIcon
-              sx={{
-                color: '#64616D',
-              }}
-            />
+            <CrossIcon />
           </IconButton>
         </DialogTitle>
         <FormProvider {...methods}>
@@ -171,16 +167,7 @@ const CollateralUpdateDialog = ({ buttonVariant, buttonSx = {} }: Props) => {
                     <Typography sx={{ fontWeight: '400', marginTop: '10px' }}>
                       {roundCurrency(depositedCollateralToDeposit[0]?.walletAmount ?? 0, 5)}
                     </Typography>
-                    <Typography
-                      sx={{
-                        color: '#3C3945',
-                        fontFamily: 'Space Grotesk Variable',
-                        fontSize: '9px',
-                        fontWeight: '700',
-                        lineHeight: '11px',
-                        letterSpacing: '0em',
-                      }}
-                    >
+                    <Typography variant="label" paragraph>
                       Trove
                     </Typography>
                   </div>
@@ -220,16 +207,7 @@ const CollateralUpdateDialog = ({ buttonVariant, buttonSx = {} }: Props) => {
                           >
                             {roundCurrency(etherAmount, 5)}
                           </Typography>
-                          <Typography
-                            sx={{
-                              color: '#3C3945',
-                              fontFamily: 'Space Grotesk Variable',
-                              fontSize: '9px',
-                              fontWeight: '700',
-                              lineHeight: '11px',
-                              letterSpacing: '0em',
-                            }}
-                          >
+                          <Typography variant="label" paragraph>
                             Wallet
                           </Typography>
                         </>
@@ -243,16 +221,7 @@ const CollateralUpdateDialog = ({ buttonVariant, buttonSx = {} }: Props) => {
                           >
                             {roundCurrency(depositedCollateralToDeposit[0]?.walletAmount ?? 0, 5)}
                           </Typography>
-                          <Typography
-                            sx={{
-                              color: '#3C3945',
-                              fontFamily: 'Space Grotesk Variable',
-                              fontSize: '9px',
-                              fontWeight: '700',
-                              lineHeight: '11px',
-                              letterSpacing: '0em',
-                            }}
-                          >
+                          <Typography variant="label" paragraph>
                             Trove
                           </Typography>
                         </>

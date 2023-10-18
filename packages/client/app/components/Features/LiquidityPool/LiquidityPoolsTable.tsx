@@ -15,6 +15,7 @@ import { GET_BORROWER_LIQUIDITY_POOLS, GET_LIQUIDITY_POOLS } from '../../../quer
 import { displayPercentage, percentageChange, roundCurrency, stdFormatter } from '../../../utils/math';
 import FeatureBox from '../../FeatureBox/FeatureBox';
 import DirectionIcon from '../../Icons/DirectionIcon';
+import ExchangeIcon from '../../Icons/ExchangeIcon';
 import Label from '../../Label/Label';
 import HeaderCell from '../../Table/HeaderCell';
 import LiquidityPoolsTableLoader from './LiquidityPoolsTableLoader';
@@ -126,12 +127,7 @@ function LiquidityPoolsTable({ selectedPool, setSelectedPool }: Props) {
                   </TableCell>
 
                   <TableCell align="center" width={200}>
-                    <img
-                      src="assets/svgs/Exchange.svg"
-                      alt="Arrow indicating trading direction"
-                      height="21"
-                      typeof="image/svg+xml"
-                    />
+                    <ExchangeIcon />
                   </TableCell>
 
                   <TableCell sx={{ pr: 0, width: '50px', maxWidth: '200px' }}>

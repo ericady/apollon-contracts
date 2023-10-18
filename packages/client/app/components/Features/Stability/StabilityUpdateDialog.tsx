@@ -1,7 +1,6 @@
 'use client';
 
 import { useQuery } from '@apollo/client';
-import CloseIcon from '@mui/icons-material/Close';
 import { Box, Dialog, DialogActions, DialogContent, DialogTitle, FormHelperText, IconButton } from '@mui/material';
 import Button from '@mui/material/Button';
 import Tab from '@mui/material/Tab';
@@ -14,6 +13,7 @@ import { GetBorrowerDebtTokensQuery, GetBorrowerDebtTokensQueryVariables } from 
 import { GET_BORROWER_DEBT_TOKENS } from '../../../queries';
 import { roundCurrency } from '../../../utils/math';
 import NumberInput from '../../FormControls/NumberInput';
+import CrossIcon from '../../Icons/CrossIcon';
 import DiamondIcon from '../../Icons/DiamondIcon';
 import Label from '../../Label/Label';
 
@@ -78,17 +78,13 @@ const StabilityUpdateDialog = () => {
           }}
         >
           <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-            <DiamondIcon />
+            <DiamondIcon isDialog />
             <Typography variant="h6" display="inline-block">
               STABILITY UPDATE
             </Typography>
           </div>
           <IconButton onClick={() => setIsOpen(false)} aria-label="close stability update dialog">
-            <CloseIcon
-              sx={{
-                color: '#64616D',
-              }}
-            />
+            <CrossIcon />
           </IconButton>
         </DialogTitle>
         <FormProvider {...methods}>
@@ -127,16 +123,7 @@ const StabilityUpdateDialog = () => {
                         <Typography sx={{ fontWeight: '400', marginTop: '10px' }}>
                           {roundCurrency(stabilityCompoundAmount!, 5)}
                         </Typography>
-                        <Typography
-                          sx={{
-                            color: '#3C3945',
-                            fontFamily: 'Space Grotesk Variable',
-                            fontSize: '9px',
-                            fontWeight: '700',
-                            lineHeight: '11px',
-                            letterSpacing: '0em',
-                          }}
-                        >
+                        <Typography variant="label" paragraph>
                           Deposited
                         </Typography>
                       </div>
@@ -176,16 +163,7 @@ const StabilityUpdateDialog = () => {
                               >
                                 {roundCurrency(walletAmount!, 5)}
                               </Typography>
-                              <Typography
-                                sx={{
-                                  color: '#3C3945',
-                                  fontFamily: 'Space Grotesk Variable',
-                                  fontSize: '9px',
-                                  fontWeight: '700',
-                                  lineHeight: '11px',
-                                  letterSpacing: '0em',
-                                }}
-                              >
+                              <Typography variant="label" paragraph>
                                 Wallet
                               </Typography>
                             </>
@@ -199,16 +177,7 @@ const StabilityUpdateDialog = () => {
                               >
                                 {roundCurrency(stabilityCompoundAmount!, 5)}
                               </Typography>
-                              <Typography
-                                sx={{
-                                  color: '#3C3945',
-                                  fontFamily: 'Space Grotesk Variable',
-                                  fontSize: '9px',
-                                  fontWeight: '700',
-                                  lineHeight: '11px',
-                                  letterSpacing: '0em',
-                                }}
-                              >
+                              <Typography variant="label" paragraph>
                                 Deposited
                               </Typography>
                             </>

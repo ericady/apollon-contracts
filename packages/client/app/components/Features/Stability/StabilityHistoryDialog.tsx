@@ -1,7 +1,6 @@
 'use client';
 
 import { useQuery } from '@apollo/client';
-import CloseIcon from '@mui/icons-material/Close';
 import ExpandLessSharpIcon from '@mui/icons-material/ExpandLessSharp';
 import { Box, Button, Dialog, DialogContent, DialogContentProps, DialogTitle, IconButton } from '@mui/material';
 import Typography from '@mui/material/Typography';
@@ -13,9 +12,9 @@ import {
   GetBorrowerStabilityHistoryQueryVariables,
 } from '../../../generated/gql-types';
 import { GET_BORROWER_STABILITY_HISTORY } from '../../../queries';
-import { DARK_BACKGROUND_EMPHASIS } from '../../../theme';
 import { formatUnixTimestamp } from '../../../utils/date';
 import { roundCurrency } from '../../../utils/math';
+import CrossIcon from '../../Icons/CrossIcon';
 import DiamondIcon from '../../Icons/DiamondIcon';
 import Label from '../../Label/Label';
 
@@ -95,17 +94,13 @@ const StabilityHistoryDialog = () => {
             }}
           >
             <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-              <DiamondIcon />
+              <DiamondIcon isDialog />
               <Typography variant="h6" display="inline-block">
                 STABILITY PER HISTORY
               </Typography>
             </div>
             <IconButton onClick={() => setOpen(false)} aria-label="close stability history dialog">
-              <CloseIcon
-                sx={{
-                  color: '#64616D',
-                }}
-              />
+              <CrossIcon />
             </IconButton>
           </DialogTitle>
           <DialogContent
@@ -118,20 +113,18 @@ const StabilityHistoryDialog = () => {
             }}
           >
             {data.getBorrowerStabilityHistory.history.map((history, index) => (
-              <div
+              <Box
                 data-testid="apollon-stability-history-dialog-history"
-                style={{
+                sx={{
                   borderBottom:
-                    index === data.getBorrowerStabilityHistory.pageInfo.totalCount - 1
-                      ? 'none'
-                      : `1px solid ${DARK_BACKGROUND_EMPHASIS}`,
-
+                    index === data.getBorrowerStabilityHistory.pageInfo.totalCount - 1 ? 'none' : `1px solid`,
+                  borderBottomColor: 'table.border',
                   padding: '20px',
                 }}
                 key={index}
               >
                 {getComponentForBorrowerHistoryType(history)}
-              </div>
+              </Box>
             ))}
           </DialogContent>
         </Dialog>

@@ -13,6 +13,7 @@ import { displayPercentage, roundCurrency, roundNumber } from '../../../utils/ma
 import InfoButton from '../../Buttons/InfoButton';
 import FeatureBox from '../../FeatureBox/FeatureBox';
 import NumberInput from '../../FormControls/NumberInput';
+import ExchangeIcon from '../../Icons/ExchangeIcon';
 import Label from '../../Label/Label';
 
 export const PROTOCOL_SWAP_FEE = 0.0009;
@@ -123,11 +124,7 @@ const Swap = () => {
                 }}
               />
 
-              <img
-                src="assets/svgs/Exchange.svg"
-                alt="Arrow indicating trading direction"
-                height="21"
-                typeof="image/svg+xml"
+              <ExchangeIcon
                 style={{
                   transform: tradingDirection === 'jUSDAquired' ? 'rotate(180deg)' : 'rotate(0deg)',
                   margin: '10px 10px 0 10px',

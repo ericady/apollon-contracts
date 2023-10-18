@@ -16,6 +16,7 @@ import { WIDGET_HEIGHTS } from '../../../utils/contants';
 import { displayPercentage, roundCurrency, stdFormatter } from '../../../utils/math';
 import FeatureBox from '../../FeatureBox/FeatureBox';
 import DirectionIcon from '../../Icons/DirectionIcon';
+import PinnedIcon from '../../Icons/PinnedIcon';
 import HeaderCell from '../../Table/HeaderCell';
 import AssetsLoader from './AssetsLoader';
 
@@ -164,23 +165,7 @@ function Assets() {
                         onClick={() => toggleFavorite(address)}
                         disableRipple
                       >
-                        {isFavorite ? (
-                          <img
-                            src="assets/svgs/Pinned_active.svg"
-                            alt="a white pin icon with a transparant body"
-                            height="17"
-                            width="15.6"
-                            typeof="image/svg+xml"
-                          />
-                        ) : (
-                          <img
-                            src="assets/svgs/Pinned_inactive.svg"
-                            alt="a grey pin icon with a transparant body"
-                            height="17"
-                            width="15.6"
-                            typeof="image/svg+xml"
-                          />
-                        )}
+                        <PinnedIcon isFavorite={isFavorite} />
                       </IconButton>
                     </TableCell>
                   </TableRow>

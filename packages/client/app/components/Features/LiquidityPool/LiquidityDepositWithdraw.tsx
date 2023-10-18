@@ -175,7 +175,16 @@ function LiquidityDepositWithdraw({ selectedPool }: Props) {
           {/* WITHDRAW */}
 
           {tabValue === 'WITHDRAW' && tokenA.borrowerAmount && (
-            <div style={{ display: 'flex', justifyContent: 'space-between', padding: 20 }}>
+            <Box
+              sx={{
+                height: '125px',
+                display: 'flex',
+                justifyContent: 'space-between',
+                padding: '20px',
+                borderBottom: '1px solid',
+                borderColor: 'background.paper',
+              }}
+            >
               <div style={{ marginTop: 6 }}>
                 <Label variant="success">{tokenA.token.symbol}</Label>
               </div>
@@ -221,11 +230,20 @@ function LiquidityDepositWithdraw({ selectedPool }: Props) {
                   </Button>
                 </div>
               </div>
-            </div>
+            </Box>
           )}
 
           {tabValue === 'WITHDRAW' && tokenB.borrowerAmount && (
-            <div style={{ display: 'flex', justifyContent: 'space-between', padding: 20 }}>
+            <Box
+              sx={{
+                height: '125px',
+                display: 'flex',
+                justifyContent: 'space-between',
+                padding: '20px',
+                borderBottom: '1px solid',
+                borderColor: 'background.paper',
+              }}
+            >
               <div style={{ marginTop: 6 }}>
                 <Label variant="success">{tokenB.token.symbol}</Label>
               </div>
@@ -272,7 +290,7 @@ function LiquidityDepositWithdraw({ selectedPool }: Props) {
                   </Button>
                 </div>
               </div>
-            </div>
+            </Box>
           )}
 
           <Box

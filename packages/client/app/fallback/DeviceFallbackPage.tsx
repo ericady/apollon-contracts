@@ -1,4 +1,5 @@
 import { Button, Typography } from '@mui/material';
+import ApollonLogo from '../components/Icons/ApollonLogo';
 
 function DeviceFallbackPage() {
   return (
@@ -11,13 +12,9 @@ function DeviceFallbackPage() {
         alignItems: 'center',
       }}
     >
-      <img
-        src="assets/svgs/Apollon_logo_negative.svg"
-        alt="Apollon Logo"
-        height="30"
-        typeof="image/svg+xml"
-        style={{ marginBottom: 20 }}
-      />
+      <div style={{ marginBottom: 20 }}>
+        <ApollonLogo />
+      </div>
 
       <img
         src="assets/svgs/client-side-error.svg"

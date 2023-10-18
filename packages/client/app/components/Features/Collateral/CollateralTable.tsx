@@ -1,5 +1,5 @@
 import { useQuery } from '@apollo/client';
-import { Box, Button, Skeleton } from '@mui/material';
+import { Box, Button, Skeleton, useTheme } from '@mui/material';
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
 import TableCell from '@mui/material/TableCell';
@@ -39,6 +39,9 @@ const generateColorPalette = (paletteLength: number) => {
 };
 
 function CollateralTable() {
+  const theme = useTheme();
+  const isDarkMode = theme.palette.mode === 'dark';
+
   const { address } = useEthers();
 
   const [oldRatio, setOldRatio] = useState<null | number>(null);
@@ -73,7 +76,14 @@ function CollateralTable() {
 
   return (
     <div style={{ display: 'flex' }}>
-      <Box style={{ width: '40%', display: 'flex', justifyContent: 'center', backgroundColor: '#1e1b27' }}>
+      <Box
+        style={{
+          width: '40%',
+          display: 'flex',
+          justifyContent: 'center',
+          backgroundColor: isDarkMode ? '#1e1b27' : '#f8f8f8',
+        }}
+      >
         <CollateralPieVisualization borrowerCollateralTokens={borrowerCollateralTokens} />
       </Box>
       <Box sx={{ width: '100%', borderLeft: '1px solid', borderColor: 'table.border' }}>
@@ -137,7 +147,7 @@ function CollateralTable() {
                             d="M4 0a6.449 6.449 0 0 0 4 4 6.449 6.449 0 0 0-4 4 6.449 6.449 0 0 0-4-4 6.449 6.449 0 0 0 4-4Z"
                           />
                         </svg>
-                        <Typography color="primary.contrastText" fontSize={14.3}>
+                        <Typography color="primary.contrastText" fontWeight={400}>
                           {roundCurrency(troveLockedAmount!, 5)}
                         </Typography>
                       </div>

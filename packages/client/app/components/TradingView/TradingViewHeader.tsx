@@ -27,26 +27,27 @@ function TradingViewHeader() {
           style={{ marginLeft: 10, marginRight: 10 }}
         />
 
-        <Typography variant="titleAlternate">
-          Pool <Box sx={{ color: 'text.primary', display: 'inline' }}>-</Box>
+        <Typography variant="subtitle1" fontFamily="Space Grotesk Variable">
+          Pool <Box sx={{ color: 'text.primary', display: 'inline' }}> -</Box>
         </Typography>
-        <Typography variant="titleAlternate">
-          Oracle <Box sx={{ color: 'text.primary', display: 'inline' }}>-</Box>
+        <Typography variant="subtitle1" fontFamily="Space Grotesk Variable">
+          Oracle <Box sx={{ color: 'text.primary', display: 'inline' }}> -</Box>
         </Typography>
-        <Typography variant="titleAlternate">
-          Premium <Box sx={{ color: 'text.primary', display: 'inline' }}>-</Box>
+        <Typography variant="subtitle1" fontFamily="Space Grotesk Variable">
+          Premium <Box sx={{ color: 'text.primary', display: 'inline' }}> -</Box>
         </Typography>
-        <Typography variant="titleAlternate">
-          Opening Fee{' '}
+        <Typography variant="subtitle1" fontFamily="Space Grotesk Variable">
+          Opening Fee
           <Box sx={{ color: 'text.primary', display: 'inline' }}>
-            {selectedToken ? displayPercentage(selectedToken.openingFee, 'positive') : '-'}
+            {' '}
+            {selectedToken ? displayPercentage(selectedToken.openingFee, 'positive') : ' -'}
           </Box>
         </Typography>
       </div>
 
       <Typography variant="titleAlternate" fontWeight={400} noWrap>
-        24h Volume{' '}
-        <Box sx={{ color: 'text.primary', display: 'inline' }}>
+        24h Volume
+        <Box sx={{ color: 'text.primary', display: 'inline', ml: '8px' }}>
           {selectedToken ? roundCurrency(selectedToken.volume24hUSD) : '-'}
         </Box>{' '}
         $

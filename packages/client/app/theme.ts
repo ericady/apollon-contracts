@@ -5,6 +5,8 @@ const DARK_PAPER_BACKGROUND = '#2A2636';
 const DARK_PRIMARY_TEXT = '#FFFFFF';
 const DARK_SECONDARY_TEXT = '#827F8B';
 const DARK_DISABLED_TEXT = '#504D59';
+const DARK_TEXT_SHADY = '#46434F';
+const DARK_TEXT_LABEL = '#3C3945';
 const DARK_BUTTON_2_BORDER = '#3C3945';
 const DARK_BUTTON_BACKGROUND_HOVER = '#1D202F';
 const DARK_FIELDSET_COLOR = '#46434F';
@@ -14,6 +16,8 @@ const LIGHT_PAPER_BACKGROUND = '#ECECEC';
 const LIGHT_PRIMARY_TEXT = '#14111D';
 const LIGHT_SECONDARY_TEXT = '#5A5A5A';
 const LIGHT_DISABLED_TEXT = '#939393';
+const LIGHT_TEXT_SHADY = '#AEAEAE';
+const LIGHT_TEXT_LABEL = '#CBCBCB';
 const LIGHT_BUTTON_2_BORDER = '#14111D';
 // TODO: Not sure
 const LIGHT_BUTTON_BACKGROUND_HOVER = '#ECECEC';
@@ -32,7 +36,7 @@ const buildTheme = (mode: PaletteOptions['mode']) =>
       mode,
       primary: {
         main: mode === 'dark' ? DARK_SECONDARY_TEXT : LIGHT_SECONDARY_TEXT,
-        contrastText: '#FFFFFF',
+        contrastText: mode === 'dark' ? DARK_PRIMARY_TEXT : LIGHT_PRIMARY_TEXT,
       },
       background: {
         default: mode === 'dark' ? DARK_PRIMARY_BACKGROUND : LIGHT_PRIMARY_BACKGROUND,
@@ -122,7 +126,13 @@ const buildTheme = (mode: PaletteOptions['mode']) =>
       },
       label: {
         fontFamily: 'Space Grotesk Variable',
-        color: '#3C3945',
+        color: mode === 'dark' ? DARK_TEXT_LABEL : LIGHT_TEXT_LABEL,
+        fontWeight: '700',
+        fontSize: '11.7px',
+      },
+      shady: {
+        fontFamily: 'Space Grotesk Variable',
+        color: mode === 'dark' ? DARK_TEXT_SHADY : LIGHT_TEXT_SHADY,
         fontWeight: '700',
         fontSize: '11.7px',
       },
@@ -302,6 +312,7 @@ declare module '@mui/material/styles' {
     titleAlternate: React.CSSProperties;
     hint: React.CSSProperties;
     label: React.CSSProperties;
+    shady: React.CSSProperties;
   }
 
   // allow configuration using `createTheme`
@@ -309,6 +320,7 @@ declare module '@mui/material/styles' {
     titleAlternate?: React.CSSProperties;
     hint?: React.CSSProperties;
     label?: React.CSSProperties;
+    shady?: React.CSSProperties;
   }
 
   interface PaletteOptions {
@@ -342,6 +354,7 @@ declare module '@mui/material/Typography' {
     titleAlternate: true;
     hint: true;
     label: true;
+    shady: true;
   }
 }
 

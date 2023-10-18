@@ -1,6 +1,7 @@
 'use client';
 
 import { Button, Typography } from '@mui/material';
+import ApollonLogo from './components/Icons/ApollonLogo';
 
 function error(props: { error: Error; reset: () => void }) {
   return (
@@ -13,13 +14,9 @@ function error(props: { error: Error; reset: () => void }) {
         alignItems: 'center',
       }}
     >
-      <img
-        src="assets/svgs/Apollon_logo_negative.svg"
-        alt="Apollon Logo"
-        height="30"
-        typeof="image/svg+xml"
-        style={{ marginBottom: 20 }}
-      />
+      <div style={{ marginBottom: 20 }}>
+        <ApollonLogo />
+      </div>
 
       <img
         src="assets/svgs/client-side-error.svg"

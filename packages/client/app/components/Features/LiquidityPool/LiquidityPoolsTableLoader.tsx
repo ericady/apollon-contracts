@@ -1,5 +1,6 @@
 import { Skeleton, Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from '@mui/material';
 import FeatureBox from '../../FeatureBox/FeatureBox';
+import ExchangeIcon from '../../Icons/ExchangeIcon';
 import HeaderCell from '../../Table/HeaderCell';
 
 function LiquidityPoolsTableLoader() {
@@ -54,12 +55,7 @@ function LiquidityPoolsTableLoader() {
                   </TableCell>
 
                   <TableCell align="center">
-                    <img
-                      src="assets/svgs/Exchange.svg"
-                      alt="Arrow indicating trading direction"
-                      height="21"
-                      typeof="image/svg+xml"
-                    />
+                    <ExchangeIcon />
                   </TableCell>
 
                   <TableCell align="right" width={150}>
