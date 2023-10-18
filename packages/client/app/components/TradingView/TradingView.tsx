@@ -1,12 +1,13 @@
 'use client';
 
+import { useTheme } from '@mui/material';
 import { ChartOptions, ColorType, CrosshairMode, LineStyle, createChart } from 'lightweight-charts';
 import { useEffect } from 'react';
 import TradingViewHeader from './TradingViewHeader';
 import areaSeriesDemoData from './areaSeriesDemoData.json';
 import candleStickSeriesDemoData from './candleStickSeriesDemoData.json';
 
-const chartOptions: Partial<ChartOptions> = {
+const chartOptionsDark: Partial<ChartOptions> = {
   grid: {
     vertLines: {
       style: LineStyle.Solid,
@@ -47,9 +48,56 @@ const chartOptions: Partial<ChartOptions> = {
   autoSize: true,
 };
 
+const chartOptionsLight: Partial<ChartOptions> = {
+  grid: {
+    vertLines: {
+      style: LineStyle.Solid,
+      visible: true,
+      color: '#ECECEC',
+    },
+    horzLines: {
+      style: LineStyle.Solid,
+      visible: true,
+      color: '#ECECEC',
+    },
+  },
+  layout: {
+    textColor: '#696969',
+    fontFamily: 'Space Grotesk Variable',
+    fontSize: 11,
+    background: { type: ColorType.Solid, color: '#F8F8F8' },
+  },
+  crosshair: {
+    horzLine: {
+      visible: true,
+      labelVisible: true,
+      color: '#e04a4a',
+      labelBackgroundColor: '#e04a4a',
+      style: LineStyle.Dashed,
+      width: 1,
+    },
+    vertLine: {
+      visible: true,
+      labelVisible: true,
+      color: '#e04a4a',
+      labelBackgroundColor: '#e04a4a',
+      style: LineStyle.Dashed,
+      width: 1,
+    },
+    mode: CrosshairMode.Normal,
+  },
+  autoSize: true,
+};
+
 function TradingView() {
+  const theme = useTheme();
+  const isDarkMode = theme.palette.mode === 'dark';
+
   useEffect(() => {
-    const chart = createChart(document.getElementById('apollon-trading-view')!, chartOptions);
+    const chart = createChart(
+      document.getElementById('apollon-trading-view')!,
+      isDarkMode ? chartOptionsDark : chartOptionsLight,
+    );
     const areaSeries = chart.addAreaSeries({
       lineColor: '#2962FF',
       topColor: '#2962FF',
@@ -70,7 +118,7 @@ function TradingView() {
     return () => {
       chart.remove();
     };
-  }, []);
+  }, [isDarkMode]);
 
   return (
     <>

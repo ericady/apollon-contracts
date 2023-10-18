@@ -7,12 +7,13 @@ import {
   GetCollateralRatioHistoryQueryVariables,
 } from '../../../../generated/gql-types';
 import { GET_COLLATERAL_RATIO_HISTORY } from '../../../../queries';
-import { DARK_BACKGROUND_EMPHASIS, DARK_BUTTON_BACKGROUND } from '../../../../theme';
+import { DARK_BACKGROUND_EMPHASIS, LIGHT_BACKGROUND_EMPHASIS } from '../../../../theme';
 import { stdFormatter } from '../../../../utils/math';
 import DiagramPlaceholder from '../../../Loader/DiagramPlaceholder';
 
 function SystemCollateralRatioChart() {
   const theme = useTheme();
+  const isDarkMode = theme.palette.mode === 'dark';
 
   const { data } = useQuery<GetCollateralRatioHistoryQuery, GetCollateralRatioHistoryQueryVariables>(
     GET_COLLATERAL_RATIO_HISTORY,
@@ -32,11 +33,11 @@ function SystemCollateralRatioChart() {
   const systemCollateralRatio = chartData[chartData.length - 1].value;
 
   return (
-    <div style={{ background: DARK_BUTTON_BACKGROUND }}>
+    <Box sx={{ backgroundColor: 'table.border' }}>
       <LineChart width={320} height={190} data={chartData}>
         <Tooltip />
 
-        <CartesianGrid stroke={DARK_BACKGROUND_EMPHASIS} />
+        <CartesianGrid stroke={isDarkMode ? DARK_BACKGROUND_EMPHASIS : LIGHT_BACKGROUND_EMPHASIS} />
 
         <Line type="linear" dataKey="value" stroke={theme.palette.info.main} dot={false} isAnimationActive={false} />
       </LineChart>
@@ -48,7 +49,7 @@ function SystemCollateralRatioChart() {
 
         <Typography variant="titleAlternate">%</Typography>
       </Box>
-    </div>
+    </Box>
   );
 }
 

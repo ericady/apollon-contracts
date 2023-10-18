@@ -6,12 +6,13 @@ import { useMemo } from 'react';
 import { CartesianGrid, Line, LineChart, Tooltip } from 'recharts';
 import { GetReserveUsdHistoryQuery, GetReserveUsdHistoryQueryVariables } from '../../../generated/gql-types';
 import { GET_RESERVE_USD_HISTORY } from '../../../queries';
-import { DARK_BACKGROUND_EMPHASIS, DARK_BUTTON_BACKGROUND } from '../../../theme';
+import { DARK_BACKGROUND_EMPHASIS, LIGHT_BACKGROUND_EMPHASIS } from '../../../theme';
 import { stdFormatter } from '../../../utils/math';
 import DiagramPlaceholder from '../../Loader/DiagramPlaceholder';
 
 function ReservePoolValueChart() {
   const theme = useTheme();
+  const isDarkMode = theme.palette.mode === 'dark';
 
   const { data } = useQuery<GetReserveUsdHistoryQuery, GetReserveUsdHistoryQueryVariables>(GET_RESERVE_USD_HISTORY);
 
@@ -29,11 +30,11 @@ function ReservePoolValueChart() {
   const reservePoolValue = chartData[chartData.length - 1].value;
 
   return (
-    <div style={{ background: DARK_BUTTON_BACKGROUND }}>
+    <Box sx={{ backgroundColor: 'table.border' }}>
       <LineChart width={320} height={190} data={chartData}>
         <Tooltip />
 
-        <CartesianGrid stroke={DARK_BACKGROUND_EMPHASIS} />
+        <CartesianGrid stroke={isDarkMode ? DARK_BACKGROUND_EMPHASIS : LIGHT_BACKGROUND_EMPHASIS} />
 
         <Line type="linear" dataKey="value" stroke={theme.palette.info.main} dot={false} isAnimationActive={false} />
       </LineChart>
@@ -45,7 +46,7 @@ function ReservePoolValueChart() {
 
         <Typography variant="titleAlternate">$</Typography>
       </Box>
-    </div>
+    </Box>
   );
 }
 
