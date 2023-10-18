@@ -6,6 +6,7 @@ import {
   MockDebtToken,
   MockERC20,
   MockPriceFeed,
+  MockTroveManager,
   StabilityPoolManager,
   StoragePool,
   TroveManager,
@@ -14,6 +15,7 @@ import { expect } from 'chai';
 import {
   _100pct,
   checkRecoveryMode,
+  fastForwardTime,
   getStabilityPool,
   getTCR,
   getTroveEntireColl,
@@ -43,7 +45,7 @@ describe('BorrowerOperations', () => {
 
   let contracts: Contracts;
   let priceFeed: MockPriceFeed;
-  let troveManager: TroveManager;
+  let troveManager: MockTroveManager;
   let borrowerOperations: BorrowerOperations;
   let storagePool: StoragePool;
   let stabilityPoolManager: StabilityPoolManager;
@@ -997,5 +999,85 @@ describe('BorrowerOperations', () => {
         _100pct
       )
     ).to.be.revertedWithCustomError(borrowerOperations, 'ICR_lt_MCR');
+  });
+  it('increaseDebt(): decays a non-zero base rate', async () => {
+    await openTrove({
+      from: whale,
+      contracts,
+      collToken: BTC,
+      collAmount: parseUnits('10', 9),
+      debts: [{ tokenAddress: STABLE, amount: parseUnits('1') }],
+    });
+
+    await openTrove({
+      from: alice,
+      contracts,
+      collToken: BTC,
+      collAmount: parseUnits('1', 9),
+      debts: [{ tokenAddress: STABLE, amount: parseUnits('10000') }],
+    });
+    await openTrove({
+      from: bob,
+      contracts,
+      collToken: BTC,
+      collAmount: parseUnits('1', 9),
+      debts: [{ tokenAddress: STABLE, amount: parseUnits('10000') }],
+    });
+    await openTrove({
+      from: carol,
+      contracts,
+      collToken: BTC,
+      collAmount: parseUnits('1', 9),
+      debts: [{ tokenAddress: STABLE, amount: parseUnits('10000') }],
+    });
+    await openTrove({
+      from: dennis,
+      contracts,
+      collToken: BTC,
+      collAmount: parseUnits('1', 9),
+      debts: [{ tokenAddress: STABLE, amount: parseUnits('10000') }],
+    });
+
+    // Artificially set base rate to 5%
+    await troveManager.setBaseRate(parseUnits('0.05'));
+
+    // Check baseRate is now non-zero
+    const baseRate_1 = await troveManager.baseRate();
+    expect(baseRate_1).to.be.equal(parseUnits('0.05'));
+
+    // 2 hours pass
+    await fastForwardTime(60 * 60 * 2);
+
+    // D withdraws LUSD
+    await borrowerOperations.connect(dennis).increaseDebt(
+      [
+        {
+          tokenAddress: STABLE,
+          amount: parseUnits('1'),
+        },
+      ],
+      _100pct
+    );
+
+    // Check baseRate has decreased
+    const baseRate_2 = await troveManager.baseRate();
+    expect(baseRate_2).to.be.lt(baseRate_1);
+
+    // 1 hour passes
+    await fastForwardTime(60 * 60);
+
+    // E withdraws LUSD
+    await borrowerOperations.connect(carol).increaseDebt(
+      [
+        {
+          tokenAddress: STABLE,
+          amount: parseUnits('1'),
+        },
+      ],
+      _100pct
+    );
+
+    const baseRate_3 = await troveManager.baseRate();
+    expect(baseRate_3).to.be.lt(baseRate_2);
   });
 });

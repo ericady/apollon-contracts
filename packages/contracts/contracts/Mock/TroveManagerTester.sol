@@ -7,7 +7,7 @@ import '../TroveManager.sol';
 /* Tester contract inherits from TroveManager, and provides external functions 
 for testing the parent's internal functions. */
 
-contract TroveManagerTester is TroveManager {
+contract MockTroveManager is TroveManager {
   function computeICR(uint _coll, uint _debt) external pure returns (uint) {
     return LiquityMath._computeCR(_coll, _debt);
   }

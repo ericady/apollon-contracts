@@ -4,6 +4,7 @@ import {
   CollTokenManager,
   DebtTokenManager,
   MockPriceFeed,
+  MockTroveManager,
   StabilityPoolManager,
   StoragePool,
   TroveManager,
@@ -12,7 +13,7 @@ import { parseUnits } from 'ethers';
 
 export interface Contracts {
   borrowerOperations: BorrowerOperations;
-  troveManager: TroveManager;
+  troveManager: MockTroveManager;
   stabilityPoolManager: StabilityPoolManager;
   storagePool: StoragePool;
   collTokenManager: CollTokenManager;
@@ -26,7 +27,7 @@ export const deployCore = async (): Promise<Contracts> => {
   const borrowerOperationsFactory = await ethers.getContractFactory('BorrowerOperations');
   const borrowerOperations = await borrowerOperationsFactory.deploy();
 
-  const troveManagerFactory = await ethers.getContractFactory('TroveManager');
+  const troveManagerFactory = await ethers.getContractFactory('MockTroveManager');
   const troveManager = await troveManagerFactory.deploy();
 
   const stabilityPoolManagerFactory = await ethers.getContractFactory('StabilityPoolManager');
