@@ -4,7 +4,7 @@ import { MockDebtToken, MockERC20, StabilityPoolManager, contracts } from '../ty
 import { Contracts } from './deploymentHelpers';
 import { ethers } from 'hardhat';
 import { expect } from 'chai';
-import { ContractTransactionResponse } from 'ethers';
+import { ContractTransactionReceipt, ContractTransactionResponse } from 'ethers';
 import { parseUnits } from 'ethers';
 
 export const _100pct = '1000000000000000000';
@@ -161,6 +161,20 @@ export const getTCR = async (contracts: Contracts) => {
 
 export const fastForwardTime = async (seconds: number) => {
   await time.increase(seconds);
+};
+
+export const getEmittedLiquidationValues = (liquidationTx: ContractTransactionReceipt | null, contracts: Contracts) => {
+  for (let i = 0; i < (liquidationTx?.logs.length || 0); i++) {
+    const logData = contracts.troveManager.interface.parseLog(liquidationTx?.logs[i] as any);
+    if (logData?.name === 'TroveIndexUpdated') {
+      const liquidatedDebt = logData.args[0];
+      const liquidatedColl = logData.args[1];
+      const collGasComp = logData.args[2];
+      const lusdGasComp = logData.args[3];
+
+      return [liquidatedDebt, liquidatedColl, collGasComp, lusdGasComp];
+    }
+  }
 };
 
 export const TimeValues = {
