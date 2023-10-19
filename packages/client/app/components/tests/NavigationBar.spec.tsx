@@ -26,7 +26,7 @@ test.describe('NavigationBar', () => {
   test('should render NavigationBar', async ({ mount }) => {
     const component = await mount(
       <IntegrationWrapper>
-        <NavigationBar />
+        <NavigationBar setThemeMode={() => {}} themeMode="dark" />
       </IntegrationWrapper>,
     );
 
@@ -36,7 +36,7 @@ test.describe('NavigationBar', () => {
   test('should go to "/balance" when clicking "Balance"', async ({ mount, page }) => {
     const component = await mount(
       <IntegrationWrapper>
-        <NavigationBar />
+        <NavigationBar setThemeMode={() => {}} themeMode="dark" />
       </IntegrationWrapper>,
     );
 
@@ -48,7 +48,7 @@ test.describe('NavigationBar', () => {
   test('should go to "/spot" when clicking "Spot"', async ({ mount, page }) => {
     const component = await mount(
       <IntegrationWrapper>
-        <NavigationBar />
+        <NavigationBar setThemeMode={() => {}} themeMode="dark" />
       </IntegrationWrapper>,
     );
 
@@ -60,7 +60,7 @@ test.describe('NavigationBar', () => {
   test('should go to "/pools" when clicking "Pools"', async ({ mount, page }) => {
     const component = await mount(
       <IntegrationWrapper>
-        <NavigationBar />
+        <NavigationBar setThemeMode={() => {}} themeMode="dark" />
       </IntegrationWrapper>,
     );
 

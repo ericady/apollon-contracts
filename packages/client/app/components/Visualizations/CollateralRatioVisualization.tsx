@@ -113,6 +113,7 @@ function CollateralRatioVisualization({
   if (isProcessing) {
     return (
       <div
+        data-testid="apollon-collateral-ratio-visualization-loader"
         style={{
           height: '31px',
           width: '100%',
@@ -178,6 +179,7 @@ function CollateralRatioVisualization({
         {/* Just show indicator if a change is showns and not all debt can be extinguished */}
         {addedDebtUSD !== 0 && newRatio !== 0 && (
           <Box
+            data-testid="apollon-collateral-ratio-visualization-new-position"
             sx={{
               position: 'absolute',
               width: `${newPosition * 100}%`,

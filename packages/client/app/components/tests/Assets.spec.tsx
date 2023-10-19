@@ -62,7 +62,7 @@ test.describe('Assets', () => {
     await expect(component).toHaveText('AssetsType$OF %%');
 
     const element = page.getByTestId('apollon-assets-loader');
-    expect(element).toBeTruthy();
+    await expect(element).toBeVisible();
   });
 
   test.describe('Selecting Asset', () => {
