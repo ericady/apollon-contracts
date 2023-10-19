@@ -633,8 +633,31 @@ contract TroveManager is LiquityBase, Ownable, CheckContract, ITroveManager {
     // Update system snapshots
     _updateSystemSnapshots_excludeCollRemainder(vars.collTokenAddresses);
 
-    // todo
-    // emit Liquidation(vars.liquidatedDebt, vars.liquidatedColl, totals.totalCollGasCompensation, totals.totalLUSDGasCompensation);
+    // liquidation event
+    TokenAmount[] memory liquidatedColl = new TokenAmount[](vars.collTokenAddresses.length);
+    for (uint i = 0; i < vars.collTokenAddresses.length; i++) {
+      liquidatedColl[i] = TokenAmount(
+        vars.collTokenAddresses[i],
+        vars.tokensToRedistribute[i].amount // works because of the initialisation of the array (first debts, then colls)
+      );
+    }
+    TokenAmount[] memory liquidatedDebt = new TokenAmount[](vars.remainingStabilities.length);
+    for (uint i = 0; i < vars.remainingStabilities.length; i++) {
+      RemainingStability memory remainingStability = vars.remainingStabilities[i];
+
+      uint redistributed = vars.tokensToRedistribute[vars.collTokenAddresses.length + i].amount; // has the same token order in the array
+      liquidatedDebt[i] = TokenAmount(remainingStability.tokenAddress, remainingStability.debtToOffset + redistributed);
+
+      for (uint ii = 0; ii < vars.collTokenAddresses.length; ii++) {
+        liquidatedColl[ii].amount += remainingStability.collGained[ii].amount;
+      }
+    }
+    emit Liquidation(
+      liquidatedDebt,
+      liquidatedColl,
+      vars.totalStableCoinGasCompensation,
+      0 // todo add coll gas comp
+    );
 
     // Send gas compensation to caller
     // todo what about the coll gas comp? where does that go?

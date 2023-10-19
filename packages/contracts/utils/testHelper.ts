@@ -132,14 +132,14 @@ export const whaleShrimpTroveInit = async (contracts: Contracts, signers: Signer
     contracts,
     collToken: BTC,
     collAmount: parseUnits('0.02', 9), // 0.02 BTC
-    debts: [{ tokenAddress: STABLE, amount: parseUnits('1') }],
+    debts: [{ tokenAddress: STABLE, amount: parseUnits('100') }],
   });
   await openTrove({
     from: defaulter_2,
     contracts,
     collToken: BTC,
     collAmount: parseUnits('0.02', 9), // 0.02 BTC
-    debts: [{ tokenAddress: STABLE, amount: parseUnits('1') }],
+    debts: [{ tokenAddress: STABLE, amount: parseUnits('100') }],
   });
 };
 
@@ -163,17 +163,20 @@ export const fastForwardTime = async (seconds: number) => {
   await time.increase(seconds);
 };
 
-export const getEmittedLiquidationValues = (liquidationTx: ContractTransactionReceipt | null, contracts: Contracts) => {
-  for (let i = 0; i < (liquidationTx?.logs.length || 0); i++) {
-    const logData = contracts.troveManager.interface.parseLog(liquidationTx?.logs[i] as any);
-    if (logData?.name === 'Liquidation') {
-      const liquidatedDebt = logData.args[0];
-      const liquidatedColl = logData.args[1];
-      const collGasComp = logData.args[2];
-      const lusdGasComp = logData.args[3];
+export const getEmittedLiquidationValues = async (
+  liquidationTx: ContractTransactionResponse | null,
+  contracts: Contracts
+) => {
+  const receipt = await liquidationTx?.wait();
+  for (const log of receipt?.logs ?? []) {
+    const logData = contracts.troveManager.interface.parseLog(log as any);
+    if (logData?.name !== 'Liquidation') continue;
 
-      return [liquidatedDebt, liquidatedColl, collGasComp, lusdGasComp];
-    }
+    const liquidatedDebt = logData.args[0];
+    const liquidatedColl = logData.args[1];
+    const stableGasComp = logData.args[2];
+    const collGasComp = logData.args[3];
+    return [liquidatedDebt, liquidatedColl, stableGasComp, collGasComp];
   }
 };
 

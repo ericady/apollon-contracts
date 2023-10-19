@@ -152,27 +152,51 @@
         "anonymous": false,
         "inputs": [
             {
+                "components": [
+                    {
+                        "internalType": "address",
+                        "name": "tokenAddress",
+                        "type": "address"
+                    },
+                    {
+                        "internalType": "uint256",
+                        "name": "amount",
+                        "type": "uint256"
+                    }
+                ],
+                "indexed": false,
+                "internalType": "struct IBase.TokenAmount[]",
+                "name": "liquidatedDebt",
+                "type": "tuple[]"
+            },
+            {
+                "components": [
+                    {
+                        "internalType": "address",
+                        "name": "tokenAddress",
+                        "type": "address"
+                    },
+                    {
+                        "internalType": "uint256",
+                        "name": "amount",
+                        "type": "uint256"
+                    }
+                ],
+                "indexed": false,
+                "internalType": "struct IBase.TokenAmount[]",
+                "name": "liquidatedColl",
+                "type": "tuple[]"
+            },
+            {
                 "indexed": false,
                 "internalType": "uint256",
-                "name": "_liquidatedDebt",
+                "name": "totalStableCoinGasCompensation",
                 "type": "uint256"
             },
             {
                 "indexed": false,
                 "internalType": "uint256",
-                "name": "_liquidatedColl",
-                "type": "uint256"
-            },
-            {
-                "indexed": false,
-                "internalType": "uint256",
-                "name": "_collGasCompensation",
-                "type": "uint256"
-            },
-            {
-                "indexed": false,
-                "internalType": "uint256",
-                "name": "_LUSDGasCompensation",
+                "name": "totalCollGasCompensation",
                 "type": "uint256"
             }
         ],

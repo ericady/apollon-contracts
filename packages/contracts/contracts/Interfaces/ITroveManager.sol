@@ -26,7 +26,12 @@ interface ITroveManager is IBBase {
   event StoragePoolAddressChanged(address _storagePoolAddress);
   event StabilityPoolManagerAddressChanged(address _stabilityPoolManagerAddress);
 
-  event Liquidation(uint _liquidatedDebt, uint _liquidatedColl, uint _collGasCompensation, uint _LUSDGasCompensation);
+  event Liquidation(
+    TokenAmount[] liquidatedDebt,
+    TokenAmount[] liquidatedColl,
+    uint totalStableCoinGasCompensation,
+    uint totalCollGasCompensation
+  );
   event Redemption(uint _attemptedLUSDAmount, uint _actualLUSDAmount, uint _ETHSent, uint _ETHFee);
   event TroveUpdated(address indexed _borrower, uint _debt, uint _coll, uint _stake, TroveManagerOperation _operation);
   event TroveLiquidated(address indexed _borrower, uint _debt, uint _coll, TroveManagerOperation _operation);
