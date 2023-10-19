@@ -166,7 +166,7 @@ export const fastForwardTime = async (seconds: number) => {
 export const getEmittedLiquidationValues = (liquidationTx: ContractTransactionReceipt | null, contracts: Contracts) => {
   for (let i = 0; i < (liquidationTx?.logs.length || 0); i++) {
     const logData = contracts.troveManager.interface.parseLog(liquidationTx?.logs[i] as any);
-    if (logData?.name === 'TroveIndexUpdated') {
+    if (logData?.name === 'Liquidation') {
       const liquidatedDebt = logData.args[0];
       const liquidatedColl = logData.args[1];
       const collGasComp = logData.args[2];
