@@ -3,6 +3,7 @@ import { SetupServer } from 'msw/node';
 import CollateralUpdateDialog from '../Features/Collateral/CollateralUpdateDialog';
 import { integrationSuiteSetup, integrationTestSetup } from './integration-test.setup';
 import MockedBorrowerCollateralTokens from './mockedResponses/GetBorrowerCollateralTokens.mocked.json';
+import MockedBorrowerDebtTokens from './mockedResponses/GetBorrowerDebtTokens.mocked.json';
 import MockedCollateralTokensWithoutBorrower from './mockedResponses/GetCollateralTokens.mocked.json';
 import { parseNumberString } from './test-helpers';
 import { IntegrationWrapper } from './test-utils';
@@ -36,6 +37,11 @@ test.describe('CollateralUpdateDialog', () => {
           status: 200,
           body: JSON.stringify(MockedBorrowerCollateralTokens),
         });
+      } else if (JSON.parse(route.request().postData()!).operationName === 'GetBorrowerDebtTokens') {
+        return route.fulfill({
+          status: 200,
+          body: JSON.stringify(MockedBorrowerDebtTokens),
+        });
       } else {
         return route.abort();
       }
@@ -53,6 +59,9 @@ test.describe('CollateralUpdateDialog', () => {
     await updateButton.click();
 
     await page.waitForSelector('[data-testid="apollon-collateral-update-dialog-ether-amount"]', {
+      state: 'visible',
+    });
+    await page.waitForSelector('[data-testid="apollon-collateral-ratio-visualization"]', {
       state: 'visible',
     });
 

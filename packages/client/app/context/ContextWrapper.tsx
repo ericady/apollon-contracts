@@ -5,7 +5,7 @@ import { PaletteMode } from '@mui/material';
 import CssBaseline from '@mui/material/CssBaseline';
 import ThemeProvider from '@mui/material/styles/ThemeProvider';
 import { SnackbarProvider } from 'notistack';
-import { PropsWithChildren, useMemo, useState } from 'react';
+import { PropsWithChildren, useEffect, useMemo, useState } from 'react';
 import { client } from '../client';
 import { ThemeModeLocalStorageKey } from '../components/Buttons/ThemeSwitch';
 import MockServer from '../components/MockServer';
@@ -18,15 +18,18 @@ import WalletProvider from './WalletProvider';
 
 function ContextWrapper({ children }: PropsWithChildren<{}>) {
   // The initial mode will be taken from LS or from the browser if the user didnt select any before.
-  const [themeMode, setThemeMode] = useState<PaletteMode>(() => {
+  const [themeMode, setThemeMode] = useState<PaletteMode>('dark');
+
+  // FIXME: Cant access LS in useState initializer because of page pre-rendering.
+  useEffect(() => {
     const storedThemeMode = localStorage.getItem(ThemeModeLocalStorageKey) as PaletteMode | null;
 
     if (storedThemeMode) {
-      return storedThemeMode;
+      setThemeMode(storedThemeMode);
     } else {
-      return window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+      setThemeMode(window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
     }
-  });
+  }, []);
 
   const theme = useMemo(() => buildTheme(themeMode), [themeMode]);
 

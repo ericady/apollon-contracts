@@ -145,6 +145,7 @@ function CollateralRatioVisualization({
   return (
     <>
       <Box
+        data-testid="apollon-collateral-ratio-visualization"
         sx={{
           width: '100%',
           height: 20,
@@ -183,7 +184,6 @@ function CollateralRatioVisualization({
               height: '100%',
               borderRight: '2px solid',
               borderColor: 'primary.contrastText',
-              borderColor: isDarkMode ? '#FFFFFF' : '#14111D',
             }}
           ></Box>
         )}
