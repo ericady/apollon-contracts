@@ -469,6 +469,7 @@ contract StabilityPool is LiquityBase, Ownable, CheckContract, IStabilityPool {
 
     uint newTotalDeposit = totalDeposits - _debtToOffset;
     totalDeposits = newTotalDeposit;
+
     // todo
     //    emit StabilityPoolDepositBalanceUpdated(newTotalDeposit);
   }
@@ -642,9 +643,7 @@ contract StabilityPool is LiquityBase, Ownable, CheckContract, IStabilityPool {
     Snapshots storage _snapshots
   ) internal view returns (uint) {
     // If stake was made before a pool-emptying event, then it has been fully cancelled with debt -- so, return 0
-    if (_snapshots.epoch < currentEpoch) {
-      return 0;
-    }
+    if (_snapshots.epoch < currentEpoch) return 0;
 
     uint compoundedStake;
     uint128 scaleDiff = currentScale - _snapshots.scale;
@@ -653,14 +652,9 @@ contract StabilityPool is LiquityBase, Ownable, CheckContract, IStabilityPool {
      * account for it. If more than one scale change was made, then the stake has decreased by a factor of
      * at least 1e-9 -- so return 0.
      */
-    if (scaleDiff == 0) {
-      compoundedStake = (_initialStake * P) / _snapshots.P;
-    } else if (scaleDiff == 1) {
-      compoundedStake = (_initialStake * P) / _snapshots.P / SCALE_FACTOR;
-    } else {
-      // if scaleDiff >= 2
-      compoundedStake = 0;
-    }
+    if (scaleDiff == 0) compoundedStake = (_initialStake * P) / _snapshots.P;
+    else if (scaleDiff == 1) compoundedStake = (_initialStake * P) / _snapshots.P / SCALE_FACTOR;
+    else compoundedStake = 0; // if scaleDiff >= 2
 
     /*
      * If compounded deposit is less than a billionth of the initial deposit, return 0.
@@ -671,9 +665,7 @@ contract StabilityPool is LiquityBase, Ownable, CheckContract, IStabilityPool {
      *
      * Thus it's unclear whether this line is still really needed.
      */
-    if (compoundedStake < _initialStake / 1e9) {
-      return 0;
-    }
+    if (compoundedStake < _initialStake / 1e9) return 0;
 
     return compoundedStake;
   }
