@@ -87,7 +87,9 @@ function HistoryTable() {
                   </TableCell>
 
                   <TableCell align="right">
-                    <Typography>{size}</Typography>
+                    <Typography color="primary.contrastText" fontWeight={400}>
+                      {size}
+                    </Typography>
                   </TableCell>
                   <TableCell sx={{ pl: 0 }} width={50}>
                     <Label variant="none">{token.symbol}</Label>

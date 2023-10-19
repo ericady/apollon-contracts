@@ -91,7 +91,7 @@ function LiquidityPoolsTable({ selectedPool, setSelectedPool }: Props) {
                 <TableRow
                   key={id}
                   data-testid="apollon-liquidity-pool-table-row"
-                  hover
+                  hover={selectedPool?.id !== id}
                   selected={selectedPool?.id === id}
                   sx={{
                     ':hover': {

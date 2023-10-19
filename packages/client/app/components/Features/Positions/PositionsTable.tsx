@@ -94,7 +94,9 @@ function PositionsTable() {
                   </TableCell>
 
                   <TableCell align="right">
-                    <Typography>{stdFormatter.format(size)}</Typography>
+                    <Typography color="primary.contrastText" fontWeight={400}>
+                      {stdFormatter.format(size)}
+                    </Typography>
                   </TableCell>
                   <TableCell sx={{ pl: 0 }} width={50}>
                     <Label variant="none">{token.symbol}</Label>

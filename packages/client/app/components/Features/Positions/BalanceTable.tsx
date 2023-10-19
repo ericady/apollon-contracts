@@ -52,7 +52,7 @@ function BalanceTable() {
                       : displayPercentage(0)}
                   </TableCell>
                   <TableCell align="right">
-                    <Typography fontWeight={400} sx={{ color: 'primary.contrastText' }}>
+                    <Typography fontWeight={400} color="primary.contrastText">
                       {stdFormatter.format(walletAmount!)}
                     </Typography>
                   </TableCell>
@@ -88,7 +88,7 @@ function BalanceTable() {
                     : displayPercentage(0)}
                 </TableCell>
                 <TableCell align="right">
-                  <Typography fontWeight={400} sx={{ color: 'primary.contrastText' }}>
+                  <Typography fontWeight={400} color="primary.contrastText">
                     {stdFormatter.format(walletAmount!)}
                   </Typography>
                 </TableCell>

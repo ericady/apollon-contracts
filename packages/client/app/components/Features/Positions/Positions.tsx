@@ -76,7 +76,7 @@ const Positions = () => {
               <span>
                 POSITIONS{'  '}
                 {openPositions && (
-                  <Label variant="none">
+                  <Label variant="none" fixedWidth={false}>
                     <span data-testid="apollon-positions-count">{openPositions.getPositions.pageInfo.totalCount}</span>
                   </Label>
                 )}
@@ -91,7 +91,7 @@ const Positions = () => {
               <span>
                 HISTORY{'  '}
                 {closedPositions && (
-                  <Label variant="none">
+                  <Label variant="none" fixedWidth={false}>
                     <span data-testid="apollon-history-count">{closedPositions.getPositions.pageInfo.totalCount}</span>
                   </Label>
                 )}

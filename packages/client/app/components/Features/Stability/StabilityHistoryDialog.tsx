@@ -147,16 +147,13 @@ function StabilityClaimedRewards({ history }: StabilityWidgetProps) {
         style={{
           display: 'flex',
           alignItems: 'center',
-          gap: '10px',
           justifyContent: 'space-between',
           marginBottom: '20px',
         }}
       >
-        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-          <Typography variant="titleAlternate" color="primary.contrastText">
-            {formatUnixTimestamp(history.timestamp, false)}
-          </Typography>
-        </div>
+        <Typography variant="titleAlternate" color="primary.contrastText">
+          {formatUnixTimestamp(history.timestamp, false)}
+        </Typography>
 
         <Label variant="success" fixedWidth={false}>
           Claimed Collateral
@@ -164,10 +161,12 @@ function StabilityClaimedRewards({ history }: StabilityWidgetProps) {
       </div>
 
       <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', gap: '40px' }}>
-        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', minWidth: 120, gap: 20 }}>
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 20 }}>
           {lostTokens.map(({ token, amount }) => (
             <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }} key={token.address}>
-              <Typography fontWeight={400}>{roundCurrency(amount, 5)}</Typography>
+              <Typography fontWeight={400} noWrap>
+                {roundCurrency(amount, 5)}
+              </Typography>
               <Label variant="none">{token.symbol}</Label>
             </div>
           ))}
@@ -219,16 +218,13 @@ function StabilityDeposit({ history }: StabilityWidgetProps) {
         style={{
           display: 'flex',
           alignItems: 'center',
-          gap: '10px',
           justifyContent: 'space-between',
           marginBottom: '20px',
         }}
       >
-        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-          <Typography variant="titleAlternate" color="primary.contrastText">
-            {formatUnixTimestamp(history.timestamp, false)}
-          </Typography>
-        </div>
+        <Typography variant="titleAlternate" color="primary.contrastText">
+          {formatUnixTimestamp(history.timestamp, false)}
+        </Typography>
 
         <Label variant="none" fixedWidth={false}>
           Deposited token
@@ -257,16 +253,13 @@ function StabilityWithdraw({ history }: StabilityWidgetProps) {
         style={{
           display: 'flex',
           alignItems: 'center',
-          gap: '10px',
           justifyContent: 'space-between',
           marginBottom: '20px',
         }}
       >
-        <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
-          <Typography variant="titleAlternate" color="primary.contrastText">
-            {formatUnixTimestamp(history.timestamp, false)}
-          </Typography>
-        </div>
+        <Typography variant="titleAlternate" color="primary.contrastText">
+          {formatUnixTimestamp(history.timestamp, false)}
+        </Typography>
 
         <Label variant="info" fixedWidth={false}>
           Withdrawn token

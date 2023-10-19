@@ -11,7 +11,8 @@ type Props = {
   })[];
 };
 
-const renderCustomizedLabel = (svgPropsAndData: any) => {
+// eslint-disable-next-line react/display-name
+const createRenderCustomizedLabel = (isDarkMode: boolean) => (svgPropsAndData: any) => {
   // has all the spread data and some props from the library
   const { x, y, cx, troveLockedAmount, chartColor, token } = svgPropsAndData;
   const isRight = x > cx;
@@ -25,7 +26,7 @@ const renderCustomizedLabel = (svgPropsAndData: any) => {
         />
       </svg>
       <text
-        fill="#504D59"
+        fill={isDarkMode ? '#504D59' : '#939393'}
         x={isRight ? x + 28 : x - 10}
         y={y - 10}
         textAnchor={x > cx ? 'start' : 'end'}
@@ -69,6 +70,8 @@ function CollateralPieVisualization({ borrowerCollateralTokens }: Props) {
       </div>
     );
 
+  const renderCustomizedLabel = createRenderCustomizedLabel(isDarkMode);
+
   return (
     <PieChart width={360} height={280} margin={{ top: 0, right: 0, bottom: 0, left: 0 }}>
       <Pie
@@ -80,7 +83,7 @@ function CollateralPieVisualization({ borrowerCollateralTokens }: Props) {
         outerRadius={92}
         paddingAngle={1}
         label={renderCustomizedLabel}
-        labelLine={{ stroke: '#504D59', strokeWidth: 2 }}
+        labelLine={{ stroke: isDarkMode ? '#504D59' : '#939393', strokeWidth: 2 }}
       >
         {borrowerCollateralTokens.map(({ token, chartColor }) => (
           <Cell stroke="transparent" key={token.address} fill={chartColor} />

@@ -34,7 +34,7 @@ function NavigationBar({ themeMode, setThemeMode }: Props) {
   }, [pathname, setTabValue, tabValue]);
 
   return (
-    <AppBar sx={{ height: 48 }} position="sticky">
+    <AppBar sx={{ height: 48, boxShadow: 'none' }} position="sticky">
       <Toolbar
         style={{
           minHeight: '48px',
@@ -61,7 +61,12 @@ function NavigationBar({ themeMode, setThemeMode }: Props) {
                 sx={{ p: 0 }}
                 label={
                   <Link href="/balance" style={{ padding: '12px 16px' }}>
-                    <Typography variant={pathname === '/balance' ? 'body1' : 'subtitle2'}>Balance</Typography>
+                    <Typography
+                      variant={pathname === '/balance' ? 'body1' : 'subtitle2'}
+                      fontFamily="Space Grotesk Variable"
+                    >
+                      Balance
+                    </Typography>
                   </Link>
                 }
                 value="/balance"
@@ -71,7 +76,12 @@ function NavigationBar({ themeMode, setThemeMode }: Props) {
                 sx={{ p: 0 }}
                 label={
                   <Link href="/spot" style={{ padding: '12px 16px' }}>
-                    <Typography variant={pathname === '/spot' ? 'body1' : 'subtitle2'}>Spot</Typography>
+                    <Typography
+                      variant={pathname === '/spot' ? 'body1' : 'subtitle2'}
+                      fontFamily="Space Grotesk Variable"
+                    >
+                      Spot
+                    </Typography>
                   </Link>
                 }
                 value="/spot"
@@ -81,7 +91,12 @@ function NavigationBar({ themeMode, setThemeMode }: Props) {
                 sx={{ p: 0 }}
                 label={
                   <Link href="/pools" style={{ padding: '12px 16px' }}>
-                    <Typography variant={pathname === '/pools' ? 'body1' : 'subtitle2'}>Pools</Typography>
+                    <Typography
+                      variant={pathname === '/pools' ? 'body1' : 'subtitle2'}
+                      fontFamily="Space Grotesk Variable"
+                    >
+                      Pools
+                    </Typography>
                   </Link>
                 }
                 value="/pools"
@@ -90,7 +105,7 @@ function NavigationBar({ themeMode, setThemeMode }: Props) {
             </Tabs>
           </div>
 
-          <div>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
             <EthersAddressLabel />
 
             <ThemeSwitch themeMode={themeMode} setThemeMode={setThemeMode} />

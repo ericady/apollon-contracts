@@ -1,4 +1,5 @@
 import { Button, Typography } from '@mui/material';
+import InfoIcon from '../Icons/InfoIcon';
 
 type Props = {
   title: string;
@@ -23,12 +24,7 @@ function InfoButton({ title, description, disabled = false }: Props) {
           marginTop: '6px',
         }}
       >
-        <img
-          src="assets/svgs/Info.svg"
-          alt="an lower case i info icon with a rounded square"
-          height="16"
-          typeof="image/svg+xml"
-        />
+        <InfoIcon />
 
         {description}
       </Typography>

@@ -18,7 +18,7 @@ const LIGHT_SECONDARY_TEXT = '#5A5A5A';
 const LIGHT_DISABLED_TEXT = '#939393';
 const LIGHT_TEXT_SHADY = '#AEAEAE';
 const LIGHT_TEXT_LABEL = '#CBCBCB';
-const LIGHT_BUTTON_2_BORDER = '#14111D';
+const LIGHT_BUTTON_2_BORDER = '#CBCBCB';
 // TODO: Not sure
 const LIGHT_BUTTON_BACKGROUND_HOVER = '#ECECEC';
 const LIGHT_FIELDSET_COLOR = '#AEAEAE';
@@ -138,6 +138,22 @@ const buildTheme = (mode: PaletteOptions['mode']) =>
       },
     },
     components: {
+      MuiTableRow: {
+        styleOverrides: {
+          root: {
+            '&.MuiTableRow-hover:hover': {
+              backgroundColor: mode === 'dark' ? DARK_BUTTON_BACKGROUND : LIGHT_BUTTON_BACKGROUND,
+            },
+            '&.Mui-selected': {
+              backgroundColor: mode === 'dark' ? DARK_BUTTON_BACKGROUND : LIGHT_BUTTON_BACKGROUND,
+              ':hover': {
+                backgroundColor: mode === 'dark' ? DARK_BUTTON_BACKGROUND : LIGHT_BUTTON_BACKGROUND,
+              },
+            },
+          },
+        },
+      },
+
       MuiTableCell: {
         styleOverrides: {
           root: {
@@ -207,6 +223,7 @@ const buildTheme = (mode: PaletteOptions['mode']) =>
           {
             props: { variant: 'undercover' },
             style: {
+              fontFamily: 'Inter Variable',
               margin: '5px 0',
               minWidth: 'auto',
               backgroundColor: 'transparent',
@@ -224,6 +241,10 @@ const buildTheme = (mode: PaletteOptions['mode']) =>
         ],
 
         styleOverrides: {
+          root: {
+            fontFamily: 'Space Grotesk Variable',
+          },
+
           contained: {
             backgroundColor: mode === 'dark' ? DARK_BUTTON_BACKGROUND : LIGHT_BUTTON_BACKGROUND,
             color: mode === 'dark' ? DARK_SECONDARY_TEXT : LIGHT_SECONDARY_TEXT,
@@ -232,10 +253,12 @@ const buildTheme = (mode: PaletteOptions['mode']) =>
             width: '100%',
             height: '30px',
             textTransform: 'none',
+            boxShadow: 'none',
             '&:hover': {
               backgroundColor: mode === 'dark' ? DARK_BUTTON_BACKGROUND_HOVER : LIGHT_BUTTON_BACKGROUND_HOVER,
               color: mode === 'dark' ? DARK_SECONDARY_TEXT : LIGHT_SECONDARY_TEXT,
               border: '2px solid transparent',
+              boxShadow: 'none',
             },
           },
           outlined: {
@@ -271,6 +294,7 @@ const buildTheme = (mode: PaletteOptions['mode']) =>
             fontWeight: '700',
           },
           root: {
+            fontFamily: 'Space Grotesk Variable',
             // These styles will apply when the tab is selected
             '&.Mui-selected': {
               color: mode === 'dark' ? DARK_PRIMARY_TEXT : LIGHT_PRIMARY_TEXT,
