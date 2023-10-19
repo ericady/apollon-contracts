@@ -45,7 +45,11 @@ function SpotWidgetGridStack({ children }: PropsWithChildren<{}>) {
     }, 1000);
   }, []);
 
-  return <div className="grid-stack">{children}</div>;
+  return (
+    <div className="grid-stack" style={{ display: 'flex', flexDirection: 'column' }}>
+      {children}
+    </div>
+  );
 }
 
 export default SpotWidgetGridStack;

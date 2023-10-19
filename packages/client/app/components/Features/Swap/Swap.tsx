@@ -101,7 +101,7 @@ const Swap = () => {
       >
         <FormProvider {...methods}>
           <form onSubmit={handleSubmit(onSubmit)}>
-            <div style={{ display: 'flex' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
               {/* TODO: Add Validation that not more than the wallet amount can be entered. */}
               <NumberInput
                 name="jUSDAmount"
@@ -127,7 +127,7 @@ const Swap = () => {
               <ExchangeIcon
                 style={{
                   transform: tradingDirection === 'jUSDAquired' ? 'rotate(180deg)' : 'rotate(0deg)',
-                  margin: '10px 10px 0 10px',
+                  margin: '0px 10px',
                 }}
               />
 

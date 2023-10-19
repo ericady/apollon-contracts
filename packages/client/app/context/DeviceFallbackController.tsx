@@ -7,10 +7,10 @@ function DeviceFallbackController({ children }: PropsWithChildren<{}>) {
   const [showFallbackPage, setShowFallbackPage] = useState(false);
 
   useEffect(() => {
-    setShowFallbackPage(window.matchMedia('(max-width: 1499px)').matches);
+    setShowFallbackPage(window.matchMedia('(max-width: 1300px)').matches);
 
     const handleResize = () => {
-      setShowFallbackPage(window.matchMedia('(max-width: 1499px)').matches);
+      setShowFallbackPage(window.matchMedia('(max-width: 1300px)').matches);
     };
     window.addEventListener('resize', handleResize);
 

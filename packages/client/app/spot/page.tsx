@@ -14,22 +14,18 @@ function Spot() {
     <div
       style={{
         height: 'calc(100vh - 52px)',
-        display: 'grid',
-        gridTemplateColumns: '1fr 4fr',
-        gridTemplateRows: '1fr 1fr 1fr',
-        gridTemplateAreas: `
-    "widget trading"
-    "widget trading"
-    "widget trading"
-`,
+        display: 'flex',
       }}
     >
       <Box
         sx={{
-          gridArea: 'widget',
           borderRight: '1px solid',
           borderRightColor: 'background.paper',
           overflowY: 'scroll',
+          minWidth: '335px',
+          // After that it looks broken and is way too small anyway
+          maxWidth: '760px',
+          width: '20vw',
         }}
       >
         <SpotWidgetGridStack>
@@ -41,10 +37,10 @@ function Spot() {
 
       <Box
         sx={{
-          gridArea: 'trading',
           display: 'flex',
           flexDirection: 'column',
           justifyContent: 'flex-end',
+          width: '80vw',
         }}
       >
         <TradingView />
