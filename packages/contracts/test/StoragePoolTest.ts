@@ -13,10 +13,7 @@ import { SignerWithAddress } from '@nomicfoundation/hardhat-ethers/signers';
 import { assertRevert } from '../utils/testHelper';
 import { assert } from 'chai';
 
-const testHelpers = require('../utils/testHelpers.js');
-const th = testHelpers.TestHelper;
-
-describe('StoragePool', () => {
+describe.only('StoragePool', () => {
   let signers: SignerWithAddress[];
   let owner: SignerWithAddress;
   let alice: SignerWithAddress;
@@ -69,11 +66,11 @@ describe('StoragePool', () => {
   describe('StoragePool Mechanisms', async () => {
     beforeEach(async () => {
       contracts = await deployCore();
-      commonSetup(contracts);
+      await commonSetup(contracts);
     });
 
     it('addValue() revert if caller is neither borrowerOperationsAddress nor troveManagerAddress nor stabilityPoolManagerAddress for all _poolType', async () => {
-      const amount = th.dec(1, 'ether');
+      const amount = ethers.parseEther('1.0');
       const expectedErrorMsg = 'NotFromBOorTroveMorSP';
 
       await assertRevert(storagePool.addValue(BTC, false, 0, amount), expectedErrorMsg);
@@ -87,7 +84,7 @@ describe('StoragePool', () => {
     });
 
     it('subtractValue() revert if caller is neither borrowerOperationsAddress nor troveManagerAddress nor stabilityPoolManagerAddress for all _poolType)', async () => {
-      const amount = th.dec(1, 'ether');
+      const amount = ethers.parseEther('1.0');
       const expectedErrorMsg = 'NotFromBOorTroveMorSP';
 
       await assertRevert(storagePool.subtractValue(BTC, false, 0, amount), expectedErrorMsg);
@@ -100,7 +97,7 @@ describe('StoragePool', () => {
     });
 
     it('withdrawalValue() revert if caller is neither borrowerOperationsAddress nor troveManagerAddress nor stabilityPoolManagerAddress for all _poolType)', async () => {
-      const amount = th.dec(1, 'ether');
+      const amount = ethers.parseEther('1.0');
       const expectedErrorMsg = 'NotFromBOorTroveMorSP';
 
       await assertRevert(storagePool.withdrawalValue(carol, BTC, false, 0, amount), expectedErrorMsg);
@@ -113,7 +110,7 @@ describe('StoragePool', () => {
     });
 
     it('transferBetweenTypes() revert if caller is neither borrowerOperationsAddress nor troveManagerAddress nor stabilityPoolManagerAddress for all _poolType)', async () => {
-      const amount = th.dec(1, 'ether');
+      const amount = ethers.parseEther('1.0');
       const expectedErrorMsg = 'NotFromBOorTroveMorSP';
 
       await assertRevert(storagePool.transferBetweenTypes(BTC, false, 0, 1, amount), expectedErrorMsg);
@@ -126,7 +123,7 @@ describe('StoragePool', () => {
     });
 
     it('transferBetweenTypes() revert if caller is neither borrowerOperationsAddress nor troveManagerAddress nor stabilityPoolManagerAddress for all _poolType)', async () => {
-      const amount = th.dec(1, 'ether');
+      const amount = ethers.parseEther('1.0');
       const expectedErrorMsg = 'NotFromBOorTroveMorSP';
 
       await assertRevert(storagePool.transferBetweenTypes(BTC, false, 0, 1, amount), expectedErrorMsg);
@@ -146,7 +143,7 @@ describe('StoragePool', () => {
   describe('ActivePool', async () => {
     beforeEach(async () => {
       contracts = await deployCore(true);
-      commonSetup(contracts);
+      await commonSetup(contracts);
     });
 
     it('getValue(): gets the recorded token balance', async () => {
@@ -242,7 +239,7 @@ describe('StoragePool', () => {
   describe('DefaultPool', async () => {
     beforeEach(async () => {
       contracts = await deployCore(true);
-      commonSetup(contracts);
+      await commonSetup(contracts);
     });
 
     it('getValue(): gets the recorded token balance', async () => {
