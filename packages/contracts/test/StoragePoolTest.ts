@@ -66,7 +66,7 @@ describe('StoragePool', () => {
     BTC = contracts.collToken.BTC;
   };
 
-  describe('StoragePool Mechanisms', async () => {
+  describe('StoragePool Mechanisms', () => {
     beforeEach(async () => {
       contracts = await deployCore();
       await commonSetup(contracts);
@@ -139,7 +139,7 @@ describe('StoragePool', () => {
     });
   });
 
-  describe('ActivePool', async () => {
+  describe('ActivePool', () => {
     beforeEach(async () => {
       contracts = await deployCore(true);
       await commonSetup(contracts);
@@ -161,9 +161,7 @@ describe('StoragePool', () => {
       beforeEach(async () => {
         contracts = await deployCore(true);
         await commonSetup(contracts);
-      });
 
-      beforeAll(async () => {
         // make call from required borrowerOperations.target as string
         await network.provider.request({
           method: 'hardhat_impersonateAccount',
@@ -171,7 +169,7 @@ describe('StoragePool', () => {
         });
       });
 
-      afterAll(async () => {
+      afterEach(async () => {
         // Stop impersonating
         await network.provider.request({
           method: 'hardhat_stopImpersonatingAccount',
@@ -209,7 +207,7 @@ describe('StoragePool', () => {
     });
   });
 
-  describe('DefaultPool', async () => {
+  describe('DefaultPool', () => {
     beforeEach(async () => {
       contracts = await deployCore(true);
       await commonSetup(contracts);
@@ -231,9 +229,7 @@ describe('StoragePool', () => {
       beforeEach(async () => {
         contracts = await deployCore(true);
         await commonSetup(contracts);
-      });
 
-      beforeAll(async () => {
         // make call from required borrowerOperations.target as string
         await network.provider.request({
           method: 'hardhat_impersonateAccount',
@@ -241,7 +237,7 @@ describe('StoragePool', () => {
         });
       });
 
-      afterAll(async () => {
+      afterEach(async () => {
         // Stop impersonating
         await network.provider.request({
           method: 'hardhat_stopImpersonatingAccount',
