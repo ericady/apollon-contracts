@@ -169,6 +169,10 @@ export const fastForwardTime = async (seconds: number) => {
   await time.increase(seconds);
 };
 
+export const getLatestBlockTimestamp = async () => {
+  return await time.latest();
+};
+
 export const getEmittedLiquidationValues = async (
   liquidationTx: ContractTransactionResponse | null,
   contracts: Contracts

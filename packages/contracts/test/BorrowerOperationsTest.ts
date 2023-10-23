@@ -13,9 +13,11 @@ import {
 } from '../typechain';
 import { expect } from 'chai';
 import {
+  TimeValues,
   _100pct,
   checkRecoveryMode,
   fastForwardTime,
+  getLatestBlockTimestamp,
   getStabilityPool,
   getTCR,
   getTroveEntireColl,
@@ -1234,5 +1236,207 @@ describe('BorrowerOperations', () => {
       ],
       parseUnits('1')
     );
+  });
+  it("increaseDebt(): doesn't change base rate if it is already zero", async () => {
+    await openTrove({
+      from: whale,
+      contracts,
+      collToken: BTC,
+      collAmount: parseUnits('10', 9),
+      debts: [{ tokenAddress: STABLE, amount: parseUnits('10000') }],
+    });
+    await openTrove({
+      from: alice,
+      contracts,
+      collToken: BTC,
+      collAmount: parseUnits('1', 9),
+      debts: [{ tokenAddress: STABLE, amount: parseUnits('10000') }],
+    });
+    await openTrove({
+      from: bob,
+      contracts,
+      collToken: BTC,
+      collAmount: parseUnits('2', 9),
+      debts: [{ tokenAddress: STABLE, amount: parseUnits('20000') }],
+    });
+
+    // Check baseRate is zero
+    const baseRate_1 = await troveManager.baseRate();
+    expect(baseRate_1).to.be.equal(0n);
+
+    // 2 hours pass
+    await fastForwardTime(7200);
+
+    // D withdraws LUSD
+    await borrowerOperations.connect(alice).increaseDebt(
+      [
+        {
+          tokenAddress: STABLE,
+          amount: parseUnits('37'),
+        },
+      ],
+      _100pct
+    );
+
+    // Check baseRate is still 0
+    const baseRate_2 = await troveManager.baseRate();
+    expect(baseRate_2).to.be.equal(0n);
+
+    // 1 hour passes
+    await fastForwardTime(3600);
+
+    // E opens trove
+    await borrowerOperations.connect(bob).increaseDebt(
+      [
+        {
+          tokenAddress: STABLE,
+          amount: parseUnits('12'),
+        },
+      ],
+      _100pct
+    );
+
+    const baseRate_3 = await troveManager.baseRate();
+    expect(baseRate_3).to.be.equal(0n);
+  });
+  it("increaseDebt(): lastFeeOpTime doesn't update if less time than decay interval has passed since the last fee operation", async () => {
+    await openTrove({
+      from: whale,
+      contracts,
+      collToken: BTC,
+      collAmount: parseUnits('10', 9),
+      debts: [{ tokenAddress: STABLE, amount: parseUnits('10000') }],
+    });
+    await openTrove({
+      from: alice,
+      contracts,
+      collToken: BTC,
+      collAmount: parseUnits('1', 9),
+      debts: [{ tokenAddress: STABLE, amount: parseUnits('10000') }],
+    });
+    await openTrove({
+      from: bob,
+      contracts,
+      collToken: BTC,
+      collAmount: parseUnits('2', 9),
+      debts: [{ tokenAddress: STABLE, amount: parseUnits('20000') }],
+    });
+
+    // Artificially make baseRate 5%
+    await troveManager.setBaseRate(parseUnits('0.05'));
+    await troveManager.setLastFeeOpTimeToNow();
+
+    // Check baseRate is now non-zero
+    const baseRate_1 = await troveManager.baseRate();
+    expect(baseRate_1).to.be.equal(parseUnits('0.05'));
+
+    const lastFeeOpTime_1 = await troveManager.lastFeeOperationTime();
+
+    // 10 seconds pass
+    await fastForwardTime(10);
+
+    // Borrower C triggers a fee
+    await borrowerOperations.connect(bob).increaseDebt(
+      [
+        {
+          tokenAddress: STABLE,
+          amount: parseUnits('1'),
+        },
+      ],
+      _100pct
+    );
+
+    const lastFeeOpTime_2 = await troveManager.lastFeeOperationTime();
+
+    // Check that the last fee operation time did not update, as borrower D's debt issuance occured
+    // since before minimum interval had passed
+    expect(lastFeeOpTime_2).to.be.equal(lastFeeOpTime_1);
+
+    // 60 seconds passes
+    await fastForwardTime(60);
+
+    // Check that now, at least one minute has passed since lastFeeOpTime_1
+    const timeNow = await getLatestBlockTimestamp();
+    expect(BigInt(timeNow) - lastFeeOpTime_1).to.be.gte(60n);
+
+    // Borrower C triggers a fee
+    await borrowerOperations.connect(bob).increaseDebt(
+      [
+        {
+          tokenAddress: STABLE,
+          amount: parseUnits('1'),
+        },
+      ],
+      _100pct
+    );
+
+    const lastFeeOpTime_3 = await troveManager.lastFeeOperationTime();
+
+    // Check that the last fee operation time DID update, as borrower's debt issuance occured
+    // after minimum interval had passed
+    expect(lastFeeOpTime_3).to.be.gt(lastFeeOpTime_1);
+  });
+  it("increaseDebt(): borrower can't grief the baseRate and stop it decaying by issuing debt at higher frequency than the decay granularity", async () => {
+    await openTrove({
+      from: whale,
+      contracts,
+      collToken: BTC,
+      collAmount: parseUnits('10', 9),
+      debts: [{ tokenAddress: STABLE, amount: parseUnits('10000') }],
+    });
+    await openTrove({
+      from: alice,
+      contracts,
+      collToken: BTC,
+      collAmount: parseUnits('1', 9),
+      debts: [{ tokenAddress: STABLE, amount: parseUnits('10000') }],
+    });
+    await openTrove({
+      from: bob,
+      contracts,
+      collToken: BTC,
+      collAmount: parseUnits('2', 9),
+      debts: [{ tokenAddress: STABLE, amount: parseUnits('20000') }],
+    });
+
+    // Artificially make baseRate 5%
+    await troveManager.setBaseRate(parseUnits('0.05'));
+    await troveManager.setLastFeeOpTimeToNow();
+
+    // Check baseRate is now non-zero
+    const baseRate_1 = await troveManager.baseRate();
+    expect(baseRate_1).to.be.equal(parseUnits('0.05'));
+
+    // 30 seconds pass
+    await fastForwardTime(30);
+
+    // Borrower C triggers a fee, before decay interval has passed
+    await borrowerOperations.connect(bob).increaseDebt(
+      [
+        {
+          tokenAddress: STABLE,
+          amount: parseUnits('1'),
+        },
+      ],
+      _100pct
+    );
+
+    // 30 seconds pass
+    await fastForwardTime(30);
+
+    // Borrower C triggers another fee
+    await borrowerOperations.connect(bob).increaseDebt(
+      [
+        {
+          tokenAddress: STABLE,
+          amount: parseUnits('1'),
+        },
+      ],
+      _100pct
+    );
+
+    // Check base rate has decreased even though Borrower tried to stop it decaying
+    const baseRate_2 = await troveManager.baseRate();
+    expect(baseRate_2).to.be.lt(baseRate_1);
   });
 });
