@@ -85,7 +85,6 @@ contract StoragePool is LiquityBase, Ownable, CheckContract, IStoragePool {
 
     entry.poolTypes[_poolType] += _amount;
     entry.totalAmount += _amount;
-    // FIXME: read entry.poolTypes[_poolType] via getter?
     emit PoolValueUpdated(_tokenAddress, _isColl, _poolType, entry.poolTypes[_poolType]);
   }
 
