@@ -23,7 +23,7 @@ export interface Contracts {
   debtToken: any;
 }
 
-export const deployCore = async (provideFunds: boolean): Promise<Contracts> => {
+export const deployCore = async (provideFunds: boolean = false): Promise<Contracts> => {
   const initialFunds = ethers.parseEther('1.0');
 
   // using the tester to deposit funds
