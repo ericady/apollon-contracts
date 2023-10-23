@@ -48,4 +48,6 @@ interface IStabilityPool is IBase {
   function getDepositorCollGain(address _depositor, address _collToken) external view returns (uint);
 
   function getCompoundedDebtDeposit(address _depositor) external view returns (uint);
+
+  function getDepositorCollSnapshot(address _depositor, address _collToken) external view returns (uint);
 }

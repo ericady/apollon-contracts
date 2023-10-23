@@ -255,6 +255,10 @@ contract StabilityPool is LiquityBase, Ownable, CheckContract, IStabilityPool {
     return depositToken;
   }
 
+  function getDepositorCollSnapshot(address _depositor, address _collToken) external view override returns (uint) {
+    return depositSnapshots[_depositor].sums[_collToken];
+  }
+
   // --- External Depositor Functions ---
 
   /*  provideToSP():
