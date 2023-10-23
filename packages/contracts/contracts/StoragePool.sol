@@ -27,7 +27,6 @@ contract StoragePool is LiquityBase, Ownable, CheckContract, IStoragePool {
 
   struct PoolEntry {
     address tokenAddress;
-    bool isColl;
     uint256 totalAmount;
     mapping(PoolType => uint256) poolTypes;
     bool exists;
@@ -86,6 +85,7 @@ contract StoragePool is LiquityBase, Ownable, CheckContract, IStoragePool {
 
     entry.poolTypes[_poolType] += _amount;
     entry.totalAmount += _amount;
+    // FIXME: read entry.poolTypes[_poolType] via getter?
     emit PoolValueUpdated(_tokenAddress, _isColl, _poolType, entry.poolTypes[_poolType]);
   }
 
@@ -130,6 +130,7 @@ contract StoragePool is LiquityBase, Ownable, CheckContract, IStoragePool {
     _requireCallerIsBOorTroveMorSP();
 
     PoolEntry storage entry = poolEntries[_tokenAddress][_isColl];
+    require(entry.exists, 'StoragePool: PoolEntry does not exist');
 
     entry.poolTypes[_fromType] -= _amount;
     emit PoolValueUpdated(_tokenAddress, _isColl, _fromType, entry.poolTypes[_fromType]);

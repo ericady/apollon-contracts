@@ -53,7 +53,13 @@ export const getStabilityPool = async (contracts: Contracts, debt: MockDebtToken
   return await ethers.getContractAt('StabilityPool', poolAddress);
 };
 
-export const assertRevert = async (txPromise: Promise<ContractTransactionResponse>, message?: String) => {
+/**
+ * asserts that an transaction fails and is reverted. Part of the error message can be asserted.
+ *
+ * @param txPromise transaction that should be reverted
+ * @param message part of the revert message that should be included. Usually the custom error of the contract.
+ */
+export const assertRevert = async (txPromise: Promise<ContractTransactionResponse>, message?: string) => {
   try {
     const tx = await txPromise;
     const receipt = await tx.wait();

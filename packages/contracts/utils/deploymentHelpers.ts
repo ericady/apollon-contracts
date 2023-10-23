@@ -9,7 +9,7 @@ import {
   StoragePool,
   TroveManager,
 } from '../typechain';
-import { parseUnits } from 'ethers';
+import { parseUnits, parseEther } from 'ethers';
 
 export interface Contracts {
   borrowerOperations: BorrowerOperations;
@@ -24,8 +24,17 @@ export interface Contracts {
 }
 
 export const deployCore = async (): Promise<Contracts> => {
-  const borrowerOperationsFactory = await ethers.getContractFactory('BorrowerOperations');
+  const initialFunds = ethers.parseEther('1.0');
+
+  // using the tester to deposit funds
+  const borrowerOperationsFactory = await ethers.getContractFactory('BorrowerOperationsTester');
   const borrowerOperations = await borrowerOperationsFactory.deploy();
+  // Send Ether to the contract
+  const [deployer] = await ethers.getSigners();
+  await deployer.sendTransaction({
+    to: await borrowerOperations.getAddress(),
+    value: initialFunds,
+  });
 
   const troveManagerFactory = await ethers.getContractFactory('MockTroveManager');
   const troveManager = await troveManagerFactory.deploy();

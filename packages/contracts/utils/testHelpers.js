@@ -1,5 +1,9 @@
+// TODO: This file provided helpers that can be migrated to testHelper.ts
+
 const BN = require('bn.js');
-const Destructible = artifacts.require('./TestContracts/Destructible.sol');
+const web3 = require('web3');
+
+// const Destructible = artifacts.require('./TestContracts/Destructible.sol');
 
 const MoneyValues = {
   negative_5e17: '-' + web3.utils.toWei('500', 'finney'),
