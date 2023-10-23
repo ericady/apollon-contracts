@@ -24,8 +24,8 @@ jobs:
         run: yarn --version
 
       - name: Install dependencies 📦
-        run: yarn workspace contracts install
+        run: yarn workspace @liquity/contracts install
 
       # TEST
       - name: Testing 🧪
-        run: yarn workspace contracts test
+        run: yarn workspace @liquity/contracts test

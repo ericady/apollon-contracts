@@ -23,18 +23,21 @@ export interface Contracts {
   debtToken: any;
 }
 
-export const deployCore = async (): Promise<Contracts> => {
+export const deployCore = async (provideFunds: boolean): Promise<Contracts> => {
   const initialFunds = ethers.parseEther('1.0');
 
   // using the tester to deposit funds
   const borrowerOperationsFactory = await ethers.getContractFactory('BorrowerOperationsTester');
   const borrowerOperations = await borrowerOperationsFactory.deploy();
-  // Send Ether to the contract
-  const [deployer] = await ethers.getSigners();
-  await deployer.sendTransaction({
-    to: await borrowerOperations.getAddress(),
-    value: initialFunds,
-  });
+
+  if (provideFunds) {
+    // Send Ether to the contract
+    const [deployer] = await ethers.getSigners();
+    await deployer.sendTransaction({
+      to: await borrowerOperations.getAddress(),
+      value: initialFunds,
+    });
+  }
 
   const troveManagerFactory = await ethers.getContractFactory('MockTroveManager');
   const troveManager = await troveManagerFactory.deploy();
