@@ -1,18 +1,17 @@
 import { ethers } from 'hardhat';
 import {
-  BorrowerOperations,
   CollTokenManager,
   DebtTokenManager,
   MockPriceFeed,
   MockTroveManager,
   StabilityPoolManager,
   StoragePool,
-  TroveManager,
 } from '../typechain';
-import { parseUnits, parseEther } from 'ethers';
+import { parseUnits } from 'ethers';
+import { BorrowerOperationsTester } from '../typechain/contracts/TestContracts/BorrowerOperationsTester';
 
 export interface Contracts {
-  borrowerOperations: BorrowerOperations;
+  borrowerOperations: BorrowerOperationsTester;
   troveManager: MockTroveManager;
   stabilityPoolManager: StabilityPoolManager;
   storagePool: StoragePool;
@@ -23,21 +22,9 @@ export interface Contracts {
   debtToken: any;
 }
 
-export const deployCore = async (provideFunds: boolean = false): Promise<Contracts> => {
-  const initialFunds = ethers.parseEther('1.0');
-
-  // using the tester to deposit funds
+export const deployCore = async (): Promise<Contracts> => {
   const borrowerOperationsFactory = await ethers.getContractFactory('BorrowerOperationsTester');
   const borrowerOperations = await borrowerOperationsFactory.deploy();
-
-  if (provideFunds) {
-    // Send Ether to the contract
-    const [deployer] = await ethers.getSigners();
-    await deployer.sendTransaction({
-      to: await borrowerOperations.getAddress(),
-      value: initialFunds,
-    });
-  }
 
   const troveManagerFactory = await ethers.getContractFactory('MockTroveManager');
   const troveManager = await troveManagerFactory.deploy();

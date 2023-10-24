@@ -1,12 +1,12 @@
-import { ethers, network } from 'hardhat';
+import { ethers } from 'hardhat';
 import {
   MockDebtToken,
   MockERC20,
   MockPriceFeed,
   TroveManager,
-  BorrowerOperations,
   StabilityPoolManager,
   StoragePool,
+  BorrowerOperationsTester,
 } from '../typechain';
 import { Contracts, deployCore, connectCoreContracts, deployAndLinkToken } from '../utils/deploymentHelpers';
 import { SignerWithAddress } from '@nomicfoundation/hardhat-ethers/signers';
@@ -37,8 +37,7 @@ describe('StoragePool', () => {
   let priceFeed: MockPriceFeed;
   let troveManager: TroveManager;
 
-  let borrowerOperations: BorrowerOperations;
-  let borrowerOperationsSigner: SignerWithAddress;
+  let borrowerOperations: BorrowerOperationsTester;
 
   let stabilityPoolManager: StabilityPoolManager;
 
@@ -57,7 +56,6 @@ describe('StoragePool', () => {
     priceFeed = contracts.priceFeed;
     troveManager = contracts.troveManager;
     borrowerOperations = contracts.borrowerOperations;
-    borrowerOperationsSigner = await ethers.getSigner(borrowerOperations.target as string);
     storagePool = contracts.storagePool;
     stabilityPoolManager = contracts.stabilityPoolManager;
 
@@ -66,12 +64,12 @@ describe('StoragePool', () => {
     BTC = contracts.collToken.BTC;
   };
 
-  describe('StoragePool Mechanisms', () => {
-    beforeEach(async () => {
-      contracts = await deployCore();
-      await commonSetup(contracts);
-    });
+  beforeEach(async () => {
+    contracts = await deployCore();
+    await commonSetup(contracts);
+  });
 
+  describe('StoragePool Mechanisms', () => {
     it('addValue() revert if caller is neither borrowerOperationsAddress nor troveManagerAddress nor stabilityPoolManagerAddress for all _poolType', async () => {
       const amount = ethers.parseEther('1.0');
       const expectedErrorMsg = 'NotFromBOorTroveMorSP';
@@ -140,11 +138,6 @@ describe('StoragePool', () => {
   });
 
   describe('ActivePool', () => {
-    beforeEach(async () => {
-      contracts = await deployCore(true);
-      await commonSetup(contracts);
-    });
-
     it('getValue(): gets the recorded token balance', async () => {
       const recordedTokenBalance = await storagePool.getValue(BTC, true, 0);
 
@@ -158,27 +151,8 @@ describe('StoragePool', () => {
     });
 
     describe('Authenticated transactions as borrowerOperation', () => {
-      beforeEach(async () => {
-        contracts = await deployCore(true);
-        await commonSetup(contracts);
-
-        // make call from required borrowerOperations.target as string
-        await network.provider.request({
-          method: 'hardhat_impersonateAccount',
-          params: [borrowerOperations.target as string],
-        });
-      });
-
-      afterEach(async () => {
-        // Stop impersonating
-        await network.provider.request({
-          method: 'hardhat_stopImpersonatingAccount',
-          params: [borrowerOperations.target as string],
-        });
-      });
-
       it('addValue(): increases the recorded token debt by the correct amount', async () => {
-        await storagePool.connect(borrowerOperationsSigner).addValue(STABLE, false, 0, 100);
+        await borrowerOperations.testStoragePool_addValue(STABLE, false, 0, 100);
 
         const tokenDebt_balanceAfter = await storagePool.getValue(STABLE, false, 0);
         assert.equal(tokenDebt_balanceAfter, 100);
@@ -186,8 +160,8 @@ describe('StoragePool', () => {
 
       it('subtractValue(): decreases the recorded token balance by the correct amount', async () => {
         // First add anything to add default pool entry
-        await storagePool.connect(borrowerOperationsSigner).addValue(STABLE, false, 0, 101);
-        await storagePool.connect(borrowerOperationsSigner).subtractValue(STABLE, false, 0, 100);
+        await borrowerOperations.testStoragePool_addValue(STABLE, false, 0, 101);
+        await borrowerOperations.testStoragePool_subtractValue(STABLE, false, 0, 100);
 
         const tokenDebt_balanceAfter = await storagePool.getValue(STABLE, false, 0);
         assert.equal(tokenDebt_balanceAfter, 1);
@@ -195,8 +169,8 @@ describe('StoragePool', () => {
 
       it('transferBetweenTypes(): exchanges the recorded token balance by the correct amount', async () => {
         // First add anything to add default pool entry
-        await storagePool.connect(borrowerOperationsSigner).addValue(STABLE, false, 0, 100);
-        await storagePool.connect(borrowerOperationsSigner).transferBetweenTypes(STABLE, false, 0, 2, 10);
+        await borrowerOperations.testStoragePool_addValue(STABLE, false, 0, 100);
+        await borrowerOperations.testStoragePool_transferBetweenTypes(STABLE, false, 0, 2, 10);
 
         const defaultPoolTokenDebt_balanceAfter = await storagePool.getValue(STABLE, false, 0);
         assert.equal(defaultPoolTokenDebt_balanceAfter, 90);
@@ -208,11 +182,6 @@ describe('StoragePool', () => {
   });
 
   describe('DefaultPool', () => {
-    beforeEach(async () => {
-      contracts = await deployCore(true);
-      await commonSetup(contracts);
-    });
-
     it('getValue(): gets the recorded token balance', async () => {
       const recordedTokenBalance = await storagePool.getValue(BTC, true, 1);
 
@@ -226,27 +195,8 @@ describe('StoragePool', () => {
     });
 
     describe('Authenticated transactions as borrowerOperation', () => {
-      beforeEach(async () => {
-        contracts = await deployCore(true);
-        await commonSetup(contracts);
-
-        // make call from required borrowerOperations.target as string
-        await network.provider.request({
-          method: 'hardhat_impersonateAccount',
-          params: [borrowerOperations.target as string],
-        });
-      });
-
-      afterEach(async () => {
-        // Stop impersonating
-        await network.provider.request({
-          method: 'hardhat_stopImpersonatingAccount',
-          params: [borrowerOperations.target as string],
-        });
-      });
-
       it('addValue(): increases the recorded token debt by the correct amount', async () => {
-        await storagePool.connect(borrowerOperationsSigner).addValue(STABLE, false, 1, 100);
+        await borrowerOperations.testStoragePool_addValue(STABLE, false, 1, 100);
 
         const tokenDebt_balanceAfter = await storagePool.getValue(STABLE, false, 1);
         assert.equal(tokenDebt_balanceAfter, 100);
@@ -254,8 +204,8 @@ describe('StoragePool', () => {
 
       it('subtractValue(): decreases the recorded token balance by the correct amount', async () => {
         // First add anything to add default pool entry
-        await storagePool.connect(borrowerOperationsSigner).addValue(STABLE, false, 1, 101);
-        await storagePool.connect(borrowerOperationsSigner).subtractValue(STABLE, false, 1, 100);
+        await borrowerOperations.testStoragePool_addValue(STABLE, false, 1, 101);
+        await borrowerOperations.testStoragePool_subtractValue(STABLE, false, 1, 100);
 
         const tokenDebt_balanceAfter = await storagePool.getValue(STABLE, false, 1);
         assert.equal(tokenDebt_balanceAfter, 1);
@@ -263,9 +213,8 @@ describe('StoragePool', () => {
 
       it('transferBetweenTypes(): exchanges the recorded token balance by the correct amount', async () => {
         // First add anything to add default pool entry
-        await storagePool.connect(borrowerOperationsSigner).addValue(STABLE, false, 1, 100);
-
-        await storagePool.connect(borrowerOperationsSigner).transferBetweenTypes(STABLE, false, 1, 0, 10);
+        await borrowerOperations.testStoragePool_addValue(STABLE, false, 1, 100);
+        await borrowerOperations.testStoragePool_transferBetweenTypes(STABLE, false, 1, 0, 10);
 
         const defaultPoolTokenDebt_balanceAfter = await storagePool.getValue(STABLE, false, 1);
         assert.equal(defaultPoolTokenDebt_balanceAfter, 90);

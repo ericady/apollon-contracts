@@ -603,6 +603,95 @@
         "inputs": [
             {
                 "internalType": "address",
+                "name": "_tokenAddress",
+                "type": "address"
+            },
+            {
+                "internalType": "bool",
+                "name": "_isColl",
+                "type": "bool"
+            },
+            {
+                "internalType": "enum IBase.PoolType",
+                "name": "_poolType",
+                "type": "uint8"
+            },
+            {
+                "internalType": "uint256",
+                "name": "_amount",
+                "type": "uint256"
+            }
+        ],
+        "name": "testStoragePool_addValue",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "address",
+                "name": "_tokenAddress",
+                "type": "address"
+            },
+            {
+                "internalType": "bool",
+                "name": "_isColl",
+                "type": "bool"
+            },
+            {
+                "internalType": "enum IBase.PoolType",
+                "name": "_poolType",
+                "type": "uint8"
+            },
+            {
+                "internalType": "uint256",
+                "name": "_amount",
+                "type": "uint256"
+            }
+        ],
+        "name": "testStoragePool_subtractValue",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "address",
+                "name": "_tokenAddress",
+                "type": "address"
+            },
+            {
+                "internalType": "bool",
+                "name": "_isColl",
+                "type": "bool"
+            },
+            {
+                "internalType": "enum IBase.PoolType",
+                "name": "_fromType",
+                "type": "uint8"
+            },
+            {
+                "internalType": "enum IBase.PoolType",
+                "name": "_toType",
+                "type": "uint8"
+            },
+            {
+                "internalType": "uint256",
+                "name": "_amount",
+                "type": "uint256"
+            }
+        ],
+        "name": "testStoragePool_transferBetweenTypes",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "address",
                 "name": "newOwner",
                 "type": "address"
             }
@@ -649,9 +738,5 @@
         "outputs": [],
         "stateMutability": "nonpayable",
         "type": "function"
-    },
-    {
-        "stateMutability": "payable",
-        "type": "receive"
     }
 ]

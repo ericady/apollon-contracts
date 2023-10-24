@@ -46,5 +46,26 @@ contract BorrowerOperationsTester is BorrowerOperations {
 
   // Payable fallback function
 
-  receive() external payable virtual {}
+  function testStoragePool_addValue(address _tokenAddress, bool _isColl, PoolType _poolType, uint _amount) external {
+    storagePool.addValue(_tokenAddress, _isColl, _poolType, _amount);
+  }
+
+  function testStoragePool_subtractValue(
+    address _tokenAddress,
+    bool _isColl,
+    PoolType _poolType,
+    uint _amount
+  ) external {
+    storagePool.subtractValue(_tokenAddress, _isColl, _poolType, _amount);
+  }
+
+  function testStoragePool_transferBetweenTypes(
+    address _tokenAddress,
+    bool _isColl,
+    PoolType _fromType,
+    PoolType _toType,
+    uint _amount
+  ) external {
+    storagePool.transferBetweenTypes(_tokenAddress, _isColl, _fromType, _toType, _amount);
+  }
 }
