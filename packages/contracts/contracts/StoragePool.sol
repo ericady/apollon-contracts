@@ -173,6 +173,7 @@ contract StoragePool is LiquityBase, Ownable, CheckContract, IStoragePool {
 
   // --- 'require' functions ---
 
+  // TODO: Some functions are never called by all of these contracts. Implement individual checkers for possibly better security and gas usage.
   function _requireCallerIsBOorTroveMorSP() internal view {
     if (
       msg.sender != borrowerOperationsAddress &&
