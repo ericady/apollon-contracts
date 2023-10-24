@@ -393,6 +393,19 @@
     },
     {
         "inputs": [],
+        "name": "debtToken",
+        "outputs": [
+            {
+                "internalType": "contract IDebtToken",
+                "name": "",
+                "type": "address"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [],
         "name": "debtTokenManager",
         "outputs": [
             {
@@ -592,6 +605,19 @@
         "type": "function"
     },
     {
+        "inputs": [
+            {
+                "internalType": "contract IDebtToken",
+                "name": "_debtToken",
+                "type": "address"
+            }
+        ],
+        "name": "setDebtToken",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
         "inputs": [],
         "name": "storagePool",
         "outputs": [
@@ -602,6 +628,42 @@
             }
         ],
         "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "address",
+                "name": "_account",
+                "type": "address"
+            },
+            {
+                "internalType": "uint256",
+                "name": "_amount",
+                "type": "uint256"
+            }
+        ],
+        "name": "testDebtToken_burn",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "address",
+                "name": "_account",
+                "type": "address"
+            },
+            {
+                "internalType": "uint256",
+                "name": "_amount",
+                "type": "uint256"
+            }
+        ],
+        "name": "testDebtToken_mint",
+        "outputs": [],
+        "stateMutability": "nonpayable",
         "type": "function"
     },
     {

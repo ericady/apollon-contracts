@@ -121,11 +121,10 @@ contract DebtToken is CheckContract, IDebtToken {
   }
 
   function sendToPool(address _sender, address _poolAddress, uint256 _amount) external override {
+    // FIXME: This doesnt guarantee that receiver is really a pool
     _requireCallerIsStabilityPoolManager();
     _transfer(_sender, _poolAddress, _amount);
   }
-
-  // --- External functions ---
 
   function totalSupply() external view override returns (uint256) {
     return _totalSupply;
@@ -219,6 +218,7 @@ contract DebtToken is CheckContract, IDebtToken {
   // --- Internal operations ---
   // Warning: sanity checks (for sender and recipient) should have been done before calling these internal functions
   function _transfer(address sender, address recipient, uint256 amount) internal {
+    // TODO: Can remove `assert(recipient != address(0));` because valid recipient is always pre-validated
     assert(sender != address(0));
     assert(recipient != address(0));
     if (_balances[sender] < amount) revert InsufficientBalance();

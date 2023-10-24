@@ -4,7 +4,7 @@ import {
   DebtTokenManager,
   MockPriceFeed,
   MockTroveManager,
-  StabilityPoolManager,
+  StabilityPoolManagerTester,
   StoragePool,
 } from '../typechain';
 import { parseUnits } from 'ethers';
@@ -13,7 +13,7 @@ import { BorrowerOperationsTester } from '../typechain/contracts/TestContracts/B
 export interface Contracts {
   borrowerOperations: BorrowerOperationsTester;
   troveManager: MockTroveManager;
-  stabilityPoolManager: StabilityPoolManager;
+  stabilityPoolManager: StabilityPoolManagerTester;
   storagePool: StoragePool;
   collTokenManager: CollTokenManager;
   debtTokenManager: DebtTokenManager;
@@ -29,7 +29,7 @@ export const deployCore = async (): Promise<Contracts> => {
   const troveManagerFactory = await ethers.getContractFactory('MockTroveManager');
   const troveManager = await troveManagerFactory.deploy();
 
-  const stabilityPoolManagerFactory = await ethers.getContractFactory('StabilityPoolManager');
+  const stabilityPoolManagerFactory = await ethers.getContractFactory('StabilityPoolManagerTester');
   const stabilityPoolManager = await stabilityPoolManagerFactory.deploy();
 
   const storagePoolFactory = await ethers.getContractFactory('StoragePool');

@@ -46,6 +46,7 @@ contract BorrowerOperationsTester is BorrowerOperations {
 
   // Payable fallback function
 
+  // STORAGE POOL TESTER PROXIES
   function testStoragePool_addValue(address _tokenAddress, bool _isColl, PoolType _poolType, uint _amount) external {
     storagePool.addValue(_tokenAddress, _isColl, _poolType, _amount);
   }
@@ -67,5 +68,20 @@ contract BorrowerOperationsTester is BorrowerOperations {
     uint _amount
   ) external {
     storagePool.transferBetweenTypes(_tokenAddress, _isColl, _fromType, _toType, _amount);
+  }
+
+  // DEBTTOKEN POOL TESTER PROXIES
+  IDebtToken public debtToken;
+
+  function setDebtToken(IDebtToken _debtToken) external {
+    debtToken = _debtToken;
+  }
+
+  function testDebtToken_mint(address _account, uint256 _amount) external {
+    debtToken.mint(_account, _amount);
+  }
+
+  function testDebtToken_burn(address _account, uint256 _amount) external {
+    debtToken.burn(_account, _amount);
   }
 }
