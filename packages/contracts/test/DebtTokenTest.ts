@@ -48,9 +48,9 @@ describe('DebtToken', () => {
     [owner, defaulter_1, defaulter_2, defaulter_3, whale, alice, bob, carol, dennis, erin, flyn] = signers;
   });
 
-  const commonSetup = async (contracts: Contracts) => {
+  beforeEach(async () => {
+    contracts = await deployCore();
     await connectCoreContracts(contracts);
-
     await deployAndLinkToken(contracts);
 
     priceFeed = contracts.priceFeed;
@@ -62,11 +62,6 @@ describe('DebtToken', () => {
     STABLE = contracts.debtToken.STABLE;
     STOCK = contracts.debtToken.STOCK;
     BTC = contracts.collToken.BTC;
-  };
-
-  beforeEach(async () => {
-    contracts = await deployCore();
-    await commonSetup(contracts);
 
     await borrowerOperations.setDebtToken(STABLE);
     await stabilityPoolManager.setDebtToken(STABLE);

@@ -5,7 +5,6 @@ pragma solidity ^0.8.9;
 import './Dependencies/CheckContract.sol';
 import './Interfaces/IDebtToken.sol';
 import './Interfaces/IPriceFeed.sol';
-import 'hardhat/console.sol';
 
 /*
  *
