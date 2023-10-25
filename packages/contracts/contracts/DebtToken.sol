@@ -5,6 +5,7 @@ pragma solidity ^0.8.9;
 import './Dependencies/CheckContract.sol';
 import './Interfaces/IDebtToken.sol';
 import './Interfaces/IPriceFeed.sol';
+import 'hardhat/console.sol';
 
 /*
  *
@@ -51,6 +52,7 @@ contract DebtToken is CheckContract, IDebtToken {
 
   // User data for dToken
   mapping(address => uint256) private _balances;
+  // sender => spender => amount
   mapping(address => mapping(address => uint256)) private _allowances;
 
   // --- Addresses ---
@@ -255,6 +257,7 @@ contract DebtToken is CheckContract, IDebtToken {
   // --- 'require' functions ---
 
   function _requireValidRecipient(address _recipient) internal view {
+    // FIXME: _recipient != address(0) is already asserted on all _transfer calls; exclude check in either of them
     if (_recipient == address(0) || _recipient == address(this)) revert ZeroAddress();
     if (
       _recipient == stabilityPoolManagerAddress ||
@@ -279,12 +282,10 @@ contract DebtToken is CheckContract, IDebtToken {
     if (msg.sender != stabilityPoolManagerAddress) revert NotFromSPManager();
   }
 
-  function _requireCallerIsTroveMorSP() internal view {
-    if (msg.sender != troveManagerAddress && msg.sender != stabilityPoolManagerAddress) revert NotFromTroveMorSP();
-  }
-
   // --- Optional functions ---
 
+  // FIXME: Use auto-generated getters from Solidity instead. Gas cost is nearly identical but the scope would be clearer that these arguments are indeed not internal/private but PUBLIC
+  // Make all below variable "public" and access like "name()"
   function name() external view override returns (string memory) {
     return _NAME;
   }
