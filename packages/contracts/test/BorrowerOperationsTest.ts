@@ -1439,4 +1439,409 @@ describe('BorrowerOperations', () => {
     const baseRate_2 = await troveManager.baseRate();
     expect(baseRate_2).to.be.lt(baseRate_1);
   });
+  // TODO: Take care after staking enabled
+  // it('withdrawLUSD(): borrowing at non-zero base rate sends LUSD fee to LQTY staking contract', async () => {
+  //   // time fast-forwards 1 year, and multisig stakes 1 LQTY
+  //   await th.fastForwardTime(timeValues.SECONDS_IN_ONE_YEAR, web3.currentProvider);
+  //   await lqtyToken.approve(lqtyStaking.address, dec(1, 18), {
+  //     from: multisig,
+  //   });
+  //   await lqtyStaking.stake(dec(1, 18), { from: multisig });
+
+  //   // Check LQTY LUSD balance before == 0
+  //   const lqtyStaking_LUSDBalance_Before = await lusdToken.balanceOf(lqtyStaking.address);
+  //   assert.equal(lqtyStaking_LUSDBalance_Before, '0');
+
+  //   await openTrove({ ICR: toBN(dec(10, 18)), extraParams: { from: whale } });
+  //   await openTrove({
+  //     extraLUSDAmount: toBN(dec(30, 18)),
+  //     ICR: toBN(dec(2, 18)),
+  //     extraParams: { from: A },
+  //   });
+  //   await openTrove({
+  //     extraLUSDAmount: toBN(dec(40, 18)),
+  //     ICR: toBN(dec(2, 18)),
+  //     extraParams: { from: B },
+  //   });
+  //   await openTrove({
+  //     extraLUSDAmount: toBN(dec(50, 18)),
+  //     ICR: toBN(dec(2, 18)),
+  //     extraParams: { from: C },
+  //   });
+  //   await openTrove({
+  //     extraLUSDAmount: toBN(dec(50, 18)),
+  //     ICR: toBN(dec(2, 18)),
+  //     extraParams: { from: D },
+  //   });
+
+  //   // Artificially make baseRate 5%
+  //   await troveManager.setBaseRate(dec(5, 16));
+  //   await troveManager.setLastFeeOpTimeToNow();
+
+  //   // Check baseRate is now non-zero
+  //   const baseRate_1 = await troveManager.baseRate();
+  //   assert.isTrue(baseRate_1.gt(toBN('0')));
+
+  //   // 2 hours pass
+  //   th.fastForwardTime(7200, web3.currentProvider);
+
+  //   // D withdraws LUSD
+  //   await borrowerOperations.withdrawLUSD(th._100pct, dec(37, 18), C, C, {
+  //     from: D,
+  //   });
+
+  //   // Check LQTY LUSD balance after has increased
+  //   const lqtyStaking_LUSDBalance_After = await lusdToken.balanceOf(lqtyStaking.address);
+  //   assert.isTrue(lqtyStaking_LUSDBalance_After.gt(lqtyStaking_LUSDBalance_Before));
+  // });
+
+  // if (!withProxy) {
+  //   // TODO: use rawLogs instead of logs
+  //   it('withdrawLUSD(): borrowing at non-zero base records the (drawn debt + fee) on the Trove struct', async () => {
+  //     // time fast-forwards 1 year, and multisig stakes 1 LQTY
+  //     await th.fastForwardTime(timeValues.SECONDS_IN_ONE_YEAR, web3.currentProvider);
+  //     await lqtyToken.approve(lqtyStaking.address, dec(1, 18), {
+  //       from: multisig,
+  //     });
+  //     await lqtyStaking.stake(dec(1, 18), { from: multisig });
+
+  //     await openTrove({
+  //       ICR: toBN(dec(10, 18)),
+  //       extraParams: { from: whale },
+  //     });
+  //     await openTrove({
+  //       extraLUSDAmount: toBN(dec(30, 18)),
+  //       ICR: toBN(dec(2, 18)),
+  //       extraParams: { from: A },
+  //     });
+  //     await openTrove({
+  //       extraLUSDAmount: toBN(dec(40, 18)),
+  //       ICR: toBN(dec(2, 18)),
+  //       extraParams: { from: B },
+  //     });
+  //     await openTrove({
+  //       extraLUSDAmount: toBN(dec(50, 18)),
+  //       ICR: toBN(dec(2, 18)),
+  //       extraParams: { from: C },
+  //     });
+  //     await openTrove({
+  //       extraLUSDAmount: toBN(dec(50, 18)),
+  //       ICR: toBN(dec(2, 18)),
+  //       extraParams: { from: D },
+  //     });
+  //     const D_debtBefore = await getTroveEntireDebt(D);
+
+  //     // Artificially make baseRate 5%
+  //     await troveManager.setBaseRate(dec(5, 16));
+  //     await troveManager.setLastFeeOpTimeToNow();
+
+  //     // Check baseRate is now non-zero
+  //     const baseRate_1 = await troveManager.baseRate();
+  //     assert.isTrue(baseRate_1.gt(toBN('0')));
+
+  //     // 2 hours pass
+  //     th.fastForwardTime(7200, web3.currentProvider);
+
+  //     // D withdraws LUSD
+  //     const withdrawal_D = toBN(dec(37, 18));
+  //     const withdrawalTx = await borrowerOperations.withdrawLUSD(th._100pct, toBN(dec(37, 18)), D, D, { from: D });
+
+  //     const emittedFee = toBN(th.getLUSDFeeFromLUSDBorrowingEvent(withdrawalTx));
+  //     assert.isTrue(emittedFee.gt(toBN('0')));
+
+  //     const newDebt = (await troveManager.Troves(D))[0];
+
+  //     // Check debt on Trove struct equals initial debt + withdrawal + emitted fee
+  //     th.assertIsApproximatelyEqual(newDebt, D_debtBefore.add(withdrawal_D).add(emittedFee), 10000);
+  //   });
+  // }
+  // it('withdrawLUSD(): Borrowing at non-zero base rate increases the LQTY staking contract LUSD fees-per-unit-staked', async () => {
+  //   // time fast-forwards 1 year, and multisig stakes 1 LQTY
+  //   await th.fastForwardTime(timeValues.SECONDS_IN_ONE_YEAR, web3.currentProvider);
+  //   await lqtyToken.approve(lqtyStaking.address, dec(1, 18), {
+  //     from: multisig,
+  //   });
+  //   await lqtyStaking.stake(dec(1, 18), { from: multisig });
+
+  //   // Check LQTY contract LUSD fees-per-unit-staked is zero
+  //   const F_LUSD_Before = await lqtyStaking.F_LUSD();
+  //   assert.equal(F_LUSD_Before, '0');
+
+  //   await openTrove({ ICR: toBN(dec(10, 18)), extraParams: { from: whale } });
+  //   await openTrove({
+  //     extraLUSDAmount: toBN(dec(30, 18)),
+  //     ICR: toBN(dec(2, 18)),
+  //     extraParams: { from: A },
+  //   });
+  //   await openTrove({
+  //     extraLUSDAmount: toBN(dec(40, 18)),
+  //     ICR: toBN(dec(2, 18)),
+  //     extraParams: { from: B },
+  //   });
+  //   await openTrove({
+  //     extraLUSDAmount: toBN(dec(50, 18)),
+  //     ICR: toBN(dec(2, 18)),
+  //     extraParams: { from: C },
+  //   });
+  //   await openTrove({
+  //     extraLUSDAmount: toBN(dec(50, 18)),
+  //     ICR: toBN(dec(2, 18)),
+  //     extraParams: { from: D },
+  //   });
+
+  //   // Artificially make baseRate 5%
+  //   await troveManager.setBaseRate(dec(5, 16));
+  //   await troveManager.setLastFeeOpTimeToNow();
+
+  //   // Check baseRate is now non-zero
+  //   const baseRate_1 = await troveManager.baseRate();
+  //   assert.isTrue(baseRate_1.gt(toBN('0')));
+
+  //   // 2 hours pass
+  //   th.fastForwardTime(7200, web3.currentProvider);
+
+  //   // D withdraws LUSD
+  //   await borrowerOperations.withdrawLUSD(th._100pct, toBN(dec(37, 18)), D, D, { from: D });
+
+  //   // Check LQTY contract LUSD fees-per-unit-staked has increased
+  //   const F_LUSD_After = await lqtyStaking.F_LUSD();
+  //   assert.isTrue(F_LUSD_After.gt(F_LUSD_Before));
+  // });
+
+  // it('withdrawLUSD(): Borrowing at non-zero base rate sends requested amount to the user', async () => {
+  //   // time fast-forwards 1 year, and multisig stakes 1 LQTY
+  //   await th.fastForwardTime(timeValues.SECONDS_IN_ONE_YEAR, web3.currentProvider);
+  //   await lqtyToken.approve(lqtyStaking.address, dec(1, 18), {
+  //     from: multisig,
+  //   });
+  //   await lqtyStaking.stake(dec(1, 18), { from: multisig });
+
+  //   // Check LQTY Staking contract balance before == 0
+  //   const lqtyStaking_LUSDBalance_Before = await lusdToken.balanceOf(lqtyStaking.address);
+  //   assert.equal(lqtyStaking_LUSDBalance_Before, '0');
+
+  //   await openTrove({ ICR: toBN(dec(10, 18)), extraParams: { from: whale } });
+  //   await openTrove({
+  //     extraLUSDAmount: toBN(dec(30, 18)),
+  //     ICR: toBN(dec(2, 18)),
+  //     extraParams: { from: A },
+  //   });
+  //   await openTrove({
+  //     extraLUSDAmount: toBN(dec(40, 18)),
+  //     ICR: toBN(dec(2, 18)),
+  //     extraParams: { from: B },
+  //   });
+  //   await openTrove({
+  //     extraLUSDAmount: toBN(dec(50, 18)),
+  //     ICR: toBN(dec(2, 18)),
+  //     extraParams: { from: C },
+  //   });
+  //   await openTrove({
+  //     extraLUSDAmount: toBN(dec(50, 18)),
+  //     ICR: toBN(dec(2, 18)),
+  //     extraParams: { from: D },
+  //   });
+
+  //   // Artificially make baseRate 5%
+  //   await troveManager.setBaseRate(dec(5, 16));
+  //   await troveManager.setLastFeeOpTimeToNow();
+
+  //   // Check baseRate is now non-zero
+  //   const baseRate_1 = await troveManager.baseRate();
+  //   assert.isTrue(baseRate_1.gt(toBN('0')));
+
+  //   // 2 hours pass
+  //   th.fastForwardTime(7200, web3.currentProvider);
+
+  //   const D_LUSDBalanceBefore = await lusdToken.balanceOf(D);
+
+  //   // D withdraws LUSD
+  //   const D_LUSDRequest = toBN(dec(37, 18));
+  //   await borrowerOperations.withdrawLUSD(th._100pct, D_LUSDRequest, D, D, {
+  //     from: D,
+  //   });
+
+  //   // Check LQTY staking LUSD balance has increased
+  //   const lqtyStaking_LUSDBalance_After = await lusdToken.balanceOf(lqtyStaking.address);
+  //   assert.isTrue(lqtyStaking_LUSDBalance_After.gt(lqtyStaking_LUSDBalance_Before));
+
+  //   // Check D's LUSD balance now equals their initial balance plus request LUSD
+  //   const D_LUSDBalanceAfter = await lusdToken.balanceOf(D);
+  //   assert.isTrue(D_LUSDBalanceAfter.eq(D_LUSDBalanceBefore.add(D_LUSDRequest)));
+  // });
+
+  // it('withdrawLUSD(): Borrowing at zero base rate changes LUSD fees-per-unit-staked', async () => {
+  //   await openTrove({ ICR: toBN(dec(10, 18)), extraParams: { from: whale } });
+  //   await openTrove({
+  //     extraLUSDAmount: toBN(dec(30, 18)),
+  //     ICR: toBN(dec(2, 18)),
+  //     extraParams: { from: A },
+  //   });
+  //   await openTrove({
+  //     extraLUSDAmount: toBN(dec(40, 18)),
+  //     ICR: toBN(dec(2, 18)),
+  //     extraParams: { from: B },
+  //   });
+  //   await openTrove({
+  //     extraLUSDAmount: toBN(dec(50, 18)),
+  //     ICR: toBN(dec(2, 18)),
+  //     extraParams: { from: C },
+  //   });
+  //   await openTrove({
+  //     extraLUSDAmount: toBN(dec(50, 18)),
+  //     ICR: toBN(dec(2, 18)),
+  //     extraParams: { from: D },
+  //   });
+
+  //   // Check baseRate is zero
+  //   const baseRate_1 = await troveManager.baseRate();
+  //   assert.equal(baseRate_1, '0');
+
+  //   // A artificially receives LQTY, then stakes it
+  //   await lqtyToken.unprotectedMint(A, dec(100, 18));
+  //   await lqtyStaking.stake(dec(100, 18), { from: A });
+
+  //   // 2 hours pass
+  //   th.fastForwardTime(7200, web3.currentProvider);
+
+  //   // Check LQTY LUSD balance before == 0
+  //   const F_LUSD_Before = await lqtyStaking.F_LUSD();
+  //   assert.equal(F_LUSD_Before, '0');
+
+  //   // D withdraws LUSD
+  //   await borrowerOperations.withdrawLUSD(th._100pct, dec(37, 18), D, D, {
+  //     from: D,
+  //   });
+
+  //   // Check LQTY LUSD balance after > 0
+  //   const F_LUSD_After = await lqtyStaking.F_LUSD();
+  //   assert.isTrue(F_LUSD_After.gt('0'));
+  // });
+
+  // it('withdrawLUSD(): Borrowing at zero base rate sends debt request to user', async () => {
+  //   await openTrove({ ICR: toBN(dec(10, 18)), extraParams: { from: whale } });
+  //   await openTrove({
+  //     extraLUSDAmount: toBN(dec(30, 18)),
+  //     ICR: toBN(dec(2, 18)),
+  //     extraParams: { from: A },
+  //   });
+  //   await openTrove({
+  //     extraLUSDAmount: toBN(dec(40, 18)),
+  //     ICR: toBN(dec(2, 18)),
+  //     extraParams: { from: B },
+  //   });
+  //   await openTrove({
+  //     extraLUSDAmount: toBN(dec(50, 18)),
+  //     ICR: toBN(dec(2, 18)),
+  //     extraParams: { from: C },
+  //   });
+  //   await openTrove({
+  //     extraLUSDAmount: toBN(dec(50, 18)),
+  //     ICR: toBN(dec(2, 18)),
+  //     extraParams: { from: D },
+  //   });
+
+  //   // Check baseRate is zero
+  //   const baseRate_1 = await troveManager.baseRate();
+  //   assert.equal(baseRate_1, '0');
+
+  //   // 2 hours pass
+  //   th.fastForwardTime(7200, web3.currentProvider);
+
+  //   const D_LUSDBalanceBefore = await lusdToken.balanceOf(D);
+
+  //   // D withdraws LUSD
+  //   const D_LUSDRequest = toBN(dec(37, 18));
+  //   await borrowerOperations.withdrawLUSD(th._100pct, dec(37, 18), D, D, {
+  //     from: D,
+  //   });
+
+  //   // Check D's LUSD balance now equals their requested LUSD
+  //   const D_LUSDBalanceAfter = await lusdToken.balanceOf(D);
+
+  //   // Check D's trove debt == D's LUSD balance + liquidation reserve
+  //   assert.isTrue(D_LUSDBalanceAfter.eq(D_LUSDBalanceBefore.add(D_LUSDRequest)));
+  // });
+
+  it('increaseDebt(): reverts when calling address does not have active trove', async () => {
+    await openTrove({
+      from: alice,
+      contracts,
+      collToken: BTC,
+      collAmount: parseUnits('1', 9),
+      debts: [{ tokenAddress: STABLE, amount: parseUnits('10000') }],
+    });
+    await openTrove({
+      from: bob,
+      contracts,
+      collToken: BTC,
+      collAmount: parseUnits('2', 9),
+      debts: [{ tokenAddress: STABLE, amount: parseUnits('20000') }],
+    });
+
+    // Bob successfully withdraws LUSD
+    await borrowerOperations.connect(bob).increaseDebt(
+      [
+        {
+          tokenAddress: STABLE,
+          amount: parseUnits('100'),
+        },
+      ],
+      _100pct
+    );
+
+    // Carol with no active trove attempts to withdraw LUSD
+    await expect(
+      borrowerOperations.connect(carol).increaseDebt(
+        [
+          {
+            tokenAddress: STABLE,
+            amount: parseUnits('100'),
+          },
+        ],
+        _100pct
+      )
+    ).to.be.revertedWithCustomError(borrowerOperations, 'TroveClosedOrNotExist');
+  });
+
+  it('increaseDebt(): reverts when requested withdrawal amount is zero LUSD', async () => {
+    await openTrove({
+      from: alice,
+      contracts,
+      collToken: BTC,
+      collAmount: parseUnits('1', 9),
+      debts: [{ tokenAddress: STABLE, amount: parseUnits('10000') }],
+    });
+    await openTrove({
+      from: bob,
+      contracts,
+      collToken: BTC,
+      collAmount: parseUnits('2', 9),
+      debts: [{ tokenAddress: STABLE, amount: parseUnits('20000') }],
+    });
+
+    // Bob successfully withdraws 1e-18 LUSD
+    await borrowerOperations.connect(bob).increaseDebt(
+      [
+        {
+          tokenAddress: STABLE,
+          amount: parseUnits('100'),
+        },
+      ],
+      _100pct
+    );
+
+    // Alice attempts to withdraw 0 LUSD
+    await expect(
+      borrowerOperations.connect(alice).increaseDebt(
+        [
+          {
+            tokenAddress: STABLE,
+            amount: 0,
+          },
+        ],
+        _100pct
+      )
+    ).to.be.revertedWithCustomError(borrowerOperations, 'ZeroDebtChange');
+  });
 });

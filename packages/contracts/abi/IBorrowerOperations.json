@@ -75,6 +75,11 @@
         "type": "error"
     },
     {
+        "inputs": [],
+        "name": "ZeroDebtChange",
+        "type": "error"
+    },
+    {
         "anonymous": false,
         "inputs": [
             {

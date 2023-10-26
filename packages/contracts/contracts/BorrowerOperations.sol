@@ -296,7 +296,10 @@ contract BorrowerOperations is LiquityBase, Ownable, CheckContract, IBorrowerOpe
     ) = _getDebtTokenAmountsWithFetchedPrices(contractsCache.debtTokenManager, _debts);
 
     // checking if new debt is above the minimum
-    for (uint i = 0; i < addedDebts.length; i++) _requireAtLeastMinNetDebt(addedDebts[i].netDebt);
+    for (uint i = 0; i < addedDebts.length; i++) {
+      _requireNonZeroDebtChange(_debts[i].amount);
+      _requireAtLeastMinNetDebt(addedDebts[i].netDebt);
+    }
 
     // adding the borrowing fee to the net debt
     uint borrowingFeesPaid = 0;
@@ -616,7 +619,7 @@ contract BorrowerOperations is LiquityBase, Ownable, CheckContract, IBorrowerOpe
   }
 
   function _requireNonZeroDebtChange(uint _LUSDChange) internal pure {
-    require(_LUSDChange > 0, 'BorrowerOps: Debt increase requires non-zero debtChange');
+    if (_LUSDChange == 0) revert ZeroDebtChange();
   }
 
   //  function _requireNotInRecoveryMode(PriceCache memory _priceCache) internal {
