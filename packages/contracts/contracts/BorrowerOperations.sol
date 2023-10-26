@@ -534,8 +534,7 @@ contract BorrowerOperations is LiquityBase, Ownable, CheckContract, IBorrowerOpe
     uint _amount,
     PoolType _poolType
   ) internal {
-    _pool.subtractValue(_collAddress, true, _poolType, _amount);
-    _pool.refundValue(_borrower, _collAddress, _amount);
+    _pool.withdrawalValue(_borrower, _collAddress, true, _poolType, _amount);
   }
 
   function _poolAddDebt(

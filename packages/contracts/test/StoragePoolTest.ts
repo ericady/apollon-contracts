@@ -11,7 +11,7 @@ import {
 import { Contracts, deployCore, connectCoreContracts, deployAndLinkToken } from '../utils/deploymentHelpers';
 import { SignerWithAddress } from '@nomicfoundation/hardhat-ethers/signers';
 import { assertRevert } from '../utils/testHelper';
-import { assert } from 'chai';
+import { assert, expect } from 'chai';
 
 describe('StoragePool', () => {
   let signers: SignerWithAddress[];
@@ -70,70 +70,197 @@ describe('StoragePool', () => {
   });
 
   describe('StoragePool Mechanisms', () => {
-    it('addValue() revert if caller is neither borrowerOperationsAddress nor troveManagerAddress nor stabilityPoolManagerAddress for all _poolType', async () => {
-      const amount = ethers.parseEther('1.0');
-      const expectedErrorMsg = 'NotFromBOorTroveMorSP';
+    describe('addValue()', () => {
+      it('addValue() revert if caller is neither borrowerOperationsAddress nor troveManagerAddress nor stabilityPoolManagerAddress for all _poolType', async () => {
+        await assertRevert(storagePool.addValue(STABLE, false, 0, 1), 'NotFromBOorTroveMorSP');
+      });
 
-      await assertRevert(storagePool.addValue(BTC, false, 0, amount), expectedErrorMsg);
-      await assertRevert(storagePool.addValue(BTC, false, 1, amount), expectedErrorMsg);
-      await assertRevert(storagePool.addValue(BTC, false, 2, amount), expectedErrorMsg);
+      it('addValue(): increases the recorded token debt by the correct amount', async () => {
+        await borrowerOperations.testStoragePool_addValue(STABLE, false, 0, 100);
 
-      // _isColl = true
-      await assertRevert(storagePool.addValue(BTC, true, 0, amount), expectedErrorMsg);
-      await assertRevert(storagePool.addValue(BTC, true, 1, amount), expectedErrorMsg);
-      await assertRevert(storagePool.addValue(BTC, true, 2, amount), expectedErrorMsg);
+        const tokenDebt_balanceAfter = await storagePool.getValue(STABLE, false, 0);
+        assert.equal(tokenDebt_balanceAfter, 100);
+      });
+
+      it('addValue(): emits "PoolValueUpdated" event with expected arguments', async () => {
+        const tx = borrowerOperations.testStoragePool_addValue(STABLE, false, 0, 100);
+
+        await expect(tx).to.emit(storagePool, 'PoolValueUpdated').withArgs(STABLE.target, false, 0, 100);
+      });
     });
 
-    it('subtractValue() revert if caller is neither borrowerOperationsAddress nor troveManagerAddress nor stabilityPoolManagerAddress for all _poolType)', async () => {
-      const amount = ethers.parseEther('1.0');
-      const expectedErrorMsg = 'NotFromBOorTroveMorSP';
+    describe('subtractValue()', () => {
+      it('subtractValue() revert if caller is neither borrowerOperationsAddress nor troveManagerAddress nor stabilityPoolManagerAddress for all _poolType', async () => {
+        await assertRevert(storagePool.subtractValue(STABLE, false, 0, 1), 'NotFromBOorTroveMorSP');
+      });
 
-      await assertRevert(storagePool.subtractValue(BTC, false, 0, amount), expectedErrorMsg);
-      await assertRevert(storagePool.subtractValue(BTC, false, 1, amount), expectedErrorMsg);
-      await assertRevert(storagePool.subtractValue(BTC, false, 2, amount), expectedErrorMsg);
-      // collateral
-      await assertRevert(storagePool.subtractValue(BTC, true, 0, amount), expectedErrorMsg);
-      await assertRevert(storagePool.subtractValue(BTC, true, 1, amount), expectedErrorMsg);
-      await assertRevert(storagePool.subtractValue(BTC, true, 2, amount), expectedErrorMsg);
+      it('subtractValue() revert if the token does not yet have an entry', async () => {
+        await assertRevert(
+          borrowerOperations.testStoragePool_subtractValue(STABLE, false, 0, 100),
+          'StoragePool: PoolEntry does not exist'
+        );
+      });
+
+      it('subtractValue(): decreases the recorded token debt by the correct amount', async () => {
+        // First add anything to add default pool entry
+        await borrowerOperations.testStoragePool_addValue(STABLE, false, 0, 101);
+        await borrowerOperations.testStoragePool_subtractValue(STABLE, false, 0, 100);
+
+        const tokenDebt_balanceAfter = await storagePool.getValue(STABLE, false, 0);
+        assert.equal(tokenDebt_balanceAfter, 1);
+      });
+
+      it('subtractValue(): emits "PoolValueUpdated" event with expected arguments', async () => {
+        await borrowerOperations.testStoragePool_addValue(STABLE, false, 0, 101);
+        const tx = borrowerOperations.testStoragePool_subtractValue(STABLE, false, 0, 100);
+
+        await expect(tx).to.emit(storagePool, 'PoolValueUpdated').withArgs(STABLE.target, false, 0, 1);
+      });
     });
 
-    it('withdrawalValue() revert if caller is neither borrowerOperationsAddress nor troveManagerAddress nor stabilityPoolManagerAddress for all _poolType)', async () => {
-      const amount = ethers.parseEther('1.0');
-      const expectedErrorMsg = 'NotFromBOorTroveMorSP';
+    describe('withdrawalValue()', () => {
+      it('withdrawalValue() revert if caller is neither borrowerOperationsAddress nor troveManagerAddress nor stabilityPoolManagerAddress for all _poolType', async () => {
+        await assertRevert(storagePool.withdrawalValue(alice, STABLE, false, 0, 1), 'NotFromBOorTroveMorSP');
+      });
 
-      await assertRevert(storagePool.withdrawalValue(carol, BTC, false, 0, amount), expectedErrorMsg);
-      await assertRevert(storagePool.withdrawalValue(carol, BTC, false, 1, amount), expectedErrorMsg);
-      await assertRevert(storagePool.withdrawalValue(carol, BTC, false, 2, amount), expectedErrorMsg);
-      // collateral
-      await assertRevert(storagePool.withdrawalValue(carol, BTC, true, 0, amount), expectedErrorMsg);
-      await assertRevert(storagePool.withdrawalValue(carol, BTC, true, 1, amount), expectedErrorMsg);
-      await assertRevert(storagePool.withdrawalValue(carol, BTC, true, 2, amount), expectedErrorMsg);
+      it('withdrawalValue() send token from the storagePool to Alice successfully', async () => {
+        // Give storagePool some tokens
+        await borrowerOperations.setDebtToken(STABLE);
+        await borrowerOperations.testDebtToken_mint(storagePool, 100);
+
+        await borrowerOperations.testStoragePool_addValue(STABLE, false, 0, 100);
+
+        await borrowerOperations.testStoragePool_withdrawalValue(alice, STABLE, false, 0, 30);
+
+        const tokenDebt_balanceAfter = await storagePool.getValue(STABLE, false, 0);
+        assert.equal(tokenDebt_balanceAfter, 70);
+
+        const alice_balanceAfter = await STABLE.balanceOf(alice.address);
+        assert.equal(alice_balanceAfter, 30);
+      });
     });
 
-    it('transferBetweenTypes() revert if caller is neither borrowerOperationsAddress nor troveManagerAddress nor stabilityPoolManagerAddress for all _poolType)', async () => {
-      const amount = ethers.parseEther('1.0');
-      const expectedErrorMsg = 'NotFromBOorTroveMorSP';
+    describe('getEntireSystemColl()', () => {
+      it('getEntireSystemColl() should return 0 when no collTokens are there', async () => {
+        const entireCollateral = await storagePool.getEntireSystemColl();
 
-      await assertRevert(storagePool.transferBetweenTypes(BTC, false, 0, 1, amount), expectedErrorMsg);
-      await assertRevert(storagePool.transferBetweenTypes(BTC, false, 1, 2, amount), expectedErrorMsg);
-      await assertRevert(storagePool.transferBetweenTypes(BTC, false, 2, 0, amount), expectedErrorMsg);
-      // collateral
-      await assertRevert(storagePool.transferBetweenTypes(BTC, true, 0, 2, amount), expectedErrorMsg);
-      await assertRevert(storagePool.transferBetweenTypes(BTC, true, 1, 0, amount), expectedErrorMsg);
-      await assertRevert(storagePool.transferBetweenTypes(BTC, true, 2, 1, amount), expectedErrorMsg);
+        assert.equal(entireCollateral, 0);
+      });
+
+      it('getEntireSystemColl() should return the complete dollar value of all collateral tokens', async () => {
+        const amount = ethers.parseEther('1.0');
+
+        // add and remove value
+        await borrowerOperations.testStoragePool_addValue(STABLE, true, 0, amount);
+        await borrowerOperations.testStoragePool_subtractValue(STABLE, true, 0, amount);
+
+        // Should all be added up
+        await borrowerOperations.testStoragePool_addValue(STABLE, true, 1, amount);
+        await borrowerOperations.testStoragePool_addValue(STABLE, true, 2, amount);
+        await borrowerOperations.testStoragePool_addValue(BTC, true, 0, amount);
+
+        // unrelated
+        await borrowerOperations.testStoragePool_addValue(STABLE, false, 0, amount);
+
+        const entireCollateral = await storagePool.getEntireSystemColl();
+        const twoStablesAndABitcoin = ethers.parseEther('21002');
+
+        assert.equal(entireCollateral, twoStablesAndABitcoin);
+      });
     });
 
-    it('transferBetweenTypes() revert if caller is neither borrowerOperationsAddress nor troveManagerAddress nor stabilityPoolManagerAddress for all _poolType)', async () => {
-      const amount = ethers.parseEther('1.0');
-      const expectedErrorMsg = 'NotFromBOorTroveMorSP';
+    describe('getEntireSystemDebt()', () => {
+      it('getEntireSystemDebt() should return 0 when no collTokens are there', async () => {
+        const entireCollateral = await storagePool.getEntireSystemDebt();
 
-      await assertRevert(storagePool.transferBetweenTypes(BTC, false, 0, 1, amount), expectedErrorMsg);
-      await assertRevert(storagePool.transferBetweenTypes(BTC, false, 1, 2, amount), expectedErrorMsg);
-      await assertRevert(storagePool.transferBetweenTypes(BTC, false, 2, 0, amount), expectedErrorMsg);
-      // collateral
-      await assertRevert(storagePool.transferBetweenTypes(BTC, true, 0, 2, amount), expectedErrorMsg);
-      await assertRevert(storagePool.transferBetweenTypes(BTC, true, 1, 0, amount), expectedErrorMsg);
-      await assertRevert(storagePool.transferBetweenTypes(BTC, true, 2, 1, amount), expectedErrorMsg);
+        assert.equal(entireCollateral, 0);
+      });
+
+      it('getEntireSystemDebt() should return the complete dollar value of all debt tokens', async () => {
+        const amount = ethers.parseEther('1.0');
+
+        // Should all be added up
+        await borrowerOperations.testStoragePool_addValue(STABLE, false, 0, amount);
+        await borrowerOperations.testStoragePool_addValue(STABLE, false, 1, amount);
+        await borrowerOperations.testStoragePool_addValue(STABLE, false, 2, amount);
+        await borrowerOperations.testStoragePool_addValue(BTC, false, 0, amount);
+
+        // unrelated
+        await borrowerOperations.testStoragePool_addValue(STABLE, true, 0, amount);
+
+        const entireCollateral = await storagePool.getEntireSystemDebt();
+        const threeStablesAndABitcoin = ethers.parseEther('21003');
+
+        assert.equal(entireCollateral, threeStablesAndABitcoin);
+      });
+    });
+
+    describe('transferBetweenTypes()', () => {
+      it('transferBetweenTypes() revert if caller is neither borrowerOperationsAddress nor troveManagerAddress nor stabilityPoolManagerAddress for all _poolType)', async () => {
+        const amount = ethers.parseEther('1.0');
+
+        await assertRevert(storagePool.transferBetweenTypes(BTC, false, 0, 1, amount), 'NotFromBOorTroveMorSP');
+      });
+
+      it('transferBetweenTypes() revert if the token does not yet have an entry', async () => {
+        await assertRevert(
+          borrowerOperations.testStoragePool_transferBetweenTypes(STABLE, false, 0, 2, 10),
+          'StoragePool: PoolEntry does not exist'
+        );
+      });
+
+      it('transferBetweenTypes(): exchanges the recorded token balance by the correct amount', async () => {
+        // First add anything to add default pool entry
+        await borrowerOperations.testStoragePool_addValue(STABLE, false, 0, 100);
+        const tx = borrowerOperations.testStoragePool_transferBetweenTypes(STABLE, false, 0, 2, 10);
+
+        await expect(tx).to.emit(storagePool, 'PoolValueUpdated').withArgs(STABLE.target, false, 0, 90);
+        await expect(tx).to.emit(storagePool, 'PoolValueUpdated').withArgs(STABLE.target, false, 2, 10);
+
+        const defaultPoolTokenDebt_balanceAfter = await storagePool.getValue(STABLE, false, 0);
+        assert.equal(defaultPoolTokenDebt_balanceAfter, 90);
+
+        const activePoolTokenDebt_balanceAfter = await storagePool.getValue(STABLE, false, 2);
+        assert.equal(activePoolTokenDebt_balanceAfter, 10);
+      });
+    });
+
+    describe('checkRecoveryMode()', () => {
+      it('checkRecoveryMode(): returns false when enough collateral exists in the system', async () => {
+        const collateralAmount = ethers.parseEther('1.5');
+
+        // add twice the amount of debt as collateral to have exactly the border TCR
+        await borrowerOperations.testStoragePool_addValue(STABLE, true, 0, collateralAmount);
+        await borrowerOperations.testStoragePool_addValue(STABLE, true, 1, collateralAmount);
+
+        const systemDebtAmount = ethers.parseEther('2');
+        await borrowerOperations.testStoragePool_addValue(STABLE, false, 2, systemDebtAmount);
+
+        const [isInRecoveryMode, TCR, entireSystemColl, entireSystemDebt] = await storagePool.checkRecoveryMode();
+
+        assert.isFalse(isInRecoveryMode);
+        const expectedCollateralRatio = ethers.parseEther('1.5');
+        assert.equal(TCR, expectedCollateralRatio);
+        assert.equal(entireSystemColl, collateralAmount + collateralAmount);
+        assert.equal(entireSystemDebt, systemDebtAmount);
+      });
+
+      it('checkRecoveryMode(): returns true when not enough collateral exists in the system', async () => {
+        const collateralAmount = ethers.parseEther('1.5');
+
+        // add twice the amount of debt as collateral to have exactly the border TCR
+        await borrowerOperations.testStoragePool_addValue(STABLE, true, 0, collateralAmount);
+        await borrowerOperations.testStoragePool_addValue(STABLE, true, 1, collateralAmount);
+
+        const systemDebtAmount = ethers.parseEther('2.01');
+        await borrowerOperations.testStoragePool_addValue(STABLE, false, 2, systemDebtAmount);
+
+        const [isInRecoveryMode, TCR, entireSystemColl, entireSystemDebt] = await storagePool.checkRecoveryMode();
+
+        assert.isTrue(isInRecoveryMode);
+        const minimumCollateralRatio = ethers.parseEther('1.5');
+        assert.isBelow(TCR, minimumCollateralRatio);
+      });
     });
   });
 
@@ -148,36 +275,6 @@ describe('StoragePool', () => {
       const recordedTokenDebt = await storagePool.getValue(STABLE, false, 0);
 
       assert.equal(recordedTokenDebt, 0);
-    });
-
-    describe('Authenticated transactions as borrowerOperation', () => {
-      it('addValue(): increases the recorded token debt by the correct amount', async () => {
-        await borrowerOperations.testStoragePool_addValue(STABLE, false, 0, 100);
-
-        const tokenDebt_balanceAfter = await storagePool.getValue(STABLE, false, 0);
-        assert.equal(tokenDebt_balanceAfter, 100);
-      });
-
-      it('subtractValue(): decreases the recorded token balance by the correct amount', async () => {
-        // First add anything to add default pool entry
-        await borrowerOperations.testStoragePool_addValue(STABLE, false, 0, 101);
-        await borrowerOperations.testStoragePool_subtractValue(STABLE, false, 0, 100);
-
-        const tokenDebt_balanceAfter = await storagePool.getValue(STABLE, false, 0);
-        assert.equal(tokenDebt_balanceAfter, 1);
-      });
-
-      it('transferBetweenTypes(): exchanges the recorded token balance by the correct amount', async () => {
-        // First add anything to add default pool entry
-        await borrowerOperations.testStoragePool_addValue(STABLE, false, 0, 100);
-        await borrowerOperations.testStoragePool_transferBetweenTypes(STABLE, false, 0, 2, 10);
-
-        const defaultPoolTokenDebt_balanceAfter = await storagePool.getValue(STABLE, false, 0);
-        assert.equal(defaultPoolTokenDebt_balanceAfter, 90);
-
-        const activePoolTokenDebt_balanceAfter = await storagePool.getValue(STABLE, false, 2);
-        assert.equal(activePoolTokenDebt_balanceAfter, 10);
-      });
     });
   });
 

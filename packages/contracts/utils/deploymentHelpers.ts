@@ -112,7 +112,7 @@ export const deployAndLinkToken = async (contracts: Contracts) => {
   };
   await contracts.collTokenManager.addCollToken(USDT);
   await contracts.collTokenManager.addCollToken(BTC);
-  await contracts.priceFeed.setTokenPrice(BTC, parseUnits('21000'));
+  await contracts.priceFeed.setTokenPrice(BTC, parseUnits('21000', 9));
 
   const mockDebtTokenFactory = await ethers.getContractFactory('MockDebtToken');
   const STABLE = await mockDebtTokenFactory.deploy(

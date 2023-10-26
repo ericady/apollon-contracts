@@ -93,11 +93,6 @@ contract StoragePool is LiquityBase, Ownable, CheckContract, IStoragePool {
     _subtractValue(_tokenAddress, _isColl, _poolType, _amount);
   }
 
-  function refundValue(address _account, address _token, uint _amount) external override {
-    _requireCallerIsBOorTroveMorSP();
-    IERC20(_token).transfer(_account, _amount);
-  }
-
   function withdrawalValue(
     address _receiver,
     address _tokenAddress,
@@ -112,6 +107,7 @@ contract StoragePool is LiquityBase, Ownable, CheckContract, IStoragePool {
 
   function _subtractValue(address _tokenAddress, bool _isColl, PoolType _poolType, uint _amount) internal {
     PoolEntry storage entry = poolEntries[_tokenAddress][_isColl];
+    // FIXME: Throw this rather when the requested pool of the entry is not there so the caller knows the issue?
     require(entry.exists, 'StoragePool: PoolEntry does not exist');
 
     entry.poolTypes[_poolType] -= _amount;
@@ -128,6 +124,7 @@ contract StoragePool is LiquityBase, Ownable, CheckContract, IStoragePool {
   ) external override {
     _requireCallerIsBOorTroveMorSP();
 
+    // FIXME: Throw this rather when the requested pool of the entry is not there so the caller knows the issue?
     PoolEntry storage entry = poolEntries[_tokenAddress][_isColl];
     require(entry.exists, 'StoragePool: PoolEntry does not exist');
 

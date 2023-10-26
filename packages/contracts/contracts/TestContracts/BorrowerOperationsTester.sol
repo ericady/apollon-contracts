@@ -70,6 +70,16 @@ contract BorrowerOperationsTester is BorrowerOperations {
     storagePool.transferBetweenTypes(_tokenAddress, _isColl, _fromType, _toType, _amount);
   }
 
+  function testStoragePool_withdrawalValue(
+    address _receiver,
+    address _tokenAddress,
+    bool _isColl,
+    PoolType _poolType,
+    uint _amount
+  ) external {
+    storagePool.withdrawalValue(_receiver, _tokenAddress, _isColl, _poolType, _amount);
+  }
+
   // DEBTTOKEN POOL TESTER PROXIES
   IDebtToken public debtToken;
 

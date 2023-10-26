@@ -26,8 +26,6 @@ interface IStoragePool is IBase {
 
   function subtractValue(address _tokenAddress, bool _isColl, PoolType _poolType, uint _amount) external;
 
-  function refundValue(address _account, address _token, uint _amount) external;
-
   function withdrawalValue(
     address _receiver,
     address _tokenAddress,
