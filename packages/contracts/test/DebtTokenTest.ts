@@ -12,6 +12,11 @@ import { Contracts, deployCore, connectCoreContracts, deployAndLinkToken } from 
 import { SignerWithAddress } from '@nomicfoundation/hardhat-ethers/signers';
 import { assertRevert } from '../utils/testHelper';
 import { assert, expect } from 'chai';
+import { AbiCoder, keccak256, toUtf8Bytes } from 'ethers';
+
+const PERMIT_TYPEHASH = keccak256(
+  toUtf8Bytes('Permit(address owner,address spender,uint256 value,uint256 nonce,uint256 deadline)')
+);
 
 describe('DebtToken', () => {
   let signers: SignerWithAddress[];
@@ -67,15 +72,64 @@ describe('DebtToken', () => {
     await stabilityPoolManager.setDebtToken(STABLE);
   });
 
+  const getDomainSeparator = (name: string, contractAddress: string, chainId: bigint, version: string) => {
+    const abiCoder = AbiCoder.defaultAbiCoder();
+    return ethers.keccak256(
+      abiCoder.encode(
+        ['bytes32', 'bytes32', 'bytes32', 'uint256', 'address'],
+        [
+          ethers.keccak256(
+            ethers.toUtf8Bytes('EIP712Domain(string name,string version,uint256 chainId,address verifyingContract)')
+          ),
+          ethers.keccak256(ethers.toUtf8Bytes(name)),
+          ethers.keccak256(ethers.toUtf8Bytes(version)),
+          parseInt(chainId.toString()),
+          contractAddress.toLowerCase(),
+        ]
+      )
+    );
+  };
+
+  const getPermitDigest = (
+    name: string,
+    address: string,
+    chainId: bigint,
+    version: string,
+    owner: string,
+    spender: string,
+    value: bigint,
+    nonce: bigint,
+    deadline: bigint | number
+  ) => {
+    const abiCoder = AbiCoder.defaultAbiCoder();
+    const DOMAIN_SEPARATOR = getDomainSeparator(name, address, chainId, version);
+    return ethers.keccak256(
+      ethers.solidityPacked(
+        ['bytes1', 'bytes1', 'bytes32', 'bytes32'],
+        [
+          '0x19',
+          '0x01',
+          DOMAIN_SEPARATOR,
+          ethers.keccak256(
+            abiCoder.encode(
+              ['bytes32', 'address', 'address', 'uint256', 'uint256', 'uint256'],
+              [PERMIT_TYPEHASH, owner, spender, value, nonce, deadline]
+            )
+          ),
+        ]
+      )
+    );
+  };
+
   it('balanceOf(): gets the balance of the account', async () => {
     // mint some debt tokens for alice
     await borrowerOperations.testDebtToken_mint(alice, 1);
 
     const aliceBalance = await STABLE.balanceOf(alice);
-    assert.equal(aliceBalance, 1);
+    assert.equal(aliceBalance, 1n);
 
     const bobBalance = await STABLE.balanceOf(bob);
-    assert.equal(bobBalance, 0);
+    assert.equal(bobBalance, 0n);
   });
 
   it('totalSupply(): gets the total supply', async () => {
@@ -84,7 +138,7 @@ describe('DebtToken', () => {
     await borrowerOperations.testDebtToken_mint(bob, 2);
 
     const totalSupply = await STABLE.totalSupply();
-    assert.equal(totalSupply, 3);
+    assert.equal(totalSupply, 3n);
   });
 
   it("name(): returns the token's name", async () => {
@@ -99,7 +153,7 @@ describe('DebtToken', () => {
 
   it('decimal(): returns the number of decimal digits used', async () => {
     const decimals = await STABLE.decimals();
-    assert.equal(decimals, 18);
+    assert.equal(decimals, 18n);
   });
 
   it("version(): returns the token contract's version", async () => {
@@ -143,12 +197,12 @@ describe('DebtToken', () => {
 
     it("allowance(): returns an account's spending allowance for another account's balance", async () => {
       const allowance_before = await STABLE.allowance(owner, alice);
-      assert.equal(allowance_before, 0);
+      assert.equal(allowance_before, 0n);
 
       await STABLE.approve(alice, 100);
 
       const allowance_after = await STABLE.allowance(owner, alice);
-      assert.equal(allowance_after, 100);
+      assert.equal(allowance_after, 100n);
     });
   });
 
@@ -190,15 +244,15 @@ describe('DebtToken', () => {
       await STABLE.approve(alice, 100);
 
       const bobBalance_before = await STABLE.balanceOf(bob);
-      assert.equal(bobBalance_before, 0);
+      assert.equal(bobBalance_before, 0n);
 
       await STABLE.connect(alice).transferFrom(owner, bob, 90);
 
       const bobBalance_after = await STABLE.balanceOf(bob);
-      assert.equal(bobBalance_after, 90);
+      assert.equal(bobBalance_after, 90n);
 
       const myBalance = await STABLE.balanceOf(owner);
-      assert.equal(myBalance, 10);
+      assert.equal(myBalance, 10n);
     });
   });
 
@@ -238,15 +292,15 @@ describe('DebtToken', () => {
       await borrowerOperations.testDebtToken_mint(owner, 100);
 
       const aliceBalance_before = await STABLE.balanceOf(alice);
-      assert.equal(aliceBalance_before, 0);
+      assert.equal(aliceBalance_before, 0n);
 
       await STABLE.transfer(alice, 40);
 
       const aliceBalance_after = await STABLE.balanceOf(alice);
-      assert.equal(aliceBalance_after, 40);
+      assert.equal(aliceBalance_after, 40n);
 
       const myBalance = await STABLE.balanceOf(owner);
-      assert.equal(myBalance, 60);
+      assert.equal(myBalance, 60n);
     });
 
     it('transfer(): emits "Transfer" event with expected arguments', async () => {
@@ -260,12 +314,12 @@ describe('DebtToken', () => {
 
   it("increaseAllowance(): increases an account's allowance by the correct amount", async () => {
     const allowance_A_Before = await STABLE.allowance(owner, alice);
-    assert.equal(allowance_A_Before, 0);
+    assert.equal(allowance_A_Before, 0n);
 
     await STABLE.increaseAllowance(alice, 100);
 
     const allowance_A_After = await STABLE.allowance(owner, alice);
-    assert.equal(allowance_A_After, 100);
+    assert.equal(allowance_A_After, 100n);
   });
 
   it('decreaseAllowance(): decreases allowance by the expected amount', async () => {
@@ -274,7 +328,7 @@ describe('DebtToken', () => {
     await STABLE.decreaseAllowance(alice, 25);
 
     const alice_allowanceAfter = await STABLE.allowance(owner, alice);
-    assert.equal(alice_allowanceAfter, 75);
+    assert.equal(alice_allowanceAfter, 75n);
   });
 
   it('decreaseAllowance(): fails trying to decrease more than previously allowed', async () => {
@@ -288,23 +342,23 @@ describe('DebtToken', () => {
   describe('mint()', () => {
     it('mint(): issues correct amount of tokens to the given address', async () => {
       const alice_balanceBefore = await STABLE.balanceOf(alice);
-      assert.equal(alice_balanceBefore, 0);
+      assert.equal(alice_balanceBefore, 0n);
 
       await borrowerOperations.testDebtToken_mint(alice, 100);
 
       const alice_balanceAfter = await STABLE.balanceOf(alice);
-      assert.equal(alice_balanceAfter, 100);
+      assert.equal(alice_balanceAfter, 100n);
     });
 
     it('mint(): increases totalAmount incrementally', async () => {
       const totalSupply_before = await STABLE.totalSupply();
-      assert.equal(totalSupply_before, 0);
+      assert.equal(totalSupply_before, 0n);
 
       await borrowerOperations.testDebtToken_mint(alice, 100);
       await borrowerOperations.testDebtToken_mint(bob, 50);
 
       const totalSupply_after = await STABLE.totalSupply();
-      assert.equal(totalSupply_after, 150);
+      assert.equal(totalSupply_after, 150n);
     });
 
     it('mint(): reverts if not borrowerOperations', async () => {
@@ -332,7 +386,7 @@ describe('DebtToken', () => {
       await borrowerOperations.testDebtToken_burn(alice, 70);
 
       const alice_BalanceAfter = await STABLE.balanceOf(alice);
-      assert.equal(alice_BalanceAfter, 30);
+      assert.equal(alice_BalanceAfter, 30n);
     });
 
     it('burn(): reverts if not borrowerOperations or troveManager or stabilityPoolManger', async () => {
@@ -352,13 +406,13 @@ describe('DebtToken', () => {
       await borrowerOperations.testDebtToken_mint(bob, 50);
 
       const totalSupply_before = await STABLE.totalSupply();
-      assert.equal(totalSupply_before, 150);
+      assert.equal(totalSupply_before, 150n);
 
       await borrowerOperations.testDebtToken_burn(alice, 50);
       await borrowerOperations.testDebtToken_burn(bob, 25);
 
       const totalSupply_after = await STABLE.totalSupply();
-      assert.equal(totalSupply_after, 75);
+      assert.equal(totalSupply_after, 75n);
     });
 
     it('burn(): emits "Transfer" event with expected arguments', async () => {
@@ -376,10 +430,10 @@ describe('DebtToken', () => {
       await stabilityPoolManager.testDebtToken_sendToPool(alice, bob, 75);
 
       const alice_balanceAfter = await STABLE.balanceOf(alice);
-      assert.equal(alice_balanceAfter, 25);
+      assert.equal(alice_balanceAfter, 25n);
 
       const bob_balanceAfter = await STABLE.balanceOf(bob);
-      assert.equal(bob_balanceAfter, 75);
+      assert.equal(bob_balanceAfter, 75n);
     });
 
     it('sendToPool(): reverts if not stabilityPoolManger', async () => {
@@ -394,20 +448,57 @@ describe('DebtToken', () => {
   });
 
   // TODO: Can I test this better. Original implementation seems useless.
-  it.skip('DOMAIN_SEPARATOR remains unchanged', async () => {
+  it('DOMAIN_SEPARATOR remains unchanged', async () => {
     const domainSeparator = await STABLE.domainSeparator();
 
-    assert.equal(domainSeparator, '0xb818b099015716584ffb41e7c25a7c873e22a118e5365f304cf5d2b1e475c13a');
+    const tokenName = await STABLE.name();
+    const version = await STABLE.version();
+    const chainId = await STABLE.getChainId();
+    const generatedDomain = getDomainSeparator(tokenName, STABLE.target.toString(), chainId, version);
+
+    assert.equal(domainSeparator, generatedDomain);
   });
 
   it('Initial nonce for a given address is 0', async () => {
     const alicesNonde = await STABLE.nonces(alice);
 
-    assert.equal(alicesNonde, 0);
+    assert.equal(alicesNonde, 0n);
   });
 
   // TODO: How to test this with modern hardhat
-  it.skip('permits and emits an Approval event (replay protected)', async () => {});
+  it('permits and emits an Approval event (replay protected)', async () => {
+    const approve = {
+      owner: alice,
+      spender: bob,
+      value: 1n,
+    };
+
+    const tokenName = await STABLE.name();
+    const version = await STABLE.version();
+    const chainId = await STABLE.getChainId();
+    const nonce = await STABLE.nonces(approve.owner);
+    const deadline = 100000000000000;
+
+    const digest = getPermitDigest(
+      tokenName,
+      STABLE.target.toString(),
+      chainId,
+      version,
+      approve.owner.address,
+      approve.spender.address,
+      approve.value,
+      nonce,
+      deadline
+    );
+
+    console.log(digest);
+    const signature = await alice.signMessage(digest);
+    console.log(signature);
+    const r = signature.slice(0, 66);
+    const s = '0x' + signature.slice(66, 130);
+    const v = '0x' + signature.slice(130, 132);
+    console.log(v, r, s);
+  });
 
   // TODO: Add other permit tests once there is a usable signature.
 });
