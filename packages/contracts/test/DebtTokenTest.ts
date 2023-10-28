@@ -476,7 +476,7 @@ describe('DebtToken', () => {
     const tokenName = await STABLE.name();
     const version = await STABLE.version();
     const chainId = await STABLE.getChainId();
-    const nonce = 1n;
+    const nonce = await STABLE.nonces(alice);
     const deadline = 100000000000000;
     const value = 1n;
 
