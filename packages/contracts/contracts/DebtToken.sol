@@ -5,6 +5,7 @@ pragma solidity ^0.8.9;
 import './Dependencies/CheckContract.sol';
 import './Interfaces/IDebtToken.sol';
 import './Interfaces/IPriceFeed.sol';
+import 'hardhat/console.sol';
 
 /*
  *
@@ -175,6 +176,21 @@ contract DebtToken is CheckContract, IDebtToken {
     } else {
       return _buildDomainSeparator(_TYPE_HASH, _HASHED_NAME, _HASHED_VERSION);
     }
+  }
+
+  // FIXME: remove me
+  function testPermit(
+    address owner,
+    address spender,
+    uint amount,
+    uint deadline,
+    uint8 v,
+    bytes32 r,
+    bytes32 s
+  ) external returns (bytes memory testMe) {
+    if (deadline < block.timestamp) revert ExpiredDeadline();
+
+    testMe = abi.encode(_PERMIT_TYPEHASH, owner, spender, amount, _nonces[owner]++, deadline);
   }
 
   function permit(

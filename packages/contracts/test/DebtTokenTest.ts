@@ -103,6 +103,13 @@ describe('DebtToken', () => {
   ) => {
     const abiCoder = AbiCoder.defaultAbiCoder();
     const DOMAIN_SEPARATOR = getDomainSeparator(name, address, chainId, version);
+
+    const defaultABIencoded = abiCoder.encode(
+      ['bytes32', 'address', 'address', 'uint256', 'uint256', 'uint256'],
+      [PERMIT_TYPEHASH, owner, spender, value, nonce, deadline]
+    );
+    console.log('defaultABIencoded', defaultABIencoded);
+
     return ethers.keccak256(
       ethers.solidityPacked(
         ['bytes1', 'bytes1', 'bytes32', 'bytes32'],
@@ -465,39 +472,33 @@ describe('DebtToken', () => {
     assert.equal(alicesNonde, 0n);
   });
 
-  // TODO: How to test this with modern hardhat
-  it('permits and emits an Approval event (replay protected)', async () => {
-    const approve = {
-      owner: alice,
-      spender: bob,
-      value: 1n,
-    };
-
+  it.only('permits and emits an Approval event (replay protected)', async () => {
     const tokenName = await STABLE.name();
     const version = await STABLE.version();
     const chainId = await STABLE.getChainId();
-    const nonce = await STABLE.nonces(approve.owner);
+    const nonce = 1n;
     const deadline = 100000000000000;
+    const value = 1n;
 
     const digest = getPermitDigest(
       tokenName,
       STABLE.target.toString(),
       chainId,
       version,
-      approve.owner.address,
-      approve.spender.address,
-      approve.value,
+      alice.address,
+      bob.address,
+      value,
       nonce,
       deadline
     );
 
-    console.log(digest);
     const signature = await alice.signMessage(digest);
-    console.log(signature);
     const r = signature.slice(0, 66);
     const s = '0x' + signature.slice(66, 130);
     const v = '0x' + signature.slice(130, 132);
-    console.log(v, r, s);
+
+    const returnEncoded = await STABLE.testPermit(alice, bob, value, deadline, v, r, s);
+    console.log('returnEncoded', returnEncoded.data);
   });
 
   // TODO: Add other permit tests once there is a usable signature.
