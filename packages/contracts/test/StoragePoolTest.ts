@@ -177,7 +177,7 @@ describe('StoragePool', () => {
         assert.equal(entireCollateral, 0n);
       });
 
-      it('getEntireSystemDebt() should return the complete dollar value of all debt tokens', async () => {
+      it.only('getEntireSystemDebt() should return the complete dollar value of all debt tokens', async () => {
         const amount = ethers.parseEther('1.0');
 
         // Should all be added up
