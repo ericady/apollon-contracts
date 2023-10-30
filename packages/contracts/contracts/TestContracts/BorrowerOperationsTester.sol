@@ -89,4 +89,10 @@ contract BorrowerOperationsTester is BorrowerOperations {
   function testDebtToken_burn(address _account, uint256 _amount, IDebtToken _debtToken) external {
     _debtToken.burn(_account, _amount);
   }
+
+  // TROVE MANAGER TESTER PROXIES
+
+  function testTroveManager_increaseTroveDebt(address _borrower, DebtTokenAmount[] memory _debtTokenAmounts) external {
+    troveManager.increaseTroveDebt(_borrower, _debtTokenAmounts);
+  }
 }

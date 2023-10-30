@@ -776,6 +776,41 @@
         "inputs": [
             {
                 "internalType": "address",
+                "name": "_borrower",
+                "type": "address"
+            },
+            {
+                "components": [
+                    {
+                        "internalType": "contract IDebtToken",
+                        "name": "debtToken",
+                        "type": "address"
+                    },
+                    {
+                        "internalType": "uint256",
+                        "name": "netDebt",
+                        "type": "uint256"
+                    },
+                    {
+                        "internalType": "uint256",
+                        "name": "borrowingFee",
+                        "type": "uint256"
+                    }
+                ],
+                "internalType": "struct IBBase.DebtTokenAmount[]",
+                "name": "_debtTokenAmounts",
+                "type": "tuple[]"
+            }
+        ],
+        "name": "testTroveManager_increaseTroveDebt",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "address",
                 "name": "newOwner",
                 "type": "address"
             }
