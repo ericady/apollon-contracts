@@ -2,6 +2,7 @@ import { ethers } from 'hardhat';
 import {
   CollTokenManager,
   DebtTokenManager,
+  MockERC20,
   MockPriceFeed,
   MockTroveManager,
   StabilityPoolManagerTester,
@@ -103,7 +104,7 @@ export const connectCoreContracts = async (contracts: Contracts) => {
 
 export const deployAndLinkToken = async (contracts: Contracts) => {
   const mockTokenFactory = await ethers.getContractFactory('MockERC20');
-  const BTC = await mockTokenFactory.deploy('Bitcoin', 'BTC', 9);
+  const BTC = await mockTokenFactory.deploy('Bitcoin', 'BTC', 18);
   const USDT = await mockTokenFactory.deploy('USDT', 'USDT', 18);
   // coll tokens
   contracts.collToken = {
@@ -111,8 +112,9 @@ export const deployAndLinkToken = async (contracts: Contracts) => {
     USDT,
   };
   await contracts.collTokenManager.addCollToken(USDT);
+  await contracts.priceFeed.setTokenPrice(USDT, parseUnits('1'));
   await contracts.collTokenManager.addCollToken(BTC);
-  await contracts.priceFeed.setTokenPrice(BTC, parseUnits('21000', 9));
+  await contracts.priceFeed.setTokenPrice(BTC, parseUnits('21000'));
 
   const mockDebtTokenFactory = await ethers.getContractFactory('MockDebtToken');
   const STABLE = await mockDebtTokenFactory.deploy(

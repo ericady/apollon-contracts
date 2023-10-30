@@ -76,16 +76,16 @@ describe('StoragePool', () => {
       });
 
       it('addValue(): increases the recorded token debt by the correct amount', async () => {
-        await borrowerOperations.testStoragePool_addValue(STABLE, false, 0, 100);
+        await borrowerOperations.testStoragePool_addValue(STABLE, false, 0, 100n);
 
         const tokenDebt_balanceAfter = await storagePool.getValue(STABLE, false, 0);
-        assert.equal(tokenDebt_balanceAfter, 100);
+        assert.equal(tokenDebt_balanceAfter, 100n);
       });
 
       it('addValue(): emits "PoolValueUpdated" event with expected arguments', async () => {
-        const tx = borrowerOperations.testStoragePool_addValue(STABLE, false, 0, 100);
+        const tx = borrowerOperations.testStoragePool_addValue(STABLE, false, 0, 100n);
 
-        await expect(tx).to.emit(storagePool, 'PoolValueUpdated').withArgs(STABLE.target, false, 0, 100);
+        await expect(tx).to.emit(storagePool, 'PoolValueUpdated').withArgs(STABLE.target, false, 0, 100n);
       });
     });
 
@@ -96,23 +96,23 @@ describe('StoragePool', () => {
 
       it('subtractValue() revert if the token does not yet have an entry', async () => {
         await assertRevert(
-          borrowerOperations.testStoragePool_subtractValue(STABLE, false, 0, 100),
+          borrowerOperations.testStoragePool_subtractValue(STABLE, false, 0, 100n),
           'StoragePool: PoolEntry does not exist'
         );
       });
 
       it('subtractValue(): decreases the recorded token debt by the correct amount', async () => {
         // First add anything to add default pool entry
-        await borrowerOperations.testStoragePool_addValue(STABLE, false, 0, 101);
-        await borrowerOperations.testStoragePool_subtractValue(STABLE, false, 0, 100);
+        await borrowerOperations.testStoragePool_addValue(STABLE, false, 0, 101n);
+        await borrowerOperations.testStoragePool_subtractValue(STABLE, false, 0, 100n);
 
         const tokenDebt_balanceAfter = await storagePool.getValue(STABLE, false, 0);
-        assert.equal(tokenDebt_balanceAfter, 1);
+        assert.equal(tokenDebt_balanceAfter, 1n);
       });
 
       it('subtractValue(): emits "PoolValueUpdated" event with expected arguments', async () => {
-        await borrowerOperations.testStoragePool_addValue(STABLE, false, 0, 101);
-        const tx = borrowerOperations.testStoragePool_subtractValue(STABLE, false, 0, 100);
+        await borrowerOperations.testStoragePool_addValue(STABLE, false, 0, 101n);
+        const tx = borrowerOperations.testStoragePool_subtractValue(STABLE, false, 0, 100n);
 
         await expect(tx).to.emit(storagePool, 'PoolValueUpdated').withArgs(STABLE.target, false, 0, 1);
       });
@@ -120,23 +120,23 @@ describe('StoragePool', () => {
 
     describe('withdrawalValue()', () => {
       it('withdrawalValue() revert if caller is neither borrowerOperationsAddress nor troveManagerAddress nor stabilityPoolManagerAddress for all _poolType', async () => {
-        await assertRevert(storagePool.withdrawalValue(alice, STABLE, false, 0, 1), 'NotFromBOorTroveMorSP');
+        await assertRevert(storagePool.withdrawalValue(alice, STABLE, false, 0, 1n), 'NotFromBOorTroveMorSP');
       });
 
       it('withdrawalValue() send token from the storagePool to Alice successfully', async () => {
         // Give storagePool some tokens
         await borrowerOperations.setDebtToken(STABLE);
-        await borrowerOperations.testDebtToken_mint(storagePool, 100);
+        await borrowerOperations.testDebtToken_mint(storagePool, 100n);
 
-        await borrowerOperations.testStoragePool_addValue(STABLE, false, 0, 100);
+        await borrowerOperations.testStoragePool_addValue(STABLE, false, 0, 100n);
 
-        await borrowerOperations.testStoragePool_withdrawalValue(alice, STABLE, false, 0, 30);
+        await borrowerOperations.testStoragePool_withdrawalValue(alice, STABLE, false, 0, 30n);
 
         const tokenDebt_balanceAfter = await storagePool.getValue(STABLE, false, 0);
-        assert.equal(tokenDebt_balanceAfter, 70);
+        assert.equal(tokenDebt_balanceAfter, 70n);
 
         const alice_balanceAfter = await STABLE.balanceOf(alice.address);
-        assert.equal(alice_balanceAfter, 30);
+        assert.equal(alice_balanceAfter, 30n);
       });
     });
 
@@ -144,13 +144,14 @@ describe('StoragePool', () => {
       it('getEntireSystemColl() should return 0 when no collTokens are there', async () => {
         const entireCollateral = await storagePool.getEntireSystemColl();
 
-        assert.equal(entireCollateral, 0);
+        assert.equal(entireCollateral, 0n);
       });
 
       it('getEntireSystemColl() should return the complete dollar value of all collateral tokens', async () => {
         const amount = ethers.parseEther('1.0');
 
         // add and remove value
+
         await borrowerOperations.testStoragePool_addValue(STABLE, true, 0, amount);
         await borrowerOperations.testStoragePool_subtractValue(STABLE, true, 0, amount);
 
@@ -173,7 +174,7 @@ describe('StoragePool', () => {
       it('getEntireSystemDebt() should return 0 when no collTokens are there', async () => {
         const entireCollateral = await storagePool.getEntireSystemDebt();
 
-        assert.equal(entireCollateral, 0);
+        assert.equal(entireCollateral, 0n);
       });
 
       it('getEntireSystemDebt() should return the complete dollar value of all debt tokens', async () => {
@@ -211,17 +212,17 @@ describe('StoragePool', () => {
 
       it('transferBetweenTypes(): exchanges the recorded token balance by the correct amount', async () => {
         // First add anything to add default pool entry
-        await borrowerOperations.testStoragePool_addValue(STABLE, false, 0, 100);
-        const tx = borrowerOperations.testStoragePool_transferBetweenTypes(STABLE, false, 0, 2, 10);
+        await borrowerOperations.testStoragePool_addValue(STABLE, false, 0, 100n);
+        const tx = borrowerOperations.testStoragePool_transferBetweenTypes(STABLE, false, 0, 2, 10n);
 
-        await expect(tx).to.emit(storagePool, 'PoolValueUpdated').withArgs(STABLE.target, false, 0, 90);
-        await expect(tx).to.emit(storagePool, 'PoolValueUpdated').withArgs(STABLE.target, false, 2, 10);
+        await expect(tx).to.emit(storagePool, 'PoolValueUpdated').withArgs(STABLE.target, false, 0, 90n);
+        await expect(tx).to.emit(storagePool, 'PoolValueUpdated').withArgs(STABLE.target, false, 2, 10n);
 
         const defaultPoolTokenDebt_balanceAfter = await storagePool.getValue(STABLE, false, 0);
-        assert.equal(defaultPoolTokenDebt_balanceAfter, 90);
+        assert.equal(defaultPoolTokenDebt_balanceAfter, 90n);
 
         const activePoolTokenDebt_balanceAfter = await storagePool.getValue(STABLE, false, 2);
-        assert.equal(activePoolTokenDebt_balanceAfter, 10);
+        assert.equal(activePoolTokenDebt_balanceAfter, 10n);
       });
     });
 
@@ -268,13 +269,13 @@ describe('StoragePool', () => {
     it('getValue(): gets the recorded token balance', async () => {
       const recordedTokenBalance = await storagePool.getValue(BTC, true, 0);
 
-      assert.equal(recordedTokenBalance, 0);
+      assert.equal(recordedTokenBalance, 0n);
     });
 
     it('getValue(): gets the recorded token debt', async () => {
       const recordedTokenDebt = await storagePool.getValue(STABLE, false, 0);
 
-      assert.equal(recordedTokenDebt, 0);
+      assert.equal(recordedTokenDebt, 0n);
     });
   });
 
@@ -282,42 +283,42 @@ describe('StoragePool', () => {
     it('getValue(): gets the recorded token balance', async () => {
       const recordedTokenBalance = await storagePool.getValue(BTC, true, 1);
 
-      assert.equal(recordedTokenBalance.toString(), '0');
+      assert.equal(recordedTokenBalance, 0n);
     });
 
     it('getValue(): gets the recorded token debt', async () => {
       const recordedTokenDebt = await storagePool.getValue(STABLE, false, 1);
 
-      assert.equal(recordedTokenDebt.toString(), '0');
+      assert.equal(recordedTokenDebt, 0n);
     });
 
     describe('Authenticated transactions as borrowerOperation', () => {
       it('addValue(): increases the recorded token debt by the correct amount', async () => {
-        await borrowerOperations.testStoragePool_addValue(STABLE, false, 1, 100);
+        await borrowerOperations.testStoragePool_addValue(STABLE, false, 1, 100n);
 
         const tokenDebt_balanceAfter = await storagePool.getValue(STABLE, false, 1);
-        assert.equal(tokenDebt_balanceAfter, 100);
+        assert.equal(tokenDebt_balanceAfter, 100n);
       });
 
       it('subtractValue(): decreases the recorded token balance by the correct amount', async () => {
         // First add anything to add default pool entry
-        await borrowerOperations.testStoragePool_addValue(STABLE, false, 1, 101);
-        await borrowerOperations.testStoragePool_subtractValue(STABLE, false, 1, 100);
+        await borrowerOperations.testStoragePool_addValue(STABLE, false, 1, 101n);
+        await borrowerOperations.testStoragePool_subtractValue(STABLE, false, 1, 100n);
 
         const tokenDebt_balanceAfter = await storagePool.getValue(STABLE, false, 1);
-        assert.equal(tokenDebt_balanceAfter, 1);
+        assert.equal(tokenDebt_balanceAfter, 1n);
       });
 
       it('transferBetweenTypes(): exchanges the recorded token balance by the correct amount', async () => {
         // First add anything to add default pool entry
-        await borrowerOperations.testStoragePool_addValue(STABLE, false, 1, 100);
-        await borrowerOperations.testStoragePool_transferBetweenTypes(STABLE, false, 1, 0, 10);
+        await borrowerOperations.testStoragePool_addValue(STABLE, false, 1, 100n);
+        await borrowerOperations.testStoragePool_transferBetweenTypes(STABLE, false, 1, 0, 10n);
 
         const defaultPoolTokenDebt_balanceAfter = await storagePool.getValue(STABLE, false, 1);
-        assert.equal(defaultPoolTokenDebt_balanceAfter, 90);
+        assert.equal(defaultPoolTokenDebt_balanceAfter, 90n);
 
         const activePoolTokenDebt_balanceAfter = await storagePool.getValue(STABLE, false, 0);
-        assert.equal(activePoolTokenDebt_balanceAfter, 10);
+        assert.equal(activePoolTokenDebt_balanceAfter, 10n);
       });
     });
   });
