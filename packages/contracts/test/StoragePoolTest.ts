@@ -12,8 +12,12 @@ import { Contracts, deployCore, connectCoreContracts, deployAndLinkToken } from 
 import { SignerWithAddress } from '@nomicfoundation/hardhat-ethers/signers';
 import { assertRevert } from '../utils/testHelper';
 import { assert, expect } from 'chai';
+import { parseUnits } from 'ethers';
 
 describe('StoragePool', () => {
+  const oneBTC = parseUnits('1', 9);
+  const oneSTABLE = parseUnits('1');
+
   let signers: SignerWithAddress[];
   let owner: SignerWithAddress;
   let alice: SignerWithAddress;
@@ -148,23 +152,20 @@ describe('StoragePool', () => {
       });
 
       it('getEntireSystemColl() should return the complete dollar value of all collateral tokens', async () => {
-        const amount = ethers.parseEther('1.0');
-
         // add and remove value
-
-        await borrowerOperations.testStoragePool_addValue(STABLE, true, 0, amount);
-        await borrowerOperations.testStoragePool_subtractValue(STABLE, true, 0, amount);
+        await borrowerOperations.testStoragePool_addValue(STABLE, true, 0, oneSTABLE);
+        await borrowerOperations.testStoragePool_subtractValue(STABLE, true, 0, oneSTABLE);
 
         // Should all be added up
-        await borrowerOperations.testStoragePool_addValue(STABLE, true, 1, amount);
-        await borrowerOperations.testStoragePool_addValue(STABLE, true, 2, amount);
-        await borrowerOperations.testStoragePool_addValue(BTC, true, 0, amount);
+        await borrowerOperations.testStoragePool_addValue(STABLE, true, 1, oneSTABLE);
+        await borrowerOperations.testStoragePool_addValue(STABLE, true, 2, oneSTABLE);
+        await borrowerOperations.testStoragePool_addValue(BTC, true, 0, oneBTC);
 
         // unrelated
-        await borrowerOperations.testStoragePool_addValue(STABLE, false, 0, amount);
+        await borrowerOperations.testStoragePool_addValue(STABLE, false, 0, oneSTABLE);
 
         const entireCollateral = await storagePool.getEntireSystemColl();
-        const twoStablesAndABitcoin = ethers.parseEther('21002');
+        const twoStablesAndABitcoin = parseUnits('21002');
 
         assert.equal(entireCollateral, twoStablesAndABitcoin);
       });
@@ -177,20 +178,18 @@ describe('StoragePool', () => {
         assert.equal(entireCollateral, 0n);
       });
 
-      it.only('getEntireSystemDebt() should return the complete dollar value of all debt tokens', async () => {
-        const amount = ethers.parseEther('1.0');
-
+      it('getEntireSystemDebt() should return the complete dollar value of all debt tokens', async () => {
         // Should all be added up
-        await borrowerOperations.testStoragePool_addValue(STABLE, false, 0, amount);
-        await borrowerOperations.testStoragePool_addValue(STABLE, false, 1, amount);
-        await borrowerOperations.testStoragePool_addValue(STABLE, false, 2, amount);
-        await borrowerOperations.testStoragePool_addValue(BTC, false, 0, amount);
+        await borrowerOperations.testStoragePool_addValue(STABLE, false, 0, oneSTABLE);
+        await borrowerOperations.testStoragePool_addValue(STABLE, false, 1, oneSTABLE);
+        await borrowerOperations.testStoragePool_addValue(STABLE, false, 2, oneSTABLE);
+        await borrowerOperations.testStoragePool_addValue(BTC, false, 0, oneBTC);
 
         // unrelated
-        await borrowerOperations.testStoragePool_addValue(STABLE, true, 0, amount);
+        await borrowerOperations.testStoragePool_addValue(STABLE, true, 0, oneSTABLE);
 
         const entireCollateral = await storagePool.getEntireSystemDebt();
-        const threeStablesAndABitcoin = ethers.parseEther('21003');
+        const threeStablesAndABitcoin = parseUnits('21003');
 
         assert.equal(entireCollateral, threeStablesAndABitcoin);
       });
@@ -198,9 +197,7 @@ describe('StoragePool', () => {
 
     describe('transferBetweenTypes()', () => {
       it('transferBetweenTypes() revert if caller is neither borrowerOperationsAddress nor troveManagerAddress nor stabilityPoolManagerAddress for all _poolType)', async () => {
-        const amount = ethers.parseEther('1.0');
-
-        await assertRevert(storagePool.transferBetweenTypes(BTC, false, 0, 1, amount), 'NotFromBOorTroveMorSP');
+        await assertRevert(storagePool.transferBetweenTypes(BTC, false, 0, 1, oneBTC), 'NotFromBOorTroveMorSP');
       });
 
       it('transferBetweenTypes() revert if the token does not yet have an entry', async () => {
@@ -228,38 +225,39 @@ describe('StoragePool', () => {
 
     describe('checkRecoveryMode()', () => {
       it('checkRecoveryMode(): returns false when enough collateral exists in the system', async () => {
-        const collateralAmount = ethers.parseEther('1.5');
+        const collateralAmount = parseUnits('1.5');
 
         // add twice the amount of debt as collateral to have exactly the border TCR
         await borrowerOperations.testStoragePool_addValue(STABLE, true, 0, collateralAmount);
         await borrowerOperations.testStoragePool_addValue(STABLE, true, 1, collateralAmount);
 
-        const systemDebtAmount = ethers.parseEther('2');
+        const systemDebtAmount = parseUnits('2');
         await borrowerOperations.testStoragePool_addValue(STABLE, false, 2, systemDebtAmount);
 
         const [isInRecoveryMode, TCR, entireSystemColl, entireSystemDebt] = await storagePool.checkRecoveryMode();
 
         assert.isFalse(isInRecoveryMode);
-        const expectedCollateralRatio = ethers.parseEther('1.5');
+        const expectedCollateralRatio = parseUnits('1.5');
         assert.equal(TCR, expectedCollateralRatio);
         assert.equal(entireSystemColl, collateralAmount + collateralAmount);
         assert.equal(entireSystemDebt, systemDebtAmount);
       });
 
       it('checkRecoveryMode(): returns true when not enough collateral exists in the system', async () => {
-        const collateralAmount = ethers.parseEther('1.5');
+        const collateralAmount = parseUnits('1.5');
 
         // add twice the amount of debt as collateral to have exactly the border TCR
         await borrowerOperations.testStoragePool_addValue(STABLE, true, 0, collateralAmount);
         await borrowerOperations.testStoragePool_addValue(STABLE, true, 1, collateralAmount);
 
-        const systemDebtAmount = ethers.parseEther('2.01');
+        const systemDebtAmount = parseUnits('2.01');
         await borrowerOperations.testStoragePool_addValue(STABLE, false, 2, systemDebtAmount);
 
         const [isInRecoveryMode, TCR, entireSystemColl, entireSystemDebt] = await storagePool.checkRecoveryMode();
 
         assert.isTrue(isInRecoveryMode);
-        const minimumCollateralRatio = ethers.parseEther('1.5');
+        const minimumCollateralRatio = parseUnits('1.5');
+        // @ts-ignore
         assert.isBelow(TCR, minimumCollateralRatio);
       });
     });

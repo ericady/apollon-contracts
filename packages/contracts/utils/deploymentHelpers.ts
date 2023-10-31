@@ -103,16 +103,11 @@ export const connectCoreContracts = async (contracts: Contracts) => {
 };
 
 export const deployAndLinkToken = async (contracts: Contracts) => {
+  // coll tokens
   const mockTokenFactory = await ethers.getContractFactory('MockERC20');
-  // FIXME: Should be: 18
-  // const BTC = await mockTokenFactory.deploy('Bitcoin', 'BTC', 18);
   const BTC = await mockTokenFactory.deploy('Bitcoin', 'BTC', 9);
   const USDT = await mockTokenFactory.deploy('USDT', 'USDT', 18);
-  // coll tokens
-  contracts.collToken = {
-    BTC,
-    USDT,
-  };
+  contracts.collToken = { BTC, USDT };
   await contracts.collTokenManager.addCollToken(USDT);
   await contracts.priceFeed.setTokenPrice(USDT, parseUnits('1'));
   await contracts.collTokenManager.addCollToken(BTC);
