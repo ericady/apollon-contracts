@@ -80,18 +80,13 @@ contract BorrowerOperationsTester is BorrowerOperations {
     storagePool.withdrawalValue(_receiver, _tokenAddress, _isColl, _poolType, _amount);
   }
 
-  // DEBTTOKEN POOL TESTER PROXIES
-  IDebtToken public debtToken;
+  // DEBTTOKEN TESTER PROXIES
 
-  function setDebtToken(IDebtToken _debtToken) external {
-    debtToken = _debtToken;
+  function testDebtToken_mint(address _account, uint256 _amount, IDebtToken _debtToken) external {
+    _debtToken.mint(_account, _amount);
   }
 
-  function testDebtToken_mint(address _account, uint256 _amount) external {
-    debtToken.mint(_account, _amount);
-  }
-
-  function testDebtToken_burn(address _account, uint256 _amount) external {
-    debtToken.burn(_account, _amount);
+  function testDebtToken_burn(address _account, uint256 _amount, IDebtToken _debtToken) external {
+    _debtToken.burn(_account, _amount);
   }
 }

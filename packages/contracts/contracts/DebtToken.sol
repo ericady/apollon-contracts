@@ -154,8 +154,8 @@ contract DebtToken is CheckContract, IDebtToken {
 
   function transferFrom(address sender, address recipient, uint256 amount) external override returns (bool) {
     _requireValidRecipient(recipient);
-    _transfer(sender, recipient, amount);
     _approve(sender, msg.sender, _allowances[sender][msg.sender] - amount);
+    _transfer(sender, recipient, amount);
     return true;
   }
 

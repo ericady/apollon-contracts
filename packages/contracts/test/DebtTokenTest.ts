@@ -18,7 +18,7 @@ const PERMIT_TYPEHASH = keccak256(
   toUtf8Bytes('Permit(address owner,address spender,uint256 value,uint256 nonce,uint256 deadline)')
 );
 
-describe('DebtToken', () => {
+describe.only('DebtToken', () => {
   let signers: SignerWithAddress[];
   let owner: SignerWithAddress;
   let alice: SignerWithAddress;
@@ -67,9 +67,6 @@ describe('DebtToken', () => {
     STABLE = contracts.debtToken.STABLE;
     STOCK = contracts.debtToken.STOCK;
     BTC = contracts.collToken.BTC;
-
-    await borrowerOperations.setDebtToken(STABLE);
-    await stabilityPoolManager.setDebtToken(STABLE);
   });
 
   const getDomainSeparator = (name: string, contractAddress: string, chainId: bigint, version: string) => {
@@ -121,7 +118,7 @@ describe('DebtToken', () => {
 
   it('balanceOf(): gets the balance of the account', async () => {
     // mint some debt tokens for alice
-    await borrowerOperations.testDebtToken_mint(alice, 1);
+    await borrowerOperations.testDebtToken_mint(alice, 1, STABLE);
 
     const aliceBalance = await STABLE.balanceOf(alice);
     assert.equal(aliceBalance, 1n);
@@ -132,8 +129,8 @@ describe('DebtToken', () => {
 
   it('totalSupply(): gets the total supply', async () => {
     // mint some debt tokens to increase total supply
-    await borrowerOperations.testDebtToken_mint(alice, 1);
-    await borrowerOperations.testDebtToken_mint(bob, 2);
+    await borrowerOperations.testDebtToken_mint(alice, 1, STABLE);
+    await borrowerOperations.testDebtToken_mint(bob, 2, STABLE);
 
     const totalSupply = await STABLE.totalSupply();
     assert.equal(totalSupply, 3n);
@@ -229,7 +226,7 @@ describe('DebtToken', () => {
     });
 
     it('transferFrom(): reverts if more is transfered than allowed', async () => {
-      await borrowerOperations.testDebtToken_mint(owner, 100);
+      await borrowerOperations.testDebtToken_mint(owner, 100, STABLE);
       await STABLE.approve(alice, 40);
 
       const tx = STABLE.connect(alice).transferFrom(owner, bob, 41);
@@ -238,7 +235,7 @@ describe('DebtToken', () => {
     });
 
     it('transferFrom(): successfully transfers from an account which is it approved to transfer from', async () => {
-      await borrowerOperations.testDebtToken_mint(owner, 100);
+      await borrowerOperations.testDebtToken_mint(owner, 100, STABLE);
       await STABLE.approve(alice, 100);
 
       const bobBalance_before = await STABLE.balanceOf(bob);
@@ -279,7 +276,7 @@ describe('DebtToken', () => {
     });
 
     it("transfer(): reverts if amount exceeds sender's balance", async () => {
-      await borrowerOperations.testDebtToken_mint(owner, 100);
+      await borrowerOperations.testDebtToken_mint(owner, 100, STABLE);
 
       const txPromise = STABLE.transfer(alice, 101);
 
@@ -287,7 +284,7 @@ describe('DebtToken', () => {
     });
 
     it("transfer(): increases the recipient's balance by the correct amount", async () => {
-      await borrowerOperations.testDebtToken_mint(owner, 100);
+      await borrowerOperations.testDebtToken_mint(owner, 100, STABLE);
 
       const aliceBalance_before = await STABLE.balanceOf(alice);
       assert.equal(aliceBalance_before, 0n);
@@ -302,7 +299,7 @@ describe('DebtToken', () => {
     });
 
     it('transfer(): emits "Transfer" event with expected arguments', async () => {
-      await borrowerOperations.testDebtToken_mint(owner, 40);
+      await borrowerOperations.testDebtToken_mint(owner, 40, STABLE);
 
       const tx = STABLE.transfer(alice, 40);
 
@@ -342,7 +339,7 @@ describe('DebtToken', () => {
       const alice_balanceBefore = await STABLE.balanceOf(alice);
       assert.equal(alice_balanceBefore, 0n);
 
-      await borrowerOperations.testDebtToken_mint(alice, 100);
+      await borrowerOperations.testDebtToken_mint(alice, 100, STABLE);
 
       const alice_balanceAfter = await STABLE.balanceOf(alice);
       assert.equal(alice_balanceAfter, 100n);
@@ -352,8 +349,8 @@ describe('DebtToken', () => {
       const totalSupply_before = await STABLE.totalSupply();
       assert.equal(totalSupply_before, 0n);
 
-      await borrowerOperations.testDebtToken_mint(alice, 100);
-      await borrowerOperations.testDebtToken_mint(bob, 50);
+      await borrowerOperations.testDebtToken_mint(alice, 100, STABLE);
+      await borrowerOperations.testDebtToken_mint(bob, 50, STABLE);
 
       const totalSupply_after = await STABLE.totalSupply();
       assert.equal(totalSupply_after, 150n);
@@ -366,13 +363,13 @@ describe('DebtToken', () => {
     });
 
     it('mint(): reverts if account is ZeroAddress', async () => {
-      const tx = borrowerOperations.testDebtToken_mint(ethers.ZeroAddress, 100);
+      const tx = borrowerOperations.testDebtToken_mint(ethers.ZeroAddress, 100, STABLE);
 
       await assertRevert(tx);
     });
 
     it('mint(): emits "Transfer" event with expected arguments', async () => {
-      const tx = borrowerOperations.testDebtToken_mint(alice, 100);
+      const tx = borrowerOperations.testDebtToken_mint(alice, 100, STABLE);
 
       await expect(tx).to.emit(STABLE, 'Transfer').withArgs(ethers.ZeroAddress, alice.address, 100);
     });
@@ -380,8 +377,8 @@ describe('DebtToken', () => {
 
   describe('burn()', () => {
     it('burn(): burns correct amount of tokens from the given address', async () => {
-      await borrowerOperations.testDebtToken_mint(alice, 100);
-      await borrowerOperations.testDebtToken_burn(alice, 70);
+      await borrowerOperations.testDebtToken_mint(alice, 100, STABLE);
+      await borrowerOperations.testDebtToken_burn(alice, 70, STABLE);
 
       const alice_BalanceAfter = await STABLE.balanceOf(alice);
       assert.equal(alice_BalanceAfter, 30n);
@@ -400,22 +397,22 @@ describe('DebtToken', () => {
     });
 
     it('burn(): reduces totalAmount incrementally', async () => {
-      await borrowerOperations.testDebtToken_mint(alice, 100);
-      await borrowerOperations.testDebtToken_mint(bob, 50);
+      await borrowerOperations.testDebtToken_mint(alice, 100, STABLE);
+      await borrowerOperations.testDebtToken_mint(bob, 50, STABLE);
 
       const totalSupply_before = await STABLE.totalSupply();
       assert.equal(totalSupply_before, 150n);
 
-      await borrowerOperations.testDebtToken_burn(alice, 50);
-      await borrowerOperations.testDebtToken_burn(bob, 25);
+      await borrowerOperations.testDebtToken_burn(alice, 50, STABLE);
+      await borrowerOperations.testDebtToken_burn(bob, 25, STABLE);
 
       const totalSupply_after = await STABLE.totalSupply();
       assert.equal(totalSupply_after, 75n);
     });
 
     it('burn(): emits "Transfer" event with expected arguments', async () => {
-      await borrowerOperations.testDebtToken_mint(alice, 100);
-      const tx = borrowerOperations.testDebtToken_burn(alice, 100);
+      await borrowerOperations.testDebtToken_mint(alice, 100, STABLE);
+      const tx = borrowerOperations.testDebtToken_burn(alice, 100, STABLE);
 
       await expect(tx).to.emit(STABLE, 'Transfer').withArgs(alice.address, ethers.ZeroAddress, 100);
     });
@@ -423,9 +420,9 @@ describe('DebtToken', () => {
 
   describe('sendToPool()', () => {
     it('sendToPool(): changes balances of Stability pool and user by the correct amounts', async () => {
-      await borrowerOperations.testDebtToken_mint(alice, 100);
+      await borrowerOperations.testDebtToken_mint(alice, 100, STABLE);
 
-      await stabilityPoolManager.testDebtToken_sendToPool(alice, bob, 75);
+      await stabilityPoolManager.testDebtToken_sendToPool(alice, bob, 75, STABLE);
 
       const alice_balanceAfter = await STABLE.balanceOf(alice);
       assert.equal(alice_balanceAfter, 25n);
@@ -463,7 +460,7 @@ describe('DebtToken', () => {
     assert.equal(alicesNonde, 0n);
   });
 
-  it.only('permits and emits an Approval event (replay protected)', async () => {
+  it('permit(): approval of owner from a third party', async () => {
     const tokenName = await STABLE.name();
     const version = await STABLE.version();
     const chainId = await STABLE.getChainId();
@@ -486,8 +483,84 @@ describe('DebtToken', () => {
     const signature = await alice.signMessage(ethers.toBeArray(digest));
     const { v, r, s } = Signature.from(signature);
 
-    await expect(STABLE.connect(alice).permit(alice, bob, value, deadline, v, r, s)).to.be.emit(STABLE, 'Approval');
+    await STABLE.permit(alice, bob, value, deadline, v, r, s);
+
+    const allowance = await STABLE.allowance(alice, bob);
+    assert.equal(allowance, value);
   });
 
-  // TODO: Add other permit tests once there is a usable signature.
+  it('permit() send approval event when successfull', async () => {
+    const tokenName = await STABLE.name();
+    const version = await STABLE.version();
+    const chainId = await STABLE.getChainId();
+    const nonce = await STABLE.nonces(alice);
+    const deadline = 100000000000000;
+    const value = 1n;
+
+    const digest = getPermitDigest(
+      tokenName,
+      STABLE.target.toString(),
+      chainId,
+      version,
+      alice.address,
+      bob.address,
+      value,
+      nonce,
+      deadline
+    );
+
+    const signature = await alice.signMessage(ethers.toBeArray(digest));
+    const { v, r, s } = Signature.from(signature);
+
+    const tx = STABLE.permit(alice, bob, value, deadline, v, r, s);
+
+    await expect(tx).to.emit(STABLE, 'Approval').withArgs(alice.address, bob.address, value);
+  });
+
+  it('permit() fails if deadline has been overdue', async () => {
+    const tokenName = await STABLE.name();
+    const version = await STABLE.version();
+    const chainId = await STABLE.getChainId();
+    const nonce = await STABLE.nonces(alice);
+    // Today as of writing this
+    const deadline = 1698383579;
+    const value = 1n;
+
+    const digest = getPermitDigest(
+      tokenName,
+      STABLE.target.toString(),
+      chainId,
+      version,
+      alice.address,
+      bob.address,
+      value,
+      nonce,
+      deadline
+    );
+
+    const signature = await alice.signMessage(ethers.toBeArray(digest));
+    const { v, r, s } = Signature.from(signature);
+
+    const tx = STABLE.permit(alice, bob, value, deadline, v, r, s);
+
+    await assertRevert(tx, 'ExpiredDeadline');
+  });
+
+  it('permit() fails if deadline has been overdue', async () => {
+    const deadline = 100000000000000;
+    const value = 1n;
+
+    const tx = STABLE.permit(
+      alice,
+      bob,
+      value,
+      deadline,
+      27,
+      // valid but malformed signature
+      '0xafea649b9689d61b6a59ebe3c72540f87832e02196315b9639ad05709e9f48bf',
+      '0x33fd2733ec25c13406ac7258cb526f208f2698a0774b20c42a4088684a2074f8'
+    );
+
+    await assertRevert(tx, 'InvalidSignature');
+  });
 });
