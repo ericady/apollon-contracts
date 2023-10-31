@@ -73,6 +73,8 @@ contract MockDebtToken is DebtToken {
   }
 
   function recoverAddress(bytes32 digest, uint8 v, bytes32 r, bytes32 s) external pure returns (address) {
-    return ecrecover(digest, v, r, s);
+    bytes32 signedMsg = ECDSA.toEthSignedMessageHash(digest);
+    address recoveredAddress = ECDSA.recover(signedMsg, v, r, s);
+    return recoveredAddress;
   }
 }

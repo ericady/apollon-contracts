@@ -12,7 +12,7 @@ import { Contracts, deployCore, connectCoreContracts, deployAndLinkToken } from 
 import { SignerWithAddress } from '@nomicfoundation/hardhat-ethers/signers';
 import { assertRevert } from '../utils/testHelper';
 import { assert, expect } from 'chai';
-import { AbiCoder, keccak256, toUtf8Bytes } from 'ethers';
+import { AbiCoder, Signature, keccak256, solidityPacked, toUtf8Bytes } from 'ethers';
 
 const PERMIT_TYPEHASH = keccak256(
   toUtf8Bytes('Permit(address owner,address spender,uint256 value,uint256 nonce,uint256 deadline)')
@@ -74,15 +74,13 @@ describe('DebtToken', () => {
 
   const getDomainSeparator = (name: string, contractAddress: string, chainId: bigint, version: string) => {
     const abiCoder = AbiCoder.defaultAbiCoder();
-    return ethers.keccak256(
+    return keccak256(
       abiCoder.encode(
         ['bytes32', 'bytes32', 'bytes32', 'uint256', 'address'],
         [
-          ethers.keccak256(
-            ethers.toUtf8Bytes('EIP712Domain(string name,string version,uint256 chainId,address verifyingContract)')
-          ),
-          ethers.keccak256(ethers.toUtf8Bytes(name)),
-          ethers.keccak256(ethers.toUtf8Bytes(version)),
+          keccak256(toUtf8Bytes('EIP712Domain(string name,string version,uint256 chainId,address verifyingContract)')),
+          keccak256(toUtf8Bytes(name)),
+          keccak256(toUtf8Bytes(version)),
           parseInt(chainId.toString()),
           contractAddress.toLowerCase(),
         ]
@@ -104,20 +102,13 @@ describe('DebtToken', () => {
     const abiCoder = AbiCoder.defaultAbiCoder();
     const DOMAIN_SEPARATOR = getDomainSeparator(name, address, chainId, version);
 
-    const defaultABIencoded = abiCoder.encode(
-      ['bytes32', 'address', 'address', 'uint256', 'uint256', 'uint256'],
-      [PERMIT_TYPEHASH, owner, spender, value, nonce, deadline]
-    );
-    console.log('defaultABIencoded', defaultABIencoded);
-
-    return ethers.keccak256(
-      ethers.solidityPacked(
-        ['bytes1', 'bytes1', 'bytes32', 'bytes32'],
+    return keccak256(
+      solidityPacked(
+        ['bytes2', 'bytes32', 'bytes32'],
         [
-          '0x19',
-          '0x01',
+          '0x1901',
           DOMAIN_SEPARATOR,
-          ethers.keccak256(
+          keccak256(
             abiCoder.encode(
               ['bytes32', 'address', 'address', 'uint256', 'uint256', 'uint256'],
               [PERMIT_TYPEHASH, owner, spender, value, nonce, deadline]
@@ -492,13 +483,10 @@ describe('DebtToken', () => {
       deadline
     );
 
-    const signature = await alice.signMessage(digest);
-    const r = signature.slice(0, 66);
-    const s = '0x' + signature.slice(66, 130);
-    const v = '0x' + signature.slice(130, 132);
+    const signature = await alice.signMessage(ethers.toBeArray(digest));
+    const { v, r, s } = Signature.from(signature);
 
-    const returnEncoded = await STABLE.testPermit(alice, bob, value, deadline, v, r, s);
-    console.log('returnEncoded', returnEncoded.data);
+    await expect(STABLE.connect(alice).permit(alice, bob, value, deadline, v, r, s)).to.be.emit(STABLE, 'Approval');
   });
 
   // TODO: Add other permit tests once there is a usable signature.
