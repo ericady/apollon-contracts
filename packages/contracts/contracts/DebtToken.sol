@@ -6,7 +6,6 @@ import '@openzeppelin/contracts/utils/cryptography/ECDSA.sol';
 import './Dependencies/CheckContract.sol';
 import './Interfaces/IDebtToken.sol';
 import './Interfaces/IPriceFeed.sol';
-import 'hardhat/console.sol';
 
 /*
  *
