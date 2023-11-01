@@ -95,4 +95,12 @@ contract BorrowerOperationsTester is BorrowerOperations {
   function testTroveManager_increaseTroveDebt(address _borrower, DebtTokenAmount[] memory _debtTokenAmounts) external {
     troveManager.increaseTroveDebt(_borrower, _debtTokenAmounts);
   }
+
+  function testTroveManager_setTroveStatus(address _borrower, uint _num) external {
+    troveManager.setTroveStatus(_borrower, _num);
+  }
+
+  function testTroveManager_closeTrove(address[] memory collTokenAddresses, address _borrower) external {
+    troveManager.closeTrove(collTokenAddresses, _borrower);
+  }
 }

@@ -1209,6 +1209,7 @@ contract TroveManager is LiquityBase, Ownable, CheckContract, ITroveManager {
 
       totalStakesSnapshot[tokenAddress] = totalStakes[tokenAddress];
 
+      // FIXME: This looks wrong. The value is arbitrarily high
       totalCollateralSnapshots[tokenAddress] =
         storagePool.getValue(tokenAddress, true, PoolType.Active) *
         storagePool.getValue(tokenAddress, true, PoolType.Default);

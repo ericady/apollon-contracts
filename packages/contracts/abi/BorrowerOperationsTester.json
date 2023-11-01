@@ -775,6 +775,24 @@
     {
         "inputs": [
             {
+                "internalType": "address[]",
+                "name": "collTokenAddresses",
+                "type": "address[]"
+            },
+            {
+                "internalType": "address",
+                "name": "_borrower",
+                "type": "address"
+            }
+        ],
+        "name": "testTroveManager_closeTrove",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
                 "internalType": "address",
                 "name": "_borrower",
                 "type": "address"
@@ -803,6 +821,24 @@
             }
         ],
         "name": "testTroveManager_increaseTroveDebt",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "address",
+                "name": "_borrower",
+                "type": "address"
+            },
+            {
+                "internalType": "uint256",
+                "name": "_num",
+                "type": "uint256"
+            }
+        ],
+        "name": "testTroveManager_setTroveStatus",
         "outputs": [],
         "stateMutability": "nonpayable",
         "type": "function"

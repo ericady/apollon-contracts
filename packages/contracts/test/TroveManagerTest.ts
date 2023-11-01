@@ -13,6 +13,7 @@ import { SignerWithAddress } from '@nomicfoundation/hardhat-ethers/signers';
 import { assertRevert, openTrove } from '../utils/testHelper';
 import { assert, expect } from 'chai';
 import { BigNumberish, parseEther, parseUnits } from 'ethers';
+import { parse } from 'typechain';
 
 describe.only('TroveManager', () => {
   let signers: SignerWithAddress[];
@@ -68,7 +69,6 @@ describe.only('TroveManager', () => {
     BTC = contracts.collToken.BTC;
     USDT = contracts.collToken.USDT;
 
-    await borrowerOperations.setDebtToken(STABLE);
     redemptionFee = await troveManager.REDEMPTION_FEE_FLOOR();
   });
 
@@ -139,12 +139,9 @@ describe.only('TroveManager', () => {
       const initialColl = parseEther('1000');
       const collToLiquidate = parseEther('400');
 
-      // Add enough coll to not enter recovery mode
       await borrowerOperations.testStoragePool_addValue(USDT, true, 0, initialColl);
-      // add value so that pool transfer can be made
       await borrowerOperations.testStoragePool_addValue(STABLE, false, 0, collToLiquidate);
 
-      // Add enough coll to not enter recovery mode
       await openTrove({
         from: alice,
         contracts,
@@ -170,7 +167,6 @@ describe.only('TroveManager', () => {
       const [isInRecoveryMode] = await storagePool.checkRecoveryMode();
       assert.isFalse(isInRecoveryMode);
 
-      // liquidate alice but spare bob
       await troveManager.liquidate(alice);
 
       const storageActivePool_After = await storagePool.getValue(USDT.target, true, 0);
@@ -184,9 +180,7 @@ describe.only('TroveManager', () => {
     it('liquidate(): increases DefaultPool ETH and LUSD debt by correct amounts', async () => {
       const collToLiquidate = parseEther('300');
 
-      // Add enough coll to not enter recovery mode
       await borrowerOperations.testStoragePool_addValue(USDT, true, 0, parseEther('1000'));
-      // add value so that pool transfer can be made
       await borrowerOperations.testStoragePool_addValue(STABLE, false, 0, collToLiquidate);
 
       await openTrove({
@@ -210,7 +204,6 @@ describe.only('TroveManager', () => {
       const defaultPool_Before = await storagePool.getValue(USDT.target, true, 1);
       assert.equal(defaultPool_Before, 0n);
 
-      // liquidate alice but spare bob
       await troveManager.liquidate(alice);
 
       const defaultPool_After = await storagePool.getValue(USDT.target, true, 1);
@@ -220,9 +213,7 @@ describe.only('TroveManager', () => {
     it("liquidate(): removes the Trove's stake from the total stakes", async () => {
       const collToLiquidate = parseEther('300');
 
-      // Add enough coll to not enter recovery mode
       await borrowerOperations.testStoragePool_addValue(USDT, true, 0, parseEther('1000'));
-      // add value so that pool transfer can be made
       await borrowerOperations.testStoragePool_addValue(STABLE, false, 0, collToLiquidate);
 
       await openTrove({
@@ -247,7 +238,6 @@ describe.only('TroveManager', () => {
       const stakes_Before = await troveManager.totalStakes(USDT.target);
       assert.equal(stakes_Before, collToLiquidate + bystandingColl);
 
-      // liquidate alice but spare bob
       await troveManager.liquidate(alice);
 
       const stakes_After = await troveManager.totalStakes(USDT.target);
@@ -257,9 +247,7 @@ describe.only('TroveManager', () => {
     it('liquidate(): Removes the correct trove from the TroveOwners array, and moves the last array element to the new empty slot', async () => {
       const collToLiquidate = parseEther('300');
 
-      // Add enough coll to not enter recovery mode
       await borrowerOperations.testStoragePool_addValue(USDT, true, 0, parseEther('1000'));
-      // add value so that pool transfer can be made
       await borrowerOperations.testStoragePool_addValue(STABLE, false, 0, collToLiquidate);
 
       await openTrove({
@@ -316,6 +304,266 @@ describe.only('TroveManager', () => {
 
       assert.equal(trove_0_after, bob.address);
       assert.equal(trove_1_after, carol.address);
+    });
+
+    it.only('liquidate(): updates the snapshots of total stakes and total collateral', async () => {
+      const collToLiquidate = parseEther('300');
+
+      await borrowerOperations.testStoragePool_addValue(USDT, true, 0, parseEther('1000'));
+      await borrowerOperations.testStoragePool_addValue(STABLE, false, 0, collToLiquidate);
+
+      await openTrove({
+        from: alice,
+        contracts,
+        collToken: USDT,
+        collAmount: collToLiquidate,
+      });
+
+      const bystandingColl = parseEther('300');
+      await openTrove({
+        from: bob,
+        contracts,
+        collToken: USDT,
+        collAmount: bystandingColl,
+      });
+
+      await borrowerOperations.testTroveManager_increaseTroveDebt(alice, [
+        { debtToken: STABLE.target, borrowingFee: parseEther('0.01'), netDebt: parseEther('300') },
+      ]);
+
+      const totalStakesSnapshot_Before = await troveManager.totalStakesSnapshot(USDT);
+      const totalCollateralSnapshot_Before = await troveManager.totalCollateralSnapshots(USDT);
+      // only updated after liquidation
+      assert.equal(totalStakesSnapshot_Before, 0n);
+      assert.equal(totalCollateralSnapshot_Before, 0n);
+
+      await troveManager.liquidate(alice);
+
+      const totalStakesSnapshot_After = await troveManager.totalStakesSnapshot(USDT);
+      const totalCollateralSnapshot_After = await troveManager.totalCollateralSnapshots(USDT);
+
+      assert.equal(totalStakesSnapshot_After, bystandingColl);
+      assert.equal(
+        totalCollateralSnapshot_After,
+        bystandingColl + collToLiquidate - (collToLiquidate * redemptionFee) / parseEther('1')
+      );
+    });
+
+    // TODO: Still testable?
+    it.skip('liquidate(): updates the L_ETH and L_LUSDDebt reward-per-unit-staked totals', async () => {});
+
+    // TODO: Useless test, has been tested and asserted before
+    it.skip('liquidate(): Liquidates undercollateralized trove if there are two troves in the system', async () => {});
+
+    it('liquidate(): reverts if trove is non-existent', async () => {
+      await borrowerOperations.testStoragePool_addValue(USDT, true, 0, parseEther('1000'));
+      await borrowerOperations.testStoragePool_addValue(STABLE, false, 0, parseEther('300'));
+
+      await openTrove({
+        from: alice,
+        contracts,
+        collToken: USDT,
+        collAmount: parseEther('300'),
+      });
+
+      await openTrove({
+        from: bob,
+        contracts,
+        collToken: USDT,
+        collAmount: parseEther('300'),
+      });
+
+      await borrowerOperations.testTroveManager_increaseTroveDebt(alice, [
+        { debtToken: STABLE.target, borrowingFee: parseEther('0.01'), netDebt: parseEther('300') },
+      ]);
+
+      await borrowerOperations.testTroveManager_setTroveStatus(alice, 0); // set trove non-existent
+
+      assert.equal(await troveManager.getTroveStatus(alice), 0n); // check trove non-existent
+
+      const tx = troveManager.liquidate(alice);
+
+      await assertRevert(tx, 'InvalidTrove');
+    });
+
+    it('liquidate(): reverts if trove is already closedByLiquidation', async () => {
+      await borrowerOperations.testStoragePool_addValue(USDT, true, 0, parseEther('1000'));
+      await borrowerOperations.testStoragePool_addValue(STABLE, false, 0, parseEther('300'));
+
+      await openTrove({
+        from: alice,
+        contracts,
+        collToken: USDT,
+        collAmount: parseEther('300'),
+      });
+
+      await openTrove({
+        from: bob,
+        contracts,
+        collToken: USDT,
+        collAmount: parseEther('300'),
+      });
+
+      await borrowerOperations.testTroveManager_increaseTroveDebt(alice, [
+        { debtToken: STABLE.target, borrowingFee: parseEther('0.01'), netDebt: parseEther('300') },
+      ]);
+
+      await borrowerOperations.testTroveManager_setTroveStatus(alice, 3); // set trove non-existent
+
+      assert.equal(await troveManager.getTroveStatus(alice), 3n); // check trove non-existent
+
+      const tx = troveManager.liquidate(alice);
+
+      await assertRevert(tx, 'InvalidTrove');
+    });
+
+    it('liquidate(): reverts if trove has been closed', async () => {
+      await borrowerOperations.testStoragePool_addValue(USDT, true, 0, parseEther('1000'));
+      await borrowerOperations.testStoragePool_addValue(STABLE, false, 0, parseEther('300'));
+
+      await openTrove({
+        from: alice,
+        contracts,
+        collToken: USDT,
+        collAmount: parseEther('300'),
+      });
+
+      await openTrove({
+        from: bob,
+        contracts,
+        collToken: USDT,
+        collAmount: parseEther('300'),
+      });
+
+      await borrowerOperations.testTroveManager_increaseTroveDebt(alice, [
+        { debtToken: STABLE.target, borrowingFee: parseEther('0.01'), netDebt: parseEther('300') },
+      ]);
+
+      await borrowerOperations.testTroveManager_closeTrove([USDT.target], alice);
+
+      assert.equal(await troveManager.getTroveStatus(alice), 2n); // check trove closedByOwner
+
+      const tx = troveManager.liquidate(alice);
+
+      await assertRevert(tx, 'InvalidTrove');
+    });
+
+    it('liquidate(): does nothing if trove has >= 110% ICR', async () => {
+      const debtUnderICR = parseEther('300');
+      const gasCompensation = parseEther('200');
+
+      await borrowerOperations.testStoragePool_addValue(USDT, true, 0, parseEther('1000'));
+      await borrowerOperations.testStoragePool_addValue(STABLE, false, 0, parseEther('300'));
+
+      await openTrove({
+        from: alice,
+        contracts,
+        collToken: USDT,
+        collAmount: ((debtUnderICR + gasCompensation) * parseEther('1.11')) / parseEther('1'),
+      });
+
+      await openTrove({
+        from: bob,
+        contracts,
+        collToken: USDT,
+        collAmount: parseEther('300'),
+      });
+
+      await borrowerOperations.testTroveManager_increaseTroveDebt(alice, [
+        { debtToken: STABLE.target, borrowingFee: parseEther('0.01'), netDebt: debtUnderICR },
+      ]);
+
+      await assertRevert(troveManager.liquidate(alice), 'NoLiquidatableTrove');
+    });
+
+    // TODO: Can not be tested because TCR doesnt exist anymore
+    it.skip('liquidate(): Given the same price and no other trove changes, complete Pool offsets restore the TCR to its value prior to the defaulters opening troves', async () => {});
+    it.skip('liquidate(): Pool offsets increase the TCR', async () => {});
+    it.skip('liquidate(): a pure redistribution reduces the TCR only as a result of compensation', async () => {});
+
+    it("liquidate(): does not affect the SP deposit or ETH gain when called on an SP depositor's address that has no trove", async () => {
+      await borrowerOperations.testStoragePool_addValue(USDT, true, 0, parseEther('1000'));
+      await borrowerOperations.testStoragePool_addValue(STABLE, false, 0, parseEther('300'));
+
+      await openTrove({
+        from: alice,
+        contracts,
+        collToken: USDT,
+        collAmount: parseEther('300'),
+      });
+
+      await openTrove({
+        from: bob,
+        contracts,
+        collToken: USDT,
+        collAmount: parseEther('300'),
+      });
+
+      await borrowerOperations.testTroveManager_increaseTroveDebt(alice, [
+        { debtToken: STABLE.target, borrowingFee: parseEther('0.01'), netDebt: parseEther('300') },
+      ]);
+
+      // Bob sends tokens to Dennis, who has no trove
+      await borrowerOperations.testDebtToken_mint(bob, parseEther('1000'), STABLE);
+      await STABLE.connect(bob).transfer(dennis, parseEther('500'));
+
+      //Dennis provides LUSD to SP
+      await stabilityPoolManager
+        .connect(dennis)
+        .provideStability([{ tokenAddress: STABLE.target, amount: parseEther('500') }]);
+
+      // Alice gets liquidated
+      await troveManager.liquidate(alice);
+
+      const [[, dennisCompoundedDeposits_Before]] = await stabilityPoolManager.connect(dennis).getCompoundedDeposits();
+
+      await assertRevert(troveManager.liquidate(dennis), 'InvalidTrove');
+      const [[, dennisCompoundedDeposits_After]] = await stabilityPoolManager.connect(dennis).getCompoundedDeposits();
+
+      assert.equal(dennisCompoundedDeposits_Before, dennisCompoundedDeposits_After);
+    });
+
+    it("liquidate(): liquidates a SP depositor's trove with ICR < 110%, and the liquidation correctly impacts their SP deposit and ETH gain", async () => {
+      const liquidatedDebt = parseEther('300');
+
+      await borrowerOperations.testStoragePool_addValue(USDT, true, 0, parseEther('1000'));
+      await borrowerOperations.testStoragePool_addValue(STABLE, false, 0, parseEther('300'));
+
+      await openTrove({
+        from: alice,
+        contracts,
+        collToken: USDT,
+        collAmount: parseEther('300'),
+      });
+
+      await openTrove({
+        from: bob,
+        contracts,
+        collToken: USDT,
+        collAmount: parseEther('300'),
+      });
+
+      await borrowerOperations.testTroveManager_increaseTroveDebt(alice, [
+        { debtToken: STABLE.target, borrowingFee: parseEther('0.01'), netDebt: liquidatedDebt },
+      ]);
+
+      // Bob sends tokens to Dennis, who has no trove
+      await borrowerOperations.testDebtToken_mint(carol, parseEther('1000'), STABLE);
+      await STABLE.connect(carol).transfer(alice, parseEther('500'));
+
+      //Dennis provides LUSD to SP
+
+      await stabilityPoolManager
+        .connect(alice)
+        .provideStability([{ tokenAddress: STABLE.target, amount: parseEther('500') }]);
+
+      const [[, aliceCompoundedDeposits_Before]] = await stabilityPoolManager.connect(alice).getCompoundedDeposits();
+
+      await troveManager.liquidate(alice);
+
+      const [[, aliceCompoundedDeposits_After]] = await stabilityPoolManager.connect(alice).getCompoundedDeposits();
+
+      assert.equal(aliceCompoundedDeposits_Before - liquidatedDebt, aliceCompoundedDeposits_After);
     });
   });
 });
