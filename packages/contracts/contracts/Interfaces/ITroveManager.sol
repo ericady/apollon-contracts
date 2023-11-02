@@ -30,7 +30,7 @@ interface ITroveManager is IBBase {
     TokenAmount[] liquidatedDebt,
     TokenAmount[] liquidatedColl,
     uint totalStableCoinGasCompensation,
-    uint totalCollGasCompensation
+    TokenAmount[] totalCollGasCompensation
   );
   event Redemption(uint _attemptedLUSDAmount, uint _actualLUSDAmount, uint _ETHSent, uint _ETHFee);
   event TroveUpdated(address indexed _borrower, uint _debt, uint _coll, uint _stake, TroveManagerOperation _operation);

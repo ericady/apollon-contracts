@@ -204,10 +204,22 @@
                 "type": "uint256"
             },
             {
+                "components": [
+                    {
+                        "internalType": "address",
+                        "name": "tokenAddress",
+                        "type": "address"
+                    },
+                    {
+                        "internalType": "uint256",
+                        "name": "amount",
+                        "type": "uint256"
+                    }
+                ],
                 "indexed": false,
-                "internalType": "uint256",
+                "internalType": "struct IBase.TokenAmount[]",
                 "name": "totalCollGasCompensation",
-                "type": "uint256"
+                "type": "tuple[]"
             }
         ],
         "name": "Liquidation",

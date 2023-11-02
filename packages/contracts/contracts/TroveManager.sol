@@ -85,7 +85,7 @@ contract TroveManager is LiquityBase, Ownable, CheckContract, ITroveManager {
 
   // stakes gets stored relative to the coll token, total stake needs to be calculated on runtime using token prices
   mapping(address => uint) public totalStakes; // [collTokenAddress] => total system stake, relative to the coll token
-  mapping(address => uint) public totalStakesSnapshot; // [collTokenAddress] => stake, taken immediately after the latest liquidation
+  mapping(address => uint) public totalStakesSnapshot; // [collTokenAddress] => system stake, taken immediately after the latest liquidation
   mapping(address => uint) public totalCollateralSnapshots; // [collTokenAddress] => Snapshot of the total collateral across the ActivePool and DefaultPool, immediately after the latest liquidation.
 
   /*
@@ -113,7 +113,10 @@ contract TroveManager is LiquityBase, Ownable, CheckContract, ITroveManager {
     //
     RemainingStability[] remainingStabilities;
     CAmount[] tokensToRedistribute;
-    uint totalStableCoinGasCompensation;
+    //
+    uint totalStableCoinGasCompensation; // paid out to the liquidator
+    TokenAmount[] totalCollGasCompensation; // paid out to the liquidator
+    //
     uint entireSystemCollInStable;
     uint entireSystemDebtInStable;
   }
@@ -275,9 +278,9 @@ contract TroveManager is LiquityBase, Ownable, CheckContract, ITroveManager {
       for (uint i = 0; i < troveAmountsIncludingRewards.length; i++) {
         RAmount memory rAmount = troveAmountsIncludingRewards[i];
         rAmount.toRedistribute = rAmount.toLiquidate;
+        // todo gas comp missing
       }
       _closeTrove(collTokenAddresses, _borrower, Status.closedByLiquidation);
-      // todo no coll gas comb in that case?
 
       // todo
       //      emit TroveLiquidated(
@@ -538,6 +541,7 @@ contract TroveManager is LiquityBase, Ownable, CheckContract, ITroveManager {
     // not liquidated
     if (vars.troveAmountsIncludingRewards.length == 0) return false;
 
+    _mergeCollGasCompensation(vars.troveAmountsIncludingRewards, outerVars.totalCollGasCompensation);
     _mergeTokensToRedistribute(vars.troveAmountsIncludingRewards, outerVars.tokensToRedistribute);
     outerVars.totalStableCoinGasCompensation += STABLE_COIN_GAS_COMPENSATION;
     return true;
@@ -564,6 +568,7 @@ contract TroveManager is LiquityBase, Ownable, CheckContract, ITroveManager {
       vars.troveAmountsIncludingRewards
     );
 
+    _mergeCollGasCompensation(vars.troveAmountsIncludingRewards, outerVars.totalCollGasCompensation);
     _mergeTokensToRedistribute(vars.troveAmountsIncludingRewards, outerVars.tokensToRedistribute);
     outerVars.totalStableCoinGasCompensation += STABLE_COIN_GAS_COMPENSATION;
     return true;
@@ -594,8 +599,11 @@ contract TroveManager is LiquityBase, Ownable, CheckContract, ITroveManager {
     address[] memory debtTokenAddresses = debtTokenManager.getDebtTokenAddresses();
 
     vars.tokensToRedistribute = new CAmount[](debtTokenAddresses.length + vars.collTokenAddresses.length);
-    for (uint i = 0; i < vars.collTokenAddresses.length; i++)
+    vars.totalCollGasCompensation = new TokenAmount[](vars.collTokenAddresses.length);
+    for (uint i = 0; i < vars.collTokenAddresses.length; i++) {
       vars.tokensToRedistribute[i] = CAmount(vars.collTokenAddresses[i], true, 0);
+      vars.totalCollGasCompensation[i] = TokenAmount(vars.collTokenAddresses[i], 0);
+    }
     for (uint i = 0; i < debtTokenAddresses.length; i++)
       vars.tokensToRedistribute[vars.collTokenAddresses.length + i] = CAmount(debtTokenAddresses[i], false, 0);
   }
@@ -610,9 +618,30 @@ contract TroveManager is LiquityBase, Ownable, CheckContract, ITroveManager {
       if (rAmount.toRedistribute == 0) continue;
 
       for (uint ib = 0; ib < tokensToRedistribute.length; ib++) {
-        if (tokensToRedistribute[ib].tokenAddress != rAmount.tokenAddress) continue;
+        if (
+          tokensToRedistribute[ib].tokenAddress != rAmount.tokenAddress ||
+          tokensToRedistribute[ib].isColl != rAmount.isColl
+        ) continue;
 
         tokensToRedistribute[ib].amount += rAmount.toRedistribute;
+        break;
+      }
+    }
+  }
+
+  // adding up the coll gas compensation
+  function _mergeCollGasCompensation(
+    RAmount[] memory troveAmountsIncludingRewards,
+    TokenAmount[] memory totalCollGasCompensation
+  ) internal pure {
+    for (uint i = 0; i < troveAmountsIncludingRewards.length; i++) {
+      RAmount memory rAmount = troveAmountsIncludingRewards[i];
+      if (rAmount.gasCompensation == 0 || !rAmount.isColl) continue;
+
+      for (uint ib = 0; ib < totalCollGasCompensation.length; ib++) {
+        if (totalCollGasCompensation[ib].tokenAddress != rAmount.tokenAddress) continue;
+
+        totalCollGasCompensation[ib].amount += rAmount.gasCompensation;
         break;
       }
     }
@@ -631,7 +660,7 @@ contract TroveManager is LiquityBase, Ownable, CheckContract, ITroveManager {
     _redistributeDebtAndColl(vars.collTokenAddresses, vars.tokensToRedistribute);
 
     // Update system snapshots
-    _updateSystemSnapshots_excludeCollRemainder(vars.collTokenAddresses);
+    _updateSystemSnapshots_excludeCollRemainder(vars.totalCollGasCompensation);
 
     // liquidation event
     TokenAmount[] memory liquidatedColl = new TokenAmount[](vars.collTokenAddresses.length);
@@ -656,25 +685,41 @@ contract TroveManager is LiquityBase, Ownable, CheckContract, ITroveManager {
       liquidatedDebt,
       liquidatedColl,
       vars.totalStableCoinGasCompensation,
-      0 // todo add coll gas comp
+      vars.totalCollGasCompensation
     );
 
     // Send gas compensation to caller
-    // todo what about the coll gas comp? where does that go?
-    _sendGasCompensation(msg.sender, vars.totalStableCoinGasCompensation);
+    _sendGasCompensation(msg.sender, vars.totalStableCoinGasCompensation, vars.totalCollGasCompensation);
   }
 
-  function _sendGasCompensation(address _liquidator, uint _stableCoinGasCompensation) internal {
-    if (_stableCoinGasCompensation == 0) return;
+  function _sendGasCompensation(
+    address _liquidator,
+    uint _stableCoinGasCompensation,
+    TokenAmount[] memory _collGasCompensation
+  ) internal {
+    // stable payout
+    if (_stableCoinGasCompensation != 0) {
+      IDebtToken stableCoin = debtTokenManager.getStableCoin();
+      storagePool.withdrawalValue(
+        _liquidator,
+        address(stableCoin),
+        false,
+        PoolType.GasCompensation,
+        _stableCoinGasCompensation
+      );
+    }
 
-    IDebtToken stableCoin = debtTokenManager.getStableCoin();
-    storagePool.withdrawalValue(
-      _liquidator,
-      address(stableCoin),
-      false,
-      PoolType.GasCompensation,
-      _stableCoinGasCompensation
-    );
+    // coll payout
+    for (uint i = 0; i < _collGasCompensation.length; i++) {
+      if (_collGasCompensation[i].amount == 0) continue;
+      storagePool.withdrawalValue(
+        _liquidator,
+        _collGasCompensation[i].tokenAddress,
+        true,
+        PoolType.Active,
+        _collGasCompensation[i].amount
+      );
+    }
   }
 
   // Move a Trove's pending debt and collateral rewards from distributions, from the Default Pool to the Active Pool
@@ -1103,10 +1148,10 @@ contract TroveManager is LiquityBase, Ownable, CheckContract, ITroveManager {
     for (uint i = 0; i < collTokenAddresses.length; i++) {
       address _collAddress = collTokenAddresses[i];
 
-      uint newStake;
+      uint newBorrowerCollStake;
       uint totalCollateralSnapshot = totalCollateralSnapshots[_collAddress];
       uint collAmount = Troves[_borrower].colls[_collAddress];
-      if (totalCollateralSnapshot == 0) newStake = collAmount;
+      if (totalCollateralSnapshot == 0) newBorrowerCollStake = collAmount;
       else {
         /*
          * The following assert() holds true because:
@@ -1116,13 +1161,12 @@ contract TroveManager is LiquityBase, Ownable, CheckContract, ITroveManager {
          */
         uint stakedSnapshot = totalStakesSnapshot[_collAddress];
         assert(stakedSnapshot > 0);
-        newStake = (collAmount * stakedSnapshot) / totalCollateralSnapshot;
+        newBorrowerCollStake = (collAmount * stakedSnapshot) / totalCollateralSnapshot;
       }
 
       uint oldStake = Troves[_borrower].stakes[_collAddress];
-      Troves[_borrower].stakes[_collAddress] = newStake;
-
-      totalStakes[_collAddress] = totalStakes[_collAddress] - oldStake + newStake;
+      Troves[_borrower].stakes[_collAddress] = newBorrowerCollStake;
+      totalStakes[_collAddress] = totalStakes[_collAddress] - oldStake + newBorrowerCollStake;
 
       // todo
       // emit TotalStakesUpdated(tokenAddress, totalStakes);
@@ -1203,19 +1247,19 @@ contract TroveManager is LiquityBase, Ownable, CheckContract, ITroveManager {
    * Updates snapshots of system total stakes and total collateral, excluding a given collateral remainder from the calculation.
    * Used in a liquidation sequence.
    */
-  function _updateSystemSnapshots_excludeCollRemainder(address[] memory collTokenAddresses) internal {
-    for (uint i = 0; i < collTokenAddresses.length; i++) {
-      address tokenAddress = collTokenAddresses[i];
+  function _updateSystemSnapshots_excludeCollRemainder(TokenAmount[] memory totalCollGasCompensation) internal {
+    // totalCollGasCompensation array included every available coll in the system, even if there is 0 gas compensation
+    for (uint i = 0; i < totalCollGasCompensation.length; i++) {
+      address tokenAddress = totalCollGasCompensation[i].tokenAddress;
 
       totalStakesSnapshot[tokenAddress] = totalStakes[tokenAddress];
-
-      // FIXME: This looks wrong. The value is arbitrarily high
       totalCollateralSnapshots[tokenAddress] =
-        storagePool.getValue(tokenAddress, true, PoolType.Active) *
-        storagePool.getValue(tokenAddress, true, PoolType.Default);
+        storagePool.getValue(tokenAddress, true, PoolType.Active) +
+        storagePool.getValue(tokenAddress, true, PoolType.Default) -
+        totalCollGasCompensation[i].amount;
 
       // todo
-      // emit SystemSnapshotsUpdated(tokenAddress, totalStakesSnapshot[tokenAddress], totalCollateralSnapshots[tokenAddress]); todo
+      // emit SystemSnapshotsUpdated(tokenAddress, totalStakesSnapshot[tokenAddress], totalCollateralSnapshots[tokenAddress]);
     }
   }
 

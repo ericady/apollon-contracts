@@ -668,6 +668,7 @@ contract BorrowerOperations is LiquityBase, Ownable, CheckContract, IBorrowerOpe
         _vars.entireSystemColl,
         _vars.entireSystemDebt
       );
+
       _requireNewTCRisAboveCCR(_vars.newTCR);
     }
   }
