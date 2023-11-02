@@ -15,7 +15,7 @@ import { assert, expect } from 'chai';
 import { BigNumberish, parseEther, parseUnits } from 'ethers';
 import { parse } from 'typechain';
 
-describe.only('TroveManager', () => {
+describe('TroveManager', () => {
   let signers: SignerWithAddress[];
   let owner: SignerWithAddress;
   let alice: SignerWithAddress;
@@ -306,7 +306,7 @@ describe.only('TroveManager', () => {
       assert.equal(trove_1_after, carol.address);
     });
 
-    it.only('liquidate(): updates the snapshots of total stakes and total collateral', async () => {
+    it('liquidate(): updates the snapshots of total stakes and total collateral', async () => {
       const collToLiquidate = parseUnits('1000');
       await openTrove({
         from: alice,

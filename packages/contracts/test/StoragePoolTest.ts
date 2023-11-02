@@ -129,7 +129,6 @@ describe('StoragePool', () => {
 
       it('withdrawalValue() send token from the storagePool to Alice successfully', async () => {
         // Give storagePool some tokens
-        await borrowerOperations.setDebtToken(STABLE);
         await borrowerOperations.testDebtToken_mint(storagePool, 100n, STABLE);
 
         await borrowerOperations.testStoragePool_addValue(STABLE, false, 0, 100n);

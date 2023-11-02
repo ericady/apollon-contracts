@@ -290,16 +290,13 @@ contract BorrowerOperations is LiquityBase, Ownable, CheckContract, IBorrowerOpe
 
     _requireValidMaxFeePercentage(_maxFeePercentage, vars.isInRecoveryMode);
 
+    // checking if new debt is above the minimum
+    for (uint i = 0; i < _debts.length; i++) _requireNonZeroDebtChange(_debts[i].amount);
+
     (
       DebtTokenAmount[] memory addedDebts,
       DebtTokenAmount memory stableCoinAmount
     ) = _getDebtTokenAmountsWithFetchedPrices(contractsCache.debtTokenManager, _debts);
-
-    // checking if new debt is above the minimum
-    for (uint i = 0; i < addedDebts.length; i++) {
-      _requireNonZeroDebtChange(_debts[i].amount);
-      _requireAtLeastMinNetDebt(addedDebts[i].netDebt);
-    }
 
     // adding the borrowing fee to the net debt
     uint borrowingFeesPaid = 0;
@@ -617,8 +614,8 @@ contract BorrowerOperations is LiquityBase, Ownable, CheckContract, IBorrowerOpe
     return (debtTokenAmounts, stableCoinEntry);
   }
 
-  function _requireNonZeroDebtChange(uint _LUSDChange) internal pure {
-    if (_LUSDChange == 0) revert ZeroDebtChange();
+  function _requireNonZeroDebtChange(uint _change) internal pure {
+    if (_change == 0) revert ZeroDebtChange();
   }
 
   //  function _requireNotInRecoveryMode(PriceCache memory _priceCache) internal {

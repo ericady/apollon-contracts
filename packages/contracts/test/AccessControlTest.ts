@@ -71,7 +71,7 @@ describe('Access Control: Apollon functions with the caller restricted to Apollo
 
     // updateRewardSnapshots
     it('updateRewardSnapshots(): reverts when called by an account that is not BorrowerOperations', async () => {
-      await expect(troveManager.updateTroveRewardSnapshots([], bob)).to.be.revertedWithCustomError(
+      await expect(troveManager.updateTroveRewardSnapshots(bob)).to.be.revertedWithCustomError(
         troveManager,
         'NotFromBorrowerOps'
       );
@@ -229,11 +229,12 @@ describe('Access Control: Apollon functions with the caller restricted to Apollo
     // });
 
     // returnFromPool
-    it('returnFromPool(): reverts when called by an account that is not TroveManager nor StabilityPool', async () => {
-      await expect(stableDebt.returnFromPool(storagePool, bob, 100)).to.be.revertedWithCustomError(
-        stableDebt,
-        'NotFromTroveMorSP'
-      );
-    });
+    // removed function
+    // it('returnFromPool(): reverts when called by an account that is not TroveManager nor StabilityPool', async () => {
+    //   await expect(stableDebt.returnFromPool(storagePool, bob, 100)).to.be.revertedWithCustomError(
+    //     stableDebt,
+    //     'NotFromTroveMorSP'
+    //   );
+    // });
   });
 });

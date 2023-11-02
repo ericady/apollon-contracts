@@ -23,7 +23,7 @@ import {
 } from '../utils/testHelper';
 import { parseUnits } from 'ethers';
 
-describe('StabilityPool', () => {
+describe.only('StabilityPool', () => {
   let signers: SignerWithAddress[];
   let owner: SignerWithAddress;
   let alice: SignerWithAddress;
