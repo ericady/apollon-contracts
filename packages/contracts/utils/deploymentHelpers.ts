@@ -105,13 +105,15 @@ export const connectCoreContracts = async (contracts: Contracts) => {
 export const deployAndLinkToken = async (contracts: Contracts) => {
   const mockTokenFactory = await ethers.getContractFactory('MockERC20');
   const BTC = await mockTokenFactory.deploy('Bitcoin', 'BTC', 9);
-  const USDT = await mockTokenFactory.deploy('USDT', 'USDT', 18);
-  // coll tokens
-  contracts.collToken = { BTC, USDT };
-  await contracts.collTokenManager.addCollToken(USDT);
-  await contracts.priceFeed.setTokenPrice(USDT, parseUnits('1'));
   await contracts.collTokenManager.addCollToken(BTC);
   await contracts.priceFeed.setTokenPrice(BTC, parseUnits('21000'));
+
+  const USDT = await mockTokenFactory.deploy('USDT', 'USDT', 18);
+  await contracts.collTokenManager.addCollToken(USDT);
+  await contracts.priceFeed.setTokenPrice(USDT, parseUnits('1'));
+
+  // coll tokens
+  contracts.collToken = { BTC, USDT };
 
   const mockDebtTokenFactory = await ethers.getContractFactory('MockDebtToken');
   const STABLE = await mockDebtTokenFactory.deploy(
@@ -124,6 +126,9 @@ export const deployAndLinkToken = async (contracts: Contracts) => {
     '1',
     true
   );
+  await contracts.debtTokenManager.addDebtToken(STABLE);
+  await contracts.priceFeed.setTokenPrice(STABLE, parseUnits('1'));
+
   const STOCK = await mockDebtTokenFactory.deploy(
     contracts.troveManager,
     contracts.borrowerOperations,
@@ -134,16 +139,11 @@ export const deployAndLinkToken = async (contracts: Contracts) => {
     '1',
     false
   );
-
-  // debt tokens
-  contracts.debtToken = {
-    STABLE,
-    STOCK,
-  };
-  await contracts.debtTokenManager.addDebtToken(STABLE);
   await contracts.debtTokenManager.addDebtToken(STOCK);
   await contracts.priceFeed.setTokenPrice(STOCK, parseUnits('150'));
-  await contracts.priceFeed.setTokenPrice(STABLE, parseUnits('1'));
+
+  // debt tokens
+  contracts.debtToken = { STABLE, STOCK };
 };
 
 // class DeploymentHelper {

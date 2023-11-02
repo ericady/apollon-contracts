@@ -307,19 +307,16 @@ describe.only('TroveManager', () => {
     });
 
     it.only('liquidate(): updates the snapshots of total stakes and total collateral', async () => {
-      const collToLiquidate = parseEther('300');
-
-      await borrowerOperations.testStoragePool_addValue(USDT, true, 0, parseEther('1000'));
-      await borrowerOperations.testStoragePool_addValue(STABLE, false, 0, collToLiquidate);
-
+      const collToLiquidate = parseUnits('1000');
       await openTrove({
         from: alice,
         contracts,
         collToken: USDT,
         collAmount: collToLiquidate,
+        debts: [{ tokenAddress: STABLE, amount: parseUnits('300') }],
       });
 
-      const bystandingColl = parseEther('300');
+      const bystandingColl = parseUnits('300');
       await openTrove({
         from: bob,
         contracts,
@@ -327,26 +324,31 @@ describe.only('TroveManager', () => {
         collAmount: bystandingColl,
       });
 
-      await borrowerOperations.testTroveManager_increaseTroveDebt(alice, [
-        { debtToken: STABLE.target, borrowingFee: parseEther('0.01'), netDebt: parseEther('300') },
-      ]);
-
+      const totalStakes_Before = await troveManager.totalStakes(USDT);
       const totalStakesSnapshot_Before = await troveManager.totalStakesSnapshot(USDT);
       const totalCollateralSnapshot_Before = await troveManager.totalCollateralSnapshots(USDT);
-      // only updated after liquidation
+      assert.equal(totalStakes_Before, collToLiquidate + bystandingColl);
       assert.equal(totalStakesSnapshot_Before, 0n);
       assert.equal(totalCollateralSnapshot_Before, 0n);
 
+      // drop the USDT price by 80% and liquidates alice
+      await priceFeed.setTokenPrice(USDT, parseUnits('0.2'));
       await troveManager.liquidate(alice);
 
+      const totalStakes_After = await troveManager.totalStakes(USDT);
       const totalStakesSnapshot_After = await troveManager.totalStakesSnapshot(USDT);
       const totalCollateralSnapshot_After = await troveManager.totalCollateralSnapshots(USDT);
-
+      assert.equal(totalStakes_After, bystandingColl);
       assert.equal(totalStakesSnapshot_After, bystandingColl);
       assert.equal(
         totalCollateralSnapshot_After,
-        bystandingColl + collToLiquidate - (collToLiquidate * redemptionFee) / parseEther('1')
+        bystandingColl + collToLiquidate - (collToLiquidate * redemptionFee) / parseUnits('1')
       );
+
+      const activeUSDT = await storagePool.getValue(USDT, true, 0);
+      const defaultUSDT = await storagePool.getValue(USDT, true, 1);
+      assert.equal(activeUSDT, bystandingColl);
+      assert.equal(defaultUSDT, collToLiquidate - (collToLiquidate * redemptionFee) / parseEther('1'));
     });
 
     // TODO: Still testable?
