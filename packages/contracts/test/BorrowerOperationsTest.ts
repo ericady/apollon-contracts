@@ -1440,7 +1440,7 @@ describe('BorrowerOperations', () => {
     expect(baseRate_2).to.be.lt(baseRate_1);
   });
   // TODO: Take care after staking enabled
-  // it('withdrawLUSD(): borrowing at non-zero base rate sends LUSD fee to LQTY staking contract', async () => {
+  // it('increaseDebt(): borrowing at non-zero base rate sends LUSD fee to LQTY staking contract', async () => {
   //   // time fast-forwards 1 year, and multisig stakes 1 LQTY
   //   await th.fastForwardTime(timeValues.SECONDS_IN_ONE_YEAR, web3.currentProvider);
   //   await lqtyToken.approve(lqtyStaking.address, dec(1, 18), {
@@ -1486,7 +1486,7 @@ describe('BorrowerOperations', () => {
   //   th.fastForwardTime(7200, web3.currentProvider);
 
   //   // D withdraws LUSD
-  //   await borrowerOperations.withdrawLUSD(th._100pct, dec(37, 18), C, C, {
+  //   await borrowerOperations.increaseDebt(th._100pct, dec(37, 18), C, C, {
   //     from: D,
   //   });
 
@@ -1497,7 +1497,7 @@ describe('BorrowerOperations', () => {
 
   // if (!withProxy) {
   //   // TODO: use rawLogs instead of logs
-  //   it('withdrawLUSD(): borrowing at non-zero base records the (drawn debt + fee) on the Trove struct', async () => {
+  //   it('increaseDebt(): borrowing at non-zero base records the (drawn debt + fee) on the Trove struct', async () => {
   //     // time fast-forwards 1 year, and multisig stakes 1 LQTY
   //     await th.fastForwardTime(timeValues.SECONDS_IN_ONE_YEAR, web3.currentProvider);
   //     await lqtyToken.approve(lqtyStaking.address, dec(1, 18), {
@@ -1544,7 +1544,7 @@ describe('BorrowerOperations', () => {
 
   //     // D withdraws LUSD
   //     const withdrawal_D = toBN(dec(37, 18));
-  //     const withdrawalTx = await borrowerOperations.withdrawLUSD(th._100pct, toBN(dec(37, 18)), D, D, { from: D });
+  //     const withdrawalTx = await borrowerOperations.increaseDebt(th._100pct, toBN(dec(37, 18)), D, D, { from: D });
 
   //     const emittedFee = toBN(th.getLUSDFeeFromLUSDBorrowingEvent(withdrawalTx));
   //     assert.isTrue(emittedFee.gt(toBN('0')));
@@ -1555,7 +1555,7 @@ describe('BorrowerOperations', () => {
   //     th.assertIsApproximatelyEqual(newDebt, D_debtBefore.add(withdrawal_D).add(emittedFee), 10000);
   //   });
   // }
-  // it('withdrawLUSD(): Borrowing at non-zero base rate increases the LQTY staking contract LUSD fees-per-unit-staked', async () => {
+  // it('increaseDebt(): Borrowing at non-zero base rate increases the LQTY staking contract LUSD fees-per-unit-staked', async () => {
   //   // time fast-forwards 1 year, and multisig stakes 1 LQTY
   //   await th.fastForwardTime(timeValues.SECONDS_IN_ONE_YEAR, web3.currentProvider);
   //   await lqtyToken.approve(lqtyStaking.address, dec(1, 18), {
@@ -1601,14 +1601,14 @@ describe('BorrowerOperations', () => {
   //   th.fastForwardTime(7200, web3.currentProvider);
 
   //   // D withdraws LUSD
-  //   await borrowerOperations.withdrawLUSD(th._100pct, toBN(dec(37, 18)), D, D, { from: D });
+  //   await borrowerOperations.increaseDebt(th._100pct, toBN(dec(37, 18)), D, D, { from: D });
 
   //   // Check LQTY contract LUSD fees-per-unit-staked has increased
   //   const F_LUSD_After = await lqtyStaking.F_LUSD();
   //   assert.isTrue(F_LUSD_After.gt(F_LUSD_Before));
   // });
 
-  // it('withdrawLUSD(): Borrowing at non-zero base rate sends requested amount to the user', async () => {
+  // it('increaseDebt(): Borrowing at non-zero base rate sends requested amount to the user', async () => {
   //   // time fast-forwards 1 year, and multisig stakes 1 LQTY
   //   await th.fastForwardTime(timeValues.SECONDS_IN_ONE_YEAR, web3.currentProvider);
   //   await lqtyToken.approve(lqtyStaking.address, dec(1, 18), {
@@ -1657,7 +1657,7 @@ describe('BorrowerOperations', () => {
 
   //   // D withdraws LUSD
   //   const D_LUSDRequest = toBN(dec(37, 18));
-  //   await borrowerOperations.withdrawLUSD(th._100pct, D_LUSDRequest, D, D, {
+  //   await borrowerOperations.increaseDebt(th._100pct, D_LUSDRequest, D, D, {
   //     from: D,
   //   });
 
@@ -1670,7 +1670,7 @@ describe('BorrowerOperations', () => {
   //   assert.isTrue(D_LUSDBalanceAfter.eq(D_LUSDBalanceBefore.add(D_LUSDRequest)));
   // });
 
-  // it('withdrawLUSD(): Borrowing at zero base rate changes LUSD fees-per-unit-staked', async () => {
+  // it('increaseDebt(): Borrowing at zero base rate changes LUSD fees-per-unit-staked', async () => {
   //   await openTrove({ ICR: toBN(dec(10, 18)), extraParams: { from: whale } });
   //   await openTrove({
   //     extraLUSDAmount: toBN(dec(30, 18)),
@@ -1709,7 +1709,7 @@ describe('BorrowerOperations', () => {
   //   assert.equal(F_LUSD_Before, '0');
 
   //   // D withdraws LUSD
-  //   await borrowerOperations.withdrawLUSD(th._100pct, dec(37, 18), D, D, {
+  //   await borrowerOperations.increaseDebt(th._100pct, dec(37, 18), D, D, {
   //     from: D,
   //   });
 
@@ -1718,7 +1718,7 @@ describe('BorrowerOperations', () => {
   //   assert.isTrue(F_LUSD_After.gt('0'));
   // });
 
-  // it('withdrawLUSD(): Borrowing at zero base rate sends debt request to user', async () => {
+  // it('increaseDebt(): Borrowing at zero base rate sends debt request to user', async () => {
   //   await openTrove({ ICR: toBN(dec(10, 18)), extraParams: { from: whale } });
   //   await openTrove({
   //     extraLUSDAmount: toBN(dec(30, 18)),
@@ -1752,7 +1752,7 @@ describe('BorrowerOperations', () => {
 
   //   // D withdraws LUSD
   //   const D_LUSDRequest = toBN(dec(37, 18));
-  //   await borrowerOperations.withdrawLUSD(th._100pct, dec(37, 18), D, D, {
+  //   await borrowerOperations.increaseDebt(th._100pct, dec(37, 18), D, D, {
   //     from: D,
   //   });
 
@@ -1803,7 +1803,6 @@ describe('BorrowerOperations', () => {
       )
     ).to.be.revertedWithCustomError(borrowerOperations, 'TroveClosedOrNotExist');
   });
-
   it('increaseDebt(): reverts when requested withdrawal amount is zero LUSD', async () => {
     await openTrove({
       from: alice,
@@ -1843,5 +1842,203 @@ describe('BorrowerOperations', () => {
         _100pct
       )
     ).to.be.revertedWithCustomError(borrowerOperations, 'ZeroDebtChange');
+  });
+  it('increaseDebt(): reverts when system is in Recovery Mode', async () => {
+    await openTrove({
+      from: alice,
+      contracts,
+      collToken: BTC,
+      collAmount: parseUnits('1', 9),
+      debts: [{ tokenAddress: STABLE, amount: parseUnits('10000') }],
+    });
+    await openTrove({
+      from: bob,
+      contracts,
+      collToken: BTC,
+      collAmount: parseUnits('2', 9),
+      debts: [{ tokenAddress: STABLE, amount: parseUnits('20000') }],
+    });
+
+    expect(await checkRecoveryMode(contracts)).to.be.false;
+
+    // Withdrawal possible when recoveryMode == false
+    await borrowerOperations.connect(alice).increaseDebt(
+      [
+        {
+          tokenAddress: STABLE,
+          amount: parseUnits('100'),
+        },
+      ],
+      _100pct
+    );
+
+    await priceFeed.setTokenPrice(BTC, parseUnits('100'));
+
+    expect(await checkRecoveryMode(contracts)).to.be.true;
+
+    //Check LUSD withdrawal impossible when recoveryMode == true
+    await expect(
+      borrowerOperations.connect(alice).increaseDebt(
+        [
+          {
+            tokenAddress: STABLE,
+            amount: 1,
+          },
+        ],
+        _100pct
+      )
+    ).to.be.revertedWithCustomError(borrowerOperations, 'ICR_lt_CCR');
+  });
+  it("increaseDebt(): reverts when withdrawal would bring the trove's ICR < MCR", async () => {
+    await openTrove({
+      from: alice,
+      contracts,
+      collToken: BTC,
+      collAmount: parseUnits('1', 9),
+      debts: [{ tokenAddress: STABLE, amount: parseUnits('10000') }],
+    });
+    await openTrove({
+      from: bob,
+      contracts,
+      collToken: BTC,
+      collAmount: parseUnits('2', 9),
+      debts: [{ tokenAddress: STABLE, amount: parseUnits('20000') }],
+    });
+    // await openTrove({ ICR: toBN(dec(10, 18)), extraParams: { from: alice } });
+    // await openTrove({ ICR: toBN(dec(11, 17)), extraParams: { from: bob } });
+
+    // Bob tries to withdraw LUSD that would bring his ICR < MCR
+    await expect(
+      borrowerOperations.connect(bob).increaseDebt(
+        [
+          {
+            tokenAddress: STABLE,
+            amount: parseUnits('20000'),
+          },
+        ],
+        _100pct
+      )
+    ).to.be.revertedWithCustomError(borrowerOperations, 'ICR_lt_MCR');
+  });
+  it('increaseDebt(): reverts when a withdrawal would cause the TCR of the system to fall below the CCR', async () => {
+    // Alice and Bob creates troves with 150% ICR.  System TCR = 150%.
+    await openTrove({
+      from: alice,
+      contracts,
+      collToken: BTC,
+      collAmount: parseUnits('1', 9),
+      debts: [{ tokenAddress: STABLE, amount: parseUnits('13700') }],
+    });
+    await openTrove({
+      from: bob,
+      contracts,
+      collToken: BTC,
+      collAmount: parseUnits('1', 9),
+      debts: [{ tokenAddress: STABLE, amount: parseUnits('13700') }],
+    });
+
+    // TCR close to 150%
+    const TCR = await getTCR(contracts);
+    expect(TCR).to.be.closeTo(parseUnits('1.5'), parseUnits('0.005'));
+
+    // Bob attempts to withdraw 1 LUSD and system TCR would be lower than CCR of 150%.
+    await expect(
+      borrowerOperations.connect(bob).increaseDebt([{ tokenAddress: STABLE, amount: parseUnits('100') }], _100pct)
+    ).to.be.revertedWithCustomError(borrowerOperations, 'TCR_lt_CCR');
+  });
+  it('increaseDebt(): reverts if system is in Recovery Mode', async () => {
+    // --- SETUP ---
+    await openTrove({
+      from: alice,
+      contracts,
+      collToken: BTC,
+      collAmount: parseUnits('1', 9),
+      debts: [{ tokenAddress: STABLE, amount: parseUnits('13700') }],
+    });
+    await openTrove({
+      from: bob,
+      contracts,
+      collToken: BTC,
+      collAmount: parseUnits('1', 9),
+      debts: [{ tokenAddress: STABLE, amount: parseUnits('13700') }],
+    });
+
+    // --- TEST ---
+
+    // price drops to 1ETH:150LUSD, reducing TCR below 150%
+    await priceFeed.setTokenPrice(BTC, parseUnits('150'));
+    expect(await getTCR(contracts)).to.be.lt(parseUnits('1.5'));
+    expect(await checkRecoveryMode(contracts)).to.be.true;
+
+    await expect(
+      borrowerOperations.connect(alice).increaseDebt([{ tokenAddress: STABLE, amount: parseUnits('200') }], _100pct)
+    ).to.be.revertedWithCustomError(borrowerOperations, 'ICR_lt_CCR');
+  });
+  it("increaseDebt(): increases the Trove's LUSD debt by the correct amount", async () => {
+    await openTrove({
+      from: alice,
+      contracts,
+      collToken: BTC,
+      collAmount: parseUnits('1', 9),
+      debts: [{ tokenAddress: STABLE, amount: parseUnits('10000') }],
+    });
+
+    // check before
+    const aliceDebtBefore = await getTroveEntireDebt(contracts, alice);
+    expect(aliceDebtBefore).to.be.gt(0n);
+
+    await borrowerOperations
+      .connect(alice)
+      .increaseDebt([{ tokenAddress: STABLE, amount: parseUnits('100') }], _100pct);
+
+    // check after
+    const aliceDebtAfter = await getTroveEntireDebt(contracts, alice);
+    expect(aliceDebtAfter - aliceDebtBefore).to.be.equal(parseUnits('100') + parseUnits('100') / 200n);
+  });
+  it('increaseDebt(): increases Stable debt in StoragePool by correct amount', async () => {
+    await openTrove({
+      from: alice,
+      contracts,
+      collToken: BTC,
+      collAmount: parseUnits('1', 9),
+      debts: [{ tokenAddress: STABLE, amount: parseUnits('10000') }],
+    });
+
+    // check before
+    const aliceDebtBefore = await getTroveEntireDebt(contracts, alice);
+    expect(aliceDebtBefore).to.be.gt(0n);
+
+    // check before
+    const storagePool_Debt_Before = await storagePool.getEntireSystemDebt();
+    expect(storagePool_Debt_Before).to.be.eq(aliceDebtBefore);
+
+    await borrowerOperations
+      .connect(alice)
+      .increaseDebt([{ tokenAddress: STABLE, amount: parseUnits('100') }], _100pct);
+
+    // check after
+    const storagePool_Debt_After = await storagePool.getEntireSystemDebt();
+    expect(storagePool_Debt_After - storagePool_Debt_Before).to.be.equal(parseUnits('100') + parseUnits('100') / 200n);
+  });
+  it('increaseDebt(): increases user Stable balance by correct amount', async () => {
+    await openTrove({
+      from: alice,
+      contracts,
+      collToken: BTC,
+      collAmount: parseUnits('1', 9),
+      debts: [{ tokenAddress: STABLE, amount: parseUnits('10000') }],
+    });
+
+    // check before
+    const alice_StableBalance_Before = await STABLE.balanceOf(alice);
+    expect(alice_StableBalance_Before).to.be.equal(parseUnits('10000'));
+
+    await borrowerOperations
+      .connect(alice)
+      .increaseDebt([{ tokenAddress: STABLE, amount: parseUnits('100') }], _100pct);
+
+    // check after
+    const alice_StableBalance_After = await STABLE.balanceOf(alice);
+    expect(alice_StableBalance_After - alice_StableBalance_Before).to.be.equal(parseUnits('100'));
   });
 });
