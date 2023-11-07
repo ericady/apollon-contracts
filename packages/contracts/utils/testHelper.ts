@@ -24,9 +24,7 @@ export const openTrove = async ({
 }) => {
   await collToken.unprotectedMint(from, collAmount);
   await collToken.connect(from).approve(contracts.borrowerOperations, collAmount);
-  const openingTx = await contracts.borrowerOperations
-    .connect(from)
-    .openTrove([{ tokenAddress: collToken, amount: collAmount }]);
+  await contracts.borrowerOperations.connect(from).openTrove([{ tokenAddress: collToken, amount: collAmount }]);
 
   if (debts) await increaseDebt(from, contracts, debts);
 

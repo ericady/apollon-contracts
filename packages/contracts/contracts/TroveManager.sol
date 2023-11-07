@@ -15,6 +15,7 @@ import './Interfaces/IStoragePool.sol';
 import './Interfaces/IStabilityPoolManager.sol';
 import './Interfaces/IBBase.sol';
 import './Interfaces/ICollTokenManager.sol';
+import 'hardhat/console.sol';
 
 contract TroveManager is LiquityBase, Ownable, CheckContract, ITroveManager {
   string public constant NAME = 'TroveManager';
