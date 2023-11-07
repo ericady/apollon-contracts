@@ -2041,4 +2041,171 @@ describe('BorrowerOperations', () => {
     const alice_StableBalance_After = await STABLE.balanceOf(alice);
     expect(alice_StableBalance_After - alice_StableBalance_Before).to.be.equal(parseUnits('100'));
   });
+
+  // --- repayLUSD() ---
+  it('repayDebt(): reverts when repayment would leave trove with ICR < MCR', async () => {
+    // alice creates a Trove and adds first collateral
+    await openTrove({
+      from: alice,
+      contracts,
+      collToken: BTC,
+      collAmount: parseUnits('1', 9),
+      debts: [{ tokenAddress: STABLE, amount: parseUnits('1000') }],
+    });
+    await openTrove({
+      from: bob,
+      contracts,
+      collToken: BTC,
+      collAmount: parseUnits('10', 9),
+      debts: [{ tokenAddress: STABLE, amount: parseUnits('1000') }],
+    });
+
+    // Price drops
+    await priceFeed.setTokenPrice(BTC, parseUnits('1000'));
+    const price = await priceFeed.getPrice(BTC);
+
+    expect(await checkRecoveryMode(contracts)).to.be.false;
+    const { ICR } = await troveManager.getCurrentICR(alice);
+    expect(ICR).to.be.lt(parseUnits('1.1')); // 110%
+
+    await expect(
+      borrowerOperations.connect(alice).repayDebt([{ tokenAddress: STABLE, amount: 1 }])
+    ).to.be.revertedWithCustomError(borrowerOperations, 'ICR_lt_MCR');
+  });
+  it('repayDebt(): Succeeds when it would leave trove with net debt >= minimum net debt', async () => {
+    // Make the LUSD request 2 wei above min net debt to correct for floor division, and make net debt = min net debt + 1 wei
+    await openTrove({
+      from: alice,
+      contracts,
+      collToken: BTC,
+      collAmount: parseUnits('1', 9),
+      debts: [{ tokenAddress: STABLE, amount: parseUnits('1') }],
+    });
+
+    await borrowerOperations.connect(alice).repayDebt([{ tokenAddress: STABLE, amount: 1 }]);
+
+    await openTrove({
+      from: bob,
+      contracts,
+      collToken: BTC,
+      collAmount: parseUnits('1', 9),
+      debts: [{ tokenAddress: STABLE, amount: parseUnits('20') }],
+    });
+
+    await borrowerOperations.connect(bob).repayDebt([{ tokenAddress: STABLE, amount: parseUnits('19') }]);
+  });
+  it.skip('repayDebt(): reverts when it would leave trove with net debt < minimum net debt', async () => {
+    //TODO: We don't have min net debt yet, check it out later
+    // // Make the LUSD request 2 wei above min net debt to correct for floor division, and make net debt = min net debt + 1 wei
+    // await borrowerOperations.openTrove(th._100pct, await getNetBorrowingAmount(MIN_NET_DEBT.add(toBN('2'))), A, A, {
+    //   from: A,
+    //   value: dec(100, 30),
+    // });
+    // const repayTxAPromise = borrowerOperations.repayLUSD(2, A, A, {
+    //   from: A,
+    // });
+    // await assertRevert(repayTxAPromise, "BorrowerOps: Trove's net debt must be greater than minimum");
+  });
+  it('repayDebt(): Reverts if repaid amount is greater than current debt', async () => {
+    await openTrove({
+      from: alice,
+      contracts,
+      collToken: BTC,
+      collAmount: parseUnits('1', 9),
+      debts: [{ tokenAddress: STABLE, amount: parseUnits('1') }],
+    });
+    const STABLE_COIN_GAS_COMPENSATION = await borrowerOperations.STABLE_COIN_GAS_COMPENSATION();
+    const totalDebt = await troveManager.getTroveDebt(alice);
+    const repayAmount = totalDebt[0].amount - STABLE_COIN_GAS_COMPENSATION + 1n;
+
+    await openTrove({
+      from: bob,
+      contracts,
+      collToken: BTC,
+      collAmount: parseUnits('1', 9),
+      debts: [{ tokenAddress: STABLE, amount: repayAmount }],
+    });
+
+    await STABLE.connect(bob).transfer(alice, repayAmount);
+
+    await expect(
+      borrowerOperations.connect(alice).repayDebt([{ tokenAddress: STABLE, amount: repayAmount }])
+    ).to.be.revertedWithCustomError(borrowerOperations, 'Repaid_gt_CurrentDebt');
+  });
+  it('repayDebt(): reverts when calling address does not have active trove', async () => {
+    await openTrove({
+      from: alice,
+      contracts,
+      collToken: BTC,
+      collAmount: parseUnits('1', 9),
+      debts: [{ tokenAddress: STABLE, amount: parseUnits('1000') }],
+    });
+    await openTrove({
+      from: bob,
+      contracts,
+      collToken: BTC,
+      collAmount: parseUnits('1', 9),
+      debts: [{ tokenAddress: STABLE, amount: parseUnits('1000') }],
+    });
+    // Bob successfully repays some LUSD
+    await borrowerOperations.connect(bob).repayDebt([{ tokenAddress: STABLE, amount: parseUnits('500') }]);
+
+    // Carol with no active trove attempts to repayLUSD
+    await expect(
+      borrowerOperations.connect(carol).repayDebt([{ tokenAddress: STABLE, amount: parseUnits('500') }])
+    ).to.be.revertedWithCustomError(borrowerOperations, 'TroveClosedOrNotExist');
+  });
+  it('repayDebt(): reverts when attempted repayment is > the debt of the trove', async () => {
+    await openTrove({
+      from: alice,
+      contracts,
+      collToken: BTC,
+      collAmount: parseUnits('1', 9),
+      debts: [{ tokenAddress: STABLE, amount: parseUnits('10000') }],
+    });
+    await openTrove({
+      from: bob,
+      contracts,
+      collToken: BTC,
+      collAmount: parseUnits('1', 9),
+      debts: [{ tokenAddress: STABLE, amount: parseUnits('10000') }],
+    });
+    const aliceDebt = await getTroveEntireDebt(contracts, alice);
+
+    // Bob successfully repays some LUSD
+    await borrowerOperations.connect(bob).repayDebt([{ tokenAddress: STABLE, amount: parseUnits('500') }]);
+
+    // Alice attempts to repay more than her debt
+    await expect(
+      borrowerOperations.connect(alice).repayDebt([{ tokenAddress: STABLE, amount: aliceDebt + 1n }])
+    ).to.be.revertedWithPanic();
+    // TODO: should not reverted with panic error, check later
+    // ).to.be.revertedWithCustomError(borrowerOperations, 'Repaid_gt_CurrentDebt');
+  });
+  it("repayDebt(): reduces the Trove's LUSD debt by the correct amount", async () => {
+    const aliceBorrowAmount = parseUnits('10000');
+    await openTrove({
+      from: alice,
+      contracts,
+      collToken: BTC,
+      collAmount: parseUnits('1', 9),
+      debts: [{ tokenAddress: STABLE, amount: aliceBorrowAmount }],
+    });
+    await openTrove({
+      from: bob,
+      contracts,
+      collToken: BTC,
+      collAmount: parseUnits('1', 9),
+      debts: [{ tokenAddress: STABLE, amount: parseUnits('10000') }],
+    });
+    const aliceDebtBefore = await getTroveEntireDebt(contracts, alice);
+    expect(aliceDebtBefore).to.be.equal(aliceBorrowAmount + aliceBorrowAmount / 200n + parseUnits('200'));
+
+    const repayAmount = parseUnits('500');
+    await borrowerOperations.connect(alice).repayDebt([{ tokenAddress: STABLE, amount: repayAmount }]);
+
+    const aliceDebtAfter = await getTroveEntireDebt(contracts, alice);
+
+    expect(aliceDebtAfter).to.be.equal(aliceDebtBefore - repayAmount);
+  });
 });

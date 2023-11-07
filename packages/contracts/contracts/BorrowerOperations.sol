@@ -330,15 +330,15 @@ contract BorrowerOperations is LiquityBase, Ownable, CheckContract, IBorrowerOpe
     address borrower = msg.sender;
     (ContractsCache memory contractsCache, LocalVariables_adjustTrove memory vars) = _prepareTroveAdjustment(borrower);
 
-    (DebtTokenAmount[] memory removedDebts, ) = _getDebtTokenAmountsWithFetchedPrices(
+    (DebtTokenAmount[] memory debtsToRemove, ) = _getDebtTokenAmountsWithFetchedPrices(
       contractsCache.debtTokenManager,
       _debts
     );
-    vars.newCompositeDebtInStable -= _getCompositeDebt(removedDebts);
-    contractsCache.troveManager.decreaseTroveDebt(borrower, vars.debts);
+    vars.newCompositeDebtInStable -= _getCompositeDebt(debtsToRemove);
+    contractsCache.troveManager.decreaseTroveDebt(borrower, debtsToRemove);
 
-    for (uint i = 0; i < removedDebts.length; i++) {
-      DebtTokenAmount memory debtTokenAmount = removedDebts[i];
+    for (uint i = 0; i < debtsToRemove.length; i++) {
+      DebtTokenAmount memory debtTokenAmount = debtsToRemove[i];
       address debtTokenAddress = address(debtTokenAmount.debtToken);
 
       // checking if the trove has enough debt for the repayment (gas comp needs to remain)
@@ -348,7 +348,7 @@ contract BorrowerOperations is LiquityBase, Ownable, CheckContract, IBorrowerOpe
         existingDebt = vars.debts[ii];
         break;
       }
-      _requireAtLeastMinNetDebt(existingDebt.netDebt - debtTokenAmount.netDebt);
+      _requireAtLeastMinNetDebt(existingDebt.netDebt, debtTokenAmount.netDebt);
       if (debtTokenAmount.debtToken.isStableCoin())
         _requireValidStableCoinRepayment(existingDebt.netDebt, debtTokenAmount.netDebt);
 
@@ -690,9 +690,9 @@ contract BorrowerOperations is LiquityBase, Ownable, CheckContract, IBorrowerOpe
     if (_newTCR < CCR) revert TCR_lt_CCR();
   }
 
-  function _requireAtLeastMinNetDebt(uint _netDebt) internal pure {
-    // TODO: this will never happen from solidity 8.0
-    require(_netDebt >= 0, "BorrowerOps: Trove's net debt must be greater than minimum");
+  function _requireAtLeastMinNetDebt(uint _netDebt, uint _repayment) internal pure {
+    // TODO: It should be netDebt - repayment > minDebt, but no min debt defined yet, check later
+    if (_netDebt < _repayment) revert Repaid_gt_CurrentDebt();
   }
 
   function _requireValidStableCoinRepayment(uint _currentDebt, uint _debtRepayment) internal pure {
