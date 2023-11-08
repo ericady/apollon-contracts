@@ -1,16 +1,78 @@
 [
   {
-    "anonymous": false,
-    "inputs": [
-      {
-        "indexed": false,
-        "internalType": "address",
-        "name": "_activePoolAddress",
-        "type": "address"
-      }
-    ],
-    "name": "ActivePoolAddressChanged",
-    "type": "event"
+    "inputs": [],
+    "name": "EmptyArray",
+    "type": "error"
+  },
+  {
+    "inputs": [],
+    "name": "ExceedDebtBalance",
+    "type": "error"
+  },
+  {
+    "inputs": [],
+    "name": "FeeExceedMaxPercentage",
+    "type": "error"
+  },
+  {
+    "inputs": [],
+    "name": "GreaterThanTCR",
+    "type": "error"
+  },
+  {
+    "inputs": [],
+    "name": "InvalidMaxFeePercent",
+    "type": "error"
+  },
+  {
+    "inputs": [],
+    "name": "InvalidTrove",
+    "type": "error"
+  },
+  {
+    "inputs": [],
+    "name": "LessThanMCR",
+    "type": "error"
+  },
+  {
+    "inputs": [],
+    "name": "NoLiquidatableTrove",
+    "type": "error"
+  },
+  {
+    "inputs": [],
+    "name": "NoRedeems",
+    "type": "error"
+  },
+  {
+    "inputs": [],
+    "name": "NotContract",
+    "type": "error"
+  },
+  {
+    "inputs": [],
+    "name": "NotFromBorrowerOps",
+    "type": "error"
+  },
+  {
+    "inputs": [],
+    "name": "OnlyOneTrove",
+    "type": "error"
+  },
+  {
+    "inputs": [],
+    "name": "TooHighRedeemFee",
+    "type": "error"
+  },
+  {
+    "inputs": [],
+    "name": "ZeroAddress",
+    "type": "error"
+  },
+  {
+    "inputs": [],
+    "name": "ZeroAmount",
+    "type": "error"
   },
   {
     "anonymous": false,
@@ -44,11 +106,11 @@
       {
         "indexed": false,
         "internalType": "address",
-        "name": "_collSurplusPoolAddress",
+        "name": "_newCollTokenManagerAddress",
         "type": "address"
       }
     ],
-    "name": "CollSurplusPoolAddressChanged",
+    "name": "CollTokenManagerAddressChanged",
     "type": "event"
   },
   {
@@ -57,50 +119,11 @@
       {
         "indexed": false,
         "internalType": "address",
-        "name": "_defaultPoolAddress",
+        "name": "_newDebtTokenManagerAddress",
         "type": "address"
       }
     ],
-    "name": "DefaultPoolAddressChanged",
-    "type": "event"
-  },
-  {
-    "anonymous": false,
-    "inputs": [
-      {
-        "indexed": false,
-        "internalType": "address",
-        "name": "_gasPoolAddress",
-        "type": "address"
-      }
-    ],
-    "name": "GasPoolAddressChanged",
-    "type": "event"
-  },
-  {
-    "anonymous": false,
-    "inputs": [
-      {
-        "indexed": false,
-        "internalType": "address",
-        "name": "_lqtyStakingAddress",
-        "type": "address"
-      }
-    ],
-    "name": "LQTYStakingAddressChanged",
-    "type": "event"
-  },
-  {
-    "anonymous": false,
-    "inputs": [
-      {
-        "indexed": false,
-        "internalType": "address",
-        "name": "_lqtyTokenAddress",
-        "type": "address"
-      }
-    ],
-    "name": "LQTYTokenAddressChanged",
+    "name": "DebtTokenManagerAddressChanged",
     "type": "event"
   },
   {
@@ -127,19 +150,6 @@
     "inputs": [
       {
         "indexed": false,
-        "internalType": "address",
-        "name": "_newLUSDTokenAddress",
-        "type": "address"
-      }
-    ],
-    "name": "LUSDTokenAddressChanged",
-    "type": "event"
-  },
-  {
-    "anonymous": false,
-    "inputs": [
-      {
-        "indexed": false,
         "internalType": "uint256",
         "name": "_lastFeeOpTime",
         "type": "uint256"
@@ -152,28 +162,64 @@
     "anonymous": false,
     "inputs": [
       {
+        "components": [
+          {
+            "internalType": "address",
+            "name": "tokenAddress",
+            "type": "address"
+          },
+          {
+            "internalType": "uint256",
+            "name": "amount",
+            "type": "uint256"
+          }
+        ],
         "indexed": false,
-        "internalType": "uint256",
-        "name": "_liquidatedDebt",
-        "type": "uint256"
+        "internalType": "struct IBase.TokenAmount[]",
+        "name": "liquidatedDebt",
+        "type": "tuple[]"
+      },
+      {
+        "components": [
+          {
+            "internalType": "address",
+            "name": "tokenAddress",
+            "type": "address"
+          },
+          {
+            "internalType": "uint256",
+            "name": "amount",
+            "type": "uint256"
+          }
+        ],
+        "indexed": false,
+        "internalType": "struct IBase.TokenAmount[]",
+        "name": "liquidatedColl",
+        "type": "tuple[]"
       },
       {
         "indexed": false,
         "internalType": "uint256",
-        "name": "_liquidatedColl",
+        "name": "totalStableCoinGasCompensation",
         "type": "uint256"
       },
       {
+        "components": [
+          {
+            "internalType": "address",
+            "name": "tokenAddress",
+            "type": "address"
+          },
+          {
+            "internalType": "uint256",
+            "name": "amount",
+            "type": "uint256"
+          }
+        ],
         "indexed": false,
-        "internalType": "uint256",
-        "name": "_collGasCompensation",
-        "type": "uint256"
-      },
-      {
-        "indexed": false,
-        "internalType": "uint256",
-        "name": "_LUSDGasCompensation",
-        "type": "uint256"
+        "internalType": "struct IBase.TokenAmount[]",
+        "name": "totalCollGasCompensation",
+        "type": "tuple[]"
       }
     ],
     "name": "Liquidation",
@@ -248,11 +294,11 @@
       {
         "indexed": false,
         "internalType": "address",
-        "name": "_sortedTrovesAddress",
+        "name": "_stabilityPoolManagerAddress",
         "type": "address"
       }
     ],
-    "name": "SortedTrovesAddressChanged",
+    "name": "StabilityPoolManagerAddressChanged",
     "type": "event"
   },
   {
@@ -261,11 +307,11 @@
       {
         "indexed": false,
         "internalType": "address",
-        "name": "_stabilityPoolAddress",
+        "name": "_storagePoolAddress",
         "type": "address"
       }
     ],
-    "name": "StabilityPoolAddressChanged",
+    "name": "StoragePoolAddressChanged",
     "type": "event"
   },
   {
@@ -342,7 +388,7 @@
       },
       {
         "indexed": false,
-        "internalType": "enum TroveManager.TroveManagerOperation",
+        "internalType": "enum ITroveManager.TroveManagerOperation",
         "name": "_operation",
         "type": "uint8"
       }
@@ -398,7 +444,7 @@
       },
       {
         "indexed": false,
-        "internalType": "enum TroveManager.TroveManagerOperation",
+        "internalType": "enum ITroveManager.TroveManagerOperation",
         "name": "_operation",
         "type": "uint8"
       }
@@ -460,58 +506,6 @@
   },
   {
     "inputs": [],
-    "name": "DECIMAL_PRECISION",
-    "outputs": [
-      {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [],
-    "name": "LUSD_GAS_COMPENSATION",
-    "outputs": [
-      {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [],
-    "name": "L_ETH",
-    "outputs": [
-      {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [],
-    "name": "L_LUSDDebt",
-    "outputs": [
-      {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [],
     "name": "MAX_BORROWING_FEE",
     "outputs": [
       {
@@ -539,19 +533,6 @@
   {
     "inputs": [],
     "name": "MINUTE_DECAY_FACTOR",
-    "outputs": [
-      {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [],
-    "name": "MIN_NET_DEBT",
     "outputs": [
       {
         "internalType": "uint256",
@@ -615,6 +596,19 @@
     "type": "function"
   },
   {
+    "inputs": [],
+    "name": "STABLE_COIN_GAS_COMPENSATION",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
     "inputs": [
       {
         "internalType": "uint256",
@@ -644,21 +638,6 @@
     "name": "Troves",
     "outputs": [
       {
-        "internalType": "uint256",
-        "name": "debt",
-        "type": "uint256"
-      },
-      {
-        "internalType": "uint256",
-        "name": "coll",
-        "type": "uint256"
-      },
-      {
-        "internalType": "uint256",
-        "name": "stake",
-        "type": "uint256"
-      },
-      {
         "internalType": "enum TroveManager.Status",
         "name": "status",
         "type": "uint8"
@@ -680,19 +659,6 @@
         "internalType": "uint256",
         "name": "",
         "type": "uint256"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [],
-    "name": "activePool",
-    "outputs": [
-      {
-        "internalType": "contract IActivePool",
-        "name": "",
-        "type": "address"
       }
     ],
     "stateMutability": "view",
@@ -772,24 +738,10 @@
   {
     "inputs": [
       {
-        "internalType": "uint256",
-        "name": "_price",
-        "type": "uint256"
-      }
-    ],
-    "name": "checkRecoveryMode",
-    "outputs": [
-      {
-        "internalType": "bool",
-        "name": "",
-        "type": "bool"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [
+        "internalType": "address[]",
+        "name": "collTokenAddresses",
+        "type": "address[]"
+      },
       {
         "internalType": "address",
         "name": "_borrower",
@@ -799,6 +751,32 @@
     "name": "closeTrove",
     "outputs": [],
     "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "collTokenManager",
+    "outputs": [
+      {
+        "internalType": "contract ICollTokenManager",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "debtTokenManager",
+    "outputs": [
+      {
+        "internalType": "contract IDebtTokenManager",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
     "type": "function"
   },
   {
@@ -816,19 +794,25 @@
         "type": "address"
       },
       {
-        "internalType": "uint256",
-        "name": "_collDecrease",
-        "type": "uint256"
+        "components": [
+          {
+            "internalType": "address",
+            "name": "tokenAddress",
+            "type": "address"
+          },
+          {
+            "internalType": "uint256",
+            "name": "amount",
+            "type": "uint256"
+          }
+        ],
+        "internalType": "struct IBase.TokenAmount[]",
+        "name": "_collTokenAmounts",
+        "type": "tuple[]"
       }
     ],
     "name": "decreaseTroveColl",
-    "outputs": [
-      {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      }
-    ],
+    "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
   },
@@ -840,40 +824,38 @@
         "type": "address"
       },
       {
-        "internalType": "uint256",
-        "name": "_debtDecrease",
-        "type": "uint256"
+        "components": [
+          {
+            "internalType": "contract IDebtToken",
+            "name": "debtToken",
+            "type": "address"
+          },
+          {
+            "internalType": "uint256",
+            "name": "netDebt",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "borrowingFee",
+            "type": "uint256"
+          }
+        ],
+        "internalType": "struct IBBase.DebtTokenAmount[]",
+        "name": "_debtTokenAmounts",
+        "type": "tuple[]"
       }
     ],
     "name": "decreaseTroveDebt",
-    "outputs": [
-      {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      }
-    ],
+    "outputs": [],
     "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [],
-    "name": "defaultPool",
-    "outputs": [
-      {
-        "internalType": "contract IDefaultPool",
-        "name": "",
-        "type": "address"
-      }
-    ],
-    "stateMutability": "view",
     "type": "function"
   },
   {
     "inputs": [
       {
         "internalType": "uint256",
-        "name": "_LUSDDebt",
+        "name": "_debtValue",
         "type": "uint256"
       }
     ],
@@ -892,7 +874,7 @@
     "inputs": [
       {
         "internalType": "uint256",
-        "name": "_LUSDDebt",
+        "name": "_debtValue",
         "type": "uint256"
       }
     ],
@@ -939,18 +921,18 @@
         "internalType": "address",
         "name": "_borrower",
         "type": "address"
-      },
-      {
-        "internalType": "uint256",
-        "name": "_price",
-        "type": "uint256"
       }
     ],
     "name": "getCurrentICR",
     "outputs": [
       {
         "internalType": "uint256",
-        "name": "",
+        "name": "ICR",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "currentDebtInStable",
         "type": "uint256"
       }
     ],
@@ -968,49 +950,65 @@
     "name": "getEntireDebtAndColl",
     "outputs": [
       {
+        "components": [
+          {
+            "internalType": "address",
+            "name": "tokenAddress",
+            "type": "address"
+          },
+          {
+            "internalType": "bool",
+            "name": "isColl",
+            "type": "bool"
+          },
+          {
+            "internalType": "uint256",
+            "name": "amount",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "pendingReward",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "gasCompensation",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "toLiquidate",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "toRedistribute",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "toOffset",
+            "type": "uint256"
+          }
+        ],
+        "internalType": "struct IBase.RAmount[]",
+        "name": "amounts",
+        "type": "tuple[]"
+      },
+      {
         "internalType": "uint256",
-        "name": "debt",
+        "name": "troveCollInStable",
         "type": "uint256"
       },
       {
         "internalType": "uint256",
-        "name": "coll",
+        "name": "troveDebtInStable",
         "type": "uint256"
       },
       {
         "internalType": "uint256",
-        "name": "pendingLUSDDebtReward",
-        "type": "uint256"
-      },
-      {
-        "internalType": "uint256",
-        "name": "pendingETHReward",
-        "type": "uint256"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [],
-    "name": "getEntireSystemColl",
-    "outputs": [
-      {
-        "internalType": "uint256",
-        "name": "entireSystemColl",
-        "type": "uint256"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [],
-    "name": "getEntireSystemDebt",
-    "outputs": [
-      {
-        "internalType": "uint256",
-        "name": "entireSystemDebt",
+        "name": "troveDebtInStableWithoutGasCompensation",
         "type": "uint256"
       }
     ],
@@ -1042,32 +1040,23 @@
         "internalType": "address",
         "name": "_borrower",
         "type": "address"
-      }
-    ],
-    "name": "getPendingETHReward",
-    "outputs": [
-      {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [
+      },
       {
         "internalType": "address",
-        "name": "_borrower",
+        "name": "_tokenAddress",
         "type": "address"
+      },
+      {
+        "internalType": "bool",
+        "name": "_isColl",
+        "type": "bool"
       }
     ],
-    "name": "getPendingLUSDDebtReward",
+    "name": "getPendingReward",
     "outputs": [
       {
         "internalType": "uint256",
-        "name": "",
+        "name": "pendingReward",
         "type": "uint256"
       }
     ],
@@ -1122,25 +1111,6 @@
   {
     "inputs": [
       {
-        "internalType": "uint256",
-        "name": "_price",
-        "type": "uint256"
-      }
-    ],
-    "name": "getTCR",
-    "outputs": [
-      {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
         "internalType": "address",
         "name": "_borrower",
         "type": "address"
@@ -1149,9 +1119,21 @@
     "name": "getTroveColl",
     "outputs": [
       {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
+        "components": [
+          {
+            "internalType": "address",
+            "name": "tokenAddress",
+            "type": "address"
+          },
+          {
+            "internalType": "uint256",
+            "name": "amount",
+            "type": "uint256"
+          }
+        ],
+        "internalType": "struct IBase.TokenAmount[]",
+        "name": "colls",
+        "type": "tuple[]"
       }
     ],
     "stateMutability": "view",
@@ -1168,28 +1150,21 @@
     "name": "getTroveDebt",
     "outputs": [
       {
-        "internalType": "uint256",
+        "components": [
+          {
+            "internalType": "address",
+            "name": "tokenAddress",
+            "type": "address"
+          },
+          {
+            "internalType": "uint256",
+            "name": "amount",
+            "type": "uint256"
+          }
+        ],
+        "internalType": "struct IBase.TokenAmount[]",
         "name": "",
-        "type": "uint256"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "uint256",
-        "name": "_index",
-        "type": "uint256"
-      }
-    ],
-    "name": "getTroveFromTroveOwnersArray",
-    "outputs": [
-      {
-        "internalType": "address",
-        "name": "",
-        "type": "address"
+        "type": "tuple[]"
       }
     ],
     "stateMutability": "view",
@@ -1233,6 +1208,30 @@
         "internalType": "address",
         "name": "_borrower",
         "type": "address"
+      },
+      {
+        "internalType": "address",
+        "name": "_token",
+        "type": "address"
+      }
+    ],
+    "name": "getTroveStakes",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "_borrower",
+        "type": "address"
       }
     ],
     "name": "getTroveStatus",
@@ -1252,40 +1251,27 @@
         "internalType": "address",
         "name": "_borrower",
         "type": "address"
-      }
-    ],
-    "name": "hasPendingRewards",
-    "outputs": [
-      {
-        "internalType": "bool",
-        "name": "",
-        "type": "bool"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "address",
-        "name": "_borrower",
-        "type": "address"
       },
       {
-        "internalType": "uint256",
-        "name": "_collIncrease",
-        "type": "uint256"
+        "components": [
+          {
+            "internalType": "address",
+            "name": "tokenAddress",
+            "type": "address"
+          },
+          {
+            "internalType": "uint256",
+            "name": "amount",
+            "type": "uint256"
+          }
+        ],
+        "internalType": "struct IBase.TokenAmount[]",
+        "name": "_collTokenAmounts",
+        "type": "tuple[]"
       }
     ],
     "name": "increaseTroveColl",
-    "outputs": [
-      {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      }
-    ],
+    "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
   },
@@ -1297,38 +1283,47 @@
         "type": "address"
       },
       {
-        "internalType": "uint256",
-        "name": "_debtIncrease",
-        "type": "uint256"
+        "components": [
+          {
+            "internalType": "contract IDebtToken",
+            "name": "debtToken",
+            "type": "address"
+          },
+          {
+            "internalType": "uint256",
+            "name": "netDebt",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "borrowingFee",
+            "type": "uint256"
+          }
+        ],
+        "internalType": "struct IBBase.DebtTokenAmount[]",
+        "name": "_debtTokenAmounts",
+        "type": "tuple[]"
       }
     ],
     "name": "increaseTroveDebt",
-    "outputs": [
-      {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      }
-    ],
+    "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
   },
   {
-    "inputs": [],
-    "name": "isOwner",
-    "outputs": [
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      },
       {
         "internalType": "bool",
         "name": "",
         "type": "bool"
       }
     ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [],
-    "name": "lastETHError_Redistribution",
+    "name": "lastErrorRedistribution",
     "outputs": [
       {
         "internalType": "uint256",
@@ -1342,19 +1337,6 @@
   {
     "inputs": [],
     "name": "lastFeeOperationTime",
-    "outputs": [
-      {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [],
-    "name": "lastLUSDDebtError_Redistribution",
     "outputs": [
       {
         "internalType": "uint256",
@@ -1381,50 +1363,22 @@
   {
     "inputs": [
       {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      },
+      {
+        "internalType": "bool",
+        "name": "",
+        "type": "bool"
+      }
+    ],
+    "name": "liquidatedTokens",
+    "outputs": [
+      {
         "internalType": "uint256",
-        "name": "_n",
+        "name": "",
         "type": "uint256"
-      }
-    ],
-    "name": "liquidateTroves",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [],
-    "name": "lqtyStaking",
-    "outputs": [
-      {
-        "internalType": "contract ILQTYStaking",
-        "name": "",
-        "type": "address"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [],
-    "name": "lqtyToken",
-    "outputs": [
-      {
-        "internalType": "contract ILQTYToken",
-        "name": "",
-        "type": "address"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [],
-    "name": "lusdToken",
-    "outputs": [
-      {
-        "internalType": "contract ILUSDToken",
-        "name": "",
-        "type": "address"
       }
     ],
     "stateMutability": "view",
@@ -1460,38 +1414,18 @@
     "inputs": [
       {
         "internalType": "uint256",
-        "name": "_LUSDamount",
-        "type": "uint256"
-      },
-      {
-        "internalType": "address",
-        "name": "_firstRedemptionHint",
-        "type": "address"
-      },
-      {
-        "internalType": "address",
-        "name": "_upperPartialRedemptionHint",
-        "type": "address"
-      },
-      {
-        "internalType": "address",
-        "name": "_lowerPartialRedemptionHint",
-        "type": "address"
-      },
-      {
-        "internalType": "uint256",
-        "name": "_partialRedemptionHintNICR",
-        "type": "uint256"
-      },
-      {
-        "internalType": "uint256",
-        "name": "_maxIterations",
+        "name": "_stableCoinAmount",
         "type": "uint256"
       },
       {
         "internalType": "uint256",
         "name": "_maxFeePercentage",
         "type": "uint256"
+      },
+      {
+        "internalType": "address[]",
+        "name": "_sourceTroves",
+        "type": "address[]"
       }
     ],
     "name": "redeemCollateral",
@@ -1501,6 +1435,11 @@
   },
   {
     "inputs": [
+      {
+        "internalType": "address[]",
+        "name": "collTokenAddresses",
+        "type": "address[]"
+      },
       {
         "internalType": "address",
         "name": "_borrower",
@@ -1513,23 +1452,35 @@
     "type": "function"
   },
   {
+    "inputs": [],
+    "name": "renounceOwnership",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
     "inputs": [
       {
         "internalType": "address",
         "name": "",
         "type": "address"
+      },
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      },
+      {
+        "internalType": "bool",
+        "name": "",
+        "type": "bool"
       }
     ],
     "name": "rewardSnapshots",
     "outputs": [
       {
         "internalType": "uint256",
-        "name": "ETH",
-        "type": "uint256"
-      },
-      {
-        "internalType": "uint256",
-        "name": "LUSDDebt",
+        "name": "",
         "type": "uint256"
       }
     ],
@@ -1545,27 +1496,12 @@
       },
       {
         "internalType": "address",
-        "name": "_activePoolAddress",
+        "name": "_storagePoolAddress",
         "type": "address"
       },
       {
         "internalType": "address",
-        "name": "_defaultPoolAddress",
-        "type": "address"
-      },
-      {
-        "internalType": "address",
-        "name": "_stabilityPoolAddress",
-        "type": "address"
-      },
-      {
-        "internalType": "address",
-        "name": "_gasPoolAddress",
-        "type": "address"
-      },
-      {
-        "internalType": "address",
-        "name": "_collSurplusPoolAddress",
+        "name": "_stabilityPoolManagerAddress",
         "type": "address"
       },
       {
@@ -1575,22 +1511,12 @@
       },
       {
         "internalType": "address",
-        "name": "_lusdTokenAddress",
+        "name": "_debtTokenManagerAddress",
         "type": "address"
       },
       {
         "internalType": "address",
-        "name": "_sortedTrovesAddress",
-        "type": "address"
-      },
-      {
-        "internalType": "address",
-        "name": "_lqtyTokenAddress",
-        "type": "address"
-      },
-      {
-        "internalType": "address",
-        "name": "_lqtyStakingAddress",
+        "name": "_collTokenManagerAddress",
         "type": "address"
       }
     ],
@@ -1619,10 +1545,10 @@
   },
   {
     "inputs": [],
-    "name": "sortedTroves",
+    "name": "stabilityPoolManager",
     "outputs": [
       {
-        "internalType": "contract ISortedTroves",
+        "internalType": "contract IStabilityPoolManager",
         "name": "",
         "type": "address"
       }
@@ -1632,10 +1558,10 @@
   },
   {
     "inputs": [],
-    "name": "stabilityPool",
+    "name": "storagePool",
     "outputs": [
       {
-        "internalType": "contract IStabilityPool",
+        "internalType": "contract IStoragePool",
         "name": "",
         "type": "address"
       }
@@ -1644,8 +1570,14 @@
     "type": "function"
   },
   {
-    "inputs": [],
-    "name": "totalCollateralSnapshot",
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "name": "totalCollateralSnapshots",
     "outputs": [
       {
         "internalType": "uint256",
@@ -1657,7 +1589,13 @@
     "type": "function"
   },
   {
-    "inputs": [],
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      }
+    ],
     "name": "totalStakes",
     "outputs": [
       {
@@ -1670,7 +1608,13 @@
     "type": "function"
   },
   {
-    "inputs": [],
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      }
+    ],
     "name": "totalStakesSnapshot",
     "outputs": [
       {
@@ -1686,18 +1630,30 @@
     "inputs": [
       {
         "internalType": "address",
+        "name": "newOwner",
+        "type": "address"
+      }
+    ],
+    "name": "transferOwnership",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address[]",
+        "name": "collTokenAddresses",
+        "type": "address[]"
+      },
+      {
+        "internalType": "address",
         "name": "_borrower",
         "type": "address"
       }
     ],
     "name": "updateStakeAndTotalStakes",
-    "outputs": [
-      {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      }
-    ],
+    "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
   },

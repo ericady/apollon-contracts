@@ -1,5 +1,20 @@
 [
   {
+    "inputs": [],
+    "name": "FeeExceedMaxPercentage",
+    "type": "error"
+  },
+  {
+    "inputs": [],
+    "name": "NotContract",
+    "type": "error"
+  },
+  {
+    "inputs": [],
+    "name": "ZeroAddress",
+    "type": "error"
+  },
+  {
     "anonymous": false,
     "inputs": [
       {
@@ -36,26 +51,13 @@
     "inputs": [
       {
         "indexed": false,
-        "internalType": "enum PriceFeed.Status",
+        "internalType": "enum IPriceFeed.Status",
         "name": "newStatus",
         "type": "uint8"
       }
     ],
     "name": "PriceFeedStatusChanged",
     "type": "event"
-  },
-  {
-    "inputs": [],
-    "name": "DECIMAL_PRECISION",
-    "outputs": [
-      {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
   },
   {
     "inputs": [],
@@ -162,13 +164,43 @@
     "type": "function"
   },
   {
-    "inputs": [],
-    "name": "isOwner",
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "_tokenAddress",
+        "type": "address"
+      }
+    ],
+    "name": "getPrice",
     "outputs": [
       {
-        "internalType": "bool",
-        "name": "",
-        "type": "bool"
+        "internalType": "uint256",
+        "name": "price",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "_token",
+        "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "_amount",
+        "type": "uint256"
+      }
+    ],
+    "name": "getUSDValue",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "usdValue",
+        "type": "uint256"
       }
     ],
     "stateMutability": "view",
@@ -177,6 +209,25 @@
   {
     "inputs": [],
     "name": "lastGoodPrice",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "name": "lastGoodPrices",
     "outputs": [
       {
         "internalType": "uint256",
@@ -214,6 +265,13 @@
     "type": "function"
   },
   {
+    "inputs": [],
+    "name": "renounceOwnership",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
     "inputs": [
       {
         "internalType": "address",
@@ -236,7 +294,7 @@
     "name": "status",
     "outputs": [
       {
-        "internalType": "enum PriceFeed.Status",
+        "internalType": "enum IPriceFeed.Status",
         "name": "",
         "type": "uint8"
       }
@@ -255,6 +313,19 @@
       }
     ],
     "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "newOwner",
+        "type": "address"
+      }
+    ],
+    "name": "transferOwnership",
+    "outputs": [],
+    "stateMutability": "nonpayable",
     "type": "function"
   }
 ]

@@ -1,17 +1,11 @@
-import { Signer } from "@ethersproject/abstract-signer";
-import { ContractTransaction, ContractFactory, Overrides } from "@ethersproject/contracts";
-import { Wallet } from "@ethersproject/wallet";
-
-import { Decimal } from "@liquity/lib-base";
-
+import { Signer } from '@ethersproject/abstract-signer';
+import { ContractTransaction, ContractFactory, Overrides } from '@ethersproject/contracts';
 import {
   _LiquityContractAddresses,
   _LiquityContracts,
   _LiquityDeploymentJSON,
-  _connectToContracts
-} from "../src/contracts";
-
-import { createUniswapV2Pair } from "./UniswapV2Factory";
+  _connectToContracts,
+} from '../src/contracts';
 
 let silent = true;
 
@@ -40,7 +34,7 @@ const deployContractAndGetBlockNumber = async (
   log({
     contractAddress: contract.address,
     blockNumber: receipt.blockNumber,
-    gasUsed: receipt.gasUsed.toNumber()
+    gasUsed: receipt.gasUsed.toNumber(),
   });
 
   log();
@@ -48,101 +42,54 @@ const deployContractAndGetBlockNumber = async (
   return [contract.address, receipt.blockNumber];
 };
 
-const deployContract: (
-  ...p: Parameters<typeof deployContractAndGetBlockNumber>
-) => Promise<string> = (...p) => deployContractAndGetBlockNumber(...p).then(([a]) => a);
+const deployContract: (...p: Parameters<typeof deployContractAndGetBlockNumber>) => Promise<string> = (...p) =>
+  deployContractAndGetBlockNumber(...p).then(([a]) => a);
 
 const deployContracts = async (
   deployer: Signer,
   getContractFactory: (name: string, signer: Signer) => Promise<ContractFactory>,
   priceFeedIsTestnet = true,
   overrides?: Overrides
-): Promise<[addresses: Omit<_LiquityContractAddresses, "uniToken">, startBlock: number]> => {
-  const [activePoolAddress, startBlock] = await deployContractAndGetBlockNumber(
-    deployer,
-    getContractFactory,
-    "ActivePool",
-    { ...overrides }
-  );
-
-  const addresses = {
-    activePool: activePoolAddress,
-    borrowerOperations: await deployContract(deployer, getContractFactory, "BorrowerOperations", {
-      ...overrides
-    }),
-    troveManager: await deployContract(deployer, getContractFactory, "TroveManager", {
-      ...overrides
-    }),
-    collSurplusPool: await deployContract(deployer, getContractFactory, "CollSurplusPool", {
-      ...overrides
-    }),
-    communityIssuance: await deployContract(deployer, getContractFactory, "CommunityIssuance", {
-      ...overrides
-    }),
-    defaultPool: await deployContract(deployer, getContractFactory, "DefaultPool", { ...overrides }),
-    hintHelpers: await deployContract(deployer, getContractFactory, "HintHelpers", { ...overrides }),
-    lockupContractFactory: await deployContract(
-      deployer,
-      getContractFactory,
-      "LockupContractFactory",
-      { ...overrides }
-    ),
-    lqtyStaking: await deployContract(deployer, getContractFactory, "LQTYStaking", { ...overrides }),
-    priceFeed: await deployContract(
-      deployer,
-      getContractFactory,
-      priceFeedIsTestnet ? "PriceFeedTestnet" : "PriceFeed",
-      { ...overrides }
-    ),
-    sortedTroves: await deployContract(deployer, getContractFactory, "SortedTroves", {
-      ...overrides
-    }),
-    stabilityPool: await deployContract(deployer, getContractFactory, "StabilityPool", {
-      ...overrides
-    }),
-    gasPool: await deployContract(deployer, getContractFactory, "GasPool", {
-      ...overrides
-    }),
-    unipool: await deployContract(deployer, getContractFactory, "Unipool", { ...overrides })
-  };
+): Promise<[addresses: Omit<_LiquityContractAddresses, 'uniToken'>, startBlock: number]> => {
+  const [storagePool, startBlock] = await deployContractAndGetBlockNumber(deployer, getContractFactory, 'StoragePool', {
+    ...overrides,
+  });
 
   return [
     {
-      ...addresses,
-      lusdToken: await deployContract(
+      borrowerOperations: await deployContract(deployer, getContractFactory, 'BorrowerOperations', {
+        ...overrides,
+      }),
+      troveManager: await deployContract(deployer, getContractFactory, 'TroveManager', {
+        ...overrides,
+      }),
+      stabilityPoolManager: await deployContract(deployer, getContractFactory, 'StabilityPoolManager', {
+        ...overrides,
+      }),
+      storagePool,
+      collTokenManager: await deployContract(deployer, getContractFactory, 'CollTokenManager', {
+        ...overrides,
+      }),
+      debtTokenManager: await deployContract(deployer, getContractFactory, 'DebtTokenManager', {
+        ...overrides,
+      }),
+      priceFeed: await deployContract(
         deployer,
         getContractFactory,
-        "LUSDToken",
-        addresses.troveManager,
-        addresses.stabilityPool,
-        addresses.borrowerOperations,
+        priceFeedIsTestnet ? 'MockPriceFeed' : 'PriceFeed',
         { ...overrides }
       ),
-
-      lqtyToken: await deployContract(
-        deployer,
-        getContractFactory,
-        "LQTYToken",
-        addresses.communityIssuance,
-        addresses.lqtyStaking,
-        addresses.lockupContractFactory,
-        Wallet.createRandom().address, // _bountyAddress (TODO: parameterize this)
-        addresses.unipool, // _lpRewardsAddress
-        Wallet.createRandom().address, // _multisigAddress (TODO: parameterize this)
-        { ...overrides }
-      ),
-
-      multiTroveGetter: await deployContract(
-        deployer,
-        getContractFactory,
-        "MultiTroveGetter",
-        addresses.troveManager,
-        addresses.sortedTroves,
-        { ...overrides }
-      )
+      // communityIssuance: await deployContract(deployer, getContractFactory, 'CommunityIssuance', {
+      //   ...overrides,
+      // }),
+      // hintHelpers: await deployContract(deployer, getContractFactory, 'HintHelpers', { ...overrides }),
+      // lockupContractFactory: await deployContract(deployer, getContractFactory, 'LockupContractFactory', {
+      //   ...overrides,
+      // }),
+      // lqtyStaking: await deployContract(deployer, getContractFactory, 'LQTYStaking', { ...overrides }),
+      // unipool: await deployContract(deployer, getContractFactory, 'Unipool', { ...overrides }),
     },
-
-    startBlock
+    startBlock,
   ];
 };
 
@@ -151,144 +98,109 @@ export const deployTellorCaller = (
   getContractFactory: (name: string, signer: Signer) => Promise<ContractFactory>,
   tellorAddress: string,
   overrides?: Overrides
-): Promise<string> =>
-  deployContract(deployer, getContractFactory, "TellorCaller", tellorAddress, { ...overrides });
+): Promise<string> => deployContract(deployer, getContractFactory, 'TellorCaller', tellorAddress, { ...overrides });
 
 const connectContracts = async (
   {
-    activePool,
+    storagePool,
     borrowerOperations,
     troveManager,
-    lusdToken,
-    collSurplusPool,
-    communityIssuance,
-    defaultPool,
-    lqtyToken,
-    hintHelpers,
-    lockupContractFactory,
-    lqtyStaking,
+    stabilityPoolManager,
+    debtTokenManager,
+    collTokenManager,
     priceFeed,
-    sortedTroves,
-    stabilityPool,
-    gasPool,
-    unipool,
-    uniToken
   }: _LiquityContracts,
   deployer: Signer,
   overrides?: Overrides
 ) => {
   if (!deployer.provider) {
-    throw new Error("Signer must have a provider.");
+    throw new Error('Signer must have a provider.');
   }
 
   const txCount = await deployer.provider.getTransactionCount(deployer.getAddress());
 
   const connections: ((nonce: number) => Promise<ContractTransaction>)[] = [
     nonce =>
-      sortedTroves.setParams(1e6, troveManager.address, borrowerOperations.address, {
-        ...overrides,
-        nonce
-      }),
-
-    nonce =>
       troveManager.setAddresses(
         borrowerOperations.address,
-        activePool.address,
-        defaultPool.address,
-        stabilityPool.address,
-        gasPool.address,
-        collSurplusPool.address,
+        storagePool.address,
+        stabilityPoolManager.address,
         priceFeed.address,
-        lusdToken.address,
-        sortedTroves.address,
-        lqtyToken.address,
-        lqtyStaking.address,
+        debtTokenManager.address,
+        collTokenManager.address,
         { ...overrides, nonce }
       ),
 
     nonce =>
       borrowerOperations.setAddresses(
         troveManager.address,
-        activePool.address,
-        defaultPool.address,
-        stabilityPool.address,
-        gasPool.address,
-        collSurplusPool.address,
+        storagePool.address,
+        stabilityPoolManager.address,
         priceFeed.address,
-        sortedTroves.address,
-        lusdToken.address,
-        lqtyStaking.address,
+        debtTokenManager.address,
+        collTokenManager.address,
         { ...overrides, nonce }
       ),
 
     nonce =>
-      stabilityPool.setAddresses(
+      storagePool.setAddresses(
         borrowerOperations.address,
         troveManager.address,
-        activePool.address,
-        lusdToken.address,
-        sortedTroves.address,
+        stabilityPoolManager.address,
         priceFeed.address,
-        communityIssuance.address,
         { ...overrides, nonce }
       ),
 
     nonce =>
-      activePool.setAddresses(
-        borrowerOperations.address,
-        troveManager.address,
-        stabilityPool.address,
-        defaultPool.address,
-        { ...overrides, nonce }
-      ),
-
-    nonce =>
-      defaultPool.setAddresses(troveManager.address, activePool.address, {
-        ...overrides,
-        nonce
-      }),
-
-    nonce =>
-      collSurplusPool.setAddresses(
-        borrowerOperations.address,
-        troveManager.address,
-        activePool.address,
-        { ...overrides, nonce }
-      ),
-
-    nonce =>
-      hintHelpers.setAddresses(sortedTroves.address, troveManager.address, {
-        ...overrides,
-        nonce
-      }),
-
-    nonce =>
-      lqtyStaking.setAddresses(
-        lqtyToken.address,
-        lusdToken.address,
+      debtTokenManager.setAddresses(
         troveManager.address,
         borrowerOperations.address,
-        activePool.address,
+        stabilityPoolManager.address,
+        priceFeed.address,
         { ...overrides, nonce }
       ),
 
-    nonce =>
-      lockupContractFactory.setLQTYTokenAddress(lqtyToken.address, {
-        ...overrides,
-        nonce
-      }),
+    nonce => collTokenManager.setAddresses(priceFeed.address, { ...overrides, nonce }),
 
     nonce =>
-      communityIssuance.setAddresses(lqtyToken.address, stabilityPool.address, {
-        ...overrides,
-        nonce
-      }),
+      stabilityPoolManager.setAddresses(
+        troveManager.address,
+        priceFeed.address,
+        storagePool.address,
+        debtTokenManager.address,
+        { ...overrides, nonce }
+      ),
 
-    nonce =>
-      unipool.setParams(lqtyToken.address, uniToken.address, 2 * 30 * 24 * 60 * 60, {
-        ...overrides,
-        nonce
-      })
+    // todo
+    // nonce =>
+    //   hintHelpers.setAddresses(sortedTroves.address, troveManager.address, {
+    //     ...overrides,
+    //     nonce,
+    //   }),
+    // nonce =>
+    //   lqtyStaking.setAddresses(
+    //     lqtyToken.address,
+    //     lusdToken.address,
+    //     troveManager.address,
+    //     borrowerOperations.address,
+    //     activePool.address,
+    //     { ...overrides, nonce }
+    //   ),
+    // nonce =>
+    //   lockupContractFactory.setLQTYTokenAddress(lqtyToken.address, {
+    //     ...overrides,
+    //     nonce,
+    //   }),
+    // nonce =>
+    //   communityIssuance.setAddresses(lqtyToken.address, stabilityPool.address, {
+    //     ...overrides,
+    //     nonce,
+    //   }),
+    // nonce =>
+    //   unipool.setParams(lqtyToken.address, uniToken.address, 2 * 30 * 24 * 60 * 60, {
+    //     ...overrides,
+    //     nonce,
+    //   }),
   ];
 
   const txs = await Promise.all(connections.map((connect, i) => connect(txCount + i)));
@@ -297,21 +209,43 @@ const connectContracts = async (
   await Promise.all(txs.map(tx => tx.wait().then(() => log(`Connected ${++i}`))));
 };
 
-const deployMockUniToken = (
+const deployAndConnectDebtTokens = async (
+  _isDev: boolean,
+  { borrowerOperations, troveManager, stabilityPoolManager, debtTokenManager, priceFeed }: _LiquityContracts,
   deployer: Signer,
   getContractFactory: (name: string, signer: Signer) => Promise<ContractFactory>,
+  deployment: _LiquityDeploymentJSON,
   overrides?: Overrides
-) =>
-  deployContract(
-    deployer,
-    getContractFactory,
-    "ERC20Mock",
-    "Mock Uniswap V2",
-    "UNI-V2",
-    Wallet.createRandom().address, // initialAccount
-    0, // initialBalance
-    { ...overrides }
-  );
+) => {
+  const debtTokenNames = [{ name: 'jUSD', symbol: 'jUSD', version: '1.0', isStable: true }];
+  if (_isDev) debtTokenNames.push({ name: 'STOCK', symbol: 'STOCK', version: '1.0', isStable: false });
+
+  for (const { name, symbol, version, isStable } of debtTokenNames) {
+    const debtTokenAddress = await deployContract(
+      deployer,
+      getContractFactory,
+      'DebtToken',
+      troveManager.address,
+      borrowerOperations.address,
+      stabilityPoolManager.address,
+      priceFeed.address,
+      name,
+      symbol,
+      version,
+      isStable,
+      { ...overrides }
+    );
+    await debtTokenManager.addDebtToken(debtTokenAddress, { ...overrides });
+    deployment.debtTokens[name] = debtTokenAddress;
+    log(`Added debt token ${name} at ${debtTokenAddress}`);
+  }
+};
+
+// const deployMockUniToken = (
+//   deployer: Signer,
+//   getContractFactory: (name: string, signer: Signer) => Promise<ContractFactory>,
+//   overrides?: Overrides
+// ) => deployContract(deployer, getContractFactory, 'MockERC20', 'Mock Uniswap V2', 'UNI-V2', 18, { ...overrides });
 
 export const deployAndSetupContracts = async (
   deployer: Signer,
@@ -322,57 +256,55 @@ export const deployAndSetupContracts = async (
   overrides?: Overrides
 ): Promise<_LiquityDeploymentJSON> => {
   if (!deployer.provider) {
-    throw new Error("Signer must have a provider.");
+    throw new Error('Signer must have a provider.');
   }
 
-  log("Deploying contracts...");
+  log('Deploying contracts...');
   log();
 
   const deployment: _LiquityDeploymentJSON = {
     chainId: await deployer.getChainId(),
-    version: "unknown",
+    version: 'unknown',
     deploymentDate: new Date().getTime(),
     bootstrapPeriod: 0,
-    totalStabilityPoolLQTYReward: "0",
-    liquidityMiningLQTYRewardRate: "0",
+    totalStabilityPoolLQTYReward: '0',
+    liquidityMiningLQTYRewardRate: '0',
     _priceFeedIsTestnet,
     _uniTokenIsMock: !wethAddress,
     _isDev,
+    debtTokens: {},
 
     ...(await deployContracts(deployer, getContractFactory, _priceFeedIsTestnet, overrides).then(
       async ([addresses, startBlock]) => ({
         startBlock,
-
         addresses: {
           ...addresses,
-
-          uniToken: await (wethAddress
-            ? createUniswapV2Pair(deployer, wethAddress, addresses.lusdToken, overrides)
-            : deployMockUniToken(deployer, getContractFactory, overrides))
-        }
+          // todo
+          // uniToken: await (wethAddress
+          //   ? createUniswapV2Pair(deployer, wethAddress, addresses.lusdToken, overrides)
+          //   : deployMockUniToken(deployer, getContractFactory, overrides)),
+        },
       })
-    ))
+    )),
   };
 
   const contracts = _connectToContracts(deployer, deployment);
 
-  log("Connecting contracts...");
+  log('Connecting contracts...');
   await connectContracts(contracts, deployer, overrides);
 
-  const lqtyTokenDeploymentTime = await contracts.lqtyToken.getDeploymentStartTime();
-  const bootstrapPeriod = await contracts.troveManager.BOOTSTRAP_PERIOD();
-  const totalStabilityPoolLQTYReward = await contracts.communityIssuance.LQTYSupplyCap();
-  const liquidityMiningLQTYRewardRate = await contracts.unipool.rewardRate();
+  log('Deploying debt tokens...');
+  await deployAndConnectDebtTokens(_isDev, contracts, deployer, getContractFactory, deployment, overrides);
 
   return {
     ...deployment,
-    deploymentDate: lqtyTokenDeploymentTime.toNumber() * 1000,
-    bootstrapPeriod: bootstrapPeriod.toNumber(),
-    totalStabilityPoolLQTYReward: `${Decimal.fromBigNumberString(
-      totalStabilityPoolLQTYReward.toHexString()
-    )}`,
-    liquidityMiningLQTYRewardRate: `${Decimal.fromBigNumberString(
-      liquidityMiningLQTYRewardRate.toHexString()
-    )}`
+    bootstrapPeriod: (await contracts.troveManager.BOOTSTRAP_PERIOD()).toNumber(),
+
+    // todo
+    // deploymentDate: (await contracts.troveManager.getDeploymentStartTime()).toNumber() * 1000,
+    // totalStabilityPoolLQTYReward: `${Decimal.fromBigNumberString(
+    //   (await contracts.communityIssuance.LQTYSupplyCap()).toHexString()
+    // )}`,
+    // liquidityMiningLQTYRewardRate: `${Decimal.fromBigNumberString((await contracts.unipool.rewardRate()).toHexString())}`,
   };
 };

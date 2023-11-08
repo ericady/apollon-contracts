@@ -12,45 +12,34 @@ import {
   ContractTransaction,
 } from '@ethersproject/contracts';
 
-import activePoolAbi from '../abi/ActivePool.json';
+import storagePoolAbi from '../abi/StoragePool.json';
 import borrowerOperationsAbi from '../abi/BorrowerOperations.json';
 import troveManagerAbi from '../abi/TroveManager.json';
-import lusdTokenAbi from '../abi/LUSDToken.json';
-import collSurplusPoolAbi from '../abi/CollSurplusPool.json';
-import communityIssuanceAbi from '../abi/CommunityIssuance.json';
-import defaultPoolAbi from '../abi/DefaultPool.json';
-import lqtyTokenAbi from '../abi/LQTYToken.json';
-import lockupContractFactoryAbi from '../abi/LockupContractFactory.json';
-import lqtyStakingAbi from '../abi/LQTYStaking.json';
-import multiTroveGetterAbi from '../abi/MultiTroveGetter.json';
+import debtTokenManagerAbi from '../abi/DebtTokenManager.json';
 import priceFeedAbi from '../abi/PriceFeed.json';
-import priceFeedTestnetAbi from '../abi/PriceFeedTestnet.json';
-import stabilityPoolAbi from '../abi/StabilityPool.json';
-import gasPoolAbi from '../abi/GasPool.json';
-import unipoolAbi from '../abi/Unipool.json';
-import iERC20Abi from '../abi/IERC20.json';
-import erc20MockAbi from '../abi/ERC20Mock.json';
+import mockPriceFeedAbi from '../abi/MockPriceFeed.json';
+import collTokenManagerAbi from '../abi/CollTokenManager.json';
+import stabilityPoolManagerAbi from '../abi/StabilityPoolManager.json';
+
+// todo
+// import communityIssuanceAbi from '../abi/CommunityIssuance.json';
+// import lqtyTokenAbi from '../abi/LQTYToken.json';
+// import lockupContractFactoryAbi from '../abi/LockupContractFactory.json';
+// import lqtyStakingAbi from '../abi/LQTYStaking.json';
+// import multiTroveGetterAbi from '../abi/MultiTroveGetter.json';
+// import unipoolAbi from '../abi/Unipool.json';
 
 import {
-  ActivePool,
   BorrowerOperations,
   TroveManager,
-  LUSDToken,
-  CollSurplusPool,
-  CommunityIssuance,
-  DefaultPool,
-  LQTYToken,
-  HintHelpers,
-  LockupContractFactory,
-  LQTYStaking,
-  MultiTroveGetter,
   PriceFeed,
-  PriceFeedTestnet,
-  StabilityPool,
-  GasPool,
-  Unipool,
-  ERC20Mock,
   IERC20,
+  DebtTokenManager,
+  CollTokenManager,
+  StoragePool,
+  MockPriceFeed,
+  MockERC20,
+  StabilityPoolManager,
 } from '../types';
 
 import { EthersProvider, EthersSigner } from './types';
@@ -157,31 +146,31 @@ export type _TypedLiquityContract<T = unknown, U = unknown> = TypedContract<_Liq
 
 /** @internal */
 export interface _LiquityContracts {
-  activePool: ActivePool;
+  storagePool: StoragePool;
   borrowerOperations: BorrowerOperations;
   troveManager: TroveManager;
-  lusdToken: LUSDToken;
-  collSurplusPool: CollSurplusPool;
-  communityIssuance: CommunityIssuance;
-  defaultPool: DefaultPool;
-  lqtyToken: LQTYToken;
-  hintHelpers: HintHelpers;
-  lockupContractFactory: LockupContractFactory;
-  lqtyStaking: LQTYStaking;
-  multiTroveGetter: MultiTroveGetter;
-  priceFeed: PriceFeed | PriceFeedTestnet;
-  stabilityPool: StabilityPool;
-  gasPool: GasPool;
-  unipool: Unipool;
-  uniToken: IERC20 | ERC20Mock;
+  debtTokenManager: DebtTokenManager;
+  priceFeed: PriceFeed | MockPriceFeed;
+  collTokenManager: CollTokenManager;
+  stabilityPoolManager: StabilityPoolManager;
+
+  // todo
+  // communityIssuance: CommunityIssuance;
+  // lqtyToken: LQTYToken;
+  // hintHelpers: HintHelpers;
+  // lockupContractFactory: LockupContractFactory;
+  // lqtyStaking: LQTYStaking;
+  // multiTroveGetter: MultiTroveGetter;
+  // unipool: Unipool;
+  // uniToken: IERC20 | ERC20Mock;
 }
 
 /** @internal */
-export const _priceFeedIsTestnet = (priceFeed: PriceFeed | PriceFeedTestnet): priceFeed is PriceFeedTestnet =>
+export const _priceFeedIsTestnet = (priceFeed: PriceFeed | MockPriceFeed): priceFeed is MockPriceFeed =>
   'setPrice' in priceFeed;
 
 /** @internal */
-export const _uniTokenIsMock = (uniToken: IERC20 | ERC20Mock): uniToken is ERC20Mock => 'mint' in uniToken;
+export const _uniTokenIsMock = (uniToken: IERC20 | MockERC20): uniToken is MockERC20 => 'mint' in uniToken;
 
 type LiquityContractsKey = keyof _LiquityContracts;
 
@@ -191,22 +180,22 @@ export type _LiquityContractAddresses = Record<LiquityContractsKey, string>;
 type LiquityContractAbis = Record<LiquityContractsKey, JsonFragment[]>;
 
 const getAbi = (priceFeedIsTestnet: boolean, uniTokenIsMock: boolean): LiquityContractAbis => ({
-  activePool: activePoolAbi,
+  storagePool: storagePoolAbi,
   borrowerOperations: borrowerOperationsAbi,
   troveManager: troveManagerAbi,
-  lusdToken: lusdTokenAbi,
-  communityIssuance: communityIssuanceAbi,
-  defaultPool: defaultPoolAbi,
-  lqtyToken: lqtyTokenAbi,
-  lockupContractFactory: lockupContractFactoryAbi,
-  lqtyStaking: lqtyStakingAbi,
-  multiTroveGetter: multiTroveGetterAbi,
-  priceFeed: priceFeedIsTestnet ? priceFeedTestnetAbi : priceFeedAbi,
-  stabilityPool: stabilityPoolAbi,
-  gasPool: gasPoolAbi,
-  collSurplusPool: collSurplusPoolAbi,
-  unipool: unipoolAbi,
-  uniToken: uniTokenIsMock ? erc20MockAbi : iERC20Abi,
+  debtTokenManager: debtTokenManagerAbi,
+  priceFeed: priceFeedIsTestnet ? mockPriceFeedAbi : priceFeedAbi,
+  collTokenManager: collTokenManagerAbi,
+  stabilityPoolManager: stabilityPoolManagerAbi,
+
+  // todo
+  // communityIssuance: communityIssuanceAbi,
+  // lqtyToken: lqtyTokenAbi,
+  // lockupContractFactory: lockupContractFactoryAbi,
+  // lqtyStaking: lqtyStakingAbi,
+  // multiTroveGetter: multiTroveGetterAbi,
+  // unipool: unipoolAbi,
+  // uniToken: uniTokenIsMock ? erc20MockAbi : iERC20Abi,
 });
 
 const mapLiquityContracts = <T, U>(
@@ -222,6 +211,7 @@ const mapLiquityContracts = <T, U>(
 export interface _LiquityDeploymentJSON {
   readonly chainId: number;
   readonly addresses: _LiquityContractAddresses;
+  readonly debtTokens: Record<string, string>;
   readonly version: string;
   readonly deploymentDate: number;
   readonly startBlock: number;
