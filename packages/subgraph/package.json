@@ -1,23 +1,20 @@
 {
-  "name": "@liquity/subgraph",
-  "version": "0.1.0",
-  "private": true,
+  "name": "subgraph",
+  "license": "UNLICENSED",
   "scripts": {
-    "create-local": "graph create liquity/liquity --node http://127.0.0.1:8020",
-    "prepare": "run-s 'prepare:*'",
-    "prepare:manifest": "node subgraph.yaml.js",
-    "prepare:codegen": "graph codegen",
-    "prepare-local": "run-s 'prepare-local:*'",
-    "prepare-local:manifest": "node subgraph.yaml.js dev",
-    "prepare-local:codegen": "graph codegen",
+    "codegen": "graph codegen",
     "build": "graph build",
-    "deploy": "graph deploy liquity/liquity --debug --ipfs https://api.thegraph.com/ipfs/ --node https://api.thegraph.com/deploy/",
-    "deploy-local": "graph deploy liquity/liquity --ipfs http://localhost:5001 --node http://127.0.0.1:8020",
-    "graph": "graph"
+    "deploy": "graph deploy --node https://api.studio.thegraph.com/deploy/ subgraph",
+    "create-local": "graph create --node http://localhost:8020/ subgraph",
+    "remove-local": "graph remove --node http://localhost:8020/ subgraph",
+    "deploy-local": "graph deploy --node http://localhost:8020/ --ipfs http://localhost:5001 subgraph",
+    "test": "graph test"
+  },
+  "dependencies": {
+    "@graphprotocol/graph-cli": "0.60.0",
+    "@graphprotocol/graph-ts": "0.30.0"
   },
   "devDependencies": {
-    "@graphprotocol/graph-cli": "^0.54.0",
-    "@graphprotocol/graph-ts": "0.31.0",
-    "npm-run-all": "^4.1.5"
+    "matchstick-as": "0.5.0"
   }
 }

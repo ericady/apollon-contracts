@@ -9,6 +9,12 @@ module.exports = {
       gas: 9000000,
       network_id: 5777,
     },
+    development: {
+      host: '127.0.0.1',
+      port: 8545,
+      gas: 9000000,
+      network_id: 5777,
+    },
     // test: {
     //   port: 7545,
     //   gas: 9000000,

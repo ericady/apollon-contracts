@@ -1,0 +1,39 @@
+specVersion: 0.0.5
+schema:
+  file: ./schema.graphql
+dataSources:
+  - kind: ethereum
+    name: StoragePool
+    network: mainnet
+    source:
+      address: "0xf3f802640f8a26379ce76975ef169733e3906ff4"
+      abi: StoragePool
+      startBlock: 1
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      entities:
+        - BorrowerOperationsAddressChanged
+        - OwnershipTransferred
+        - PoolValueUpdated
+        - PriceFeedAddressChanged
+        - StabilityPoolManagerAddressChanged
+        - TroveManagerAddressChanged
+      abis:
+        - name: StoragePool
+          file: ./abis/StoragePool.json
+      eventHandlers:
+        - event: BorrowerOperationsAddressChanged(address)
+          handler: handleBorrowerOperationsAddressChanged
+        - event: OwnershipTransferred(indexed address,indexed address)
+          handler: handleOwnershipTransferred
+        - event: PoolValueUpdated(address,bool,uint8,uint256)
+          handler: handlePoolValueUpdated
+        - event: PriceFeedAddressChanged(address)
+          handler: handlePriceFeedAddressChanged
+        - event: StabilityPoolManagerAddressChanged(address)
+          handler: handleStabilityPoolManagerAddressChanged
+        - event: TroveManagerAddressChanged(address)
+          handler: handleTroveManagerAddressChanged
+      file: ./src/storage-pool.ts

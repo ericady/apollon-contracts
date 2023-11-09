@@ -1,0 +1,8 @@
+{
+  "mainnet": {
+    "StoragePool": {
+      "address": "0xf3f802640f8a26379ce76975ef169733e3906ff4",
+      "startBlock": 1
+    }
+  }
+}
