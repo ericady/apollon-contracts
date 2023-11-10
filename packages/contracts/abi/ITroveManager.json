@@ -41,22 +41,12 @@
     },
     {
         "inputs": [],
-        "name": "NoRedeems",
-        "type": "error"
-    },
-    {
-        "inputs": [],
-        "name": "NotFromBorrowerOps",
+        "name": "NotFromBorrowerOrRedemptionOps",
         "type": "error"
     },
     {
         "inputs": [],
         "name": "OnlyOneTrove",
-        "type": "error"
-    },
-    {
-        "inputs": [],
-        "name": "TooHighRedeemFee",
         "type": "error"
     },
     {
@@ -257,6 +247,19 @@
             }
         ],
         "name": "Redemption",
+        "type": "event"
+    },
+    {
+        "anonymous": false,
+        "inputs": [
+            {
+                "indexed": false,
+                "internalType": "address",
+                "name": "_newRedemptionManagerAddress",
+                "type": "address"
+            }
+        ],
+        "name": "RedemptionManagerAddressChanged",
         "type": "event"
     },
     {
@@ -469,6 +472,19 @@
         "type": "function"
     },
     {
+        "inputs": [],
+        "name": "calcDecayedBaseRate",
+        "outputs": [
+            {
+                "internalType": "uint256",
+                "name": "",
+                "type": "uint256"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
         "inputs": [
             {
                 "internalType": "address[]",
@@ -556,6 +572,19 @@
         "name": "decreaseTroveDebt",
         "outputs": [],
         "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [],
+        "name": "getBaseRate",
+        "outputs": [
+            {
+                "internalType": "uint256",
+                "name": "",
+                "type": "uint256"
+            }
+        ],
+        "stateMutability": "view",
         "type": "function"
     },
     {
@@ -764,51 +793,6 @@
             {
                 "internalType": "uint256",
                 "name": "pendingReward",
-                "type": "uint256"
-            }
-        ],
-        "stateMutability": "view",
-        "type": "function"
-    },
-    {
-        "inputs": [
-            {
-                "internalType": "uint256",
-                "name": "_ETHDrawn",
-                "type": "uint256"
-            }
-        ],
-        "name": "getRedemptionFeeWithDecay",
-        "outputs": [
-            {
-                "internalType": "uint256",
-                "name": "",
-                "type": "uint256"
-            }
-        ],
-        "stateMutability": "view",
-        "type": "function"
-    },
-    {
-        "inputs": [],
-        "name": "getRedemptionRate",
-        "outputs": [
-            {
-                "internalType": "uint256",
-                "name": "",
-                "type": "uint256"
-            }
-        ],
-        "stateMutability": "view",
-        "type": "function"
-    },
-    {
-        "inputs": [],
-        "name": "getRedemptionRateWithDecay",
-        "outputs": [
-            {
-                "internalType": "uint256",
-                "name": "",
                 "type": "uint256"
             }
         ],
@@ -1033,29 +1017,6 @@
     {
         "inputs": [
             {
-                "internalType": "uint256",
-                "name": "_stableCoinAmount",
-                "type": "uint256"
-            },
-            {
-                "internalType": "uint256",
-                "name": "_maxFee",
-                "type": "uint256"
-            },
-            {
-                "internalType": "address[]",
-                "name": "_sourceTroves",
-                "type": "address[]"
-            }
-        ],
-        "name": "redeemCollateral",
-        "outputs": [],
-        "stateMutability": "nonpayable",
-        "type": "function"
-    },
-    {
-        "inputs": [
-            {
                 "internalType": "address[]",
                 "name": "collTokenAddresses",
                 "type": "address[]"
@@ -1085,6 +1046,24 @@
             }
         ],
         "name": "setTroveStatus",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "uint256",
+                "name": "_totalRedeemedStable",
+                "type": "uint256"
+            },
+            {
+                "internalType": "uint256",
+                "name": "_totalStableCoinSupply",
+                "type": "uint256"
+            }
+        ],
+        "name": "updateBaseRateFromRedemption",
         "outputs": [],
         "stateMutability": "nonpayable",
         "type": "function"

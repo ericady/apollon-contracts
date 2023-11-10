@@ -32,34 +32,5 @@
         ],
         "stateMutability": "view",
         "type": "function"
-    },
-    {
-        "inputs": [
-            {
-                "internalType": "uint256",
-                "name": "_stableCoinAmount",
-                "type": "uint256"
-            },
-            {
-                "internalType": "uint256",
-                "name": "_maxFeePercentage",
-                "type": "uint256"
-            },
-            {
-                "internalType": "address[]",
-                "name": "_sourceTroves",
-                "type": "address[]"
-            }
-        ],
-        "name": "redeemCollateral",
-        "outputs": [
-            {
-                "internalType": "uint256",
-                "name": "",
-                "type": "uint256"
-            }
-        ],
-        "stateMutability": "nonpayable",
-        "type": "function"
     }
 ]

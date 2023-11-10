@@ -19,6 +19,7 @@ interface ITroveManager is IBBase {
 
   // --- Events ---
 
+  event RedemptionManagerAddressChanged(address _newRedemptionManagerAddress);
   event BorrowerOperationsAddressChanged(address _newBorrowerOperationsAddress);
   event PriceFeedAddressChanged(address _newPriceFeedAddress);
   event DebtTokenManagerAddressChanged(address _newDebtTokenManagerAddress);
@@ -43,7 +44,7 @@ interface ITroveManager is IBBase {
   event TroveSnapshotsUpdated(uint _L_ETH, uint _L_LUSDDebt);
   event TroveIndexUpdated(address _borrower, uint _newIndex);
 
-  error NotFromBorrowerOps();
+  error NotFromBorrowerOrRedemptionOps();
   error InvalidTrove();
   error ExceedDebtBalance();
   error OnlyOneTrove();
@@ -52,8 +53,6 @@ interface ITroveManager is IBBase {
   error GreaterThanTCR();
   error InvalidMaxFeePercent();
   error NoLiquidatableTrove();
-  error NoRedeems();
-  error TooHighRedeemFee();
   error EmptyArray();
 
   // --- Functions ---
@@ -71,6 +70,10 @@ interface ITroveManager is IBBase {
   function updateStakeAndTotalStakes(address[] memory collTokenAddresses, address _borrower) external;
 
   function updateTroveRewardSnapshots(address _borrower) external;
+
+  function calcDecayedBaseRate() external view returns (uint);
+
+  function updateBaseRateFromRedemption(uint _totalRedeemedStable, uint _totalStableCoinSupply) external;
 
   function addTroveOwnerToArray(address _borrower) external returns (uint index);
 
@@ -98,13 +101,7 @@ interface ITroveManager is IBBase {
 
   function removeStake(address[] memory collTokenAddresses, address _borrower) external;
 
-  function redeemCollateral(uint _stableCoinAmount, uint _maxFee, address[] memory _sourceTroves) external;
-
-  function getRedemptionRate() external view returns (uint);
-
-  function getRedemptionRateWithDecay() external view returns (uint);
-
-  function getRedemptionFeeWithDecay(uint _ETHDrawn) external view returns (uint);
+  function getBaseRate() external view returns (uint);
 
   function getBorrowingRate() external view returns (uint);
 

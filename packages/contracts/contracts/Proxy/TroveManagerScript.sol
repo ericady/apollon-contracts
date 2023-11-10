@@ -14,12 +14,4 @@ contract TroveManagerScript is CheckContract {
     checkContract(address(_troveManager));
     troveManager = _troveManager;
   }
-
-  function redeemCollateral(
-    uint _stableCoinAmount,
-    uint _maxFeePercentage,
-    address[] memory _sourceTroves
-  ) external returns (uint) {
-    troveManager.redeemCollateral(_stableCoinAmount, _maxFeePercentage, _sourceTroves);
-  }
 }

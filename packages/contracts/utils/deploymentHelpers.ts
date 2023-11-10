@@ -4,6 +4,7 @@ import {
   DebtTokenManager,
   MockERC20,
   MockPriceFeed,
+  RedemptionOperations,
   MockTroveManager,
   StabilityPoolManagerTester,
   StoragePool,
@@ -13,6 +14,7 @@ import { BorrowerOperationsTester } from '../typechain/contracts/TestContracts/B
 
 export interface Contracts {
   borrowerOperations: BorrowerOperationsTester;
+  redemptionOperations: RedemptionOperations;
   troveManager: MockTroveManager;
   stabilityPoolManager: StabilityPoolManagerTester;
   storagePool: StoragePool;
@@ -26,6 +28,9 @@ export interface Contracts {
 export const deployCore = async (): Promise<Contracts> => {
   const borrowerOperationsFactory = await ethers.getContractFactory('BorrowerOperationsTester');
   const borrowerOperations = await borrowerOperationsFactory.deploy();
+
+  const redemptionOperationsFactory = await ethers.getContractFactory('RedemptionOperations');
+  const redemptionOperations = await redemptionOperationsFactory.deploy();
 
   const troveManagerFactory = await ethers.getContractFactory('MockTroveManager');
   const troveManager = await troveManagerFactory.deploy();
@@ -47,6 +52,7 @@ export const deployCore = async (): Promise<Contracts> => {
 
   return {
     borrowerOperations,
+    redemptionOperations,
     troveManager,
     stabilityPoolManager,
     storagePool,
@@ -62,6 +68,7 @@ export const deployCore = async (): Promise<Contracts> => {
 export const connectCoreContracts = async (contracts: Contracts) => {
   await contracts.troveManager.setAddresses(
     contracts.borrowerOperations,
+    contracts.redemptionOperations,
     contracts.storagePool,
     contracts.stabilityPoolManager,
     contracts.priceFeed,
@@ -73,6 +80,14 @@ export const connectCoreContracts = async (contracts: Contracts) => {
     contracts.troveManager,
     contracts.storagePool,
     contracts.stabilityPoolManager,
+    contracts.priceFeed,
+    contracts.debtTokenManager,
+    contracts.collTokenManager
+  );
+
+  await contracts.redemptionOperations.setAddresses(
+    contracts.troveManager,
+    contracts.storagePool,
     contracts.priceFeed,
     contracts.debtTokenManager,
     contracts.collTokenManager

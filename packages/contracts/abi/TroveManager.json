@@ -41,27 +41,17 @@
     },
     {
         "inputs": [],
-        "name": "NoRedeems",
-        "type": "error"
-    },
-    {
-        "inputs": [],
         "name": "NotContract",
         "type": "error"
     },
     {
         "inputs": [],
-        "name": "NotFromBorrowerOps",
+        "name": "NotFromBorrowerOrRedemptionOps",
         "type": "error"
     },
     {
         "inputs": [],
         "name": "OnlyOneTrove",
-        "type": "error"
-    },
-    {
-        "inputs": [],
-        "name": "TooHighRedeemFee",
         "type": "error"
     },
     {
@@ -286,6 +276,19 @@
             }
         ],
         "name": "Redemption",
+        "type": "event"
+    },
+    {
+        "anonymous": false,
+        "inputs": [
+            {
+                "indexed": false,
+                "internalType": "address",
+                "name": "_newRedemptionManagerAddress",
+                "type": "address"
+            }
+        ],
+        "name": "RedemptionManagerAddressChanged",
         "type": "event"
     },
     {
@@ -571,19 +574,6 @@
     },
     {
         "inputs": [],
-        "name": "REDEMPTION_FEE_FLOOR",
-        "outputs": [
-            {
-                "internalType": "uint256",
-                "name": "",
-                "type": "uint256"
-            }
-        ],
-        "stateMutability": "view",
-        "type": "function"
-    },
-    {
-        "inputs": [],
         "name": "SECONDS_IN_ONE_MINUTE",
         "outputs": [
             {
@@ -736,6 +726,19 @@
         "type": "function"
     },
     {
+        "inputs": [],
+        "name": "calcDecayedBaseRate",
+        "outputs": [
+            {
+                "internalType": "uint256",
+                "name": "",
+                "type": "uint256"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
         "inputs": [
             {
                 "internalType": "address[]",
@@ -849,6 +852,19 @@
         "name": "decreaseTroveDebt",
         "outputs": [],
         "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [],
+        "name": "getBaseRate",
+        "outputs": [
+            {
+                "internalType": "uint256",
+                "name": "",
+                "type": "uint256"
+            }
+        ],
+        "stateMutability": "view",
         "type": "function"
     },
     {
@@ -1057,51 +1073,6 @@
             {
                 "internalType": "uint256",
                 "name": "pendingReward",
-                "type": "uint256"
-            }
-        ],
-        "stateMutability": "view",
-        "type": "function"
-    },
-    {
-        "inputs": [
-            {
-                "internalType": "uint256",
-                "name": "_ETHDrawn",
-                "type": "uint256"
-            }
-        ],
-        "name": "getRedemptionFeeWithDecay",
-        "outputs": [
-            {
-                "internalType": "uint256",
-                "name": "",
-                "type": "uint256"
-            }
-        ],
-        "stateMutability": "view",
-        "type": "function"
-    },
-    {
-        "inputs": [],
-        "name": "getRedemptionRate",
-        "outputs": [
-            {
-                "internalType": "uint256",
-                "name": "",
-                "type": "uint256"
-            }
-        ],
-        "stateMutability": "view",
-        "type": "function"
-    },
-    {
-        "inputs": [],
-        "name": "getRedemptionRateWithDecay",
-        "outputs": [
-            {
-                "internalType": "uint256",
-                "name": "",
                 "type": "uint256"
             }
         ],
@@ -1411,26 +1382,16 @@
         "type": "function"
     },
     {
-        "inputs": [
+        "inputs": [],
+        "name": "redemptionManagerAddress",
+        "outputs": [
             {
-                "internalType": "uint256",
-                "name": "_stableCoinAmount",
-                "type": "uint256"
-            },
-            {
-                "internalType": "uint256",
-                "name": "_maxFeePercentage",
-                "type": "uint256"
-            },
-            {
-                "internalType": "address[]",
-                "name": "_sourceTroves",
-                "type": "address[]"
+                "internalType": "address",
+                "name": "",
+                "type": "address"
             }
         ],
-        "name": "redeemCollateral",
-        "outputs": [],
-        "stateMutability": "nonpayable",
+        "stateMutability": "view",
         "type": "function"
     },
     {
@@ -1492,6 +1453,11 @@
             {
                 "internalType": "address",
                 "name": "_borrowerOperationsAddress",
+                "type": "address"
+            },
+            {
+                "internalType": "address",
+                "name": "_redemptionManagerAddress",
                 "type": "address"
             },
             {
@@ -1635,6 +1601,24 @@
             }
         ],
         "name": "transferOwnership",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "uint256",
+                "name": "_totalRedeemedStable",
+                "type": "uint256"
+            },
+            {
+                "internalType": "uint256",
+                "name": "_totalStableCoinSupply",
+                "type": "uint256"
+            }
+        ],
+        "name": "updateBaseRateFromRedemption",
         "outputs": [],
         "stateMutability": "nonpayable",
         "type": "function"

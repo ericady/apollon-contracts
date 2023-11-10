@@ -24,6 +24,7 @@ contract TroveManager is LiquityBase, Ownable, CheckContract, ITroveManager {
   IDebtTokenManager public debtTokenManager;
   ICollTokenManager public collTokenManager;
   address public borrowerOperationsAddress;
+  address public redemptionManagerAddress;
   IStabilityPoolManager public stabilityPoolManager;
   IStoragePool public storagePool;
   IPriceFeed public priceFeed;
@@ -40,7 +41,6 @@ contract TroveManager is LiquityBase, Ownable, CheckContract, ITroveManager {
    */
   uint public constant SECONDS_IN_ONE_MINUTE = 60;
   uint public constant MINUTE_DECAY_FACTOR = 999037758833783000;
-  uint public constant REDEMPTION_FEE_FLOOR = (DECIMAL_PRECISION / 1000) * 5; // 0.5%
   uint public constant MAX_BORROWING_FEE = (DECIMAL_PRECISION / 100) * 5; // 5%
 
   // During bootsrap period redemptions are not allowed
@@ -134,24 +134,6 @@ contract TroveManager is LiquityBase, Ownable, CheckContract, ITroveManager {
     uint troveCollInStable;
   }
 
-  struct RedemptionVariables {
-    address[] collTokenAddresses;
-    //
-    uint totalStableSupplyAtStart;
-    uint totalRedeemedStable;
-    //
-    uint totalETHDrawn;
-    uint ETHFee;
-    uint ETHToSendToRedeemer;
-    uint decayedBaseRate;
-  }
-
-  struct RedemptionCollAmount {
-    uint drawn;
-    uint redemptionFee;
-    uint sendToRedeemer;
-  }
-
   struct SingleRedemptionVariables {
     uint stableCoinLot;
     TokenAmount[] collLots;
@@ -165,6 +147,7 @@ contract TroveManager is LiquityBase, Ownable, CheckContract, ITroveManager {
 
   function setAddresses(
     address _borrowerOperationsAddress,
+    address _redemptionManagerAddress,
     address _storagePoolAddress,
     address _stabilityPoolManagerAddress,
     address _priceFeedAddress,
@@ -172,6 +155,7 @@ contract TroveManager is LiquityBase, Ownable, CheckContract, ITroveManager {
     address _collTokenManagerAddress
   ) external onlyOwner {
     checkContract(_borrowerOperationsAddress);
+    checkContract(_redemptionManagerAddress);
     checkContract(_storagePoolAddress);
     checkContract(_stabilityPoolManagerAddress);
     checkContract(_priceFeedAddress);
@@ -180,6 +164,9 @@ contract TroveManager is LiquityBase, Ownable, CheckContract, ITroveManager {
 
     borrowerOperationsAddress = _borrowerOperationsAddress;
     emit BorrowerOperationsAddressChanged(_borrowerOperationsAddress);
+
+    redemptionManagerAddress = _redemptionManagerAddress;
+    emit RedemptionManagerAddressChanged(_redemptionManagerAddress);
 
     storagePool = IStoragePool(_storagePoolAddress);
     emit StoragePoolAddressChanged(_storagePoolAddress);
@@ -737,178 +724,6 @@ contract TroveManager is LiquityBase, Ownable, CheckContract, ITroveManager {
     }
   }
 
-  // --- Redemption functions ---
-
-  /* Send stable coin to the system and redeem the corresponding amount of collateral from as many Troves as are needed to fill the redemption
-   * request.  Applies pending rewards to a Trove before reducing its debt and coll.
-   *
-   * Note that if _amount is very large, this function can run out of gas, specially if traversed troves are small. This can be easily avoided by
-   * splitting the total _amount in appropriate chunks and calling the function multiple times.
-   *
-   * Param `_maxIterations` can also be provided, so the loop through Troves is capped (if it’s zero, it will be ignored).This makes it easier to
-   * avoid OOG for the frontend, as only knowing approximately the average cost of an iteration is enough, without needing to know the “topology”
-   * of the trove list. It also avoids the need to set the cap in stone in the contract, nor doing gas calculations, as both gas price and opcode
-   * costs can vary.
-   *
-   * All Troves that are redeemed from, will end up with no stable coin debt left.
-   *
-   * If another transaction modifies the list between calling getRedemptionHints() and passing the hints to redeemCollateral(), it
-   * is very likely that the last (partially) redeemed Trove would end up with a different ICR than what the hint is for. In this case the
-   * redemption will stop after the last completely redeemed Trove and the sender will keep the remaining stable amount, which they can attempt
-   * to redeem later.
-   */
-  function redeemCollateral(
-    uint _stableCoinAmount,
-    uint _maxFeePercentage,
-    address[] memory _sourceTroves
-  ) external override {
-    RedemptionVariables memory vars;
-    vars.collTokenAddresses = collTokenManager.getCollTokenAddresses();
-    IDebtToken stableCoin = debtTokenManager.getStableCoin();
-
-    if (_stableCoinAmount == 0) revert ZeroAmount();
-    if (_maxFeePercentage < REDEMPTION_FEE_FLOOR || _maxFeePercentage > DECIMAL_PRECISION)
-      revert InvalidMaxFeePercent();
-    if (_stableCoinAmount > stableCoin.balanceOf(msg.sender)) revert ExceedDebtBalance();
-    (, uint TCR, , ) = storagePool.checkRecoveryMode();
-    if (TCR < MCR) revert LessThanMCR();
-
-    vars.totalStableSupplyAtStart =
-      storagePool.getValue(address(stableCoin), false, PoolType.Active) +
-      storagePool.getValue(address(stableCoin), false, PoolType.Default);
-
-    // Confirm redeemer's balance is less than total stable coin supply
-    assert(stableCoin.balanceOf(msg.sender) <= vars.totalStableSupplyAtStart);
-
-    // seed drawn coll
-    RedemptionCollAmount[] memory totalCollDrawn = new RedemptionCollAmount[](vars.collTokenAddresses.length);
-
-    // Loop through the stable coin source troves
-    assert(_sourceTroves.length >= 1);
-    for (uint i = 0; i < _sourceTroves.length; i++) {
-      address currentBorrower = _sourceTroves[i];
-      if (currentBorrower == address(0) || _stableCoinAmount == 0) continue;
-
-      SingleRedemptionVariables memory singleRedemption = _redeemCollateralFromTrove(
-        vars,
-        currentBorrower,
-        _stableCoinAmount
-      );
-
-      // sum up redeemed stable and drawn collateral
-      vars.totalRedeemedStable += singleRedemption.stableCoinLot;
-      _stableCoinAmount -= singleRedemption.stableCoinLot;
-      for (uint a = 0; a < singleRedemption.collLots.length; a++) {
-        for (uint b = 0; b < totalCollDrawn.length; b++) {
-          if (singleRedemption.collLots[a].tokenAddress != vars.collTokenAddresses[b]) continue;
-
-          totalCollDrawn[b].drawn += singleRedemption.collLots[a].amount;
-          break;
-        }
-      }
-    }
-
-    if (vars.totalRedeemedStable == 0) revert NoRedeems();
-
-    // Decay the baseRate due to time passed, and then increase it according to the size of this redemption.
-    // Use the saved total LUSD supply value, from before it was reduced by the redemption.
-    _updateBaseRateFromRedemption(vars.totalRedeemedStable, vars.totalStableSupplyAtStart);
-
-    // Calculate the redemption fee
-    for (uint i = 0; i < totalCollDrawn.length; i++) {
-      RedemptionCollAmount memory collEntry = totalCollDrawn[i];
-      collEntry.redemptionFee = _getRedemptionFee(collEntry.drawn);
-      collEntry.sendToRedeemer = collEntry.drawn - collEntry.redemptionFee;
-      _requireUserAcceptsFee(collEntry.redemptionFee, collEntry.drawn, _maxFeePercentage);
-    }
-
-    // todo
-    //    emit Redemption(_LUSDamount, vars.totalLUSDToRedeem, vars.totalETHDrawn, vars.ETHFee);
-
-    // Burn the total stable coin that is cancelled with debt, and send the redeemed coll to msg.sender
-    storagePool.subtractValue(address(stableCoin), false, PoolType.Active, vars.totalRedeemedStable);
-    stableCoin.burn(msg.sender, vars.totalRedeemedStable);
-
-    // transfer the drawn collateral to account
-    for (uint i = 0; i < totalCollDrawn.length; i++) {
-      RedemptionCollAmount memory collEntry = totalCollDrawn[i];
-      if (collEntry.sendToRedeemer == 0) continue;
-
-      storagePool.withdrawalValue(msg.sender, vars.collTokenAddresses[i], true, PoolType.Active, collEntry.drawn);
-
-      // todo jelly handover
-      //    // Send the fee to the gov token staking contract
-      //    contractsCache.activePool.sendETH(address(contractsCache.lqtyStaking), vars.ETHFee);
-    }
-  }
-
-  // Redeem as much collateral as possible from _borrower's Trove in exchange for stable coin up to _redeemMaxAmount
-  function _redeemCollateralFromTrove(
-    RedemptionVariables memory outerVars,
-    address _borrower,
-    uint _redeemMaxAmount
-  ) internal returns (SingleRedemptionVariables memory vars) {
-    _applyPendingRewards(_borrower);
-
-    (vars.collLots, vars.stableCoinEntry, vars.troveCollInStable, vars.troveDebtInStable) = _prepareTroveRedemption(
-      _borrower
-    );
-
-    // todo stable coin only CRs are needed here, all the other debt tokens need to be excluded.
-    // also just < TCR is not enough, if the user whats to redeem more then 50% of the stable coin supply...
-    uint preCR = LiquityMath._computeCR(vars.troveCollInStable, vars.troveDebtInStable);
-    (, uint TCR, , ) = storagePool.checkRecoveryMode();
-    // TroveManager: Source troves CR is not under the TCR.
-    if (preCR >= TCR) revert GreaterThanTCR();
-
-    // Determine the remaining amount (lot) to be redeemed, capped by the entire debt of the Trove minus the liquidation reserve
-    vars.stableCoinLot = LiquityMath._min(_redeemMaxAmount, vars.stableCoinEntry.amount - STABLE_COIN_GAS_COMPENSATION);
-
-    // calculate the coll lot
-    uint newCollInStable = vars.troveCollInStable;
-    for (uint i = 0; i < vars.collLots.length; i++) {
-      TokenAmount memory collEntry = vars.collLots[i];
-
-      uint collPrice = priceFeed.getPrice(collEntry.tokenAddress);
-      uint collInStable = priceFeed.getUSDValue(collEntry.tokenAddress, collEntry.amount);
-      uint collToRedeemInStable = (vars.stableCoinLot * collInStable) / vars.troveCollInStable;
-      collEntry.amount = collToRedeemInStable / collPrice;
-      newCollInStable -= collToRedeemInStable;
-    }
-
-    /*
-     * If the provided hint is out of date, we bail since trying to reinsert without a good hint will almost
-     * certainly result in running out of gas.
-     *
-     * If the resultant net debt of the partial is less than the minimum, net debt we bail.
-     */
-    // TODO: Disabling cause it is never used, check again later
-    // uint newNICR = LiquityMath._computeNominalCR(
-    //   newCollInStable,
-    //   vars.troveDebtInStable - (vars.stableCoinLot * vars.stableCoinEntry.price)
-    // );
-
-    // updating the troves coll and debt
-    Troves[_borrower].debts[debtTokenManager.getStableCoin()] -= vars.stableCoinLot;
-    for (uint i = 0; i < vars.collLots.length; i++) {
-      TokenAmount memory collAmount = vars.collLots[i];
-      Troves[_borrower].colls[collAmount.tokenAddress] -= collAmount.amount;
-    }
-
-    _updateStakeAndTotalStakes(outerVars.collTokenAddresses, _borrower);
-
-    // todo
-    //    emit TroveUpdated(
-    //      _borrower,
-    //      newStableDebt,
-    //      newColl,
-    //      Troves[_borrower].stake,
-    //      TroveManagerOperation.redeemCollateral
-    //    );
-
-    return vars;
-  }
-
   // --- Helper functions ---
 
   // Return the nominal collateral ratio (ICR) of a given Trove, without the price. Takes a trove's pending coll and debt rewards from redistributions into account.
@@ -949,7 +764,7 @@ contract TroveManager is LiquityBase, Ownable, CheckContract, ITroveManager {
   }
 
   function applyPendingRewards(address _borrower) external override {
-    _requireCallerIsBorrowerOperations();
+    _requireCallerIsBorrowerOrRedemptionOperations();
     _applyPendingRewards(_borrower);
   }
 
@@ -993,7 +808,7 @@ contract TroveManager is LiquityBase, Ownable, CheckContract, ITroveManager {
 
   // Update borrower's snapshots to reflect the current values
   function updateTroveRewardSnapshots(address _borrower) external override {
-    _requireCallerIsBorrowerOperations();
+    _requireCallerIsBorrowerOrRedemptionOperations();
     return _updateTroveRewardSnapshots(_borrower);
   }
 
@@ -1090,41 +905,8 @@ contract TroveManager is LiquityBase, Ownable, CheckContract, ITroveManager {
     return (amounts, troveCollInStable, troveDebtInStable, troveDebtInStableWithoutGasCompensation);
   }
 
-  function _prepareTroveRedemption(
-    address _borrower
-  )
-    internal
-    view
-    returns (
-      TokenAmount[] memory amounts,
-      TokenAmount memory stableCoinEntry,
-      uint troveCollInStable,
-      uint troveDebtInStable
-    )
-  {
-    Trove storage trove = Troves[_borrower];
-
-    // stable coin debt should always exists because of the gas comp
-    for (uint i = 0; i < trove.debtTokens.length; i++) {
-      IDebtToken debtToken = trove.debtTokens[i];
-      uint amount = trove.debts[debtToken];
-
-      if (debtToken.isStableCoin()) stableCoinEntry = TokenAmount(address(debtToken), amount);
-      troveDebtInStable += priceFeed.getUSDValue(address(debtToken), amount);
-    }
-
-    amounts = new TokenAmount[](trove.collTokens.length);
-    for (uint i = 0; i < amounts.length; i++) {
-      address tokenAddress = trove.collTokens[i];
-      amounts[i] = TokenAmount(tokenAddress, trove.colls[tokenAddress]);
-      troveCollInStable += priceFeed.getUSDValue(tokenAddress, amounts[i].amount);
-    }
-
-    return (amounts, stableCoinEntry, troveCollInStable, troveDebtInStable);
-  }
-
   function removeStake(address[] memory collTokenAddresses, address _borrower) external override {
-    _requireCallerIsBorrowerOperations();
+    _requireCallerIsBorrowerOrRedemptionOperations();
     return _removeStake(collTokenAddresses, _borrower);
   }
 
@@ -1139,7 +921,7 @@ contract TroveManager is LiquityBase, Ownable, CheckContract, ITroveManager {
   }
 
   function updateStakeAndTotalStakes(address[] memory collTokenAddresses, address _borrower) external override {
-    _requireCallerIsBorrowerOperations();
+    _requireCallerIsBorrowerOrRedemptionOperations();
     _updateStakeAndTotalStakes(collTokenAddresses, _borrower);
   }
 
@@ -1224,7 +1006,7 @@ contract TroveManager is LiquityBase, Ownable, CheckContract, ITroveManager {
   }
 
   function closeTrove(address[] memory collTokenAddresses, address _borrower) external override {
-    _requireCallerIsBorrowerOperations();
+    _requireCallerIsBorrowerOrRedemptionOperations();
     return _closeTrove(collTokenAddresses, _borrower, Status.closedByOwner);
   }
 
@@ -1265,7 +1047,7 @@ contract TroveManager is LiquityBase, Ownable, CheckContract, ITroveManager {
 
   // Push the owner's address to the Trove owners list, and record the corresponding array index on the Trove struct
   function addTroveOwnerToArray(address _borrower) external override returns (uint index) {
-    _requireCallerIsBorrowerOperations();
+    _requireCallerIsBorrowerOrRedemptionOperations();
     return _addTroveOwnerToArray(_borrower);
   }
 
@@ -1310,75 +1092,18 @@ contract TroveManager is LiquityBase, Ownable, CheckContract, ITroveManager {
     return TCR < CCR;
   }
 
-  // --- Redemption fee functions ---
-
-  /*
-   * This function has two impacts on the baseRate state variable:
-   * 1) decays the baseRate based on time passed since last redemption or stable coin borrowing operation.
-   * then,
-   * 2) increases the baseRate based on the amount redeemed, as a proportion of total supply
-   */
-  function _updateBaseRateFromRedemption(
-    uint _totalRedeemedStable,
-    uint _totalStableCoinSupply
-  ) internal returns (uint newBaseRate) {
-    uint decayedBaseRate = _calcDecayedBaseRate();
-
-    /* Convert the drawn coll back to LUSD at face value rate, in order to get
-     * the fraction of total supply that was redeemed at face value. */
-    uint redeemedLUSDFraction = _totalRedeemedStable / _totalStableCoinSupply;
-
-    // cap baseRate at a maximum of 100%
-    newBaseRate = LiquityMath._min(decayedBaseRate + redeemedLUSDFraction / BETA, DECIMAL_PRECISION);
-    //assert(newBaseRate <= DECIMAL_PRECISION); // This is already enforced in the line above
-    assert(newBaseRate > 0); // Base rate is always non-zero after redemption
-
-    // Update the baseRate state variable
-    baseRate = newBaseRate;
-    emit BaseRateUpdated(newBaseRate);
-
-    _updateLastFeeOpTime();
-  }
-
-  function getRedemptionRate() public view override returns (uint) {
-    return _calcRedemptionRate(baseRate);
-  }
-
-  function getRedemptionRateWithDecay() public view override returns (uint) {
-    return _calcRedemptionRate(_calcDecayedBaseRate());
-  }
-
-  function _calcRedemptionRate(uint _baseRate) internal pure returns (uint) {
-    return
-      LiquityMath._min(
-        REDEMPTION_FEE_FLOOR + _baseRate,
-        DECIMAL_PRECISION // cap at a maximum of 100%
-      );
-  }
-
-  function _getRedemptionFee(uint _ETHDrawn) internal view returns (uint) {
-    return _calcRedemptionFee(getRedemptionRate(), _ETHDrawn);
-  }
-
-  function getRedemptionFeeWithDecay(uint _ETHDrawn) external view override returns (uint) {
-    return _calcRedemptionFee(getRedemptionRateWithDecay(), _ETHDrawn);
-  }
-
-  function _calcRedemptionFee(uint _redemptionRate, uint _collDrawn) internal pure returns (uint) {
-    uint redemptionFee = (_redemptionRate * _collDrawn) / DECIMAL_PRECISION;
-    // TroveManager: Fee would eat up all returned collateral
-    if (redemptionFee >= _collDrawn) revert TooHighRedeemFee();
-    return redemptionFee;
-  }
-
   // --- Borrowing fee functions ---
+
+  function getBaseRate() external view override returns (uint) {
+    return baseRate;
+  }
 
   function getBorrowingRate() public view override returns (uint) {
     return _calcBorrowingRate(baseRate);
   }
 
   function getBorrowingRateWithDecay() public view override returns (uint) {
-    return _calcBorrowingRate(_calcDecayedBaseRate());
+    return _calcBorrowingRate(this.calcDecayedBaseRate());
   }
 
   function _calcBorrowingRate(uint _baseRate) internal pure returns (uint) {
@@ -1399,13 +1124,40 @@ contract TroveManager is LiquityBase, Ownable, CheckContract, ITroveManager {
 
   // Updates the baseRate state variable based on time elapsed since the last redemption or LUSD borrowing operation.
   function decayBaseRateFromBorrowing() external override {
-    _requireCallerIsBorrowerOperations();
+    _requireCallerIsBorrowerOrRedemptionOperations();
 
-    uint decayedBaseRate = _calcDecayedBaseRate();
+    uint decayedBaseRate = this.calcDecayedBaseRate();
     assert(decayedBaseRate <= DECIMAL_PRECISION); // The baseRate can decay to 0
 
     baseRate = decayedBaseRate;
     emit BaseRateUpdated(decayedBaseRate);
+
+    _updateLastFeeOpTime();
+  }
+
+  /*
+   * This function has two impacts on the baseRate state variable:
+   * 1) decays the baseRate based on time passed since last redemption or stable coin borrowing operation.
+   * then,
+   * 2) increases the baseRate based on the amount redeemed, as a proportion of total supply
+   */
+  function updateBaseRateFromRedemption(uint _totalRedeemedStable, uint _totalStableCoinSupply) external override {
+    _requireCallerIsBorrowerOrRedemptionOperations();
+
+    uint decayedBaseRate = this.calcDecayedBaseRate();
+
+    /* Convert the drawn coll back to LUSD at face value rate, in order to get
+     * the fraction of total supply that was redeemed at face value. */
+    uint redeemedLUSDFraction = _totalRedeemedStable / _totalStableCoinSupply;
+
+    // cap baseRate at a maximum of 100%
+    uint newBaseRate = LiquityMath._min(decayedBaseRate + redeemedLUSDFraction / BETA, DECIMAL_PRECISION);
+    //assert(newBaseRate <= DECIMAL_PRECISION); // This is already enforced in the line above
+    assert(newBaseRate > 0); // Base rate is always non-zero after redemption
+
+    // Update the baseRate state variable
+    baseRate = newBaseRate;
+    emit BaseRateUpdated(newBaseRate);
 
     _updateLastFeeOpTime();
   }
@@ -1422,7 +1174,7 @@ contract TroveManager is LiquityBase, Ownable, CheckContract, ITroveManager {
     }
   }
 
-  function _calcDecayedBaseRate() internal view returns (uint) {
+  function calcDecayedBaseRate() external view override returns (uint) {
     uint minutesPassed = _minutesPassedSinceLastFeeOp();
     uint decayFactor = LiquityMath._decPow(MINUTE_DECAY_FACTOR, minutesPassed);
 
@@ -1435,8 +1187,9 @@ contract TroveManager is LiquityBase, Ownable, CheckContract, ITroveManager {
 
   // --- 'require' wrapper functions ---
 
-  function _requireCallerIsBorrowerOperations() internal view {
-    if (msg.sender != borrowerOperationsAddress) revert NotFromBorrowerOps();
+  function _requireCallerIsBorrowerOrRedemptionOperations() internal view {
+    if (msg.sender != borrowerOperationsAddress && msg.sender != redemptionManagerAddress)
+      revert NotFromBorrowerOrRedemptionOps();
   }
 
   function _requireTroveIsActive(address _borrower) internal view {
@@ -1497,12 +1250,12 @@ contract TroveManager is LiquityBase, Ownable, CheckContract, ITroveManager {
   // --- Trove property setters, called by BorrowerOperations ---
 
   function setTroveStatus(address _borrower, uint _num) external override {
-    _requireCallerIsBorrowerOperations();
+    _requireCallerIsBorrowerOrRedemptionOperations();
     Troves[_borrower].status = Status(_num);
   }
 
   function increaseTroveColl(address _borrower, TokenAmount[] memory _collTokenAmounts) external override {
-    _requireCallerIsBorrowerOperations();
+    _requireCallerIsBorrowerOrRedemptionOperations();
 
     Trove storage trove = Troves[_borrower];
     for (uint i = 0; i < _collTokenAmounts.length; i++) {
@@ -1517,7 +1270,7 @@ contract TroveManager is LiquityBase, Ownable, CheckContract, ITroveManager {
   }
 
   function decreaseTroveColl(address _borrower, TokenAmount[] memory _collTokenAmounts) external override {
-    _requireCallerIsBorrowerOperations();
+    _requireCallerIsBorrowerOrRedemptionOperations();
 
     Trove storage trove = Troves[_borrower];
     for (uint i = 0; i < _collTokenAmounts.length; i++) {
@@ -1526,7 +1279,7 @@ contract TroveManager is LiquityBase, Ownable, CheckContract, ITroveManager {
   }
 
   function increaseTroveDebt(address _borrower, DebtTokenAmount[] memory _debtTokenAmounts) external override {
-    _requireCallerIsBorrowerOperations();
+    _requireCallerIsBorrowerOrRedemptionOperations();
 
     Trove storage trove = Troves[_borrower];
     for (uint i = 0; i < _debtTokenAmounts.length; i++) {
@@ -1541,7 +1294,7 @@ contract TroveManager is LiquityBase, Ownable, CheckContract, ITroveManager {
   }
 
   function decreaseTroveDebt(address _borrower, DebtTokenAmount[] memory _debtTokenAmounts) external override {
-    _requireCallerIsBorrowerOperations();
+    _requireCallerIsBorrowerOrRedemptionOperations();
 
     Trove storage trove = Troves[_borrower];
     for (uint i = 0; i < _debtTokenAmounts.length; i++) {

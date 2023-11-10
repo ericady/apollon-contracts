@@ -21,7 +21,7 @@ contract MockTroveManager is TroveManager {
   }
 
   function unprotectedDecayBaseRateFromBorrowing() external returns (uint) {
-    baseRate = _calcDecayedBaseRate();
+    baseRate = this.calcDecayedBaseRate();
     assert(baseRate >= 0 && baseRate <= DECIMAL_PRECISION);
 
     _updateLastFeeOpTime();
@@ -38,10 +38,6 @@ contract MockTroveManager is TroveManager {
 
   function setBaseRate(uint _baseRate) external {
     baseRate = _baseRate;
-  }
-
-  function callGetRedemptionFee(uint _ETHDrawn) external view returns (uint) {
-    _getRedemptionFee(_ETHDrawn);
   }
 
   function callInternalRemoveTroveOwner(address _troveOwner) external {
