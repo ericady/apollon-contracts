@@ -66,6 +66,55 @@ export interface BorrowerOperations
   extractEvents(logs: Log[], name: "TroveUpdated"): _TypedLogDescription<{ _borrower: string; _debt: BigNumber; _coll: BigNumber; stake: BigNumber }>[];
 }
 
+interface RedemptionOperationsCalls {
+  BORROWING_FEE_FLOOR(_overrides?: CallOverrides): Promise<BigNumber>;
+  CCR(_overrides?: CallOverrides): Promise<BigNumber>;
+  MCR(_overrides?: CallOverrides): Promise<BigNumber>;
+  NAME(_overrides?: CallOverrides): Promise<string>;
+  PERCENT_DIVISOR(_overrides?: CallOverrides): Promise<BigNumber>;
+  REDEMPTION_FEE_FLOOR(_overrides?: CallOverrides): Promise<BigNumber>;
+  STABLE_COIN_GAS_COMPENSATION(_overrides?: CallOverrides): Promise<BigNumber>;
+  _100pct(_overrides?: CallOverrides): Promise<BigNumber>;
+  collTokenManager(_overrides?: CallOverrides): Promise<string>;
+  debtTokenManager(_overrides?: CallOverrides): Promise<string>;
+  getRedemptionFeeWithDecay(_ETHDrawn: BigNumberish, _overrides?: CallOverrides): Promise<BigNumber>;
+  getRedemptionRate(_overrides?: CallOverrides): Promise<BigNumber>;
+  getRedemptionRateWithDecay(_overrides?: CallOverrides): Promise<BigNumber>;
+  owner(_overrides?: CallOverrides): Promise<string>;
+  priceFeed(_overrides?: CallOverrides): Promise<string>;
+  storagePool(_overrides?: CallOverrides): Promise<string>;
+  troveManager(_overrides?: CallOverrides): Promise<string>;
+}
+
+interface RedemptionOperationsTransactions {
+  redeemCollateral(_stableCoinAmount: BigNumberish, _maxFeePercentage: BigNumberish, _sourceTroves: string[], _overrides?: Overrides): Promise<void>;
+  renounceOwnership(_overrides?: Overrides): Promise<void>;
+  setAddresses(_troveManagerAddress: string, _storagePoolAddress: string, _priceFeedAddress: string, _debtTokenManagerAddress: string, _collTokenManagerAddress: string, _overrides?: Overrides): Promise<void>;
+  transferOwnership(newOwner: string, _overrides?: Overrides): Promise<void>;
+}
+
+export interface RedemptionOperations
+  extends _TypedLiquityContract<RedemptionOperationsCalls, RedemptionOperationsTransactions> {
+  readonly filters: {
+    BaseRateUpdated(_baseRate?: null): EventFilter;
+    CollTokenManagerAddressChanged(_newCollTokenManagerAddress?: null): EventFilter;
+    DebtTokenManagerAddressChanged(_newDebtTokenManagerAddress?: null): EventFilter;
+    OwnershipTransferred(previousOwner?: string | null, newOwner?: string | null): EventFilter;
+    PriceFeedAddressChanged(_newPriceFeedAddress?: null): EventFilter;
+    Redemption(_attemptedLUSDAmount?: null, _actualLUSDAmount?: null, _ETHSent?: null, _ETHFee?: null): EventFilter;
+    StoragePoolAddressChanged(_storagePoolAddress?: null): EventFilter;
+    TroveManagerAddressChanged(_newTroveManagerAddress?: null): EventFilter;
+  };
+  extractEvents(logs: Log[], name: "BaseRateUpdated"): _TypedLogDescription<{ _baseRate: BigNumber }>[];
+  extractEvents(logs: Log[], name: "CollTokenManagerAddressChanged"): _TypedLogDescription<{ _newCollTokenManagerAddress: string }>[];
+  extractEvents(logs: Log[], name: "DebtTokenManagerAddressChanged"): _TypedLogDescription<{ _newDebtTokenManagerAddress: string }>[];
+  extractEvents(logs: Log[], name: "OwnershipTransferred"): _TypedLogDescription<{ previousOwner: string; newOwner: string }>[];
+  extractEvents(logs: Log[], name: "PriceFeedAddressChanged"): _TypedLogDescription<{ _newPriceFeedAddress: string }>[];
+  extractEvents(logs: Log[], name: "Redemption"): _TypedLogDescription<{ _attemptedLUSDAmount: BigNumber; _actualLUSDAmount: BigNumber; _ETHSent: BigNumber; _ETHFee: BigNumber }>[];
+  extractEvents(logs: Log[], name: "StoragePoolAddressChanged"): _TypedLogDescription<{ _storagePoolAddress: string }>[];
+  extractEvents(logs: Log[], name: "TroveManagerAddressChanged"): _TypedLogDescription<{ _newTroveManagerAddress: string }>[];
+}
+
 interface TroveManagerCalls {
   BETA(_overrides?: CallOverrides): Promise<BigNumber>;
   BOOTSTRAP_PERIOD(_overrides?: CallOverrides): Promise<BigNumber>;
@@ -76,7 +125,6 @@ interface TroveManagerCalls {
   MINUTE_DECAY_FACTOR(_overrides?: CallOverrides): Promise<BigNumber>;
   NAME(_overrides?: CallOverrides): Promise<string>;
   PERCENT_DIVISOR(_overrides?: CallOverrides): Promise<BigNumber>;
-  REDEMPTION_FEE_FLOOR(_overrides?: CallOverrides): Promise<BigNumber>;
   SECONDS_IN_ONE_MINUTE(_overrides?: CallOverrides): Promise<BigNumber>;
   STABLE_COIN_GAS_COMPENSATION(_overrides?: CallOverrides): Promise<BigNumber>;
   TroveOwners(arg0: BigNumberish, _overrides?: CallOverrides): Promise<string>;
@@ -84,8 +132,10 @@ interface TroveManagerCalls {
   _100pct(_overrides?: CallOverrides): Promise<BigNumber>;
   baseRate(_overrides?: CallOverrides): Promise<BigNumber>;
   borrowerOperationsAddress(_overrides?: CallOverrides): Promise<string>;
+  calcDecayedBaseRate(_overrides?: CallOverrides): Promise<BigNumber>;
   collTokenManager(_overrides?: CallOverrides): Promise<string>;
   debtTokenManager(_overrides?: CallOverrides): Promise<string>;
+  getBaseRate(_overrides?: CallOverrides): Promise<BigNumber>;
   getBorrowingFee(_debtValue: BigNumberish, _overrides?: CallOverrides): Promise<BigNumber>;
   getBorrowingFeeWithDecay(_debtValue: BigNumberish, _overrides?: CallOverrides): Promise<BigNumber>;
   getBorrowingRate(_overrides?: CallOverrides): Promise<BigNumber>;
@@ -94,9 +144,6 @@ interface TroveManagerCalls {
   getEntireDebtAndColl(_borrower: string, _overrides?: CallOverrides): Promise<{ amounts: { tokenAddress: string; isColl: boolean; amount: BigNumber; pendingReward: BigNumber; gasCompensation: BigNumber; toLiquidate: BigNumber; toRedistribute: BigNumber; toOffset: BigNumber }[]; troveCollInStable: BigNumber; troveDebtInStable: BigNumber; troveDebtInStableWithoutGasCompensation: BigNumber }>;
   getNominalICR(_borrower: string, _overrides?: CallOverrides): Promise<BigNumber>;
   getPendingReward(_borrower: string, _tokenAddress: string, _isColl: boolean, _overrides?: CallOverrides): Promise<BigNumber>;
-  getRedemptionFeeWithDecay(_ETHDrawn: BigNumberish, _overrides?: CallOverrides): Promise<BigNumber>;
-  getRedemptionRate(_overrides?: CallOverrides): Promise<BigNumber>;
-  getRedemptionRateWithDecay(_overrides?: CallOverrides): Promise<BigNumber>;
   getTroveColl(_borrower: string, _overrides?: CallOverrides): Promise<{ tokenAddress: string; amount: BigNumber }[]>;
   getTroveDebt(_borrower: string, _overrides?: CallOverrides): Promise<{ tokenAddress: string; amount: BigNumber }[]>;
   getTroveOwnersCount(_overrides?: CallOverrides): Promise<BigNumber>;
@@ -108,6 +155,7 @@ interface TroveManagerCalls {
   liquidatedTokens(arg0: string, arg1: boolean, _overrides?: CallOverrides): Promise<BigNumber>;
   owner(_overrides?: CallOverrides): Promise<string>;
   priceFeed(_overrides?: CallOverrides): Promise<string>;
+  redemptionManagerAddress(_overrides?: CallOverrides): Promise<string>;
   rewardSnapshots(arg0: string, arg1: string, arg2: boolean, _overrides?: CallOverrides): Promise<BigNumber>;
   stabilityPoolManager(_overrides?: CallOverrides): Promise<string>;
   storagePool(_overrides?: CallOverrides): Promise<string>;
@@ -127,12 +175,12 @@ interface TroveManagerTransactions {
   increaseTroveColl(_borrower: string, _collTokenAmounts: { tokenAddress: string; amount: BigNumberish }[], _overrides?: Overrides): Promise<void>;
   increaseTroveDebt(_borrower: string, _debtTokenAmounts: { debtToken: string; netDebt: BigNumberish; borrowingFee: BigNumberish }[], _overrides?: Overrides): Promise<void>;
   liquidate(_borrower: string, _overrides?: Overrides): Promise<void>;
-  redeemCollateral(_stableCoinAmount: BigNumberish, _maxFeePercentage: BigNumberish, _sourceTroves: string[], _overrides?: Overrides): Promise<void>;
   removeStake(collTokenAddresses: string[], _borrower: string, _overrides?: Overrides): Promise<void>;
   renounceOwnership(_overrides?: Overrides): Promise<void>;
-  setAddresses(_borrowerOperationsAddress: string, _storagePoolAddress: string, _stabilityPoolManagerAddress: string, _priceFeedAddress: string, _debtTokenManagerAddress: string, _collTokenManagerAddress: string, _overrides?: Overrides): Promise<void>;
+  setAddresses(_borrowerOperationsAddress: string, _redemptionManagerAddress: string, _storagePoolAddress: string, _stabilityPoolManagerAddress: string, _priceFeedAddress: string, _debtTokenManagerAddress: string, _collTokenManagerAddress: string, _overrides?: Overrides): Promise<void>;
   setTroveStatus(_borrower: string, _num: BigNumberish, _overrides?: Overrides): Promise<void>;
   transferOwnership(newOwner: string, _overrides?: Overrides): Promise<void>;
+  updateBaseRateFromRedemption(_totalRedeemedStable: BigNumberish, _totalStableCoinSupply: BigNumberish, _overrides?: Overrides): Promise<void>;
   updateStakeAndTotalStakes(collTokenAddresses: string[], _borrower: string, _overrides?: Overrides): Promise<void>;
   updateTroveRewardSnapshots(_borrower: string, _overrides?: Overrides): Promise<void>;
 }
@@ -150,6 +198,7 @@ export interface TroveManager
     OwnershipTransferred(previousOwner?: string | null, newOwner?: string | null): EventFilter;
     PriceFeedAddressChanged(_newPriceFeedAddress?: null): EventFilter;
     Redemption(_attemptedLUSDAmount?: null, _actualLUSDAmount?: null, _ETHSent?: null, _ETHFee?: null): EventFilter;
+    RedemptionManagerAddressChanged(_newRedemptionManagerAddress?: null): EventFilter;
     StabilityPoolManagerAddressChanged(_stabilityPoolManagerAddress?: null): EventFilter;
     StoragePoolAddressChanged(_storagePoolAddress?: null): EventFilter;
     SystemSnapshotsUpdated(_totalStakesSnapshot?: null, _totalCollateralSnapshot?: null): EventFilter;
@@ -169,6 +218,7 @@ export interface TroveManager
   extractEvents(logs: Log[], name: "OwnershipTransferred"): _TypedLogDescription<{ previousOwner: string; newOwner: string }>[];
   extractEvents(logs: Log[], name: "PriceFeedAddressChanged"): _TypedLogDescription<{ _newPriceFeedAddress: string }>[];
   extractEvents(logs: Log[], name: "Redemption"): _TypedLogDescription<{ _attemptedLUSDAmount: BigNumber; _actualLUSDAmount: BigNumber; _ETHSent: BigNumber; _ETHFee: BigNumber }>[];
+  extractEvents(logs: Log[], name: "RedemptionManagerAddressChanged"): _TypedLogDescription<{ _newRedemptionManagerAddress: string }>[];
   extractEvents(logs: Log[], name: "StabilityPoolManagerAddressChanged"): _TypedLogDescription<{ _stabilityPoolManagerAddress: string }>[];
   extractEvents(logs: Log[], name: "StoragePoolAddressChanged"): _TypedLogDescription<{ _storagePoolAddress: string }>[];
   extractEvents(logs: Log[], name: "SystemSnapshotsUpdated"): _TypedLogDescription<{ _totalStakesSnapshot: BigNumber; _totalCollateralSnapshot: BigNumber }>[];
@@ -713,7 +763,6 @@ interface TroveManagerCalls {
   MINUTE_DECAY_FACTOR(_overrides?: CallOverrides): Promise<BigNumber>;
   NAME(_overrides?: CallOverrides): Promise<string>;
   PERCENT_DIVISOR(_overrides?: CallOverrides): Promise<BigNumber>;
-  REDEMPTION_FEE_FLOOR(_overrides?: CallOverrides): Promise<BigNumber>;
   SECONDS_IN_ONE_MINUTE(_overrides?: CallOverrides): Promise<BigNumber>;
   STABLE_COIN_GAS_COMPENSATION(_overrides?: CallOverrides): Promise<BigNumber>;
   TroveOwners(arg0: BigNumberish, _overrides?: CallOverrides): Promise<string>;
@@ -721,8 +770,10 @@ interface TroveManagerCalls {
   _100pct(_overrides?: CallOverrides): Promise<BigNumber>;
   baseRate(_overrides?: CallOverrides): Promise<BigNumber>;
   borrowerOperationsAddress(_overrides?: CallOverrides): Promise<string>;
+  calcDecayedBaseRate(_overrides?: CallOverrides): Promise<BigNumber>;
   collTokenManager(_overrides?: CallOverrides): Promise<string>;
   debtTokenManager(_overrides?: CallOverrides): Promise<string>;
+  getBaseRate(_overrides?: CallOverrides): Promise<BigNumber>;
   getBorrowingFee(_debtValue: BigNumberish, _overrides?: CallOverrides): Promise<BigNumber>;
   getBorrowingFeeWithDecay(_debtValue: BigNumberish, _overrides?: CallOverrides): Promise<BigNumber>;
   getBorrowingRate(_overrides?: CallOverrides): Promise<BigNumber>;
@@ -731,9 +782,6 @@ interface TroveManagerCalls {
   getEntireDebtAndColl(_borrower: string, _overrides?: CallOverrides): Promise<{ amounts: { tokenAddress: string; isColl: boolean; amount: BigNumber; pendingReward: BigNumber; gasCompensation: BigNumber; toLiquidate: BigNumber; toRedistribute: BigNumber; toOffset: BigNumber }[]; troveCollInStable: BigNumber; troveDebtInStable: BigNumber; troveDebtInStableWithoutGasCompensation: BigNumber }>;
   getNominalICR(_borrower: string, _overrides?: CallOverrides): Promise<BigNumber>;
   getPendingReward(_borrower: string, _tokenAddress: string, _isColl: boolean, _overrides?: CallOverrides): Promise<BigNumber>;
-  getRedemptionFeeWithDecay(_ETHDrawn: BigNumberish, _overrides?: CallOverrides): Promise<BigNumber>;
-  getRedemptionRate(_overrides?: CallOverrides): Promise<BigNumber>;
-  getRedemptionRateWithDecay(_overrides?: CallOverrides): Promise<BigNumber>;
   getTroveColl(_borrower: string, _overrides?: CallOverrides): Promise<{ tokenAddress: string; amount: BigNumber }[]>;
   getTroveDebt(_borrower: string, _overrides?: CallOverrides): Promise<{ tokenAddress: string; amount: BigNumber }[]>;
   getTroveOwnersCount(_overrides?: CallOverrides): Promise<BigNumber>;
@@ -745,6 +793,7 @@ interface TroveManagerCalls {
   liquidatedTokens(arg0: string, arg1: boolean, _overrides?: CallOverrides): Promise<BigNumber>;
   owner(_overrides?: CallOverrides): Promise<string>;
   priceFeed(_overrides?: CallOverrides): Promise<string>;
+  redemptionManagerAddress(_overrides?: CallOverrides): Promise<string>;
   rewardSnapshots(arg0: string, arg1: string, arg2: boolean, _overrides?: CallOverrides): Promise<BigNumber>;
   stabilityPoolManager(_overrides?: CallOverrides): Promise<string>;
   storagePool(_overrides?: CallOverrides): Promise<string>;
@@ -764,12 +813,12 @@ interface TroveManagerTransactions {
   increaseTroveColl(_borrower: string, _collTokenAmounts: { tokenAddress: string; amount: BigNumberish }[], _overrides?: Overrides): Promise<void>;
   increaseTroveDebt(_borrower: string, _debtTokenAmounts: { debtToken: string; netDebt: BigNumberish; borrowingFee: BigNumberish }[], _overrides?: Overrides): Promise<void>;
   liquidate(_borrower: string, _overrides?: Overrides): Promise<void>;
-  redeemCollateral(_stableCoinAmount: BigNumberish, _maxFeePercentage: BigNumberish, _sourceTroves: string[], _overrides?: Overrides): Promise<void>;
   removeStake(collTokenAddresses: string[], _borrower: string, _overrides?: Overrides): Promise<void>;
   renounceOwnership(_overrides?: Overrides): Promise<void>;
-  setAddresses(_borrowerOperationsAddress: string, _storagePoolAddress: string, _stabilityPoolManagerAddress: string, _priceFeedAddress: string, _debtTokenManagerAddress: string, _collTokenManagerAddress: string, _overrides?: Overrides): Promise<void>;
+  setAddresses(_borrowerOperationsAddress: string, _redemptionManagerAddress: string, _storagePoolAddress: string, _stabilityPoolManagerAddress: string, _priceFeedAddress: string, _debtTokenManagerAddress: string, _collTokenManagerAddress: string, _overrides?: Overrides): Promise<void>;
   setTroveStatus(_borrower: string, _num: BigNumberish, _overrides?: Overrides): Promise<void>;
   transferOwnership(newOwner: string, _overrides?: Overrides): Promise<void>;
+  updateBaseRateFromRedemption(_totalRedeemedStable: BigNumberish, _totalStableCoinSupply: BigNumberish, _overrides?: Overrides): Promise<void>;
   updateStakeAndTotalStakes(collTokenAddresses: string[], _borrower: string, _overrides?: Overrides): Promise<void>;
   updateTroveRewardSnapshots(_borrower: string, _overrides?: Overrides): Promise<void>;
 }
@@ -787,6 +836,7 @@ export interface TroveManager
     OwnershipTransferred(previousOwner?: string | null, newOwner?: string | null): EventFilter;
     PriceFeedAddressChanged(_newPriceFeedAddress?: null): EventFilter;
     Redemption(_attemptedLUSDAmount?: null, _actualLUSDAmount?: null, _ETHSent?: null, _ETHFee?: null): EventFilter;
+    RedemptionManagerAddressChanged(_newRedemptionManagerAddress?: null): EventFilter;
     StabilityPoolManagerAddressChanged(_stabilityPoolManagerAddress?: null): EventFilter;
     StoragePoolAddressChanged(_storagePoolAddress?: null): EventFilter;
     SystemSnapshotsUpdated(_totalStakesSnapshot?: null, _totalCollateralSnapshot?: null): EventFilter;
@@ -806,6 +856,7 @@ export interface TroveManager
   extractEvents(logs: Log[], name: "OwnershipTransferred"): _TypedLogDescription<{ previousOwner: string; newOwner: string }>[];
   extractEvents(logs: Log[], name: "PriceFeedAddressChanged"): _TypedLogDescription<{ _newPriceFeedAddress: string }>[];
   extractEvents(logs: Log[], name: "Redemption"): _TypedLogDescription<{ _attemptedLUSDAmount: BigNumber; _actualLUSDAmount: BigNumber; _ETHSent: BigNumber; _ETHFee: BigNumber }>[];
+  extractEvents(logs: Log[], name: "RedemptionManagerAddressChanged"): _TypedLogDescription<{ _newRedemptionManagerAddress: string }>[];
   extractEvents(logs: Log[], name: "StabilityPoolManagerAddressChanged"): _TypedLogDescription<{ _stabilityPoolManagerAddress: string }>[];
   extractEvents(logs: Log[], name: "StoragePoolAddressChanged"): _TypedLogDescription<{ _storagePoolAddress: string }>[];
   extractEvents(logs: Log[], name: "SystemSnapshotsUpdated"): _TypedLogDescription<{ _totalStakesSnapshot: BigNumber; _totalCollateralSnapshot: BigNumber }>[];

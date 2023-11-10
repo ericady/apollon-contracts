@@ -60,6 +60,9 @@ const deployContracts = async (
       borrowerOperations: await deployContract(deployer, getContractFactory, 'BorrowerOperations', {
         ...overrides,
       }),
+      redemptionOperations: await deployContract(deployer, getContractFactory, 'RedemptionOperations', {
+        ...overrides,
+      }),
       troveManager: await deployContract(deployer, getContractFactory, 'TroveManager', {
         ...overrides,
       }),
@@ -104,6 +107,7 @@ const connectContracts = async (
   {
     storagePool,
     borrowerOperations,
+    redemptionOperations,
     troveManager,
     stabilityPoolManager,
     debtTokenManager,
@@ -123,6 +127,7 @@ const connectContracts = async (
     nonce =>
       troveManager.setAddresses(
         borrowerOperations.address,
+        redemptionOperations.address,
         storagePool.address,
         stabilityPoolManager.address,
         priceFeed.address,
@@ -136,6 +141,16 @@ const connectContracts = async (
         troveManager.address,
         storagePool.address,
         stabilityPoolManager.address,
+        priceFeed.address,
+        debtTokenManager.address,
+        collTokenManager.address,
+        { ...overrides, nonce }
+      ),
+
+    nonce =>
+      redemptionOperations.setAddresses(
+        troveManager.address,
+        storagePool.address,
         priceFeed.address,
         debtTokenManager.address,
         collTokenManager.address,

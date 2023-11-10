@@ -5,6 +5,7 @@ import { Interface, ParamType } from '@ethersproject/abi';
 
 import StoragePool from '../../contracts/artifacts/contracts/StoragePool.sol/StoragePool.json';
 import BorrowerOperations from '../../contracts/artifacts/contracts/BorrowerOperations.sol/BorrowerOperations.json';
+import RedemptionOperations from '../../contracts/artifacts/contracts/RedemptionOperations.sol/RedemptionOperations.json';
 import TroveManager from '../../contracts/artifacts/contracts/TroveManager.sol/TroveManager.json';
 import DebtToken from '../../contracts/artifacts/contracts/DebtToken.sol/DebtToken.json';
 import PriceFeed from '../../contracts/artifacts/contracts/PriceFeed.sol/PriceFeed.json';
@@ -137,6 +138,7 @@ const declareInterface = ({
 
 const contractArtifacts = [
   BorrowerOperations,
+  RedemptionOperations,
   TroveManager,
   StoragePool,
   DebtToken,

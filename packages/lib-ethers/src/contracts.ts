@@ -14,6 +14,7 @@ import {
 
 import storagePoolAbi from '../abi/StoragePool.json';
 import borrowerOperationsAbi from '../abi/BorrowerOperations.json';
+import redemptionOperationsAbi from '../abi/RedemptionOperations.json';
 import troveManagerAbi from '../abi/TroveManager.json';
 import debtTokenManagerAbi from '../abi/DebtTokenManager.json';
 import priceFeedAbi from '../abi/PriceFeed.json';
@@ -21,16 +22,9 @@ import mockPriceFeedAbi from '../abi/MockPriceFeed.json';
 import collTokenManagerAbi from '../abi/CollTokenManager.json';
 import stabilityPoolManagerAbi from '../abi/StabilityPoolManager.json';
 
-// todo
-// import communityIssuanceAbi from '../abi/CommunityIssuance.json';
-// import lqtyTokenAbi from '../abi/LQTYToken.json';
-// import lockupContractFactoryAbi from '../abi/LockupContractFactory.json';
-// import lqtyStakingAbi from '../abi/LQTYStaking.json';
-// import multiTroveGetterAbi from '../abi/MultiTroveGetter.json';
-// import unipoolAbi from '../abi/Unipool.json';
-
 import {
   BorrowerOperations,
+  RedemptionOperations,
   TroveManager,
   PriceFeed,
   IERC20,
@@ -43,6 +37,14 @@ import {
 } from '../types';
 
 import { EthersProvider, EthersSigner } from './types';
+
+// todo
+// import communityIssuanceAbi from '../abi/CommunityIssuance.json';
+// import lqtyTokenAbi from '../abi/LQTYToken.json';
+// import lockupContractFactoryAbi from '../abi/LockupContractFactory.json';
+// import lqtyStakingAbi from '../abi/LQTYStaking.json';
+// import multiTroveGetterAbi from '../abi/MultiTroveGetter.json';
+// import unipoolAbi from '../abi/Unipool.json';
 
 export interface _TypedLogDescription<T> extends Omit<LogDescription, 'args'> {
   args: T;
@@ -148,6 +150,7 @@ export type _TypedLiquityContract<T = unknown, U = unknown> = TypedContract<_Liq
 export interface _LiquityContracts {
   storagePool: StoragePool;
   borrowerOperations: BorrowerOperations;
+  redemptionOperations: RedemptionOperations;
   troveManager: TroveManager;
   debtTokenManager: DebtTokenManager;
   priceFeed: PriceFeed | MockPriceFeed;
@@ -182,6 +185,7 @@ type LiquityContractAbis = Record<LiquityContractsKey, JsonFragment[]>;
 const getAbi = (priceFeedIsTestnet: boolean, uniTokenIsMock: boolean): LiquityContractAbis => ({
   storagePool: storagePoolAbi,
   borrowerOperations: borrowerOperationsAbi,
+  redemptionOperations: redemptionOperationsAbi,
   troveManager: troveManagerAbi,
   debtTokenManager: debtTokenManagerAbi,
   priceFeed: priceFeedIsTestnet ? mockPriceFeedAbi : priceFeedAbi,
