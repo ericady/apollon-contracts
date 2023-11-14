@@ -3,37 +3,37 @@ schema:
   file: ./schema.graphql
 dataSources:
   - kind: ethereum
-    name: StoragePool
-    network: mainnet
+    name: DebtToken
+    network: development
     source:
-      address: "0xf3f802640f8a26379ce76975ef169733e3906ff4"
-      abi: StoragePool
+      address: '0x25309189268017d8C79C8dacCbF44EC25C12FEB4'
+      abi: DebtToken
       startBlock: 1
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.7
       language: wasm/assemblyscript
       entities:
-        - BorrowerOperationsAddressChanged
-        - OwnershipTransferred
-        - PoolValueUpdated
-        - PriceFeedAddressChanged
-        - StabilityPoolManagerAddressChanged
-        - TroveManagerAddressChanged
+        - Approval
+        - DebtTokenBorrowerOperationsAddressChanged
+        - DebtTokenPriceFeedAddressChanged
+        - DebtTokenStabilityPoolManagerAddressChanged
+        - Transfer
+        - DebtTokenTroveManagerAddressChanged
       abis:
-        - name: StoragePool
-          file: ./abis/StoragePool.json
+        - name: DebtToken
+          file: ./abis/DebtToken.json
       eventHandlers:
+        - event: Approval(indexed address,indexed address,uint256)
+          handler: handleApproval
         - event: BorrowerOperationsAddressChanged(address)
           handler: handleBorrowerOperationsAddressChanged
-        - event: OwnershipTransferred(indexed address,indexed address)
-          handler: handleOwnershipTransferred
-        - event: PoolValueUpdated(address,bool,uint8,uint256)
-          handler: handlePoolValueUpdated
         - event: PriceFeedAddressChanged(address)
           handler: handlePriceFeedAddressChanged
         - event: StabilityPoolManagerAddressChanged(address)
           handler: handleStabilityPoolManagerAddressChanged
+        - event: Transfer(indexed address,indexed address,uint256)
+          handler: handleTransfer
         - event: TroveManagerAddressChanged(address)
           handler: handleTroveManagerAddressChanged
-      file: ./src/storage-pool.ts
+      file: ./src/debt-token.ts

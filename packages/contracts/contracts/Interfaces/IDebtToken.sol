@@ -10,9 +10,9 @@ import './IBase.sol';
 interface IDebtToken is IERC20, IERC20Metadata, IERC2612, IBase {
   // --- Events ---
 
-  event TroveManagerAddressChanged(address _troveManagerAddress);
+  event TroveManagerAddressChanged(address _newTroveManagerAddress);
   event BorrowerOperationsAddressChanged(address _newBorrowerOperationsAddress);
-  event StabilityPoolManagerAddressChanged(address _stabilityPoolManagerAddress);
+  event StabilityPoolManagerAddressChanged(address _newStabilityPoolManagerAddress);
   event PriceFeedAddressChanged(address _newPriceFeedAddress);
 
   // --- Custom Errors ---

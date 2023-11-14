@@ -12,7 +12,7 @@ interface IStoragePool is IBase {
   event BorrowerOperationsAddressChanged(address _newBorrowerOperationsAddress);
   event TroveManagerAddressChanged(address _newTroveManagerAddress);
   event StabilityPoolManagerAddressChanged(address _newStabilityPoolAddress);
-  event PriceFeedAddressChanged(address _priceFeedAddress);
+  event PriceFeedAddressChanged(address _newPriceFeedAddress);
 
   // --- Custom Errors ---
 

@@ -1,51 +1,44 @@
-type BorrowerOperationsAddressChanged @entity(immutable: true) {
+# # Custom
+
+# Singleton entity to store the ID of the last created Token
+
+type Token @entity {
   id: Bytes!
-  _newBorrowerOperationsAddress: Bytes! # address
-  blockNumber: BigInt!
-  blockTimestamp: BigInt!
-  transactionHash: Bytes!
+  address: Bytes! # contract address
+  symbol: String!
+  createdAt: BigInt!
+  #
+  priceUSD: BigDecimal!
+  # TODO: Fetch this from the client side and get it from the TradingView entities
+  # priceUSD24hAgo: BigDecimal!
+  #
+  isPoolToken: Boolean!
 }
 
-type OwnershipTransferred @entity(immutable: true) {
+type DebtTokenMeta @entity(immutable: true) {
   id: Bytes!
-  previousOwner: Bytes! # address
-  newOwner: Bytes! # address
-  blockNumber: BigInt!
-  blockTimestamp: BigInt!
-  transactionHash: Bytes!
+  token: Token! @relation(name: "TokenToDebtTokenMeta")
+  timestamp: BigInt!
+
+  # global
+  stabilityDepositAPY: BigDecimal!
+  totalDepositedStability: BigDecimal!
+  totalReserve: BigDecimal!
+  # TODO: Fetch this from the client side
+  # totalReserve24hAgo: BigDecimal!
+  totalSupplyUSD: BigDecimal!
+  # TODO: Fetch this from the client side
+  # totalSupplyUSD24hAgo: BigDecimal!
 }
 
-type PoolValueUpdated @entity(immutable: true) {
-  id: Bytes!
-  _tokenAddress: Bytes! # address
-  _isColl: Boolean! # bool
-  _poolType: Int! # uint8
-  _updatedAmount: BigInt! # uint256
-  blockNumber: BigInt!
-  blockTimestamp: BigInt!
-  transactionHash: Bytes!
-}
+type UserDebtTokenMeta @entity {
+  # "UserDebtTokenMeta" + token + borrower
+  id: String!
+  borrower: Bytes!
+  token: Token! @relation(name: "TokenToUserDebtTokenMeta")
 
-type PriceFeedAddressChanged @entity(immutable: true) {
-  id: Bytes!
-  _priceFeedAddress: Bytes! # address
-  blockNumber: BigInt!
-  blockTimestamp: BigInt!
-  transactionHash: Bytes!
-}
-
-type StabilityPoolManagerAddressChanged @entity(immutable: true) {
-  id: Bytes!
-  _newStabilityPoolAddress: Bytes! # address
-  blockNumber: BigInt!
-  blockTimestamp: BigInt!
-  transactionHash: Bytes!
-}
-
-type TroveManagerAddressChanged @entity(immutable: true) {
-  id: Bytes!
-  _newTroveManagerAddress: Bytes! # address
-  blockNumber: BigInt!
-  blockTimestamp: BigInt!
-  transactionHash: Bytes!
+  walletAmount: BigDecimal!
+  troveMintedAmount: BigDecimal!
+  stabilityLostAmount: BigDecimal!
+  stabilityCompoundAmount: BigDecimal!
 }
