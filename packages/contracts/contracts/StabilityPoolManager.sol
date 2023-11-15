@@ -39,16 +39,16 @@ contract StabilityPoolManager is Ownable, CheckContract, IStabilityPoolManager {
     checkContract(_debtTokenManagerAddress);
 
     troveManagerAddress = _troveManagerAddress;
-    emit TroveManagerAddressChanged(_troveManagerAddress);
-
     priceFeedAddress = _priceFeedAddress;
-    emit PriceFeedAddressChanged(_priceFeedAddress);
-
     storagePool = IStoragePool(_storagePoolAddress);
-    emit StoragePoolAddressChanged(_storagePoolAddress);
-
     debtTokenManagerAddress = _debtTokenManagerAddress;
-    emit DebtTokenManagerAddressChanged(_debtTokenManagerAddress);
+
+    emit StabilityPoolManagerInitiated(
+      _troveManagerAddress,
+      _storagePoolAddress,
+      _debtTokenManagerAddress,
+      _priceFeedAddress
+    );
 
     // todo addDebtToken should be still callable...
     //    _renounceOwnership();
@@ -166,12 +166,12 @@ contract StabilityPoolManager is Ownable, CheckContract, IStabilityPoolManager {
         PoolType.Active,
         remainingStability.debtToOffset
       );
+
       // Burn the debt that was successfully offset
       remainingStability.stabilityPool.getDepositToken().burn(stabilityPoolAddress, remainingStability.debtToOffset);
 
       // move the coll from the active pool into the stability pool
       for (uint ii = 0; ii < remainingStability.collGained.length; ii++) {
-        // todo there is no coll gained on stability pool offset -> has to be a bug!
         if (remainingStability.collGained[ii].amount == 0) continue;
         storagePoolCached.withdrawalValue(
           stabilityPoolAddress,
@@ -198,7 +198,7 @@ contract StabilityPoolManager is Ownable, CheckContract, IStabilityPoolManager {
 
     stabilityPools[_debtToken] = stabilityPool;
     stabilityPoolsArray.push(stabilityPool);
-    emit StabilityPoolAdded(stabilityPool);
+    emit StabilityPoolAdded(address(stabilityPool));
   }
 
   function _requireCallerIsTroveManager() internal view {

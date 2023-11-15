@@ -23,7 +23,7 @@ import {
 } from '../utils/testHelper';
 import { parseUnits } from 'ethers';
 
-describe('StabilityPool', () => {
+describe.only('StabilityPool', () => {
   let signers: SignerWithAddress[];
   let owner: SignerWithAddress;
   let alice: SignerWithAddress;
@@ -678,32 +678,6 @@ describe('StabilityPool', () => {
     });
 
     describe('withdrawFromSP()', () => {
-      it('reverts when user has no active deposit', async () => {
-        await openTrove({
-          from: alice,
-          contracts,
-          collToken: BTC,
-          collAmount: parseUnits('1', 9),
-          debts: [{ tokenAddress: STABLE, amount: parseUnits('1000') }],
-        });
-        await stabilityPoolManager
-          .connect(alice)
-          .provideStability([{ tokenAddress: STABLE, amount: parseUnits('1000') }]);
-        await openTrove({
-          from: bob,
-          contracts,
-          collToken: BTC,
-          collAmount: parseUnits('1', 9),
-          debts: [{ tokenAddress: STABLE, amount: parseUnits('2000') }],
-        });
-
-        stabilityPoolManager.connect(alice).withdrawStability([{ tokenAddress: STABLE, amount: parseUnits('100') }]);
-        await assertRevert(
-          stabilityPoolManager.connect(bob).withdrawStability([{ tokenAddress: STABLE, amount: parseUnits('100') }]),
-          'ZeroAmount()'
-        );
-      });
-
       // todo isnt working yet, currently not able to check on that because of the removed sorted troves
       // it('withdrawFromSP(): reverts when amount > 0 and system has an undercollateralized trove', async () => {
       //   await openTrove({

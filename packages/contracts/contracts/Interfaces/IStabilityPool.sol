@@ -8,22 +8,29 @@ import './IBase.sol';
 interface IStabilityPool is IBase {
   // --- Events ---
 
-  event StabilityPoolCollBalanceUpdates(address _tokenAddress, uint _newBalance);
-  event StabilityPoolDepositBalanceUpdated(uint _newBalance);
+  event StabilityPoolInitialized(
+    address stabilityPoolManagerAddress,
+    address troveManagerAddress,
+    address storagePoolAddress,
+    address priceFeedAddress,
+    address depositTokenAddress
+  );
 
-  event StabilityPoolManagerAddressChanged(address _newStabilityPoolManagerAddress);
-  event TroveManagerAddressChanged(address _newTroveManagerAddress);
-  event PriceFeedAddressChanged(address _newPriceFeedAddress);
-  event StoragePoolAddressChanged(address _newStoragePoolAddress);
-  event DepositTokenAddressChanged(address _newDepositTokenAddress);
+  event StabilityProvided(address user, uint amount);
+  event StabilityWithdrawn(address user, uint amount);
+  event StabilityGainsWithdrawn(address user, uint depositLost, TokenAmount[] gainsWithdrawn);
+
+  // used as trigger to update the users compounded deposit and current coll gains (there is not user specific event for that)
+  event StabilityOffset(uint removedDeposit, TokenAmount[] addedGains);
 
   event P_Updated(uint _P);
   event S_Updated(address _tokenAddress, uint _S, uint128 _epoch, uint128 _scale);
-  event DepositSnapshotUpdated(address indexed _depositor, uint _P, uint _S);
-
-  //    event G_Updated(uint _G, uint128 _epoch, uint128 _scale);
   event EpochUpdated(uint128 _currentEpoch);
   event ScaleUpdated(uint128 _currentScale);
+  event DepositSnapshotUpdated(address indexed _depositor);
+  // event G_Updated(uint _G, uint128 _epoch, uint128 _scale);
+
+  // --- Errors  ---
 
   error NotFromStabilityPoolManager();
   error ZeroAmount();

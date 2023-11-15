@@ -38,19 +38,6 @@
         "anonymous": false,
         "inputs": [
             {
-                "indexed": false,
-                "internalType": "address",
-                "name": "_debtTokenManagerAddress",
-                "type": "address"
-            }
-        ],
-        "name": "DebtTokenManagerAddressChanged",
-        "type": "event"
-    },
-    {
-        "anonymous": false,
-        "inputs": [
-            {
                 "indexed": true,
                 "internalType": "address",
                 "name": "previousOwner",
@@ -72,20 +59,7 @@
             {
                 "indexed": false,
                 "internalType": "address",
-                "name": "_newPriceFeedAddress",
-                "type": "address"
-            }
-        ],
-        "name": "PriceFeedAddressChanged",
-        "type": "event"
-    },
-    {
-        "anonymous": false,
-        "inputs": [
-            {
-                "indexed": false,
-                "internalType": "contract IStabilityPool",
-                "name": "_stabilityPool",
+                "name": "stabilityPoolAddress",
                 "type": "address"
             }
         ],
@@ -98,24 +72,29 @@
             {
                 "indexed": false,
                 "internalType": "address",
-                "name": "_newStoragePoolAddress",
+                "name": "troveManagerAddress",
                 "type": "address"
-            }
-        ],
-        "name": "StoragePoolAddressChanged",
-        "type": "event"
-    },
-    {
-        "anonymous": false,
-        "inputs": [
+            },
             {
                 "indexed": false,
                 "internalType": "address",
-                "name": "_newTroveManagerAddress",
+                "name": "storgePoolAddress",
+                "type": "address"
+            },
+            {
+                "indexed": false,
+                "internalType": "address",
+                "name": "debtTokenManagerAddress",
+                "type": "address"
+            },
+            {
+                "indexed": false,
+                "internalType": "address",
+                "name": "priceFeedAddress",
                 "type": "address"
             }
         ],
-        "name": "TroveManagerAddressChanged",
+        "name": "StabilityPoolManagerInitiated",
         "type": "event"
     },
     {

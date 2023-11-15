@@ -219,19 +219,18 @@ contract StabilityPool is LiquityBase, Ownable, CheckContract, IStabilityPool {
     checkContract(_depositTokenAddress);
 
     stabilityPoolManagerAddress = _stabilityPoolManagerAddress;
-    emit StabilityPoolManagerAddressChanged(_stabilityPoolManagerAddress);
-
     troveManager = ITroveManager(_troveManagerAddress);
-    emit TroveManagerAddressChanged(_troveManagerAddress);
-
     priceFeed = IPriceFeed(_priceFeedAddress);
-    emit PriceFeedAddressChanged(_priceFeedAddress);
-
     storagePool = IStoragePool(_storagePoolAddress);
-    emit StoragePoolAddressChanged(_storagePoolAddress);
-
     depositToken = IDebtToken(_depositTokenAddress);
-    emit DepositTokenAddressChanged(_depositTokenAddress);
+
+    emit StabilityPoolInitialized(
+      _stabilityPoolManagerAddress,
+      _troveManagerAddress,
+      _storagePoolAddress,
+      _priceFeedAddress,
+      _depositTokenAddress
+    );
 
     renounceOwnership();
   }
@@ -270,24 +269,20 @@ contract StabilityPool is LiquityBase, Ownable, CheckContract, IStabilityPool {
     _requireCallerIsStabilityPoolManager();
     _requireNonZeroAmount(_amount);
 
-    uint initialDeposit = deposits[depositor];
     uint remainingDeposit = this.getCompoundedDebtDeposit(depositor);
-    uint depositLoss = initialDeposit - remainingDeposit; // Needed only for event log
-    //        emit DepositLoss(depositor, depositLoss); todo
-
-    _payoutCollGains(depositor);
+    _payoutCollGains(depositor, remainingDeposit);
 
     totalDeposits += _amount;
-    emit StabilityPoolDepositBalanceUpdated(totalDeposits);
 
     // update deposit snapshots
     uint newDeposit = remainingDeposit + _amount;
     _updateDepositAndSnapshots(depositor, newDeposit);
-    //        emit UserDepositChanged(user, newDeposit); todo
 
     // todo gov token...
     // ICommunityIssuance communityIssuanceCached = communityIssuance;
     // _triggerLQTYIssuance(communityIssuanceCached);
+
+    emit StabilityProvided(depositor, _amount);
   }
 
   /*  withdrawFromSP():
@@ -296,7 +291,7 @@ contract StabilityPool is LiquityBase, Ownable, CheckContract, IStabilityPool {
    * - Decreases deposit and takes new snapshots.
    * - If _amount > userDeposit, the user withdraws all of their compounded deposit.
    */
-  function withdrawFromSP(address user, uint debtToWithdrawal) external override {
+  function withdrawFromSP(address user, uint depositToWithdrawal) external override {
     _requireCallerIsStabilityPoolManager();
 
     // todo removed this check, because we do not know about potential under collateralized loans
@@ -305,26 +300,23 @@ contract StabilityPool is LiquityBase, Ownable, CheckContract, IStabilityPool {
     // but it prevented users from withdrawing their deposit out of the stability pool in case of an <100% CR trove (to avoid the loss)
     //    if (debtToWithdrawal != 0) _requireNoUnderCollateralizedTroves();
 
-    uint initialDeposit = deposits[user];
-    _requireUserHasDeposit(initialDeposit);
-
     uint remainingDeposit = this.getCompoundedDebtDeposit(user);
-    uint depositLoss = initialDeposit - remainingDeposit; // Needed only for event log
-    //        emit DepositLoss(msg.sender, depositLoss); todo
-    debtToWithdrawal = LiquityMath._min(debtToWithdrawal, remainingDeposit);
+    depositToWithdrawal = LiquityMath._min(depositToWithdrawal, remainingDeposit);
+    if (depositToWithdrawal == 0) return;
 
     // coll gain and deposit payout
-    _payoutCollGains(user);
-    _sendDepositToDepositor(user, debtToWithdrawal);
+    _payoutCollGains(user, remainingDeposit);
+    _sendDepositToDepositor(user, depositToWithdrawal);
 
     // update current deposit snapshot
-    uint newDeposit = remainingDeposit - debtToWithdrawal;
+    uint newDeposit = remainingDeposit - depositToWithdrawal;
     _updateDepositAndSnapshots(user, newDeposit);
-    //        emit UserDepositChanged(msg.sender, newDeposit); todo
 
     // todo gov token...
     // ICommunityIssuance communityIssuanceCached = communityIssuance;
     // _triggerLQTYIssuance(communityIssuanceCached);
+
+    emit StabilityWithdrawn(user, depositToWithdrawal);
   }
 
   /* withdrawGains:
@@ -336,17 +328,12 @@ contract StabilityPool is LiquityBase, Ownable, CheckContract, IStabilityPool {
   function withdrawGains(address user) external override {
     _requireCallerIsStabilityPoolManager();
 
-    uint initialDeposit = deposits[user];
-    uint remainingDeposit = this.getCompoundedDebtDeposit(user);
-    uint depositLoss = initialDeposit - remainingDeposit; // Needed only for event log
-    //        emit DepositLoss(msg.sender, depositLoss); todo
-
     // coll gain payout
-    _payoutCollGains(user);
+    uint remainingDeposit = this.getCompoundedDebtDeposit(user);
+    _payoutCollGains(user, remainingDeposit);
 
     // update deposit snapshots
-    if (initialDeposit != remainingDeposit) _updateDepositAndSnapshots(user, remainingDeposit);
-    //        emit UserDepositChanged(msg.sender, remainingDeposit); todo
+    _updateDepositAndSnapshots(user, remainingDeposit);
 
     // todo gov token...
     // ICommunityIssuance communityIssuanceCached = communityIssuance;
@@ -454,13 +441,15 @@ contract StabilityPool is LiquityBase, Ownable, CheckContract, IStabilityPool {
 
     // adding coll token address into the usedCollTokens array, if they are not already there
     for (uint i = 0; i < _collToAdd.length; i++) {
+      TokenAmount memory collEntry = _collToAdd[i];
+
       bool found = false;
       for (uint ii = 0; ii < usedCollTokens.length; ii++) {
-        if (usedCollTokens[ii] != _collToAdd[i].tokenAddress) continue;
+        if (usedCollTokens[ii] != collEntry.tokenAddress) continue;
         found = true;
         break;
       }
-      if (!found) usedCollTokens.push(_collToAdd[i].tokenAddress);
+      if (!found) usedCollTokens.push(collEntry.tokenAddress);
     }
 
     // todo gov...
@@ -476,9 +465,7 @@ contract StabilityPool is LiquityBase, Ownable, CheckContract, IStabilityPool {
 
     uint newTotalDeposit = totalDeposits - _debtToOffset;
     totalDeposits = newTotalDeposit;
-
-    // todo
-    //    emit StabilityPoolDepositBalanceUpdated(newTotalDeposit);
+    emit StabilityOffset(_debtToOffset, _collToAdd);
   }
 
   function _computeRewardsPerUnitStaked(
@@ -587,21 +574,21 @@ contract StabilityPool is LiquityBase, Ownable, CheckContract, IStabilityPool {
 
   // --- Reward calculator functions ---
 
-  function _payoutCollGains(address _depositor) internal {
+  function _payoutCollGains(address _depositor, uint remainingDeposit) internal {
+    TokenAmount[] memory collGains = new TokenAmount[](usedCollTokens.length);
     for (uint i = 0; i < usedCollTokens.length; i++) {
       address collTokenAddress = usedCollTokens[i];
       uint collGain = this.getDepositorCollGain(_depositor, collTokenAddress);
       if (collGain == 0) continue;
 
-      uint newTotalColl = totalGainedColl[collTokenAddress] - collGain;
-      totalGainedColl[collTokenAddress] = newTotalColl;
-
+      totalGainedColl[collTokenAddress] -= collGain;
       IERC20(collTokenAddress).transfer(_depositor, collGain);
-
-      // todo
-      // emit CollateralGainWithdrawn(_depositor, usedCollTokens[i], collGain);
-      // emit StabilityPoolCollBalanceUpdates(_collToken, newTotalColl);
+      collGains[i] = TokenAmount(collTokenAddress, collGain);
     }
+
+    uint initialDeposit = deposits[_depositor];
+    uint depositLoss = initialDeposit - remainingDeposit;
+    emit StabilityGainsWithdrawn(_depositor, depositLoss, collGains);
   }
 
   /* Calculates the gains earned by the deposit since its last snapshots were taken.
@@ -693,7 +680,6 @@ contract StabilityPool is LiquityBase, Ownable, CheckContract, IStabilityPool {
 
     depositToken.transfer(_depositor, _amount);
     totalDeposits -= _amount;
-    emit StabilityPoolDepositBalanceUpdated(totalDeposits);
   }
 
   // --- Stability Pool Deposit Functionality ---
@@ -703,7 +689,7 @@ contract StabilityPool is LiquityBase, Ownable, CheckContract, IStabilityPool {
 
     if (_newValue == 0) {
       delete depositSnapshots[_depositor];
-      emit DepositSnapshotUpdated(_depositor, 0, 0);
+      emit DepositSnapshotUpdated(_depositor);
       return;
     }
 
@@ -725,7 +711,7 @@ contract StabilityPool is LiquityBase, Ownable, CheckContract, IStabilityPool {
     // uint currentG = epochToScaleToG[currentEpochCached][currentScaleCached];
     // depositSnapshots[_depositor].G = currentG; todo gov
 
-    //        emit DepositSnapshotUpdated(_depositor, currentP, currentSums); todo...
+    emit DepositSnapshotUpdated(_depositor);
   }
 
   // --- 'require' functions ---

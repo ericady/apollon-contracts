@@ -6,11 +6,14 @@ import './IBBase.sol';
 
 interface IStabilityPoolManager is IBBase {
   // --- Events ---
-  event TroveManagerAddressChanged(address _newTroveManagerAddress);
-  event PriceFeedAddressChanged(address _newPriceFeedAddress);
-  event StoragePoolAddressChanged(address _newStoragePoolAddress);
-  event DebtTokenManagerAddressChanged(address _debtTokenManagerAddress);
-  event StabilityPoolAdded(IStabilityPool _stabilityPool);
+
+  event StabilityPoolManagerInitiated(
+    address troveManagerAddress,
+    address storgePoolAddress,
+    address debtTokenManagerAddress,
+    address priceFeedAddress
+  );
+  event StabilityPoolAdded(address stabilityPoolAddress);
 
   // --- Custom Errors ---
   error NotFromTroveManager();
