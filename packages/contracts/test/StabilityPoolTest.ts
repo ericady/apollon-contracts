@@ -18,13 +18,12 @@ import {
   whaleShrimpTroveInit,
   fastForwardTime,
   TimeValues,
-  gasUsed,
   getEmittedLiquidationValues,
   increaseDebt,
 } from '../utils/testHelper';
 import { parseUnits } from 'ethers';
 
-describe.only('StabilityPool', () => {
+describe('StabilityPool', () => {
   let signers: SignerWithAddress[];
   let owner: SignerWithAddress;
   let alice: SignerWithAddress;
@@ -85,10 +84,12 @@ describe.only('StabilityPool', () => {
     // it("withdrawFromSP(): succeeds when amount is 0 and system has an undercollateralized trove", async () => {
     // it("withdrawFromSP(): triggers LQTY reward event - increases the sum G", async () => {
     // it("withdrawFromSP(), partial withdrawal: depositor receives LQTY rewards", async () => {
+    // it("withdrawETHGainToTrove(): triggers LQTY reward event - increases the sum G", async () => {
+    // it("withdrawETHGainToTrove(), eligible deposit: depositor receives LQTY rewards", async () => {
 
     describe('provideToSP()', () => {
       // increases recorded stable at Stability Pool
-      it('provideToSP(): increases the Stability Pool stable balance', async () => {
+      it('increases the Stability Pool stable balance', async () => {
         // --- SETUP --- Give Alice a least 200
         await STOCK.unprotectedMint(alice, 200);
 
@@ -100,7 +101,7 @@ describe.only('StabilityPool', () => {
         expect(stockDeposit?.amount).to.be.equal(200n);
       });
 
-      it("provideToSP(): updates the user's deposit record in StabilityPool", async () => {
+      it("updates the user's deposit record in StabilityPool", async () => {
         // --- SETUP --- Give Alice a least 200
         await STOCK.unprotectedMint(alice, 200n);
 
@@ -120,7 +121,7 @@ describe.only('StabilityPool', () => {
         expect(depositAfter).to.be.equal(200n);
       });
 
-      it("provideToSP(): reduces the user's stock balance by the correct amount", async () => {
+      it("reduces the user's stock balance by the correct amount", async () => {
         // --- SETUP --- Give Alice a least 200
         await STOCK.unprotectedMint(alice, 200n);
 
@@ -136,7 +137,7 @@ describe.only('StabilityPool', () => {
         expect(stockBefore - stockAfter).to.be.equal(200n);
       });
 
-      it('provideToSP(): Correctly updates user snapshots of accumulated rewards per unit staked', async () => {
+      it('Correctly updates user snapshots of accumulated rewards per unit staked', async () => {
         // --- SETUP ---
 
         // Whale opens Trove and deposits to SP
@@ -228,7 +229,7 @@ describe.only('StabilityPool', () => {
         expect(alice_snapshot_S_Before_BTC).to.be.equal(alice_snapshot_S_After_BTC);
       });
 
-      it("provideToSP(), multiple deposits: updates user's deposit and snapshots", async () => {
+      it("multiple deposits: updates user's deposit and snapshots", async () => {
         // --- SETUP ---
 
         // Whale opens Trove and deposits to SP
@@ -346,7 +347,7 @@ describe.only('StabilityPool', () => {
         expect(alice_Snapshot_P_2).to.be.eq(P_2);
       });
 
-      it('provideToSP(): reverts if user tries to provide more than their STOCK balance', async () => {
+      it('reverts if user tries to provide more than their STOCK balance', async () => {
         await STOCK.unprotectedMint(alice, 200n);
         await STOCK.unprotectedMint(bob, 200n);
         const aliceBalance = await STOCK.balanceOf(alice);
@@ -365,7 +366,7 @@ describe.only('StabilityPool', () => {
         await assertRevert(bobTxPromise);
       });
 
-      it('provideToSP(): reverts if user tries to provide 2^256-1 STABLE, which exceeds their balance', async () => {
+      it('reverts if user tries to provide 2^256-1 STABLE, which exceeds their balance', async () => {
         await STOCK.unprotectedMint(alice, 200n);
 
         // Alice attempts to deposit 2^256-1
@@ -375,7 +376,7 @@ describe.only('StabilityPool', () => {
         await assertRevert(aliceTxPromise);
       });
 
-      it("provideToSP(): doesn't impact other users' deposits or coll gains", async () => {
+      it("doesn't impact other users' deposits or coll gains", async () => {
         await whaleShrimpTroveInit(contracts, signers);
 
         // Price drops
@@ -423,7 +424,7 @@ describe.only('StabilityPool', () => {
         expect(carol_btc_gain_before).to.be.equal(carol_btc_gain_after);
       });
 
-      it("provideToSP(): doesn't impact system debt, collateral or TCR", async () => {
+      it("doesn't impact system debt, collateral or TCR", async () => {
         await whaleShrimpTroveInit(contracts, signers);
 
         // Price drops
@@ -458,7 +459,7 @@ describe.only('StabilityPool', () => {
         expect(tcrBefore).to.be.equal(tcrAfter);
       });
 
-      it("provideToSP(): doesn't impact any troves, including the caller's trove", async () => {
+      it("doesn't impact any troves, including the caller's trove", async () => {
         await whaleShrimpTroveInit(contracts, signers);
 
         // Price drops
@@ -525,7 +526,7 @@ describe.only('StabilityPool', () => {
         expect(dennis_ICR_Before).to.be.equal(dennis_ICR_After);
       });
 
-      it("provideToSP(): doesn't protect the depositor's trove from liquidation", async () => {
+      it("doesn't protect the depositor's trove from liquidation", async () => {
         await whaleShrimpTroveInit(contracts, signers);
 
         // Confirm Bob has a Stability deposit
@@ -544,7 +545,7 @@ describe.only('StabilityPool', () => {
         expect(await troveManager.getTroveStatus(bob)).to.be.equal(3n); // check Bob's trove status was closed by liquidation
       });
 
-      it('provideToSP(): providing 0 stable reverts', async () => {
+      it('providing 0 stable reverts', async () => {
         await whaleShrimpTroveInit(contracts, signers);
 
         const StableInSP_Before = (await stabilityPoolManager.getTotalDeposits()).find(
@@ -559,7 +560,7 @@ describe.only('StabilityPool', () => {
         await assertRevert(bobTxPromise);
       });
 
-      it('provideToSP(), new deposit: depositor does not receive ETH gains', async () => {
+      it('new deposit: depositor does not receive ETH gains', async () => {
         await openTrove({
           from: whale,
           contracts,
@@ -603,7 +604,7 @@ describe.only('StabilityPool', () => {
         expect(B_btcBalance_Before).to.be.equal(B_btcBalance_After);
       });
 
-      it('provideToSP(), new deposit after past full withdrawal: depositor does not receive btc gains', async () => {
+      it('new deposit after past full withdrawal: depositor does not receive btc gains', async () => {
         await whaleShrimpTroveInit(contracts, signers);
 
         // time passes
@@ -624,7 +625,7 @@ describe.only('StabilityPool', () => {
         // A whale fully withdraw from the pool
         await stabilityPoolManager
           .connect(whale)
-          .withdrawalStability([{ tokenAddress: STABLE, amount: parseUnits('1000') }]); // gets paid out a little bit more because of the defaulter liquidation/compensation
+          .withdrawStability([{ tokenAddress: STABLE, amount: parseUnits('1000') }]); // gets paid out a little bit more because of the defaulter liquidation/compensation
 
         // --- TEST ---
 
@@ -642,7 +643,7 @@ describe.only('StabilityPool', () => {
         expect(whale_btcBalance_Before).to.be.equal(whale_btcBalance_After);
       });
 
-      it('provideToSP(): reverts when amount is zero', async () => {
+      it('reverts when amount is zero', async () => {
         await openTrove({
           from: whale,
           contracts,
@@ -677,7 +678,7 @@ describe.only('StabilityPool', () => {
     });
 
     describe('withdrawFromSP()', () => {
-      it('withdrawFromSP(): reverts when user has no active deposit', async () => {
+      it('reverts when user has no active deposit', async () => {
         await openTrove({
           from: alice,
           contracts,
@@ -696,9 +697,9 @@ describe.only('StabilityPool', () => {
           debts: [{ tokenAddress: STABLE, amount: parseUnits('2000') }],
         });
 
-        stabilityPoolManager.connect(alice).withdrawalStability([{ tokenAddress: STABLE, amount: parseUnits('100') }]);
+        stabilityPoolManager.connect(alice).withdrawStability([{ tokenAddress: STABLE, amount: parseUnits('100') }]);
         await assertRevert(
-          stabilityPoolManager.connect(bob).withdrawalStability([{ tokenAddress: STABLE, amount: parseUnits('100') }]),
+          stabilityPoolManager.connect(bob).withdrawStability([{ tokenAddress: STABLE, amount: parseUnits('100') }]),
           'ZeroAmount()'
         );
       });
@@ -734,11 +735,11 @@ describe.only('StabilityPool', () => {
       //
       //   // should not work, because there is a trove (defaulter) which is not liquidated yet
       //   await assertRevert(
-      //     stabilityPoolManager.connect(alice).withdrawalStability([{ tokenAddress: STABLE, amount: parseUnits('500') }])
+      //     stabilityPoolManager.connect(alice).withdrawStability([{ tokenAddress: STABLE, amount: parseUnits('500') }])
       //   );
       // });
 
-      it('withdrawFromSP(): partial retrieval - retrieves correct stable amount and the entire btc Gain, and updates deposit', async () => {
+      it('partial retrieval - retrieves correct stable amount and the entire btc Gain, and updates deposit', async () => {
         // --- SETUP ---
         await whaleShrimpTroveInit(contracts, signers);
 
@@ -779,7 +780,7 @@ describe.only('StabilityPool', () => {
         // Alice retrieves part of her entitled stable
         await stabilityPoolManager
           .connect(alice)
-          .withdrawalStability([{ tokenAddress: STABLE, amount: parseUnits('1000') }]);
+          .withdrawStability([{ tokenAddress: STABLE, amount: parseUnits('1000') }]);
         const aliceStableBalanceAfterWithdrawal = await STABLE.balanceOf(alice);
         expect(expectedCompoundedStableDeposit_A - aliceStableBalanceAfterWithdrawal).to.be.lt(5000);
 
@@ -798,7 +799,7 @@ describe.only('StabilityPool', () => {
         expect(stableInPoolA - aliceStableBalanceAfterWithdrawal - expectedStableLoss - stableInPoolB).to.be.lt(5000);
       });
 
-      it('withdrawFromSP(): partial retrieval - leaves the correct amount of stable in the Stability Pool', async () => {
+      it('partial retrieval - leaves the correct amount of stable in the Stability Pool', async () => {
         // --- SETUP ---
         await whaleShrimpTroveInit(contracts, signers);
 
@@ -823,7 +824,7 @@ describe.only('StabilityPool', () => {
         // Alice retrieves part of her entitled stable
         await stabilityPoolManager
           .connect(alice)
-          .withdrawalStability([{ tokenAddress: STABLE, amount: parseUnits('500') }]);
+          .withdrawStability([{ tokenAddress: STABLE, amount: parseUnits('500') }]);
 
         const expectedRemainingStable =
           stableInPoolA -
@@ -835,7 +836,7 @@ describe.only('StabilityPool', () => {
         expect(expectedRemainingStable - stableInPoolB).to.be.lt(5000);
       });
 
-      it('withdrawFromSP(): Subsequent deposit and withdrawal attempt from same account, with no intermediate liquidations, withdraws zero ETH', async () => {
+      it('Subsequent deposit and withdrawal attempt from same account, with no intermediate liquidations, withdraws zero ETH', async () => {
         // --- SETUP ---
         await whaleShrimpTroveInit(contracts, signers);
 
@@ -849,7 +850,7 @@ describe.only('StabilityPool', () => {
         // Alice retrieves all of her entitled stable:
         await stabilityPoolManager
           .connect(alice)
-          .withdrawalStability([{ tokenAddress: STABLE, amount: parseUnits('1000') }]);
+          .withdrawStability([{ tokenAddress: STABLE, amount: parseUnits('1000') }]);
 
         const stabilityPool = await getStabilityPool(contracts, STABLE);
         expect(await stabilityPool.getDepositorCollGain(alice, BTC)).to.be.equal(0);
@@ -866,7 +867,7 @@ describe.only('StabilityPool', () => {
         // Alice attempts second withdrawal
         await stabilityPoolManager
           .connect(alice)
-          .withdrawalStability([{ tokenAddress: STABLE, amount: parseUnits('500') }]);
+          .withdrawStability([{ tokenAddress: STABLE, amount: parseUnits('500') }]);
         expect(await stabilityPool.getDepositorCollGain(alice, BTC)).to.be.equal(0);
 
         // Check ETH in pool does not change
@@ -881,7 +882,7 @@ describe.only('StabilityPool', () => {
         expect(await stabilityPool.getDepositorCollGain(alice, BTC)).to.be.equal(0);
       });
 
-      it("withdrawFromSP(): it correctly updates the user's stable and btc snapshots of entitled reward per unit staked", async () => {
+      it("it correctly updates the user's stable and btc snapshots of entitled reward per unit staked", async () => {
         await whaleShrimpTroveInit(contracts, signers);
         const stabilityPool = await getStabilityPool(contracts, STABLE);
 
@@ -901,7 +902,7 @@ describe.only('StabilityPool', () => {
         // Alice retrieves part of her entitled stable
         await stabilityPoolManager
           .connect(alice)
-          .withdrawalStability([{ tokenAddress: STABLE, amount: parseUnits('500') }]);
+          .withdrawStability([{ tokenAddress: STABLE, amount: parseUnits('500') }]);
 
         const P = await stabilityPool.P();
         const S = await stabilityPool.epochToScaleToCollTokenToSum(0, 0, BTC);
@@ -912,7 +913,7 @@ describe.only('StabilityPool', () => {
         expect(alice_snapshot_P_After).to.be.equal(P);
       });
 
-      it('withdrawFromSP(): decreases StabilityPool ETH', async () => {
+      it('decreases StabilityPool ETH', async () => {
         // --- SETUP ---
         await whaleShrimpTroveInit(contracts, signers);
         const stabilityPool = await getStabilityPool(contracts, STABLE);
@@ -942,7 +943,7 @@ describe.only('StabilityPool', () => {
         // Alice retrieves all of her deposit
         await stabilityPoolManager
           .connect(alice)
-          .withdrawalStability([{ tokenAddress: STABLE, amount: parseUnits('1000') }]);
+          .withdrawStability([{ tokenAddress: STABLE, amount: parseUnits('1000') }]);
 
         const active_BTC_After = await storagePool.getValue(BTC, true, 0);
         expect(active_BTC_Before).to.be.equal(active_BTC_After);
@@ -953,7 +954,7 @@ describe.only('StabilityPool', () => {
         expect(stability_BTC_Before - stability_BTC_After - aliceBTCGain).to.be.lt(5000);
       });
 
-      it('withdrawFromSP(): All depositors are able to withdraw from the SP to their account', async () => {
+      it('All depositors are able to withdraw from the SP to their account', async () => {
         await whaleShrimpTroveInit(contracts, signers);
 
         // price drops: defaulters' Troves fall below MCR, alice and whale Trove remain active
@@ -963,20 +964,20 @@ describe.only('StabilityPool', () => {
         // All depositors attempt to withdraw
         await stabilityPoolManager
           .connect(alice)
-          .withdrawalStability([{ tokenAddress: STABLE, amount: parseUnits('5000') }]); // gets paid out a little bit more because of the defaulter liquidation/compensation
+          .withdrawStability([{ tokenAddress: STABLE, amount: parseUnits('5000') }]); // gets paid out a little bit more because of the defaulter liquidation/compensation
         await stabilityPoolManager
           .connect(bob)
-          .withdrawalStability([{ tokenAddress: STABLE, amount: parseUnits('5000') }]); // gets paid out a little bit more because of the defaulter liquidation/compensation
+          .withdrawStability([{ tokenAddress: STABLE, amount: parseUnits('5000') }]); // gets paid out a little bit more because of the defaulter liquidation/compensation
         await stabilityPoolManager
           .connect(carol)
-          .withdrawalStability([{ tokenAddress: STABLE, amount: parseUnits('5000') }]); // gets paid out a little bit more because of the defaulter liquidation/compensation
+          .withdrawStability([{ tokenAddress: STABLE, amount: parseUnits('5000') }]); // gets paid out a little bit more because of the defaulter liquidation/compensation
 
         const stabilityPool = await getStabilityPool(contracts, STABLE);
         const totalDeposits = await stabilityPool.getTotalDeposit();
         expect(totalDeposits).to.be.lt(10000);
       });
 
-      it("withdrawFromSP(): increases depositor's stable token balance by the expected amount", async () => {
+      it("increases depositor's stable token balance by the expected amount", async () => {
         await whaleShrimpTroveInit(contracts, signers);
 
         // price drops: defaulters' Troves fall below MCR, alice and whale Trove remain active
@@ -989,23 +990,23 @@ describe.only('StabilityPool', () => {
         // alive 1/6 of 100 = 16.66
         await stabilityPoolManager
           .connect(alice)
-          .withdrawalStability([{ tokenAddress: STABLE, amount: parseUnits('5000') }]);
+          .withdrawStability([{ tokenAddress: STABLE, amount: parseUnits('5000') }]);
         expect((await STABLE.balanceOf(alice)) - parseUnits('983.34')).to.be.lt(10000);
 
         // bob 2/6 of 100 = 33.33
         await stabilityPoolManager
           .connect(bob)
-          .withdrawalStability([{ tokenAddress: STABLE, amount: parseUnits('5000') }]);
+          .withdrawStability([{ tokenAddress: STABLE, amount: parseUnits('5000') }]);
         expect((await STABLE.balanceOf(bob)) - parseUnits('2966.67')).to.be.lt(10000);
 
         // carol 3/6 of 100 = 50
         await stabilityPoolManager
           .connect(carol)
-          .withdrawalStability([{ tokenAddress: STABLE, amount: parseUnits('5000') }]);
+          .withdrawStability([{ tokenAddress: STABLE, amount: parseUnits('5000') }]);
         expect((await STABLE.balanceOf(carol)) - parseUnits('2950')).to.be.lt(10000);
       });
 
-      it("withdrawFromSP(): doesn't impact other users Stability deposits or coll gains", async () => {
+      it("doesn't impact other users Stability deposits or coll gains", async () => {
         await whaleShrimpTroveInit(contracts, signers);
 
         // price drops: defaulters' Troves fall below MCR, alice and whale Trove remain active
@@ -1020,7 +1021,7 @@ describe.only('StabilityPool', () => {
         // Carol withdraws her Stability deposit
         await stabilityPoolManager
           .connect(carol)
-          .withdrawalStability([{ tokenAddress: STABLE, amount: parseUnits('5000') }]);
+          .withdrawStability([{ tokenAddress: STABLE, amount: parseUnits('5000') }]);
 
         const alice_Deposit_After = (await stabilityPool.getCompoundedDebtDeposit(alice)).toString();
         const alice_Gain_After = (await stabilityPool.getDepositorCollGain(alice, BTC)).toString();
@@ -1030,7 +1031,7 @@ describe.only('StabilityPool', () => {
         assert.equal(alice_Gain_Before, alice_Gain_After);
       });
 
-      it("withdrawFromSP(): doesn't impact system debt, collateral or TCR ", async () => {
+      it("doesn't impact system debt, collateral or TCR ", async () => {
         await whaleShrimpTroveInit(contracts, signers);
 
         // price drops: defaulters' Troves fall below MCR, alice and whale Trove remain active
@@ -1047,7 +1048,7 @@ describe.only('StabilityPool', () => {
         // Carol withdraws her Stability deposit
         await stabilityPoolManager
           .connect(carol)
-          .withdrawalStability([{ tokenAddress: STABLE, amount: parseUnits('5000') }]);
+          .withdrawStability([{ tokenAddress: STABLE, amount: parseUnits('5000') }]);
 
         const activeDebt_After = await storagePool.getValue(STABLE, false, 0);
         const defaultedDebt_After = await storagePool.getValue(STABLE, false, 1);
@@ -1063,7 +1064,7 @@ describe.only('StabilityPool', () => {
         assert.equal(tcrBefore, tcrAfter);
       });
 
-      it("withdrawFromSP(): doesn't impact any troves, including the caller's trove", async () => {
+      it("doesn't impact any troves, including the caller's trove", async () => {
         await whaleShrimpTroveInit(contracts, signers);
 
         // price drops: defaulters' Troves fall below MCR, alice and whale Trove remain active
@@ -1090,7 +1091,7 @@ describe.only('StabilityPool', () => {
         // Carol withdraws her Stability deposit
         await stabilityPoolManager
           .connect(carol)
-          .withdrawalStability([{ tokenAddress: STABLE, amount: parseUnits('5000') }]);
+          .withdrawStability([{ tokenAddress: STABLE, amount: parseUnits('5000') }]);
 
         const whale_Debt_After = (await troveManager.getTroveDebt(whale))[0][1];
         const alice_Debt_After = (await troveManager.getTroveDebt(alice))[0][1];
@@ -1124,7 +1125,7 @@ describe.only('StabilityPool', () => {
         assert.equal(carol_ICR_Before, carol_ICR_After);
       });
 
-      it("withdrawFromSP(): withdrawing 0 stable doesn't alter the caller's deposit or the total stable in the Stability Pool", async () => {
+      it("withdrawing 0 stable doesn't alter the caller's deposit or the total stable in the Stability Pool", async () => {
         await whaleShrimpTroveInit(contracts, signers);
         const stabilityPool = await getStabilityPool(contracts, STABLE);
 
@@ -1133,9 +1134,7 @@ describe.only('StabilityPool', () => {
         assert.equal(LUSDinSP_Before, parseUnits('6000'));
 
         // Bob withdraws 0 LUSD from the Stability Pool
-        await stabilityPoolManager
-          .connect(bob)
-          .withdrawalStability([{ tokenAddress: STABLE, amount: parseUnits('0') }]);
+        await stabilityPoolManager.connect(bob).withdrawStability([{ tokenAddress: STABLE, amount: parseUnits('0') }]);
 
         // check Bob's deposit and total LUSD in Stability Pool has not changed
         const bob_Deposit_After = await stabilityPool.getCompoundedDebtDeposit(bob);
@@ -1145,7 +1144,7 @@ describe.only('StabilityPool', () => {
         assert.equal(LUSDinSP_Before, LUSDinSP_After);
       });
 
-      it("withdrawFromSP(): withdrawing 0 ETH Gain does not alter the caller's ETH balance, their trove collateral, or the ETH  in the Stability Pool", async () => {
+      it("withdrawing 0 ETH Gain does not alter the caller's ETH balance, their trove collateral, or the ETH  in the Stability Pool", async () => {
         await whaleShrimpTroveInit(contracts, signers);
 
         await priceFeed.setTokenPrice(BTC, parseUnits('5000'));
@@ -1169,7 +1168,7 @@ describe.only('StabilityPool', () => {
         // Dennis withdraws his full deposit and ETHGain to his account
         await stabilityPoolManager
           .connect(dennis)
-          .withdrawalStability([{ tokenAddress: STABLE, amount: parseUnits('1000') }]);
+          .withdrawStability([{ tokenAddress: STABLE, amount: parseUnits('1000') }]);
 
         // Check withdrawal does not alter Dennis' ETH balance or his trove's collateral
         const dennisBTCAfter = await BTC.balanceOf(dennis);
@@ -1184,7 +1183,7 @@ describe.only('StabilityPool', () => {
         assert.equal(btcPoolBefore, btcPoolAfter);
       });
 
-      it("withdrawFromSP(): Request to withdraw > caller's deposit only withdraws the caller's compounded deposit", async () => {
+      it("Request to withdraw > caller's deposit only withdraws the caller's compounded deposit", async () => {
         await whaleShrimpTroveInit(contracts, signers);
 
         await priceFeed.setTokenPrice(BTC, parseUnits('5000'));
@@ -1201,7 +1200,7 @@ describe.only('StabilityPool', () => {
         // Bob attempts to withdraws 1 wei more than his compounded deposit from the Stability Pool
         await stabilityPoolManager
           .connect(bob)
-          .withdrawalStability([{ tokenAddress: STABLE, amount: bob_Deposit_Before + BigInt(1) }]);
+          .withdrawStability([{ tokenAddress: STABLE, amount: bob_Deposit_Before + BigInt(1) }]);
 
         // Check Bob's LUSD balance has risen by only the value of his compounded deposit
         const bob_expectedLUSDBalance = bob_Stable_Balance_Before + bob_Deposit_Before;
@@ -1211,7 +1210,7 @@ describe.only('StabilityPool', () => {
         // Alice attempts to withdraws 2309842309.000000000000000000 LUSD from the Stability Pool
         await stabilityPoolManager
           .connect(alice)
-          .withdrawalStability([{ tokenAddress: STABLE, amount: parseUnits('9999999999') }]);
+          .withdrawStability([{ tokenAddress: STABLE, amount: parseUnits('9999999999') }]);
 
         // Check Alice's LUSD balance has risen by only the value of her compounded deposit
         const alice_expectedLUSDBalance = alice_Stable_Balance_Before + alice_Deposit_Before;
@@ -1224,7 +1223,7 @@ describe.only('StabilityPool', () => {
         assert.equal(LUSDinSP_After, expectedLUSDinSP);
       });
 
-      it('withdrawFromSP(): caller can withdraw full deposit and ETH gain during Recovery Mode', async () => {
+      it('caller can withdraw full deposit and ETH gain during Recovery Mode', async () => {
         await whaleShrimpTroveInit(contracts, signers);
         const stabilityPool = await getStabilityPool(contracts, STABLE);
 
@@ -1259,13 +1258,13 @@ describe.only('StabilityPool', () => {
         // A, B, C withdraw their full deposits from the Stability Pool
         await stabilityPoolManager
           .connect(alice)
-          .withdrawalStability([{ tokenAddress: STABLE, amount: parseUnits('5000') }]);
+          .withdrawStability([{ tokenAddress: STABLE, amount: parseUnits('5000') }]);
         await stabilityPoolManager
           .connect(bob)
-          .withdrawalStability([{ tokenAddress: STABLE, amount: parseUnits('5000') }]);
+          .withdrawStability([{ tokenAddress: STABLE, amount: parseUnits('5000') }]);
         await stabilityPoolManager
           .connect(carol)
-          .withdrawalStability([{ tokenAddress: STABLE, amount: parseUnits('5000') }]);
+          .withdrawStability([{ tokenAddress: STABLE, amount: parseUnits('5000') }]);
 
         // Check LUSD balances of A, B, C have risen by the value of their compounded deposits, respectively
         const alice_expectedLUSDBalance = alice_LUSD_Balance_Before + alice_Deposit_Before;
@@ -1300,7 +1299,7 @@ describe.only('StabilityPool', () => {
         expect(ETHinSP_After).to.be.lt(10000);
       });
 
-      it('getDepositorETHGain(): depositor does not earn further ETH gains from liquidations while their compounded deposit == 0: ', async () => {
+      it('depositor does not earn further ETH gains from liquidations while their compounded deposit == 0: ', async () => {
         await whaleShrimpTroveInit(contracts, signers);
         const stabilityPool = await getStabilityPool(contracts, STABLE);
 
@@ -1340,6 +1339,116 @@ describe.only('StabilityPool', () => {
         const bob_ETHGain_2 = await stabilityPool.getDepositorCollGain(bob, BTC);
         assert.equal(alice_ETHGain_1, alice_ETHGain_2);
         assert.equal(bob_ETHGain_1, bob_ETHGain_2);
+      });
+    });
+
+    describe('withdrawGains():', () => {
+      it("Applies stable loss to user's deposit, and redirects coll reward to user's wallet", async () => {
+        await whaleShrimpTroveInit(contracts, signers);
+
+        const aliceBTCBefore = await BTC.balanceOf(alice);
+
+        await priceFeed.setTokenPrice(BTC, parseUnits('5000'));
+        await troveManager.liquidate(defaulter_1);
+
+        const stabilityPool = await getStabilityPool(contracts, STABLE);
+        const btcGainA = await stabilityPool.getDepositorCollGain(alice, BTC);
+        const compoundedDeposit_A = await stabilityPool.getCompoundedDebtDeposit(alice);
+
+        await stabilityPoolManager.connect(alice).withdrawGains();
+
+        const compoundedDeposit_B = await stabilityPool.getCompoundedDebtDeposit(alice);
+        expect(compoundedDeposit_A - compoundedDeposit_B).to.be.lt(10000);
+
+        const aliceBTCAfter = await BTC.balanceOf(alice);
+        expect(btcGainA).to.be.gt(0);
+        assert.equal(aliceBTCBefore + btcGainA, aliceBTCAfter);
+      });
+
+      it('Subsequent deposit and withdrawal attempt from same account, with no intermediate liquidations, withdraws zero ETH', async () => {
+        await whaleShrimpTroveInit(contracts, signers);
+        const stabilityPool = await getStabilityPool(contracts, STABLE);
+
+        await priceFeed.setTokenPrice(BTC, parseUnits('5000'));
+        await troveManager.liquidate(defaulter_1);
+
+        await stabilityPoolManager.connect(alice).withdrawGains();
+
+        expect(await stabilityPool.getDepositorCollGain(alice, BTC)).to.be.equal(0);
+
+        const aliceBTCBefore = await BTC.balanceOf(alice);
+        const btcInSPBefore = (await stabilityPool.getTotalGainedColl()).find(d => d.tokenAddress === BTC.target)
+          ?.amount;
+
+        // Alice attempts second withdrawal
+        await stabilityPoolManager.connect(alice).withdrawGains();
+
+        // Check ETH in pool does not change
+        const aliceBTCAfter = await BTC.balanceOf(alice);
+        const btcInSPAfter = (await stabilityPool.getTotalGainedColl()).find(d => d.tokenAddress === BTC.target)
+          ?.amount;
+
+        expect(aliceBTCAfter).to.be.equal(aliceBTCBefore);
+        expect(btcInSPAfter).to.be.equal(btcInSPBefore);
+      });
+
+      it('All depositors are able to withdraw their coll gain from the SP', async () => {
+        await whaleShrimpTroveInit(contracts, signers);
+        const stabilityPool = await getStabilityPool(contracts, STABLE);
+
+        await priceFeed.setTokenPrice(BTC, parseUnits('5000'));
+        await troveManager.liquidate(defaulter_1);
+
+        // All depositors attempt to withdraw
+        await stabilityPoolManager.connect(alice).withdrawGains();
+        await stabilityPoolManager.connect(bob).withdrawGains();
+        await stabilityPoolManager.connect(carol).withdrawGains();
+        await stabilityPoolManager.connect(dennis).withdrawGains();
+      });
+
+      it('caller can withdraw full deposit and ETH gain to their wallet during Recovery Mode', async () => {
+        await whaleShrimpTroveInit(contracts, signers);
+        const stabilityPool = await getStabilityPool(contracts, STABLE);
+
+        const [isRecoveryModeA] = await storagePool.checkRecoveryMode();
+        assert.isFalse(isRecoveryModeA);
+
+        const alice_Collateral_Before = await BTC.balanceOf(alice);
+        const bob_Collateral_Before = await BTC.balanceOf(bob);
+        const carol_Collateral_Before = await BTC.balanceOf(carol);
+
+        await priceFeed.setTokenPrice(BTC, parseUnits('5000'));
+        await troveManager.liquidate(defaulter_1);
+
+        await priceFeed.setTokenPrice(BTC, parseUnits('5'));
+        const [isRecoveryModeB] = await storagePool.checkRecoveryMode();
+        assert.isTrue(isRecoveryModeB);
+
+        const alice_ETHGain_Before = await stabilityPool.getDepositorCollGain(alice, BTC);
+        const bob_ETHGain_Before = await stabilityPool.getDepositorCollGain(bob, BTC);
+        const carol_ETHGain_Before = await stabilityPool.getDepositorCollGain(carol, BTC);
+
+        // A, B, C withdraw their full ETH gain from the Stability Pool to their trove
+        await stabilityPoolManager.connect(alice).withdrawGains();
+        await stabilityPoolManager.connect(bob).withdrawGains();
+        await stabilityPoolManager.connect(carol).withdrawGains();
+
+        // Check collateral of troves A, B, C has increased by the value of their ETH gain from liquidations, respectively
+        const alice_expectedCollateral = alice_Collateral_Before + alice_ETHGain_Before;
+        const bob_expectedColalteral = bob_Collateral_Before + bob_ETHGain_Before;
+        const carol_expectedCollateral = carol_Collateral_Before + carol_ETHGain_Before;
+
+        const alice_Collateral_After = await BTC.balanceOf(alice);
+        const bob_Collateral_After = await BTC.balanceOf(bob);
+        const carol_Collateral_After = await BTC.balanceOf(carol);
+
+        assert.equal(alice_expectedCollateral, alice_Collateral_After);
+        assert.equal(bob_expectedColalteral, bob_Collateral_After);
+        assert.equal(carol_expectedCollateral, carol_Collateral_After);
+
+        // no btc left in pool, all claimed
+        const btcInPool = (await stabilityPool.getTotalGainedColl()).find(d => d.tokenAddress === BTC.target)?.amount;
+        expect(btcInPool).to.be.lt(10000);
       });
     });
   });
