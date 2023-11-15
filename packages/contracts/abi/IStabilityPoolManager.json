@@ -307,6 +307,13 @@
         "type": "function"
     },
     {
+        "inputs": [],
+        "name": "withdrawGains",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
         "inputs": [
             {
                 "components": [
@@ -326,7 +333,7 @@
                 "type": "tuple[]"
             }
         ],
-        "name": "withdrawalStability",
+        "name": "withdrawStability",
         "outputs": [],
         "stateMutability": "nonpayable",
         "type": "function"

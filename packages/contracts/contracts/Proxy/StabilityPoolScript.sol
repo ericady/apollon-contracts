@@ -23,7 +23,7 @@ contract StabilityPoolScript is CheckContract {
     stabilityPool.withdrawFromSP(user, _amount);
   }
 
-  function withdrawGains() external {
-    stabilityPool.withdrawGains();
+  function withdrawGains(address user) external {
+    stabilityPool.withdrawGains(user);
   }
 }

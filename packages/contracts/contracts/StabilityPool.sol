@@ -267,6 +267,7 @@ contract StabilityPool is LiquityBase, Ownable, CheckContract, IStabilityPool {
    * - Increases deposit stake, and takes new snapshots.
    */
   function provideToSP(address depositor, uint _amount) external override {
+    _requireCallerIsStabilityPoolManager();
     _requireNonZeroAmount(_amount);
 
     uint initialDeposit = deposits[depositor];
@@ -296,6 +297,8 @@ contract StabilityPool is LiquityBase, Ownable, CheckContract, IStabilityPool {
    * - If _amount > userDeposit, the user withdraws all of their compounded deposit.
    */
   function withdrawFromSP(address user, uint debtToWithdrawal) external override {
+    _requireCallerIsStabilityPoolManager();
+
     // todo removed this check, because we do not know about potential under collateralized loans
     // (sorted troves is not anymore sorted by runtime cr, its the cr on creation time)
     // this check is not required for any security reasons
@@ -310,10 +313,11 @@ contract StabilityPool is LiquityBase, Ownable, CheckContract, IStabilityPool {
     //        emit DepositLoss(msg.sender, depositLoss); todo
     debtToWithdrawal = LiquityMath._min(debtToWithdrawal, remainingDeposit);
 
+    // coll gain and deposit payout
     _payoutCollGains(user);
-
-    // update deposit snapshots
     _sendDepositToDepositor(user, debtToWithdrawal);
+
+    // update current deposit snapshot
     uint newDeposit = remainingDeposit - debtToWithdrawal;
     _updateDepositAndSnapshots(user, newDeposit);
     //        emit UserDepositChanged(msg.sender, newDeposit); todo
@@ -329,20 +333,19 @@ contract StabilityPool is LiquityBase, Ownable, CheckContract, IStabilityPool {
    * - Transfers the depositor's entire gains to its wallet
    * - Leaves their compounded deposit in the Stability Pool
    * - Updates snapshots for deposit stake */
-  function withdrawGains() external override {
-    _requireUserHasTrove(msg.sender);
+  function withdrawGains(address user) external override {
+    _requireCallerIsStabilityPoolManager();
 
-    uint initialDeposit = deposits[msg.sender];
-    _requireUserHasDeposit(initialDeposit);
-
-    uint remainingDeposit = this.getCompoundedDebtDeposit(msg.sender);
+    uint initialDeposit = deposits[user];
+    uint remainingDeposit = this.getCompoundedDebtDeposit(user);
     uint depositLoss = initialDeposit - remainingDeposit; // Needed only for event log
     //        emit DepositLoss(msg.sender, depositLoss); todo
 
-    _payoutCollGains(msg.sender);
+    // coll gain payout
+    _payoutCollGains(user);
 
     // update deposit snapshots
-    _updateDepositAndSnapshots(msg.sender, remainingDeposit);
+    if (initialDeposit != remainingDeposit) _updateDepositAndSnapshots(user, remainingDeposit);
     //        emit UserDepositChanged(msg.sender, remainingDeposit); todo
 
     // todo gov token...
@@ -586,9 +589,18 @@ contract StabilityPool is LiquityBase, Ownable, CheckContract, IStabilityPool {
 
   function _payoutCollGains(address _depositor) internal {
     for (uint i = 0; i < usedCollTokens.length; i++) {
-      uint collGain = this.getDepositorCollGain(_depositor, usedCollTokens[i]);
-      _sendCollGainToDepositor(_depositor, usedCollTokens[i], collGain);
-      //            emit CollateralGainWithdrawn(_depositor, usedCollTokens[i], collGain); todo
+      address collTokenAddress = usedCollTokens[i];
+      uint collGain = this.getDepositorCollGain(_depositor, collTokenAddress);
+      if (collGain == 0) continue;
+
+      uint newTotalColl = totalGainedColl[collTokenAddress] - collGain;
+      totalGainedColl[collTokenAddress] = newTotalColl;
+
+      IERC20(collTokenAddress).transfer(_depositor, collGain);
+
+      // todo
+      // emit CollateralGainWithdrawn(_depositor, usedCollTokens[i], collGain);
+      // emit StabilityPoolCollBalanceUpdates(_collToken, newTotalColl);
     }
   }
 
@@ -682,16 +694,6 @@ contract StabilityPool is LiquityBase, Ownable, CheckContract, IStabilityPool {
     depositToken.transfer(_depositor, _amount);
     totalDeposits -= _amount;
     emit StabilityPoolDepositBalanceUpdated(totalDeposits);
-  }
-
-  function _sendCollGainToDepositor(address _depositor, address _collToken, uint _amount) internal {
-    if (_amount == 0) return;
-
-    uint newColl = totalGainedColl[_collToken] - _amount;
-    totalGainedColl[_collToken] = newColl;
-    emit StabilityPoolCollBalanceUpdates(_collToken, newColl);
-
-    IERC20(_collToken).transfer(_depositor, _amount);
   }
 
   // --- Stability Pool Deposit Functionality ---

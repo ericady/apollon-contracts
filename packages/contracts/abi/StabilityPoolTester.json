@@ -870,7 +870,13 @@
         "type": "function"
     },
     {
-        "inputs": [],
+        "inputs": [
+            {
+                "internalType": "address",
+                "name": "user",
+                "type": "address"
+            }
+        ],
         "name": "withdrawGains",
         "outputs": [],
         "stateMutability": "nonpayable",

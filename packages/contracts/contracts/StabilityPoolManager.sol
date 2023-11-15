@@ -114,23 +114,36 @@ contract StabilityPoolManager is Ownable, CheckContract, IStabilityPoolManager {
   // --- Setters ---
 
   function provideStability(TokenAmount[] memory _debts) external override {
+    address user = msg.sender;
+
     for (uint i = 0; i < _debts.length; i++) {
       IDebtToken debtToken = IDebtToken(_debts[i].tokenAddress);
       IStabilityPool stabilityPool = stabilityPools[debtToken];
       if (address(stabilityPool) == address(0)) revert PoolNotExist();
 
-      stabilityPool.provideToSP(msg.sender, _debts[i].amount);
-      debtToken.sendToPool(msg.sender, address(stabilityPool), _debts[i].amount);
+      debtToken.sendToPool(user, address(stabilityPool), _debts[i].amount);
+      stabilityPool.provideToSP(user, _debts[i].amount);
     }
   }
 
-  function withdrawalStability(TokenAmount[] memory _debts) external override {
+  function withdrawStability(TokenAmount[] memory _debts) external override {
+    address user = msg.sender;
+
     for (uint i = 0; i < _debts.length; i++) {
       IDebtToken debtToken = IDebtToken(_debts[i].tokenAddress);
       IStabilityPool stabilityPool = stabilityPools[debtToken];
       if (address(stabilityPool) == address(0)) revert PoolNotExist();
 
-      stabilityPool.withdrawFromSP(msg.sender, _debts[i].amount);
+      stabilityPool.withdrawFromSP(user, _debts[i].amount);
+    }
+  }
+
+  function withdrawGains() external override {
+    address user = msg.sender;
+
+    for (uint i = 0; i < stabilityPoolsArray.length; i++) {
+      IStabilityPool stabilityPool = stabilityPoolsArray[i];
+      stabilityPool.withdrawGains(user);
     }
   }
 
