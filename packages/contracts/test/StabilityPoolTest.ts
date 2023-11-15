@@ -83,6 +83,8 @@ describe.only('StabilityPool', () => {
     // it("provideToSP(), topup: triggers LQTY reward event - increases the sum G", async () => {
     // it("provideToSP(), topup: depositor receives LQTY rewards", async () => {
     // it("withdrawFromSP(): succeeds when amount is 0 and system has an undercollateralized trove", async () => {
+    // it("withdrawFromSP(): triggers LQTY reward event - increases the sum G", async () => {
+    // it("withdrawFromSP(), partial withdrawal: depositor receives LQTY rewards", async () => {
 
     describe('provideToSP()', () => {
       // increases recorded stable at Stability Pool
@@ -1180,6 +1182,164 @@ describe.only('StabilityPool', () => {
 
         // Check withdrawal has not altered the ETH in the Stability Pool
         assert.equal(btcPoolBefore, btcPoolAfter);
+      });
+
+      it("withdrawFromSP(): Request to withdraw > caller's deposit only withdraws the caller's compounded deposit", async () => {
+        await whaleShrimpTroveInit(contracts, signers);
+
+        await priceFeed.setTokenPrice(BTC, parseUnits('5000'));
+        await troveManager.liquidate(defaulter_1);
+
+        const alice_Stable_Balance_Before = await STABLE.balanceOf(alice);
+        const bob_Stable_Balance_Before = await STABLE.balanceOf(bob);
+
+        const stabilityPool = await getStabilityPool(contracts, STABLE);
+        const alice_Deposit_Before = await stabilityPool.getCompoundedDebtDeposit(alice);
+        const bob_Deposit_Before = await stabilityPool.getCompoundedDebtDeposit(bob);
+        const stableInSPBefore = await stabilityPool.getTotalDeposit();
+
+        // Bob attempts to withdraws 1 wei more than his compounded deposit from the Stability Pool
+        await stabilityPoolManager
+          .connect(bob)
+          .withdrawalStability([{ tokenAddress: STABLE, amount: bob_Deposit_Before + BigInt(1) }]);
+
+        // Check Bob's LUSD balance has risen by only the value of his compounded deposit
+        const bob_expectedLUSDBalance = bob_Stable_Balance_Before + bob_Deposit_Before;
+        const bob_LUSD_Balance_After = await STABLE.balanceOf(bob);
+        assert.equal(bob_LUSD_Balance_After, bob_expectedLUSDBalance);
+
+        // Alice attempts to withdraws 2309842309.000000000000000000 LUSD from the Stability Pool
+        await stabilityPoolManager
+          .connect(alice)
+          .withdrawalStability([{ tokenAddress: STABLE, amount: parseUnits('9999999999') }]);
+
+        // Check Alice's LUSD balance has risen by only the value of her compounded deposit
+        const alice_expectedLUSDBalance = alice_Stable_Balance_Before + alice_Deposit_Before;
+        const alice_LUSD_Balance_After = await STABLE.balanceOf(alice);
+        assert.equal(alice_LUSD_Balance_After, alice_expectedLUSDBalance);
+
+        // Check LUSD in Stability Pool has been reduced by only Alice's compounded deposit and Bob's compounded deposit
+        const expectedLUSDinSP = stableInSPBefore - alice_Deposit_Before - bob_Deposit_Before;
+        const LUSDinSP_After = await stabilityPool.getTotalDeposit();
+        assert.equal(LUSDinSP_After, expectedLUSDinSP);
+      });
+
+      it('withdrawFromSP(): caller can withdraw full deposit and ETH gain during Recovery Mode', async () => {
+        await whaleShrimpTroveInit(contracts, signers);
+        const stabilityPool = await getStabilityPool(contracts, STABLE);
+
+        await priceFeed.setTokenPrice(BTC, parseUnits('5000'));
+        await troveManager.liquidate(defaulter_1);
+
+        const [isRecoveryModeBefore] = await storagePool.checkRecoveryMode();
+        assert.isFalse(isRecoveryModeBefore);
+
+        const alice_LUSD_Balance_Before = await STABLE.balanceOf(alice);
+        const bob_LUSD_Balance_Before = await STABLE.balanceOf(bob);
+        const carol_LUSD_Balance_Before = await STABLE.balanceOf(carol);
+
+        const alice_ETH_Balance_Before = await BTC.balanceOf(alice);
+        const bob_ETH_Balance_Before = await BTC.balanceOf(bob);
+        const carol_ETH_Balance_Before = await BTC.balanceOf(carol);
+
+        const alice_Deposit_Before = await stabilityPool.getCompoundedDebtDeposit(alice);
+        const bob_Deposit_Before = await stabilityPool.getCompoundedDebtDeposit(bob);
+        const carol_Deposit_Before = await stabilityPool.getCompoundedDebtDeposit(carol);
+
+        const alice_ETHGain_Before = await stabilityPool.getDepositorCollGain(alice, BTC);
+        const bob_ETHGain_Before = await stabilityPool.getDepositorCollGain(bob, BTC);
+        const carol_ETHGain_Before = await stabilityPool.getDepositorCollGain(carol, BTC);
+        const LUSDinSP_Before = await stabilityPool.getTotalDeposit();
+
+        // Price rises
+        await priceFeed.setTokenPrice(BTC, parseUnits('500'));
+        const [isRecoveryModeAfter] = await storagePool.checkRecoveryMode();
+        assert.isTrue(isRecoveryModeAfter);
+
+        // A, B, C withdraw their full deposits from the Stability Pool
+        await stabilityPoolManager
+          .connect(alice)
+          .withdrawalStability([{ tokenAddress: STABLE, amount: parseUnits('5000') }]);
+        await stabilityPoolManager
+          .connect(bob)
+          .withdrawalStability([{ tokenAddress: STABLE, amount: parseUnits('5000') }]);
+        await stabilityPoolManager
+          .connect(carol)
+          .withdrawalStability([{ tokenAddress: STABLE, amount: parseUnits('5000') }]);
+
+        // Check LUSD balances of A, B, C have risen by the value of their compounded deposits, respectively
+        const alice_expectedLUSDBalance = alice_LUSD_Balance_Before + alice_Deposit_Before;
+        const bob_expectedLUSDBalance = bob_LUSD_Balance_Before + bob_Deposit_Before;
+        const carol_expectedLUSDBalance = carol_LUSD_Balance_Before + carol_Deposit_Before;
+
+        const alice_LUSD_Balance_After = await STABLE.balanceOf(alice);
+        const bob_LUSD_Balance_After = await STABLE.balanceOf(bob);
+        const carol_LUSD_Balance_After = await STABLE.balanceOf(carol);
+
+        assert.equal(alice_LUSD_Balance_After, alice_expectedLUSDBalance);
+        assert.equal(bob_LUSD_Balance_After, bob_expectedLUSDBalance);
+        assert.equal(carol_LUSD_Balance_After, carol_expectedLUSDBalance);
+
+        // Check ETH balances of A, B, C have increased by the value of their ETH gain from liquidations, respectively
+        const alice_expectedETHBalance = alice_ETH_Balance_Before + alice_ETHGain_Before;
+        const bob_expectedETHBalance = bob_ETH_Balance_Before + bob_ETHGain_Before;
+        const carol_expectedETHBalance = carol_ETH_Balance_Before + carol_ETHGain_Before;
+
+        assert.equal(alice_expectedETHBalance, await BTC.balanceOf(alice));
+        assert.equal(bob_expectedETHBalance, await BTC.balanceOf(bob));
+        assert.equal(carol_expectedETHBalance, await BTC.balanceOf(carol));
+
+        // Check LUSD in Stability Pool has been reduced by A, B and C's compounded deposit
+        const expectedLUSDinSP = LUSDinSP_Before - alice_Deposit_Before - bob_Deposit_Before - carol_Deposit_Before;
+        const LUSDinSP_After = await stabilityPool.getTotalDeposit();
+        assert.equal(LUSDinSP_After, expectedLUSDinSP);
+
+        // Check ETH in SP has reduced to zero
+        const ETHinSP_After = (await stabilityPool.getTotalGainedColl()).find(d => d.tokenAddress === BTC.target)
+          ?.amount;
+        expect(ETHinSP_After).to.be.lt(10000);
+      });
+
+      it('getDepositorETHGain(): depositor does not earn further ETH gains from liquidations while their compounded deposit == 0: ', async () => {
+        await whaleShrimpTroveInit(contracts, signers);
+        const stabilityPool = await getStabilityPool(contracts, STABLE);
+
+        await openTrove({
+          from: erin,
+          contracts,
+          collToken: BTC,
+          collAmount: parseUnits('1', 9),
+          debts: [{ tokenAddress: STABLE, amount: parseUnits('7000') }],
+        });
+        await priceFeed.setTokenPrice(BTC, parseUnits('5000'));
+        await troveManager.liquidate(erin);
+
+        const LUSDinSP = await stabilityPool.getTotalDeposit();
+        assert.equal(LUSDinSP, 0n);
+
+        // Check Stability deposits have been fully cancelled with debt, and are now all zero
+        const alice_Deposit = await stabilityPool.getCompoundedDebtDeposit(alice);
+        const bob_Deposit = await stabilityPool.getCompoundedDebtDeposit(bob);
+        assert.equal(alice_Deposit, 0n);
+        assert.equal(bob_Deposit, 0n);
+
+        // Get ETH gain for A and B
+        const alice_ETHGain_1 = await stabilityPool.getDepositorCollGain(alice, BTC);
+        const bob_ETHGain_1 = await stabilityPool.getDepositorCollGain(bob, BTC);
+
+        // Whale deposits 1000 LUSD to Stability Pool
+        await stabilityPoolManager
+          .connect(whale)
+          .provideStability([{ tokenAddress: STABLE, amount: parseUnits('1000') }]);
+
+        // Liquidation 2
+        await troveManager.liquidate(defaulter_2);
+
+        // Check Alice and Bob have not received ETH gain from liquidation 2 while their deposit was 0
+        const alice_ETHGain_2 = await stabilityPool.getDepositorCollGain(alice, BTC);
+        const bob_ETHGain_2 = await stabilityPool.getDepositorCollGain(bob, BTC);
+        assert.equal(alice_ETHGain_1, alice_ETHGain_2);
+        assert.equal(bob_ETHGain_1, bob_ETHGain_2);
       });
     });
   });

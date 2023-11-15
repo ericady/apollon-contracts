@@ -37,6 +37,12 @@ interface IStabilityPool is IBase {
 
   function getDepositToken() external view returns (IDebtToken);
 
+  function getDepositorCollGain(address _depositor, address _collToken) external view returns (uint);
+
+  function getCompoundedDebtDeposit(address _depositor) external view returns (uint);
+
+  function getDepositorCollSnapshot(address _depositor, address _collToken) external view returns (uint);
+
   function provideToSP(address user, uint _amount) external;
 
   function withdrawFromSP(address user, uint _amount) external;
@@ -44,10 +50,4 @@ interface IStabilityPool is IBase {
   function withdrawGains() external;
 
   function offset(uint _debtToOffset, TokenAmount[] memory _collToAdd) external;
-
-  function getDepositorCollGain(address _depositor, address _collToken) external view returns (uint);
-
-  function getCompoundedDebtDeposit(address _depositor) external view returns (uint);
-
-  function getDepositorCollSnapshot(address _depositor, address _collToken) external view returns (uint);
 }
