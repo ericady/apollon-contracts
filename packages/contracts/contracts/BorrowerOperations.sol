@@ -4,13 +4,14 @@ pragma solidity ^0.8.9;
 
 import '@openzeppelin/contracts/token/ERC20/IERC20.sol';
 import '@openzeppelin/contracts/access/Ownable.sol';
+import './Dependencies/LiquityBase.sol';
+import './Dependencies/CheckContract.sol';
 import './Interfaces/IBorrowerOperations.sol';
 import './Interfaces/ITroveManager.sol';
 import './Interfaces/IDebtToken.sol';
-import './Dependencies/LiquityBase.sol';
-import './Dependencies/CheckContract.sol';
 import './Interfaces/IDebtTokenManager.sol';
 import './Interfaces/IStoragePool.sol';
+import './Interfaces/IReservePool.sol';
 import './Interfaces/IPriceFeed.sol';
 import './Interfaces/IBBase.sol';
 import './Interfaces/ICollTokenManager.sol';
@@ -24,6 +25,7 @@ contract BorrowerOperations is LiquityBase, Ownable, CheckContract, IBorrowerOpe
   IDebtTokenManager public debtTokenManager;
   ICollTokenManager public collTokenManager;
   IStoragePool public storagePool;
+  IReservePool public reservePool;
   IPriceFeed public priceFeed;
   address stabilityPoolAddress;
   address swapOperations;
@@ -97,6 +99,7 @@ contract BorrowerOperations is LiquityBase, Ownable, CheckContract, IBorrowerOpe
     address _troveManagerAddress,
     address _storagePoolAddress,
     address _stabilityPoolAddress,
+    address _reservePoolAddress,
     address _priceFeedAddress,
     address _debtTokenManagerAddress,
     address _collTokenManagerAddress,
@@ -105,6 +108,7 @@ contract BorrowerOperations is LiquityBase, Ownable, CheckContract, IBorrowerOpe
     checkContract(_troveManagerAddress);
     checkContract(_storagePoolAddress);
     checkContract(_stabilityPoolAddress);
+    checkContract(_reservePoolAddress);
     checkContract(_priceFeedAddress);
     checkContract(_debtTokenManagerAddress);
     checkContract(_collTokenManagerAddress);
@@ -113,6 +117,7 @@ contract BorrowerOperations is LiquityBase, Ownable, CheckContract, IBorrowerOpe
     troveManager = ITroveManager(_troveManagerAddress);
     storagePool = IStoragePool(_storagePoolAddress);
     stabilityPoolAddress = _stabilityPoolAddress;
+    reservePool = IReservePool(_reservePoolAddress);
     priceFeed = IPriceFeed(_priceFeedAddress);
     debtTokenManager = IDebtTokenManager(_debtTokenManagerAddress);
     collTokenManager = ICollTokenManager(_collTokenManagerAddress);
@@ -292,7 +297,7 @@ contract BorrowerOperations is LiquityBase, Ownable, CheckContract, IBorrowerOpe
     for (uint i = 0; i < _debts.length; i++) _requireNonZeroDebtChange(_debts[i].amount);
 
     (
-      DebtTokenAmount[] memory addedDebts,
+      DebtTokenAmount[] memory debtsToAdd,
       DebtTokenAmount memory stableCoinAmount
     ) = _getDebtTokenAmountsWithFetchedPrices(contractsCache.debtTokenManager, _debts);
 
@@ -301,22 +306,22 @@ contract BorrowerOperations is LiquityBase, Ownable, CheckContract, IBorrowerOpe
     if (!vars.isInRecoveryMode)
       borrowingFeesPaid = _addBorrowingFees(
         contractsCache.troveManager,
-        addedDebts,
+        debtsToAdd,
         stableCoinAmount,
         _maxFeePercentage
       );
 
-    vars.newCompositeDebtInUSD += _getCompositeDebt(addedDebts);
-    contractsCache.troveManager.increaseTroveDebt(msg.sender, addedDebts);
+    vars.newCompositeDebtInUSD += _getCompositeDebt(debtsToAdd);
+    contractsCache.troveManager.increaseTroveDebt(msg.sender, debtsToAdd);
 
-    for (uint i = 0; i < addedDebts.length; i++) {
-      DebtTokenAmount memory debtTokenAmount = addedDebts[i];
+    for (uint i = 0; i < debtsToAdd.length; i++) {
+      DebtTokenAmount memory debtTokenAmount = debtsToAdd[i];
       _poolAddDebt(
         msg.sender,
         contractsCache.storagePool,
         debtTokenAmount.debtToken,
         debtTokenAmount.netDebt,
-        debtTokenAmount.netDebt - debtTokenAmount.borrowingFee
+        debtTokenAmount.borrowingFee
       );
     }
 
@@ -524,10 +529,17 @@ contract BorrowerOperations is LiquityBase, Ownable, CheckContract, IBorrowerOpe
     IStoragePool _storagePool,
     IDebtToken _debtToken,
     uint _netDebtIncrease,
-    uint _mintAmount
+    uint _borrowingFee
   ) internal {
     _storagePool.addValue(address(_debtToken), false, PoolType.Active, _netDebtIncrease);
-    if (_mintAmount > 0) _debtToken.mint(_borrower, _mintAmount);
+    uint mintAmount = _netDebtIncrease - _borrowingFee;
+    if (mintAmount > 0) _debtToken.mint(_borrower, mintAmount);
+
+    // Mint reserves
+    uint reserveAmount = (_borrowingFee * RESERVE_FEE) / 1e18;
+    if (reserveAmount > 0 && !reservePool.isReserveCapReached()) {
+      _debtToken.mint(address(reservePool), reserveAmount);
+    }
   }
 
   function _poolRepayDebt(
@@ -691,9 +703,9 @@ contract BorrowerOperations is LiquityBase, Ownable, CheckContract, IBorrowerOpe
 
   function _requireValidMaxFeePercentage(uint _maxFeePercentage, bool _isInRecoveryMode) internal pure {
     if (_isInRecoveryMode) {
-      if (_maxFeePercentage > DECIMAL_PRECISION) revert MaxFee_gt_100_InRM();
+      if (_maxFeePercentage > MAX_BORROWING_FEE) revert MaxFee_gt_100_InRM();
     } else {
-      if (_maxFeePercentage < BORROWING_FEE_FLOOR || _maxFeePercentage > DECIMAL_PRECISION) revert MaxFee_out_Range();
+      if (_maxFeePercentage < BORROWING_FEE_FLOOR || _maxFeePercentage > MAX_BORROWING_FEE) revert MaxFee_out_Range();
     }
   }
 

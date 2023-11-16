@@ -209,6 +209,19 @@
     },
     {
         "inputs": [],
+        "name": "MAX_BORROWING_FEE",
+        "outputs": [
+            {
+                "internalType": "uint256",
+                "name": "",
+                "type": "uint256"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [],
         "name": "MCR",
         "outputs": [
             {
@@ -236,6 +249,32 @@
     {
         "inputs": [],
         "name": "PERCENT_DIVISOR",
+        "outputs": [
+            {
+                "internalType": "uint256",
+                "name": "",
+                "type": "uint256"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [],
+        "name": "REDEMPTION_FEE_FLOOR",
+        "outputs": [
+            {
+                "internalType": "uint256",
+                "name": "",
+                "type": "uint256"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [],
+        "name": "RESERVE_FEE",
         "outputs": [
             {
                 "internalType": "uint256",
@@ -480,6 +519,19 @@
         "type": "function"
     },
     {
+        "inputs": [],
+        "name": "reservePool",
+        "outputs": [
+            {
+                "internalType": "contract IReservePool",
+                "name": "",
+                "type": "address"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
         "inputs": [
             {
                 "internalType": "address",
@@ -494,6 +546,11 @@
             {
                 "internalType": "address",
                 "name": "_stabilityPoolAddress",
+                "type": "address"
+            },
+            {
+                "internalType": "address",
+                "name": "_reservePoolAddress",
                 "type": "address"
             },
             {

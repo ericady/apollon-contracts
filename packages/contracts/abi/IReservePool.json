@@ -1,0 +1,53 @@
+[
+    {
+        "anonymous": false,
+        "inputs": [
+            {
+                "indexed": false,
+                "internalType": "uint256",
+                "name": "newReserveCap",
+                "type": "uint256"
+            }
+        ],
+        "name": "ReserveCapChanged",
+        "type": "event"
+    },
+    {
+        "anonymous": false,
+        "inputs": [
+            {
+                "indexed": false,
+                "internalType": "address",
+                "name": "_stabilityPoolAddress",
+                "type": "address"
+            },
+            {
+                "indexed": false,
+                "internalType": "address",
+                "name": "_stabilityPoolManager",
+                "type": "address"
+            },
+            {
+                "indexed": false,
+                "internalType": "address",
+                "name": "_stableDebtTokenAddress",
+                "type": "address"
+            }
+        ],
+        "name": "ReservePoolInitialized",
+        "type": "event"
+    },
+    {
+        "inputs": [],
+        "name": "isReserveCapReached",
+        "outputs": [
+            {
+                "internalType": "bool",
+                "name": "",
+                "type": "bool"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    }
+]

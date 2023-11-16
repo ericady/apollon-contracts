@@ -2,6 +2,7 @@
 
 pragma solidity ^0.8.9;
 
+import '@openzeppelin/contracts/access/Ownable.sol';
 import './Interfaces/IDebtToken.sol';
 import './Dependencies/CheckContract.sol';
 import './Interfaces/IDebtTokenManager.sol';

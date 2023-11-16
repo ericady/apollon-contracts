@@ -19,8 +19,6 @@ import './Interfaces/ITroveManager.sol';
 contract RedemptionOperations is LiquityBase, Ownable, CheckContract, IRedemptionOperations {
   string public constant NAME = 'RedemptionManager';
 
-  uint public constant REDEMPTION_FEE_FLOOR = (DECIMAL_PRECISION / 1000) * 5; // 0.5%
-
   // --- Connected contract declarations ---
 
   ITroveManager public troveManager;

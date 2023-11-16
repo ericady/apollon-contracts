@@ -2,7 +2,6 @@
 
 pragma solidity ^0.8.9;
 
-import '@openzeppelin/contracts/access/Ownable.sol';
 import './Interfaces/IBorrowerOperations.sol';
 import './Interfaces/IStabilityPool.sol';
 import './Interfaces/IBorrowerOperations.sol';
@@ -143,7 +142,7 @@ import './Interfaces/IStoragePool.sol';
  * The product P (and snapshot P_t) is re-used, as the ratio P/P_t tracks a deposit's depletion due to liquidations.
  *
  */
-contract StabilityPool is LiquityBase, Ownable, CheckContract, IStabilityPool {
+contract StabilityPool is LiquityBase, CheckContract, IStabilityPool {
   string public constant NAME = 'StabilityPool';
 
   ITroveManager public troveManager;
@@ -231,8 +230,6 @@ contract StabilityPool is LiquityBase, Ownable, CheckContract, IStabilityPool {
       _priceFeedAddress,
       _depositTokenAddress
     );
-
-    renounceOwnership();
   }
 
   // --- Getters for public variables. Required by IPool interface ---

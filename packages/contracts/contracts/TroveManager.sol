@@ -39,9 +39,7 @@ contract TroveManager is LiquityBase, Ownable, CheckContract, ITroveManager {
    * Half-life of 12h. 12h = 720 min
    * (1/2) = d^720 => d = (1/2)^(1/720)
    */
-  uint public constant SECONDS_IN_ONE_MINUTE = 60;
   uint public constant MINUTE_DECAY_FACTOR = 999037758833783000;
-  uint public constant MAX_BORROWING_FEE = (DECIMAL_PRECISION / 100) * 5; // 5%
 
   // During bootsrap period redemptions are not allowed
   uint public constant BOOTSTRAP_PERIOD = 14 days;
@@ -1155,7 +1153,7 @@ contract TroveManager is LiquityBase, Ownable, CheckContract, ITroveManager {
   function _updateLastFeeOpTime() internal {
     uint timePassed = block.timestamp - lastFeeOperationTime;
 
-    if (timePassed >= SECONDS_IN_ONE_MINUTE) {
+    if (timePassed >= 1 minutes) {
       lastFeeOperationTime = block.timestamp;
       emit LastFeeOpTimeUpdated(block.timestamp);
     }
@@ -1169,7 +1167,7 @@ contract TroveManager is LiquityBase, Ownable, CheckContract, ITroveManager {
   }
 
   function _minutesPassedSinceLastFeeOp() internal view returns (uint) {
-    return (block.timestamp - lastFeeOperationTime) / SECONDS_IN_ONE_MINUTE;
+    return (block.timestamp - lastFeeOperationTime) / 1 minutes;
   }
 
   // --- 'require' wrapper functions ---
