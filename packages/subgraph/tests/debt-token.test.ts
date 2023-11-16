@@ -1,62 +1,118 @@
+import { Address, BigInt, ethereum } from '@graphprotocol/graph-ts';
+import { afterAll, assert, clearStore, createMockedFunction, describe, test } from 'matchstick-as/assembly/index';
+import { Token } from '../generated/schema';
+import { handlePriceFeedAddressChanged, handleTransfer } from '../src/debt-token';
 import {
-  assert,
-  describe,
-  test,
-  clearStore,
-  beforeAll,
-  afterAll
-} from "matchstick-as/assembly/index"
-import { Address, BigInt } from "@graphprotocol/graph-ts"
-import { Approval } from "../generated/schema"
-import { Approval as ApprovalEvent } from "../generated/DebtToken/DebtToken"
-import { handleApproval } from "../src/debt-token"
-import { createApprovalEvent } from "./debt-token-utils"
+  MockDebtTokenAddress,
+  MockStabilityPoolAddress,
+  MockStabilityPoolManagerAddress,
+  MockTroveManagerAddress,
+  MockUserAddress,
+  createPriceFeedAddressChangedEvent,
+  createTransferEvent,
+} from './debt-token-utils';
+import { mockStabilityPoolManagerGetStabilityPool } from './stability-pool-manager.test';
 
-// Tests structure (matchstick-as >=0.5.0)
-// https://thegraph.com/docs/en/developer/matchstick/#tests-structure-0-5-0
+export const mockDebtTokenSymbol = (): void => {
+  createMockedFunction(MockDebtTokenAddress, 'symbol', 'symbol():(string)').returns([
+    ethereum.Value.fromString('JUSD'),
+  ]);
+};
+export const mockDebtTokenPrice = (): void => {
+  createMockedFunction(MockDebtTokenAddress, 'getPrice', 'getPrice():(uint256)').returns([
+    ethereum.Value.fromSignedBigInt(BigInt.fromI32(1)),
+  ]);
+};
+export const mockDebtTokenTotalSupply = (): void => {
+  createMockedFunction(MockDebtTokenAddress, 'totalSupply', 'totalSupply():(uint256)').returns([
+    ethereum.Value.fromSignedBigInt(BigInt.fromI32(1)),
+  ]);
+};
+export const mockDebtTokenStabilityPoolManagerAddress = (): void => {
+  createMockedFunction(
+    MockDebtTokenAddress,
+    'stabilityPoolManagerAddress',
+    'stabilityPoolManagerAddress():(address)',
+  ).returns([ethereum.Value.fromAddress(MockStabilityPoolManagerAddress)]);
+};
+export const mockDebtTokenTroveManagerAddress = (): void => {
+  createMockedFunction(MockDebtTokenAddress, 'troveManagerAddress', 'troveManagerAddress():(address)').returns([
+    ethereum.Value.fromAddress(MockTroveManagerAddress),
+  ]);
+};
+export const mockDebtTokenBalanceOf = (): void => {
+  createMockedFunction(MockDebtTokenAddress, 'balanceOf', 'balanceOf(address):(uint256)')
+    .withArgs([ethereum.Value.fromAddress(MockUserAddress)])
+    .returns([ethereum.Value.fromSignedBigInt(BigInt.fromI32(10))]);
+};
 
-describe("Describe entity assertions", () => {
-  beforeAll(() => {
-    let owner = Address.fromString("0x0000000000000000000000000000000000000001")
-    let spender = Address.fromString(
-      "0x0000000000000000000000000000000000000001"
-    )
-    let value = BigInt.fromI32(234)
-    let newApprovalEvent = createApprovalEvent(owner, spender, value)
-    handleApproval(newApprovalEvent)
-  })
+export const mockStabilityPoolGetStabilityAPY = (): void => {
+  createMockedFunction(MockStabilityPoolAddress, 'getStabilityAPY', 'getStabilityAPY():(uint256)').returns([
+    ethereum.Value.fromSignedBigInt(BigInt.fromI32(10)),
+  ]);
+};
+export const mockStabilityPoolGetTotalDeposit = (): void => {
+  createMockedFunction(MockStabilityPoolAddress, 'getTotalDeposit', 'getTotalDeposit():(uint256)').returns([
+    ethereum.Value.fromSignedBigInt(BigInt.fromI32(100)),
+  ]);
+};
 
+describe('handlePriceFeedAddressChanged()', () => {
   afterAll(() => {
-    clearStore()
-  })
+    clearStore();
+  });
 
-  // For more test scenarios, see:
-  // https://thegraph.com/docs/en/developer/matchstick/#write-a-unit-test
+  test('Token entity created and stored', () => {
+    const newCreatedEvent = createPriceFeedAddressChangedEvent(
+      Address.fromString('0x0000000000000000000000000000000000000001'),
+    );
+    mockDebtTokenSymbol();
+    mockDebtTokenPrice();
 
-  test("Approval created and stored", () => {
-    assert.entityCount("Approval", 1)
+    handlePriceFeedAddressChanged(newCreatedEvent);
 
-    // 0xa16081f360e3847006db660bae1c6d1b2e17ec2a is the default address used in newMockEvent() function
+    assert.entityCount('Token', 1);
+
     assert.fieldEquals(
-      "Approval",
-      "0xa16081f360e3847006db660bae1c6d1b2e17ec2a-1",
-      "owner",
-      "0x0000000000000000000000000000000000000001"
-    )
-    assert.fieldEquals(
-      "Approval",
-      "0xa16081f360e3847006db660bae1c6d1b2e17ec2a-1",
-      "spender",
-      "0x0000000000000000000000000000000000000001"
-    )
-    assert.fieldEquals(
-      "Approval",
-      "0xa16081f360e3847006db660bae1c6d1b2e17ec2a-1",
-      "value",
-      "234"
-    )
+      'Token',
+      '0x0000000000000000000000000000000000000100',
+      'address',
+      '0x0000000000000000000000000000000000000100',
+    );
+    assert.fieldEquals('Token', '0x0000000000000000000000000000000000000100', 'priceUSD', '1');
+  });
+});
 
-    // More assert options:
-    // https://thegraph.com/docs/en/developer/matchstick/#asserts
-  })
-})
+describe('handleTransfer()', () => {
+  afterAll(() => {
+    clearStore();
+  });
+
+  test('Token entity priceUSD is updated', () => {
+    const debtToken = new Token(MockDebtTokenAddress);
+    debtToken.address = MockDebtTokenAddress;
+
+    debtToken.createdAt = BigInt.fromI32(1);
+    debtToken.symbol = 'JUSD';
+    debtToken.isPoolToken = true;
+    debtToken.priceUSD = BigInt.fromI32(1);
+    debtToken.save();
+
+    const newTransferEvent = createTransferEvent(
+      Address.fromString('0x1000000000000000000000000000000000000000'),
+      Address.fromString('0x2000000000000000000000000000000000000000'),
+      BigInt.fromI32(1),
+    );
+
+    mockDebtTokenPrice();
+    mockDebtTokenTotalSupply();
+    mockDebtTokenStabilityPoolManagerAddress();
+    mockStabilityPoolManagerGetStabilityPool();
+    mockStabilityPoolGetStabilityAPY();
+    mockStabilityPoolGetTotalDeposit();
+
+    handleTransfer(newTransferEvent);
+
+    assert.entityCount('DebtTokenMeta', 1);
+  });
+});

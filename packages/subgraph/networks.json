@@ -2,6 +2,15 @@
   "development": {
     "DebtToken": {
       "address": "0x25309189268017d8C79C8dacCbF44EC25C12FEB4"
+    },
+    "StabilityPool": {
+      "address": "StabilityPool"
+    },
+    "StabilityPoolManager": {
+      "address": "StabilityPoolManager"
+    },
+    "TroveManager": {
+      "address": "TroveManager"
     }
   }
 }

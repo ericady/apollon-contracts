@@ -8,9 +8,9 @@ type Token @entity {
   symbol: String!
   createdAt: BigInt!
   #
-  priceUSD: BigDecimal!
+  priceUSD: BigInt!
   # TODO: Fetch this from the client side and get it from the TradingView entities
-  # priceUSD24hAgo: BigDecimal!
+  # priceUSD24hAgo: BigInt!
   #
   isPoolToken: Boolean!
 }
@@ -21,14 +21,14 @@ type DebtTokenMeta @entity(immutable: true) {
   timestamp: BigInt!
 
   # global
-  stabilityDepositAPY: BigDecimal!
-  totalDepositedStability: BigDecimal!
-  totalReserve: BigDecimal!
+  stabilityDepositAPY: BigInt!
+  totalDepositedStability: BigInt!
+  totalReserve: BigInt!
   # TODO: Fetch this from the client side
-  # totalReserve24hAgo: BigDecimal!
-  totalSupplyUSD: BigDecimal!
+  # totalReserve24hAgo: BigInt!
+  totalSupplyUSD: BigInt!
   # TODO: Fetch this from the client side
-  # totalSupplyUSD24hAgo: BigDecimal!
+  # totalSupplyUSD24hAgo: BigInt!
 }
 
 type UserDebtTokenMeta @entity {
@@ -37,8 +37,9 @@ type UserDebtTokenMeta @entity {
   borrower: Bytes!
   token: Token! @relation(name: "TokenToUserDebtTokenMeta")
 
-  walletAmount: BigDecimal!
-  troveMintedAmount: BigDecimal!
-  stabilityLostAmount: BigDecimal!
-  stabilityCompoundAmount: BigDecimal!
+  walletAmount: BigInt!
+  troveMintedAmount: BigInt!
+  # When user claims rewards set to deposit => track any increase/decrease but claimed stability
+  providedStablitySinceLastCollClaim: BigInt!
+  stabilityCompoundAmount: BigInt!
 }
