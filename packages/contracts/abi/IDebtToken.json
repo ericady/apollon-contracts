@@ -101,7 +101,7 @@
             {
                 "indexed": false,
                 "internalType": "address",
-                "name": "_stabilityPoolManagerAddress",
+                "name": "_newStabilityPoolManagerAddress",
                 "type": "address"
             }
         ],
@@ -139,7 +139,7 @@
             {
                 "indexed": false,
                 "internalType": "address",
-                "name": "_troveManagerAddress",
+                "name": "_newTroveManagerAddress",
                 "type": "address"
             }
         ],

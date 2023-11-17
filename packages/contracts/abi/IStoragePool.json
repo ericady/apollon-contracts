@@ -59,7 +59,7 @@
             {
                 "indexed": false,
                 "internalType": "address",
-                "name": "_priceFeedAddress",
+                "name": "_newPriceFeedAddress",
                 "type": "address"
             }
         ],
