@@ -72,7 +72,6 @@ describe('handleUserClaimedRewards()', () => {
   test('existing UserDebtTokenMeta entity is updated', () => {
     // save a dummy entity and make sure that its updating all fields of this existing entity
     const entityId = `UserDebtTokenMeta-${MockDebtTokenAddress.toHexString()}-${MockUserAddress.toHexString()}`;
-    log.info('My entityId is: {}', [entityId]);
     const userDebtTokenMeta = new UserDebtTokenMeta(entityId);
     userDebtTokenMeta.token = MockDebtTokenAddress;
     userDebtTokenMeta.borrower = MockUserAddress;

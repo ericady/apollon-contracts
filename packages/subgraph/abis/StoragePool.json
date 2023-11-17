@@ -262,9 +262,7 @@
   {
     "inputs": [],
     "name": "priceFeed",
-    "outputs": [
-      { "internalType": "contract IPriceFeed", "name": "", "type": "address" }
-    ],
+    "outputs": [{ "internalType": "contract IPriceFeed", "name": "", "type": "address" }],
     "stateMutability": "view",
     "type": "function"
   },
@@ -348,9 +346,7 @@
     "type": "function"
   },
   {
-    "inputs": [
-      { "internalType": "address", "name": "newOwner", "type": "address" }
-    ],
+    "inputs": [{ "internalType": "address", "name": "newOwner", "type": "address" }],
     "name": "transferOwnership",
     "outputs": [],
     "stateMutability": "nonpayable",

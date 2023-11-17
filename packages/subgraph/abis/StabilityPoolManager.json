@@ -356,9 +356,7 @@
     "type": "function"
   },
   {
-    "inputs": [
-      { "internalType": "contract IDebtToken", "name": "", "type": "address" }
-    ],
+    "inputs": [{ "internalType": "contract IDebtToken", "name": "", "type": "address" }],
     "name": "stabilityPools",
     "outputs": [
       {
@@ -386,16 +384,12 @@
   {
     "inputs": [],
     "name": "storagePool",
-    "outputs": [
-      { "internalType": "contract IStoragePool", "name": "", "type": "address" }
-    ],
+    "outputs": [{ "internalType": "contract IStoragePool", "name": "", "type": "address" }],
     "stateMutability": "view",
     "type": "function"
   },
   {
-    "inputs": [
-      { "internalType": "address", "name": "newOwner", "type": "address" }
-    ],
+    "inputs": [{ "internalType": "address", "name": "newOwner", "type": "address" }],
     "name": "transferOwnership",
     "outputs": [],
     "stateMutability": "nonpayable",

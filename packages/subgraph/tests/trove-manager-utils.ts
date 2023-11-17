@@ -1,5 +1,5 @@
-import { newMockEvent } from "matchstick-as"
-import { ethereum, BigInt, Address } from "@graphprotocol/graph-ts"
+import { Address, BigInt, ethereum } from '@graphprotocol/graph-ts';
+import { newMockEvent } from 'matchstick-as';
 import {
   BaseRateUpdated,
   BorrowerOperationsAddressChanged,
@@ -18,391 +18,266 @@ import {
   TroveIndexUpdated,
   TroveLiquidated,
   TroveSnapshotsUpdated,
-  TroveUpdated
-} from "../generated/TroveManager/TroveManager"
+  TroveUpdated,
+} from '../generated/TroveManager/TroveManager';
 
 export function createBaseRateUpdatedEvent(_baseRate: BigInt): BaseRateUpdated {
-  let baseRateUpdatedEvent = changetype<BaseRateUpdated>(newMockEvent())
+  let baseRateUpdatedEvent = changetype<BaseRateUpdated>(newMockEvent());
 
-  baseRateUpdatedEvent.parameters = new Array()
+  baseRateUpdatedEvent.parameters = new Array();
 
   baseRateUpdatedEvent.parameters.push(
-    new ethereum.EventParam(
-      "_baseRate",
-      ethereum.Value.fromUnsignedBigInt(_baseRate)
-    )
-  )
+    new ethereum.EventParam('_baseRate', ethereum.Value.fromUnsignedBigInt(_baseRate)),
+  );
 
-  return baseRateUpdatedEvent
+  return baseRateUpdatedEvent;
 }
 
 export function createBorrowerOperationsAddressChangedEvent(
-  _newBorrowerOperationsAddress: Address
+  _newBorrowerOperationsAddress: Address,
 ): BorrowerOperationsAddressChanged {
-  let borrowerOperationsAddressChangedEvent = changetype<
-    BorrowerOperationsAddressChanged
-  >(newMockEvent())
+  let borrowerOperationsAddressChangedEvent = changetype<BorrowerOperationsAddressChanged>(newMockEvent());
 
-  borrowerOperationsAddressChangedEvent.parameters = new Array()
+  borrowerOperationsAddressChangedEvent.parameters = new Array();
 
   borrowerOperationsAddressChangedEvent.parameters.push(
-    new ethereum.EventParam(
-      "_newBorrowerOperationsAddress",
-      ethereum.Value.fromAddress(_newBorrowerOperationsAddress)
-    )
-  )
+    new ethereum.EventParam('_newBorrowerOperationsAddress', ethereum.Value.fromAddress(_newBorrowerOperationsAddress)),
+  );
 
-  return borrowerOperationsAddressChangedEvent
+  return borrowerOperationsAddressChangedEvent;
 }
 
 export function createCollTokenManagerAddressChangedEvent(
-  _newCollTokenManagerAddress: Address
+  _newCollTokenManagerAddress: Address,
 ): CollTokenManagerAddressChanged {
-  let collTokenManagerAddressChangedEvent = changetype<
-    CollTokenManagerAddressChanged
-  >(newMockEvent())
+  let collTokenManagerAddressChangedEvent = changetype<CollTokenManagerAddressChanged>(newMockEvent());
 
-  collTokenManagerAddressChangedEvent.parameters = new Array()
+  collTokenManagerAddressChangedEvent.parameters = new Array();
 
   collTokenManagerAddressChangedEvent.parameters.push(
-    new ethereum.EventParam(
-      "_newCollTokenManagerAddress",
-      ethereum.Value.fromAddress(_newCollTokenManagerAddress)
-    )
-  )
+    new ethereum.EventParam('_newCollTokenManagerAddress', ethereum.Value.fromAddress(_newCollTokenManagerAddress)),
+  );
 
-  return collTokenManagerAddressChangedEvent
+  return collTokenManagerAddressChangedEvent;
 }
 
 export function createDebtTokenManagerAddressChangedEvent(
-  _newDebtTokenManagerAddress: Address
+  _newDebtTokenManagerAddress: Address,
 ): DebtTokenManagerAddressChanged {
-  let debtTokenManagerAddressChangedEvent = changetype<
-    DebtTokenManagerAddressChanged
-  >(newMockEvent())
+  let debtTokenManagerAddressChangedEvent = changetype<DebtTokenManagerAddressChanged>(newMockEvent());
 
-  debtTokenManagerAddressChangedEvent.parameters = new Array()
+  debtTokenManagerAddressChangedEvent.parameters = new Array();
 
   debtTokenManagerAddressChangedEvent.parameters.push(
-    new ethereum.EventParam(
-      "_newDebtTokenManagerAddress",
-      ethereum.Value.fromAddress(_newDebtTokenManagerAddress)
-    )
-  )
+    new ethereum.EventParam('_newDebtTokenManagerAddress', ethereum.Value.fromAddress(_newDebtTokenManagerAddress)),
+  );
 
-  return debtTokenManagerAddressChangedEvent
+  return debtTokenManagerAddressChangedEvent;
 }
 
-export function createLTermsUpdatedEvent(
-  _L_ETH: BigInt,
-  _L_LUSDDebt: BigInt
-): LTermsUpdated {
-  let lTermsUpdatedEvent = changetype<LTermsUpdated>(newMockEvent())
+export function createLTermsUpdatedEvent(_L_ETH: BigInt, _L_LUSDDebt: BigInt): LTermsUpdated {
+  let lTermsUpdatedEvent = changetype<LTermsUpdated>(newMockEvent());
 
-  lTermsUpdatedEvent.parameters = new Array()
+  lTermsUpdatedEvent.parameters = new Array();
 
+  lTermsUpdatedEvent.parameters.push(new ethereum.EventParam('_L_ETH', ethereum.Value.fromUnsignedBigInt(_L_ETH)));
   lTermsUpdatedEvent.parameters.push(
-    new ethereum.EventParam("_L_ETH", ethereum.Value.fromUnsignedBigInt(_L_ETH))
-  )
-  lTermsUpdatedEvent.parameters.push(
-    new ethereum.EventParam(
-      "_L_LUSDDebt",
-      ethereum.Value.fromUnsignedBigInt(_L_LUSDDebt)
-    )
-  )
+    new ethereum.EventParam('_L_LUSDDebt', ethereum.Value.fromUnsignedBigInt(_L_LUSDDebt)),
+  );
 
-  return lTermsUpdatedEvent
+  return lTermsUpdatedEvent;
 }
 
-export function createLastFeeOpTimeUpdatedEvent(
-  _lastFeeOpTime: BigInt
-): LastFeeOpTimeUpdated {
-  let lastFeeOpTimeUpdatedEvent = changetype<LastFeeOpTimeUpdated>(
-    newMockEvent()
-  )
+export function createLastFeeOpTimeUpdatedEvent(_lastFeeOpTime: BigInt): LastFeeOpTimeUpdated {
+  let lastFeeOpTimeUpdatedEvent = changetype<LastFeeOpTimeUpdated>(newMockEvent());
 
-  lastFeeOpTimeUpdatedEvent.parameters = new Array()
+  lastFeeOpTimeUpdatedEvent.parameters = new Array();
 
   lastFeeOpTimeUpdatedEvent.parameters.push(
-    new ethereum.EventParam(
-      "_lastFeeOpTime",
-      ethereum.Value.fromUnsignedBigInt(_lastFeeOpTime)
-    )
-  )
+    new ethereum.EventParam('_lastFeeOpTime', ethereum.Value.fromUnsignedBigInt(_lastFeeOpTime)),
+  );
 
-  return lastFeeOpTimeUpdatedEvent
+  return lastFeeOpTimeUpdatedEvent;
 }
 
 export function createLiquidationEvent(
   liquidatedDebt: Array<ethereum.Tuple>,
   liquidatedColl: Array<ethereum.Tuple>,
   totalStableCoinGasCompensation: BigInt,
-  totalCollGasCompensation: Array<ethereum.Tuple>
+  totalCollGasCompensation: Array<ethereum.Tuple>,
 ): Liquidation {
-  let liquidationEvent = changetype<Liquidation>(newMockEvent())
+  let liquidationEvent = changetype<Liquidation>(newMockEvent());
 
-  liquidationEvent.parameters = new Array()
+  liquidationEvent.parameters = new Array();
 
   liquidationEvent.parameters.push(
-    new ethereum.EventParam(
-      "liquidatedDebt",
-      ethereum.Value.fromTupleArray(liquidatedDebt)
-    )
-  )
+    new ethereum.EventParam('liquidatedDebt', ethereum.Value.fromTupleArray(liquidatedDebt)),
+  );
+  liquidationEvent.parameters.push(
+    new ethereum.EventParam('liquidatedColl', ethereum.Value.fromTupleArray(liquidatedColl)),
+  );
   liquidationEvent.parameters.push(
     new ethereum.EventParam(
-      "liquidatedColl",
-      ethereum.Value.fromTupleArray(liquidatedColl)
-    )
-  )
+      'totalStableCoinGasCompensation',
+      ethereum.Value.fromUnsignedBigInt(totalStableCoinGasCompensation),
+    ),
+  );
   liquidationEvent.parameters.push(
-    new ethereum.EventParam(
-      "totalStableCoinGasCompensation",
-      ethereum.Value.fromUnsignedBigInt(totalStableCoinGasCompensation)
-    )
-  )
-  liquidationEvent.parameters.push(
-    new ethereum.EventParam(
-      "totalCollGasCompensation",
-      ethereum.Value.fromTupleArray(totalCollGasCompensation)
-    )
-  )
+    new ethereum.EventParam('totalCollGasCompensation', ethereum.Value.fromTupleArray(totalCollGasCompensation)),
+  );
 
-  return liquidationEvent
+  return liquidationEvent;
 }
 
-export function createOwnershipTransferredEvent(
-  previousOwner: Address,
-  newOwner: Address
-): OwnershipTransferred {
-  let ownershipTransferredEvent = changetype<OwnershipTransferred>(
-    newMockEvent()
-  )
+export function createOwnershipTransferredEvent(previousOwner: Address, newOwner: Address): OwnershipTransferred {
+  let ownershipTransferredEvent = changetype<OwnershipTransferred>(newMockEvent());
 
-  ownershipTransferredEvent.parameters = new Array()
+  ownershipTransferredEvent.parameters = new Array();
 
   ownershipTransferredEvent.parameters.push(
-    new ethereum.EventParam(
-      "previousOwner",
-      ethereum.Value.fromAddress(previousOwner)
-    )
-  )
-  ownershipTransferredEvent.parameters.push(
-    new ethereum.EventParam("newOwner", ethereum.Value.fromAddress(newOwner))
-  )
+    new ethereum.EventParam('previousOwner', ethereum.Value.fromAddress(previousOwner)),
+  );
+  ownershipTransferredEvent.parameters.push(new ethereum.EventParam('newOwner', ethereum.Value.fromAddress(newOwner)));
 
-  return ownershipTransferredEvent
+  return ownershipTransferredEvent;
 }
 
-export function createPriceFeedAddressChangedEvent(
-  _newPriceFeedAddress: Address
-): PriceFeedAddressChanged {
-  let priceFeedAddressChangedEvent = changetype<PriceFeedAddressChanged>(
-    newMockEvent()
-  )
+export function createPriceFeedAddressChangedEvent(_newPriceFeedAddress: Address): PriceFeedAddressChanged {
+  let priceFeedAddressChangedEvent = changetype<PriceFeedAddressChanged>(newMockEvent());
 
-  priceFeedAddressChangedEvent.parameters = new Array()
+  priceFeedAddressChangedEvent.parameters = new Array();
 
   priceFeedAddressChangedEvent.parameters.push(
-    new ethereum.EventParam(
-      "_newPriceFeedAddress",
-      ethereum.Value.fromAddress(_newPriceFeedAddress)
-    )
-  )
+    new ethereum.EventParam('_newPriceFeedAddress', ethereum.Value.fromAddress(_newPriceFeedAddress)),
+  );
 
-  return priceFeedAddressChangedEvent
+  return priceFeedAddressChangedEvent;
 }
 
 export function createRedemptionEvent(
   _attemptedLUSDAmount: BigInt,
   _actualLUSDAmount: BigInt,
   _ETHSent: BigInt,
-  _ETHFee: BigInt
+  _ETHFee: BigInt,
 ): Redemption {
-  let redemptionEvent = changetype<Redemption>(newMockEvent())
+  let redemptionEvent = changetype<Redemption>(newMockEvent());
 
-  redemptionEvent.parameters = new Array()
+  redemptionEvent.parameters = new Array();
 
   redemptionEvent.parameters.push(
-    new ethereum.EventParam(
-      "_attemptedLUSDAmount",
-      ethereum.Value.fromUnsignedBigInt(_attemptedLUSDAmount)
-    )
-  )
+    new ethereum.EventParam('_attemptedLUSDAmount', ethereum.Value.fromUnsignedBigInt(_attemptedLUSDAmount)),
+  );
   redemptionEvent.parameters.push(
-    new ethereum.EventParam(
-      "_actualLUSDAmount",
-      ethereum.Value.fromUnsignedBigInt(_actualLUSDAmount)
-    )
-  )
-  redemptionEvent.parameters.push(
-    new ethereum.EventParam(
-      "_ETHSent",
-      ethereum.Value.fromUnsignedBigInt(_ETHSent)
-    )
-  )
-  redemptionEvent.parameters.push(
-    new ethereum.EventParam(
-      "_ETHFee",
-      ethereum.Value.fromUnsignedBigInt(_ETHFee)
-    )
-  )
+    new ethereum.EventParam('_actualLUSDAmount', ethereum.Value.fromUnsignedBigInt(_actualLUSDAmount)),
+  );
+  redemptionEvent.parameters.push(new ethereum.EventParam('_ETHSent', ethereum.Value.fromUnsignedBigInt(_ETHSent)));
+  redemptionEvent.parameters.push(new ethereum.EventParam('_ETHFee', ethereum.Value.fromUnsignedBigInt(_ETHFee)));
 
-  return redemptionEvent
+  return redemptionEvent;
 }
 
 export function createStabilityPoolManagerAddressChangedEvent(
-  _stabilityPoolManagerAddress: Address
+  _stabilityPoolManagerAddress: Address,
 ): StabilityPoolManagerAddressChanged {
-  let stabilityPoolManagerAddressChangedEvent = changetype<
-    StabilityPoolManagerAddressChanged
-  >(newMockEvent())
+  let stabilityPoolManagerAddressChangedEvent = changetype<StabilityPoolManagerAddressChanged>(newMockEvent());
 
-  stabilityPoolManagerAddressChangedEvent.parameters = new Array()
+  stabilityPoolManagerAddressChangedEvent.parameters = new Array();
 
   stabilityPoolManagerAddressChangedEvent.parameters.push(
-    new ethereum.EventParam(
-      "_stabilityPoolManagerAddress",
-      ethereum.Value.fromAddress(_stabilityPoolManagerAddress)
-    )
-  )
+    new ethereum.EventParam('_stabilityPoolManagerAddress', ethereum.Value.fromAddress(_stabilityPoolManagerAddress)),
+  );
 
-  return stabilityPoolManagerAddressChangedEvent
+  return stabilityPoolManagerAddressChangedEvent;
 }
 
-export function createStoragePoolAddressChangedEvent(
-  _storagePoolAddress: Address
-): StoragePoolAddressChanged {
-  let storagePoolAddressChangedEvent = changetype<StoragePoolAddressChanged>(
-    newMockEvent()
-  )
+export function createStoragePoolAddressChangedEvent(_storagePoolAddress: Address): StoragePoolAddressChanged {
+  let storagePoolAddressChangedEvent = changetype<StoragePoolAddressChanged>(newMockEvent());
 
-  storagePoolAddressChangedEvent.parameters = new Array()
+  storagePoolAddressChangedEvent.parameters = new Array();
 
   storagePoolAddressChangedEvent.parameters.push(
-    new ethereum.EventParam(
-      "_storagePoolAddress",
-      ethereum.Value.fromAddress(_storagePoolAddress)
-    )
-  )
+    new ethereum.EventParam('_storagePoolAddress', ethereum.Value.fromAddress(_storagePoolAddress)),
+  );
 
-  return storagePoolAddressChangedEvent
+  return storagePoolAddressChangedEvent;
 }
 
 export function createSystemSnapshotsUpdatedEvent(
   _totalStakesSnapshot: BigInt,
-  _totalCollateralSnapshot: BigInt
+  _totalCollateralSnapshot: BigInt,
 ): SystemSnapshotsUpdated {
-  let systemSnapshotsUpdatedEvent = changetype<SystemSnapshotsUpdated>(
-    newMockEvent()
-  )
+  let systemSnapshotsUpdatedEvent = changetype<SystemSnapshotsUpdated>(newMockEvent());
 
-  systemSnapshotsUpdatedEvent.parameters = new Array()
+  systemSnapshotsUpdatedEvent.parameters = new Array();
 
   systemSnapshotsUpdatedEvent.parameters.push(
-    new ethereum.EventParam(
-      "_totalStakesSnapshot",
-      ethereum.Value.fromUnsignedBigInt(_totalStakesSnapshot)
-    )
-  )
+    new ethereum.EventParam('_totalStakesSnapshot', ethereum.Value.fromUnsignedBigInt(_totalStakesSnapshot)),
+  );
   systemSnapshotsUpdatedEvent.parameters.push(
-    new ethereum.EventParam(
-      "_totalCollateralSnapshot",
-      ethereum.Value.fromUnsignedBigInt(_totalCollateralSnapshot)
-    )
-  )
+    new ethereum.EventParam('_totalCollateralSnapshot', ethereum.Value.fromUnsignedBigInt(_totalCollateralSnapshot)),
+  );
 
-  return systemSnapshotsUpdatedEvent
+  return systemSnapshotsUpdatedEvent;
 }
 
-export function createTotalStakesUpdatedEvent(
-  _newTotalStakes: BigInt
-): TotalStakesUpdated {
-  let totalStakesUpdatedEvent = changetype<TotalStakesUpdated>(newMockEvent())
+export function createTotalStakesUpdatedEvent(_newTotalStakes: BigInt): TotalStakesUpdated {
+  let totalStakesUpdatedEvent = changetype<TotalStakesUpdated>(newMockEvent());
 
-  totalStakesUpdatedEvent.parameters = new Array()
+  totalStakesUpdatedEvent.parameters = new Array();
 
   totalStakesUpdatedEvent.parameters.push(
-    new ethereum.EventParam(
-      "_newTotalStakes",
-      ethereum.Value.fromUnsignedBigInt(_newTotalStakes)
-    )
-  )
+    new ethereum.EventParam('_newTotalStakes', ethereum.Value.fromUnsignedBigInt(_newTotalStakes)),
+  );
 
-  return totalStakesUpdatedEvent
+  return totalStakesUpdatedEvent;
 }
 
-export function createTroveIndexUpdatedEvent(
-  _borrower: Address,
-  _newIndex: BigInt
-): TroveIndexUpdated {
-  let troveIndexUpdatedEvent = changetype<TroveIndexUpdated>(newMockEvent())
+export function createTroveIndexUpdatedEvent(_borrower: Address, _newIndex: BigInt): TroveIndexUpdated {
+  let troveIndexUpdatedEvent = changetype<TroveIndexUpdated>(newMockEvent());
 
-  troveIndexUpdatedEvent.parameters = new Array()
+  troveIndexUpdatedEvent.parameters = new Array();
 
+  troveIndexUpdatedEvent.parameters.push(new ethereum.EventParam('_borrower', ethereum.Value.fromAddress(_borrower)));
   troveIndexUpdatedEvent.parameters.push(
-    new ethereum.EventParam("_borrower", ethereum.Value.fromAddress(_borrower))
-  )
-  troveIndexUpdatedEvent.parameters.push(
-    new ethereum.EventParam(
-      "_newIndex",
-      ethereum.Value.fromUnsignedBigInt(_newIndex)
-    )
-  )
+    new ethereum.EventParam('_newIndex', ethereum.Value.fromUnsignedBigInt(_newIndex)),
+  );
 
-  return troveIndexUpdatedEvent
+  return troveIndexUpdatedEvent;
 }
 
 export function createTroveLiquidatedEvent(
   _borrower: Address,
   _debt: BigInt,
   _coll: BigInt,
-  _operation: i32
+  _operation: i32,
 ): TroveLiquidated {
-  let troveLiquidatedEvent = changetype<TroveLiquidated>(newMockEvent())
+  let troveLiquidatedEvent = changetype<TroveLiquidated>(newMockEvent());
 
-  troveLiquidatedEvent.parameters = new Array()
+  troveLiquidatedEvent.parameters = new Array();
 
+  troveLiquidatedEvent.parameters.push(new ethereum.EventParam('_borrower', ethereum.Value.fromAddress(_borrower)));
+  troveLiquidatedEvent.parameters.push(new ethereum.EventParam('_debt', ethereum.Value.fromUnsignedBigInt(_debt)));
+  troveLiquidatedEvent.parameters.push(new ethereum.EventParam('_coll', ethereum.Value.fromUnsignedBigInt(_coll)));
   troveLiquidatedEvent.parameters.push(
-    new ethereum.EventParam("_borrower", ethereum.Value.fromAddress(_borrower))
-  )
-  troveLiquidatedEvent.parameters.push(
-    new ethereum.EventParam("_debt", ethereum.Value.fromUnsignedBigInt(_debt))
-  )
-  troveLiquidatedEvent.parameters.push(
-    new ethereum.EventParam("_coll", ethereum.Value.fromUnsignedBigInt(_coll))
-  )
-  troveLiquidatedEvent.parameters.push(
-    new ethereum.EventParam(
-      "_operation",
-      ethereum.Value.fromUnsignedBigInt(BigInt.fromI32(_operation))
-    )
-  )
+    new ethereum.EventParam('_operation', ethereum.Value.fromUnsignedBigInt(BigInt.fromI32(_operation))),
+  );
 
-  return troveLiquidatedEvent
+  return troveLiquidatedEvent;
 }
 
-export function createTroveSnapshotsUpdatedEvent(
-  _L_ETH: BigInt,
-  _L_LUSDDebt: BigInt
-): TroveSnapshotsUpdated {
-  let troveSnapshotsUpdatedEvent = changetype<TroveSnapshotsUpdated>(
-    newMockEvent()
-  )
+export function createTroveSnapshotsUpdatedEvent(_L_ETH: BigInt, _L_LUSDDebt: BigInt): TroveSnapshotsUpdated {
+  let troveSnapshotsUpdatedEvent = changetype<TroveSnapshotsUpdated>(newMockEvent());
 
-  troveSnapshotsUpdatedEvent.parameters = new Array()
+  troveSnapshotsUpdatedEvent.parameters = new Array();
 
   troveSnapshotsUpdatedEvent.parameters.push(
-    new ethereum.EventParam("_L_ETH", ethereum.Value.fromUnsignedBigInt(_L_ETH))
-  )
+    new ethereum.EventParam('_L_ETH', ethereum.Value.fromUnsignedBigInt(_L_ETH)),
+  );
   troveSnapshotsUpdatedEvent.parameters.push(
-    new ethereum.EventParam(
-      "_L_LUSDDebt",
-      ethereum.Value.fromUnsignedBigInt(_L_LUSDDebt)
-    )
-  )
+    new ethereum.EventParam('_L_LUSDDebt', ethereum.Value.fromUnsignedBigInt(_L_LUSDDebt)),
+  );
 
-  return troveSnapshotsUpdatedEvent
+  return troveSnapshotsUpdatedEvent;
 }
 
 export function createTroveUpdatedEvent(
@@ -410,30 +285,19 @@ export function createTroveUpdatedEvent(
   _debt: BigInt,
   _coll: BigInt,
   _stake: BigInt,
-  _operation: i32
+  _operation: i32,
 ): TroveUpdated {
-  let troveUpdatedEvent = changetype<TroveUpdated>(newMockEvent())
+  let troveUpdatedEvent = changetype<TroveUpdated>(newMockEvent());
 
-  troveUpdatedEvent.parameters = new Array()
+  troveUpdatedEvent.parameters = new Array();
 
+  troveUpdatedEvent.parameters.push(new ethereum.EventParam('_borrower', ethereum.Value.fromAddress(_borrower)));
+  troveUpdatedEvent.parameters.push(new ethereum.EventParam('_debt', ethereum.Value.fromUnsignedBigInt(_debt)));
+  troveUpdatedEvent.parameters.push(new ethereum.EventParam('_coll', ethereum.Value.fromUnsignedBigInt(_coll)));
+  troveUpdatedEvent.parameters.push(new ethereum.EventParam('_stake', ethereum.Value.fromUnsignedBigInt(_stake)));
   troveUpdatedEvent.parameters.push(
-    new ethereum.EventParam("_borrower", ethereum.Value.fromAddress(_borrower))
-  )
-  troveUpdatedEvent.parameters.push(
-    new ethereum.EventParam("_debt", ethereum.Value.fromUnsignedBigInt(_debt))
-  )
-  troveUpdatedEvent.parameters.push(
-    new ethereum.EventParam("_coll", ethereum.Value.fromUnsignedBigInt(_coll))
-  )
-  troveUpdatedEvent.parameters.push(
-    new ethereum.EventParam("_stake", ethereum.Value.fromUnsignedBigInt(_stake))
-  )
-  troveUpdatedEvent.parameters.push(
-    new ethereum.EventParam(
-      "_operation",
-      ethereum.Value.fromUnsignedBigInt(BigInt.fromI32(_operation))
-    )
-  )
+    new ethereum.EventParam('_operation', ethereum.Value.fromUnsignedBigInt(BigInt.fromI32(_operation))),
+  );
 
-  return troveUpdatedEvent
+  return troveUpdatedEvent;
 }

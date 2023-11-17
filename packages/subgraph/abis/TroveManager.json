@@ -493,20 +493,14 @@
     "type": "function"
   },
   {
-    "inputs": [
-      { "internalType": "address", "name": "_borrower", "type": "address" }
-    ],
+    "inputs": [{ "internalType": "address", "name": "_borrower", "type": "address" }],
     "name": "addTroveOwnerToArray",
-    "outputs": [
-      { "internalType": "uint256", "name": "index", "type": "uint256" }
-    ],
+    "outputs": [{ "internalType": "uint256", "name": "index", "type": "uint256" }],
     "stateMutability": "nonpayable",
     "type": "function"
   },
   {
-    "inputs": [
-      { "internalType": "address", "name": "_borrower", "type": "address" }
-    ],
+    "inputs": [{ "internalType": "address", "name": "_borrower", "type": "address" }],
     "name": "applyPendingRewards",
     "outputs": [],
     "stateMutability": "nonpayable",
@@ -636,18 +630,14 @@
     "type": "function"
   },
   {
-    "inputs": [
-      { "internalType": "uint256", "name": "_debtValue", "type": "uint256" }
-    ],
+    "inputs": [{ "internalType": "uint256", "name": "_debtValue", "type": "uint256" }],
     "name": "getBorrowingFee",
     "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
     "stateMutability": "view",
     "type": "function"
   },
   {
-    "inputs": [
-      { "internalType": "uint256", "name": "_debtValue", "type": "uint256" }
-    ],
+    "inputs": [{ "internalType": "uint256", "name": "_debtValue", "type": "uint256" }],
     "name": "getBorrowingFeeWithDecay",
     "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
     "stateMutability": "view",
@@ -668,9 +658,7 @@
     "type": "function"
   },
   {
-    "inputs": [
-      { "internalType": "address", "name": "_borrower", "type": "address" }
-    ],
+    "inputs": [{ "internalType": "address", "name": "_borrower", "type": "address" }],
     "name": "getCurrentICR",
     "outputs": [
       { "internalType": "uint256", "name": "ICR", "type": "uint256" },
@@ -684,9 +672,7 @@
     "type": "function"
   },
   {
-    "inputs": [
-      { "internalType": "address", "name": "_borrower", "type": "address" }
-    ],
+    "inputs": [{ "internalType": "address", "name": "_borrower", "type": "address" }],
     "name": "getEntireDebtAndColl",
     "outputs": [
       {
@@ -744,9 +730,7 @@
     "type": "function"
   },
   {
-    "inputs": [
-      { "internalType": "address", "name": "_borrower", "type": "address" }
-    ],
+    "inputs": [{ "internalType": "address", "name": "_borrower", "type": "address" }],
     "name": "getNominalICR",
     "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
     "stateMutability": "view",
@@ -759,16 +743,12 @@
       { "internalType": "bool", "name": "_isColl", "type": "bool" }
     ],
     "name": "getPendingReward",
-    "outputs": [
-      { "internalType": "uint256", "name": "pendingReward", "type": "uint256" }
-    ],
+    "outputs": [{ "internalType": "uint256", "name": "pendingReward", "type": "uint256" }],
     "stateMutability": "view",
     "type": "function"
   },
   {
-    "inputs": [
-      { "internalType": "uint256", "name": "_ETHDrawn", "type": "uint256" }
-    ],
+    "inputs": [{ "internalType": "uint256", "name": "_ETHDrawn", "type": "uint256" }],
     "name": "getRedemptionFeeWithDecay",
     "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
     "stateMutability": "view",
@@ -789,9 +769,7 @@
     "type": "function"
   },
   {
-    "inputs": [
-      { "internalType": "address", "name": "_borrower", "type": "address" }
-    ],
+    "inputs": [{ "internalType": "address", "name": "_borrower", "type": "address" }],
     "name": "getTroveColl",
     "outputs": [
       {
@@ -812,9 +790,7 @@
     "type": "function"
   },
   {
-    "inputs": [
-      { "internalType": "address", "name": "_borrower", "type": "address" }
-    ],
+    "inputs": [{ "internalType": "address", "name": "_borrower", "type": "address" }],
     "name": "getTroveDebt",
     "outputs": [
       {
@@ -842,9 +818,7 @@
     "type": "function"
   },
   {
-    "inputs": [
-      { "internalType": "address", "name": "_borrower", "type": "address" }
-    ],
+    "inputs": [{ "internalType": "address", "name": "_borrower", "type": "address" }],
     "name": "getTroveStake",
     "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
     "stateMutability": "view",
@@ -861,9 +835,7 @@
     "type": "function"
   },
   {
-    "inputs": [
-      { "internalType": "address", "name": "_borrower", "type": "address" }
-    ],
+    "inputs": [{ "internalType": "address", "name": "_borrower", "type": "address" }],
     "name": "getTroveStatus",
     "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
     "stateMutability": "view",
@@ -936,9 +908,7 @@
     "type": "function"
   },
   {
-    "inputs": [
-      { "internalType": "address", "name": "_borrower", "type": "address" }
-    ],
+    "inputs": [{ "internalType": "address", "name": "_borrower", "type": "address" }],
     "name": "liquidate",
     "outputs": [],
     "stateMutability": "nonpayable",
@@ -964,9 +934,7 @@
   {
     "inputs": [],
     "name": "priceFeed",
-    "outputs": [
-      { "internalType": "contract IPriceFeed", "name": "", "type": "address" }
-    ],
+    "outputs": [{ "internalType": "contract IPriceFeed", "name": "", "type": "address" }],
     "stateMutability": "view",
     "type": "function"
   },
@@ -1089,9 +1057,7 @@
   {
     "inputs": [],
     "name": "storagePool",
-    "outputs": [
-      { "internalType": "contract IStoragePool", "name": "", "type": "address" }
-    ],
+    "outputs": [{ "internalType": "contract IStoragePool", "name": "", "type": "address" }],
     "stateMutability": "view",
     "type": "function"
   },
@@ -1117,9 +1083,7 @@
     "type": "function"
   },
   {
-    "inputs": [
-      { "internalType": "address", "name": "newOwner", "type": "address" }
-    ],
+    "inputs": [{ "internalType": "address", "name": "newOwner", "type": "address" }],
     "name": "transferOwnership",
     "outputs": [],
     "stateMutability": "nonpayable",
@@ -1140,9 +1104,7 @@
     "type": "function"
   },
   {
-    "inputs": [
-      { "internalType": "address", "name": "_borrower", "type": "address" }
-    ],
+    "inputs": [{ "internalType": "address", "name": "_borrower", "type": "address" }],
     "name": "updateTroveRewardSnapshots",
     "outputs": [],
     "stateMutability": "nonpayable",
