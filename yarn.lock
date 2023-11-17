@@ -2207,44 +2207,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@graphprotocol/graph-cli@npm:^0.60.0":
-  version: 0.60.0
-  resolution: "@graphprotocol/graph-cli@npm:0.60.0"
-  dependencies:
-    "@float-capital/float-subgraph-uncrashable": ^0.0.0-alpha.4
-    "@oclif/core": 2.8.6
-    "@oclif/plugin-autocomplete": ^2.3.6
-    "@oclif/plugin-not-found": ^2.4.0
-    "@whatwg-node/fetch": ^0.8.4
-    assemblyscript: 0.19.23
-    binary-install-raw: 0.0.13
-    chalk: 3.0.0
-    chokidar: 3.5.3
-    debug: 4.3.4
-    docker-compose: 0.23.19
-    dockerode: 2.5.8
-    fs-extra: 9.1.0
-    glob: 9.3.5
-    gluegun: 5.1.2
-    graphql: 15.5.0
-    immutable: 4.2.1
-    ipfs-http-client: 55.0.0
-    jayson: 4.0.0
-    js-yaml: 3.14.1
-    prettier: 1.19.1
-    request: 2.88.2
-    semver: 7.4.0
-    sync-request: 6.1.0
-    tmp-promise: 3.0.3
-    web3-eth-abi: 1.7.0
-    which: 2.0.2
-    yaml: 1.10.2
-  bin:
-    graph: bin/run
-  checksum: 8227283dac478d5ff1888099dd2fa79f6feb235328d00f028e203b50a08e7022b6ff45881d2547ba4c9f690eb859bc6e7a39f02a1a1a53f75132ee0954e97086
-  languageName: node
-  linkType: hard
-
 "@graphprotocol/graph-cli@npm:^0.61.0":
   version: 0.61.0
   resolution: "@graphprotocol/graph-cli@npm:0.61.0"
@@ -23779,14 +23741,6 @@ __metadata:
   checksum: 0eb6cc1b866dc17a6037d0a82ac7fa877eba6a757443e79e7c4f35bacedbf6421fadcab4363b39667b43355cbaaa570a3cde850f776498e5450f32ed2f9b7584
   languageName: node
   linkType: hard
-
-"sub-graph@workspace:packages/sub-graph":
-  version: 0.0.0-use.local
-  resolution: "sub-graph@workspace:packages/sub-graph"
-  dependencies:
-    "@graphprotocol/graph-cli": ^0.60.0
-  languageName: unknown
-  linkType: soft
 
 "subgraph@workspace:packages/subgraph":
   version: 0.0.0-use.local
