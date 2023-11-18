@@ -8,6 +8,11 @@
             },
             {
                 "internalType": "address",
+                "name": "_redemptionOperationsAddress",
+                "type": "address"
+            },
+            {
+                "internalType": "address",
                 "name": "_borrowerOperationsAddress",
                 "type": "address"
             },
@@ -512,6 +517,19 @@
         "outputs": [
             {
                 "internalType": "contract IPriceFeed",
+                "name": "",
+                "type": "address"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [],
+        "name": "redemptionOperationsAddress",
+        "outputs": [
+            {
+                "internalType": "address",
                 "name": "",
                 "type": "address"
             }

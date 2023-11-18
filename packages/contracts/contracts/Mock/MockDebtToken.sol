@@ -9,6 +9,7 @@ contract MockDebtToken is DebtToken {
 
   constructor(
     address _troveManagerAddress,
+    address _redeemerOperationsAddress,
     address _borrowerOperationsAddress,
     address _stabilityPoolManagerAddress,
     address _priceFeedAddress,
@@ -19,6 +20,7 @@ contract MockDebtToken is DebtToken {
   )
     DebtToken(
       _troveManagerAddress,
+      _redeemerOperationsAddress,
       _borrowerOperationsAddress,
       _stabilityPoolManagerAddress,
       _priceFeedAddress,

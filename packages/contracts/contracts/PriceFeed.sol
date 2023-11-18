@@ -121,6 +121,12 @@ contract PriceFeed is Ownable, CheckContract, IPriceFeed {
     usdValue = (price * _amount) / 10 ** decimals;
   }
 
+  function getAmountFromUSDValue(address _token, uint256 _usdValue) external view returns (uint amount) {
+    uint price = lastGoodPrices[_token];
+    uint8 decimals = IERC20Metadata(_token).decimals();
+    amount = (_usdValue * 10 ** decimals) / price;
+  }
+
   /*
    * fetchPrice():
    * Returns the latest price obtained from the Oracle. Called by Liquity functions that require a current price.

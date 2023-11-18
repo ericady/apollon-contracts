@@ -47,6 +47,30 @@
         "inputs": [
             {
                 "internalType": "address",
+                "name": "_token",
+                "type": "address"
+            },
+            {
+                "internalType": "uint256",
+                "name": "_usdValue",
+                "type": "uint256"
+            }
+        ],
+        "name": "getAmountFromUSDValue",
+        "outputs": [
+            {
+                "internalType": "uint256",
+                "name": "amount",
+                "type": "uint256"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "address",
                 "name": "_tokenAddress",
                 "type": "address"
             }

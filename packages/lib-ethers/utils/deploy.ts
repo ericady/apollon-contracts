@@ -161,6 +161,7 @@ const connectContracts = async (
       storagePool.setAddresses(
         borrowerOperations.address,
         troveManager.address,
+        redemptionOperations.address,
         stabilityPoolManager.address,
         priceFeed.address,
         { ...overrides, nonce }
@@ -226,7 +227,14 @@ const connectContracts = async (
 
 const deployAndConnectDebtTokens = async (
   _isDev: boolean,
-  { borrowerOperations, troveManager, stabilityPoolManager, debtTokenManager, priceFeed }: _LiquityContracts,
+  {
+    borrowerOperations,
+    troveManager,
+    redemptionOperations,
+    stabilityPoolManager,
+    debtTokenManager,
+    priceFeed,
+  }: _LiquityContracts,
   deployer: Signer,
   getContractFactory: (name: string, signer: Signer) => Promise<ContractFactory>,
   deployment: _LiquityDeploymentJSON,
@@ -241,6 +249,7 @@ const deployAndConnectDebtTokens = async (
       getContractFactory,
       'DebtToken',
       troveManager.address,
+      redemptionOperations.address,
       borrowerOperations.address,
       stabilityPoolManager.address,
       priceFeed.address,

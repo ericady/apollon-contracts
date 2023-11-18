@@ -139,17 +139,16 @@ contract RedemptionOperations is LiquityBase, Ownable, CheckContract, IRedemptio
     assert(_sourceTroves.length >= 1);
     for (uint i = 0; i < _sourceTroves.length; i++) {
       address currentBorrower = _sourceTroves[i];
-      if (currentBorrower == address(0) || _stableCoinAmount == 0) continue;
+      if (currentBorrower == address(0) || _stableCoinAmount - vars.totalRedeemedStable == 0) continue;
 
       SingleRedemptionVariables memory singleRedemption = _redeemCollateralFromTrove(
         vars,
         currentBorrower,
-        _stableCoinAmount
+        _stableCoinAmount - vars.totalRedeemedStable
       );
 
       // sum up redeemed stable and drawn collateral
       vars.totalRedeemedStable += singleRedemption.stableCoinLot;
-      _stableCoinAmount -= singleRedemption.stableCoinLot;
       for (uint a = 0; a < singleRedemption.collLots.length; a++) {
         for (uint b = 0; b < totalCollDrawn.length; b++) {
           if (singleRedemption.collLots[a].tokenAddress != vars.collTokenAddresses[b]) continue;
@@ -169,8 +168,10 @@ contract RedemptionOperations is LiquityBase, Ownable, CheckContract, IRedemptio
     // Calculate the redemption fee
     for (uint i = 0; i < totalCollDrawn.length; i++) {
       RedemptionCollAmount memory collEntry = totalCollDrawn[i];
+
       collEntry.redemptionFee = _getRedemptionFee(collEntry.drawn);
       collEntry.sendToRedeemer = collEntry.drawn - collEntry.redemptionFee;
+
       _requireUserAcceptsFee(collEntry.redemptionFee, collEntry.drawn, _maxFeePercentage);
     }
 
@@ -181,12 +182,18 @@ contract RedemptionOperations is LiquityBase, Ownable, CheckContract, IRedemptio
     storagePool.subtractValue(address(stableCoin), false, PoolType.Active, vars.totalRedeemedStable);
     stableCoin.burn(msg.sender, vars.totalRedeemedStable);
 
-    // transfer the drawn collateral to account
+    // transfer the drawn collateral to the redeemer
     for (uint i = 0; i < totalCollDrawn.length; i++) {
       RedemptionCollAmount memory collEntry = totalCollDrawn[i];
       if (collEntry.sendToRedeemer == 0) continue;
 
-      storagePool.withdrawalValue(msg.sender, vars.collTokenAddresses[i], true, PoolType.Active, collEntry.drawn);
+      storagePool.withdrawalValue(
+        msg.sender,
+        vars.collTokenAddresses[i],
+        true,
+        PoolType.Active,
+        collEntry.sendToRedeemer
+      );
 
       // todo jelly handover
       //    // Send the fee to the gov token staking contract
@@ -221,10 +228,10 @@ contract RedemptionOperations is LiquityBase, Ownable, CheckContract, IRedemptio
     for (uint i = 0; i < vars.collLots.length; i++) {
       TokenAmount memory collEntry = vars.collLots[i];
 
-      uint collPrice = priceFeed.getPrice(collEntry.tokenAddress);
-      uint collInStable = priceFeed.getUSDValue(collEntry.tokenAddress, collEntry.amount);
-      uint collToRedeemInStable = (vars.stableCoinLot * collInStable) / vars.troveCollInStable;
-      collEntry.amount = collToRedeemInStable / collPrice;
+      uint collEntryInStable = priceFeed.getUSDValue(collEntry.tokenAddress, collEntry.amount);
+      uint collToRedeemInStable = (vars.stableCoinLot * collEntryInStable) / vars.troveCollInStable;
+
+      collEntry.amount = priceFeed.getAmountFromUSDValue(collEntry.tokenAddress, collToRedeemInStable);
       newCollInStable -= collToRedeemInStable;
     }
 
@@ -234,11 +241,6 @@ contract RedemptionOperations is LiquityBase, Ownable, CheckContract, IRedemptio
      *
      * If the resultant net debt of the partial is less than the minimum, net debt we bail.
      */
-    // TODO: Disabling cause it is never used, check again later
-    // uint newNICR = LiquityMath._computeNominalCR(
-    //   newCollInStable,
-    //   vars.troveDebtInStable - (vars.stableCoinLot * vars.stableCoinEntry.price)
-    // );
 
     // updating the troves stable debt and coll
     DebtTokenAmount[] memory debtDecrease = new DebtTokenAmount[](1);
@@ -305,16 +307,19 @@ contract RedemptionOperations is LiquityBase, Ownable, CheckContract, IRedemptio
       );
   }
 
-  function _getRedemptionFee(uint _ETHDrawn) internal view returns (uint) {
-    return _calcRedemptionFee(getRedemptionRate(), _ETHDrawn);
+  function _getRedemptionFee(uint _collDrawn) internal view returns (uint) {
+    return _calcRedemptionFee(getRedemptionRate(), _collDrawn);
   }
 
-  function getRedemptionFeeWithDecay(uint _ETHDrawn) external view override returns (uint) {
-    return _calcRedemptionFee(getRedemptionRateWithDecay(), _ETHDrawn);
+  function getRedemptionFeeWithDecay(uint _collDrawn) external view override returns (uint) {
+    return _calcRedemptionFee(getRedemptionRateWithDecay(), _collDrawn);
   }
 
   function _calcRedemptionFee(uint _redemptionRate, uint _collDrawn) internal pure returns (uint) {
+    if (_collDrawn == 0) return 0;
+
     uint redemptionFee = (_redemptionRate * _collDrawn) / DECIMAL_PRECISION;
+
     // TroveManager: Fee would eat up all returned collateral
     if (redemptionFee >= _collDrawn) revert TooHighRedeemFee();
     return redemptionFee;

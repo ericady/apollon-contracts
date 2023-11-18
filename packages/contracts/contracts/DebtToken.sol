@@ -57,12 +57,14 @@ contract DebtToken is CheckContract, IDebtToken {
 
   // --- Addresses ---
   address public immutable troveManagerAddress;
+  address public immutable redemptionOperationsAddress;
   address public immutable borrowerOperationsAddress;
   address public immutable stabilityPoolManagerAddress;
   IPriceFeed public immutable priceFeed;
 
   constructor(
     address _troveManagerAddress,
+    address _redemptionOperationsAddress,
     address _borrowerOperationsAddress,
     address _stabilityPoolManagerAddress,
     address _priceFeedAddress,
@@ -72,12 +74,15 @@ contract DebtToken is CheckContract, IDebtToken {
     bool _isStableCoin
   ) {
     checkContract(_troveManagerAddress);
+    checkContract(_redemptionOperationsAddress);
     checkContract(_borrowerOperationsAddress);
     checkContract(_stabilityPoolManagerAddress);
     checkContract(_priceFeedAddress);
 
     troveManagerAddress = _troveManagerAddress;
     emit TroveManagerAddressChanged(_troveManagerAddress);
+
+    redemptionOperationsAddress = _redemptionOperationsAddress;
 
     borrowerOperationsAddress = _borrowerOperationsAddress;
     emit BorrowerOperationsAddressChanged(_borrowerOperationsAddress);
@@ -118,7 +123,7 @@ contract DebtToken is CheckContract, IDebtToken {
   }
 
   function burn(address _account, uint256 _amount) external override {
-    _requireCallerIsBOorTroveMorSP();
+    _requireCallerIsBOorTroveMorSPorRO();
     _burn(_account, _amount);
   }
 
@@ -272,11 +277,12 @@ contract DebtToken is CheckContract, IDebtToken {
     if (msg.sender != borrowerOperationsAddress) revert NotFromBorrowerOps();
   }
 
-  function _requireCallerIsBOorTroveMorSP() internal view {
+  function _requireCallerIsBOorTroveMorSPorRO() internal view {
     if (
       msg.sender != borrowerOperationsAddress &&
       msg.sender != troveManagerAddress &&
-      msg.sender != stabilityPoolManagerAddress
+      msg.sender != stabilityPoolManagerAddress &&
+      msg.sender != redemptionOperationsAddress
     ) revert NotFromBOorTroveMorSP();
   }
 

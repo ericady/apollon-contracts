@@ -8,6 +8,11 @@
             },
             {
                 "internalType": "address",
+                "name": "_redeemerOperationsAddress",
+                "type": "address"
+            },
+            {
+                "internalType": "address",
                 "name": "_borrowerOperationsAddress",
                 "type": "address"
             },
@@ -632,6 +637,19 @@
             }
         ],
         "stateMutability": "pure",
+        "type": "function"
+    },
+    {
+        "inputs": [],
+        "name": "redemptionOperationsAddress",
+        "outputs": [
+            {
+                "internalType": "address",
+                "name": "",
+                "type": "address"
+            }
+        ],
+        "stateMutability": "view",
         "type": "function"
     },
     {

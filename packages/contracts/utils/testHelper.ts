@@ -73,7 +73,11 @@ export const gasUsed = async (tx: ContractTransactionResponse) => {
   return BigInt(receipt?.cumulativeGasUsed ?? 0) * BigInt(receipt?.gasPrice ?? 0);
 };
 
-export const whaleShrimpTroveInit = async (contracts: Contracts, signers: SignerWithAddress[]) => {
+export const whaleShrimpTroveInit = async (
+  contracts: Contracts,
+  signers: SignerWithAddress[],
+  depositStability: Boolean = true
+) => {
   const STABLE: MockDebtToken = contracts.debtToken.STABLE;
   const BTC: MockERC20 = contracts.collToken.BTC;
   const stabilityPoolManager: StabilityPoolManager = contracts.stabilityPoolManager;
@@ -103,7 +107,8 @@ export const whaleShrimpTroveInit = async (contracts: Contracts, signers: Signer
     collAmount: parseUnits('1', 9),
     debts: [{ tokenAddress: STABLE, amount: parseUnits('1000') }],
   });
-  await stabilityPoolManager.connect(alice).provideStability([{ tokenAddress: STABLE, amount: parseUnits('1000') }]);
+  if (depositStability)
+    await stabilityPoolManager.connect(alice).provideStability([{ tokenAddress: STABLE, amount: parseUnits('1000') }]);
   await openTrove({
     from: bob,
     contracts,
@@ -111,7 +116,8 @@ export const whaleShrimpTroveInit = async (contracts: Contracts, signers: Signer
     collAmount: parseUnits('1', 9),
     debts: [{ tokenAddress: STABLE, amount: parseUnits('2000') }],
   });
-  await stabilityPoolManager.connect(bob).provideStability([{ tokenAddress: STABLE, amount: parseUnits('2000') }]);
+  if (depositStability)
+    await stabilityPoolManager.connect(bob).provideStability([{ tokenAddress: STABLE, amount: parseUnits('2000') }]);
   await openTrove({
     from: carol,
     contracts,
@@ -119,7 +125,8 @@ export const whaleShrimpTroveInit = async (contracts: Contracts, signers: Signer
     collAmount: parseUnits('1', 9),
     debts: [{ tokenAddress: STABLE, amount: parseUnits('3000') }],
   });
-  await stabilityPoolManager.connect(carol).provideStability([{ tokenAddress: STABLE, amount: parseUnits('3000') }]);
+  if (depositStability)
+    await stabilityPoolManager.connect(carol).provideStability([{ tokenAddress: STABLE, amount: parseUnits('3000') }]);
 
   // D opens a trove
   await openTrove({

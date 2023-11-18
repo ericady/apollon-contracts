@@ -50,4 +50,10 @@ contract MockPriceFeed is IPriceFeed {
     uint8 decimals = IERC20Metadata(_token).decimals();
     usdValue = (price * _amount) / 10 ** decimals;
   }
+
+  function getAmountFromUSDValue(address _token, uint256 _usdValue) external view returns (uint amount) {
+    uint price = tokenPrices[_token];
+    uint8 decimals = IERC20Metadata(_token).decimals();
+    amount = (_usdValue * 10 ** decimals) / price;
+  }
 }

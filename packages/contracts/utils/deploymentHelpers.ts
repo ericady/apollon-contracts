@@ -96,6 +96,7 @@ export const connectCoreContracts = async (contracts: Contracts) => {
   await contracts.storagePool.setAddresses(
     contracts.borrowerOperations,
     contracts.troveManager,
+    contracts.redemptionOperations,
     contracts.stabilityPoolManager,
     contracts.priceFeed
   );
@@ -133,6 +134,7 @@ export const deployAndLinkToken = async (contracts: Contracts) => {
   const mockDebtTokenFactory = await ethers.getContractFactory('MockDebtToken');
   const STABLE = await mockDebtTokenFactory.deploy(
     contracts.troveManager,
+    contracts.redemptionOperations,
     contracts.borrowerOperations,
     contracts.stabilityPoolManager,
     contracts.priceFeed,
@@ -146,6 +148,7 @@ export const deployAndLinkToken = async (contracts: Contracts) => {
 
   const STOCK = await mockDebtTokenFactory.deploy(
     contracts.troveManager,
+    contracts.redemptionOperations,
     contracts.borrowerOperations,
     contracts.stabilityPoolManager,
     contracts.priceFeed,

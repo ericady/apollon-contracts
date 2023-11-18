@@ -50,7 +50,6 @@ interface ITroveManager is IBBase {
   error OnlyOneTrove();
   error ZeroAmount();
   error LessThanMCR();
-  error GreaterThanTCR();
   error InvalidMaxFeePercent();
   error NoLiquidatableTrove();
   error EmptyArray();
