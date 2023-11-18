@@ -1,4 +1,4 @@
-import { Address, BigInt, Bytes, ethereum } from '@graphprotocol/graph-ts';
+import { Address, BigInt, ethereum } from '@graphprotocol/graph-ts';
 import { Address as EventAddress } from '@graphprotocol/graph-ts/common/numbers';
 import { newMockEvent } from 'matchstick-as';
 import {
@@ -20,6 +20,8 @@ export const MockDebtTokenAddress = EventAddress.fromString('0x00000000000000000
 export const MockStabilityPoolManagerAddress = EventAddress.fromString('0x0000000000000000000000000000000000000200');
 export const MockStabilityPoolAddress = EventAddress.fromString('0x0000000000000000000000000000000000000300');
 export const MockTroveManagerAddress = EventAddress.fromString('0x0000000000000000000000000000000000000400');
+export const MockCollateralToken1Address = EventAddress.fromString('0x0000000000000000000000000000000000000500');
+export const MockCollateralToken2Address = EventAddress.fromString('0x0000000000000000000000000000000000000501');
 export const MockUserAddress = EventAddress.fromString('0x1000000000000000000000000000000000000000');
 
 // TODO: Remove me later. This is how to log in AssemblyScript
@@ -107,10 +109,10 @@ export function createTroveManagerAddressChangedEvent(_newTroveManagerAddress: A
 }
 
 // When a Token is created
-export function handleNewToken(event: PriceFeedAddressChanged, tokenAddress: Bytes): void {
+export function handleNewToken(event: PriceFeedAddressChanged, tokenAddress: Address): void {
   let newToken = new Token(tokenAddress);
 
-  const contract = DebtToken.bind(Address.fromBytes(tokenAddress));
+  const contract = DebtToken.bind(tokenAddress);
 
   newToken.address = tokenAddress;
   newToken.symbol = contract.symbol();
@@ -124,21 +126,21 @@ export function handleNewToken(event: PriceFeedAddressChanged, tokenAddress: Byt
 }
 
 // FIXME: Still needs event implementation
-export function updateTokenPrice(tokenAddress: Bytes): void {
+export function updateTokenPrice(tokenAddress: Address): void {
   const contract = DebtToken.bind(tokenAddress);
 
-  const token = Token.load(Address.fromBytes(tokenAddress))!;
+  const token = Token.load(tokenAddress)!;
   token.priceUSD = contract.getPrice();
   token.save();
 }
 
-export function handleNewDebtTokenMeta(event: TransferEvent, tokenAddress: Bytes): void {
+export function handleNewDebtTokenMeta(event: TransferEvent, tokenAddress: Address): void {
   const debtTokenMeta = new DebtTokenMeta(event.transaction.hash.concatI32(event.logIndex.toI32()));
 
-  const tokenContract = DebtToken.bind(Address.fromBytes(tokenAddress));
+  const tokenContract = DebtToken.bind(tokenAddress);
   const debtTokenStabilityPoolManagerContract = StabilityPoolManager.bind(tokenContract.stabilityPoolManagerAddress());
   const debtTokenStabilityPoolContract = StabilityPool.bind(
-    debtTokenStabilityPoolManagerContract.getStabilityPool(Address.fromBytes(tokenAddress)),
+    debtTokenStabilityPoolManagerContract.getStabilityPool(tokenAddress),
   );
 
   debtTokenMeta.token = tokenAddress;
@@ -154,8 +156,8 @@ export function handleNewDebtTokenMeta(event: TransferEvent, tokenAddress: Bytes
 }
 
 export function updateUserDebtTokenMeta(
-  tokenAddress: Bytes,
-  borrower: Bytes,
+  tokenAddress: Address,
+  borrower: Address,
   newProvidedStablitySinceLastCollClaim?: BigInt,
 ): void {
   let userDebtTokenMeta = UserDebtTokenMeta.load(
@@ -167,19 +169,19 @@ export function updateUserDebtTokenMeta(
     );
   }
 
-  const tokenContract = DebtToken.bind(Address.fromBytes(tokenAddress));
+  const tokenContract = DebtToken.bind(tokenAddress);
   const troveManagerContract = TroveManager.bind(tokenContract.troveManagerAddress());
 
   userDebtTokenMeta.token = tokenAddress;
 
   userDebtTokenMeta.borrower = borrower;
-  userDebtTokenMeta.walletAmount = tokenContract.balanceOf(Address.fromBytes(borrower));
+  userDebtTokenMeta.walletAmount = tokenContract.balanceOf(borrower);
 
-  const trove = troveManagerContract.getTroveDebt(Address.fromBytes(borrower));
+  const trove = troveManagerContract.getTroveDebt(borrower);
 
   // Clossure not supported yet
   let troveIndex = -1;
-  const targetAddress = Address.fromBytes(tokenAddress);
+  const targetAddress = tokenAddress;
   for (let i = 0; i < trove.length; i++) {
     if (trove[i].tokenAddress.toHexString() == targetAddress.toHexString()) {
       troveIndex = i;
@@ -197,12 +199,8 @@ export function updateUserDebtTokenMeta(
   }
 
   const stabilityPoolManagerContract = StabilityPoolManager.bind(tokenContract.stabilityPoolManagerAddress());
-  const stabilityPoolContract = StabilityPool.bind(
-    stabilityPoolManagerContract.getStabilityPool(Address.fromBytes(tokenAddress)),
-  );
-  userDebtTokenMeta.stabilityCompoundAmount = stabilityPoolContract.getCompoundedDebtDeposit(
-    Address.fromBytes(borrower),
-  );
+  const stabilityPoolContract = StabilityPool.bind(stabilityPoolManagerContract.getStabilityPool(tokenAddress));
+  userDebtTokenMeta.stabilityCompoundAmount = stabilityPoolContract.getCompoundedDebtDeposit(borrower);
 
   userDebtTokenMeta.save();
 }

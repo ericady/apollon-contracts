@@ -11,6 +11,9 @@
     },
     "TroveManager": {
       "address": "TroveManager"
+    },
+    "StoragePool": {
+      "address": "StoragePool"
     }
   }
 }

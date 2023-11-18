@@ -1258,7 +1258,8 @@ contract TroveManager is LiquityBase, Ownable, CheckContract, ITroveManager {
   function increaseTroveColl(address _borrower, TokenAmount[] memory _collTokenAmounts) external override {
     _requireCallerIsBorrowerOrRedemptionOperations();
 
-    Trove storage trove = Troves[_borrower];
+    Trove storage trove = Troves[_borrower];    
+    address[] memory collTokenAddresses = new address[](_collTokenAmounts.length);
     for (uint i = 0; i < _collTokenAmounts.length; i++) {
       address tokenAddress = _collTokenAmounts[i].tokenAddress;
       trove.colls[tokenAddress] += _collTokenAmounts[i].amount;
@@ -1267,6 +1268,18 @@ contract TroveManager is LiquityBase, Ownable, CheckContract, ITroveManager {
         trove.collsRegistered[tokenAddress] = true;
         trove.collTokens.push(tokenAddress);
       }
+      collTokenAddresses[i] = tokenAddress;
+    }
+
+    emit CollateralUpdated(_borrower, collTokenAddresses);
+  }
+
+  function getAllTroveCollUSD(address _coll) external returns (uint totalCollInStable) {
+    for (uint i = 0; i < TroveOwners.length; i++) {
+      Trove storage trove = Troves[TroveOwners[i]];
+      if (_coll > 0) {
+        totalCollInStable += priceFeed.getUSDValue(_coll, trove.colls[token]);
+      }
     }
   }
 
@@ -1274,9 +1287,15 @@ contract TroveManager is LiquityBase, Ownable, CheckContract, ITroveManager {
     _requireCallerIsBorrowerOrRedemptionOperations();
 
     Trove storage trove = Troves[_borrower];
+    address[] memory collTokenAddresses = new address[](_collTokenAmounts.length);
+
     for (uint i = 0; i < _collTokenAmounts.length; i++) {
-      trove.colls[_collTokenAmounts[i].tokenAddress] -= _collTokenAmounts[i].amount;
+      address tokenAddress = _collTokenAmounts[i].tokenAddress;
+      trove.colls[tokenAddress] -= _collTokenAmounts[i].amount;
+      collTokenAddresses[i] = tokenAddress;
     }
+
+    emit CollateralUpdated(_borrower, collTokenAddresses);
   }
 
   function increaseTroveDebt(address _borrower, DebtTokenAmount[] memory _debtTokenAmounts) external override {

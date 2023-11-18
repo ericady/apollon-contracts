@@ -1,4 +1,4 @@
-import { BigInt, ethereum } from '@graphprotocol/graph-ts';
+import { Address, BigInt, ethereum } from '@graphprotocol/graph-ts';
 import { createMockedFunction } from 'matchstick-as';
 import { MockDebtTokenAddress, MockTroveManagerAddress, MockUserAddress } from './debt-token-utils';
 
@@ -13,4 +13,10 @@ export const mockTroveManagerGetTroveDebt = (): void => {
         ]),
       ]),
     ]);
+};
+
+export const mockTroveManagerGetAllTroveCollUSD = (collTokenAddress: Address): void => {
+  createMockedFunction(MockTroveManagerAddress, 'getAllTroveCollUSD', 'getAllTroveCollUSD(address):(uint256)')
+    .withArgs([ethereum.Value.fromAddress(collTokenAddress)])
+    .returns([ethereum.Value.fromSignedBigInt(BigInt.fromI32(1234))]);
 };

@@ -94,6 +94,25 @@
             {
                 "indexed": false,
                 "internalType": "address",
+                "name": "_borrower",
+                "type": "address"
+            },
+            {
+                "indexed": false,
+                "internalType": "address[]",
+                "name": "_collTokens",
+                "type": "address[]"
+            }
+        ],
+        "name": "CollateralUpdated",
+        "type": "event"
+    },
+    {
+        "anonymous": false,
+        "inputs": [
+            {
+                "indexed": false,
+                "internalType": "address",
                 "name": "_newDebtTokenManagerAddress",
                 "type": "address"
             }

@@ -2,6 +2,7 @@ import {
   BaseRateUpdated as BaseRateUpdatedEvent,
   BorrowerOperationsAddressChanged as BorrowerOperationsAddressChangedEvent,
   CollTokenManagerAddressChanged as CollTokenManagerAddressChangedEvent,
+  CollateralUpdated as CollateralUpdatedEvent,
   DebtTokenManagerAddressChanged as DebtTokenManagerAddressChangedEvent,
   LTermsUpdated as LTermsUpdatedEvent,
   LastFeeOpTimeUpdated as LastFeeOpTimeUpdatedEvent,
@@ -18,6 +19,7 @@ import {
   TroveSnapshotsUpdated as TroveSnapshotsUpdatedEvent,
   TroveUpdated as TroveUpdatedEvent,
 } from '../generated/TroveManager/TroveManager';
+import { handleNewCollateralTokenMeta } from '../tests/collateral-token-utils';
 
 export function handleBaseRateUpdated(event: BaseRateUpdatedEvent): void {}
 
@@ -54,3 +56,9 @@ export function handleTroveLiquidated(event: TroveLiquidatedEvent): void {}
 export function handleTroveSnapshotsUpdated(event: TroveSnapshotsUpdatedEvent): void {}
 
 export function handleTroveUpdated(event: TroveUpdatedEvent): void {}
+
+export function handleCollateralUpdated(event: CollateralUpdatedEvent): void {
+  for (let i = 0; i < event.params._collTokens.length; i++) {
+    handleNewCollateralTokenMeta(event, event.params._collTokens[i], event.address);
+  }
+}

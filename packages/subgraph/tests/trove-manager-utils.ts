@@ -4,6 +4,7 @@ import {
   BaseRateUpdated,
   BorrowerOperationsAddressChanged,
   CollTokenManagerAddressChanged,
+  CollateralUpdated,
   DebtTokenManagerAddressChanged,
   LTermsUpdated,
   LastFeeOpTimeUpdated,
@@ -20,6 +21,7 @@ import {
   TroveSnapshotsUpdated,
   TroveUpdated,
 } from '../generated/TroveManager/TroveManager';
+import { MockTroveManagerAddress } from './debt-token-utils';
 
 export function createBaseRateUpdatedEvent(_baseRate: BigInt): BaseRateUpdated {
   let baseRateUpdatedEvent = changetype<BaseRateUpdated>(newMockEvent());
@@ -300,4 +302,18 @@ export function createTroveUpdatedEvent(
   );
 
   return troveUpdatedEvent;
+}
+
+export function createCollateralUpdatedEvent(_borrower: Address, _collTokens: Address[]): CollateralUpdated {
+  let collateralUpdatedEvent = changetype<CollateralUpdated>(newMockEvent());
+  collateralUpdatedEvent.address = MockTroveManagerAddress;
+
+  collateralUpdatedEvent.parameters = new Array();
+
+  collateralUpdatedEvent.parameters.push(new ethereum.EventParam('_borrower', ethereum.Value.fromAddress(_borrower)));
+  collateralUpdatedEvent.parameters.push(
+    new ethereum.EventParam('_collTokens', ethereum.Value.fromAddressArray(_collTokens)),
+  );
+
+  return collateralUpdatedEvent;
 }

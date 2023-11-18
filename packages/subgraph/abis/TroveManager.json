@@ -33,6 +33,25 @@
       {
         "indexed": false,
         "internalType": "address",
+        "name": "_borrower",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "address[]",
+        "name": "_collTokens",
+        "type": "address[]"
+      }
+    ],
+    "name": "CollateralUpdated",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "address",
         "name": "_newBorrowerOperationsAddress",
         "type": "address"
       }
@@ -577,6 +596,19 @@
     "inputs": [],
     "name": "decayBaseRateFromBorrowing",
     "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [{ "internalType": "address", "name": "_coll", "type": "address" }],
+    "name": "getAllTroveCollUSD",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "totalCollInStable",
+        "type": "uint256"
+      }
+    ],
     "stateMutability": "nonpayable",
     "type": "function"
   },

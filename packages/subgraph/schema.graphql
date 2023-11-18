@@ -43,3 +43,25 @@ type UserDebtTokenMeta @entity {
   providedStablitySinceLastCollClaim: BigInt!
   stabilityCompoundAmount: BigInt!
 }
+
+type CollateralTokenMeta @entity(immutable: true) {
+  id: Bytes!
+  token: Token! @relation(name: "TokenToCollateralTokenMeta")
+  timestamp: BigInt!
+
+  # global
+  totalValueLockedUSD: BigInt!
+  # TODO: Fetch this from the client side
+  # totalValueLockedUSD24hAgo: BigInt!
+}
+
+type UserCollateralTokenMeta @entity {
+  # "UserDebtTokenMeta" + token + borrower
+  id: String!
+  borrower: Bytes!
+  token: Token! @relation(name: "TokenToUserCollateralTokenMeta")
+  # borrower specific
+  walletAmount: BigInt!
+  troveLockedAmount: BigInt!
+  stabilityGainedAmount: BigInt!
+}

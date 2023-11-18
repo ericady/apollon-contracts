@@ -43,6 +43,7 @@ interface ITroveManager is IBBase {
   event LTermsUpdated(uint _L_ETH, uint _L_LUSDDebt);
   event TroveSnapshotsUpdated(uint _L_ETH, uint _L_LUSDDebt);
   event TroveIndexUpdated(address _borrower, uint _newIndex);
+  event CollateralUpdated(address _borrower, address[] _collTokens);
 
   error NotFromBorrowerOrRedemptionOps();
   error InvalidTrove();
