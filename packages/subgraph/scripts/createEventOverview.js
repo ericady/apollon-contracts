@@ -3,7 +3,7 @@ const path = require('path');
 
 const srcDirectory = './src';
 const entitiesDirectory = './src/entities';
-const outputFile = 'entity-event-mapping.txt';
+const outputFile = 'scripts/entity-event-mapping.txt';
 
 // Function to recursively read all files in a directory
 function readFilesRecursively(dir, fileList = []) {

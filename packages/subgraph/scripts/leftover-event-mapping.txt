@@ -1,0 +1,53 @@
+contract (debt-token)
+  > handleBorrowerOperationsAddressChanged
+  > handleTroveManagerAddressChanged
+  > handleStabilityPoolManagerAddressChanged
+  > handleApproval
+contract (stability-pool-manager)
+  > handleDebtTokenManagerAddressChanged
+  > handleOwnershipTransferred
+  > handlePriceFeedAddressChanged
+  > handleStabilityPoolAdded
+  > handleStoragePoolAddressChanged
+  > handleTroveManagerAddressChanged
+contract (stability-pool)
+  > handleDepositSnapshotUpdated
+  > handleDepositTokenAddressChanged
+  > handleEpochUpdated
+  > handleOwnershipTransferred
+  > handleP_Updated
+  > handlePriceFeedAddressChanged
+  > handleS_Updated
+  > handleScaleUpdated
+  > handleStabilityPoolCollBalanceUpdated
+  > handleStabilityPoolDepositBalanceUpdated
+  > handleStabilityPoolManagerAddressChanged
+  > handleStoragePoolAddressChanged
+  > handleTroveManagerAddressChanged
+  > handleUserDepositChanged
+contract (storage-pool)
+  > handleBorrowerOperationsAddressChanged
+  > handleOwnershipTransferred
+  > handlePoolValueUpdated
+  > handlePriceFeedAddressChanged
+  > handleStabilityPoolManagerAddressChanged
+  > handleTroveManagerAddressChanged
+contract (trove-manager)
+  > handleBaseRateUpdated
+  > handleBorrowerOperationsAddressChanged
+  > handleCollTokenManagerAddressChanged
+  > handleDebtTokenManagerAddressChanged
+  > handleLTermsUpdated
+  > handleLastFeeOpTimeUpdated
+  > handleLiquidation
+  > handleOwnershipTransferred
+  > handlePriceFeedAddressChanged
+  > handleRedemption
+  > handleStabilityPoolManagerAddressChanged
+  > handleStoragePoolAddressChanged
+  > handleSystemSnapshotsUpdated
+  > handleTotalStakesUpdated
+  > handleTroveIndexUpdated
+  > handleTroveLiquidated
+  > handleTroveSnapshotsUpdated
+  > handleTroveUpdated

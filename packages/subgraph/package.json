@@ -11,7 +11,7 @@
     "test:unit": "graph test",
     "test:unit:local": "graph test -d",
     "prettier:check": "prettier --check **/*.{js,jsx,mjs,ts,tsx,json,css,md}",
-    "create:overview": "node createEventOverview.js"
+    "create:overview": "node scripts/createEventOverview.js && node scripts/createLeftoverEventOverview.js"
   },
   "installConfig": {
     "hoistingLimits": "workspaces"
