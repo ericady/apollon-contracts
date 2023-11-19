@@ -1,6 +1,6 @@
 import { Address, BigInt, ethereum } from '@graphprotocol/graph-ts';
-import { TroveManager } from '../generated/TroveManager/TroveManager';
-import { CollateralTokenMeta } from '../generated/schema';
+import { TroveManager } from '../../generated/TroveManager/TroveManager';
+import { CollateralTokenMeta } from '../../generated/schema';
 
 export function handleNewCollateralTokenMeta(
   event: ethereum.Event,

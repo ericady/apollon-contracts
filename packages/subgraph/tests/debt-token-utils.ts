@@ -4,17 +4,11 @@ import { newMockEvent } from 'matchstick-as';
 import {
   Approval,
   BorrowerOperationsAddressChanged,
-  DebtToken,
   PriceFeedAddressChanged,
   StabilityPoolManagerAddressChanged,
   Transfer,
-  Transfer as TransferEvent,
   TroveManagerAddressChanged,
 } from '../generated/DebtToken/DebtToken';
-import { StabilityPool } from '../generated/StabilityPool/StabilityPool';
-import { StabilityPoolManager } from '../generated/StabilityPoolManager/StabilityPoolManager';
-import { TroveManager } from '../generated/TroveManager/TroveManager';
-import { DebtTokenMeta, Token, UserDebtTokenMeta } from '../generated/schema';
 
 export const MockDebtTokenAddress = EventAddress.fromString('0x0000000000000000000000000000000000000100');
 export const MockStabilityPoolManagerAddress = EventAddress.fromString('0x0000000000000000000000000000000000000200');
@@ -106,101 +100,4 @@ export function createTroveManagerAddressChangedEvent(_newTroveManagerAddress: A
   );
 
   return troveManagerAddressChangedEvent;
-}
-
-// When a Token is created
-export function handleNewToken(event: PriceFeedAddressChanged, tokenAddress: Address): void {
-  let newToken = new Token(tokenAddress);
-
-  const contract = DebtToken.bind(tokenAddress);
-
-  newToken.address = tokenAddress;
-  newToken.symbol = contract.symbol();
-  newToken.createdAt = event.block.timestamp;
-  newToken.priceUSD = contract.getPrice();
-
-  // FIXME: When is this false?
-  newToken.isPoolToken = true;
-
-  newToken.save();
-}
-
-// FIXME: Still needs event implementation
-export function updateTokenPrice(tokenAddress: Address): void {
-  const contract = DebtToken.bind(tokenAddress);
-
-  const token = Token.load(tokenAddress)!;
-  token.priceUSD = contract.getPrice();
-  token.save();
-}
-
-export function handleNewDebtTokenMeta(event: TransferEvent, tokenAddress: Address): void {
-  const debtTokenMeta = new DebtTokenMeta(event.transaction.hash.concatI32(event.logIndex.toI32()));
-
-  const tokenContract = DebtToken.bind(tokenAddress);
-  const debtTokenStabilityPoolManagerContract = StabilityPoolManager.bind(tokenContract.stabilityPoolManagerAddress());
-  const debtTokenStabilityPoolContract = StabilityPool.bind(
-    debtTokenStabilityPoolManagerContract.getStabilityPool(tokenAddress),
-  );
-
-  debtTokenMeta.token = tokenAddress;
-  debtTokenMeta.timestamp = event.block.timestamp;
-  debtTokenMeta.totalSupplyUSD = tokenContract.totalSupply().times(tokenContract.getPrice());
-
-  debtTokenMeta.stabilityDepositAPY = debtTokenStabilityPoolContract.getStabilityAPY();
-  debtTokenMeta.totalDepositedStability = debtTokenStabilityPoolContract.getTotalDeposit();
-  // TODO: Find the right contracts for it and implement getters
-  debtTokenMeta.totalReserve = BigInt.fromI32(0);
-
-  debtTokenMeta.save();
-}
-
-export function updateUserDebtTokenMeta(
-  tokenAddress: Address,
-  borrower: Address,
-  newProvidedStablitySinceLastCollClaim?: BigInt,
-): void {
-  let userDebtTokenMeta = UserDebtTokenMeta.load(
-    `UserDebtTokenMeta-${tokenAddress.toHexString()}-${borrower.toHexString()}`,
-  );
-  if (!userDebtTokenMeta) {
-    userDebtTokenMeta = new UserDebtTokenMeta(
-      `UserDebtTokenMeta-${tokenAddress.toHexString()}-${borrower.toHexString()}`,
-    );
-  }
-
-  const tokenContract = DebtToken.bind(tokenAddress);
-  const troveManagerContract = TroveManager.bind(tokenContract.troveManagerAddress());
-
-  userDebtTokenMeta.token = tokenAddress;
-
-  userDebtTokenMeta.borrower = borrower;
-  userDebtTokenMeta.walletAmount = tokenContract.balanceOf(borrower);
-
-  const trove = troveManagerContract.getTroveDebt(borrower);
-
-  // Clossure not supported yet
-  let troveIndex = -1;
-  const targetAddress = tokenAddress;
-  for (let i = 0; i < trove.length; i++) {
-    if (trove[i].tokenAddress.toHexString() == targetAddress.toHexString()) {
-      troveIndex = i;
-      break;
-    }
-  }
-  const troveMintedAmount = trove[troveIndex].amount;
-
-  userDebtTokenMeta.troveMintedAmount = troveMintedAmount;
-
-  if (newProvidedStablitySinceLastCollClaim) {
-    userDebtTokenMeta.providedStablitySinceLastCollClaim = newProvidedStablitySinceLastCollClaim;
-  } else {
-    userDebtTokenMeta.providedStablitySinceLastCollClaim = userDebtTokenMeta.providedStablitySinceLastCollClaim;
-  }
-
-  const stabilityPoolManagerContract = StabilityPoolManager.bind(tokenContract.stabilityPoolManagerAddress());
-  const stabilityPoolContract = StabilityPool.bind(stabilityPoolManagerContract.getStabilityPool(tokenAddress));
-  userDebtTokenMeta.stabilityCompoundAmount = stabilityPoolContract.getCompoundedDebtDeposit(borrower);
-
-  userDebtTokenMeta.save();
 }

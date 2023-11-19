@@ -19,7 +19,7 @@ import {
   TroveSnapshotsUpdated as TroveSnapshotsUpdatedEvent,
   TroveUpdated as TroveUpdatedEvent,
 } from '../generated/TroveManager/TroveManager';
-import { handleNewCollateralTokenMeta } from '../tests/collateral-token-utils';
+import { handleNewCollateralTokenMeta } from './entities/collateral-token-entity';
 
 export function handleBaseRateUpdated(event: BaseRateUpdatedEvent): void {}
 

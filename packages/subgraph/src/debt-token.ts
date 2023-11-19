@@ -6,7 +6,8 @@ import {
   Transfer as TransferEvent,
   TroveManagerAddressChanged as TroveManagerAddressChangedEvent,
 } from '../generated/DebtToken/DebtToken';
-import { handleNewDebtTokenMeta, handleNewToken } from '../tests/debt-token-utils';
+import { handleNewToken } from './entities/debt-token-entity';
+import { handleNewDebtTokenMeta } from './entities/debt-token-meta-entity';
 
 export function handleBorrowerOperationsAddressChanged(event: BorrowerOperationsAddressChangedEvent): void {}
 

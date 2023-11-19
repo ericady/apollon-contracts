@@ -16,7 +16,7 @@ import {
   UserClaimedRewards as UserClaimedRewardsEvent,
   UserDepositChanged as UserDepositChangedEvent,
 } from '../generated/StabilityPool/StabilityPool';
-import { updateUserDebtTokenMeta } from '../tests/debt-token-utils';
+import { updateUserDebtTokenMeta } from './entities/user-debt-token-meta-entity';
 
 export function handleDepositSnapshotUpdated(event: DepositSnapshotUpdatedEvent): void {}
 
