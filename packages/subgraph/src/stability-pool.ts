@@ -16,7 +16,7 @@ import {
   UserClaimedRewards as UserClaimedRewardsEvent,
   UserDepositChanged as UserDepositChangedEvent,
 } from '../generated/StabilityPool/StabilityPool';
-import { updateUserDebtTokenMeta } from './entities/user-debt-token-meta-entity';
+import { handleCreateUpdateUserDebtTokenMeta } from './entities/user-debt-token-meta-entity';
 
 export function handleDepositSnapshotUpdated(event: DepositSnapshotUpdatedEvent): void {}
 
@@ -51,7 +51,7 @@ export function handleUserClaimedRewards(event: UserClaimedRewardsEvent): void {
   const tokenAddress = StabilityPoolContract.getDepositToken();
   const depositAfterClaim = StabilityPoolContract.deposits(event.params.user);
 
-  updateUserDebtTokenMeta(tokenAddress, event.params.user, depositAfterClaim);
+  handleCreateUpdateUserDebtTokenMeta(tokenAddress, event.params.user, depositAfterClaim);
 }
 
 export function handleUserDepositChanged(event: UserDepositChangedEvent): void {

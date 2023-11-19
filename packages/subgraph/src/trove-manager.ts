@@ -19,7 +19,7 @@ import {
   TroveSnapshotsUpdated as TroveSnapshotsUpdatedEvent,
   TroveUpdated as TroveUpdatedEvent,
 } from '../generated/TroveManager/TroveManager';
-import { handleNewCollateralTokenMeta } from './entities/collateral-token-entity';
+import { handleCreateCollateralTokenMeta } from './entities/collateral-token-meta-entity';
 
 export function handleBaseRateUpdated(event: BaseRateUpdatedEvent): void {}
 
@@ -59,6 +59,6 @@ export function handleTroveUpdated(event: TroveUpdatedEvent): void {}
 
 export function handleCollateralUpdated(event: CollateralUpdatedEvent): void {
   for (let i = 0; i < event.params._collTokens.length; i++) {
-    handleNewCollateralTokenMeta(event, event.params._collTokens[i], event.address);
+    handleCreateCollateralTokenMeta(event, event.params._collTokens[i], event.address);
   }
 }

@@ -2,7 +2,7 @@ import { Address, ethereum } from '@graphprotocol/graph-ts';
 import { DebtToken } from '../../generated/DebtToken/DebtToken';
 import { Token } from '../../generated/schema';
 
-export function handleNewToken(event: ethereum.Event, tokenAddress: Address): void {
+export function handleCreateToken(event: ethereum.Event, tokenAddress: Address): void {
   let newToken = new Token(tokenAddress);
 
   const contract = DebtToken.bind(tokenAddress);
@@ -18,8 +18,7 @@ export function handleNewToken(event: ethereum.Event, tokenAddress: Address): vo
   newToken.save();
 }
 
-// FIXME: Still needs event implementation
-export function updateTokenPrice(tokenAddress: Address): void {
+export function handleUpdateTokenPriceUSD(tokenAddress: Address): void {
   const contract = DebtToken.bind(tokenAddress);
 
   const token = Token.load(tokenAddress)!;

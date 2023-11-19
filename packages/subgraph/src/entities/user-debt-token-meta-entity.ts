@@ -5,7 +5,7 @@ import { StabilityPoolManager } from '../../generated/StabilityPoolManager/Stabi
 import { TroveManager } from '../../generated/TroveManager/TroveManager';
 import { UserDebtTokenMeta } from '../../generated/schema';
 
-export function updateUserDebtTokenMeta(
+export function handleCreateUpdateUserDebtTokenMeta(
   tokenAddress: Address,
   borrower: Address,
   newProvidedStablitySinceLastCollClaim?: BigInt,

@@ -6,8 +6,8 @@ import {
   Transfer as TransferEvent,
   TroveManagerAddressChanged as TroveManagerAddressChangedEvent,
 } from '../generated/DebtToken/DebtToken';
-import { handleNewToken } from './entities/debt-token-entity';
-import { handleNewDebtTokenMeta } from './entities/debt-token-meta-entity';
+import { handleCreateDebtTokenMeta } from './entities/debt-token-meta-entity';
+import { handleCreateToken } from './entities/token-entity';
 
 export function handleBorrowerOperationsAddressChanged(event: BorrowerOperationsAddressChangedEvent): void {}
 
@@ -16,12 +16,12 @@ export function handleTroveManagerAddressChanged(event: TroveManagerAddressChang
 export function handleStabilityPoolManagerAddressChanged(event: StabilityPoolManagerAddressChangedEvent): void {}
 
 export function handlePriceFeedAddressChanged(event: PriceFeedAddressChangedEvent): void {
-  handleNewToken(event, event.address);
+  handleCreateToken(event, event.address);
 }
 
 export function handleTransfer(event: TransferEvent): void {
   // Because totalSupplyUSD has changed
-  handleNewDebtTokenMeta(event, event.address);
+  handleCreateDebtTokenMeta(event, event.address);
 }
 
 export function handleApproval(event: ApprovalEvent): void {}

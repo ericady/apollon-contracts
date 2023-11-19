@@ -4,7 +4,7 @@ import { StabilityPool } from '../../generated/StabilityPool/StabilityPool';
 import { StabilityPoolManager } from '../../generated/StabilityPoolManager/StabilityPoolManager';
 import { DebtTokenMeta } from '../../generated/schema';
 
-export function handleNewDebtTokenMeta(event: ethereum.Event, tokenAddress: Address): void {
+export function handleCreateDebtTokenMeta(event: ethereum.Event, tokenAddress: Address): void {
   const debtTokenMeta = new DebtTokenMeta(event.transaction.hash.concatI32(event.logIndex.toI32()));
 
   const tokenContract = DebtToken.bind(tokenAddress);
