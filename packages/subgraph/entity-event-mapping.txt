@@ -1,0 +1,26 @@
+contract (debt-token)
+  ~ debt-token-meta-entity
+    > handleCreateDebtTokenMeta
+  ~ token-entity
+    > handleCreateToken
+contract (collateral-token-meta-entity)
+  ~ collateral-token-meta-entity
+    > handleCreateCollateralTokenMeta
+contract (debt-token-meta-entity)
+  ~ debt-token-meta-entity
+    > handleCreateDebtTokenMeta
+contract (token-entity)
+  ~ token-entity
+    > handleCreateToken
+    > handleUpdateTokenPriceUSD
+contract (user-debt-token-meta-entity)
+  ~ user-debt-token-meta-entity
+    > handleCreateUpdateUserDebtTokenMeta
+contract (stability-pool-manager)
+contract (stability-pool)
+  ~ user-debt-token-meta-entity
+    > handleCreateUpdateUserDebtTokenMeta
+contract (storage-pool)
+contract (trove-manager)
+  ~ collateral-token-meta-entity
+    > handleCreateCollateralTokenMeta

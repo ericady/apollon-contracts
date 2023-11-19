@@ -10,7 +10,8 @@
     "deploy-local": "graph deploy --node http://localhost:8020/ --ipfs http://localhost:5001 subgraph",
     "test:unit": "graph test",
     "test:unit:local": "graph test -d",
-    "prettier:check": "prettier --check **/*.{js,jsx,mjs,ts,tsx,json,css,md}"
+    "prettier:check": "prettier --check **/*.{js,jsx,mjs,ts,tsx,json,css,md}",
+    "create:overview": "node createEventOverview.js"
   },
   "installConfig": {
     "hoistingLimits": "workspaces"
