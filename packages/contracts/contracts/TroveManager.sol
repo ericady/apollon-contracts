@@ -15,6 +15,7 @@ import './Interfaces/IStoragePool.sol';
 import './Interfaces/IStabilityPoolManager.sol';
 import './Interfaces/IBBase.sol';
 import './Interfaces/ICollTokenManager.sol';
+import 'hardhat/console.sol';
 
 contract TroveManager is LiquityBase, Ownable, CheckContract, ITroveManager {
   string public constant NAME = 'TroveManager';
@@ -84,18 +85,18 @@ contract TroveManager is LiquityBase, Ownable, CheckContract, ITroveManager {
   mapping(address => Trove) public Troves;
 
   // stakes gets stored relative to the coll token, total stake needs to be calculated on runtime using token prices
+  // in token amount (not usd)
   mapping(address => uint) public totalStakes; // [collTokenAddress] => total system stake, relative to the coll token
   mapping(address => uint) public totalStakesSnapshot; // [collTokenAddress] => system stake, taken immediately after the latest liquidation (without default pool / rewards)
   mapping(address => uint) public totalCollateralSnapshots; // [collTokenAddress] => system stake, taken immediately after the latest liquidation (including default pool / rewards)
 
-  /*
-   * L_Tokens track the sums of accumulated liquidation rewards per unit staked. During its lifetime, each stake earns:
-   *
-   * A gain of ( stake * [L_TOKEN[T] - L_TOKEN[T](0)] )
-   * Where L_TOKEN[T](0) are snapshots of token T for the active Trove taken at the instant the stake was made
-   */
-  mapping(address => mapping(bool => uint)) public liquidatedTokens; // [tokenAddress][isColl] -> liquidated/redistributed amount, per unit staked, in USD
-  mapping(address => mapping(address => mapping(bool => uint))) public rewardSnapshots; // [user][tokenAddress][isColl] -> value, snapshot amount, per unit staked, in USD
+  // L_Tokens track the sums of accumulated liquidation rewards per unit staked. During its lifetime, each stake earns:
+  // A gain of ( stake * [L_TOKEN[T] - L_TOKEN[T](0)] )
+  // Where L_TOKEN[T](0) are snapshots of token T for the active Trove taken at the instant the stake was made
+  //
+  // in token amount (not usd)
+  mapping(address => mapping(bool => uint)) public liquidatedTokens; // [tokenAddress][isColl] -> liquidated/redistributed amount, per unit staked
+  mapping(address => mapping(address => mapping(bool => uint))) public rewardSnapshots; // [user][tokenAddress][isColl] -> value, snapshot amount, per unit staked
   mapping(address => mapping(bool => uint)) public lastErrorRedistribution; // [tokenAddress][isColl] -> value, Error trackers for the trove redistribution calculation
 
   // Array of all active trove addresses - used to to compute an approximate hint off-chain, for the sorted list insertion
@@ -841,8 +842,8 @@ contract TroveManager is LiquityBase, Ownable, CheckContract, ITroveManager {
     uint rewardPerUnitStaked = liquidatedTokens[_tokenAddress][_isColl] - snapshotValue;
     if (rewardPerUnitStaked == 0 || Troves[_borrower].status != Status.active) return 0;
 
-    uint stake = _calculateTrovesStake(_borrower);
-    pendingReward = (stake * rewardPerUnitStaked) / DECIMAL_PRECISION;
+    uint trovesStakeInUSD = _calculateTrovesStake(_borrower);
+    pendingReward = (trovesStakeInUSD * rewardPerUnitStaked) / DECIMAL_PRECISION;
   }
 
   // Return the Troves entire debt and coll, including pending rewards from redistributions.
@@ -979,16 +980,15 @@ contract TroveManager is LiquityBase, Ownable, CheckContract, ITroveManager {
       if (redistributeEntry.amount == 0) continue;
 
       // Get the per-unit-staked terms
-      uint numerator = redistributeEntry.amount *
-        DECIMAL_PRECISION +
+      uint numerator = redistributeEntry.amount +
         lastErrorRedistribution[redistributeEntry.tokenAddress][redistributeEntry.isColl];
-      uint rewardPerUnitStaked = numerator / totalStake;
-      lastErrorRedistribution[redistributeEntry.tokenAddress][redistributeEntry.isColl] =
-        numerator -
-        (rewardPerUnitStaked * totalStake);
+      uint rewardPerUnitStaked = (numerator * DECIMAL_PRECISION) / totalStake;
 
       // Add per-unit-staked terms to the running totals
       liquidatedTokens[redistributeEntry.tokenAddress][redistributeEntry.isColl] += rewardPerUnitStaked;
+      lastErrorRedistribution[redistributeEntry.tokenAddress][redistributeEntry.isColl] =
+        numerator -
+        ((rewardPerUnitStaked * totalStake) / DECIMAL_PRECISION);
 
       // todo
       // emit LTermsUpdated(tokenAddress, liquidatedTokens[tokenAddress]);

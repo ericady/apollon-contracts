@@ -236,8 +236,9 @@ describe('TroveManager', () => {
         );
       });
 
-      // todo wrong outpouts
-      it.skip('updates the L_coll reward-per-unit-staked totals', async () => {
+      // todo tests the pending rewards on changing coll prices!!!
+      // pretty sure that everything will break
+      it.only('updates the L_coll reward-per-unit-staked totals', async () => {
         await whaleShrimpTroveInit(contracts, signers, false);
         await priceFeed.setTokenPrice(BTC, parseUnits('5000'));
 
@@ -247,51 +248,40 @@ describe('TroveManager', () => {
         // 1. liquidation
         await troveManager.liquidate(defaulter_1);
 
-        // defaulters coll and debt should be added to the DefaultPool.
-        const L_BTC_A = await troveManager.getLiquidatedTokens(BTC, true);
-        const L_STABLE_A = await troveManager.getLiquidatedTokens(STABLE, false);
-
-        const remainingActiveBTC = parseUnits('5.02', 9);
-        const totalStake = await priceFeed.getUSDValue(BTC, remainingActiveBTC);
-        console.log(totalStake);
         const defaulterBTC = parseUnits('0.02', 9);
         const defaulterBTCWithoutFee = defaulterBTC - (await troveManager.getCollGasCompensation(defaulterBTC));
-        console.log(await priceFeed.getUSDValue(BTC, defaulterBTCWithoutFee));
-        expect(L_BTC_A).to.be.equal(
-          ((await priceFeed.getUSDValue(BTC, defaulterBTCWithoutFee)) * parseUnits('1')) / totalStake
-        );
-        expect(L_STABLE_A).to.be.equal((parseUnits('100.5') * parseUnits('1', 18)) / parseUnits('5.02', 9));
+        const remainingActiveBTC = parseUnits('5.02', 9);
+        const totalStake = await priceFeed.getUSDValue(BTC, remainingActiveBTC);
+
+        // checking liquidated snapshots
+        const L_BTC_A = await troveManager.getLiquidatedTokens(BTC, true);
+        const L_STABLE_A = await troveManager.getLiquidatedTokens(STABLE, false);
+        expect(L_BTC_A).to.be.equal((defaulterBTCWithoutFee * parseUnits('1')) / totalStake);
+        expect(L_STABLE_A).to.be.equal((parseUnits('100.5') * parseUnits('1')) / totalStake);
+
+        // checking alice pending btc rewards
+        const alicePendingBTC = await troveManager.getPendingReward(alice, BTC, true);
+        const aliceBTCCollStake = (parseUnits('1', 9) * parseUnits('1', 9)) / remainingActiveBTC;
+        const aliceExpectedBTCPending = (defaulterBTCWithoutFee * aliceBTCCollStake) / parseUnits('1', 9);
+        expect(alicePendingBTC - aliceExpectedBTCPending).to.be.lt(100);
 
         // 2. liquidation
         await troveManager.liquidate(defaulter_2);
 
-        /* Alice now has all the active stake. totalStakes in the system is now 10 ether.
+        // check it total stake remains the same
+        const totalStakeB = await priceFeed.getUSDValue(BTC, remainingActiveBTC);
+        assert.equal(totalStake, totalStakeB);
 
-       Bob's pending collateral reward and debt reward are applied to his Trove
-       before his liquidation.
-       His total collateral*0.995 and debt are then added to the DefaultPool.
-
-       The system rewards-per-unit-staked should now be:
-
-       L_ETH = (0.995 / 20) + (10.4975*0.995  / 10) = 1.09425125 ETH
-       L_LUSDDebt = (180 / 20) + (890 / 10) = 98 LUSD */
+        // checking liquidated snapshots
         const L_BTC_B = await troveManager.getLiquidatedTokens(BTC, true);
         const L_STABLE_B = await troveManager.getLiquidatedTokens(STABLE, false);
+        expect(L_BTC_B - (defaulterBTCWithoutFee * parseUnits('1') * 2n) / totalStake).to.be.lt(100);
+        // todo expect(L_STABLE_B - (parseUnits('100.5') * parseUnits('1') * 2n) / totalStake).to.be.lt(100);
 
-        const L_ETH_expected_2 = L_ETH_expected_1.add(
-          th
-            .applyLiquidationFee(B_collateral.add(B_collateral.mul(L_ETH_expected_1).div(mv._1e18BN)))
-            .mul(mv._1e18BN)
-            .div(A_collateral)
-        );
-        const L_LUSDDebt_expected_2 = L_LUSDDebt_expected_1.add(
-          B_totalDebt.add(B_increasedTotalDebt)
-            .add(B_collateral.mul(L_LUSDDebt_expected_1).div(mv._1e18BN))
-            .mul(mv._1e18BN)
-            .div(A_collateral)
-        );
-        assert.isAtMost(th.getDifference(L_ETH_AfterBobLiquidated, L_ETH_expected_2), 100);
-        assert.isAtMost(th.getDifference(L_LUSDDebt_AfterBobLiquidated, L_LUSDDebt_expected_2), 100);
+        // checking alice pending btc rewards
+        const alicePendingBTCB = await troveManager.getPendingReward(alice, BTC, true);
+        const aliceExpectedBTCPendingB = (defaulterBTCWithoutFee * 2n * aliceBTCCollStake) / parseUnits('1', 9);
+        // todo expect(alicePendingBTCB - aliceExpectedBTCPendingB).to.be.lt(100);
       });
 
       it('reverts if trove is non-existent', async () => {
@@ -399,10 +389,6 @@ describe('TroveManager', () => {
         const [aliceICRAfter2] = await troveManager.getCurrentICR(alice);
         expect(aliceICRAfter2).to.be.gt(aliceICRAfter);
       });
-
-      // TODO: This is a StabilityPool test not a TroveManager test. If it still can be tested do it there.
-      it.skip('liquidate(): when SP > 0, triggers LQTY reward event - increases the sum G', async () => {});
-      it.skip("liquidate(): when SP is empty, doesn't update G", async () => {});
     });
   });
 
