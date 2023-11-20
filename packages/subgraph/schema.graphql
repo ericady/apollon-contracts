@@ -21,6 +21,7 @@ type DebtTokenMeta @entity(immutable: true) {
   timestamp: BigInt!
 
   # global
+  # TODO: Must be calculated in the subgraph
   stabilityDepositAPY: BigInt!
   totalDepositedStability: BigInt!
   totalReserve: BigInt!
@@ -64,4 +65,86 @@ type UserCollateralTokenMeta @entity {
   walletAmount: BigInt!
   troveLockedAmount: BigInt!
   stabilityGainedAmount: BigInt!
+}
+
+enum LongShortDirection {
+  LONG
+  SHORT
+}
+
+type Position @entity {
+  # TODO: I need a unqiue ID to fetch the Position once its closed. What could that be?
+  id: String!
+  borrower: Bytes!
+  openedAt: BigInt!
+  closedAt: BigInt # undefined until closed
+  #
+  token: Token! @relation(name: "TokenToPosition")
+  direction: LongShortDirection!
+  size: BigInt! # always positive, applied by direction
+  #
+  totalPriceInStable: BigInt!
+  feesInStable: BigInt! # protocol fees, without gas
+  profitInStable: BigInt # undefined until closed
+}
+
+type PoolLiquidity @entity {
+  # unique Byte combination of tokenA + tokenB
+  id: Bytes!
+  token: Token! @relation(name: "TokenToPoolLiquidity")
+  totalAmount: BigInt!
+}
+
+type UserPoolLiquidity @entity {
+  # "UserPoolLiquidity" + TokenA + TokenB + borrower
+  id: String!
+  borrower: Bytes!
+  token: Token! @relation(name: "TokenToUserPoolLiquidity")
+  borrowerAmount: BigInt!
+}
+
+type PoolReward @entity(immutable: true) {
+  id: Bytes!
+  token: Token! @relation(name: "TokenToPoolReward")
+  amount: BigInt!
+}
+
+type Pool @entity {
+  id: Bytes!
+  borrower: Bytes!
+
+  # Percent value applied when opening the first position for this pool. Can be negative and positive.
+  openingFee: BigInt!
+  # Just linked once, always updated for all users
+  liquidity: [PoolLiquidity!]! @relation(name: "PoolLiquidityToPool")
+  # Always updated on a user basis
+  userLiquidity: [UserPoolLiquidity!]! @relation(name: "UserPoolLiquidityToPool")
+  # Just pushed once, never updated
+  rewards: [PoolReward!]!
+  # TODO: Must be calculated in the subgraph but when
+  liquidityDepositAPY: BigInt!
+
+  # TODO: We need to aggregate all Deposits/Withdrawals and update every time a new Transaction comes in
+  volume24hUSD: PoolVolume24h!
+  # once the first PoolEvent of the array is > 24h ago, we can remove it from the array and push it to the 24hAgo field
+  volume24hUSD24hAgo: PoolVolume24h!
+}
+
+enum LiquidityPoolOperation {
+  DEPOSIT
+  WITHDRAW
+}
+
+type PoolDepositWithdrawEvent @entity(immutable: true) {
+  id: Bytes!
+  type: LiquidityPoolOperation!
+  timestamp: BigInt!
+  value: BigInt!
+}
+
+# Aggregator, pushed old events out and lets new in, recalculating the acc value each time
+type PoolVolume24h @entity {
+  id: Bytes!
+  volumeUSD: BigInt!
+  events: [PoolDepositWithdrawEvent!]!
 }

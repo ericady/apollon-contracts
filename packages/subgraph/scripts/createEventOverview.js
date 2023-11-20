@@ -1,8 +1,8 @@
 const fs = require('fs');
 const path = require('path');
 
-const srcDirectory = './src';
-const entitiesDirectory = './src/entities';
+const srcDirectory = 'src';
+const entitiesDirectory = 'src/entities';
 const outputFile = 'scripts/entity-event-mapping.txt';
 
 // Function to recursively read all files in a directory
