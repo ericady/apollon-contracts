@@ -5,20 +5,7 @@
             {
                 "indexed": false,
                 "internalType": "address",
-                "name": "_newBorrowerOperationsAddress",
-                "type": "address"
-            }
-        ],
-        "name": "BorrowerOperationsAddressChanged",
-        "type": "event"
-    },
-    {
-        "anonymous": false,
-        "inputs": [
-            {
-                "indexed": false,
-                "internalType": "contract IDebtToken",
-                "name": "_debtToken",
+                "name": "_debtTokenAddress",
                 "type": "address"
             }
         ],
@@ -31,37 +18,11 @@
             {
                 "indexed": false,
                 "internalType": "address",
-                "name": "_newPriceFeedAddress",
+                "name": "_stabilityPoolManagerAddress",
                 "type": "address"
             }
         ],
-        "name": "PriceFeedAddressChanged",
-        "type": "event"
-    },
-    {
-        "anonymous": false,
-        "inputs": [
-            {
-                "indexed": false,
-                "internalType": "address",
-                "name": "_newStabilityPoolAddress",
-                "type": "address"
-            }
-        ],
-        "name": "StabilityPoolManagerAddressChanged",
-        "type": "event"
-    },
-    {
-        "anonymous": false,
-        "inputs": [
-            {
-                "indexed": false,
-                "internalType": "address",
-                "name": "_troveManagerAddress",
-                "type": "address"
-            }
-        ],
-        "name": "TroveManagerAddressChanged",
+        "name": "DebtTokenManagerInitialized",
         "type": "event"
     },
     {

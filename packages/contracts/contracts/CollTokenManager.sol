@@ -19,9 +19,8 @@ contract CollTokenManager is Ownable, CheckContract, ICollTokenManager {
 
   function setAddresses(address _priceFeedAddress) external onlyOwner {
     checkContract(_priceFeedAddress);
-
     priceFeedAddress = _priceFeedAddress;
-    emit PriceFeedAddressChanged(_priceFeedAddress);
+    emit CollTokenManagerInitialized(_priceFeedAddress);
 
     // todo addCollToken should be still callable...
     //    _renounceOwnership();

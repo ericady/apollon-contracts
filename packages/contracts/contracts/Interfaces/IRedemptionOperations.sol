@@ -8,14 +8,32 @@ import './IPriceFeed.sol';
 import './IDebtTokenManager.sol';
 
 interface IRedemptionOperations is IBBase {
-  event TroveManagerAddressChanged(address _newTroveManagerAddress);
-  event PriceFeedAddressChanged(address _newPriceFeedAddress);
-  event DebtTokenManagerAddressChanged(address _newDebtTokenManagerAddress);
-  event CollTokenManagerAddressChanged(address _newCollTokenManagerAddress);
-  event StoragePoolAddressChanged(address _storagePoolAddress);
+  // --- structs ---
 
-  event Redemption(uint _attemptedLUSDAmount, uint _actualLUSDAmount, uint _ETHSent, uint _ETHFee);
-  event BaseRateUpdated(uint _baseRate);
+  struct RedemptionCollAmount {
+    address collToken;
+    uint drawn;
+    uint redemptionFee;
+    uint sendToRedeemer;
+  }
+
+  // --- Events ---
+
+  event RedemptionOperationsInitialized(
+    address _troveManager,
+    address _storgePool,
+    address _priceFeed,
+    address _debtTokenManager,
+    address _collTokenManager
+  );
+  event SuccessfulRedemption(
+    uint _attemptedStableAmount,
+    uint _actualStableAmount,
+    RedemptionCollAmount[] _collPayouts
+  );
+  event RedeemedFromTrove(address _borrower, uint stableAmount, TokenAmount[] _drawnCollAmounts);
+
+  // --- Errors ---
 
   error ZeroAmount();
   error InvalidMaxFeePercent();

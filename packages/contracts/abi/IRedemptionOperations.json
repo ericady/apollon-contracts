@@ -44,12 +44,36 @@
         "inputs": [
             {
                 "indexed": false,
+                "internalType": "address",
+                "name": "_borrower",
+                "type": "address"
+            },
+            {
+                "indexed": false,
                 "internalType": "uint256",
-                "name": "_baseRate",
+                "name": "stableAmount",
                 "type": "uint256"
+            },
+            {
+                "components": [
+                    {
+                        "internalType": "address",
+                        "name": "tokenAddress",
+                        "type": "address"
+                    },
+                    {
+                        "internalType": "uint256",
+                        "name": "amount",
+                        "type": "uint256"
+                    }
+                ],
+                "indexed": false,
+                "internalType": "struct IBase.TokenAmount[]",
+                "name": "_drawnCollAmounts",
+                "type": "tuple[]"
             }
         ],
-        "name": "BaseRateUpdated",
+        "name": "RedeemedFromTrove",
         "type": "event"
     },
     {
@@ -58,37 +82,35 @@
             {
                 "indexed": false,
                 "internalType": "address",
-                "name": "_newCollTokenManagerAddress",
+                "name": "_troveManager",
                 "type": "address"
-            }
-        ],
-        "name": "CollTokenManagerAddressChanged",
-        "type": "event"
-    },
-    {
-        "anonymous": false,
-        "inputs": [
+            },
             {
                 "indexed": false,
                 "internalType": "address",
-                "name": "_newDebtTokenManagerAddress",
+                "name": "_storgePool",
                 "type": "address"
-            }
-        ],
-        "name": "DebtTokenManagerAddressChanged",
-        "type": "event"
-    },
-    {
-        "anonymous": false,
-        "inputs": [
+            },
             {
                 "indexed": false,
                 "internalType": "address",
-                "name": "_newPriceFeedAddress",
+                "name": "_priceFeed",
+                "type": "address"
+            },
+            {
+                "indexed": false,
+                "internalType": "address",
+                "name": "_debtTokenManager",
+                "type": "address"
+            },
+            {
+                "indexed": false,
+                "internalType": "address",
+                "name": "_collTokenManager",
                 "type": "address"
             }
         ],
-        "name": "PriceFeedAddressChanged",
+        "name": "RedemptionOperationsInitialized",
         "type": "event"
     },
     {
@@ -97,55 +119,45 @@
             {
                 "indexed": false,
                 "internalType": "uint256",
-                "name": "_attemptedLUSDAmount",
+                "name": "_attemptedStableAmount",
                 "type": "uint256"
             },
             {
                 "indexed": false,
                 "internalType": "uint256",
-                "name": "_actualLUSDAmount",
+                "name": "_actualStableAmount",
                 "type": "uint256"
             },
             {
+                "components": [
+                    {
+                        "internalType": "address",
+                        "name": "collToken",
+                        "type": "address"
+                    },
+                    {
+                        "internalType": "uint256",
+                        "name": "drawn",
+                        "type": "uint256"
+                    },
+                    {
+                        "internalType": "uint256",
+                        "name": "redemptionFee",
+                        "type": "uint256"
+                    },
+                    {
+                        "internalType": "uint256",
+                        "name": "sendToRedeemer",
+                        "type": "uint256"
+                    }
+                ],
                 "indexed": false,
-                "internalType": "uint256",
-                "name": "_ETHSent",
-                "type": "uint256"
-            },
-            {
-                "indexed": false,
-                "internalType": "uint256",
-                "name": "_ETHFee",
-                "type": "uint256"
+                "internalType": "struct IRedemptionOperations.RedemptionCollAmount[]",
+                "name": "_collPayouts",
+                "type": "tuple[]"
             }
         ],
-        "name": "Redemption",
-        "type": "event"
-    },
-    {
-        "anonymous": false,
-        "inputs": [
-            {
-                "indexed": false,
-                "internalType": "address",
-                "name": "_storagePoolAddress",
-                "type": "address"
-            }
-        ],
-        "name": "StoragePoolAddressChanged",
-        "type": "event"
-    },
-    {
-        "anonymous": false,
-        "inputs": [
-            {
-                "indexed": false,
-                "internalType": "address",
-                "name": "_newTroveManagerAddress",
-                "type": "address"
-            }
-        ],
-        "name": "TroveManagerAddressChanged",
+        "name": "SuccessfulRedemption",
         "type": "event"
     },
     {

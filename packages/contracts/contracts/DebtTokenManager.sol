@@ -13,10 +13,6 @@ import './Interfaces/IStabilityPoolManager.sol';
 contract DebtTokenManager is Ownable, CheckContract, IDebtTokenManager {
   string public constant NAME = 'DTokenManager';
 
-  // todo not in use...
-  address public troveManagerAddress;
-  address public borrowerOperationsAddress;
-  address public priceFeedAddress;
   IStabilityPoolManager public stabilityPoolManager;
 
   // --- Data structures ---
@@ -28,28 +24,10 @@ contract DebtTokenManager is Ownable, CheckContract, IDebtTokenManager {
 
   // --- Dependency setter ---
 
-  function setAddresses(
-    address _troveManagerAddress,
-    address _borrowerOperationsAddress,
-    address _stabilityPoolManagerAddress,
-    address _priceFeedAddress
-  ) external onlyOwner {
-    checkContract(_troveManagerAddress);
+  function setAddresses(address _stabilityPoolManagerAddress) external onlyOwner {
     checkContract(_stabilityPoolManagerAddress);
-    checkContract(_borrowerOperationsAddress);
-    checkContract(_priceFeedAddress);
-
-    troveManagerAddress = _troveManagerAddress;
-    emit TroveManagerAddressChanged(_troveManagerAddress);
-
     stabilityPoolManager = IStabilityPoolManager(_stabilityPoolManagerAddress);
-    emit StabilityPoolManagerAddressChanged(_stabilityPoolManagerAddress);
-
-    borrowerOperationsAddress = _borrowerOperationsAddress;
-    emit BorrowerOperationsAddressChanged(_borrowerOperationsAddress);
-
-    priceFeedAddress = _priceFeedAddress;
-    emit PriceFeedAddressChanged(_priceFeedAddress);
+    emit DebtTokenManagerInitialized(_stabilityPoolManagerAddress);
 
     // todo addDebtToken should be still callable...
     //    _renounceOwnership();
@@ -90,8 +68,9 @@ contract DebtTokenManager is Ownable, CheckContract, IDebtTokenManager {
     debtTokenAddresses.push(_debtTokenAddress);
     debtTokens[_debtTokenAddress] = debtToken;
     if (isStableCoin) stableCoin = debtToken;
-    emit DebtTokenAdded(debtToken);
 
     stabilityPoolManager.addStabilityPool(debtToken);
+
+    emit DebtTokenAdded(_debtTokenAddress);
   }
 }

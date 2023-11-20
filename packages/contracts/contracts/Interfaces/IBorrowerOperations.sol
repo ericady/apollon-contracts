@@ -6,18 +6,27 @@ import './IBBase.sol';
 
 // Common interface for the Trove Manager.
 interface IBorrowerOperations is IBBase {
+  enum BorrowerOperation {
+    openTrove,
+    addColl,
+    withdrawColl,
+    increaseDebt,
+    repayDebt,
+    closeTrove
+  }
+
   // --- Events ---
 
-  event TroveManagerAddressChanged(address _newTroveManagerAddress);
-  event StoragePoolAddressChanged(address _storagePoolAddress);
-  event StabilityPoolAddressChanged(address _stabilityPoolAddress);
-  event PriceFeedAddressChanged(address _newPriceFeedAddress);
-  event DebtTokenManagerAddressChanged(address _debtTokenManagerAddress);
-  event CollTokenManagerAddressChanged(address _collTokenManagerAddress);
-
-  event TroveCreated(address indexed _borrower, uint arrayIndex);
-  event TroveUpdated(address indexed _borrower, uint _debt, uint _coll, uint stake);
-  event LUSDBorrowingFeePaid(address indexed _borrower, uint _LUSDFee);
+  event BorrowerOperationsInitialized(
+    address _troveManagerAddress,
+    address _storagePoolAddress,
+    address _stabilityPoolAddress,
+    address _priceFeedAddress,
+    address _debtTokenManagerAddress,
+    address _collTokenManagerAddress
+  );
+  event TroveCreated(address _borrower, uint arrayIndex);
+  event TroveOperation(address _borrower, BorrowerOperation _operation, uint _paidBorrowingFeeInStable);
 
   // --- Custom Errors ---
 

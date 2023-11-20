@@ -4,9 +4,8 @@ pragma solidity ^0.8.9;
 
 interface ICollTokenManager {
   // --- Events ---
-
+  event CollTokenManagerInitialized(address _priceFeedAddress);
   event CollTokenAdded(address _collTokenAddress);
-  event PriceFeedAddressChanged(address _newPriceFeedAddress);
 
   // --- Custom Errors ---
   error TokenAlreadyAdded();

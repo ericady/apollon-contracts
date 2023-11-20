@@ -101,12 +101,7 @@ export const connectCoreContracts = async (contracts: Contracts) => {
     contracts.priceFeed
   );
 
-  await contracts.debtTokenManager.setAddresses(
-    contracts.troveManager,
-    contracts.borrowerOperations,
-    contracts.stabilityPoolManager,
-    contracts.priceFeed
-  );
+  await contracts.debtTokenManager.setAddresses(contracts.stabilityPoolManager);
 
   await contracts.collTokenManager.setAddresses(contracts.priceFeed);
 

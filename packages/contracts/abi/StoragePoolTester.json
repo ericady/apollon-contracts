@@ -23,19 +23,6 @@
         "anonymous": false,
         "inputs": [
             {
-                "indexed": false,
-                "internalType": "address",
-                "name": "_newBorrowerOperationsAddress",
-                "type": "address"
-            }
-        ],
-        "name": "BorrowerOperationsAddressChanged",
-        "type": "event"
-    },
-    {
-        "anonymous": false,
-        "inputs": [
-            {
                 "indexed": true,
                 "internalType": "address",
                 "name": "previousOwner",
@@ -49,6 +36,43 @@
             }
         ],
         "name": "OwnershipTransferred",
+        "type": "event"
+    },
+    {
+        "anonymous": false,
+        "inputs": [
+            {
+                "indexed": false,
+                "internalType": "address",
+                "name": "_borrowerOperationsAddress",
+                "type": "address"
+            },
+            {
+                "indexed": false,
+                "internalType": "address",
+                "name": "_troveManagerAddress",
+                "type": "address"
+            },
+            {
+                "indexed": false,
+                "internalType": "address",
+                "name": "_redemptionOperationsAddress",
+                "type": "address"
+            },
+            {
+                "indexed": false,
+                "internalType": "address",
+                "name": "_stabilityPoolManagerAddress",
+                "type": "address"
+            },
+            {
+                "indexed": false,
+                "internalType": "address",
+                "name": "_priceFeedAddress",
+                "type": "address"
+            }
+        ],
+        "name": "StoragePoolInitialized",
         "type": "event"
     },
     {
@@ -79,46 +103,7 @@
                 "type": "uint256"
             }
         ],
-        "name": "PoolValueUpdated",
-        "type": "event"
-    },
-    {
-        "anonymous": false,
-        "inputs": [
-            {
-                "indexed": false,
-                "internalType": "address",
-                "name": "_newPriceFeedAddress",
-                "type": "address"
-            }
-        ],
-        "name": "PriceFeedAddressChanged",
-        "type": "event"
-    },
-    {
-        "anonymous": false,
-        "inputs": [
-            {
-                "indexed": false,
-                "internalType": "address",
-                "name": "_newStabilityPoolAddress",
-                "type": "address"
-            }
-        ],
-        "name": "StabilityPoolManagerAddressChanged",
-        "type": "event"
-    },
-    {
-        "anonymous": false,
-        "inputs": [
-            {
-                "indexed": false,
-                "internalType": "address",
-                "name": "_newTroveManagerAddress",
-                "type": "address"
-            }
-        ],
-        "name": "TroveManagerAddressChanged",
+        "name": "StoragePoolValueUpdated",
         "type": "event"
     },
     {

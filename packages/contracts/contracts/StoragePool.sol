@@ -52,18 +52,18 @@ contract StoragePool is LiquityBase, Ownable, CheckContract, IStoragePool {
     checkContract(_priceFeedAddress);
 
     borrowerOperationsAddress = _borrowerOperationsAddress;
-    emit BorrowerOperationsAddressChanged(_borrowerOperationsAddress);
-
     troveManagerAddress = _troveManagerAddress;
-    emit TroveManagerAddressChanged(_troveManagerAddress);
-
     redemptionOperationsAddress = _redemptionOperationsAddress;
-
     stabilityPoolManagerAddress = _stabilityPoolManagerAddress;
-    emit StabilityPoolManagerAddressChanged(_stabilityPoolManagerAddress);
-
     priceFeed = IPriceFeed(_priceFeedAddress);
-    emit PriceFeedAddressChanged(_priceFeedAddress);
+
+    emit StoragePoolInitialized(
+      _borrowerOperationsAddress,
+      _troveManagerAddress,
+      _redemptionOperationsAddress,
+      _stabilityPoolManagerAddress,
+      _priceFeedAddress
+    );
 
     renounceOwnership();
   }
@@ -90,7 +90,7 @@ contract StoragePool is LiquityBase, Ownable, CheckContract, IStoragePool {
 
     entry.poolTypes[_poolType] += _amount;
     entry.totalAmount += _amount;
-    emit PoolValueUpdated(_tokenAddress, _isColl, _poolType, entry.poolTypes[_poolType]);
+    emit StoragePoolValueUpdated(_tokenAddress, _isColl, _poolType, entry.poolTypes[_poolType]);
   }
 
   function subtractValue(address _tokenAddress, bool _isColl, PoolType _poolType, uint _amount) external override {
@@ -112,12 +112,11 @@ contract StoragePool is LiquityBase, Ownable, CheckContract, IStoragePool {
 
   function _subtractValue(address _tokenAddress, bool _isColl, PoolType _poolType, uint _amount) internal {
     PoolEntry storage entry = poolEntries[_tokenAddress][_isColl];
-    // FIXME: Throw this rather when the requested pool of the entry is not there so the caller knows the issue?
     require(entry.exists, 'StoragePool: PoolEntry does not exist');
 
     entry.poolTypes[_poolType] -= _amount;
     entry.totalAmount -= _amount;
-    emit PoolValueUpdated(_tokenAddress, _isColl, _poolType, entry.poolTypes[_poolType]);
+    emit StoragePoolValueUpdated(_tokenAddress, _isColl, _poolType, entry.poolTypes[_poolType]);
   }
 
   function transferBetweenTypes(
@@ -129,37 +128,36 @@ contract StoragePool is LiquityBase, Ownable, CheckContract, IStoragePool {
   ) external override {
     _requireCallerIsBOorTroveMorSPorRO();
 
-    // FIXME: Throw this rather when the requested pool of the entry is not there so the caller knows the issue?
     PoolEntry storage entry = poolEntries[_tokenAddress][_isColl];
     require(entry.exists, 'StoragePool: PoolEntry does not exist');
 
     entry.poolTypes[_fromType] -= _amount;
-    emit PoolValueUpdated(_tokenAddress, _isColl, _fromType, entry.poolTypes[_fromType]);
+    emit StoragePoolValueUpdated(_tokenAddress, _isColl, _fromType, entry.poolTypes[_fromType]);
 
     entry.poolTypes[_toType] += _amount;
-    emit PoolValueUpdated(_tokenAddress, _isColl, _toType, entry.poolTypes[_toType]);
+    emit StoragePoolValueUpdated(_tokenAddress, _isColl, _toType, entry.poolTypes[_toType]);
   }
 
   function getEntireSystemColl() external view returns (uint entireSystemColl) {
     IPriceFeed priceFeedCached = priceFeed;
-    for (uint i = 0; i < collTokenAddresses.length; i++) {
-      // TODO: should surplus or gas be excluded?
+    for (uint i = 0; i < collTokenAddresses.length; i++)
       entireSystemColl += priceFeedCached.getUSDValue(
         collTokenAddresses[i],
         poolEntries[collTokenAddresses[i]][true].totalAmount
       );
-    }
+
+    return entireSystemColl;
   }
 
   function getEntireSystemDebt() external view returns (uint entireSystemDebt) {
     IPriceFeed priceFeedCached = priceFeed;
-    for (uint i = 0; i < debtTokenAddresses.length; i++) {
-      // TODO: should surplus or gas be excluded?
+    for (uint i = 0; i < debtTokenAddresses.length; i++)
       entireSystemDebt += priceFeedCached.getUSDValue(
         debtTokenAddresses[i],
         poolEntries[debtTokenAddresses[i]][false].totalAmount
       );
-    }
+
+    return entireSystemDebt;
   }
 
   function checkRecoveryMode()
@@ -175,7 +173,6 @@ contract StoragePool is LiquityBase, Ownable, CheckContract, IStoragePool {
 
   // --- 'require' functions ---
 
-  // TODO: Some functions are never called by all of these contracts. Implement individual checkers for possibly better security and gas usage.
   function _requireCallerIsBOorTroveMorSPorRO() internal view {
     if (
       msg.sender != borrowerOperationsAddress &&

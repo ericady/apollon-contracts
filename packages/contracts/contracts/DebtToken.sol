@@ -80,18 +80,10 @@ contract DebtToken is CheckContract, IDebtToken {
     checkContract(_priceFeedAddress);
 
     troveManagerAddress = _troveManagerAddress;
-    emit TroveManagerAddressChanged(_troveManagerAddress);
-
     redemptionOperationsAddress = _redemptionOperationsAddress;
-
     borrowerOperationsAddress = _borrowerOperationsAddress;
-    emit BorrowerOperationsAddressChanged(_borrowerOperationsAddress);
-
     stabilityPoolManagerAddress = _stabilityPoolManagerAddress;
-    emit StabilityPoolManagerAddressChanged(_stabilityPoolManagerAddress);
-
     priceFeed = IPriceFeed(_priceFeedAddress);
-    emit PriceFeedAddressChanged(_priceFeedAddress);
 
     _NAME = _name;
     _SYMBOL = _symbol;

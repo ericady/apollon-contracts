@@ -164,25 +164,22 @@ contract TroveManager is LiquityBase, Ownable, CheckContract, ITroveManager {
     checkContract(_collTokenManagerAddress);
 
     borrowerOperationsAddress = _borrowerOperationsAddress;
-    emit BorrowerOperationsAddressChanged(_borrowerOperationsAddress);
-
     redemptionManagerAddress = _redemptionManagerAddress;
-    emit RedemptionManagerAddressChanged(_redemptionManagerAddress);
-
     storagePool = IStoragePool(_storagePoolAddress);
-    emit StoragePoolAddressChanged(_storagePoolAddress);
-
     stabilityPoolManager = IStabilityPoolManager(_stabilityPoolManagerAddress);
-    emit StabilityPoolManagerAddressChanged(_stabilityPoolManagerAddress);
-
     priceFeed = IPriceFeed(_priceFeedAddress);
-    emit PriceFeedAddressChanged(_priceFeedAddress);
-
     debtTokenManager = IDebtTokenManager(_debtTokenManagerAddress);
-    emit DebtTokenManagerAddressChanged(_debtTokenManagerAddress);
-
     collTokenManager = ICollTokenManager(_collTokenManagerAddress);
-    emit CollTokenManagerAddressChanged(_collTokenManagerAddress);
+
+    emit TroveManagerInitialized(
+      _borrowerOperationsAddress,
+      _redemptionManagerAddress,
+      _storagePoolAddress,
+      _stabilityPoolManagerAddress,
+      _priceFeedAddress,
+      _debtTokenManagerAddress,
+      _collTokenManagerAddress
+    );
 
     renounceOwnership();
   }
@@ -1258,7 +1255,7 @@ contract TroveManager is LiquityBase, Ownable, CheckContract, ITroveManager {
   function increaseTroveColl(address _borrower, TokenAmount[] memory _collTokenAmounts) external override {
     _requireCallerIsBorrowerOrRedemptionOperations();
 
-    Trove storage trove = Troves[_borrower];    
+    Trove storage trove = Troves[_borrower];
     address[] memory collTokenAddresses = new address[](_collTokenAmounts.length);
     for (uint i = 0; i < _collTokenAmounts.length; i++) {
       address tokenAddress = _collTokenAmounts[i].tokenAddress;
@@ -1272,15 +1269,6 @@ contract TroveManager is LiquityBase, Ownable, CheckContract, ITroveManager {
     }
 
     emit CollateralUpdated(_borrower, collTokenAddresses);
-  }
-
-  function getAllTroveCollUSD(address _coll) external returns (uint totalCollInStable) {
-    for (uint i = 0; i < TroveOwners.length; i++) {
-      Trove storage trove = Troves[TroveOwners[i]];
-      if (_coll > 0) {
-        totalCollInStable += priceFeed.getUSDValue(_coll, trove.colls[token]);
-      }
-    }
   }
 
   function decreaseTroveColl(address _borrower, TokenAmount[] memory _collTokenAmounts) external override {

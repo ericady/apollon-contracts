@@ -238,7 +238,7 @@ describe('TroveManager', () => {
 
       // todo tests the pending rewards on changing coll prices!!!
       // pretty sure that everything will break
-      it.only('updates the L_coll reward-per-unit-staked totals', async () => {
+      it('updates the L_coll reward-per-unit-staked totals', async () => {
         await whaleShrimpTroveInit(contracts, signers, false);
         await priceFeed.setTokenPrice(BTC, parseUnits('5000'));
 

@@ -19,13 +19,15 @@ interface ITroveManager is IBBase {
 
   // --- Events ---
 
-  event RedemptionManagerAddressChanged(address _newRedemptionManagerAddress);
-  event BorrowerOperationsAddressChanged(address _newBorrowerOperationsAddress);
-  event PriceFeedAddressChanged(address _newPriceFeedAddress);
-  event DebtTokenManagerAddressChanged(address _newDebtTokenManagerAddress);
-  event CollTokenManagerAddressChanged(address _newCollTokenManagerAddress);
-  event StoragePoolAddressChanged(address _storagePoolAddress);
-  event StabilityPoolManagerAddressChanged(address _stabilityPoolManagerAddress);
+  event TroveManagerInitialized(
+    address _borrowerOperationsAddress,
+    address _redemptionOperationsAddress,
+    address _storagePoolAddress,
+    address _stabilityPoolAddress,
+    address _priceFeedAddress,
+    address _debtTokenManagerAddress,
+    address _collTokenManagerAddress
+  );
 
   event Liquidation(
     TokenAmount[] liquidatedDebt,
@@ -33,7 +35,6 @@ interface ITroveManager is IBBase {
     uint totalStableCoinGasCompensation,
     TokenAmount[] totalCollGasCompensation
   );
-  event Redemption(uint _attemptedLUSDAmount, uint _actualLUSDAmount, uint _ETHSent, uint _ETHFee);
   event TroveUpdated(address indexed _borrower, uint _debt, uint _coll, uint _stake, TroveManagerOperation _operation);
   event TroveLiquidated(address indexed _borrower, uint _debt, uint _coll, TroveManagerOperation _operation);
   event BaseRateUpdated(uint _baseRate);
@@ -44,6 +45,8 @@ interface ITroveManager is IBBase {
   event TroveSnapshotsUpdated(uint _L_ETH, uint _L_LUSDDebt);
   event TroveIndexUpdated(address _borrower, uint _newIndex);
   event CollateralUpdated(address _borrower, address[] _collTokens);
+
+  // --- Events ---
 
   error NotFromBorrowerOrRedemptionOps();
   error InvalidTrove();

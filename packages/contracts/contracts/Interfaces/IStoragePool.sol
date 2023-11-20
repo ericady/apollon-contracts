@@ -8,11 +8,14 @@ import './IBase.sol';
 interface IStoragePool is IBase {
   // --- Events ---
 
-  event PoolValueUpdated(address _tokenAddress, bool _isColl, PoolType _poolType, uint _updatedAmount);
-  event BorrowerOperationsAddressChanged(address _newBorrowerOperationsAddress);
-  event TroveManagerAddressChanged(address _newTroveManagerAddress);
-  event StabilityPoolManagerAddressChanged(address _newStabilityPoolAddress);
-  event PriceFeedAddressChanged(address _newPriceFeedAddress);
+  event StoragePoolInitialized(
+    address _borrowerOperationsAddress,
+    address _troveManagerAddress,
+    address _redemptionOperationsAddress,
+    address _stabilityPoolManagerAddress,
+    address _priceFeedAddress
+  );
+  event StoragePoolValueUpdated(address _tokenAddress, bool _isColl, PoolType _poolType, uint _updatedAmount);
 
   // --- Custom Errors ---
 

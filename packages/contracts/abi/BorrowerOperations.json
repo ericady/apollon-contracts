@@ -95,43 +95,41 @@
             {
                 "indexed": false,
                 "internalType": "address",
-                "name": "_collTokenManagerAddress",
+                "name": "_troveManagerAddress",
                 "type": "address"
-            }
-        ],
-        "name": "CollTokenManagerAddressChanged",
-        "type": "event"
-    },
-    {
-        "anonymous": false,
-        "inputs": [
+            },
+            {
+                "indexed": false,
+                "internalType": "address",
+                "name": "_storagePoolAddress",
+                "type": "address"
+            },
+            {
+                "indexed": false,
+                "internalType": "address",
+                "name": "_stabilityPoolAddress",
+                "type": "address"
+            },
+            {
+                "indexed": false,
+                "internalType": "address",
+                "name": "_priceFeedAddress",
+                "type": "address"
+            },
             {
                 "indexed": false,
                 "internalType": "address",
                 "name": "_debtTokenManagerAddress",
                 "type": "address"
-            }
-        ],
-        "name": "DebtTokenManagerAddressChanged",
-        "type": "event"
-    },
-    {
-        "anonymous": false,
-        "inputs": [
-            {
-                "indexed": true,
-                "internalType": "address",
-                "name": "_borrower",
-                "type": "address"
             },
             {
                 "indexed": false,
-                "internalType": "uint256",
-                "name": "_LUSDFee",
-                "type": "uint256"
+                "internalType": "address",
+                "name": "_collTokenManagerAddress",
+                "type": "address"
             }
         ],
-        "name": "LUSDBorrowingFeePaid",
+        "name": "BorrowerOperationsInitialized",
         "type": "event"
     },
     {
@@ -159,45 +157,6 @@
             {
                 "indexed": false,
                 "internalType": "address",
-                "name": "_newPriceFeedAddress",
-                "type": "address"
-            }
-        ],
-        "name": "PriceFeedAddressChanged",
-        "type": "event"
-    },
-    {
-        "anonymous": false,
-        "inputs": [
-            {
-                "indexed": false,
-                "internalType": "address",
-                "name": "_stabilityPoolAddress",
-                "type": "address"
-            }
-        ],
-        "name": "StabilityPoolAddressChanged",
-        "type": "event"
-    },
-    {
-        "anonymous": false,
-        "inputs": [
-            {
-                "indexed": false,
-                "internalType": "address",
-                "name": "_storagePoolAddress",
-                "type": "address"
-            }
-        ],
-        "name": "StoragePoolAddressChanged",
-        "type": "event"
-    },
-    {
-        "anonymous": false,
-        "inputs": [
-            {
-                "indexed": true,
-                "internalType": "address",
                 "name": "_borrower",
                 "type": "address"
             },
@@ -217,42 +176,23 @@
             {
                 "indexed": false,
                 "internalType": "address",
-                "name": "_newTroveManagerAddress",
-                "type": "address"
-            }
-        ],
-        "name": "TroveManagerAddressChanged",
-        "type": "event"
-    },
-    {
-        "anonymous": false,
-        "inputs": [
-            {
-                "indexed": true,
-                "internalType": "address",
                 "name": "_borrower",
                 "type": "address"
             },
             {
                 "indexed": false,
-                "internalType": "uint256",
-                "name": "_debt",
-                "type": "uint256"
+                "internalType": "enum IBorrowerOperations.BorrowerOperation",
+                "name": "_operation",
+                "type": "uint8"
             },
             {
                 "indexed": false,
                 "internalType": "uint256",
-                "name": "_coll",
-                "type": "uint256"
-            },
-            {
-                "indexed": false,
-                "internalType": "uint256",
-                "name": "stake",
+                "name": "_paidBorrowingFeeInStable",
                 "type": "uint256"
             }
         ],
-        "name": "TroveUpdated",
+        "name": "TroveOperation",
         "type": "event"
     },
     {

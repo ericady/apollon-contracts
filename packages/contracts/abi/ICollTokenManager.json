@@ -23,11 +23,11 @@
             {
                 "indexed": false,
                 "internalType": "address",
-                "name": "_newPriceFeedAddress",
+                "name": "_priceFeedAddress",
                 "type": "address"
             }
         ],
-        "name": "PriceFeedAddressChanged",
+        "name": "CollTokenManagerInitialized",
         "type": "event"
     },
     {

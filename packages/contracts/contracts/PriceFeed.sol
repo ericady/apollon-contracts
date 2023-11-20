@@ -24,10 +24,6 @@ contract PriceFeed is Ownable, CheckContract, IPriceFeed {
   AggregatorV3Interface public priceAggregator; // Mainnet Chainlink aggregator
   ITellorCaller public tellorCaller; // Wrapper contract that calls the Tellor system
 
-  // Core Liquity contracts
-  address borrowerOperationsAddress;
-  address troveManagerAddress;
-
   uint internal constant DECIMAL_PRECISION = 1e18;
   uint public constant ETHUSD_TELLOR_REQ_ID = 1;
 
@@ -507,12 +503,12 @@ contract PriceFeed is Ownable, CheckContract, IPriceFeed {
 
   function _changeStatus(Status _status) internal {
     status = _status;
-    emit PriceFeedStatusChanged(_status);
+    emit PriceFeedStatusChanged(address(this), _status); // todo not (this)...
   }
 
   function _storePrice(uint _currentPrice) internal {
     lastGoodPrice = _currentPrice;
-    emit LastGoodPriceUpdated(_currentPrice);
+    emit LastGoodPriceUpdated(address(this), _currentPrice); // todo not (this)...
   }
 
   function _storeTellorPrice(TellorResponse memory _tellorResponse) internal returns (uint) {

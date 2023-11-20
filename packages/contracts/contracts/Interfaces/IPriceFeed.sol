@@ -14,8 +14,8 @@ interface IPriceFeed is IBase {
   }
 
   // --- Events ---
-  event LastGoodPriceUpdated(uint _lastGoodPrice);
-  event PriceFeedStatusChanged(Status newStatus);
+  event LastGoodPriceUpdated(address _token, uint _lastGoodPrice);
+  event PriceFeedStatusChanged(address _token, Status newStatus);
 
   // --- Function ---
   function getPrice(address _tokenAddress) external view returns (uint price);

@@ -78,32 +78,6 @@
             {
                 "indexed": false,
                 "internalType": "address",
-                "name": "_newBorrowerOperationsAddress",
-                "type": "address"
-            }
-        ],
-        "name": "BorrowerOperationsAddressChanged",
-        "type": "event"
-    },
-    {
-        "anonymous": false,
-        "inputs": [
-            {
-                "indexed": false,
-                "internalType": "address",
-                "name": "_newCollTokenManagerAddress",
-                "type": "address"
-            }
-        ],
-        "name": "CollTokenManagerAddressChanged",
-        "type": "event"
-    },
-    {
-        "anonymous": false,
-        "inputs": [
-            {
-                "indexed": false,
-                "internalType": "address",
                 "name": "_borrower",
                 "type": "address"
             },
@@ -115,19 +89,6 @@
             }
         ],
         "name": "CollateralUpdated",
-        "type": "event"
-    },
-    {
-        "anonymous": false,
-        "inputs": [
-            {
-                "indexed": false,
-                "internalType": "address",
-                "name": "_newDebtTokenManagerAddress",
-                "type": "address"
-            }
-        ],
-        "name": "DebtTokenManagerAddressChanged",
         "type": "event"
     },
     {
@@ -253,89 +214,6 @@
         "inputs": [
             {
                 "indexed": false,
-                "internalType": "address",
-                "name": "_newPriceFeedAddress",
-                "type": "address"
-            }
-        ],
-        "name": "PriceFeedAddressChanged",
-        "type": "event"
-    },
-    {
-        "anonymous": false,
-        "inputs": [
-            {
-                "indexed": false,
-                "internalType": "uint256",
-                "name": "_attemptedLUSDAmount",
-                "type": "uint256"
-            },
-            {
-                "indexed": false,
-                "internalType": "uint256",
-                "name": "_actualLUSDAmount",
-                "type": "uint256"
-            },
-            {
-                "indexed": false,
-                "internalType": "uint256",
-                "name": "_ETHSent",
-                "type": "uint256"
-            },
-            {
-                "indexed": false,
-                "internalType": "uint256",
-                "name": "_ETHFee",
-                "type": "uint256"
-            }
-        ],
-        "name": "Redemption",
-        "type": "event"
-    },
-    {
-        "anonymous": false,
-        "inputs": [
-            {
-                "indexed": false,
-                "internalType": "address",
-                "name": "_newRedemptionManagerAddress",
-                "type": "address"
-            }
-        ],
-        "name": "RedemptionManagerAddressChanged",
-        "type": "event"
-    },
-    {
-        "anonymous": false,
-        "inputs": [
-            {
-                "indexed": false,
-                "internalType": "address",
-                "name": "_stabilityPoolManagerAddress",
-                "type": "address"
-            }
-        ],
-        "name": "StabilityPoolManagerAddressChanged",
-        "type": "event"
-    },
-    {
-        "anonymous": false,
-        "inputs": [
-            {
-                "indexed": false,
-                "internalType": "address",
-                "name": "_storagePoolAddress",
-                "type": "address"
-            }
-        ],
-        "name": "StoragePoolAddressChanged",
-        "type": "event"
-    },
-    {
-        "anonymous": false,
-        "inputs": [
-            {
-                "indexed": false,
                 "internalType": "uint256",
                 "name": "_totalStakesSnapshot",
                 "type": "uint256"
@@ -411,6 +289,55 @@
             }
         ],
         "name": "TroveLiquidated",
+        "type": "event"
+    },
+    {
+        "anonymous": false,
+        "inputs": [
+            {
+                "indexed": false,
+                "internalType": "address",
+                "name": "_borrowerOperationsAddress",
+                "type": "address"
+            },
+            {
+                "indexed": false,
+                "internalType": "address",
+                "name": "_redemptionOperationsAddress",
+                "type": "address"
+            },
+            {
+                "indexed": false,
+                "internalType": "address",
+                "name": "_storagePoolAddress",
+                "type": "address"
+            },
+            {
+                "indexed": false,
+                "internalType": "address",
+                "name": "_stabilityPoolAddress",
+                "type": "address"
+            },
+            {
+                "indexed": false,
+                "internalType": "address",
+                "name": "_priceFeedAddress",
+                "type": "address"
+            },
+            {
+                "indexed": false,
+                "internalType": "address",
+                "name": "_debtTokenManagerAddress",
+                "type": "address"
+            },
+            {
+                "indexed": false,
+                "internalType": "address",
+                "name": "_collTokenManagerAddress",
+                "type": "address"
+            }
+        ],
+        "name": "TroveManagerInitialized",
         "type": "event"
     },
     {
@@ -865,19 +792,6 @@
         ],
         "name": "decreaseTroveDebt",
         "outputs": [],
-        "stateMutability": "nonpayable",
-        "type": "function"
-    },
-    {
-        "inputs": [],
-        "name": "getAllTroveCollUSD",
-        "outputs": [
-            {
-                "internalType": "uint256",
-                "name": "totalCollInStable",
-                "type": "uint256"
-            }
-        ],
         "stateMutability": "nonpayable",
         "type": "function"
     },

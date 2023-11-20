@@ -43,12 +43,6 @@ contract RedemptionOperations is LiquityBase, Ownable, CheckContract, IRedemptio
     uint decayedBaseRate;
   }
 
-  struct RedemptionCollAmount {
-    uint drawn;
-    uint redemptionFee;
-    uint sendToRedeemer;
-  }
-
   struct SingleRedemptionVariables {
     uint stableCoinLot;
     TokenAmount[] collLots;
@@ -74,19 +68,18 @@ contract RedemptionOperations is LiquityBase, Ownable, CheckContract, IRedemptio
     checkContract(_collTokenManagerAddress);
 
     troveManager = ITroveManager(_troveManagerAddress);
-    emit TroveManagerAddressChanged(_troveManagerAddress);
-
     storagePool = IStoragePool(_storagePoolAddress);
-    emit StoragePoolAddressChanged(_storagePoolAddress);
-
     priceFeed = IPriceFeed(_priceFeedAddress);
-    emit PriceFeedAddressChanged(_priceFeedAddress);
-
     debtTokenManager = IDebtTokenManager(_debtTokenManagerAddress);
-    emit DebtTokenManagerAddressChanged(_debtTokenManagerAddress);
-
     collTokenManager = ICollTokenManager(_collTokenManagerAddress);
-    emit CollTokenManagerAddressChanged(_collTokenManagerAddress);
+
+    emit RedemptionOperationsInitialized(
+      _troveManagerAddress,
+      _storagePoolAddress,
+      _priceFeedAddress,
+      _debtTokenManagerAddress,
+      _collTokenManagerAddress
+    );
 
     renounceOwnership();
   }
@@ -134,6 +127,7 @@ contract RedemptionOperations is LiquityBase, Ownable, CheckContract, IRedemptio
 
     // seed drawn coll
     RedemptionCollAmount[] memory totalCollDrawn = new RedemptionCollAmount[](vars.collTokenAddresses.length);
+    for (uint i = 0; i < totalCollDrawn.length; i++) totalCollDrawn[i].collToken = vars.collTokenAddresses[i];
 
     // Loop through the stable coin source troves
     assert(_sourceTroves.length >= 1);
@@ -162,7 +156,7 @@ contract RedemptionOperations is LiquityBase, Ownable, CheckContract, IRedemptio
     if (vars.totalRedeemedStable == 0) revert NoRedeems();
 
     // Decay the baseRate due to time passed, and then increase it according to the size of this redemption.
-    // Use the saved total LUSD supply value, from before it was reduced by the redemption.
+    // Use the saved total stable supply value, from before it was reduced by the redemption.
     troveManager.updateBaseRateFromRedemption(vars.totalRedeemedStable, vars.totalStableSupplyAtStart);
 
     // Calculate the redemption fee
@@ -174,9 +168,6 @@ contract RedemptionOperations is LiquityBase, Ownable, CheckContract, IRedemptio
 
       _requireUserAcceptsFee(collEntry.redemptionFee, collEntry.drawn, _maxFeePercentage);
     }
-
-    // todo
-    //    emit Redemption(_LUSDamount, vars.totalLUSDToRedeem, vars.totalETHDrawn, vars.ETHFee);
 
     // Burn the total stable coin that is cancelled with debt, and send the redeemed coll to msg.sender
     storagePool.subtractValue(address(stableCoin), false, PoolType.Active, vars.totalRedeemedStable);
@@ -199,6 +190,8 @@ contract RedemptionOperations is LiquityBase, Ownable, CheckContract, IRedemptio
       //    // Send the fee to the gov token staking contract
       //    contractsCache.activePool.sendETH(address(contractsCache.lqtyStaking), vars.ETHFee);
     }
+
+    emit SuccessfulRedemption(_stableCoinAmount, vars.totalRedeemedStable, totalCollDrawn);
   }
 
   // Redeem as much collateral as possible from _borrower's Trove in exchange for stable coin up to _redeemMaxAmount
@@ -249,15 +242,7 @@ contract RedemptionOperations is LiquityBase, Ownable, CheckContract, IRedemptio
     troveManager.increaseTroveColl(_borrower, vars.collLots);
     troveManager.updateStakeAndTotalStakes(outerVars.collTokenAddresses, _borrower);
 
-    // todo
-    //    emit TroveUpdated(
-    //      _borrower,
-    //      newStableDebt,
-    //      newColl,
-    //      Troves[_borrower].stake,
-    //      TroveManagerOperation.redeemCollateral
-    //    );
-
+    emit RedeemedFromTrove(_borrower, vars.stableCoinLot, vars.collLots);
     return vars;
   }
 

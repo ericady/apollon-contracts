@@ -167,15 +167,7 @@ const connectContracts = async (
         { ...overrides, nonce }
       ),
 
-    nonce =>
-      debtTokenManager.setAddresses(
-        troveManager.address,
-        borrowerOperations.address,
-        stabilityPoolManager.address,
-        priceFeed.address,
-        { ...overrides, nonce }
-      ),
-
+    nonce => debtTokenManager.setAddresses(stabilityPoolManager.address, { ...overrides, nonce }),
     nonce => collTokenManager.setAddresses(priceFeed.address, { ...overrides, nonce }),
 
     nonce =>

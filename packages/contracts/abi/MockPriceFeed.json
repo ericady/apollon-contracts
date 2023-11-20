@@ -9,6 +9,12 @@
         "inputs": [
             {
                 "indexed": false,
+                "internalType": "address",
+                "name": "_token",
+                "type": "address"
+            },
+            {
+                "indexed": false,
                 "internalType": "uint256",
                 "name": "_lastGoodPrice",
                 "type": "uint256"
@@ -20,6 +26,12 @@
     {
         "anonymous": false,
         "inputs": [
+            {
+                "indexed": false,
+                "internalType": "address",
+                "name": "_token",
+                "type": "address"
+            },
             {
                 "indexed": false,
                 "internalType": "enum IPriceFeed.Status",

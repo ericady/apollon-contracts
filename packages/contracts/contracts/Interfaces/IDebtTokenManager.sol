@@ -8,11 +8,8 @@ import './IDebtToken.sol';
 interface IDebtTokenManager {
   // --- Events ---
 
-  event DebtTokenAdded(IDebtToken _debtToken);
-  event TroveManagerAddressChanged(address _troveManagerAddress);
-  event StabilityPoolManagerAddressChanged(address _newStabilityPoolAddress);
-  event BorrowerOperationsAddressChanged(address _newBorrowerOperationsAddress);
-  event PriceFeedAddressChanged(address _newPriceFeedAddress);
+  event DebtTokenManagerInitialized(address _stabilityPoolManagerAddress);
+  event DebtTokenAdded(address _debtTokenAddress);
 
   // --- Functions ---
 

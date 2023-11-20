@@ -53,45 +53,6 @@
         "anonymous": false,
         "inputs": [
             {
-                "indexed": false,
-                "internalType": "uint256",
-                "name": "_baseRate",
-                "type": "uint256"
-            }
-        ],
-        "name": "BaseRateUpdated",
-        "type": "event"
-    },
-    {
-        "anonymous": false,
-        "inputs": [
-            {
-                "indexed": false,
-                "internalType": "address",
-                "name": "_newCollTokenManagerAddress",
-                "type": "address"
-            }
-        ],
-        "name": "CollTokenManagerAddressChanged",
-        "type": "event"
-    },
-    {
-        "anonymous": false,
-        "inputs": [
-            {
-                "indexed": false,
-                "internalType": "address",
-                "name": "_newDebtTokenManagerAddress",
-                "type": "address"
-            }
-        ],
-        "name": "DebtTokenManagerAddressChanged",
-        "type": "event"
-    },
-    {
-        "anonymous": false,
-        "inputs": [
-            {
                 "indexed": true,
                 "internalType": "address",
                 "name": "previousOwner",
@@ -113,55 +74,35 @@
             {
                 "indexed": false,
                 "internalType": "address",
-                "name": "_newPriceFeedAddress",
+                "name": "_borrower",
                 "type": "address"
-            }
-        ],
-        "name": "PriceFeedAddressChanged",
-        "type": "event"
-    },
-    {
-        "anonymous": false,
-        "inputs": [
-            {
-                "indexed": false,
-                "internalType": "uint256",
-                "name": "_attemptedLUSDAmount",
-                "type": "uint256"
             },
             {
                 "indexed": false,
                 "internalType": "uint256",
-                "name": "_actualLUSDAmount",
+                "name": "stableAmount",
                 "type": "uint256"
             },
             {
+                "components": [
+                    {
+                        "internalType": "address",
+                        "name": "tokenAddress",
+                        "type": "address"
+                    },
+                    {
+                        "internalType": "uint256",
+                        "name": "amount",
+                        "type": "uint256"
+                    }
+                ],
                 "indexed": false,
-                "internalType": "uint256",
-                "name": "_ETHSent",
-                "type": "uint256"
-            },
-            {
-                "indexed": false,
-                "internalType": "uint256",
-                "name": "_ETHFee",
-                "type": "uint256"
+                "internalType": "struct IBase.TokenAmount[]",
+                "name": "_drawnCollAmounts",
+                "type": "tuple[]"
             }
         ],
-        "name": "Redemption",
-        "type": "event"
-    },
-    {
-        "anonymous": false,
-        "inputs": [
-            {
-                "indexed": false,
-                "internalType": "address",
-                "name": "_storagePoolAddress",
-                "type": "address"
-            }
-        ],
-        "name": "StoragePoolAddressChanged",
+        "name": "RedeemedFromTrove",
         "type": "event"
     },
     {
@@ -170,11 +111,82 @@
             {
                 "indexed": false,
                 "internalType": "address",
-                "name": "_newTroveManagerAddress",
+                "name": "_troveManager",
+                "type": "address"
+            },
+            {
+                "indexed": false,
+                "internalType": "address",
+                "name": "_storgePool",
+                "type": "address"
+            },
+            {
+                "indexed": false,
+                "internalType": "address",
+                "name": "_priceFeed",
+                "type": "address"
+            },
+            {
+                "indexed": false,
+                "internalType": "address",
+                "name": "_debtTokenManager",
+                "type": "address"
+            },
+            {
+                "indexed": false,
+                "internalType": "address",
+                "name": "_collTokenManager",
                 "type": "address"
             }
         ],
-        "name": "TroveManagerAddressChanged",
+        "name": "RedemptionOperationsInitialized",
+        "type": "event"
+    },
+    {
+        "anonymous": false,
+        "inputs": [
+            {
+                "indexed": false,
+                "internalType": "uint256",
+                "name": "_attemptedStableAmount",
+                "type": "uint256"
+            },
+            {
+                "indexed": false,
+                "internalType": "uint256",
+                "name": "_actualStableAmount",
+                "type": "uint256"
+            },
+            {
+                "components": [
+                    {
+                        "internalType": "address",
+                        "name": "collToken",
+                        "type": "address"
+                    },
+                    {
+                        "internalType": "uint256",
+                        "name": "drawn",
+                        "type": "uint256"
+                    },
+                    {
+                        "internalType": "uint256",
+                        "name": "redemptionFee",
+                        "type": "uint256"
+                    },
+                    {
+                        "internalType": "uint256",
+                        "name": "sendToRedeemer",
+                        "type": "uint256"
+                    }
+                ],
+                "indexed": false,
+                "internalType": "struct IRedemptionOperations.RedemptionCollAmount[]",
+                "name": "_collPayouts",
+                "type": "tuple[]"
+            }
+        ],
+        "name": "SuccessfulRedemption",
         "type": "event"
     },
     {

@@ -90,12 +90,6 @@ contract BorrowerOperations is LiquityBase, Ownable, CheckContract, IBorrowerOpe
     ICollTokenManager collTokenManager;
   }
 
-  enum BorrowerOperation {
-    openTrove,
-    closeTrove,
-    adjustTrove
-  }
-
   // --- Dependency setters ---
 
   function setAddresses(
@@ -114,22 +108,20 @@ contract BorrowerOperations is LiquityBase, Ownable, CheckContract, IBorrowerOpe
     checkContract(_collTokenManagerAddress);
 
     troveManager = ITroveManager(_troveManagerAddress);
-    emit TroveManagerAddressChanged(_troveManagerAddress);
-
     storagePool = IStoragePool(_storagePoolAddress);
-    emit StoragePoolAddressChanged(_storagePoolAddress);
-
     stabilityPoolAddress = _stabilityPoolAddress;
-    emit StabilityPoolAddressChanged(_stabilityPoolAddress);
-
     priceFeed = IPriceFeed(_priceFeedAddress);
-    emit PriceFeedAddressChanged(_priceFeedAddress);
-
     debtTokenManager = IDebtTokenManager(_debtTokenManagerAddress);
-    emit DebtTokenManagerAddressChanged(_debtTokenManagerAddress);
-
     collTokenManager = ICollTokenManager(_collTokenManagerAddress);
-    emit CollTokenManagerAddressChanged(_collTokenManagerAddress);
+
+    emit BorrowerOperationsInitialized(
+      _troveManagerAddress,
+      _storagePoolAddress,
+      _stabilityPoolAddress,
+      _priceFeedAddress,
+      _debtTokenManagerAddress,
+      _collTokenManagerAddress
+    );
 
     renounceOwnership();
   }
@@ -197,7 +189,6 @@ contract BorrowerOperations is LiquityBase, Ownable, CheckContract, IBorrowerOpe
     contractsCache.troveManager.updateStakeAndTotalStakes(vars.collTokenAddresses, borrower);
 
     vars.arrayIndex = contractsCache.troveManager.addTroveOwnerToArray(borrower);
-    emit TroveCreated(borrower, vars.arrayIndex);
 
     // Move the coll to the active pool
     for (uint i = 0; i < vars.colls.length; i++) {
@@ -220,8 +211,8 @@ contract BorrowerOperations is LiquityBase, Ownable, CheckContract, IBorrowerOpe
     );
     stableCoinAmount.debtToken.mint(address(contractsCache.storagePool), stableCoinAmount.netDebt);
 
-    //        emit TroveUpdated(msg.sender, vars.compositeDebtInStable, vars.compositeCollInStable, vars.stake, BorrowerOperation.openTrove);
-    //    emit LUSDBorrowingFeePaid(msg.sender, borrowingFeesPaid);
+    emit TroveCreated(borrower, vars.arrayIndex);
+    emit TroveOperation(borrower, BorrowerOperation.openTrove, 0);
   }
 
   // Send collateral to a trove
@@ -244,7 +235,7 @@ contract BorrowerOperations is LiquityBase, Ownable, CheckContract, IBorrowerOpe
       );
     }
 
-    _finaliseTrove(false, false, contractsCache, vars, borrower);
+    _finaliseTrove(BorrowerOperation.addColl, false, false, contractsCache, vars, borrower);
   }
 
   // Withdraw collateral from a trove
@@ -279,7 +270,7 @@ contract BorrowerOperations is LiquityBase, Ownable, CheckContract, IBorrowerOpe
       );
     }
 
-    _finaliseTrove(true, false, contractsCache, vars, borrower);
+    _finaliseTrove(BorrowerOperation.withdrawColl, true, false, contractsCache, vars, borrower);
   }
 
   // increasing debt of a trove
@@ -322,7 +313,7 @@ contract BorrowerOperations is LiquityBase, Ownable, CheckContract, IBorrowerOpe
       );
     }
 
-    _finaliseTrove(false, true, contractsCache, vars, msg.sender);
+    _finaliseTrove(BorrowerOperation.increaseDebt, false, true, contractsCache, vars, msg.sender);
   }
 
   // repay debt of a trove
@@ -360,7 +351,7 @@ contract BorrowerOperations is LiquityBase, Ownable, CheckContract, IBorrowerOpe
       );
     }
 
-    _finaliseTrove(false, false, contractsCache, vars, borrower);
+    _finaliseTrove(BorrowerOperation.repayDebt, false, false, contractsCache, vars, borrower);
   }
 
   function closeTrove() external override {
@@ -408,8 +399,7 @@ contract BorrowerOperations is LiquityBase, Ownable, CheckContract, IBorrowerOpe
     contractsCache.troveManager.removeStake(vars.collTokenAddresses, borrower);
     contractsCache.troveManager.closeTrove(vars.collTokenAddresses, borrower);
 
-    // todo
-    // emit TroveUpdated(msg.sender, 0, 0, 0, BorrowerOperation.closeTrove);
+    emit TroveOperation(borrower, BorrowerOperation.closeTrove, 0);
   }
 
   // --- Helper functions ---
@@ -445,6 +435,7 @@ contract BorrowerOperations is LiquityBase, Ownable, CheckContract, IBorrowerOpe
   }
 
   function _finaliseTrove(
+    BorrowerOperation _operation,
     bool _isCollWithdrawal,
     bool _isDebtIncrease,
     ContractsCache memory contractsCache,
@@ -461,15 +452,7 @@ contract BorrowerOperations is LiquityBase, Ownable, CheckContract, IBorrowerOpe
     // update troves stake
     contractsCache.troveManager.updateStakeAndTotalStakes(vars.collTokenAddresses, _borrower);
 
-    // todo...
-    //    emit TroveUpdated(
-    //      _borrower,
-    //      vars.newDebt,
-    //      vars.newColl,
-    //      vars.stake,
-    //      BorrowerOperation.adjustTrove
-    //    );
-    //    emit LUSDBorrowingFeePaid(msg.sender, vars.LUSDFee);
+    emit TroveOperation(_borrower, _operation, vars.stableCoinEntry.borrowingFee);
   }
 
   function _getNewTCRFromTroveChange(
