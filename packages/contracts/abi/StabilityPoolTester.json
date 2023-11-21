@@ -778,6 +778,19 @@
     {
         "inputs": [
             {
+                "internalType": "uint256",
+                "name": "debtToRepay",
+                "type": "uint256"
+            }
+        ],
+        "name": "repayLoss",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
                 "internalType": "uint128",
                 "name": "_currentScale",
                 "type": "uint128"

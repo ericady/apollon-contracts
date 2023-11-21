@@ -1,5 +1,10 @@
 [
     {
+        "inputs": [],
+        "name": "NotFromSPM",
+        "type": "error"
+    },
+    {
         "anonymous": false,
         "inputs": [
             {
@@ -15,12 +20,6 @@
     {
         "anonymous": false,
         "inputs": [
-            {
-                "indexed": false,
-                "internalType": "address",
-                "name": "_stabilityPoolAddress",
-                "type": "address"
-            },
             {
                 "indexed": false,
                 "internalType": "address",
@@ -48,6 +47,29 @@
             }
         ],
         "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "address",
+                "name": "stabilityPool",
+                "type": "address"
+            },
+            {
+                "internalType": "address",
+                "name": "stableDebt",
+                "type": "address"
+            },
+            {
+                "internalType": "uint256",
+                "name": "withdrawAmount",
+                "type": "uint256"
+            }
+        ],
+        "name": "withdrawValue",
+        "outputs": [],
+        "stateMutability": "nonpayable",
         "type": "function"
     }
 ]

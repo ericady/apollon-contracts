@@ -11,6 +11,7 @@ import './Interfaces/IStabilityPool.sol';
 import './Interfaces/IStabilityPoolManager.sol';
 import './Interfaces/ITroveManager.sol';
 import './Interfaces/IStoragePool.sol';
+import './Interfaces/IReservePool.sol';
 import './StabilityPool.sol';
 
 contract StabilityPoolManager is Ownable, CheckContract, IStabilityPoolManager {
@@ -19,6 +20,7 @@ contract StabilityPoolManager is Ownable, CheckContract, IStabilityPoolManager {
   address public troveManagerAddress;
   address public priceFeedAddress;
   IStoragePool public storagePool;
+  IReservePool public reservePool;
   address public debtTokenManagerAddress;
 
   // --- Data structures ---
@@ -176,6 +178,22 @@ contract StabilityPoolManager is Ownable, CheckContract, IStabilityPoolManager {
     }
   }
 
+  function repayLoss(TokenAmount[] memory repayAmounts) external {
+    _requireCallerIsReservePool();
+
+    for (uint i = 0; i < repayAmounts.length; i++) {
+      TokenAmount memory repayAmount = repayAmounts[i];
+      IStabilityPool stabilityPool = stabilityPools[IDebtToken(repayAmount.tokenAddress)];
+      if (repayAmount.amount == 0) continue;
+
+      // update internal pool stake snapshots
+      stabilityPool.repayLoss(repayAmount.amount);
+
+      // move the coll from the reserve pool into the stability pool
+      reservePool.withdrawValue(address(stabilityPool), repayAmount.tokenAddress, repayAmount.amount);
+    }
+  }
+
   function offset(RemainingStability[] memory _toOffset) external override {
     _requireCallerIsTroveManager();
 
@@ -232,5 +250,9 @@ contract StabilityPoolManager is Ownable, CheckContract, IStabilityPoolManager {
 
   function _requireCallerIsTroveManager() internal view {
     if (msg.sender != troveManagerAddress) revert NotFromTroveManager();
+  }
+
+  function _requireCallerIsReservePool() internal view {
+    if (msg.sender != address(reservePool)) revert NotFromReservePool();
   }
 }

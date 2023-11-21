@@ -11,6 +11,11 @@
     },
     {
         "inputs": [],
+        "name": "NotFromReservePool",
+        "type": "error"
+    },
+    {
+        "inputs": [],
         "name": "NotFromTroveManager",
         "type": "error"
     },
@@ -451,6 +456,44 @@
         "name": "renounceOwnership",
         "outputs": [],
         "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "components": [
+                    {
+                        "internalType": "address",
+                        "name": "tokenAddress",
+                        "type": "address"
+                    },
+                    {
+                        "internalType": "uint256",
+                        "name": "amount",
+                        "type": "uint256"
+                    }
+                ],
+                "internalType": "struct IBase.TokenAmount[]",
+                "name": "repayAmounts",
+                "type": "tuple[]"
+            }
+        ],
+        "name": "repayLoss",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [],
+        "name": "reservePool",
+        "outputs": [
+            {
+                "internalType": "contract IReservePool",
+                "name": "",
+                "type": "address"
+            }
+        ],
+        "stateMutability": "view",
         "type": "function"
     },
     {

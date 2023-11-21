@@ -17,6 +17,7 @@ interface IStabilityPoolManager is IBBase {
 
   // --- Custom Errors ---
   error NotFromTroveManager();
+  error NotFromReservePool();
   error PoolNotExist();
   error PoolExist();
   error Unauthorized();
@@ -42,6 +43,8 @@ interface IStabilityPoolManager is IBBase {
   function provideStability(TokenAmount[] memory _debts) external;
 
   function withdrawStability(TokenAmount[] memory _debts) external;
+
+  function repayLoss(TokenAmount[] memory repayAmounts) external;
 
   function withdrawGains() external;
 
