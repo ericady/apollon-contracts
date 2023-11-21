@@ -10,6 +10,14 @@ import './IDebtTokenManager.sol';
 
 // Common interface for the Trove Manager.
 interface ITroveManager is IBBase {
+  enum Status {
+    nonExistent,
+    active,
+    closedByOwner,
+    closedByLiquidationInNormalMode,
+    closedByLiquidationInRecoveryMode
+  }
+
   enum TroveManagerOperation {
     applyPendingRewards,
     liquidateInNormalMode,
@@ -29,22 +37,22 @@ interface ITroveManager is IBBase {
     address _collTokenManagerAddress
   );
 
-  event Liquidation(
+  event TroveAppliedRewards(address _borrower, CAmount[] _appliedRewards);
+  event TroveClosed(address _borrower, Status _closingState);
+  event TroveIndexUpdated(address _borrower, uint _newIndex);
+  event LiquidationSummary(
     TokenAmount[] liquidatedDebt,
     TokenAmount[] liquidatedColl,
     uint totalStableCoinGasCompensation,
     TokenAmount[] totalCollGasCompensation
   );
-  event TroveUpdated(address indexed _borrower, uint _debt, uint _coll, uint _stake, TroveManagerOperation _operation);
-  event TroveLiquidated(address indexed _borrower, uint _debt, uint _coll, TroveManagerOperation _operation);
+
   event BaseRateUpdated(uint _baseRate);
   event LastFeeOpTimeUpdated(uint _lastFeeOpTime);
-  event TotalStakesUpdated(uint _newTotalStakes);
-  event SystemSnapshotsUpdated(uint _totalStakesSnapshot, uint _totalCollateralSnapshot);
-  event LTermsUpdated(uint _L_ETH, uint _L_LUSDDebt);
-  event TroveSnapshotsUpdated(uint _L_ETH, uint _L_LUSDDebt);
-  event TroveIndexUpdated(address _borrower, uint _newIndex);
-  event CollateralUpdated(address _borrower, address[] _collTokens);
+  event TotalStakesUpdated(TokenAmount[] _totalStakes);
+  event SystemSnapshotsUpdated(TokenAmount[] _totalStakesSnapshot, TokenAmount[] _totalCollateralSnapshot);
+  event LTermsUpdated(CAmount[] _liquidatedTokens);
+  event TroveSnapshotsUpdated(CAmount[] _liquidatedTokens);
 
   // --- Events ---
 

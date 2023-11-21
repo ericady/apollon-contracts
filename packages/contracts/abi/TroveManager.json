@@ -76,35 +76,27 @@
         "anonymous": false,
         "inputs": [
             {
+                "components": [
+                    {
+                        "internalType": "address",
+                        "name": "tokenAddress",
+                        "type": "address"
+                    },
+                    {
+                        "internalType": "bool",
+                        "name": "isColl",
+                        "type": "bool"
+                    },
+                    {
+                        "internalType": "uint256",
+                        "name": "amount",
+                        "type": "uint256"
+                    }
+                ],
                 "indexed": false,
-                "internalType": "address",
-                "name": "_borrower",
-                "type": "address"
-            },
-            {
-                "indexed": false,
-                "internalType": "address[]",
-                "name": "_collTokens",
-                "type": "address[]"
-            }
-        ],
-        "name": "CollateralUpdated",
-        "type": "event"
-    },
-    {
-        "anonymous": false,
-        "inputs": [
-            {
-                "indexed": false,
-                "internalType": "uint256",
-                "name": "_L_ETH",
-                "type": "uint256"
-            },
-            {
-                "indexed": false,
-                "internalType": "uint256",
-                "name": "_L_LUSDDebt",
-                "type": "uint256"
+                "internalType": "struct IBase.CAmount[]",
+                "name": "_liquidatedTokens",
+                "type": "tuple[]"
             }
         ],
         "name": "LTermsUpdated",
@@ -187,7 +179,7 @@
                 "type": "tuple[]"
             }
         ],
-        "name": "Liquidation",
+        "name": "LiquidationSummary",
         "type": "event"
     },
     {
@@ -213,16 +205,40 @@
         "anonymous": false,
         "inputs": [
             {
+                "components": [
+                    {
+                        "internalType": "address",
+                        "name": "tokenAddress",
+                        "type": "address"
+                    },
+                    {
+                        "internalType": "uint256",
+                        "name": "amount",
+                        "type": "uint256"
+                    }
+                ],
                 "indexed": false,
-                "internalType": "uint256",
+                "internalType": "struct IBase.TokenAmount[]",
                 "name": "_totalStakesSnapshot",
-                "type": "uint256"
+                "type": "tuple[]"
             },
             {
+                "components": [
+                    {
+                        "internalType": "address",
+                        "name": "tokenAddress",
+                        "type": "address"
+                    },
+                    {
+                        "internalType": "uint256",
+                        "name": "amount",
+                        "type": "uint256"
+                    }
+                ],
                 "indexed": false,
-                "internalType": "uint256",
+                "internalType": "struct IBase.TokenAmount[]",
                 "name": "_totalCollateralSnapshot",
-                "type": "uint256"
+                "type": "tuple[]"
             }
         ],
         "name": "SystemSnapshotsUpdated",
@@ -232,13 +248,80 @@
         "anonymous": false,
         "inputs": [
             {
+                "components": [
+                    {
+                        "internalType": "address",
+                        "name": "tokenAddress",
+                        "type": "address"
+                    },
+                    {
+                        "internalType": "uint256",
+                        "name": "amount",
+                        "type": "uint256"
+                    }
+                ],
                 "indexed": false,
-                "internalType": "uint256",
-                "name": "_newTotalStakes",
-                "type": "uint256"
+                "internalType": "struct IBase.TokenAmount[]",
+                "name": "_totalStakes",
+                "type": "tuple[]"
             }
         ],
         "name": "TotalStakesUpdated",
+        "type": "event"
+    },
+    {
+        "anonymous": false,
+        "inputs": [
+            {
+                "indexed": false,
+                "internalType": "address",
+                "name": "_borrower",
+                "type": "address"
+            },
+            {
+                "components": [
+                    {
+                        "internalType": "address",
+                        "name": "tokenAddress",
+                        "type": "address"
+                    },
+                    {
+                        "internalType": "bool",
+                        "name": "isColl",
+                        "type": "bool"
+                    },
+                    {
+                        "internalType": "uint256",
+                        "name": "amount",
+                        "type": "uint256"
+                    }
+                ],
+                "indexed": false,
+                "internalType": "struct IBase.CAmount[]",
+                "name": "_appliedRewards",
+                "type": "tuple[]"
+            }
+        ],
+        "name": "TroveAppliedRewards",
+        "type": "event"
+    },
+    {
+        "anonymous": false,
+        "inputs": [
+            {
+                "indexed": false,
+                "internalType": "address",
+                "name": "_borrower",
+                "type": "address"
+            },
+            {
+                "indexed": false,
+                "internalType": "enum ITroveManager.Status",
+                "name": "_closingState",
+                "type": "uint8"
+            }
+        ],
+        "name": "TroveClosed",
         "type": "event"
     },
     {
@@ -258,37 +341,6 @@
             }
         ],
         "name": "TroveIndexUpdated",
-        "type": "event"
-    },
-    {
-        "anonymous": false,
-        "inputs": [
-            {
-                "indexed": true,
-                "internalType": "address",
-                "name": "_borrower",
-                "type": "address"
-            },
-            {
-                "indexed": false,
-                "internalType": "uint256",
-                "name": "_debt",
-                "type": "uint256"
-            },
-            {
-                "indexed": false,
-                "internalType": "uint256",
-                "name": "_coll",
-                "type": "uint256"
-            },
-            {
-                "indexed": false,
-                "internalType": "enum ITroveManager.TroveManagerOperation",
-                "name": "_operation",
-                "type": "uint8"
-            }
-        ],
-        "name": "TroveLiquidated",
         "type": "event"
     },
     {
@@ -344,56 +396,30 @@
         "anonymous": false,
         "inputs": [
             {
+                "components": [
+                    {
+                        "internalType": "address",
+                        "name": "tokenAddress",
+                        "type": "address"
+                    },
+                    {
+                        "internalType": "bool",
+                        "name": "isColl",
+                        "type": "bool"
+                    },
+                    {
+                        "internalType": "uint256",
+                        "name": "amount",
+                        "type": "uint256"
+                    }
+                ],
                 "indexed": false,
-                "internalType": "uint256",
-                "name": "_L_ETH",
-                "type": "uint256"
-            },
-            {
-                "indexed": false,
-                "internalType": "uint256",
-                "name": "_L_LUSDDebt",
-                "type": "uint256"
+                "internalType": "struct IBase.CAmount[]",
+                "name": "_liquidatedTokens",
+                "type": "tuple[]"
             }
         ],
         "name": "TroveSnapshotsUpdated",
-        "type": "event"
-    },
-    {
-        "anonymous": false,
-        "inputs": [
-            {
-                "indexed": true,
-                "internalType": "address",
-                "name": "_borrower",
-                "type": "address"
-            },
-            {
-                "indexed": false,
-                "internalType": "uint256",
-                "name": "_debt",
-                "type": "uint256"
-            },
-            {
-                "indexed": false,
-                "internalType": "uint256",
-                "name": "_coll",
-                "type": "uint256"
-            },
-            {
-                "indexed": false,
-                "internalType": "uint256",
-                "name": "_stake",
-                "type": "uint256"
-            },
-            {
-                "indexed": false,
-                "internalType": "enum ITroveManager.TroveManagerOperation",
-                "name": "_operation",
-                "type": "uint8"
-            }
-        ],
-        "name": "TroveUpdated",
         "type": "event"
     },
     {
@@ -569,7 +595,7 @@
         "name": "Troves",
         "outputs": [
             {
-                "internalType": "enum TroveManager.Status",
+                "internalType": "enum ITroveManager.Status",
                 "name": "status",
                 "type": "uint8"
             },
