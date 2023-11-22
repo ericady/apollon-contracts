@@ -3,242 +3,180 @@ schema:
   file: ./schema.graphql
 dataSources:
   - kind: ethereum
-    name: DebtToken
-    network: development
-    source:
-      address: '0x25309189268017d8C79C8dacCbF44EC25C12FEB4'
-      abi: DebtToken
-      startBlock: 1
-    mapping:
-      kind: ethereum/events
-      apiVersion: 0.0.7
-      language: wasm/assemblyscript
-      entities:
-        - Approval
-        - DebtTokenBorrowerOperationsAddressChanged
-        - DebtTokenPriceFeedAddressChanged
-        - DebtTokenStabilityPoolManagerAddressChanged
-        - Transfer
-        - DebtTokenTroveManagerAddressChanged
-      abis:
-        - name: DebtToken
-          file: ./abis/DebtToken.json
-      eventHandlers:
-        - event: Approval(indexed address,indexed address,uint256)
-          handler: handleApproval
-        - event: BorrowerOperationsAddressChanged(address)
-          handler: handleBorrowerOperationsAddressChanged
-        - event: PriceFeedAddressChanged(address)
-          handler: handlePriceFeedAddressChanged
-        - event: StabilityPoolManagerAddressChanged(address)
-          handler: handleStabilityPoolManagerAddressChanged
-        - event: Transfer(indexed address,indexed address,uint256)
-          handler: handleTransfer
-        - event: TroveManagerAddressChanged(address)
-          handler: handleTroveManagerAddressChanged
-      file: ./src/debt-token.ts
-  - kind: ethereum
-    name: StabilityPoolManager
-    network: development
-    source:
-      address: '0x25309189268017d8C79C8dacCbF44EC25C12FEB4'
-      abi: StabilityPoolManager
-      startBlock: 1
-    mapping:
-      kind: ethereum/events
-      apiVersion: 0.0.7
-      language: wasm/assemblyscript
-      entities:
-        - DebtTokenManagerAddressChanged
-        - StabilityPoolManagerOwnershipTransferred
-        - StabilityPoolManagerPriceFeedAddressChanged
-        - StabilityPoolAdded
-        - StabilityPoolManagerStoragePoolAddressChanged
-        - StabilityPoolManagerTroveManagerAddressChanged
-      abis:
-        - name: StabilityPoolManager
-          file: ./abis/StabilityPoolManager.json
-      eventHandlers:
-        - event: DebtTokenManagerAddressChanged(address)
-          handler: handleDebtTokenManagerAddressChanged
-        - event: OwnershipTransferred(indexed address,indexed address)
-          handler: handleOwnershipTransferred
-        - event: PriceFeedAddressChanged(address)
-          handler: handlePriceFeedAddressChanged
-        - event: StabilityPoolAdded(address)
-          handler: handleStabilityPoolAdded
-        - event: StoragePoolAddressChanged(address)
-          handler: handleStoragePoolAddressChanged
-        - event: TroveManagerAddressChanged(address)
-          handler: handleTroveManagerAddressChanged
-      file: ./src/stability-pool-manager.ts
-  - kind: ethereum
     name: TroveManager
     network: development
     source:
-      address: '0x25309189268017d8C79C8dacCbF44EC25C12FEB4'
+      address: "0x25309189268017d8C79C8dacCbF44EC25C12FEB4"
       abi: TroveManager
-      startBlock: 1
+      startBlock: 0
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.7
       language: wasm/assemblyscript
       entities:
         - BaseRateUpdated
-        - BorrowerOperationsAddressChanged
-        - CollTokenManagerAddressChanged
-        - TroveManagerDebtTokenManagerAddressChanged
         - LTermsUpdated
         - LastFeeOpTimeUpdated
-        - Liquidation
+        - LiquidationSummary
         - TroveManagerOwnershipTransferred
-        - TroveManagerPriceFeedAddressChanged
-        - Redemption
-        - TroveManagerStabilityPoolManagerAddressChanged
-        - TroveManagerStoragePoolAddressChanged
         - SystemSnapshotsUpdated
         - TotalStakesUpdated
+        - TroveAppliedRewards
+        - TroveClosed
         - TroveIndexUpdated
-        - TroveLiquidated
+        - TroveManagerInitialized
         - TroveSnapshotsUpdated
-        - TroveUpdated
       abis:
         - name: TroveManager
           file: ./abis/TroveManager.json
       eventHandlers:
         - event: BaseRateUpdated(uint256)
           handler: handleBaseRateUpdated
-        - event: BorrowerOperationsAddressChanged(address)
-          handler: handleBorrowerOperationsAddressChanged
-        - event: CollTokenManagerAddressChanged(address)
-          handler: handleCollTokenManagerAddressChanged
-        - event: DebtTokenManagerAddressChanged(address)
-          handler: handleDebtTokenManagerAddressChanged
-        - event: LTermsUpdated(uint256,uint256)
+        - event: LTermsUpdated((address,bool,uint256)[])
           handler: handleLTermsUpdated
         - event: LastFeeOpTimeUpdated(uint256)
           handler: handleLastFeeOpTimeUpdated
-        - event: Liquidation((address,uint256)[],(address,uint256)[],uint256,(address,uint256)[])
-          handler: handleLiquidation
+        - event: LiquidationSummary((address,uint256)[],(address,uint256)[],uint256,(address,uint256)[])
+          handler: handleLiquidationSummary
         - event: OwnershipTransferred(indexed address,indexed address)
           handler: handleOwnershipTransferred
-        - event: PriceFeedAddressChanged(address)
-          handler: handlePriceFeedAddressChanged
-        - event: Redemption(uint256,uint256,uint256,uint256)
-          handler: handleRedemption
-        - event: StabilityPoolManagerAddressChanged(address)
-          handler: handleStabilityPoolManagerAddressChanged
-        - event: StoragePoolAddressChanged(address)
-          handler: handleStoragePoolAddressChanged
-        - event: SystemSnapshotsUpdated(uint256,uint256)
+        - event: SystemSnapshotsUpdated((address,uint256)[],(address,uint256)[])
           handler: handleSystemSnapshotsUpdated
-        - event: TotalStakesUpdated(uint256)
+        - event: TotalStakesUpdated((address,uint256)[])
           handler: handleTotalStakesUpdated
+        - event: TroveAppliedRewards(address,(address,bool,uint256)[])
+          handler: handleTroveAppliedRewards
+        - event: TroveClosed(address,uint8)
+          handler: handleTroveClosed
         - event: TroveIndexUpdated(address,uint256)
           handler: handleTroveIndexUpdated
-        - event: TroveLiquidated(indexed address,uint256,uint256,uint8)
-          handler: handleTroveLiquidated
-        - event: TroveSnapshotsUpdated(uint256,uint256)
+        - event: TroveManagerInitialized(address,address,address,address,address,address,address)
+          handler: handleTroveManagerInitialized
+        - event: TroveSnapshotsUpdated((address,bool,uint256)[])
           handler: handleTroveSnapshotsUpdated
-        - event: TroveUpdated(indexed address,uint256,uint256,uint256,uint8)
-          handler: handleTroveUpdated
-        - event: CollateralUpdated(address,address[])
-          handler: handleCollateralUpdated
       file: ./src/trove-manager.ts
+  - kind: ethereum
+    name: StoragePool
+    network: development
+    source:
+      address: "0x25309189268017d8C79C8dacCbF44EC25C12FEB4"
+      abi: StoragePool
+      startBlock: 0
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      entities:
+        - StoragePoolOwnershipTransferred
+        - StoragePoolInitialized
+        - StoragePoolValueUpdated
+      abis:
+        - name: StoragePool
+          file: ./abis/StoragePool.json
+      eventHandlers:
+        - event: OwnershipTransferred(indexed address,indexed address)
+          handler: handleOwnershipTransferred
+        - event: StoragePoolInitialized(address,address,address,address,address)
+          handler: handleStoragePoolInitialized
+        - event: StoragePoolValueUpdated(address,bool,uint8,uint256)
+          handler: handleStoragePoolValueUpdated
+      file: ./src/storage-pool.ts
   - kind: ethereum
     name: StabilityPool
     network: development
     source:
-      address: '0x25309189268017d8C79C8dacCbF44EC25C12FEB4'
+      address: "0x25309189268017d8C79C8dacCbF44EC25C12FEB4"
       abi: StabilityPool
-      startBlock: 1
+      startBlock: 0
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.7
       language: wasm/assemblyscript
       entities:
         - DepositSnapshotUpdated
-        - DepositTokenAddressChanged
         - EpochUpdated
         - OwnershipTransferred
         - P_Updated
-        - PriceFeedAddressChanged
         - S_Updated
         - ScaleUpdated
-        - StabilityPoolCollBalanceUpdated
-        - StabilityPoolDepositBalanceUpdated
-        - StabilityPoolManagerAddressChanged
-        - StoragePoolAddressChanged
-        - TroveManagerAddressChanged
-        - UserClaimedRewards
-        - UserDepositChanged
+        - StabilityGainsWithdrawn
+        - StabilityOffset
+        - StabilityPoolInitialized
+        - StabilityProvided
+        - StabilityWithdrawn
       abis:
         - name: StabilityPool
           file: ./abis/StabilityPool.json
       eventHandlers:
-        - event: DepositSnapshotUpdated(indexed address,uint256,uint256)
+        - event: DepositSnapshotUpdated(indexed address)
           handler: handleDepositSnapshotUpdated
-        - event: DepositTokenAddressChanged(address)
-          handler: handleDepositTokenAddressChanged
         - event: EpochUpdated(uint128)
           handler: handleEpochUpdated
         - event: OwnershipTransferred(indexed address,indexed address)
           handler: handleOwnershipTransferred
         - event: P_Updated(uint256)
           handler: handleP_Updated
-        - event: PriceFeedAddressChanged(address)
-          handler: handlePriceFeedAddressChanged
         - event: S_Updated(address,uint256,uint128,uint128)
           handler: handleS_Updated
         - event: ScaleUpdated(uint128)
           handler: handleScaleUpdated
-        - event: StabilityPoolCollBalanceUpdated(address)
-          handler: handleStabilityPoolCollBalanceUpdated
-        - event: StabilityPoolDepositBalanceUpdated()
-          handler: handleStabilityPoolDepositBalanceUpdated
-        - event: StabilityPoolManagerAddressChanged(address)
-          handler: handleStabilityPoolManagerAddressChanged
-        - event: StoragePoolAddressChanged(address)
-          handler: handleStoragePoolAddressChanged
-        - event: TroveManagerAddressChanged(address)
-          handler: handleTroveManagerAddressChanged
-        - event: UserClaimedRewards(address)
-          handler: handleUserClaimedRewards
-        - event: UserDepositChanged(address)
-          handler: handleUserDepositChanged
+        - event: StabilityGainsWithdrawn(address,uint256,(address,uint256)[])
+          handler: handleStabilityGainsWithdrawn
+        - event: StabilityOffset(uint256,(address,uint256)[])
+          handler: handleStabilityOffset
+        - event: StabilityPoolInitialized(address,address,address,address,address)
+          handler: handleStabilityPoolInitialized
+        - event: StabilityProvided(address,uint256)
+          handler: handleStabilityProvided
+        - event: StabilityWithdrawn(address,uint256)
+          handler: handleStabilityWithdrawn
       file: ./src/stability-pool.ts
   - kind: ethereum
-    name: StoragePool
+    name: StabilityPoolManager
     network: development
     source:
-      address: '0x25309189268017d8C79C8dacCbF44EC25C12FEB4'
-      abi: StoragePool
-      startBlock: 1
+      address: "0x25309189268017d8C79C8dacCbF44EC25C12FEB4"
+      abi: StabilityPoolManager
+      startBlock: 0
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.7
       language: wasm/assemblyscript
       entities:
-        - StoragePoolBorrowerOperationsAddressChanged
-        - StoragePoolOwnershipTransferred
-        - PoolValueUpdated
-        - StoragePoolPriceFeedAddressChanged
-        - StoragePoolStabilityPoolManagerAddressChanged
-        - StoragePoolTroveManagerAddressChanged
+        - StabilityPoolManagerOwnershipTransferred
+        - StabilityPoolAdded
+        - StabilityPoolManagerInitiated
       abis:
-        - name: StoragePool
-          file: ./abis/StoragePool.json
+        - name: StabilityPoolManager
+          file: ./abis/StabilityPoolManager.json
       eventHandlers:
-        - event: BorrowerOperationsAddressChanged(address)
-          handler: handleBorrowerOperationsAddressChanged
         - event: OwnershipTransferred(indexed address,indexed address)
           handler: handleOwnershipTransferred
-        - event: PoolValueUpdated(address,bool,uint8,uint256)
-          handler: handlePoolValueUpdated
-        - event: PriceFeedAddressChanged(address)
-          handler: handlePriceFeedAddressChanged
-        - event: StabilityPoolManagerAddressChanged(address)
-          handler: handleStabilityPoolManagerAddressChanged
-        - event: TroveManagerAddressChanged(address)
-          handler: handleTroveManagerAddressChanged
-      file: ./src/storage-pool.ts
+        - event: StabilityPoolAdded(address)
+          handler: handleStabilityPoolAdded
+        - event: StabilityPoolManagerInitiated(address,address,address,address)
+          handler: handleStabilityPoolManagerInitiated
+      file: ./src/stability-pool-manager.ts
+  - kind: ethereum
+    name: DebtToken
+    network: development
+    source:
+      address: "0x25309189268017d8C79C8dacCbF44EC25C12FEB4"
+      abi: DebtToken
+      startBlock: 0
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      entities:
+        - Approval
+        - Transfer
+      abis:
+        - name: DebtToken
+          file: ./abis/DebtToken.json
+      eventHandlers:
+        - event: Approval(indexed address,indexed address,uint256)
+          handler: handleApproval
+        - event: Transfer(indexed address,indexed address,uint256)
+          handler: handleTransfer
+      file: ./src/debt-token.ts

@@ -1,14 +1,7 @@
 import { Address, BigInt, ethereum } from '@graphprotocol/graph-ts';
 import { Address as EventAddress } from '@graphprotocol/graph-ts/common/numbers';
 import { newMockEvent } from 'matchstick-as';
-import {
-  Approval,
-  BorrowerOperationsAddressChanged,
-  PriceFeedAddressChanged,
-  StabilityPoolManagerAddressChanged,
-  Transfer,
-  TroveManagerAddressChanged,
-} from '../generated/DebtToken/DebtToken';
+import { Approval, Transfer } from '../generated/DebtToken/DebtToken';
 
 export const MockDebtTokenAddress = EventAddress.fromString('0x0000000000000000000000000000000000000100');
 export const MockStabilityPoolManagerAddress = EventAddress.fromString('0x0000000000000000000000000000000000000200');
@@ -24,6 +17,7 @@ export const MockUserAddress = EventAddress.fromString('0x1000000000000000000000
 
 export function createApprovalEvent(owner: Address, spender: Address, value: BigInt): Approval {
   let approvalEvent = changetype<Approval>(newMockEvent());
+  approvalEvent.address = MockDebtTokenAddress;
 
   approvalEvent.parameters = new Array();
 
@@ -32,49 +26,6 @@ export function createApprovalEvent(owner: Address, spender: Address, value: Big
   approvalEvent.parameters.push(new ethereum.EventParam('value', ethereum.Value.fromUnsignedBigInt(value)));
 
   return approvalEvent;
-}
-
-export function createBorrowerOperationsAddressChangedEvent(
-  _newBorrowerOperationsAddress: Address,
-): BorrowerOperationsAddressChanged {
-  let borrowerOperationsAddressChangedEvent = changetype<BorrowerOperationsAddressChanged>(newMockEvent());
-
-  borrowerOperationsAddressChangedEvent.parameters = new Array();
-
-  borrowerOperationsAddressChangedEvent.parameters.push(
-    new ethereum.EventParam('_newBorrowerOperationsAddress', ethereum.Value.fromAddress(_newBorrowerOperationsAddress)),
-  );
-
-  return borrowerOperationsAddressChangedEvent;
-}
-
-export function createPriceFeedAddressChangedEvent(_newPriceFeedAddress: Address): PriceFeedAddressChanged {
-  let priceFeedAddressChangedEvent = changetype<PriceFeedAddressChanged>(newMockEvent());
-  priceFeedAddressChangedEvent.address = MockDebtTokenAddress;
-  priceFeedAddressChangedEvent.parameters = new Array();
-
-  priceFeedAddressChangedEvent.parameters.push(
-    new ethereum.EventParam('_newPriceFeedAddress', ethereum.Value.fromAddress(_newPriceFeedAddress)),
-  );
-
-  return priceFeedAddressChangedEvent;
-}
-
-export function createStabilityPoolManagerAddressChangedEvent(
-  _newStabilityPoolManagerAddress: Address,
-): StabilityPoolManagerAddressChanged {
-  let stabilityPoolManagerAddressChangedEvent = changetype<StabilityPoolManagerAddressChanged>(newMockEvent());
-
-  stabilityPoolManagerAddressChangedEvent.parameters = new Array();
-
-  stabilityPoolManagerAddressChangedEvent.parameters.push(
-    new ethereum.EventParam(
-      '_newStabilityPoolManagerAddress',
-      ethereum.Value.fromAddress(_newStabilityPoolManagerAddress),
-    ),
-  );
-
-  return stabilityPoolManagerAddressChangedEvent;
 }
 
 export function createTransferEvent(from: Address, to: Address, value: BigInt): Transfer {
@@ -88,16 +39,4 @@ export function createTransferEvent(from: Address, to: Address, value: BigInt): 
   transferEvent.parameters.push(new ethereum.EventParam('value', ethereum.Value.fromUnsignedBigInt(value)));
 
   return transferEvent;
-}
-
-export function createTroveManagerAddressChangedEvent(_newTroveManagerAddress: Address): TroveManagerAddressChanged {
-  let troveManagerAddressChangedEvent = changetype<TroveManagerAddressChanged>(newMockEvent());
-
-  troveManagerAddressChangedEvent.parameters = new Array();
-
-  troveManagerAddressChangedEvent.parameters.push(
-    new ethereum.EventParam('_newTroveManagerAddress', ethereum.Value.fromAddress(_newTroveManagerAddress)),
-  );
-
-  return troveManagerAddressChangedEvent;
 }

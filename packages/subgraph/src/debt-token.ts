@@ -1,21 +1,9 @@
-import {
-  Approval as ApprovalEvent,
-  BorrowerOperationsAddressChanged as BorrowerOperationsAddressChangedEvent,
-  PriceFeedAddressChanged as PriceFeedAddressChangedEvent,
-  StabilityPoolManagerAddressChanged as StabilityPoolManagerAddressChangedEvent,
-  Transfer as TransferEvent,
-  TroveManagerAddressChanged as TroveManagerAddressChangedEvent,
-} from '../generated/DebtToken/DebtToken';
+import { Approval as ApprovalEvent, Transfer as TransferEvent } from '../generated/DebtToken/DebtToken';
 import { handleCreateDebtTokenMeta } from './entities/debt-token-meta-entity';
 import { handleCreateToken } from './entities/token-entity';
 
-export function handleBorrowerOperationsAddressChanged(event: BorrowerOperationsAddressChangedEvent): void {}
-
-export function handleTroveManagerAddressChanged(event: TroveManagerAddressChangedEvent): void {}
-
-export function handleStabilityPoolManagerAddressChanged(event: StabilityPoolManagerAddressChangedEvent): void {}
-
-export function handlePriceFeedAddressChanged(event: PriceFeedAddressChangedEvent): void {
+export function handleApproval(event: ApprovalEvent): void {
+  // FIXME: This is wrong, we need an init event
   handleCreateToken(event, event.address);
 }
 
@@ -24,4 +12,5 @@ export function handleTransfer(event: TransferEvent): void {
   handleCreateDebtTokenMeta(event, event.address);
 }
 
-export function handleApproval(event: ApprovalEvent): void {}
+// export function handlePriceFeedAddressChanged(event: PriceFeedAddressChangedEvent): void {
+// }

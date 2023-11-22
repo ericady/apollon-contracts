@@ -10,19 +10,6 @@
     "anonymous": false,
     "inputs": [
       {
-        "indexed": false,
-        "internalType": "address",
-        "name": "_debtTokenManagerAddress",
-        "type": "address"
-      }
-    ],
-    "name": "DebtTokenManagerAddressChanged",
-    "type": "event"
-  },
-  {
-    "anonymous": false,
-    "inputs": [
-      {
         "indexed": true,
         "internalType": "address",
         "name": "previousOwner",
@@ -44,20 +31,7 @@
       {
         "indexed": false,
         "internalType": "address",
-        "name": "_newPriceFeedAddress",
-        "type": "address"
-      }
-    ],
-    "name": "PriceFeedAddressChanged",
-    "type": "event"
-  },
-  {
-    "anonymous": false,
-    "inputs": [
-      {
-        "indexed": false,
-        "internalType": "contract IStabilityPool",
-        "name": "_stabilityPool",
+        "name": "stabilityPoolAddress",
         "type": "address"
       }
     ],
@@ -70,24 +44,29 @@
       {
         "indexed": false,
         "internalType": "address",
-        "name": "_newStoragePoolAddress",
+        "name": "troveManagerAddress",
         "type": "address"
-      }
-    ],
-    "name": "StoragePoolAddressChanged",
-    "type": "event"
-  },
-  {
-    "anonymous": false,
-    "inputs": [
+      },
       {
         "indexed": false,
         "internalType": "address",
-        "name": "_newTroveManagerAddress",
+        "name": "storgePoolAddress",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "address",
+        "name": "debtTokenManagerAddress",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "address",
+        "name": "priceFeedAddress",
         "type": "address"
       }
     ],
-    "name": "TroveManagerAddressChanged",
+    "name": "StabilityPoolManagerInitiated",
     "type": "event"
   },
   {
@@ -356,7 +335,9 @@
     "type": "function"
   },
   {
-    "inputs": [{ "internalType": "contract IDebtToken", "name": "", "type": "address" }],
+    "inputs": [
+      { "internalType": "contract IDebtToken", "name": "", "type": "address" }
+    ],
     "name": "stabilityPools",
     "outputs": [
       {
@@ -384,12 +365,16 @@
   {
     "inputs": [],
     "name": "storagePool",
-    "outputs": [{ "internalType": "contract IStoragePool", "name": "", "type": "address" }],
+    "outputs": [
+      { "internalType": "contract IStoragePool", "name": "", "type": "address" }
+    ],
     "stateMutability": "view",
     "type": "function"
   },
   {
-    "inputs": [{ "internalType": "address", "name": "newOwner", "type": "address" }],
+    "inputs": [
+      { "internalType": "address", "name": "newOwner", "type": "address" }
+    ],
     "name": "transferOwnership",
     "outputs": [],
     "stateMutability": "nonpayable",
@@ -400,6 +385,13 @@
     "name": "troveManagerAddress",
     "outputs": [{ "internalType": "address", "name": "", "type": "address" }],
     "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "withdrawGains",
+    "outputs": [],
+    "stateMutability": "nonpayable",
     "type": "function"
   },
   {
@@ -418,7 +410,7 @@
         "type": "tuple[]"
       }
     ],
-    "name": "withdrawalStability",
+    "name": "withdrawStability",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"

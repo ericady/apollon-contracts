@@ -44,34 +44,9 @@
         "internalType": "address",
         "name": "_depositor",
         "type": "address"
-      },
-      {
-        "indexed": false,
-        "internalType": "uint256",
-        "name": "_P",
-        "type": "uint256"
-      },
-      {
-        "indexed": false,
-        "internalType": "uint256",
-        "name": "_S",
-        "type": "uint256"
       }
     ],
     "name": "DepositSnapshotUpdated",
-    "type": "event"
-  },
-  {
-    "anonymous": false,
-    "inputs": [
-      {
-        "indexed": false,
-        "internalType": "address",
-        "name": "_newDepositTokenAddress",
-        "type": "address"
-      }
-    ],
-    "name": "DepositTokenAddressChanged",
     "type": "event"
   },
   {
@@ -125,19 +100,6 @@
       {
         "indexed": false,
         "internalType": "address",
-        "name": "_newPriceFeedAddress",
-        "type": "address"
-      }
-    ],
-    "name": "PriceFeedAddressChanged",
-    "type": "event"
-  },
-  {
-    "anonymous": false,
-    "inputs": [
-      {
-        "indexed": false,
-        "internalType": "address",
         "name": "_tokenAddress",
         "type": "address"
       },
@@ -182,17 +144,58 @@
       {
         "indexed": false,
         "internalType": "address",
-        "name": "_tokenAddress",
+        "name": "user",
         "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "depositLost",
+        "type": "uint256"
+      },
+      {
+        "components": [
+          {
+            "internalType": "address",
+            "name": "tokenAddress",
+            "type": "address"
+          },
+          { "internalType": "uint256", "name": "amount", "type": "uint256" }
+        ],
+        "indexed": false,
+        "internalType": "struct IBase.TokenAmount[]",
+        "name": "gainsWithdrawn",
+        "type": "tuple[]"
       }
     ],
-    "name": "StabilityPoolCollBalanceUpdated",
+    "name": "StabilityGainsWithdrawn",
     "type": "event"
   },
   {
     "anonymous": false,
-    "inputs": [],
-    "name": "StabilityPoolDepositBalanceUpdated",
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "removedDeposit",
+        "type": "uint256"
+      },
+      {
+        "components": [
+          {
+            "internalType": "address",
+            "name": "tokenAddress",
+            "type": "address"
+          },
+          { "internalType": "uint256", "name": "amount", "type": "uint256" }
+        ],
+        "indexed": false,
+        "internalType": "struct IBase.TokenAmount[]",
+        "name": "addedGains",
+        "type": "tuple[]"
+      }
+    ],
+    "name": "StabilityOffset",
     "type": "event"
   },
   {
@@ -201,37 +204,35 @@
       {
         "indexed": false,
         "internalType": "address",
-        "name": "_newStabilityPoolManagerAddress",
+        "name": "stabilityPoolManagerAddress",
         "type": "address"
-      }
-    ],
-    "name": "StabilityPoolManagerAddressChanged",
-    "type": "event"
-  },
-  {
-    "anonymous": false,
-    "inputs": [
+      },
       {
         "indexed": false,
         "internalType": "address",
-        "name": "_newStoragePoolAddress",
+        "name": "troveManagerAddress",
         "type": "address"
-      }
-    ],
-    "name": "StoragePoolAddressChanged",
-    "type": "event"
-  },
-  {
-    "anonymous": false,
-    "inputs": [
+      },
       {
         "indexed": false,
         "internalType": "address",
-        "name": "_newTroveManagerAddress",
+        "name": "storagePoolAddress",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "address",
+        "name": "priceFeedAddress",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "address",
+        "name": "depositTokenAddress",
         "type": "address"
       }
     ],
-    "name": "TroveManagerAddressChanged",
+    "name": "StabilityPoolInitialized",
     "type": "event"
   },
   {
@@ -242,9 +243,15 @@
         "internalType": "address",
         "name": "user",
         "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "amount",
+        "type": "uint256"
       }
     ],
-    "name": "UserClaimedRewards",
+    "name": "StabilityProvided",
     "type": "event"
   },
   {
@@ -255,9 +262,15 @@
         "internalType": "address",
         "name": "user",
         "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "uint256",
+        "name": "amount",
+        "type": "uint256"
       }
     ],
-    "name": "UserDepositChanged",
+    "name": "StabilityWithdrawn",
     "type": "event"
   },
   {
@@ -351,7 +364,9 @@
   {
     "inputs": [],
     "name": "depositToken",
-    "outputs": [{ "internalType": "contract IDebtToken", "name": "", "type": "address" }],
+    "outputs": [
+      { "internalType": "contract IDebtToken", "name": "", "type": "address" }
+    ],
     "stateMutability": "view",
     "type": "function"
   },
@@ -374,7 +389,9 @@
     "type": "function"
   },
   {
-    "inputs": [{ "internalType": "address", "name": "_depositor", "type": "address" }],
+    "inputs": [
+      { "internalType": "address", "name": "_depositor", "type": "address" }
+    ],
     "name": "getCompoundedDebtDeposit",
     "outputs": [{ "internalType": "uint256", "name": "", "type": "uint256" }],
     "stateMutability": "view",
@@ -383,7 +400,9 @@
   {
     "inputs": [],
     "name": "getDepositToken",
-    "outputs": [{ "internalType": "contract IDebtToken", "name": "", "type": "address" }],
+    "outputs": [
+      { "internalType": "contract IDebtToken", "name": "", "type": "address" }
+    ],
     "stateMutability": "view",
     "type": "function"
   },
@@ -393,7 +412,9 @@
       { "internalType": "address", "name": "_collToken", "type": "address" }
     ],
     "name": "getDepositorCollGain",
-    "outputs": [{ "internalType": "uint256", "name": "collGain", "type": "uint256" }],
+    "outputs": [
+      { "internalType": "uint256", "name": "collGain", "type": "uint256" }
+    ],
     "stateMutability": "view",
     "type": "function"
   },
@@ -481,7 +502,9 @@
   {
     "inputs": [],
     "name": "priceFeed",
-    "outputs": [{ "internalType": "contract IPriceFeed", "name": "", "type": "address" }],
+    "outputs": [
+      { "internalType": "contract IPriceFeed", "name": "", "type": "address" }
+    ],
     "stateMutability": "view",
     "type": "function"
   },
@@ -512,7 +535,9 @@
   {
     "inputs": [],
     "name": "storagePool",
-    "outputs": [{ "internalType": "contract IStoragePool", "name": "", "type": "address" }],
+    "outputs": [
+      { "internalType": "contract IStoragePool", "name": "", "type": "address" }
+    ],
     "stateMutability": "view",
     "type": "function"
   },
@@ -531,7 +556,9 @@
     "type": "function"
   },
   {
-    "inputs": [{ "internalType": "address", "name": "newOwner", "type": "address" }],
+    "inputs": [
+      { "internalType": "address", "name": "newOwner", "type": "address" }
+    ],
     "name": "transferOwnership",
     "outputs": [],
     "stateMutability": "nonpayable",
@@ -562,7 +589,7 @@
       { "internalType": "address", "name": "user", "type": "address" },
       {
         "internalType": "uint256",
-        "name": "debtToWithdrawal",
+        "name": "depositToWithdrawal",
         "type": "uint256"
       }
     ],
@@ -572,7 +599,9 @@
     "type": "function"
   },
   {
-    "inputs": [],
+    "inputs": [
+      { "internalType": "address", "name": "user", "type": "address" }
+    ],
     "name": "withdrawGains",
     "outputs": [],
     "stateMutability": "nonpayable",

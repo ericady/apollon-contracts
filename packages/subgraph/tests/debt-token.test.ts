@@ -1,14 +1,14 @@
 import { Address, BigInt, ethereum } from '@graphprotocol/graph-ts';
 import { afterAll, assert, clearStore, createMockedFunction, describe, test } from 'matchstick-as/assembly/index';
 import { Token } from '../generated/schema';
-import { handlePriceFeedAddressChanged, handleTransfer } from '../src/debt-token';
+import { handleApproval, handleTransfer } from '../src/debt-token';
 import {
   MockDebtTokenAddress,
   MockStabilityPoolAddress,
   MockStabilityPoolManagerAddress,
   MockTroveManagerAddress,
   MockUserAddress,
-  createPriceFeedAddressChangedEvent,
+  createApprovalEvent,
   createTransferEvent,
 } from './debt-token-utils';
 import { mockStabilityPoolManagerGetStabilityPool } from './stability-pool-manager.test';
@@ -63,13 +63,16 @@ describe('handlePriceFeedAddressChanged()', () => {
   });
 
   test('Token entity created and stored', () => {
-    const newCreatedEvent = createPriceFeedAddressChangedEvent(
-      Address.fromString('0x0000000000000000000000000000000000000001'),
+    // FIXME: Exchange for real event that inits Token
+    const newCreatedEvent = createApprovalEvent(
+      Address.fromString('0x1000000000000000000000000000000000000001'),
+      Address.fromString('0x2000000000000000000000000000000000000001'),
+      BigInt.fromI32(1),
     );
     mockDebtTokenSymbol();
     mockDebtTokenPrice();
 
-    handlePriceFeedAddressChanged(newCreatedEvent);
+    handleApproval(newCreatedEvent);
 
     assert.entityCount('Token', 1);
 

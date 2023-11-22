@@ -1,7 +1,7 @@
 import { Address, BigInt, ethereum } from '@graphprotocol/graph-ts';
 import { afterAll, assert, clearStore, createMockedFunction, describe, test } from 'matchstick-as/assembly/index';
 import { UserDebtTokenMeta } from '../generated/schema';
-import { handleUserClaimedRewards } from '../src/stability-pool';
+import { handleStabilityGainsWithdrawn } from '../src/stability-pool';
 import { MockDebtTokenAddress, MockStabilityPoolAddress, MockUserAddress } from './debt-token-utils';
 import {
   mockDebtTokenBalanceOf,
@@ -9,7 +9,7 @@ import {
   mockDebtTokenTroveManagerAddress,
 } from './debt-token.test';
 import { mockStabilityPoolManagerGetStabilityPool } from './stability-pool-manager.test';
-import { createUserClaimedRewardsEvent } from './stability-pool-utils';
+import { createStabilityGainsWithdrawnEvent } from './stability-pool-utils';
 import { mockTroveManagerGetTroveDebt } from './trove-manager.test';
 
 export const mockStabilityPoolGetDepositToken = (): void => {
@@ -38,8 +38,10 @@ describe('handleUserClaimedRewards()', () => {
   });
 
   test('UserDebtTokenMeta entity is created', () => {
-    const newUserClaimedRewardsEvent = createUserClaimedRewardsEvent(
+    const newStabilityGainsWithdrawnEvent = createStabilityGainsWithdrawnEvent(
       Address.fromString('0x1000000000000000000000000000000000000000'),
+      BigInt.fromI32(10),
+      [],
     );
 
     mockStabilityPoolGetDepositToken();
@@ -51,7 +53,7 @@ describe('handleUserClaimedRewards()', () => {
     mockStabilityPoolManagerGetStabilityPool();
     mockStabilityPoolGetCompoundedDebtDeposit();
 
-    handleUserClaimedRewards(newUserClaimedRewardsEvent);
+    handleStabilityGainsWithdrawn(newStabilityGainsWithdrawnEvent);
 
     assert.entityCount('UserDebtTokenMeta', 1);
     const entityId = `UserDebtTokenMeta-${MockDebtTokenAddress.toHexString()}-${MockUserAddress.toHexString()}`;
@@ -81,8 +83,10 @@ describe('handleUserClaimedRewards()', () => {
     userDebtTokenMeta.stabilityCompoundAmount = BigInt.fromI32(1000);
     userDebtTokenMeta.save();
 
-    const newUserClaimedRewardsEvent = createUserClaimedRewardsEvent(
+    const newStabilityGainsWithdrawnEvent = createStabilityGainsWithdrawnEvent(
       Address.fromString('0x1000000000000000000000000000000000000000'),
+      BigInt.fromI32(10),
+      [],
     );
 
     mockStabilityPoolGetDepositToken();
@@ -94,7 +98,7 @@ describe('handleUserClaimedRewards()', () => {
     mockStabilityPoolManagerGetStabilityPool();
     mockStabilityPoolGetCompoundedDebtDeposit();
 
-    handleUserClaimedRewards(newUserClaimedRewardsEvent);
+    handleStabilityGainsWithdrawn(newStabilityGainsWithdrawnEvent);
 
     assert.entityCount('UserDebtTokenMeta', 1);
 

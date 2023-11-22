@@ -2,24 +2,20 @@ import { Address, BigInt, ethereum } from '@graphprotocol/graph-ts';
 import { newMockEvent } from 'matchstick-as';
 import {
   DepositSnapshotUpdated,
-  DepositTokenAddressChanged,
   EpochUpdated,
   OwnershipTransferred,
   P_Updated,
-  PriceFeedAddressChanged,
   S_Updated,
   ScaleUpdated,
-  StabilityPoolCollBalanceUpdated,
-  StabilityPoolDepositBalanceUpdated,
-  StabilityPoolManagerAddressChanged,
-  StoragePoolAddressChanged,
-  TroveManagerAddressChanged,
-  UserClaimedRewards,
-  UserDepositChanged,
+  StabilityGainsWithdrawn,
+  StabilityOffset,
+  StabilityPoolInitialized,
+  StabilityProvided,
+  StabilityWithdrawn,
 } from '../generated/StabilityPool/StabilityPool';
 import { MockStabilityPoolAddress } from './debt-token-utils';
 
-export function createDepositSnapshotUpdatedEvent(_depositor: Address, _P: BigInt, _S: BigInt): DepositSnapshotUpdated {
+export function createDepositSnapshotUpdatedEvent(_depositor: Address): DepositSnapshotUpdated {
   let depositSnapshotUpdatedEvent = changetype<DepositSnapshotUpdated>(newMockEvent());
 
   depositSnapshotUpdatedEvent.parameters = new Array();
@@ -27,22 +23,8 @@ export function createDepositSnapshotUpdatedEvent(_depositor: Address, _P: BigIn
   depositSnapshotUpdatedEvent.parameters.push(
     new ethereum.EventParam('_depositor', ethereum.Value.fromAddress(_depositor)),
   );
-  depositSnapshotUpdatedEvent.parameters.push(new ethereum.EventParam('_P', ethereum.Value.fromUnsignedBigInt(_P)));
-  depositSnapshotUpdatedEvent.parameters.push(new ethereum.EventParam('_S', ethereum.Value.fromUnsignedBigInt(_S)));
 
   return depositSnapshotUpdatedEvent;
-}
-
-export function createDepositTokenAddressChangedEvent(_newDepositTokenAddress: Address): DepositTokenAddressChanged {
-  let depositTokenAddressChangedEvent = changetype<DepositTokenAddressChanged>(newMockEvent());
-
-  depositTokenAddressChangedEvent.parameters = new Array();
-
-  depositTokenAddressChangedEvent.parameters.push(
-    new ethereum.EventParam('_newDepositTokenAddress', ethereum.Value.fromAddress(_newDepositTokenAddress)),
-  );
-
-  return depositTokenAddressChangedEvent;
 }
 
 export function createEpochUpdatedEvent(_currentEpoch: BigInt): EpochUpdated {
@@ -80,18 +62,6 @@ export function createP_UpdatedEvent(_P: BigInt): P_Updated {
   return pUpdatedEvent;
 }
 
-export function createPriceFeedAddressChangedEvent(_newPriceFeedAddress: Address): PriceFeedAddressChanged {
-  let priceFeedAddressChangedEvent = changetype<PriceFeedAddressChanged>(newMockEvent());
-
-  priceFeedAddressChangedEvent.parameters = new Array();
-
-  priceFeedAddressChangedEvent.parameters.push(
-    new ethereum.EventParam('_newPriceFeedAddress', ethereum.Value.fromAddress(_newPriceFeedAddress)),
-  );
-
-  return priceFeedAddressChangedEvent;
-}
-
 export function createS_UpdatedEvent(_tokenAddress: Address, _S: BigInt, _epoch: BigInt, _scale: BigInt): S_Updated {
   let sUpdatedEvent = changetype<S_Updated>(newMockEvent());
 
@@ -117,83 +87,90 @@ export function createScaleUpdatedEvent(_currentScale: BigInt): ScaleUpdated {
   return scaleUpdatedEvent;
 }
 
-export function createStabilityPoolCollBalanceUpdatedEvent(_tokenAddress: Address): StabilityPoolCollBalanceUpdated {
-  let stabilityPoolCollBalanceUpdatedEvent = changetype<StabilityPoolCollBalanceUpdated>(newMockEvent());
+export function createStabilityGainsWithdrawnEvent(
+  user: Address,
+  depositLost: BigInt,
+  gainsWithdrawn: Array<ethereum.Tuple>,
+): StabilityGainsWithdrawn {
+  let stabilityGainsWithdrawnEvent = changetype<StabilityGainsWithdrawn>(newMockEvent());
+  stabilityGainsWithdrawnEvent.address = MockStabilityPoolAddress;
 
-  stabilityPoolCollBalanceUpdatedEvent.parameters = new Array();
+  stabilityGainsWithdrawnEvent.parameters = new Array();
 
-  stabilityPoolCollBalanceUpdatedEvent.parameters.push(
-    new ethereum.EventParam('_tokenAddress', ethereum.Value.fromAddress(_tokenAddress)),
+  stabilityGainsWithdrawnEvent.parameters.push(new ethereum.EventParam('user', ethereum.Value.fromAddress(user)));
+  stabilityGainsWithdrawnEvent.parameters.push(
+    new ethereum.EventParam('depositLost', ethereum.Value.fromUnsignedBigInt(depositLost)),
+  );
+  stabilityGainsWithdrawnEvent.parameters.push(
+    new ethereum.EventParam('gainsWithdrawn', ethereum.Value.fromTupleArray(gainsWithdrawn)),
   );
 
-  return stabilityPoolCollBalanceUpdatedEvent;
+  return stabilityGainsWithdrawnEvent;
 }
 
-export function createStabilityPoolDepositBalanceUpdatedEvent(): StabilityPoolDepositBalanceUpdated {
-  let stabilityPoolDepositBalanceUpdatedEvent = changetype<StabilityPoolDepositBalanceUpdated>(newMockEvent());
+export function createStabilityOffsetEvent(removedDeposit: BigInt, addedGains: Array<ethereum.Tuple>): StabilityOffset {
+  let stabilityOffsetEvent = changetype<StabilityOffset>(newMockEvent());
 
-  stabilityPoolDepositBalanceUpdatedEvent.parameters = new Array();
+  stabilityOffsetEvent.parameters = new Array();
 
-  return stabilityPoolDepositBalanceUpdatedEvent;
-}
-
-export function createStabilityPoolManagerAddressChangedEvent(
-  _newStabilityPoolManagerAddress: Address,
-): StabilityPoolManagerAddressChanged {
-  let stabilityPoolManagerAddressChangedEvent = changetype<StabilityPoolManagerAddressChanged>(newMockEvent());
-
-  stabilityPoolManagerAddressChangedEvent.parameters = new Array();
-
-  stabilityPoolManagerAddressChangedEvent.parameters.push(
-    new ethereum.EventParam(
-      '_newStabilityPoolManagerAddress',
-      ethereum.Value.fromAddress(_newStabilityPoolManagerAddress),
-    ),
+  stabilityOffsetEvent.parameters.push(
+    new ethereum.EventParam('removedDeposit', ethereum.Value.fromUnsignedBigInt(removedDeposit)),
+  );
+  stabilityOffsetEvent.parameters.push(
+    new ethereum.EventParam('addedGains', ethereum.Value.fromTupleArray(addedGains)),
   );
 
-  return stabilityPoolManagerAddressChangedEvent;
+  return stabilityOffsetEvent;
 }
 
-export function createStoragePoolAddressChangedEvent(_newStoragePoolAddress: Address): StoragePoolAddressChanged {
-  let storagePoolAddressChangedEvent = changetype<StoragePoolAddressChanged>(newMockEvent());
+export function createStabilityPoolInitializedEvent(
+  stabilityPoolManagerAddress: Address,
+  troveManagerAddress: Address,
+  storagePoolAddress: Address,
+  priceFeedAddress: Address,
+  depositTokenAddress: Address,
+): StabilityPoolInitialized {
+  let stabilityPoolInitializedEvent = changetype<StabilityPoolInitialized>(newMockEvent());
 
-  storagePoolAddressChangedEvent.parameters = new Array();
+  stabilityPoolInitializedEvent.parameters = new Array();
 
-  storagePoolAddressChangedEvent.parameters.push(
-    new ethereum.EventParam('_newStoragePoolAddress', ethereum.Value.fromAddress(_newStoragePoolAddress)),
+  stabilityPoolInitializedEvent.parameters.push(
+    new ethereum.EventParam('stabilityPoolManagerAddress', ethereum.Value.fromAddress(stabilityPoolManagerAddress)),
+  );
+  stabilityPoolInitializedEvent.parameters.push(
+    new ethereum.EventParam('troveManagerAddress', ethereum.Value.fromAddress(troveManagerAddress)),
+  );
+  stabilityPoolInitializedEvent.parameters.push(
+    new ethereum.EventParam('storagePoolAddress', ethereum.Value.fromAddress(storagePoolAddress)),
+  );
+  stabilityPoolInitializedEvent.parameters.push(
+    new ethereum.EventParam('priceFeedAddress', ethereum.Value.fromAddress(priceFeedAddress)),
+  );
+  stabilityPoolInitializedEvent.parameters.push(
+    new ethereum.EventParam('depositTokenAddress', ethereum.Value.fromAddress(depositTokenAddress)),
   );
 
-  return storagePoolAddressChangedEvent;
+  return stabilityPoolInitializedEvent;
 }
 
-export function createTroveManagerAddressChangedEvent(_newTroveManagerAddress: Address): TroveManagerAddressChanged {
-  let troveManagerAddressChangedEvent = changetype<TroveManagerAddressChanged>(newMockEvent());
+export function createStabilityProvidedEvent(user: Address, amount: BigInt): StabilityProvided {
+  let stabilityProvidedEvent = changetype<StabilityProvided>(newMockEvent());
 
-  troveManagerAddressChangedEvent.parameters = new Array();
+  stabilityProvidedEvent.parameters = new Array();
 
-  troveManagerAddressChangedEvent.parameters.push(
-    new ethereum.EventParam('_newTroveManagerAddress', ethereum.Value.fromAddress(_newTroveManagerAddress)),
-  );
+  stabilityProvidedEvent.parameters.push(new ethereum.EventParam('user', ethereum.Value.fromAddress(user)));
+  stabilityProvidedEvent.parameters.push(new ethereum.EventParam('amount', ethereum.Value.fromUnsignedBigInt(amount)));
 
-  return troveManagerAddressChangedEvent;
+  return stabilityProvidedEvent;
 }
 
-export function createUserClaimedRewardsEvent(user: Address): UserClaimedRewards {
-  let UserClaimedRewardsEvent = changetype<UserClaimedRewards>(newMockEvent());
-  UserClaimedRewardsEvent.address = MockStabilityPoolAddress;
-  UserClaimedRewardsEvent.parameters = new Array();
+export function createStabilityWithdrawnEvent(user: Address, amount: BigInt): StabilityWithdrawn {
+  let stabilityWithdrawnEvent = changetype<StabilityWithdrawn>(newMockEvent());
 
-  UserClaimedRewardsEvent.parameters.push(new ethereum.EventParam('user', ethereum.Value.fromAddress(user)));
+  stabilityWithdrawnEvent.parameters = new Array();
 
-  return UserClaimedRewardsEvent;
-}
+  stabilityWithdrawnEvent.parameters.push(new ethereum.EventParam('user', ethereum.Value.fromAddress(user)));
+  stabilityWithdrawnEvent.parameters.push(new ethereum.EventParam('amount', ethereum.Value.fromUnsignedBigInt(amount)));
 
-export function createUserDepositChangedEvent(user: Address): UserDepositChanged {
-  let userDepositChangedEvent = changetype<UserDepositChanged>(newMockEvent());
-
-  userDepositChangedEvent.parameters = new Array();
-
-  userDepositChangedEvent.parameters.push(new ethereum.EventParam('user', ethereum.Value.fromAddress(user)));
-
-  return userDepositChangedEvent;
+  return stabilityWithdrawnEvent;
 }
