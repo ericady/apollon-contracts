@@ -96,7 +96,7 @@ type PoolLiquidity @entity {
 }
 
 type UserPoolLiquidity @entity {
-  # "UserPoolLiquidity" + TokenA + TokenB + borrower
+  # "UserPoolLiquidity" + main Token + paired Token + borrower
   id: String!
   borrower: Bytes!
   token: Token! @relation(name: "TokenToUserPoolLiquidity")
@@ -109,18 +109,25 @@ type PoolReward @entity(immutable: true) {
   amount: BigInt!
 }
 
-type Pool @entity {
-  id: Bytes!
+type UserPool @entity {
+  # "UserPool" + TokenA + TokenB + borrower
+  id: String!
   borrower: Bytes!
+
+  # Always updated on a user basis
+  userLiquidity: [UserPoolLiquidity!]! @relation(name: "UserPoolLiquidityToPool")
+  # Just pushed once, never updated
+  rewards: [PoolReward!]!
+}
+
+type Pool @entity {
+  # "Pool" + TokenA + TokenB
+  id: Bytes!
 
   # Percent value applied when opening the first position for this pool. Can be negative and positive.
   openingFee: BigInt!
   # Just linked once, always updated for all users
   liquidity: [PoolLiquidity!]! @relation(name: "PoolLiquidityToPool")
-  # Always updated on a user basis
-  userLiquidity: [UserPoolLiquidity!]! @relation(name: "UserPoolLiquidityToPool")
-  # Just pushed once, never updated
-  rewards: [PoolReward!]!
   # TODO: Must be calculated in the subgraph but when
   liquidityDepositAPY: BigInt!
 
@@ -130,21 +137,24 @@ type Pool @entity {
   volume24hUSD24hAgo: PoolVolume24h!
 }
 
-enum LiquidityPoolOperation {
+# Aggregator, pushed old events out and lets new in, recalculating the acc value each time
+type PoolVolume24h @entity {
+  id: Bytes!
+  index: Int!
+  value: BigInt!
+}
+
+enum PoolEventType {
   DEPOSIT
   WITHDRAW
 }
 
-type PoolDepositWithdrawEvent @entity(immutable: true) {
-  id: Bytes!
-  type: LiquidityPoolOperation!
+# A chunk is added once 5min are over and is deducted at the end of 24h
+type PoolVolumeChunk @entity(immutable: true) {
+  # "PoolVolumeChunk" + TokenA + TokenB + index
+  id: String!
   timestamp: BigInt!
+  # determines if value is added of deducted
+  type: PoolEventType!
   value: BigInt!
-}
-
-# Aggregator, pushed old events out and lets new in, recalculating the acc value each time
-type PoolVolume24h @entity {
-  id: Bytes!
-  volumeUSD: BigInt!
-  events: [PoolDepositWithdrawEvent!]!
 }
