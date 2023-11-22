@@ -31,33 +31,60 @@ function extractEntityHandlerFunctions(filePath) {
   return functions;
 }
 
+// Function to extract event handler functions from a file and where they use entity handlers
+function extractEventHandlersUsingEntity(content, entityHandlers) {
+  const regex = /export function (\w+)\([^)]*\): void {([\s\S]*?)}/g;
+  let match;
+  const handlers = {};
+  while ((match = regex.exec(content)) !== null) {
+    const functionName = match[1];
+    const functionBody = match[2];
+    entityHandlers.forEach((entityHandler) => {
+      if (functionBody.includes(entityHandler)) {
+        if (!handlers[entityHandler]) {
+          handlers[entityHandler] = [];
+        }
+        handlers[entityHandler].push(functionName);
+      }
+    });
+  }
+  return handlers;
+}
+
 // Function to analyze event handlers and their used entity handlers
 function analyzeEventHandlers() {
   const entityFiles = readFilesRecursively(entitiesDirectory);
-  const entityHandlers = entityFiles.reduce((acc, file) => {
+  let entityHandlers = {};
+
+  entityFiles.forEach((file) => {
     const entityName = path.basename(file, '.ts');
-    acc[entityName] = extractEntityHandlerFunctions(file);
-    return acc;
-  }, {});
+    const functions = extractEntityHandlerFunctions(file);
+    functions.forEach((fn) => {
+      if (!entityHandlers[fn]) {
+        entityHandlers[fn] = [];
+      }
+      entityHandlers[fn].push(entityName);
+    });
+  });
 
-  const allFiles = readFilesRecursively(srcDirectory);
-  const eventHandlerFiles = allFiles.filter((file) => file.endsWith('.ts') && !file.startsWith(entitiesDirectory));
-
+  const eventHandlerFiles = readFilesRecursively(srcDirectory).filter(
+    (file) => file.endsWith('.ts') && !file.startsWith(entitiesDirectory),
+  );
   let result = '';
 
   eventHandlerFiles.forEach((file) => {
     const content = fs.readFileSync(file, 'utf-8');
     const contractName = path.basename(file, '.ts');
-    result += `contract (${contractName})\n`;
+    const usedEntityHandlers = extractEventHandlersUsingEntity(content, Object.keys(entityHandlers));
 
-    Object.keys(entityHandlers).forEach((entityName) => {
-      const usedFunctions = entityHandlers[entityName].filter((fn) => content.includes(fn));
-      if (usedFunctions.length > 0) {
-        result += `  ~ ${entityName}\n`;
-        usedFunctions.forEach((fn) => {
-          result += `    > ${fn}\n`;
+    Object.entries(usedEntityHandlers).forEach(([entityHandler, eventFunctions]) => {
+      entityHandlers[entityHandler].forEach((entityName) => {
+        result += `entity (${entityName})\n`;
+        result += `  > ${entityHandler}\n`;
+        eventFunctions.forEach((fn) => {
+          result += `    ~ ${contractName}: ${fn}\n`;
         });
-      }
+      });
     });
   });
 

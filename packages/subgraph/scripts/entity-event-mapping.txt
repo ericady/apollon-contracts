@@ -1,13 +1,12 @@
-contract (debt-token)
-  ~ debt-token-meta-entity
-    > handleCreateDebtTokenMeta
-  ~ token-entity
-    > handleCreateToken
-contract (stability-pool-manager)
-contract (stability-pool)
-  ~ user-debt-token-meta-entity
-    > handleCreateUpdateUserDebtTokenMeta
-contract (storage-pool)
-contract (trove-manager)
-  ~ collateral-token-meta-entity
-    > handleCreateCollateralTokenMeta
+entity (token-entity)
+  > handleCreateToken
+    ~ debt-token: handlePriceFeedAddressChanged
+entity (debt-token-meta-entity)
+  > handleCreateDebtTokenMeta
+    ~ debt-token: handleTransfer
+entity (user-debt-token-meta-entity)
+  > handleCreateUpdateUserDebtTokenMeta
+    ~ stability-pool: handleUserClaimedRewards
+entity (collateral-token-meta-entity)
+  > handleCreateCollateralTokenMeta
+    ~ trove-manager: handleCollateralUpdated
