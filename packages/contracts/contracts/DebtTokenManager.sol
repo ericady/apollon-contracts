@@ -29,8 +29,7 @@ contract DebtTokenManager is Ownable, CheckContract, IDebtTokenManager {
     stabilityPoolManager = IStabilityPoolManager(_stabilityPoolManagerAddress);
     emit DebtTokenManagerInitialized(_stabilityPoolManagerAddress);
 
-    // todo addDebtToken should be still callable...
-    //    _renounceOwnership();
+    _renounceOwnership();
   }
 
   // --- Getters ---

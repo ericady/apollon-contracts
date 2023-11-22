@@ -50,8 +50,7 @@ contract StabilityPoolManager is Ownable, CheckContract, IStabilityPoolManager {
       _priceFeedAddress
     );
 
-    // todo addDebtToken should be still callable...
-    //    _renounceOwnership();
+    _renounceOwnership();
   }
 
   // --- Getters ---

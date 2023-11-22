@@ -22,8 +22,7 @@ contract CollTokenManager is Ownable, CheckContract, ICollTokenManager {
     priceFeedAddress = _priceFeedAddress;
     emit CollTokenManagerInitialized(_priceFeedAddress);
 
-    // todo addCollToken should be still callable...
-    //    _renounceOwnership();
+    _renounceOwnership();
   }
 
   // --- Getters ---
