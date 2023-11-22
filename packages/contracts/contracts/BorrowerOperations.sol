@@ -40,8 +40,8 @@ contract BorrowerOperations is LiquityBase, Ownable, CheckContract, IBorrowerOpe
     //
     TokenAmount[] colls;
     DebtTokenAmount[] debts;
-    uint compositeDebtInStable;
-    uint compositeCollInStable;
+    uint compositeDebtInUSD;
+    uint compositeCollInUSD;
     uint ICR;
     uint NICR;
     uint arrayIndex;
@@ -59,12 +59,12 @@ contract BorrowerOperations is LiquityBase, Ownable, CheckContract, IBorrowerOpe
     DebtTokenAmount[] debts;
     DebtTokenAmount stableCoinEntry;
     //
-    uint oldCompositeDebtInStable;
-    uint oldCompositeCollInStable;
+    uint oldCompositeDebtInUSD;
+    uint oldCompositeCollInUSD;
     uint oldICR;
     //
-    uint newCompositeDebtInStable;
-    uint newCompositeCollInStable;
+    uint newCompositeDebtInUSD;
+    uint newCompositeCollInUSD;
     uint newICR;
     uint newNCR;
     //
@@ -150,13 +150,13 @@ contract BorrowerOperations is LiquityBase, Ownable, CheckContract, IBorrowerOpe
     vars.debts = new DebtTokenAmount[](1);
     vars.debts[0] = stableCoinAmount;
     // ICR is based on the composite debt, i.e. the requested debt amount + borrowing fee + debt gas comp.
-    vars.compositeDebtInStable = _getCompositeDebt(vars.debts);
+    vars.compositeDebtInUSD = _getCompositeDebt(vars.debts);
 
     vars.colls = _colls;
-    vars.compositeCollInStable = _getCompositeColl(vars.colls);
+    vars.compositeCollInUSD = _getCompositeColl(vars.colls);
 
-    vars.ICR = LiquityMath._computeCR(vars.compositeCollInStable, vars.compositeDebtInStable);
-    vars.NICR = LiquityMath._computeNominalCR(vars.compositeCollInStable, vars.compositeDebtInStable);
+    vars.ICR = LiquityMath._computeCR(vars.compositeCollInUSD, vars.compositeDebtInUSD);
+    vars.NICR = LiquityMath._computeNominalCR(vars.compositeCollInUSD, vars.compositeDebtInUSD);
 
     (
       // checking collateral ratios
@@ -171,9 +171,9 @@ contract BorrowerOperations is LiquityBase, Ownable, CheckContract, IBorrowerOpe
       _requireICRisAboveMCR(vars.ICR); // > 110 %
 
       uint newTCR = _getNewTCRFromTroveChange(
-        vars.compositeCollInStable,
+        vars.compositeCollInUSD,
         true,
-        vars.compositeDebtInStable,
+        vars.compositeDebtInUSD,
         true,
         vars.entireSystemColl,
         vars.entireSystemDebt
@@ -220,7 +220,7 @@ contract BorrowerOperations is LiquityBase, Ownable, CheckContract, IBorrowerOpe
     address borrower = msg.sender;
     (ContractsCache memory contractsCache, LocalVariables_adjustTrove memory vars) = _prepareTroveAdjustment(borrower);
 
-    vars.newCompositeCollInStable += _getCompositeColl(_colls);
+    vars.newCompositeCollInUSD += _getCompositeColl(_colls);
 
     contractsCache.troveManager.increaseTroveColl(borrower, _colls);
 
@@ -243,9 +243,9 @@ contract BorrowerOperations is LiquityBase, Ownable, CheckContract, IBorrowerOpe
     address borrower = msg.sender;
     (ContractsCache memory contractsCache, LocalVariables_adjustTrove memory vars) = _prepareTroveAdjustment(borrower);
 
-    uint withdrawCompositeInStable = _getCompositeColl(_colls);
-    if (withdrawCompositeInStable > vars.newCompositeCollInStable) revert WithdrawAmount_gt_Coll();
-    vars.newCompositeCollInStable -= withdrawCompositeInStable;
+    uint withdrawCompositeInUSD = _getCompositeColl(_colls);
+    if (withdrawCompositeInUSD > vars.newCompositeCollInUSD) revert WithdrawAmount_gt_Coll();
+    vars.newCompositeCollInUSD -= withdrawCompositeInUSD;
 
     contractsCache.troveManager.decreaseTroveColl(borrower, _colls);
 
@@ -299,7 +299,7 @@ contract BorrowerOperations is LiquityBase, Ownable, CheckContract, IBorrowerOpe
         _maxFeePercentage
       );
 
-    vars.newCompositeDebtInStable += _getCompositeDebt(addedDebts);
+    vars.newCompositeDebtInUSD += _getCompositeDebt(addedDebts);
     contractsCache.troveManager.increaseTroveDebt(msg.sender, addedDebts);
 
     for (uint i = 0; i < addedDebts.length; i++) {
@@ -325,7 +325,7 @@ contract BorrowerOperations is LiquityBase, Ownable, CheckContract, IBorrowerOpe
       contractsCache.debtTokenManager,
       _debts
     );
-    vars.newCompositeDebtInStable -= _getCompositeDebt(debtsToRemove);
+    vars.newCompositeDebtInUSD -= _getCompositeDebt(debtsToRemove);
     contractsCache.troveManager.decreaseTroveDebt(borrower, debtsToRemove);
 
     for (uint i = 0; i < debtsToRemove.length; i++) {
@@ -359,9 +359,9 @@ contract BorrowerOperations is LiquityBase, Ownable, CheckContract, IBorrowerOpe
     (ContractsCache memory contractsCache, LocalVariables_adjustTrove memory vars) = _prepareTroveAdjustment(borrower);
 
     uint newTCR = _getNewTCRFromTroveChange(
-      vars.oldCompositeCollInStable,
+      vars.oldCompositeCollInUSD,
       false,
-      vars.oldCompositeDebtInStable,
+      vars.oldCompositeDebtInUSD,
       false,
       vars.entireSystemColl,
       vars.entireSystemDebt
@@ -422,14 +422,14 @@ contract BorrowerOperations is LiquityBase, Ownable, CheckContract, IBorrowerOpe
       contractsCache.debtTokenManager,
       contractsCache.troveManager.getTroveDebt(_borrower)
     );
-    vars.oldCompositeDebtInStable = _getCompositeDebt(vars.debts);
-    vars.newCompositeDebtInStable = vars.oldCompositeDebtInStable;
+    vars.oldCompositeDebtInUSD = _getCompositeDebt(vars.debts);
+    vars.newCompositeDebtInUSD = vars.oldCompositeDebtInUSD;
 
     vars.colls = contractsCache.troveManager.getTroveColl(_borrower);
-    vars.oldCompositeCollInStable = _getCompositeColl(vars.colls);
-    vars.newCompositeCollInStable = vars.oldCompositeCollInStable;
+    vars.oldCompositeCollInUSD = _getCompositeColl(vars.colls);
+    vars.newCompositeCollInUSD = vars.oldCompositeCollInUSD;
 
-    vars.oldICR = LiquityMath._computeCR(vars.oldCompositeCollInStable, vars.oldCompositeDebtInStable);
+    vars.oldICR = LiquityMath._computeCR(vars.oldCompositeCollInUSD, vars.oldCompositeDebtInUSD);
 
     return (contractsCache, vars);
   }
@@ -443,8 +443,8 @@ contract BorrowerOperations is LiquityBase, Ownable, CheckContract, IBorrowerOpe
     address _borrower
   ) internal {
     // calculate the new ICR
-    vars.newICR = LiquityMath._computeCR(vars.newCompositeCollInStable, vars.newCompositeDebtInStable);
-    vars.newNCR = LiquityMath._computeNominalCR(vars.newCompositeCollInStable, vars.newCompositeDebtInStable);
+    vars.newICR = LiquityMath._computeCR(vars.newCompositeCollInUSD, vars.newCompositeDebtInUSD);
+    vars.newNCR = LiquityMath._computeNominalCR(vars.newCompositeCollInUSD, vars.newCompositeDebtInUSD);
 
     // Check the adjustment satisfies all conditions for the current system mode
     _requireValidAdjustmentInCurrentMode(_isCollWithdrawal, _isDebtIncrease, vars);
@@ -476,11 +476,11 @@ contract BorrowerOperations is LiquityBase, Ownable, CheckContract, IBorrowerOpe
     DebtTokenAmount memory _stableCoinAmount,
     uint _maxFeePercentage
   ) internal returns (uint borrowingFee) {
-    uint compositeDebtInStable = _getCompositeDebt(_debts);
+    uint compositeDebtInUSD = _getCompositeDebt(_debts);
 
     _troveManager.decayBaseRateFromBorrowing(); // decay the baseRate state variable
-    borrowingFee = _troveManager.getBorrowingFee(compositeDebtInStable); // calculated in stable price
-    _requireUserAcceptsFee(borrowingFee, compositeDebtInStable, _maxFeePercentage);
+    borrowingFee = _troveManager.getBorrowingFee(compositeDebtInUSD); // calculated in stable price
+    _requireUserAcceptsFee(borrowingFee, compositeDebtInUSD, _maxFeePercentage);
     uint stableCoinPrice = _stableCoinAmount.debtToken.getPrice();
     borrowingFee = (borrowingFee * DECIMAL_PRECISION) / stableCoinPrice;
 
@@ -634,12 +634,12 @@ contract BorrowerOperations is LiquityBase, Ownable, CheckContract, IBorrowerOpe
       // if Normal Mode
       _requireICRisAboveMCR(_vars.newICR);
 
-      uint collChange = _vars.newCompositeCollInStable > _vars.oldCompositeCollInStable
-        ? _vars.newCompositeCollInStable - _vars.oldCompositeCollInStable
-        : _vars.oldCompositeCollInStable - _vars.newCompositeCollInStable;
-      uint debtChange = _vars.newCompositeDebtInStable > _vars.oldCompositeDebtInStable
-        ? _vars.newCompositeDebtInStable - _vars.oldCompositeDebtInStable
-        : _vars.oldCompositeDebtInStable - _vars.newCompositeDebtInStable;
+      uint collChange = _vars.newCompositeCollInUSD > _vars.oldCompositeCollInUSD
+        ? _vars.newCompositeCollInUSD - _vars.oldCompositeCollInUSD
+        : _vars.oldCompositeCollInUSD - _vars.newCompositeCollInUSD;
+      uint debtChange = _vars.newCompositeDebtInUSD > _vars.oldCompositeDebtInUSD
+        ? _vars.newCompositeDebtInUSD - _vars.oldCompositeDebtInUSD
+        : _vars.oldCompositeDebtInUSD - _vars.newCompositeDebtInUSD;
       _vars.newTCR = _getNewTCRFromTroveChange(
         collChange,
         !_isCollWithdrawal,
@@ -702,15 +702,15 @@ contract BorrowerOperations is LiquityBase, Ownable, CheckContract, IBorrowerOpe
   }
 
   // Returns the composite debt (drawn debt + gas compensation) of a trove, for the purpose of ICR calculation
-  function _getCompositeDebt(DebtTokenAmount[] memory _debts) internal view returns (uint debtInStable) {
+  function _getCompositeDebt(DebtTokenAmount[] memory _debts) internal view returns (uint debtInUSD) {
     for (uint i = 0; i < _debts.length; i++) {
-      debtInStable += priceFeed.getUSDValue(address(_debts[i].debtToken), _debts[i].netDebt);
+      debtInUSD += priceFeed.getUSDValue(address(_debts[i].debtToken), _debts[i].netDebt);
     }
   }
 
-  function _getCompositeColl(TokenAmount[] memory _colls) internal view returns (uint collInStable) {
+  function _getCompositeColl(TokenAmount[] memory _colls) internal view returns (uint collInUSD) {
     for (uint i = 0; i < _colls.length; i++) {
-      collInStable += priceFeed.getUSDValue(_colls[i].tokenAddress, _colls[i].amount);
+      collInUSD += priceFeed.getUSDValue(_colls[i].tokenAddress, _colls[i].amount);
     }
   }
 }

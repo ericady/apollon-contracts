@@ -48,8 +48,8 @@ contract RedemptionOperations is LiquityBase, Ownable, CheckContract, IRedemptio
     TokenAmount[] collLots;
     //
     TokenAmount stableCoinEntry;
-    uint troveCollInStable;
-    uint troveDebtInStable;
+    uint troveCollInUSD;
+    uint troveDebtInUSD;
   }
 
   // --- Dependency setter ---
@@ -202,13 +202,13 @@ contract RedemptionOperations is LiquityBase, Ownable, CheckContract, IRedemptio
   ) internal returns (SingleRedemptionVariables memory vars) {
     troveManager.applyPendingRewards(_borrower);
 
-    (vars.collLots, vars.stableCoinEntry, vars.troveCollInStable, vars.troveDebtInStable) = _prepareTroveRedemption(
+    (vars.collLots, vars.stableCoinEntry, vars.troveCollInUSD, vars.troveDebtInUSD) = _prepareTroveRedemption(
       _borrower
     );
 
     // todo stable coin only CRs are needed here, all the other debt tokens need to be excluded.
     // also just < TCR is not enough, if the user whats to redeem more then 50% of the stable coin supply...
-    uint preCR = LiquityMath._computeCR(vars.troveCollInStable, vars.troveDebtInStable);
+    uint preCR = LiquityMath._computeCR(vars.troveCollInUSD, vars.troveDebtInUSD);
     (, uint TCR, , ) = storagePool.checkRecoveryMode();
     // TroveManager: Source troves CR is not under the TCR.
     if (preCR >= TCR) revert GreaterThanTCR();
@@ -217,15 +217,15 @@ contract RedemptionOperations is LiquityBase, Ownable, CheckContract, IRedemptio
     vars.stableCoinLot = LiquityMath._min(_redeemMaxAmount, vars.stableCoinEntry.amount - STABLE_COIN_GAS_COMPENSATION);
 
     // calculate the coll lot
-    uint newCollInStable = vars.troveCollInStable;
+    uint newCollInUSD = vars.troveCollInUSD;
     for (uint i = 0; i < vars.collLots.length; i++) {
       TokenAmount memory collEntry = vars.collLots[i];
 
-      uint collEntryInStable = priceFeed.getUSDValue(collEntry.tokenAddress, collEntry.amount);
-      uint collToRedeemInStable = (vars.stableCoinLot * collEntryInStable) / vars.troveCollInStable;
+      uint collEntryInUSD = priceFeed.getUSDValue(collEntry.tokenAddress, collEntry.amount);
+      uint collToRedeemInUSD = (vars.stableCoinLot * collEntryInUSD) / vars.troveCollInUSD;
 
-      collEntry.amount = priceFeed.getAmountFromUSDValue(collEntry.tokenAddress, collToRedeemInStable);
-      newCollInStable -= collToRedeemInStable;
+      collEntry.amount = priceFeed.getAmountFromUSDValue(collEntry.tokenAddress, collToRedeemInUSD);
+      newCollInUSD -= collToRedeemInUSD;
     }
 
     /*
@@ -251,12 +251,7 @@ contract RedemptionOperations is LiquityBase, Ownable, CheckContract, IRedemptio
   )
     internal
     view
-    returns (
-      TokenAmount[] memory amounts,
-      TokenAmount memory stableCoinEntry,
-      uint troveCollInStable,
-      uint troveDebtInStable
-    )
+    returns (TokenAmount[] memory amounts, TokenAmount memory stableCoinEntry, uint troveCollInUSD, uint troveDebtInUSD)
   {
     address stableCoinAddress = address(debtTokenManager.getStableCoin());
 
@@ -266,14 +261,14 @@ contract RedemptionOperations is LiquityBase, Ownable, CheckContract, IRedemptio
       TokenAmount memory debtEntry = troveDebt[i];
 
       if (debtEntry.tokenAddress == stableCoinAddress) stableCoinEntry = debtEntry;
-      troveDebtInStable += priceFeed.getUSDValue(debtEntry.tokenAddress, debtEntry.amount);
+      troveDebtInUSD += priceFeed.getUSDValue(debtEntry.tokenAddress, debtEntry.amount);
     }
 
     amounts = troveManager.getTroveColl(_borrower);
     for (uint i = 0; i < amounts.length; i++)
-      troveCollInStable += priceFeed.getUSDValue(amounts[i].tokenAddress, amounts[i].amount);
+      troveCollInUSD += priceFeed.getUSDValue(amounts[i].tokenAddress, amounts[i].amount);
 
-    return (amounts, stableCoinEntry, troveCollInStable, troveDebtInStable);
+    return (amounts, stableCoinEntry, troveCollInUSD, troveDebtInUSD);
   }
 
   function getRedemptionRate() public view override returns (uint) {

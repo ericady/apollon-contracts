@@ -72,7 +72,7 @@ interface ITroveManager is IBBase {
 
   function getNominalICR(address _borrower) external returns (uint);
 
-  function getCurrentICR(address _borrower) external view returns (uint ICR, uint currentDebtInStable);
+  function getCurrentICR(address _borrower) external view returns (uint ICR, uint currentDebtInUSD);
 
   function liquidate(address _borrower) external;
 
@@ -103,9 +103,9 @@ interface ITroveManager is IBBase {
     view
     returns (
       RAmount[] memory amounts,
-      uint troveCollInStable,
-      uint troveDebtInStable,
-      uint troveDebtInStableWithoutGasCompensation
+      uint troveCollInUSD,
+      uint troveDebtInUSD,
+      uint troveDebtInUSDWithoutGasCompensation
     );
 
   function closeTrove(address[] memory collTokenAddresses, address _borrower) external;

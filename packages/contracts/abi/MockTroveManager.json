@@ -958,7 +958,7 @@
             },
             {
                 "internalType": "uint256",
-                "name": "currentDebtInStable",
+                "name": "currentDebtInUSD",
                 "type": "uint256"
             }
         ],
@@ -1024,17 +1024,17 @@
             },
             {
                 "internalType": "uint256",
-                "name": "troveCollInStable",
+                "name": "troveCollInUSD",
                 "type": "uint256"
             },
             {
                 "internalType": "uint256",
-                "name": "troveDebtInStable",
+                "name": "troveDebtInUSD",
                 "type": "uint256"
             },
             {
                 "internalType": "uint256",
-                "name": "troveDebtInStableWithoutGasCompensation",
+                "name": "troveDebtInUSDWithoutGasCompensation",
                 "type": "uint256"
             }
         ],

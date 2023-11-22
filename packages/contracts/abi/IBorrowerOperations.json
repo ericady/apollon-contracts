@@ -159,7 +159,7 @@
             {
                 "indexed": false,
                 "internalType": "uint256",
-                "name": "_paidBorrowingFeeInStable",
+                "name": "_paidBorrowingFeeInUSD",
                 "type": "uint256"
             }
         ],

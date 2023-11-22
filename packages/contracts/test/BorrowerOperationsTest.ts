@@ -230,7 +230,7 @@ describe('BorrowerOperations', () => {
     // --- SETUP ---
     const aliceColl = parseUnits('1.5', 9);
     const aliceDebt = parseUnits('15000');
-    const { debtInStable: aliceDebtBefore } = await openTrove({
+    const { debtInUSD: aliceDebtBefore } = await openTrove({
       from: alice,
       contracts,
       collToken: BTC,
@@ -240,7 +240,7 @@ describe('BorrowerOperations', () => {
 
     const bobColl = parseUnits('1', 9);
     const bobDebt = parseUnits('10000');
-    const { debtInStable: bobDebtBefore } = await openTrove({
+    const { debtInUSD: bobDebtBefore } = await openTrove({
       from: bob,
       contracts,
       collToken: BTC,
