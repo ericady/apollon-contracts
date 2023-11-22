@@ -22,7 +22,11 @@ type DebtTokenMeta @entity(immutable: true) {
 
   # global
   # TODO: Must be calculated in the subgraph
-  stabilityDepositAPY: BigInt!
+
+  # Es geht bei dieser Metric um einen laufenden 30 Tage Durchschnitt, welcher anzeigt wie viel die depositors in dieser Zeit, aufs Jahr hochgerechenet, verdient haben.
+  # Das muss auf dem graphen berechnet werden, über das offset event. Alle offsets der letzten 30 Tage immer zusammenfassen und schauen wie groß der Profit (debt token heraus gezogen, coll token bekommen) war.
+
+  stabilityDepositAPY: StabilityDepositAPY!
   totalDepositedStability: BigInt!
   totalReserve: BigInt!
   # TODO: Fetch this from the client side
@@ -30,6 +34,24 @@ type DebtTokenMeta @entity(immutable: true) {
   totalSupplyUSD: BigInt!
   # TODO: Fetch this from the client side
   # totalSupplyUSD24hAgo: BigInt!
+}
+
+# Aggregator, pushed old events out and lets new in, recalculating the acc value each time
+type StabilityDepositAPY @entity {
+  # "StabilityDepositAPY" + token
+  id: String!
+  index: Int!
+  profit: BigInt!
+  volume: BigInt!
+}
+
+# A chunk is added once every 60min are over and is deducted at the end of 30d
+type StabilityDepositChunk @entity {
+  # "StabilityDepositChunk" + token + index
+  id: String!
+  timestamp: BigInt!
+  profit: BigInt!
+  volume: BigInt!
 }
 
 type UserDebtTokenMeta @entity {
@@ -150,7 +172,7 @@ enum PoolEventType {
 }
 
 # A chunk is added once 5min are over and is deducted at the end of 24h
-type PoolVolumeChunk @entity(immutable: true) {
+type PoolVolumeChunk @entity {
   # "PoolVolumeChunk" + TokenA + TokenB + index
   id: String!
   timestamp: BigInt!

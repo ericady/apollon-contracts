@@ -6,7 +6,7 @@ on:
       - packages/subgraph/**
 
 jobs:
-  build:
+  QualityGate:
     runs-on: ubuntu-latest
     env:
       NODE_OPTIONS: '--max_old_space_size=4096'
