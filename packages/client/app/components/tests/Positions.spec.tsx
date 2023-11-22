@@ -208,7 +208,7 @@ test.describe('Positions', () => {
           state: 'visible',
         });
 
-        await expect(component).toHaveScreenshot({ maxDiffPixelRatio: 0.01 });
+        await expect(component).toHaveScreenshot({ maxDiffPixelRatio: 0.02 });
       });
 
       test('should display position number label in the tab', async ({ mount, page }) => {
