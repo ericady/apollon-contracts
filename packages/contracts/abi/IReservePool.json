@@ -50,15 +50,23 @@
         "type": "function"
     },
     {
+        "inputs": [],
+        "name": "stableDebtToken",
+        "outputs": [
+            {
+                "internalType": "contract IDebtToken",
+                "name": "",
+                "type": "address"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
         "inputs": [
             {
                 "internalType": "address",
                 "name": "stabilityPool",
-                "type": "address"
-            },
-            {
-                "internalType": "address",
-                "name": "stableDebt",
                 "type": "address"
             },
             {

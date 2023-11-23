@@ -10,7 +10,6 @@ import './Dependencies/CheckContract.sol';
 import './Interfaces/IReservePool.sol';
 import './Interfaces/IStabilityPool.sol';
 import './Interfaces/IStabilityPoolManager.sol';
-import './Interfaces/IDebtToken.sol';
 
 contract ReservePool is LiquityBase, Ownable, CheckContract, IReservePool {
   string public constant NAME = 'ReservePool';
@@ -42,20 +41,10 @@ contract ReservePool is LiquityBase, Ownable, CheckContract, IReservePool {
     return stableDebtToken.balanceOf(address(this)) >= reserveCap;
   }
 
-  function repayStabilityPool() external onlyOwner {
-    // TODO: calculate loss diff, for now transfer all
-    TokenAmount[] memory repayAmounts = new TokenAmount[](1);
-    repayAmounts[0] = TokenAmount({
-      tokenAddress: address(stableDebtToken),
-      amount: stableDebtToken.balanceOf(address(this))
-    });
-    stabilityPoolManager.repayLoss(repayAmounts);
-  }
-
-  function withdrawValue(address stabilityPool, address stableDebt, uint withdrawAmount) external {
+  function withdrawValue(address stabilityPool, uint withdrawAmount) external {
     _requireCallerIsStabilityPoolManager();
 
-    IERC20(stableDebt).transfer(stabilityPool, withdrawAmount);
+    stableDebtToken.transfer(stabilityPool, withdrawAmount);
   }
 
   function _requireCallerIsStabilityPoolManager() internal view {

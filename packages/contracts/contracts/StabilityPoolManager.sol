@@ -12,15 +12,16 @@ import './Interfaces/IStabilityPoolManager.sol';
 import './Interfaces/ITroveManager.sol';
 import './Interfaces/IStoragePool.sol';
 import './Interfaces/IReservePool.sol';
+import './Interfaces/IPriceFeed.sol';
 import './StabilityPool.sol';
 
 contract StabilityPoolManager is Ownable, CheckContract, IStabilityPoolManager {
   string public constant NAME = 'StabilityPoolManager';
 
   address public troveManagerAddress;
-  address public priceFeedAddress;
   IStoragePool public storagePool;
   IReservePool public reservePool;
+  IPriceFeed public priceFeed;
   address public debtTokenManagerAddress;
 
   // --- Data structures ---
@@ -42,7 +43,7 @@ contract StabilityPoolManager is Ownable, CheckContract, IStabilityPoolManager {
     checkContract(_debtTokenManagerAddress);
 
     troveManagerAddress = _troveManagerAddress;
-    priceFeedAddress = _priceFeedAddress;
+    priceFeed = IPriceFeed(_priceFeedAddress);
     storagePool = IStoragePool(_storagePoolAddress);
     debtTokenManagerAddress = _debtTokenManagerAddress;
 
@@ -178,22 +179,6 @@ contract StabilityPoolManager is Ownable, CheckContract, IStabilityPoolManager {
     }
   }
 
-  function repayLoss(TokenAmount[] memory repayAmounts) external {
-    _requireCallerIsReservePool();
-
-    for (uint i = 0; i < repayAmounts.length; i++) {
-      TokenAmount memory repayAmount = repayAmounts[i];
-      IStabilityPool stabilityPool = stabilityPools[IDebtToken(repayAmount.tokenAddress)];
-      if (repayAmount.amount == 0) continue;
-
-      // update internal pool stake snapshots
-      stabilityPool.repayLoss(repayAmount.amount);
-
-      // move the coll from the reserve pool into the stability pool
-      reservePool.withdrawValue(address(stabilityPool), repayAmount.tokenAddress, repayAmount.amount);
-    }
-  }
-
   function offset(RemainingStability[] memory _toOffset) external override {
     _requireCallerIsTroveManager();
 
@@ -202,6 +187,48 @@ contract StabilityPoolManager is Ownable, CheckContract, IStabilityPoolManager {
       RemainingStability memory remainingStability = _toOffset[i];
       address stabilityPoolAddress = address(remainingStability.stabilityPool);
       if (remainingStability.debtToOffset == 0) continue;
+
+      // Burn the debt that was successfully offset
+      remainingStability.stabilityPool.getDepositToken().burn(stabilityPoolAddress, remainingStability.debtToOffset);
+
+      // move the coll from the active pool into the stability pool
+      IDebtToken stableDebt = reservePool.stableDebtToken();
+      uint stableCollIndex = remainingStability.collGained.length; // out range index as default
+      for (uint ii = 0; ii < remainingStability.collGained.length; ii++) {
+        if (remainingStability.collGained[ii].tokenAddress == address(stableDebt)) stableCollIndex = ii;
+        if (remainingStability.collGained[ii].amount == 0) continue;
+
+        storagePoolCached.withdrawalValue(
+          stabilityPoolAddress,
+          remainingStability.collGained[ii].tokenAddress,
+          true,
+          PoolType.Active,
+          remainingStability.collGained[ii].amount
+        );
+      }
+
+      // check possible loss
+      uint gainedCollValue = _getGainedCollValue(remainingStability.collGained);
+      uint offsetValue = priceFeed.getUSDValue(remainingStability.tokenAddress, remainingStability.debtToOffset);
+      if (offsetValue > gainedCollValue) {
+        // Repay loss from reserve pool
+        uint loss = offsetValue - gainedCollValue;
+        reservePool.withdrawValue(stabilityPoolAddress, loss);
+
+        // add to coll gained array
+        if (stableCollIndex >= remainingStability.collGained.length) {
+          TokenAmount[] memory collGained = new TokenAmount[](remainingStability.collGained.length + 1);
+          for (uint ii = 0; ii < remainingStability.collGained.length; ii++) {
+            collGained[ii] = remainingStability.collGained[ii];
+          }
+          collGained[remainingStability.collGained.length] = TokenAmount({
+            tokenAddress: address(stableDebt),
+            amount: loss
+          });
+        } else {
+          remainingStability.collGained[stableCollIndex].amount += loss;
+        }
+      }
 
       // update internal pool stake snapshots
       remainingStability.stabilityPool.offset(remainingStability.debtToOffset, remainingStability.collGained);
@@ -213,21 +240,6 @@ contract StabilityPoolManager is Ownable, CheckContract, IStabilityPoolManager {
         PoolType.Active,
         remainingStability.debtToOffset
       );
-
-      // Burn the debt that was successfully offset
-      remainingStability.stabilityPool.getDepositToken().burn(stabilityPoolAddress, remainingStability.debtToOffset);
-
-      // move the coll from the active pool into the stability pool
-      for (uint ii = 0; ii < remainingStability.collGained.length; ii++) {
-        if (remainingStability.collGained[ii].amount == 0) continue;
-        storagePoolCached.withdrawalValue(
-          stabilityPoolAddress,
-          remainingStability.collGained[ii].tokenAddress,
-          true,
-          PoolType.Active,
-          remainingStability.collGained[ii].amount
-        );
-      }
     }
   }
 
@@ -238,7 +250,7 @@ contract StabilityPoolManager is Ownable, CheckContract, IStabilityPoolManager {
     IStabilityPool stabilityPool = new StabilityPool(
       address(this),
       troveManagerAddress,
-      priceFeedAddress,
+      address(priceFeed),
       address(storagePool),
       address(_debtToken)
     );
@@ -246,6 +258,12 @@ contract StabilityPoolManager is Ownable, CheckContract, IStabilityPoolManager {
     stabilityPools[_debtToken] = stabilityPool;
     stabilityPoolsArray.push(stabilityPool);
     emit StabilityPoolAdded(address(stabilityPool));
+  }
+
+  function _getGainedCollValue(TokenAmount[] memory collGained) internal view returns (uint gainedValue) {
+    for (uint i = 0; i < collGained.length; i++) {
+      gainedValue += priceFeed.getUSDValue(collGained[i].tokenAddress, collGained[i].amount);
+    }
   }
 
   function _requireCallerIsTroveManager() internal view {

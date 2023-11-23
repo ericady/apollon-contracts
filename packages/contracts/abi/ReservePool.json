@@ -256,13 +256,6 @@
     },
     {
         "inputs": [],
-        "name": "repayStabilityPool",
-        "outputs": [],
-        "stateMutability": "nonpayable",
-        "type": "function"
-    },
-    {
-        "inputs": [],
         "name": "reserveCap",
         "outputs": [
             {
@@ -331,11 +324,6 @@
             {
                 "internalType": "address",
                 "name": "stabilityPool",
-                "type": "address"
-            },
-            {
-                "internalType": "address",
-                "name": "stableDebt",
                 "type": "address"
             },
             {

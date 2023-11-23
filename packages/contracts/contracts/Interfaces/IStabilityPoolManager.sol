@@ -44,8 +44,6 @@ interface IStabilityPoolManager is IBBase {
 
   function withdrawStability(TokenAmount[] memory _debts) external;
 
-  function repayLoss(TokenAmount[] memory repayAmounts) external;
-
   function withdrawGains() external;
 
   function offset(RemainingStability[] memory _toOffset) external;

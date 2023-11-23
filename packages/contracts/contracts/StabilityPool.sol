@@ -425,26 +425,6 @@ contract StabilityPool is LiquityBase, CheckContract, IStabilityPool {
 
   // --- Liquidation functions ---
 
-  function repayLoss(uint debtToRepay) external override {
-    _requireCallerIsStabilityPoolManager();
-
-    uint _totalDeposits = totalDeposits;
-    if (_totalDeposits == 0 || debtToRepay == 0) return;
-
-    // todo gov...
-    // _triggerLQTYIssuance(communityIssuance);
-
-    (TokenAmount[] memory collGainPerUnitStaked, uint depositLossPerUnitStaked) = _computeRewardsPerUnitStaked(
-      new TokenAmount[](0),
-      debtToRepay,
-      _totalDeposits
-    );
-
-    _updateRewardSumAndProduct(collGainPerUnitStaked, depositLossPerUnitStaked); // updates S and P
-
-    totalDeposits += debtToRepay;
-  }
-
   /*
    * Cancels out the specified debt against the tokens contained in the Stability Pool (as far as possible)
    * and transfers the Trove's collateral from ActivePool to StabilityPool.
@@ -454,7 +434,7 @@ contract StabilityPool is LiquityBase, CheckContract, IStabilityPool {
     _requireCallerIsStabilityPoolManager();
 
     uint _totalDeposits = totalDeposits;
-    if (totalDeposits == 0 || _debtToOffset == 0) return;
+    if (_totalDeposits == 0) return;
 
     // adding coll token address into the usedCollTokens array, if they are not already there
     for (uint i = 0; i < _collToAdd.length; i++) {
