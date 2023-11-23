@@ -180,3 +180,59 @@ type PoolVolumeChunk @entity {
   type: PoolEventType!
   value: BigInt!
 }
+
+type TokenAmount @entity(immutable: true) {
+  id: Bytes!
+  token: Token! @relation(name: "TokenToTokenAmount")
+  amount: Float!
+}
+
+enum BorrowerHistoryType {
+  DEPOSITED
+  WITHDRAWN
+  CLAIMED_REWARDS
+}
+
+type BorrowerHistory @entity(immutable: true) {
+  id: Bytes!
+  borrower: Bytes!
+  timestamp: BigInt!
+  type: BorrowerHistoryType!
+  values: [TokenAmount!]! @relation(name: "TokenAmountToBorrowerHistory")
+  # worth of the claimed tokens in USD at the time of the event, only set on CLAIMED_REWARDS
+  claimInUSD: BigInt
+  # collGains - depositLoss
+  resultInUSD: BigInt
+}
+
+# CHARTS
+
+# We have different candle sizes for 5min, 1h .... TODO:
+# We add to a singleton cande and then save it as soon as the candlesize is reached
+
+type TokenCandleSingleton {
+  # "TokenCandleSingleton" + token + candleSize
+  id: String!
+  token: Token! @relation(name: "TokenToTokenCandleSingleton")
+  # last candle + candleSize
+  timestamp: BigInt!
+  # last candle
+  open: BigInt!
+  high: BigInt!
+  low: BigInt!
+  close: BigInt!
+  volume: BigInt!
+  candleSize: Int!
+}
+
+type TokenCandle @entity(immutable: true) {
+  id: Bytes!
+  token: Token! @relation(name: "TokenToTokenCandle")
+  timestamp: BigInt!
+  open: BigInt!
+  high: BigInt!
+  low: BigInt!
+  close: BigInt!
+  volume: BigInt!
+  candleSize: Int!
+}
