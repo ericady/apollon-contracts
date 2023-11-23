@@ -50,7 +50,7 @@ contract StabilityPoolManager is Ownable, CheckContract, IStabilityPoolManager {
       _priceFeedAddress
     );
 
-    _renounceOwnership();
+    renounceOwnership();
   }
 
   // --- Getters ---

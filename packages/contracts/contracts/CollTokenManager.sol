@@ -21,8 +21,6 @@ contract CollTokenManager is Ownable, CheckContract, ICollTokenManager {
     checkContract(_priceFeedAddress);
     priceFeedAddress = _priceFeedAddress;
     emit CollTokenManagerInitialized(_priceFeedAddress);
-
-    _renounceOwnership();
   }
 
   // --- Getters ---

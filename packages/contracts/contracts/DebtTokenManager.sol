@@ -28,8 +28,6 @@ contract DebtTokenManager is Ownable, CheckContract, IDebtTokenManager {
     checkContract(_stabilityPoolManagerAddress);
     stabilityPoolManager = IStabilityPoolManager(_stabilityPoolManagerAddress);
     emit DebtTokenManagerInitialized(_stabilityPoolManagerAddress);
-
-    _renounceOwnership();
   }
 
   // --- Getters ---
