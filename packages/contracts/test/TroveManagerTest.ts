@@ -250,7 +250,7 @@ describe('TroveManager', () => {
 
         const defaulterBTC = parseUnits('0.02', 9);
         const defaulterBTCWithoutFee = defaulterBTC - (await troveManager.getCollGasCompensation(defaulterBTC));
-        const remainingActiveBTC = parseUnits('5.02', 9);
+        let remainingActiveBTC = parseUnits('5.04', 9) - defaulterBTC;
         const totalStake = await priceFeed.getUSDValue(BTC, remainingActiveBTC);
 
         // checking liquidated snapshots
@@ -263,25 +263,31 @@ describe('TroveManager', () => {
         const alicePendingBTC = await troveManager.getPendingReward(alice, BTC, true);
         const aliceBTCCollStake = (parseUnits('1', 9) * parseUnits('1', 9)) / remainingActiveBTC;
         const aliceExpectedBTCPending = (defaulterBTCWithoutFee * aliceBTCCollStake) / parseUnits('1', 9);
-        expect(alicePendingBTC - aliceExpectedBTCPending).to.be.lt(100);
+        expect(alicePendingBTC - aliceExpectedBTCPending).to.be.lt(5);
 
         // 2. liquidation
+        const defaulterStableRewards = await troveManager.getPendingReward(defaulter_2, STABLE, false);
+        const defaulterBTCRewards = await troveManager.getPendingReward(defaulter_2, BTC, true);
         await troveManager.liquidate(defaulter_2);
 
-        // check it total stake remains the same
+        remainingActiveBTC -= defaulterBTC;
         const totalStakeB = await priceFeed.getUSDValue(BTC, remainingActiveBTC);
-        assert.equal(totalStake, totalStakeB);
 
         // checking liquidated snapshots
         const L_BTC_B = await troveManager.getLiquidatedTokens(BTC, true);
         const L_STABLE_B = await troveManager.getLiquidatedTokens(STABLE, false);
-        expect(L_BTC_B - (defaulterBTCWithoutFee * parseUnits('1') * 2n) / totalStake).to.be.lt(100);
-        // todo expect(L_STABLE_B - (parseUnits('100.5') * parseUnits('1') * 2n) / totalStake).to.be.lt(100);
+        expect(
+          L_BTC_B - ((2n * defaulterBTCWithoutFee + defaulterBTCRewards) * parseUnits('1')) / totalStakeB
+        ).to.be.lt(1);
+        expect(
+          L_STABLE_B - ((2n * parseUnits('100.5') + defaulterStableRewards) * parseUnits('1')) / totalStakeB
+        ).to.be.lt(17000000000000);
 
         // checking alice pending btc rewards
         const alicePendingBTCB = await troveManager.getPendingReward(alice, BTC, true);
-        const aliceExpectedBTCPendingB = (defaulterBTCWithoutFee * 2n * aliceBTCCollStake) / parseUnits('1', 9);
-        // todo expect(alicePendingBTCB - aliceExpectedBTCPendingB).to.be.lt(100);
+        const aliceBTCCollStakeB = (parseUnits('1', 9) * parseUnits('1', 9)) / remainingActiveBTC;
+        const aliceExpectedBTCPendingB = (defaulterBTCWithoutFee * 2n * aliceBTCCollStakeB) / parseUnits('1', 9);
+        expect(alicePendingBTCB - aliceExpectedBTCPendingB).to.be.lt(5001);
       });
 
       it('reverts if trove is non-existent', async () => {

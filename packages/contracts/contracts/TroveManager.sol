@@ -15,7 +15,6 @@ import './Interfaces/IStoragePool.sol';
 import './Interfaces/IStabilityPoolManager.sol';
 import './Interfaces/IBBase.sol';
 import './Interfaces/ICollTokenManager.sol';
-import 'hardhat/console.sol';
 
 contract TroveManager is LiquityBase, Ownable, CheckContract, ITroveManager {
   string public constant NAME = 'TroveManager';
@@ -954,19 +953,21 @@ contract TroveManager is LiquityBase, Ownable, CheckContract, ITroveManager {
       if (redistributeEntry.amount == 0) continue;
 
       // Get the per-unit-staked terms
-      uint numerator = redistributeEntry.amount +
+      uint numerator = redistributeEntry.amount *
+        DECIMAL_PRECISION +
         lastErrorRedistribution[redistributeEntry.tokenAddress][redistributeEntry.isColl];
-      uint rewardPerUnitStaked = (numerator * DECIMAL_PRECISION) / totalStake;
+      uint rewardPerUnitStaked = numerator / totalStake;
+
+      lastErrorRedistribution[redistributeEntry.tokenAddress][redistributeEntry.isColl] =
+        numerator -
+        (rewardPerUnitStaked * totalStake);
 
       // Add per-unit-staked terms to the running totals
       uint liquidated = liquidatedTokens[redistributeEntry.tokenAddress][redistributeEntry.isColl] +
         rewardPerUnitStaked;
+
       liquidatedTokens[redistributeEntry.tokenAddress][redistributeEntry.isColl] = liquidated;
       _liquidatedTokens[i] = CAmount(redistributeEntry.tokenAddress, redistributeEntry.isColl, liquidated);
-
-      lastErrorRedistribution[redistributeEntry.tokenAddress][redistributeEntry.isColl] =
-        numerator -
-        ((rewardPerUnitStaked * totalStake) / DECIMAL_PRECISION);
 
       storagePool.transferBetweenTypes(
         redistributeEntry.tokenAddress,
