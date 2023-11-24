@@ -86,10 +86,10 @@ describe('StoragePool', () => {
         assert.equal(tokenDebt_balanceAfter, 100n);
       });
 
-      it('addValue(): emits "PoolValueUpdated" event with expected arguments', async () => {
+      it('addValue(): emits "StoragePoolValueUpdated" event with expected arguments', async () => {
         const tx = borrowerOperations.testStoragePool_addValue(STABLE, false, 0, 100n);
 
-        await expect(tx).to.emit(storagePool, 'PoolValueUpdated').withArgs(STABLE.target, false, 0, 100n);
+        await expect(tx).to.emit(storagePool, 'StoragePoolValueUpdated').withArgs(STABLE.target, false, 0, 100n);
       });
     });
 
@@ -114,11 +114,11 @@ describe('StoragePool', () => {
         assert.equal(tokenDebt_balanceAfter, 1n);
       });
 
-      it('subtractValue(): emits "PoolValueUpdated" event with expected arguments', async () => {
+      it('subtractValue(): emits "StoragePoolValueUpdated" event with expected arguments', async () => {
         await borrowerOperations.testStoragePool_addValue(STABLE, false, 0, 101n);
         const tx = borrowerOperations.testStoragePool_subtractValue(STABLE, false, 0, 100n);
 
-        await expect(tx).to.emit(storagePool, 'PoolValueUpdated').withArgs(STABLE.target, false, 0, 1);
+        await expect(tx).to.emit(storagePool, 'StoragePoolValueUpdated').withArgs(STABLE.target, false, 0, 1);
       });
     });
 
@@ -211,8 +211,8 @@ describe('StoragePool', () => {
         await borrowerOperations.testStoragePool_addValue(STABLE, false, 0, 100n);
         const tx = borrowerOperations.testStoragePool_transferBetweenTypes(STABLE, false, 0, 2, 10n);
 
-        await expect(tx).to.emit(storagePool, 'PoolValueUpdated').withArgs(STABLE.target, false, 0, 90n);
-        await expect(tx).to.emit(storagePool, 'PoolValueUpdated').withArgs(STABLE.target, false, 2, 10n);
+        await expect(tx).to.emit(storagePool, 'StoragePoolValueUpdated').withArgs(STABLE.target, false, 0, 90n);
+        await expect(tx).to.emit(storagePool, 'StoragePoolValueUpdated').withArgs(STABLE.target, false, 2, 10n);
 
         const defaultPoolTokenDebt_balanceAfter = await storagePool.getValue(STABLE, false, 0);
         assert.equal(defaultPoolTokenDebt_balanceAfter, 90n);
