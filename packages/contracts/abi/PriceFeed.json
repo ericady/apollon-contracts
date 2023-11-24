@@ -72,6 +72,19 @@
         "type": "event"
     },
     {
+        "anonymous": false,
+        "inputs": [
+            {
+                "indexed": false,
+                "internalType": "address",
+                "name": "_token",
+                "type": "address"
+            }
+        ],
+        "name": "TokenPriceChanged",
+        "type": "event"
+    },
+    {
         "inputs": [],
         "name": "ETHUSD_TELLOR_REQ_ID",
         "outputs": [

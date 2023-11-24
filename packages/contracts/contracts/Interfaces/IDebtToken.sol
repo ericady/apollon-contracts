@@ -9,6 +9,7 @@ import './IBase.sol';
 
 interface IDebtToken is IERC20, IERC20Metadata, IERC2612, IBase {
   // --- Events ---
+  event DebtTokenCreated();
 
   // --- Custom Errors ---
   error NotFromBorrowerOps();

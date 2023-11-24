@@ -14,6 +14,9 @@
     },
     "StoragePool": {
       "address": "StoragePool"
+    },
+    "PriceFeed": {
+      "address": "PriceFeed"
     }
   }
 }

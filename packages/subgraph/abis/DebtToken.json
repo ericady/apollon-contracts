@@ -96,6 +96,12 @@
     "type": "event"
   },
   {
+    "anonymous": false,
+    "inputs": [],
+    "name": "DebtTokenCreated",
+    "type": "event"
+  },
+  {
     "inputs": [
       { "internalType": "address", "name": "owner", "type": "address" },
       { "internalType": "address", "name": "spender", "type": "address" }

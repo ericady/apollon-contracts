@@ -3,6 +3,7 @@
 # Singleton entity to store the ID of the last created Token
 
 type Token @entity {
+  # contract address
   id: Bytes!
   address: Bytes! # contract address
   symbol: String!
@@ -184,7 +185,7 @@ type PoolVolumeChunk @entity {
 type TokenAmount @entity(immutable: true) {
   id: Bytes!
   token: Token! @relation(name: "TokenToTokenAmount")
-  amount: Float!
+  amount: BigInt!
 }
 
 enum BorrowerHistoryType {
@@ -210,7 +211,7 @@ type BorrowerHistory @entity(immutable: true) {
 # We have different candle sizes for 5min, 1h .... TODO:
 # We add to a singleton cande and then save it as soon as the candlesize is reached
 
-type TokenCandleSingleton {
+type TokenCandleSingleton @entity {
   # "TokenCandleSingleton" + token + candleSize
   id: String!
   token: Token! @relation(name: "TokenToTokenCandleSingleton")
