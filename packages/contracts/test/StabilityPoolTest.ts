@@ -542,7 +542,7 @@ describe('StabilityPool', () => {
         await troveManager.liquidate(bob);
 
         // Check Bob's trove has been removed from the system
-        expect(await troveManager.getTroveStatus(bob)).to.be.equal(3n); // check Bob's trove status was closed by liquidation
+        expect(await troveManager.getTroveStatus(bob)).to.be.equal(4n); // check Bob's trove status was closed by liquidation in recovery mode
       });
 
       it('providing 0 stable reverts', async () => {

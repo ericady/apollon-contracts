@@ -185,7 +185,7 @@ export const getEmittedLiquidationValues = async (
   const receipt = await liquidationTx?.wait();
   for (const log of receipt?.logs ?? []) {
     const logData = contracts.troveManager.interface.parseLog(log as any);
-    if (logData?.name !== 'Liquidation') continue;
+    if (logData?.name !== 'LiquidationSummary') continue;
 
     const liquidatedDebt = logData.args[0];
     const liquidatedColl = logData.args[1];

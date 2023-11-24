@@ -6,6 +6,7 @@ import {
   MockDebtToken,
   MockERC20,
   MockPriceFeed,
+  RedemptionOperations,
   StabilityPoolManager,
   StoragePool,
   TroveManager,
@@ -21,6 +22,7 @@ describe('Access Control: Apollon functions with the caller restricted to Apollo
   let storagePool: StoragePool;
   let stabilityPoolManager: StabilityPoolManager;
   let borrowerOperations: BorrowerOperations;
+  let redemptionOperations: RedemptionOperations;
   let priceFeed: MockPriceFeed;
 
   let BTC: MockERC20;
@@ -31,6 +33,9 @@ describe('Access Control: Apollon functions with the caller restricted to Apollo
 
     const borrowerOperationsFactory = await ethers.getContractFactory('BorrowerOperations');
     borrowerOperations = await borrowerOperationsFactory.deploy();
+
+    const redemptionOperationsFactory = await ethers.getContractFactory('RedemptionOperations');
+    redemptionOperations = await redemptionOperationsFactory.deploy();
 
     const troveManagerFactory = await ethers.getContractFactory('TroveManager');
     troveManager = await troveManagerFactory.deploy();
@@ -50,6 +55,7 @@ describe('Access Control: Apollon functions with the caller restricted to Apollo
     const mockDebtTokenFactory = await ethers.getContractFactory('MockDebtToken');
     stableDebt = await mockDebtTokenFactory.deploy(
       troveManager,
+      redemptionOperations,
       borrowerOperations,
       stabilityPoolManager,
       priceFeed,
@@ -65,7 +71,7 @@ describe('Access Control: Apollon functions with the caller restricted to Apollo
     it('applyPendingRewards(): reverts when called by an account that is not BorrowerOperations', async () => {
       await expect(troveManager.applyPendingRewards(bob)).to.be.revertedWithCustomError(
         troveManager,
-        'NotFromBorrowerOps'
+        'NotFromBorrowerOrRedemptionOps'
       );
     });
 
@@ -73,33 +79,39 @@ describe('Access Control: Apollon functions with the caller restricted to Apollo
     it('updateRewardSnapshots(): reverts when called by an account that is not BorrowerOperations', async () => {
       await expect(troveManager.updateTroveRewardSnapshots(bob)).to.be.revertedWithCustomError(
         troveManager,
-        'NotFromBorrowerOps'
+        'NotFromBorrowerOrRedemptionOps'
       );
     });
 
     // removeStake
     it('removeStake(): reverts when called by an account that is not BorrowerOperations', async () => {
-      await expect(troveManager.removeStake([], bob)).to.be.revertedWithCustomError(troveManager, 'NotFromBorrowerOps');
+      await expect(troveManager.removeStake([], bob)).to.be.revertedWithCustomError(
+        troveManager,
+        'NotFromBorrowerOrRedemptionOps'
+      );
     });
 
     // updateStakeAndTotalStakes
     it('updateStakeAndTotalStakes(): reverts when called by an account that is not BorrowerOperations', async () => {
       await expect(troveManager.updateStakeAndTotalStakes([], bob)).to.be.revertedWithCustomError(
         troveManager,
-        'NotFromBorrowerOps'
+        'NotFromBorrowerOrRedemptionOps'
       );
     });
 
     // closeTrove
     it('closeTrove(): reverts when called by an account that is not BorrowerOperations', async () => {
-      await expect(troveManager.closeTrove([], bob)).to.be.revertedWithCustomError(troveManager, 'NotFromBorrowerOps');
+      await expect(troveManager.closeTrove([], bob)).to.be.revertedWithCustomError(
+        troveManager,
+        'NotFromBorrowerOrRedemptionOps'
+      );
     });
 
     // addTroveOwnerToArray
     it('addTroveOwnerToArray(): reverts when called by an account that is not BorrowerOperations', async () => {
       await expect(troveManager.addTroveOwnerToArray(bob)).to.be.revertedWithCustomError(
         troveManager,
-        'NotFromBorrowerOps'
+        'NotFromBorrowerOrRedemptionOps'
       );
     });
 
@@ -107,7 +119,7 @@ describe('Access Control: Apollon functions with the caller restricted to Apollo
     it('setTroveStatus(): reverts when called by an account that is not BorrowerOperations', async () => {
       await expect(troveManager.setTroveStatus(bob, 1)).to.be.revertedWithCustomError(
         troveManager,
-        'NotFromBorrowerOps'
+        'NotFromBorrowerOrRedemptionOps'
       );
     });
 
@@ -115,7 +127,7 @@ describe('Access Control: Apollon functions with the caller restricted to Apollo
     it('increaseTroveColl(): reverts when called by an account that is not BorrowerOperations', async () => {
       await expect(troveManager.increaseTroveColl(bob, [])).to.be.revertedWithCustomError(
         troveManager,
-        'NotFromBorrowerOps'
+        'NotFromBorrowerOrRedemptionOps'
       );
     });
 
@@ -123,7 +135,7 @@ describe('Access Control: Apollon functions with the caller restricted to Apollo
     it('decreaseTroveColl(): reverts when called by an account that is not BorrowerOperations', async () => {
       await expect(troveManager.decreaseTroveColl(bob, [])).to.be.revertedWithCustomError(
         troveManager,
-        'NotFromBorrowerOps'
+        'NotFromBorrowerOrRedemptionOps'
       );
     });
 
@@ -131,7 +143,7 @@ describe('Access Control: Apollon functions with the caller restricted to Apollo
     it('increaseTroveDebt(): reverts when called by an account that is not BorrowerOperations', async () => {
       await expect(troveManager.increaseTroveDebt(bob, [])).to.be.revertedWithCustomError(
         troveManager,
-        'NotFromBorrowerOps'
+        'NotFromBorrowerOrRedemptionOps'
       );
     });
 
@@ -139,7 +151,7 @@ describe('Access Control: Apollon functions with the caller restricted to Apollo
     it('decreaseTroveDebt(): reverts when called by an account that is not BorrowerOperations', async () => {
       await expect(troveManager.decreaseTroveDebt(bob, [])).to.be.revertedWithCustomError(
         troveManager,
-        'NotFromBorrowerOps'
+        'NotFromBorrowerOrRedemptionOps'
       );
     });
   });

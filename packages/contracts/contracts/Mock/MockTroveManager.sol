@@ -32,13 +32,13 @@ contract MockTroveManager is TroveManager {
   //    return _minutesPassedSinceLastFeeOp();
   //  }
   //
-  //  function setLastFeeOpTimeToNow() external {
-  //    lastFeeOperationTime = block.timestamp;
-  //  }
-  //
-  //  function setBaseRate(uint _baseRate) external {
-  //    baseRate = _baseRate;
-  //  }
+  function setLastFeeOpTimeToNow() external {
+    lastFeeOperationTime = block.timestamp;
+  }
+
+  function setBaseRate(uint _baseRate) external {
+    baseRate = _baseRate;
+  }
   //
   //  function callInternalRemoveTroveOwner(address _troveOwner) external {
   //    uint troveOwnersArrayLength = TroveOwners.length;

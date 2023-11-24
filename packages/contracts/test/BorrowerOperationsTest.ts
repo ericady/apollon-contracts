@@ -265,7 +265,7 @@ describe('BorrowerOperations', () => {
     await troveManager.liquidate(carol);
 
     const carolTroveStatus = await troveManager.getTroveStatus(carol);
-    expect(carolTroveStatus).to.be.equal(3n); // ClosedByLiquidation
+    expect(carolTroveStatus).to.be.equal(4n); // closedByLiquidationInRecoveryMode
 
     const L_BTC = await troveManager.liquidatedTokens(BTC, true);
     const L_STABLE = await troveManager.liquidatedTokens(STABLE, false);
