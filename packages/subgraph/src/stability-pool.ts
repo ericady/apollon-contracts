@@ -7,12 +7,15 @@ import {
   ScaleUpdated as ScaleUpdatedEvent,
   StabilityGainsWithdrawn as StabilityGainsWithdrawnEvent,
   StabilityOffset as StabilityOffsetEvent,
-  StabilityPool,
   StabilityPoolInitialized as StabilityPoolInitializedEvent,
   StabilityProvided as StabilityProvidedEvent,
   StabilityWithdrawn as StabilityWithdrawnEvent,
 } from '../generated/StabilityPool/StabilityPool';
-import { handleCreateUpdateUserDebtTokenMeta } from './entities/user-debt-token-meta-entity';
+import { handleCreateDebtTokenMeta, handleUpdateStabilityDepositAPY } from './entities/debt-token-meta-entity';
+import {
+  handleResetUserDebtTokenMeta_providedStablitySinceLastCollClaim,
+  handleUpdateUserDebtTokenMeta_providedStablitySinceLastCollClaim_stabilityCompoundAmount,
+} from './entities/user-debt-token-meta-entity';
 
 export function handleDepositSnapshotUpdated(event: DepositSnapshotUpdatedEvent): void {}
 
@@ -29,17 +32,33 @@ export function handleScaleUpdated(event: ScaleUpdatedEvent): void {}
 export function handleStabilityGainsWithdrawn(event: StabilityGainsWithdrawnEvent): void {
   // Maybe this is fired from the Manager? Then I need to loop over all Stability Pools and set them to the current deposit.
 
-  const StabilityPoolContract = StabilityPool.bind(event.address);
-  const tokenAddress = StabilityPoolContract.getDepositToken();
-  const depositAfterClaim = StabilityPoolContract.deposits(event.params.user);
-
-  handleCreateUpdateUserDebtTokenMeta(tokenAddress, event.params.user, depositAfterClaim);
+  handleResetUserDebtTokenMeta_providedStablitySinceLastCollClaim(event.address, event.params.user);
 }
 
-export function handleStabilityOffset(event: StabilityOffsetEvent): void {}
+export function handleStabilityOffset(event: StabilityOffsetEvent): void {
+  handleUpdateStabilityDepositAPY(event, event.address, event.params.removedDeposit, event.params.addedGains);
+  // stabilityDepositAPY changed
+  handleCreateDebtTokenMeta(event, event.address);
+}
 
 export function handleStabilityPoolInitialized(event: StabilityPoolInitializedEvent): void {}
 
-export function handleStabilityProvided(event: StabilityProvidedEvent): void {}
+export function handleStabilityProvided(event: StabilityProvidedEvent): void {
+  // totalDepositedStability changed
+  handleCreateDebtTokenMeta(event, event.address);
 
-export function handleStabilityWithdrawn(event: StabilityWithdrawnEvent): void {}
+  handleUpdateUserDebtTokenMeta_providedStablitySinceLastCollClaim_stabilityCompoundAmount(
+    event.address,
+    event.params.user,
+  );
+}
+
+export function handleStabilityWithdrawn(event: StabilityWithdrawnEvent): void {
+  // totalDepositedStability changed
+  handleCreateDebtTokenMeta(event, event.address);
+
+  handleUpdateUserDebtTokenMeta_providedStablitySinceLastCollClaim_stabilityCompoundAmount(
+    event.address,
+    event.params.user,
+  );
+}

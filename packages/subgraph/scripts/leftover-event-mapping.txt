@@ -1,53 +1,34 @@
 contract (debt-token)
-  > handleBorrowerOperationsAddressChanged
-  > handleTroveManagerAddressChanged
-  > handleStabilityPoolManagerAddressChanged
   > handleApproval
-contract (stability-pool-manager)
-  > handleDebtTokenManagerAddressChanged
+contract (price-feed)
+  > handleLastGoodPriceUpdated
   > handleOwnershipTransferred
-  > handlePriceFeedAddressChanged
+  > handlePriceFeedStatusChanged
+contract (stability-pool-manager)
+  > handleOwnershipTransferred
   > handleStabilityPoolAdded
-  > handleStoragePoolAddressChanged
-  > handleTroveManagerAddressChanged
+  > handleStabilityPoolManagerInitiated
 contract (stability-pool)
   > handleDepositSnapshotUpdated
-  > handleDepositTokenAddressChanged
   > handleEpochUpdated
   > handleOwnershipTransferred
   > handleP_Updated
-  > handlePriceFeedAddressChanged
   > handleS_Updated
   > handleScaleUpdated
-  > handleStabilityPoolCollBalanceUpdated
-  > handleStabilityPoolDepositBalanceUpdated
-  > handleStabilityPoolManagerAddressChanged
-  > handleStoragePoolAddressChanged
-  > handleTroveManagerAddressChanged
-  > handleUserDepositChanged
+  > handleStabilityPoolInitialized
 contract (storage-pool)
-  > handleBorrowerOperationsAddressChanged
   > handleOwnershipTransferred
-  > handlePoolValueUpdated
-  > handlePriceFeedAddressChanged
-  > handleStabilityPoolManagerAddressChanged
-  > handleTroveManagerAddressChanged
+  > handleStoragePoolInitialized
+  > handleStoragePoolValueUpdated
 contract (trove-manager)
   > handleBaseRateUpdated
-  > handleBorrowerOperationsAddressChanged
-  > handleCollTokenManagerAddressChanged
-  > handleDebtTokenManagerAddressChanged
   > handleLTermsUpdated
   > handleLastFeeOpTimeUpdated
-  > handleLiquidation
+  > handleLiquidationSummary
   > handleOwnershipTransferred
-  > handlePriceFeedAddressChanged
-  > handleRedemption
-  > handleStabilityPoolManagerAddressChanged
-  > handleStoragePoolAddressChanged
   > handleSystemSnapshotsUpdated
   > handleTotalStakesUpdated
+  > handleTroveAppliedRewards
   > handleTroveIndexUpdated
-  > handleTroveLiquidated
+  > handleTroveManagerInitialized
   > handleTroveSnapshotsUpdated
-  > handleTroveUpdated

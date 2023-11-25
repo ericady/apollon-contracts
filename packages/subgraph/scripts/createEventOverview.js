@@ -54,36 +54,49 @@ function extractEventHandlersUsingEntity(content, entityHandlers) {
 // Function to analyze event handlers and their used entity handlers
 function analyzeEventHandlers() {
   const entityFiles = readFilesRecursively(entitiesDirectory);
-  let entityHandlers = {};
+  let entityHandlersMap = {};
 
   entityFiles.forEach((file) => {
     const entityName = path.basename(file, '.ts');
     const functions = extractEntityHandlerFunctions(file);
     functions.forEach((fn) => {
-      if (!entityHandlers[fn]) {
-        entityHandlers[fn] = [];
+      if (!entityHandlersMap[fn]) {
+        entityHandlersMap[fn] = entityName;
       }
-      entityHandlers[fn].push(entityName);
     });
   });
 
   const eventHandlerFiles = readFilesRecursively(srcDirectory).filter(
     (file) => file.endsWith('.ts') && !file.startsWith(entitiesDirectory),
   );
-  let result = '';
+  let entityResults = {};
 
   eventHandlerFiles.forEach((file) => {
     const content = fs.readFileSync(file, 'utf-8');
     const contractName = path.basename(file, '.ts');
-    const usedEntityHandlers = extractEventHandlersUsingEntity(content, Object.keys(entityHandlers));
+    const usedEntityHandlers = extractEventHandlersUsingEntity(content, Object.keys(entityHandlersMap));
 
     Object.entries(usedEntityHandlers).forEach(([entityHandler, eventFunctions]) => {
-      entityHandlers[entityHandler].forEach((entityName) => {
-        result += `entity (${entityName})\n`;
-        result += `  > ${entityHandler}\n`;
-        eventFunctions.forEach((fn) => {
-          result += `    ~ ${contractName}: ${fn}\n`;
-        });
+      const entityName = entityHandlersMap[entityHandler];
+      if (!entityResults[entityName]) {
+        entityResults[entityName] = {};
+      }
+      eventFunctions.forEach((fn) => {
+        if (!entityResults[entityName][entityHandler]) {
+          entityResults[entityName][entityHandler] = [];
+        }
+        entityResults[entityName][entityHandler].push(`${contractName}: ${fn}`);
+      });
+    });
+  });
+
+  let result = '';
+  Object.entries(entityResults).forEach(([entityName, handlers]) => {
+    result += `entity (${entityName})\n`;
+    Object.entries(handlers).forEach(([handler, functions]) => {
+      result += `  > ${handler}\n`;
+      functions.forEach((fn) => {
+        result += `    ~ ${fn}\n`;
       });
     });
   });

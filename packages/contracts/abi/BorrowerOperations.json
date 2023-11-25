@@ -171,31 +171,6 @@
         "type": "event"
     },
     {
-        "anonymous": false,
-        "inputs": [
-            {
-                "indexed": false,
-                "internalType": "address",
-                "name": "_borrower",
-                "type": "address"
-            },
-            {
-                "indexed": false,
-                "internalType": "enum IBorrowerOperations.BorrowerOperation",
-                "name": "_operation",
-                "type": "uint8"
-            },
-            {
-                "indexed": false,
-                "internalType": "uint256",
-                "name": "_paidBorrowingFeeInUSD",
-                "type": "uint256"
-            }
-        ],
-        "name": "TroveOperation",
-        "type": "event"
-    },
-    {
         "inputs": [],
         "name": "BORROWING_FEE_FLOOR",
         "outputs": [

@@ -16,6 +16,44 @@
     "inputs": [
       {
         "indexed": false,
+        "internalType": "address",
+        "name": "_borrower",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "address[]",
+        "name": "_collTokenAddresses",
+        "type": "address[]"
+      }
+    ],
+    "name": "TroveCollChanged",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
+        "internalType": "address",
+        "name": "_borrower",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "address[]",
+        "name": "_debtTokenAddresses",
+        "type": "address[]"
+      }
+    ],
+    "name": "TroveDebtChanged",
+    "type": "event"
+  },
+  {
+    "anonymous": false,
+    "inputs": [
+      {
+        "indexed": false,
         "internalType": "uint256",
         "name": "_baseRate",
         "type": "uint256"

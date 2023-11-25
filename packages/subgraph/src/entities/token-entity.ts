@@ -18,7 +18,7 @@ export function handleCreateToken(event: ethereum.Event, tokenAddress: Address):
   newToken.save();
 }
 
-export function handleUpdateTokenPriceUSD(tokenAddress: Address): void {
+export function handleUpdateToken_priceUSD(tokenAddress: Address): void {
   const contract = DebtToken.bind(tokenAddress);
 
   const token = Token.load(tokenAddress)!;

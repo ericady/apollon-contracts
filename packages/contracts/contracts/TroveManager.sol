@@ -1256,6 +1256,8 @@ contract TroveManager is LiquityBase, Ownable, CheckContract, ITroveManager {
       }
       collTokenAddresses[i] = tokenAddress;
     }
+
+    emit TroveCollChanged(_borrower, collTokenAddresses);
   }
 
   function decreaseTroveColl(address _borrower, TokenAmount[] memory _collTokenAmounts) external override {
@@ -1269,29 +1271,41 @@ contract TroveManager is LiquityBase, Ownable, CheckContract, ITroveManager {
       trove.colls[tokenAddress] -= _collTokenAmounts[i].amount;
       collTokenAddresses[i] = tokenAddress;
     }
+
+    emit TroveCollChanged(_borrower, collTokenAddresses);
   }
 
   function increaseTroveDebt(address _borrower, DebtTokenAmount[] memory _debtTokenAmounts) external override {
     _requireCallerIsBorrowerOrRedemptionOperations();
 
     Trove storage trove = Troves[_borrower];
+    address[] memory debtTokenAddresses = new address[](_debtTokenAmounts.length);
+
     for (uint i = 0; i < _debtTokenAmounts.length; i++) {
       IDebtToken debtToken = _debtTokenAmounts[i].debtToken;
       trove.debts[debtToken] += _debtTokenAmounts[i].netDebt;
+      debtTokenAddresses[i] = address(debtToken);
 
       if (!trove.debtsRegistered[address(debtToken)]) {
         trove.debtsRegistered[address(debtToken)] = true;
         trove.debtTokens.push(debtToken);
       }
     }
+
+    emit TroveDebtChanged(_borrower, debtTokenAddresses);
   }
 
   function decreaseTroveDebt(address _borrower, DebtTokenAmount[] memory _debtTokenAmounts) external override {
     _requireCallerIsBorrowerOrRedemptionOperations();
 
     Trove storage trove = Troves[_borrower];
+    address[] memory debtTokenAddresses = new address[](_debtTokenAmounts.length);
+
     for (uint i = 0; i < _debtTokenAmounts.length; i++) {
       trove.debts[_debtTokenAmounts[i].debtToken] -= _debtTokenAmounts[i].netDebt;
+      debtTokenAddresses[i] = address(_debtTokenAmounts[i].debtToken);
     }
+
+    emit TroveDebtChanged(_borrower, debtTokenAddresses);
   }
 }

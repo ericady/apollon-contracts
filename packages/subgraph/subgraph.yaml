@@ -54,6 +54,10 @@ dataSources:
           handler: handleTroveManagerInitialized
         - event: TroveSnapshotsUpdated((address,bool,uint256)[])
           handler: handleTroveSnapshotsUpdated
+        - event: TroveCollChanged(address,address[])
+          handler: handleCollChanged
+        - event: TroveDebtChanged(address,address[])
+          handler: handleDebtChanged
       file: ./src/trove-manager.ts
   - kind: ethereum
     name: StoragePool

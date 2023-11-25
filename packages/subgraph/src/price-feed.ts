@@ -4,7 +4,8 @@ import {
   PriceFeedStatusChanged as PriceFeedStatusChangedEvent,
   TokenPriceChanged as TokenPriceChangedEvent,
 } from '../generated/PriceFeed/PriceFeed';
-import { handleUpdateTokenPriceUSD } from './entities/token-entity';
+import { handleUpdateTokenCandle } from './entities/token-candle-entity';
+import { handleUpdateToken_priceUSD } from './entities/token-entity';
 
 export function handleLastGoodPriceUpdated(event: LastGoodPriceUpdatedEvent): void {}
 
@@ -13,5 +14,6 @@ export function handleOwnershipTransferred(event: OwnershipTransferredEvent): vo
 export function handlePriceFeedStatusChanged(event: PriceFeedStatusChangedEvent): void {}
 
 export function handleTokenPriceChanged(event: TokenPriceChangedEvent): void {
-  handleUpdateTokenPriceUSD(event.params._token);
+  handleUpdateToken_priceUSD(event.params._token);
+  handleUpdateTokenCandle(event.params._token);
 }

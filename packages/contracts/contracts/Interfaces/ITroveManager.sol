@@ -40,6 +40,8 @@ interface ITroveManager is IBBase {
   event TroveAppliedRewards(address _borrower, CAmount[] _appliedRewards);
   event TroveClosed(address _borrower, Status _closingState);
   event TroveIndexUpdated(address _borrower, uint _newIndex);
+  event TroveDebtChanged(address _borrower, address[] _debtTokenAddresses);
+  event TroveCollChanged(address _borrower, address[] _collTokenAddresses);
   event LiquidationSummary(
     TokenAmount[] liquidatedDebt,
     TokenAmount[] liquidatedColl,

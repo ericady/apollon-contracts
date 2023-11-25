@@ -212,7 +212,6 @@ contract BorrowerOperations is LiquityBase, Ownable, CheckContract, IBorrowerOpe
     stableCoinAmount.debtToken.mint(address(contractsCache.storagePool), stableCoinAmount.netDebt);
 
     emit TroveCreated(borrower, vars.arrayIndex);
-    emit TroveOperation(borrower, BorrowerOperation.openTrove, 0);
   }
 
   // Send collateral to a trove
@@ -235,7 +234,7 @@ contract BorrowerOperations is LiquityBase, Ownable, CheckContract, IBorrowerOpe
       );
     }
 
-    _finaliseTrove(BorrowerOperation.addColl, false, false, contractsCache, vars, borrower);
+    _finaliseTrove(false, false, contractsCache, vars, borrower);
   }
 
   // Withdraw collateral from a trove
@@ -270,7 +269,7 @@ contract BorrowerOperations is LiquityBase, Ownable, CheckContract, IBorrowerOpe
       );
     }
 
-    _finaliseTrove(BorrowerOperation.withdrawColl, true, false, contractsCache, vars, borrower);
+    _finaliseTrove(true, false, contractsCache, vars, borrower);
   }
 
   // increasing debt of a trove
@@ -313,7 +312,7 @@ contract BorrowerOperations is LiquityBase, Ownable, CheckContract, IBorrowerOpe
       );
     }
 
-    _finaliseTrove(BorrowerOperation.increaseDebt, false, true, contractsCache, vars, msg.sender);
+    _finaliseTrove(false, true, contractsCache, vars, msg.sender);
   }
 
   // repay debt of a trove
@@ -351,7 +350,7 @@ contract BorrowerOperations is LiquityBase, Ownable, CheckContract, IBorrowerOpe
       );
     }
 
-    _finaliseTrove(BorrowerOperation.repayDebt, false, false, contractsCache, vars, borrower);
+    _finaliseTrove(false, false, contractsCache, vars, borrower);
   }
 
   function closeTrove() external override {
@@ -398,8 +397,6 @@ contract BorrowerOperations is LiquityBase, Ownable, CheckContract, IBorrowerOpe
 
     contractsCache.troveManager.removeStake(vars.collTokenAddresses, borrower);
     contractsCache.troveManager.closeTrove(vars.collTokenAddresses, borrower);
-
-    emit TroveOperation(borrower, BorrowerOperation.closeTrove, 0);
   }
 
   // --- Helper functions ---
@@ -435,7 +432,6 @@ contract BorrowerOperations is LiquityBase, Ownable, CheckContract, IBorrowerOpe
   }
 
   function _finaliseTrove(
-    BorrowerOperation _operation,
     bool _isCollWithdrawal,
     bool _isDebtIncrease,
     ContractsCache memory contractsCache,
@@ -451,8 +447,6 @@ contract BorrowerOperations is LiquityBase, Ownable, CheckContract, IBorrowerOpe
 
     // update troves stake
     contractsCache.troveManager.updateStakeAndTotalStakes(vars.collTokenAddresses, _borrower);
-
-    emit TroveOperation(_borrower, _operation, vars.stableCoinEntry.borrowingFee);
   }
 
   function _getNewTCRFromTroveChange(

@@ -1,6 +1,6 @@
 import { Address, BigInt, ethereum } from '@graphprotocol/graph-ts';
 import { DebtToken } from '../../generated/DebtToken/DebtToken';
-import { StabilityPool } from '../../generated/StabilityPool/StabilityPool';
+import { StabilityOffsetAddedGainsStruct, StabilityPool } from '../../generated/StabilityPool/StabilityPool';
 import { StabilityPoolManager } from '../../generated/StabilityPoolManager/StabilityPoolManager';
 import { DebtTokenMeta } from '../../generated/schema';
 
@@ -23,4 +23,13 @@ export function handleCreateDebtTokenMeta(event: ethereum.Event, tokenAddress: A
   debtTokenMeta.totalReserve = BigInt.fromI32(0);
 
   debtTokenMeta.save();
+}
+
+export function handleUpdateStabilityDepositAPY(
+  event: ethereum.Event,
+  tokenAddress: Address,
+  lostDeposit: BigInt,
+  collGain: StabilityOffsetAddedGainsStruct[],
+): void {
+  // # "StabilityDepositAPY" + token
 }

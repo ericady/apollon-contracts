@@ -1,12 +1,28 @@
-entity (token-entity)
-  > handleCreateToken
-    ~ debt-token: handlePriceFeedAddressChanged
 entity (debt-token-meta-entity)
   > handleCreateDebtTokenMeta
     ~ debt-token: handleTransfer
+    ~ stability-pool: handleStabilityOffset
+    ~ stability-pool: handleStabilityProvided
+    ~ stability-pool: handleStabilityWithdrawn
+  > handleUpdateStabilityDepositAPY
+    ~ stability-pool: handleStabilityOffset
 entity (user-debt-token-meta-entity)
-  > handleCreateUpdateUserDebtTokenMeta
-    ~ stability-pool: handleUserClaimedRewards
-entity (collateral-token-meta-entity)
-  > handleCreateCollateralTokenMeta
-    ~ trove-manager: handleCollateralUpdated
+  > handleUpdateUserDebtTokenMeta_walletAmount_stabilityCompoundAmount
+    ~ debt-token: handleTransfer
+  > handleResetUserDebtTokenMeta_providedStablitySinceLastCollClaim
+    ~ stability-pool: handleStabilityGainsWithdrawn
+  > handleUpdateUserDebtTokenMeta_providedStablitySinceLastCollClaim_stabilityCompoundAmount
+    ~ stability-pool: handleStabilityProvided
+    ~ stability-pool: handleStabilityWithdrawn
+  > handleUpdateUserDebtTokenMeta_troveMintedAmount_stabilityCompoundAmount
+    ~ trove-manager: handleTroveClosed
+    ~ trove-manager: handleCollChanged
+    ~ trove-manager: handleDebtChanged
+entity (token-entity)
+  > handleCreateToken
+    ~ debt-token: handleDebtTokenCreated
+  > handleUpdateToken_priceUSD
+    ~ price-feed: handleTokenPriceChanged
+entity (token-candle-entity)
+  > handleUpdateTokenCandle
+    ~ price-feed: handleTokenPriceChanged
