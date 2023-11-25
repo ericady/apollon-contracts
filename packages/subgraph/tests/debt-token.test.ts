@@ -87,31 +87,35 @@ describe('handleTransfer()', () => {
     clearStore();
   });
 
-  test('Token entity priceUSD is updated', () => {
-    const debtToken = new Token(MockDebtTokenAddress);
-    debtToken.address = MockDebtTokenAddress;
+  test(
+    'Token entity priceUSD is updated',
+    () => {
+      const debtToken = new Token(MockDebtTokenAddress);
+      debtToken.address = MockDebtTokenAddress;
 
-    debtToken.createdAt = BigInt.fromI32(1);
-    debtToken.symbol = 'JUSD';
-    debtToken.isPoolToken = true;
-    debtToken.priceUSD = BigInt.fromI32(1);
-    debtToken.save();
+      debtToken.createdAt = BigInt.fromI32(1);
+      debtToken.symbol = 'JUSD';
+      debtToken.isPoolToken = true;
+      debtToken.priceUSD = BigInt.fromI32(1);
+      debtToken.save();
 
-    const newTransferEvent = createTransferEvent(
-      Address.fromString('0x1000000000000000000000000000000000000000'),
-      Address.fromString('0x2000000000000000000000000000000000000000'),
-      BigInt.fromI32(1),
-    );
+      const newTransferEvent = createTransferEvent(
+        Address.fromString('0x1000000000000000000000000000000000000000'),
+        Address.fromString('0x2000000000000000000000000000000000000000'),
+        BigInt.fromI32(1),
+      );
 
-    mockDebtTokenPrice();
-    mockDebtTokenTotalSupply();
-    mockDebtTokenStabilityPoolManagerAddress();
-    mockStabilityPoolManagerGetStabilityPool();
-    mockStabilityPoolGetStabilityAPY();
-    mockStabilityPoolGetTotalDeposit();
+      mockDebtTokenPrice();
+      mockDebtTokenTotalSupply();
+      mockDebtTokenStabilityPoolManagerAddress();
+      mockStabilityPoolManagerGetStabilityPool();
+      mockStabilityPoolGetStabilityAPY();
+      mockStabilityPoolGetTotalDeposit();
 
-    handleTransfer(newTransferEvent);
+      handleTransfer(newTransferEvent);
 
-    assert.entityCount('DebtTokenMeta', 1);
-  });
+      assert.entityCount('DebtTokenMeta', 1);
+    },
+    true,
+  );
 });

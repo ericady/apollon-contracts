@@ -17,7 +17,8 @@ export function handleCreateDebtTokenMeta(event: ethereum.Event, tokenAddress: A
   debtTokenMeta.timestamp = event.block.timestamp;
   debtTokenMeta.totalSupplyUSD = tokenContract.totalSupply().times(tokenContract.getPrice());
 
-  debtTokenMeta.stabilityDepositAPY = debtTokenStabilityPoolContract.getStabilityAPY();
+  // TODO: Implement
+  debtTokenMeta.stabilityDepositAPY = 1;
   debtTokenMeta.totalDepositedStability = debtTokenStabilityPoolContract.getTotalDeposit();
   // TODO: Find the right contracts for it and implement getters
   debtTokenMeta.totalReserve = BigInt.fromI32(0);
