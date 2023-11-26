@@ -46,7 +46,7 @@ dataSources:
           handler: handleTotalStakesUpdated
         - event: TroveAppliedRewards(address,(address,bool,uint256)[])
           handler: handleTroveAppliedRewards
-        - event: TroveClosed(address,uint8)
+        - event: TroveClosed(address,uint8,address[],address[])
           handler: handleTroveClosed
         - event: TroveIndexUpdated(address,uint256)
           handler: handleTroveIndexUpdated
@@ -84,6 +84,8 @@ dataSources:
           handler: handleStoragePoolInitialized
         - event: StoragePoolValueUpdated(address,bool,uint8,uint256)
           handler: handleStoragePoolValueUpdated
+        - event: CollateralTokenUpdated(address,address,address)
+          handler: handleCollateralTokenUpdated
       file: ./src/storage-pool.ts
   - kind: ethereum
     name: StabilityPool
@@ -215,3 +217,32 @@ dataSources:
         - event: TokenPriceChanged(address)
           handler: handleTokenPriceChanged
       file: ./src/price-feed.ts
+  - kind: ethereum
+    name: BorrowerOperations
+    network: development
+    source:
+      address: '0x25309189268017d8C79C8dacCbF44EC25C12FEB4'
+      abi: BorrowerOperations
+      startBlock: 0
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      entities:
+        - BorrowerOperationsInitialized
+        - CollateralTokenUpdated
+        - BorrowerOperationsOwnershipTransferred
+        - TroveCreated
+      abis:
+        - name: BorrowerOperations
+          file: ./abis/BorrowerOperations.json
+      eventHandlers:
+        - event: BorrowerOperationsInitialized(address,address,address,address,address,address)
+          handler: handleBorrowerOperationsInitialized
+        - event: CollateralTokenUpdated(address,address,address)
+          handler: handleCollateralTokenUpdated
+        - event: OwnershipTransferred(indexed address,indexed address)
+          handler: handleOwnershipTransferred
+        - event: TroveCreated(address,uint256)
+          handler: handleTroveCreated
+      file: ./src/borrower-operations.ts

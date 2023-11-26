@@ -499,6 +499,8 @@ contract BorrowerOperations is LiquityBase, Ownable, CheckContract, IBorrowerOpe
   ) internal {
     _pool.addValue(_collAddress, true, _poolType, _amount);
     IERC20(_collAddress).transferFrom(_borrower, address(_pool), _amount);
+
+    emit CollateralTokenUpdated(_collAddress, _borrower, address(_pool));
   }
 
   function _poolSubtractColl(

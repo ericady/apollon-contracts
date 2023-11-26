@@ -12,6 +12,7 @@ import {
   StabilityWithdrawn as StabilityWithdrawnEvent,
 } from '../generated/StabilityPool/StabilityPool';
 import { handleCreateDebtTokenMeta, handleUpdateStabilityDepositAPY } from './entities/debt-token-meta-entity';
+import { handleUpdateUserCollateralTokenMeta_walletAmount } from './entities/user-collateral-token-meta-entity';
 import {
   handleResetUserDebtTokenMeta_providedStablitySinceLastCollClaim,
   handleUpdateUserDebtTokenMeta_providedStablitySinceLastCollClaim_stabilityCompoundAmount,
@@ -33,6 +34,18 @@ export function handleStabilityGainsWithdrawn(event: StabilityGainsWithdrawnEven
   // Maybe this is fired from the Manager? Then I need to loop over all Stability Pools and set them to the current deposit.
 
   handleResetUserDebtTokenMeta_providedStablitySinceLastCollClaim(event.address, event.params.user);
+
+  // because IERC20.transfer happened
+  for (let i = 0; i < event.params.gainsWithdrawn.length; i++) {
+    handleUpdateUserCollateralTokenMeta_walletAmount(
+      event,
+      event.params.gainsWithdrawn[i].tokenAddress,
+      event.params.user,
+    );
+
+    // TODO: Also update for the pools tokens? Ask @sambP
+    handleUpdateUserCollateralTokenMeta_walletAmount(event, event.params.gainsWithdrawn[i].tokenAddress, event.address);
+  }
 }
 
 export function handleStabilityOffset(event: StabilityOffsetEvent): void {

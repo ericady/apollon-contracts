@@ -76,6 +76,7 @@ type CollateralTokenMeta @entity(immutable: true) {
   timestamp: BigInt!
 
   # global
+  # TODO: Link to event when ReservePool is implemented
   totalValueLockedUSD: BigInt!
   # TODO: Fetch this from the client side
   # totalValueLockedUSD24hAgo: BigInt!
@@ -89,7 +90,9 @@ type UserCollateralTokenMeta @entity {
   # borrower specific
   walletAmount: BigInt!
   troveLockedAmount: BigInt!
-  stabilityGainedAmount: BigInt!
+
+  # TODO: This call is made from the client to the contract because there is no event for this
+  # stabilityGainedAmount: BigInt!
 }
 
 enum LongShortDirection {

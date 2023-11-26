@@ -17,6 +17,9 @@
     },
     "PriceFeed": {
       "address": "PriceFeed"
+    },
+    "BorrowerOperations": {
+      "address": "BorrowerOperations"
     }
   }
 }

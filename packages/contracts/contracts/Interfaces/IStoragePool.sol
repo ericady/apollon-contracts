@@ -16,6 +16,7 @@ interface IStoragePool is IBase {
     address _priceFeedAddress
   );
   event StoragePoolValueUpdated(address _tokenAddress, bool _isColl, PoolType _poolType, uint _updatedAmount);
+  event CollateralTokenUpdated(address _collateralTokenAddress, address _owner, address _receiver);
 
   // --- Custom Errors ---
 

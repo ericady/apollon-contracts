@@ -19,6 +19,8 @@ export function handleCreateCollateralTokenMeta(
   // const allTroveCollsUSD = troveManagerContract.getAllTroveCollUSD(tokenAddress);
 
   // collateralTokenMeta.totalValueLockedUSD = allTroveCollsUSD.plus(reservePoolCollUSD);
+  // troves total coll + reserve pool value
+  // TODO: Link to event when ReservePool is implemented
   collateralTokenMeta.totalValueLockedUSD = reservePoolCollUSD;
 
   collateralTokenMeta.save();
