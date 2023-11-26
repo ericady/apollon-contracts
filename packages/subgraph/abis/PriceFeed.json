@@ -134,20 +134,14 @@
       { "internalType": "uint256", "name": "_usdValue", "type": "uint256" }
     ],
     "name": "getAmountFromUSDValue",
-    "outputs": [
-      { "internalType": "uint256", "name": "amount", "type": "uint256" }
-    ],
+    "outputs": [{ "internalType": "uint256", "name": "amount", "type": "uint256" }],
     "stateMutability": "view",
     "type": "function"
   },
   {
-    "inputs": [
-      { "internalType": "address", "name": "_tokenAddress", "type": "address" }
-    ],
+    "inputs": [{ "internalType": "address", "name": "_tokenAddress", "type": "address" }],
     "name": "getPrice",
-    "outputs": [
-      { "internalType": "uint256", "name": "price", "type": "uint256" }
-    ],
+    "outputs": [{ "internalType": "uint256", "name": "price", "type": "uint256" }],
     "stateMutability": "view",
     "type": "function"
   },
@@ -157,9 +151,7 @@
       { "internalType": "uint256", "name": "_amount", "type": "uint256" }
     ],
     "name": "getUSDValue",
-    "outputs": [
-      { "internalType": "uint256", "name": "usdValue", "type": "uint256" }
-    ],
+    "outputs": [{ "internalType": "uint256", "name": "usdValue", "type": "uint256" }],
     "stateMutability": "view",
     "type": "function"
   },
@@ -225,9 +217,7 @@
   {
     "inputs": [],
     "name": "status",
-    "outputs": [
-      { "internalType": "enum IPriceFeed.Status", "name": "", "type": "uint8" }
-    ],
+    "outputs": [{ "internalType": "enum IPriceFeed.Status", "name": "", "type": "uint8" }],
     "stateMutability": "view",
     "type": "function"
   },
@@ -245,9 +235,7 @@
     "type": "function"
   },
   {
-    "inputs": [
-      { "internalType": "address", "name": "newOwner", "type": "address" }
-    ],
+    "inputs": [{ "internalType": "address", "name": "newOwner", "type": "address" }],
     "name": "transferOwnership",
     "outputs": [],
     "stateMutability": "nonpayable",
