@@ -28,9 +28,16 @@ interface IStabilityPoolManager is IBBase {
     address[] memory collTokenAddresses
   ) external view returns (RemainingStability[] memory);
 
+  function getTotalDeposits() external view returns (TokenAmount[] memory deposits);
+
+  function getDepositorDeposits(address _depositor) external view returns (TokenAmount[] memory deposits);
+
   function getCompoundedDeposits() external view returns (TokenAmount[] memory deposits);
 
-  function getTotalDeposits() external view returns (TokenAmount[] memory deposits);
+  function getDepositorCollGains(
+    address _depositor,
+    address[] memory collTokenAddresses
+  ) external view returns (TokenAmount[] memory collGains);
 
   function provideStability(TokenAmount[] memory _debts) external;
 

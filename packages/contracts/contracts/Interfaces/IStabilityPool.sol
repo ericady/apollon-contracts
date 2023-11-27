@@ -38,15 +38,17 @@ interface IStabilityPool is IBase {
 
   // --- Functions ---
 
-  function getTotalGainedColl() external view returns (TokenAmount[] memory coll);
+  function getDepositToken() external view returns (IDebtToken);
 
   function getTotalDeposit() external view returns (uint);
 
-  function getDepositToken() external view returns (IDebtToken);
-
-  function getDepositorCollGain(address _depositor, address _collToken) external view returns (uint);
+  function getDepositorDeposit(address _depositor) external view returns (uint);
 
   function getCompoundedDebtDeposit(address _depositor) external view returns (uint);
+
+  function getTotalGainedColl() external view returns (TokenAmount[] memory coll);
+
+  function getDepositorCollGain(address _depositor, address _collToken) external view returns (uint);
 
   function getDepositorCollSnapshot(address _depositor, address _collToken) external view returns (uint);
 

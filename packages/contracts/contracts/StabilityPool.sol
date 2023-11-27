@@ -258,11 +258,6 @@ contract StabilityPool is LiquityBase, Ownable, CheckContract, IStabilityPool {
     return depositSnapshots[_depositor].sums[_collToken];
   }
 
-  // TODO: Implement. Can I use epochToScaleToCollTokenToSum?
-  function getStabilityAPY() external view returns (uint) {
-    return 0;
-  }
-
   // --- External Depositor Functions ---
 
   /*  provideToSP():
@@ -631,6 +626,10 @@ contract StabilityPool is LiquityBase, Ownable, CheckContract, IStabilityPool {
   }
 
   // --- Compounded deposit ---
+
+  function getDepositorDeposit(address _depositor) external view override returns (uint) {
+    return deposits[_depositor];
+  }
 
   /*
    * Return the user's compounded deposit. Given by the formula:  d = d0 * P/P(0)

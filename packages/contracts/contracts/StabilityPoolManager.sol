@@ -110,6 +110,35 @@ contract StabilityPoolManager is Ownable, CheckContract, IStabilityPoolManager {
     return deposits;
   }
 
+  function getDepositorDeposits(address _depositor) external view override returns (TokenAmount[] memory deposits) {
+    deposits = new TokenAmount[](stabilityPoolsArray.length);
+    for (uint i = 0; i < stabilityPoolsArray.length; i++) {
+      deposits[i] = TokenAmount(
+        address(stabilityPoolsArray[i].getDepositToken()),
+        stabilityPoolsArray[i].getDepositorDeposit(_depositor)
+      );
+    }
+
+    return deposits;
+  }
+
+  function getDepositorCollGains(
+    address _depositor,
+    address[] memory collTokenAddresses
+  ) external view override returns (TokenAmount[] memory collGains) {
+    collGains = new TokenAmount[](collTokenAddresses.length);
+    for (uint i = 0; i < collTokenAddresses.length; i++) {
+      for (uint ii = 0; ii < stabilityPoolsArray.length; ii++) {
+        collGains[i] = TokenAmount(
+          address(stabilityPoolsArray[ii].getDepositToken()),
+          stabilityPoolsArray[ii].getDepositorCollGain(_depositor, collTokenAddresses[i])
+        );
+      }
+    }
+
+    return collGains;
+  }
+
   // --- Setters ---
 
   function provideStability(TokenAmount[] memory _debts) external override {
