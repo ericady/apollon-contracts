@@ -48,7 +48,8 @@ contract ReservePool is LiquityBase, Ownable, CheckContract, IReservePool {
   function withdrawValue(address stabilityPool, uint withdrawAmount) external {
     _requireCallerIsStabilityPoolManager();
 
-    stableDebtToken.transfer(stabilityPool, withdrawAmount);
+    if (stableDebtToken.balanceOf(address(this)) > withdrawAmount)
+      stableDebtToken.transfer(stabilityPool, withdrawAmount);
   }
 
   function _requireCallerIsStabilityPoolManager() internal view {

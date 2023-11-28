@@ -7,7 +7,7 @@ import { expect } from 'chai';
 import { ContractTransactionReceipt, ContractTransactionResponse } from 'ethers';
 import { parseUnits } from 'ethers';
 
-export const _100pct = '1000000000000000000';
+export const MAX_BORROWING_FEE = parseUnits('0.05');
 
 export const openTrove = async ({
   from,
@@ -41,7 +41,7 @@ export const increaseDebt = async (
   from: SignerWithAddress,
   contracts: Contracts,
   debts: any[],
-  maxFeePercentage = _100pct
+  maxFeePercentage = MAX_BORROWING_FEE
 ) => {
   return { tx: await contracts.borrowerOperations.connect(from).increaseDebt(debts, maxFeePercentage) };
 };

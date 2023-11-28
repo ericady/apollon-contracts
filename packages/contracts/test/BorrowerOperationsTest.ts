@@ -14,7 +14,7 @@ import {
 import { expect } from 'chai';
 import {
   TimeValues,
-  _100pct,
+  MAX_BORROWING_FEE,
   checkRecoveryMode,
   fastForwardTime,
   getLatestBlockTimestamp,
@@ -998,7 +998,7 @@ describe('BorrowerOperations', () => {
             amount: stableMint,
           },
         ],
-        _100pct
+        MAX_BORROWING_FEE
       )
     ).to.be.revertedWithCustomError(borrowerOperations, 'ICR_lt_MCR');
   });
@@ -1058,7 +1058,7 @@ describe('BorrowerOperations', () => {
           amount: parseUnits('1'),
         },
       ],
-      _100pct
+      MAX_BORROWING_FEE
     );
 
     // Check baseRate has decreased
@@ -1076,7 +1076,7 @@ describe('BorrowerOperations', () => {
           amount: parseUnits('1'),
         },
       ],
-      _100pct
+      MAX_BORROWING_FEE
     );
 
     const baseRate_3 = await troveManager.baseRate();
@@ -1174,16 +1174,17 @@ describe('BorrowerOperations', () => {
     expect(baseRate).to.be.equal(parseUnits('0.05'));
 
     // Attempt with maxFee > 5%
-    const moreThan5pct = parseUnits('0.05') + 1n;
-    await borrowerOperations.connect(alice).increaseDebt(
-      [
-        {
-          tokenAddress: STABLE,
-          amount: parseUnits('1'),
-        },
-      ],
-      moreThan5pct
-    );
+    await expect(
+      borrowerOperations.connect(alice).increaseDebt(
+        [
+          {
+            tokenAddress: STABLE,
+            amount: parseUnits('1'),
+          },
+        ],
+        MAX_BORROWING_FEE + 1n
+      )
+    ).to.be.revertedWithCustomError(borrowerOperations, 'MaxFee_out_Range');
 
     baseRate = await troveManager.baseRate(); // expect 5% base rate
     expect(baseRate).to.be.equal(parseUnits('0.05'));
@@ -1201,41 +1202,6 @@ describe('BorrowerOperations', () => {
 
     baseRate = await troveManager.baseRate(); // expect 5% base rate
     expect(baseRate).to.be.equal(parseUnits('0.05'));
-
-    // Attempt with maxFee 10%
-    await borrowerOperations.connect(alice).increaseDebt(
-      [
-        {
-          tokenAddress: STABLE,
-          amount: parseUnits('1'),
-        },
-      ],
-      parseUnits('0.1')
-    );
-
-    baseRate = await troveManager.baseRate(); // expect 5% base rate
-    expect(baseRate).to.be.equal(parseUnits('0.05'));
-
-    // Attempt with maxFee 37.659%
-    await borrowerOperations.connect(alice).increaseDebt(
-      [
-        {
-          tokenAddress: STABLE,
-          amount: parseUnits('1'),
-        },
-      ],
-      parseUnits('0.37659')
-    );
-    // Attempt with maxFee 100%
-    await borrowerOperations.connect(alice).increaseDebt(
-      [
-        {
-          tokenAddress: STABLE,
-          amount: parseUnits('1'),
-        },
-      ],
-      parseUnits('1')
-    );
   });
   it("increaseDebt(): doesn't change base rate if it is already zero", async () => {
     await openTrove({
@@ -1275,7 +1241,7 @@ describe('BorrowerOperations', () => {
           amount: parseUnits('37'),
         },
       ],
-      _100pct
+      MAX_BORROWING_FEE
     );
 
     // Check baseRate is still 0
@@ -1293,7 +1259,7 @@ describe('BorrowerOperations', () => {
           amount: parseUnits('12'),
         },
       ],
-      _100pct
+      MAX_BORROWING_FEE
     );
 
     const baseRate_3 = await troveManager.baseRate();
@@ -1343,7 +1309,7 @@ describe('BorrowerOperations', () => {
           amount: parseUnits('1'),
         },
       ],
-      _100pct
+      MAX_BORROWING_FEE
     );
 
     const lastFeeOpTime_2 = await troveManager.lastFeeOperationTime();
@@ -1367,7 +1333,7 @@ describe('BorrowerOperations', () => {
           amount: parseUnits('1'),
         },
       ],
-      _100pct
+      MAX_BORROWING_FEE
     );
 
     const lastFeeOpTime_3 = await troveManager.lastFeeOperationTime();
@@ -1418,7 +1384,7 @@ describe('BorrowerOperations', () => {
           amount: parseUnits('1'),
         },
       ],
-      _100pct
+      MAX_BORROWING_FEE
     );
 
     // 30 seconds pass
@@ -1432,7 +1398,7 @@ describe('BorrowerOperations', () => {
           amount: parseUnits('1'),
         },
       ],
-      _100pct
+      MAX_BORROWING_FEE
     );
 
     // Check base rate has decreased even though Borrower tried to stop it decaying
@@ -1787,7 +1753,7 @@ describe('BorrowerOperations', () => {
           amount: parseUnits('100'),
         },
       ],
-      _100pct
+      MAX_BORROWING_FEE
     );
 
     // Carol with no active trove attempts to withdraw LUSD
@@ -1799,7 +1765,7 @@ describe('BorrowerOperations', () => {
             amount: parseUnits('100'),
           },
         ],
-        _100pct
+        MAX_BORROWING_FEE
       )
     ).to.be.revertedWithCustomError(borrowerOperations, 'TroveClosedOrNotExist');
   });
@@ -1827,7 +1793,7 @@ describe('BorrowerOperations', () => {
           amount: parseUnits('100'),
         },
       ],
-      _100pct
+      MAX_BORROWING_FEE
     );
 
     // Alice attempts to withdraw 0 LUSD
@@ -1839,7 +1805,7 @@ describe('BorrowerOperations', () => {
             amount: 0,
           },
         ],
-        _100pct
+        MAX_BORROWING_FEE
       )
     ).to.be.revertedWithCustomError(borrowerOperations, 'ZeroDebtChange');
   });
@@ -1869,7 +1835,7 @@ describe('BorrowerOperations', () => {
           amount: parseUnits('100'),
         },
       ],
-      _100pct
+      MAX_BORROWING_FEE
     );
 
     await priceFeed.setTokenPrice(BTC, parseUnits('100'));
@@ -1885,7 +1851,7 @@ describe('BorrowerOperations', () => {
             amount: 1,
           },
         ],
-        _100pct
+        MAX_BORROWING_FEE
       )
     ).to.be.revertedWithCustomError(borrowerOperations, 'ICR_lt_CCR');
   });
@@ -1916,7 +1882,7 @@ describe('BorrowerOperations', () => {
             amount: parseUnits('20000'),
           },
         ],
-        _100pct
+        MAX_BORROWING_FEE
       )
     ).to.be.revertedWithCustomError(borrowerOperations, 'ICR_lt_MCR');
   });
@@ -1943,7 +1909,9 @@ describe('BorrowerOperations', () => {
 
     // Bob attempts to withdraw 1 LUSD and system TCR would be lower than CCR of 150%.
     await expect(
-      borrowerOperations.connect(bob).increaseDebt([{ tokenAddress: STABLE, amount: parseUnits('100') }], _100pct)
+      borrowerOperations
+        .connect(bob)
+        .increaseDebt([{ tokenAddress: STABLE, amount: parseUnits('100') }], MAX_BORROWING_FEE)
     ).to.be.revertedWithCustomError(borrowerOperations, 'TCR_lt_CCR');
   });
   it('increaseDebt(): reverts if system is in Recovery Mode', async () => {
@@ -1971,7 +1939,9 @@ describe('BorrowerOperations', () => {
     expect(await checkRecoveryMode(contracts)).to.be.true;
 
     await expect(
-      borrowerOperations.connect(alice).increaseDebt([{ tokenAddress: STABLE, amount: parseUnits('200') }], _100pct)
+      borrowerOperations
+        .connect(alice)
+        .increaseDebt([{ tokenAddress: STABLE, amount: parseUnits('200') }], MAX_BORROWING_FEE)
     ).to.be.revertedWithCustomError(borrowerOperations, 'ICR_lt_CCR');
   });
   it("increaseDebt(): increases the Trove's LUSD debt by the correct amount", async () => {
@@ -1989,7 +1959,7 @@ describe('BorrowerOperations', () => {
 
     await borrowerOperations
       .connect(alice)
-      .increaseDebt([{ tokenAddress: STABLE, amount: parseUnits('100') }], _100pct);
+      .increaseDebt([{ tokenAddress: STABLE, amount: parseUnits('100') }], MAX_BORROWING_FEE);
 
     // check after
     const aliceDebtAfter = await getTroveEntireDebt(contracts, alice);
@@ -2014,7 +1984,7 @@ describe('BorrowerOperations', () => {
 
     await borrowerOperations
       .connect(alice)
-      .increaseDebt([{ tokenAddress: STABLE, amount: parseUnits('100') }], _100pct);
+      .increaseDebt([{ tokenAddress: STABLE, amount: parseUnits('100') }], MAX_BORROWING_FEE);
 
     // check after
     const storagePool_Debt_After = await storagePool.getEntireSystemDebt();
@@ -2035,7 +2005,7 @@ describe('BorrowerOperations', () => {
 
     await borrowerOperations
       .connect(alice)
-      .increaseDebt([{ tokenAddress: STABLE, amount: parseUnits('100') }], _100pct);
+      .increaseDebt([{ tokenAddress: STABLE, amount: parseUnits('100') }], MAX_BORROWING_FEE);
 
     // check after
     const alice_StableBalance_After = await STABLE.balanceOf(alice);
