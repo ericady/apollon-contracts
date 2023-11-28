@@ -32,8 +32,8 @@ contract ReservePool is LiquityBase, Ownable, CheckContract, IReservePool {
 
     reserveCap = _reserveCap;
 
-    emit ReserveCapChanged(reserveCap);
     emit ReservePoolInitialized(_stabilityPoolManager, _stableDebtTokenAddress);
+    emit ReserveCapChanged(reserveCap);
   }
 
   function setReserveCap(uint newReserveCap) external onlyOwner {

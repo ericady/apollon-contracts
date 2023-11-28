@@ -118,6 +118,12 @@
             {
                 "indexed": false,
                 "internalType": "address",
+                "name": "_reservePoolAddress",
+                "type": "address"
+            },
+            {
+                "indexed": false,
+                "internalType": "address",
                 "name": "_priceFeedAddress",
                 "type": "address"
             },

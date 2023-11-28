@@ -12,6 +12,7 @@ interface IBorrowerOperations is IBBase {
     address _troveManagerAddress,
     address _storagePoolAddress,
     address _stabilityPoolAddress,
+    address _reservePoolAddress,
     address _priceFeedAddress,
     address _debtTokenManagerAddress,
     address _collTokenManagerAddress,

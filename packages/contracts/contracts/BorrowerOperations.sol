@@ -127,6 +127,7 @@ contract BorrowerOperations is LiquityBase, Ownable, CheckContract, IBorrowerOpe
       _troveManagerAddress,
       _storagePoolAddress,
       _stabilityPoolAddress,
+      _reservePoolAddress,
       _priceFeedAddress,
       _debtTokenManagerAddress,
       _collTokenManagerAddress,
@@ -524,6 +525,14 @@ contract BorrowerOperations is LiquityBase, Ownable, CheckContract, IBorrowerOpe
     _pool.withdrawalValue(_borrower, _collAddress, true, _poolType, _amount);
   }
 
+  /**
+   * @notice Increase debt of Borrower and update storagePool, and mint reserve fees to the reserve pool
+   * @param _borrower Borrower address
+   * @param _storagePool Cached storage pool interface
+   * @param _debtToken Debt token to borrow
+   * @param _netDebtIncrease Debt amount to borrow
+   * @param _borrowingFee Borrowing fee
+   */
   function _poolAddDebt(
     address _borrower,
     IStoragePool _storagePool,
@@ -535,10 +544,10 @@ contract BorrowerOperations is LiquityBase, Ownable, CheckContract, IBorrowerOpe
     uint mintAmount = _netDebtIncrease - _borrowingFee;
     if (mintAmount > 0) _debtToken.mint(_borrower, mintAmount);
 
-    // Mint reserves
-    uint reserveAmount = (_borrowingFee * RESERVE_FEE) / 1e18;
-    if (reserveAmount > 0 && !reservePool.isReserveCapReached()) {
-      _debtToken.mint(address(reservePool), reserveAmount);
+    // Cut reserve fees from borrowing fee and mint to the reserve pool
+    uint reserveFeeAmount = (_borrowingFee * RESERVE_FEE) / 1e18;
+    if (reserveFeeAmount > 0 && !reservePool.isReserveCapReached()) {
+      _debtToken.mint(address(reservePool), reserveFeeAmount);
     }
   }
 

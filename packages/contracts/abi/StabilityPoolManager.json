@@ -89,6 +89,12 @@
             {
                 "indexed": false,
                 "internalType": "address",
+                "name": "reservePoolAddress",
+                "type": "address"
+            },
+            {
+                "indexed": false,
+                "internalType": "address",
                 "name": "debtTokenManagerAddress",
                 "type": "address"
             },

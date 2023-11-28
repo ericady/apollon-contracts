@@ -53,6 +53,7 @@ contract StabilityPoolManager is Ownable, CheckContract, IStabilityPoolManager {
     emit StabilityPoolManagerInitiated(
       _troveManagerAddress,
       _storagePoolAddress,
+      _reservePoolAddress,
       _debtTokenManagerAddress,
       _priceFeedAddress
     );
@@ -218,7 +219,7 @@ contract StabilityPoolManager is Ownable, CheckContract, IStabilityPoolManager {
         uint loss = offsetValue - gainedCollValue;
         reservePool.withdrawValue(stabilityPoolAddress, loss);
 
-        // add to coll gained array
+        // add repaid colls to coll gained array
         if (stableCollIndex >= remainingStability.collGained.length) {
           TokenAmount[] memory collGained = new TokenAmount[](remainingStability.collGained.length + 1);
           for (uint ii = 0; ii < remainingStability.collGained.length; ii++) {

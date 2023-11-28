@@ -10,6 +10,7 @@ interface IStabilityPoolManager is IBBase {
   event StabilityPoolManagerInitiated(
     address troveManagerAddress,
     address storgePoolAddress,
+    address reservePoolAddress,
     address debtTokenManagerAddress,
     address priceFeedAddress
   );
