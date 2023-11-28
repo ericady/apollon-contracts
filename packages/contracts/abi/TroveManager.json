@@ -319,18 +319,6 @@
                 "internalType": "enum ITroveManager.Status",
                 "name": "_closingState",
                 "type": "uint8"
-            },
-            {
-                "indexed": false,
-                "internalType": "address[]",
-                "name": "_collTokenAddresses",
-                "type": "address[]"
-            },
-            {
-                "indexed": false,
-                "internalType": "address[]",
-                "name": "_debtTokenAddresses",
-                "type": "address[]"
             }
         ],
         "name": "TroveClosed",
@@ -353,25 +341,6 @@
             }
         ],
         "name": "TroveCollChanged",
-        "type": "event"
-    },
-    {
-        "anonymous": false,
-        "inputs": [
-            {
-                "indexed": false,
-                "internalType": "address",
-                "name": "_borrower",
-                "type": "address"
-            },
-            {
-                "indexed": false,
-                "internalType": "address[]",
-                "name": "_debtTokenAddresses",
-                "type": "address[]"
-            }
-        ],
-        "name": "TroveDebtChanged",
         "type": "event"
     },
     {

@@ -46,7 +46,7 @@ dataSources:
           handler: handleTotalStakesUpdated
         - event: TroveAppliedRewards(address,(address,bool,uint256)[])
           handler: handleTroveAppliedRewards
-        - event: TroveClosed(address,uint8,address[],address[])
+        - event: TroveClosed(address,uint8)
           handler: handleTroveClosed
         - event: TroveIndexUpdated(address,uint256)
           handler: handleTroveIndexUpdated
