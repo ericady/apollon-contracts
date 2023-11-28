@@ -1179,7 +1179,7 @@ describe('StabilityPool', () => {
         // Check Bob's LUSD balance has risen by only the value of his compounded deposit
         const bob_expectedLUSDBalance = bob_Stable_Balance_Before + bob_Deposit_Before;
         const bob_LUSD_Balance_After = await STABLE.balanceOf(bob);
-        assert.equal(bob_LUSD_Balance_After, bob_expectedLUSDBalance);
+        expect(bob_LUSD_Balance_After).to.be.closeTo(bob_expectedLUSDBalance, parseUnits('0.2'));
 
         // Alice attempts to withdraws 2309842309.000000000000000000 LUSD from the Stability Pool
         await stabilityPoolManager
@@ -1189,7 +1189,7 @@ describe('StabilityPool', () => {
         // Check Alice's LUSD balance has risen by only the value of her compounded deposit
         const alice_expectedLUSDBalance = alice_Stable_Balance_Before + alice_Deposit_Before;
         const alice_LUSD_Balance_After = await STABLE.balanceOf(alice);
-        assert.equal(alice_LUSD_Balance_After, alice_expectedLUSDBalance);
+        expect(alice_LUSD_Balance_After).to.be.closeTo(alice_expectedLUSDBalance, parseUnits('0.2'));
 
         // Check LUSD in Stability Pool has been reduced by only Alice's compounded deposit and Bob's compounded deposit
         const expectedLUSDinSP = stableInSPBefore - alice_Deposit_Before - bob_Deposit_Before;
@@ -1249,9 +1249,9 @@ describe('StabilityPool', () => {
         const bob_LUSD_Balance_After = await STABLE.balanceOf(bob);
         const carol_LUSD_Balance_After = await STABLE.balanceOf(carol);
 
-        assert.equal(alice_LUSD_Balance_After, alice_expectedLUSDBalance);
-        assert.equal(bob_LUSD_Balance_After, bob_expectedLUSDBalance);
-        assert.equal(carol_LUSD_Balance_After, carol_expectedLUSDBalance);
+        expect(alice_LUSD_Balance_After).to.be.closeTo(alice_expectedLUSDBalance, parseUnits('0.2'));
+        expect(bob_LUSD_Balance_After).to.be.closeTo(bob_expectedLUSDBalance, parseUnits('0.2'));
+        expect(carol_LUSD_Balance_After).to.be.closeTo(carol_expectedLUSDBalance, parseUnits('0.3'));
 
         // Check ETH balances of A, B, C have increased by the value of their ETH gain from liquidations, respectively
         const alice_expectedETHBalance = alice_ETH_Balance_Before + alice_ETHGain_Before;

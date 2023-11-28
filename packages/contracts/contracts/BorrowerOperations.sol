@@ -492,11 +492,6 @@ contract BorrowerOperations is LiquityBase, Ownable, CheckContract, IBorrowerOpe
     uint stableCoinPrice = _stableCoinAmount.debtToken.getPrice();
     borrowingFee = (borrowingFee * DECIMAL_PRECISION) / stableCoinPrice;
 
-    // todo...
-    // Send fee to staking contract
-    //        lqtyStaking.increaseF_LUSD(borrowingFee);
-    //        stableCoinAmount.debtToken.mint(address(lqtyStaking), borrowingFee);
-
     // update troves debts
     _stableCoinAmount.netDebt += borrowingFee;
     _stableCoinAmount.borrowingFee += borrowingFee;
@@ -526,7 +521,8 @@ contract BorrowerOperations is LiquityBase, Ownable, CheckContract, IBorrowerOpe
   }
 
   /**
-   * @notice Increase debt of Borrower and update storagePool, and mint reserve fees to the reserve pool
+   * @notice Increase debt of Borrower and distribute borrowing fees
+   * @dev Cut reserve fee from borrowing fees and send to the reserve pool, rest borrowing fees to staking pool
    * @param _borrower Borrower address
    * @param _storagePool Cached storage pool interface
    * @param _debtToken Debt token to borrow
@@ -545,10 +541,16 @@ contract BorrowerOperations is LiquityBase, Ownable, CheckContract, IBorrowerOpe
     if (mintAmount > 0) _debtToken.mint(_borrower, mintAmount);
 
     // Cut reserve fees from borrowing fee and mint to the reserve pool
-    uint reserveFeeAmount = (_borrowingFee * RESERVE_FEE) / 1e18;
-    if (reserveFeeAmount > 0 && !reservePool.isReserveCapReached()) {
-      _debtToken.mint(address(reservePool), reserveFeeAmount);
+    uint reserveFee = (_borrowingFee * RESERVE_FEE) / 1e18;
+    (bool stableCapReached, ) = reservePool.isReserveCapReached();
+    if (reserveFee > 0 && !stableCapReached) {
+      _debtToken.mint(address(reservePool), reserveFee);
     }
+
+    // TODO: Add remaining borrowing fees to gov token staking as rewards
+    // uint stakingRewards = _borrowingFee - reserveFee;
+    // lqtyStaking.increaseF_LUSD(reserveFee);
+    // _debtToken.mint(address(lqtyStaking), stakingRewards);
   }
 
   function _poolRepayDebt(

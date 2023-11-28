@@ -1,6 +1,11 @@
 [
     {
         "inputs": [],
+        "name": "FeeExceedMaxPercentage",
+        "type": "error"
+    },
+    {
+        "inputs": [],
         "name": "NotFromSPM",
         "type": "error"
     },
@@ -11,6 +16,12 @@
                 "indexed": false,
                 "internalType": "uint256",
                 "name": "newReserveCap",
+                "type": "uint256"
+            },
+            {
+                "indexed": false,
+                "internalType": "uint256",
+                "name": "newGovReserveCap",
                 "type": "uint256"
             }
         ],
@@ -29,7 +40,19 @@
             {
                 "indexed": false,
                 "internalType": "address",
+                "name": "_priceFeed",
+                "type": "address"
+            },
+            {
+                "indexed": false,
+                "internalType": "address",
                 "name": "_stableDebtTokenAddress",
+                "type": "address"
+            },
+            {
+                "indexed": false,
+                "internalType": "address",
+                "name": "_govTokenAddress",
                 "type": "address"
             }
         ],
@@ -38,8 +61,26 @@
     },
     {
         "inputs": [],
+        "name": "govReserveCap",
+        "outputs": [
+            {
+                "internalType": "uint256",
+                "name": "",
+                "type": "uint256"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [],
         "name": "isReserveCapReached",
         "outputs": [
+            {
+                "internalType": "bool",
+                "name": "",
+                "type": "bool"
+            },
             {
                 "internalType": "bool",
                 "name": "",
@@ -63,6 +104,19 @@
         "type": "function"
     },
     {
+        "inputs": [],
+        "name": "stableReserveCap",
+        "outputs": [
+            {
+                "internalType": "uint256",
+                "name": "",
+                "type": "uint256"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
         "inputs": [
             {
                 "internalType": "address",
@@ -76,7 +130,25 @@
             }
         ],
         "name": "withdrawValue",
-        "outputs": [],
+        "outputs": [
+            {
+                "components": [
+                    {
+                        "internalType": "address",
+                        "name": "tokenAddress",
+                        "type": "address"
+                    },
+                    {
+                        "internalType": "uint256",
+                        "name": "amount",
+                        "type": "uint256"
+                    }
+                ],
+                "internalType": "struct IBase.TokenAmount[]",
+                "name": "",
+                "type": "tuple[]"
+            }
+        ],
         "stateMutability": "nonpayable",
         "type": "function"
     }

@@ -46,6 +46,12 @@
                 "internalType": "uint256",
                 "name": "newReserveCap",
                 "type": "uint256"
+            },
+            {
+                "indexed": false,
+                "internalType": "uint256",
+                "name": "newGovReserveCap",
+                "type": "uint256"
             }
         ],
         "name": "ReserveCapChanged",
@@ -63,7 +69,19 @@
             {
                 "indexed": false,
                 "internalType": "address",
+                "name": "_priceFeed",
+                "type": "address"
+            },
+            {
+                "indexed": false,
+                "internalType": "address",
                 "name": "_stableDebtTokenAddress",
+                "type": "address"
+            },
+            {
+                "indexed": false,
+                "internalType": "address",
+                "name": "_govTokenAddress",
                 "type": "address"
             }
         ],
@@ -202,11 +220,42 @@
     },
     {
         "inputs": [],
+        "name": "govReserveCap",
+        "outputs": [
+            {
+                "internalType": "uint256",
+                "name": "",
+                "type": "uint256"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [],
+        "name": "govToken",
+        "outputs": [
+            {
+                "internalType": "contract IERC20",
+                "name": "",
+                "type": "address"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [],
         "name": "isReserveCapReached",
         "outputs": [
             {
                 "internalType": "bool",
-                "name": "",
+                "name": "stableCapReached",
+                "type": "bool"
+            },
+            {
+                "internalType": "bool",
+                "name": "govCapReached",
                 "type": "bool"
             }
         ],
@@ -228,22 +277,22 @@
     },
     {
         "inputs": [],
-        "name": "renounceOwnership",
-        "outputs": [],
-        "stateMutability": "nonpayable",
+        "name": "priceFeed",
+        "outputs": [
+            {
+                "internalType": "contract IPriceFeed",
+                "name": "",
+                "type": "address"
+            }
+        ],
+        "stateMutability": "view",
         "type": "function"
     },
     {
         "inputs": [],
-        "name": "reserveCap",
-        "outputs": [
-            {
-                "internalType": "uint256",
-                "name": "",
-                "type": "uint256"
-            }
-        ],
-        "stateMutability": "view",
+        "name": "renounceOwnership",
+        "outputs": [],
+        "stateMutability": "nonpayable",
         "type": "function"
     },
     {
@@ -255,12 +304,27 @@
             },
             {
                 "internalType": "address",
+                "name": "_priceFeed",
+                "type": "address"
+            },
+            {
+                "internalType": "address",
                 "name": "_stableDebtTokenAddress",
                 "type": "address"
             },
             {
+                "internalType": "address",
+                "name": "_govTokenAddress",
+                "type": "address"
+            },
+            {
                 "internalType": "uint256",
-                "name": "_reserveCap",
+                "name": "_stableReserveCap",
+                "type": "uint256"
+            },
+            {
+                "internalType": "uint256",
+                "name": "_govReserveCap",
                 "type": "uint256"
             }
         ],
@@ -273,7 +337,12 @@
         "inputs": [
             {
                 "internalType": "uint256",
-                "name": "newReserveCap",
+                "name": "newStableReserveCap",
+                "type": "uint256"
+            },
+            {
+                "internalType": "uint256",
+                "name": "newGovReserveCap",
                 "type": "uint256"
             }
         ],
@@ -309,6 +378,19 @@
         "type": "function"
     },
     {
+        "inputs": [],
+        "name": "stableReserveCap",
+        "outputs": [
+            {
+                "internalType": "uint256",
+                "name": "",
+                "type": "uint256"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
         "inputs": [
             {
                 "internalType": "address",
@@ -335,7 +417,25 @@
             }
         ],
         "name": "withdrawValue",
-        "outputs": [],
+        "outputs": [
+            {
+                "components": [
+                    {
+                        "internalType": "address",
+                        "name": "tokenAddress",
+                        "type": "address"
+                    },
+                    {
+                        "internalType": "uint256",
+                        "name": "amount",
+                        "type": "uint256"
+                    }
+                ],
+                "internalType": "struct IBase.TokenAmount[]",
+                "name": "repaidReserves",
+                "type": "tuple[]"
+            }
+        ],
         "stateMutability": "nonpayable",
         "type": "function"
     }

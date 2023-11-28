@@ -175,7 +175,10 @@ export const deployAndLinkToken = async (contracts: Contracts) => {
 
   await contracts.reservePool.setAddresses(
     contracts.stabilityPoolManager,
+    contracts.priceFeed,
     contracts.debtToken.STABLE,
+    contracts.debtToken.STABLE, // TODO: change to gov token
+    parseUnits('1000000'),
     parseUnits('1000000')
   );
 };
