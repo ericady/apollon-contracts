@@ -1,12 +1,6 @@
-entity (user-collateral-token-meta-entity)
-  > handleUpdateUserCollateralTokenMeta_walletAmount
-    ~ borrower-operations: handleCollateralTokenUpdated
-    ~ stability-pool: handleStabilityGainsWithdrawn
-    ~ storage-pool: handleCollateralTokenUpdated
-  > handleUpdateUserCollateralTokenMeta_troveLockedAmount
-    ~ trove-manager: handleTroveAppliedRewards
-    ~ trove-manager: handleTroveClosed
-    ~ trove-manager: handleCollChanged
+entity (token-entity)
+  > handleCreateToken
+    ~ debt-token-manager: handleDebtTokenAdded
 entity (debt-token-meta-entity)
   > handleCreateDebtTokenMeta
     ~ debt-token: handleTransfer
@@ -15,22 +9,6 @@ entity (debt-token-meta-entity)
     ~ stability-pool: handleStabilityWithdrawn
   > handleUpdateStabilityDepositAPY
     ~ stability-pool: handleStabilityOffset
-entity (user-debt-token-meta-entity)
-  > handleUpdateUserDebtTokenMeta_walletAmount_stabilityCompoundAmount
-    ~ debt-token: handleTransfer
-  > handleResetUserDebtTokenMeta_providedStablitySinceLastCollClaim
-    ~ stability-pool: handleStabilityGainsWithdrawn
-  > handleUpdateUserDebtTokenMeta_providedStablitySinceLastCollClaim_stabilityCompoundAmount
-    ~ stability-pool: handleStabilityProvided
-    ~ stability-pool: handleStabilityWithdrawn
-  > handleUpdateUserDebtTokenMeta_troveMintedAmount_stabilityCompoundAmount
-    ~ trove-manager: handleTroveAppliedRewards
-    ~ trove-manager: handleDebtChanged
-entity (token-entity)
-  > handleCreateToken
-    ~ debt-token: handleDebtTokenCreated
-  > handleUpdateToken_priceUSD
-    ~ price-feed: handleTokenPriceChanged
 entity (token-candle-entity)
   > handleUpdateTokenCandle
     ~ price-feed: handleTokenPriceChanged

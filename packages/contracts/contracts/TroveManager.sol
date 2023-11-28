@@ -1006,6 +1006,8 @@ contract TroveManager is LiquityBase, Ownable, CheckContract, ITroveManager {
     for (uint i = 0; i < collTokenAddresses.length; i++) trove.stakes[collTokenAddresses[i]] = 0;
 
     _removeTroveOwner(_borrower, numOfOwners);
+
+    emit TroveClosed(_borrower, closedStatus);
   }
 
   /*

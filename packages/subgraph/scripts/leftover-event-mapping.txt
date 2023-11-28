@@ -2,6 +2,9 @@ contract (borrower-operations)
   > handleBorrowerOperationsInitialized
   > handleOwnershipTransferred
   > handleTroveCreated
+contract (debt-token-manager)
+  > handleDebtTokenManagerInitialized
+  > handleOwnershipTransferred
 contract (debt-token)
   > handleApproval
 contract (price-feed)
@@ -19,6 +22,7 @@ contract (stability-pool)
   > handleP_Updated
   > handleS_Updated
   > handleScaleUpdated
+  > handleStabilityGainsWithdrawn
   > handleStabilityPoolInitialized
 contract (storage-pool)
   > handleOwnershipTransferred
@@ -32,6 +36,8 @@ contract (trove-manager)
   > handleOwnershipTransferred
   > handleSystemSnapshotsUpdated
   > handleTotalStakesUpdated
+  > handleTroveAppliedRewards
+  > handleTroveClosed
   > handleTroveIndexUpdated
   > handleTroveManagerInitialized
   > handleTroveSnapshotsUpdated
