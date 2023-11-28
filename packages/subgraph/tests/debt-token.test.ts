@@ -1,17 +1,14 @@
-import { Address, BigInt, ethereum } from '@graphprotocol/graph-ts';
+import { BigInt, ethereum } from '@graphprotocol/graph-ts';
 import { afterAll, assert, clearStore, createMockedFunction, describe, test } from 'matchstick-as/assembly/index';
-import { Token } from '../generated/schema';
-import { handleDebtTokenCreated, handleTransfer } from '../src/debt-token';
+import { handleDebtTokenAdded } from '../src/debt-token-manager';
+import { createDebtTokenAddedEvent } from './debt-token-manager-utils';
 import {
   MockDebtTokenAddress,
   MockStabilityPoolAddress,
   MockStabilityPoolManagerAddress,
   MockTroveManagerAddress,
   MockUserAddress,
-  createDebtTokenCreatedEvent,
-  createTransferEvent,
 } from './debt-token-utils';
-import { mockStabilityPoolManagerGetStabilityPool } from './stability-pool-manager.test';
 
 export const mockDebtTokenSymbol = (): void => {
   createMockedFunction(MockDebtTokenAddress, 'symbol', 'symbol():(string)').returns([
@@ -63,12 +60,12 @@ describe('handlePriceFeedAddressChanged()', () => {
   });
 
   test('Token entity created and stored', () => {
-    const newCreatedEvent = createDebtTokenCreatedEvent();
+    const newCreatedEvent = createDebtTokenAddedEvent(MockDebtTokenAddress);
 
     mockDebtTokenSymbol();
     mockDebtTokenPrice();
 
-    handleDebtTokenCreated(newCreatedEvent);
+    handleDebtTokenAdded(newCreatedEvent);
 
     assert.entityCount('Token', 1);
 
@@ -78,7 +75,6 @@ describe('handlePriceFeedAddressChanged()', () => {
       'address',
       '0x0000000000000000000000000000000000000100',
     );
-    assert.fieldEquals('Token', '0x0000000000000000000000000000000000000100', 'priceUSD', '1');
   });
 });
 
@@ -87,35 +83,34 @@ describe('handleTransfer()', () => {
     clearStore();
   });
 
-  test(
-    'Token entity priceUSD is updated',
-    () => {
-      const debtToken = new Token(MockDebtTokenAddress);
-      debtToken.address = MockDebtTokenAddress;
+  // test(
+  //   'Token entity priceUSD is updated',
+  //   () => {
+  //     const debtToken = new Token(MockDebtTokenAddress);
+  //     debtToken.address = MockDebtTokenAddress;
 
-      debtToken.createdAt = BigInt.fromI32(1);
-      debtToken.symbol = 'JUSD';
-      debtToken.isPoolToken = true;
-      debtToken.priceUSD = BigInt.fromI32(1);
-      debtToken.save();
+  //     debtToken.createdAt = BigInt.fromI32(1);
+  //     debtToken.symbol = 'JUSD';
+  //     debtToken.isPoolToken = true;
+  //     debtToken.save();
 
-      const newTransferEvent = createTransferEvent(
-        Address.fromString('0x1000000000000000000000000000000000000000'),
-        Address.fromString('0x2000000000000000000000000000000000000000'),
-        BigInt.fromI32(1),
-      );
+  //     const newTransferEvent = createTransferEvent(
+  //       Address.fromString('0x1000000000000000000000000000000000000000'),
+  //       Address.fromString('0x2000000000000000000000000000000000000000'),
+  //       BigInt.fromI32(1),
+  //     );
 
-      mockDebtTokenPrice();
-      mockDebtTokenTotalSupply();
-      mockDebtTokenStabilityPoolManagerAddress();
-      mockStabilityPoolManagerGetStabilityPool();
-      mockStabilityPoolGetStabilityAPY();
-      mockStabilityPoolGetTotalDeposit();
+  //     mockDebtTokenPrice();
+  //     mockDebtTokenTotalSupply();
+  //     mockDebtTokenStabilityPoolManagerAddress();
+  //     mockStabilityPoolManagerGetStabilityPool();
+  //     mockStabilityPoolGetStabilityAPY();
+  //     mockStabilityPoolGetTotalDeposit();
 
-      handleTransfer(newTransferEvent);
+  //     handleTransfer(newTransferEvent);
 
-      assert.entityCount('DebtTokenMeta', 1);
-    },
-    true,
-  );
+  //     assert.entityCount('DebtTokenMeta', 1);
+  //   },
+  //   true,
+  // );
 });

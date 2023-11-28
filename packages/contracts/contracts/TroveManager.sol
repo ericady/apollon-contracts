@@ -1283,33 +1283,23 @@ contract TroveManager is LiquityBase, Ownable, CheckContract, ITroveManager {
     _requireCallerIsBorrowerOrRedemptionOperations();
 
     Trove storage trove = Troves[_borrower];
-    address[] memory debtTokenAddresses = new address[](_debtTokenAmounts.length);
-
     for (uint i = 0; i < _debtTokenAmounts.length; i++) {
       IDebtToken debtToken = _debtTokenAmounts[i].debtToken;
       trove.debts[debtToken] += _debtTokenAmounts[i].netDebt;
-      debtTokenAddresses[i] = address(debtToken);
 
       if (!trove.debtsRegistered[address(debtToken)]) {
         trove.debtsRegistered[address(debtToken)] = true;
         trove.debtTokens.push(debtToken);
       }
     }
-
-    emit TroveDebtChanged(_borrower, debtTokenAddresses);
   }
 
   function decreaseTroveDebt(address _borrower, DebtTokenAmount[] memory _debtTokenAmounts) external override {
     _requireCallerIsBorrowerOrRedemptionOperations();
 
     Trove storage trove = Troves[_borrower];
-    address[] memory debtTokenAddresses = new address[](_debtTokenAmounts.length);
-
     for (uint i = 0; i < _debtTokenAmounts.length; i++) {
       trove.debts[_debtTokenAmounts[i].debtToken] -= _debtTokenAmounts[i].netDebt;
-      debtTokenAddresses[i] = address(_debtTokenAmounts[i].debtToken);
     }
-
-    emit TroveDebtChanged(_borrower, debtTokenAddresses);
   }
 }

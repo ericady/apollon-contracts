@@ -97,8 +97,6 @@ contract DebtToken is CheckContract, IDebtToken {
     _HASHED_VERSION = hashedVersion;
     _CACHED_CHAIN_ID = _chainID();
     _CACHED_DOMAIN_SEPARATOR = _buildDomainSeparator(_TYPE_HASH, hashedName, hashedVersion);
-
-    emit DebtTokenCreated();
   }
 
   // --- Functions for intra-Liquity calls ---

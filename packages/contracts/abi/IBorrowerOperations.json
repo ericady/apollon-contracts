@@ -128,31 +128,6 @@
             {
                 "indexed": false,
                 "internalType": "address",
-                "name": "_collateralTokenAddress",
-                "type": "address"
-            },
-            {
-                "indexed": false,
-                "internalType": "address",
-                "name": "_owner",
-                "type": "address"
-            },
-            {
-                "indexed": false,
-                "internalType": "address",
-                "name": "_receiver",
-                "type": "address"
-            }
-        ],
-        "name": "CollateralTokenUpdated",
-        "type": "event"
-    },
-    {
-        "anonymous": false,
-        "inputs": [
-            {
-                "indexed": false,
-                "internalType": "address",
                 "name": "_borrower",
                 "type": "address"
             },

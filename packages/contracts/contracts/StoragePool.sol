@@ -108,7 +108,6 @@ contract StoragePool is LiquityBase, Ownable, CheckContract, IStoragePool {
     _requireCallerIsBOorTroveMorSPorRO();
     _subtractValue(_tokenAddress, _isColl, _poolType, _amount);
     IERC20(_tokenAddress).transfer(_receiver, _amount);
-    emit CollateralTokenUpdated(_tokenAddress, address(this), _receiver);
   }
 
   function _subtractValue(address _tokenAddress, bool _isColl, PoolType _poolType, uint _amount) internal {

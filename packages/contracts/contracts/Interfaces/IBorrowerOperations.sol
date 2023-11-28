@@ -17,7 +17,6 @@ interface IBorrowerOperations is IBBase {
     address _collTokenManagerAddress
   );
   event TroveCreated(address _borrower, uint arrayIndex);
-  event CollateralTokenUpdated(address _collateralTokenAddress, address _owner, address _receiver);
 
   // --- Custom Errors ---
 

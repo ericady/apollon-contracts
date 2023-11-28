@@ -71,12 +71,6 @@
     },
     {
         "anonymous": false,
-        "inputs": [],
-        "name": "DebtTokenCreated",
-        "type": "event"
-    },
-    {
-        "anonymous": false,
         "inputs": [
             {
                 "indexed": true,

@@ -20,6 +20,9 @@
     },
     "BorrowerOperations": {
       "address": "BorrowerOperations"
+    },
+    "DebtTokenManager": {
+      "address": "DebtTokenManager"
     }
   }
 }

@@ -9,7 +9,7 @@ type Token @entity {
   symbol: String!
   createdAt: BigInt!
   #
-  priceUSD: BigInt!
+  # priceUSD: BigInt!
   # TODO: Fetch this from the client side and get it from the TradingView entities
   # priceUSD24hAgo: BigInt!
   #
@@ -18,7 +18,7 @@ type Token @entity {
 
 type DebtTokenMeta @entity(immutable: true) {
   id: Bytes!
-  token: Token! @relation(name: "TokenToDebtTokenMeta")
+  token: Bytes!
   timestamp: BigInt!
 
   # global
@@ -57,22 +57,22 @@ type StabilityDepositChunk @entity {
   volume: BigInt!
 }
 
-type UserDebtTokenMeta @entity {
-  # "UserDebtTokenMeta" + token + borrower
-  id: String!
-  borrower: Bytes!
-  token: Token! @relation(name: "TokenToUserDebtTokenMeta")
+# type UserDebtTokenMeta @entity {
+#   # "UserDebtTokenMeta" + token + borrower
+#   id: String!
+#   borrower: Bytes!
+#   token: Bytes!
 
-  walletAmount: BigInt!
-  troveMintedAmount: BigInt!
-  # When user claims rewards set to deposit => track any increase/decrease but claimed stability
-  providedStablitySinceLastCollClaim: BigInt!
-  stabilityCompoundAmount: BigInt!
-}
+#   walletAmount: BigInt!
+#   troveMintedAmount: BigInt!
+#   # When user claims rewards set to deposit => track any increase/decrease but claimed stability
+#   providedStablitySinceLastCollClaim: BigInt!
+#   stabilityCompoundAmount: BigInt!
+# }
 
 type CollateralTokenMeta @entity(immutable: true) {
   id: Bytes!
-  token: Token! @relation(name: "TokenToCollateralTokenMeta")
+  token: Bytes!
   timestamp: BigInt!
 
   # global
@@ -82,114 +82,115 @@ type CollateralTokenMeta @entity(immutable: true) {
   # totalValueLockedUSD24hAgo: BigInt!
 }
 
-type UserCollateralTokenMeta @entity {
-  # "UserDebtTokenMeta" + token + borrower
-  id: String!
-  borrower: Bytes!
-  token: Token! @relation(name: "TokenToUserCollateralTokenMeta")
-  # borrower specific
-  walletAmount: BigInt!
-  troveLockedAmount: BigInt!
+# type UserCollateralTokenMeta @entity {
+#   # "UserDebtTokenMeta" + token + borrower
+#   id: String!
+#   borrower: Bytes!
+#   token: Bytes!
+#   # borrower specific
+#   walletAmount: BigInt!
+#   troveLockedAmount: BigInt!
 
-  # TODO: This call is made from the client to the contract because there is no event for this
-  # stabilityGainedAmount: BigInt!
-}
+#   # TODO: This call is made from the client to the contract because there is no event for this
+#   # stabilityGainedAmount: BigInt!
+# }
 
-enum LongShortDirection {
-  LONG
-  SHORT
-}
+# TODO: Positions and Pools are not yet implemented.
+# enum LongShortDirection {
+#   LONG
+#   SHORT
+# }
 
-type Position @entity {
-  # TODO: I need a unqiue ID to fetch the Position once its closed. What could that be?
-  id: String!
-  borrower: Bytes!
-  openedAt: BigInt!
-  closedAt: BigInt # undefined until closed
-  #
-  token: Token! @relation(name: "TokenToPosition")
-  direction: LongShortDirection!
-  size: BigInt! # always positive, applied by direction
-  #
-  totalPriceInStable: BigInt!
-  feesInStable: BigInt! # protocol fees, without gas
-  profitInStable: BigInt # undefined until closed
-}
+# type Position @entity {
+#   # TODO: I need a unqiue ID to fetch the Position once its closed. What could that be?
+#   id: String!
+#   borrower: Bytes!
+#   openedAt: BigInt!
+#   closedAt: BigInt # undefined until closed
+#   #
+#   token: Bytes!
+#   direction: LongShortDirection!
+#   size: BigInt! # always positive, applied by direction
+#   #
+#   totalPriceInStable: BigInt!
+#   feesInStable: BigInt! # protocol fees, without gas
+#   profitInStable: BigInt # undefined until closed
+# }
 
-type PoolLiquidity @entity {
-  # unique Byte combination of tokenA + tokenB
-  id: Bytes!
-  token: Token! @relation(name: "TokenToPoolLiquidity")
-  totalAmount: BigInt!
-}
+# type PoolLiquidity @entity {
+#   # unique Byte combination of tokenA + tokenB
+#   id: Bytes!
+#   token: Bytes!
+#   totalAmount: BigInt!
+# }
 
-type UserPoolLiquidity @entity {
-  # "UserPoolLiquidity" + main Token + paired Token + borrower
-  id: String!
-  borrower: Bytes!
-  token: Token! @relation(name: "TokenToUserPoolLiquidity")
-  borrowerAmount: BigInt!
-}
+# type UserPoolLiquidity @entity {
+#   # "UserPoolLiquidity" + main Token + paired Token + borrower
+#   id: String!
+#   borrower: Bytes!
+#   token: Bytes!
+#   borrowerAmount: BigInt!
+# }
 
-type PoolReward @entity(immutable: true) {
-  id: Bytes!
-  token: Token! @relation(name: "TokenToPoolReward")
-  amount: BigInt!
-}
+# type PoolReward @entity(immutable: true) {
+#   id: Bytes!
+#   token: Bytes!
+#   amount: BigInt!
+# }
 
-type UserPool @entity {
-  # "UserPool" + TokenA + TokenB + borrower
-  id: String!
-  borrower: Bytes!
+# type UserPool @entity {
+#   # "UserPool" + TokenA + TokenB + borrower
+#   id: String!
+#   borrower: Bytes!
 
-  # Always updated on a user basis
-  userLiquidity: [UserPoolLiquidity!]! @relation(name: "UserPoolLiquidityToPool")
-  # Just pushed once, never updated
-  rewards: [PoolReward!]!
-}
+#   # Always updated on a user basis
+#   userLiquidity: [UserPoolLiquidity!]! @relation(name: "UserPoolLiquidityToPool")
+#   # Just pushed once, never updated
+#   rewards: [PoolReward!]!
+# }
 
-type Pool @entity {
-  # "Pool" + TokenA + TokenB
-  id: Bytes!
+# type Pool @entity {
+#   # "Pool" + TokenA + TokenB
+#   id: Bytes!
 
-  # Percent value applied when opening the first position for this pool. Can be negative and positive.
-  openingFee: BigInt!
-  # Just linked once, always updated for all users
-  liquidity: [PoolLiquidity!]! @relation(name: "PoolLiquidityToPool")
-  # TODO: Must be calculated in the subgraph but when
-  liquidityDepositAPY: BigInt!
+#   # Percent value applied when opening the first position for this pool. Can be negative and positive.
+#   openingFee: BigInt!
+#   # Just linked once, always updated for all users
+#   liquidity: [PoolLiquidity!]! @relation(name: "PoolLiquidityToPool")
+#   # TODO: Must be calculated in the subgraph but when
+#   liquidityDepositAPY: BigInt!
 
-  # TODO: We need to aggregate all Deposits/Withdrawals and update every time a new Transaction comes in
-  volume24hUSD: PoolVolume24h!
-  # once the first PoolEvent of the array is > 24h ago, we can remove it from the array and push it to the 24hAgo field
-  volume24hUSD24hAgo: PoolVolume24h!
-}
+#   # TODO: We need to aggregate all Deposits/Withdrawals and update every time a new Transaction comes in
+#   volume24hUSD: PoolVolume24h!
+#   # once the first PoolEvent of the array is > 24h ago, we can remove it from the array and push it to the 24hAgo field
+#   volume24hUSD24hAgo: PoolVolume24h!
+# }
 
-# Aggregator, pushed old events out and lets new in, recalculating the acc value each time
-type PoolVolume24h @entity {
-  id: Bytes!
-  index: Int!
-  value: BigInt!
-}
+# # Aggregator, pushed old events out and lets new in, recalculating the acc value each time
+# type PoolVolume24h @entity {
+#   id: Bytes!
+#   index: Int!
+#   value: BigInt!
+# }
 
-enum PoolEventType {
-  DEPOSIT
-  WITHDRAW
-}
+# enum PoolEventType {
+#   DEPOSIT
+#   WITHDRAW
+# }
 
-# A chunk is added once 5min are over and is deducted at the end of 24h
-type PoolVolumeChunk @entity {
-  # "PoolVolumeChunk" + TokenA + TokenB + index
-  id: String!
-  timestamp: BigInt!
-  # determines if value is added of deducted
-  type: PoolEventType!
-  value: BigInt!
-}
+# # A chunk is added once 5min are over and is deducted at the end of 24h
+# type PoolVolumeChunk @entity {
+#   # "PoolVolumeChunk" + TokenA + TokenB + index
+#   id: String!
+#   timestamp: BigInt!
+#   # determines if value is added of deducted
+#   type: PoolEventType!
+#   value: BigInt!
+# }
 
 type TokenAmount @entity(immutable: true) {
   id: Bytes!
-  token: Token! @relation(name: "TokenToTokenAmount")
+  token: Bytes!
   amount: BigInt!
 }
 
@@ -219,7 +220,7 @@ type BorrowerHistory @entity(immutable: true) {
 type TokenCandleSingleton @entity {
   # "TokenCandleSingleton" + token + candleSize
   id: String!
-  token: Token! @relation(name: "TokenToTokenCandleSingleton")
+  token: Bytes!
   # last candle + candleSize
   timestamp: BigInt!
   # last candle
@@ -233,7 +234,7 @@ type TokenCandleSingleton @entity {
 
 type TokenCandle @entity(immutable: true) {
   id: Bytes!
-  token: Token! @relation(name: "TokenToTokenCandle")
+  token: Bytes! @relation(name: "TokenToTokenCandle")
   timestamp: BigInt!
   open: BigInt!
   high: BigInt!
