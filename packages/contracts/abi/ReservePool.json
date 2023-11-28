@@ -1,26 +1,5 @@
 [
     {
-        "inputs": [
-            {
-                "internalType": "address",
-                "name": "_stabilityPoolManager",
-                "type": "address"
-            },
-            {
-                "internalType": "address",
-                "name": "_stableDebtTokenAddress",
-                "type": "address"
-            },
-            {
-                "internalType": "uint256",
-                "name": "_reserveCap",
-                "type": "uint256"
-            }
-        ],
-        "stateMutability": "nonpayable",
-        "type": "constructor"
-    },
-    {
         "inputs": [],
         "name": "FeeExceedMaxPercentage",
         "type": "error"
@@ -265,6 +244,29 @@
             }
         ],
         "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "address",
+                "name": "_stabilityPoolManager",
+                "type": "address"
+            },
+            {
+                "internalType": "address",
+                "name": "_stableDebtTokenAddress",
+                "type": "address"
+            },
+            {
+                "internalType": "uint256",
+                "name": "_reserveCap",
+                "type": "uint256"
+            }
+        ],
+        "name": "setAddresses",
+        "outputs": [],
+        "stateMutability": "nonpayable",
         "type": "function"
     },
     {

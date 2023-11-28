@@ -9,6 +9,7 @@ import {
   MockTroveManager,
   StabilityPoolManagerTester,
   StoragePool,
+  ReservePool,
 } from '../typechain';
 import { parseUnits } from 'ethers';
 import { BorrowerOperationsTester } from '../typechain/contracts/TestContracts/BorrowerOperationsTester';
@@ -19,6 +20,7 @@ export interface Contracts {
   troveManager: MockTroveManager;
   stabilityPoolManager: StabilityPoolManagerTester;
   storagePool: StoragePool;
+  reservePool: ReservePool;
   collTokenManager: CollTokenManager;
   debtTokenManager: DebtTokenManager;
   priceFeed: MockPriceFeed;
@@ -43,6 +45,9 @@ export const deployCore = async (): Promise<Contracts> => {
   const storagePoolFactory = await ethers.getContractFactory('StoragePool');
   const storagePool = await storagePoolFactory.deploy();
 
+  const reservePoolFactory = await ethers.getContractFactory('ReservePool');
+  const reservePool = await reservePoolFactory.deploy();
+
   const collTokenManagerFactory = await ethers.getContractFactory('CollTokenManager');
   const collTokenManager = await collTokenManagerFactory.deploy();
 
@@ -61,6 +66,7 @@ export const deployCore = async (): Promise<Contracts> => {
     troveManager,
     stabilityPoolManager,
     storagePool,
+    reservePool,
     collTokenManager,
     debtTokenManager,
     priceFeed,
@@ -86,6 +92,7 @@ export const connectCoreContracts = async (contracts: Contracts) => {
     contracts.troveManager,
     contracts.storagePool,
     contracts.stabilityPoolManager,
+    contracts.reservePool,
     contracts.priceFeed,
     contracts.debtTokenManager,
     contracts.collTokenManager,
@@ -116,6 +123,7 @@ export const connectCoreContracts = async (contracts: Contracts) => {
     contracts.troveManager,
     contracts.priceFeed,
     contracts.storagePool,
+    contracts.reservePool,
     contracts.debtTokenManager
   );
 };
@@ -164,6 +172,12 @@ export const deployAndLinkToken = async (contracts: Contracts) => {
 
   // debt tokens
   contracts.debtToken = { STABLE, STOCK };
+
+  await contracts.reservePool.setAddresses(
+    contracts.stabilityPoolManager,
+    contracts.debtToken.STABLE,
+    parseUnits('1000000')
+  );
 };
 
 // class DeploymentHelper {

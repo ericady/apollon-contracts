@@ -35,16 +35,19 @@ contract StabilityPoolManager is Ownable, CheckContract, IStabilityPoolManager {
     address _troveManagerAddress,
     address _priceFeedAddress,
     address _storagePoolAddress,
+    address _reservePoolAddress,
     address _debtTokenManagerAddress
   ) external onlyOwner {
     checkContract(_troveManagerAddress);
     checkContract(_priceFeedAddress);
     checkContract(_storagePoolAddress);
+    checkContract(_reservePoolAddress);
     checkContract(_debtTokenManagerAddress);
 
     troveManagerAddress = _troveManagerAddress;
     priceFeed = IPriceFeed(_priceFeedAddress);
     storagePool = IStoragePool(_storagePoolAddress);
+    reservePool = IReservePool(_reservePoolAddress);
     debtTokenManagerAddress = _debtTokenManagerAddress;
 
     emit StabilityPoolManagerInitiated(

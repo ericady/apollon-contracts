@@ -19,7 +19,11 @@ contract ReservePool is LiquityBase, Ownable, CheckContract, IReservePool {
 
   uint public reserveCap;
 
-  constructor(address _stabilityPoolManager, address _stableDebtTokenAddress, uint _reserveCap) {
+  function setAddresses(
+    address _stabilityPoolManager,
+    address _stableDebtTokenAddress,
+    uint _reserveCap
+  ) external onlyOwner {
     checkContract(_stabilityPoolManager);
     checkContract(_stableDebtTokenAddress);
 
