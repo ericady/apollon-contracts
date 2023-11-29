@@ -16,7 +16,7 @@ import './Interfaces/IPriceFeed.sol';
 import './Interfaces/IBBase.sol';
 import './Interfaces/ICollTokenManager.sol';
 
-contract BorrowerOperations is LiquityBase, Ownable, CheckContract, IBorrowerOperations {
+contract BorrowerOperations is LiquityBase, Ownable(msg.sender), CheckContract, IBorrowerOperations {
   string public constant NAME = 'BorrowerOperations';
 
   // --- Connected contract declarations ---

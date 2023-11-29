@@ -16,7 +16,7 @@ import './Interfaces/IStabilityPoolManager.sol';
 import './Interfaces/IBBase.sol';
 import './Interfaces/ICollTokenManager.sol';
 
-contract TroveManager is LiquityBase, Ownable, CheckContract, ITroveManager {
+contract TroveManager is LiquityBase, Ownable(msg.sender), CheckContract, ITroveManager {
   string public constant NAME = 'TroveManager';
 
   // --- Connected contract declarations ---

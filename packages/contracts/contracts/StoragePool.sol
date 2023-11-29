@@ -17,7 +17,7 @@ import './Interfaces/IStabilityPoolManager.sol';
  * Stability Pool, the Default Pool, or both, depending on the liquidation conditions.
  *
  */
-contract StoragePool is LiquityBase, Ownable, CheckContract, IStoragePool {
+contract StoragePool is LiquityBase, Ownable(msg.sender), CheckContract, IStoragePool {
   string public constant NAME = 'StoragePool';
 
   address public borrowerOperationsAddress;

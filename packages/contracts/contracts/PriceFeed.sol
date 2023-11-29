@@ -18,7 +18,7 @@ import './Dependencies/LiquityMath.sol';
  * switching oracles based on oracle failures, timeouts, and conditions for returning to the primary
  * Chainlink oracle.
  */
-contract PriceFeed is Ownable, CheckContract, IPriceFeed {
+contract PriceFeed is Ownable(msg.sender), CheckContract, IPriceFeed {
   string public constant NAME = 'PriceFeed';
 
   AggregatorV3Interface public priceAggregator; // Mainnet Chainlink aggregator

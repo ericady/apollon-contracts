@@ -10,7 +10,7 @@ import './Dependencies/LiquityBase.sol';
 import './DebtToken.sol';
 import './Interfaces/IStabilityPoolManager.sol';
 
-contract DebtTokenManager is Ownable, CheckContract, IDebtTokenManager {
+contract DebtTokenManager is Ownable(msg.sender), CheckContract, IDebtTokenManager {
   string public constant NAME = 'DTokenManager';
 
   IStabilityPoolManager public stabilityPoolManager;

@@ -15,7 +15,7 @@ import './Interfaces/IReservePool.sol';
 import './Interfaces/IPriceFeed.sol';
 import './StabilityPool.sol';
 
-contract StabilityPoolManager is Ownable, CheckContract, IStabilityPoolManager {
+contract StabilityPoolManager is Ownable(msg.sender), CheckContract, IStabilityPoolManager {
   string public constant NAME = 'StabilityPoolManager';
 
   address public troveManagerAddress;

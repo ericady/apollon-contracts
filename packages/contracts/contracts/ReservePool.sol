@@ -12,7 +12,7 @@ import './Interfaces/IStabilityPool.sol';
 import './Interfaces/IStabilityPoolManager.sol';
 import './Interfaces/IPriceFeed.sol';
 
-contract ReservePool is LiquityBase, Ownable, CheckContract, IReservePool {
+contract ReservePool is LiquityBase, Ownable(msg.sender), CheckContract, IReservePool {
   string public constant NAME = 'ReservePool';
 
   IStabilityPoolManager public stabilityPoolManager;

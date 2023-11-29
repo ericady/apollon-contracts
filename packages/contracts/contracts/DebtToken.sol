@@ -3,6 +3,7 @@
 pragma solidity ^0.8.9;
 
 import '@openzeppelin/contracts/utils/cryptography/ECDSA.sol';
+import '@openzeppelin/contracts/utils/cryptography/MessageHashUtils.sol';
 import './Dependencies/CheckContract.sol';
 import './Interfaces/IDebtToken.sol';
 import './Interfaces/IPriceFeed.sol';
@@ -193,7 +194,7 @@ contract DebtToken is CheckContract, IDebtToken {
       )
     );
 
-    bytes32 signedMsg = ECDSA.toEthSignedMessageHash(digest);
+    bytes32 signedMsg = MessageHashUtils.toEthSignedMessageHash(digest);
     address recoveredAddress = ECDSA.recover(signedMsg, v, r, s);
     if (recoveredAddress != owner) revert InvalidSignature();
     _approve(owner, spender, amount);

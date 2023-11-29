@@ -6,7 +6,7 @@ import '@openzeppelin/contracts/access/Ownable.sol';
 import './Dependencies/CheckContract.sol';
 import './Interfaces/ICollTokenManager.sol';
 
-contract CollTokenManager is Ownable, CheckContract, ICollTokenManager {
+contract CollTokenManager is Ownable(msg.sender), CheckContract, ICollTokenManager {
   string public constant NAME = 'CollTokenManager';
 
   address public priceFeedAddress;
