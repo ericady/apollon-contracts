@@ -545,6 +545,8 @@ contract BorrowerOperations is LiquityBase, Ownable(msg.sender), CheckContract, 
     (bool stableCapReached, ) = reservePool.isReserveCapReached();
     if (reserveFee > 0 && !stableCapReached) {
       _debtToken.mint(address(reservePool), reserveFee);
+    } else {
+      reserveFee = 0;
     }
 
     // TODO: Add remaining borrowing fees to gov token staking as rewards

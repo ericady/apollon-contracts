@@ -3,6 +3,7 @@
 pragma solidity ^0.8.9;
 
 import '@openzeppelin/contracts/access/Ownable.sol';
+import '@openzeppelin/contracts/utils/math/Math.sol';
 
 import './Dependencies/LiquityBase.sol';
 import './Dependencies/CheckContract.sol';
@@ -76,18 +77,17 @@ contract ReservePool is LiquityBase, Ownable(msg.sender), CheckContract, IReserv
     repaidReserves[0].tokenAddress = address(stableDebtToken);
 
     uint stableAmount = withdrawAmount / 2;
-    if (stableDebtToken.balanceOf(address(this)) > stableAmount) {
-      stableDebtToken.transfer(stabilityPool, stableAmount);
-      repaidReserves[0].amount = stableAmount;
-    }
+    stableAmount = Math.min(stableAmount, stableDebtToken.balanceOf(address(this)));
+    stableDebtToken.transfer(stabilityPool, stableAmount);
+    repaidReserves[0].amount = stableAmount;
 
     // TODO: enable when gov token implemented
     // repaidReserves[1].tokenAddress = address(govToken);
     // uint govAmount = (stableAmount * 1e18) / priceFeed.getPrice(address(govToken));
-    // if (govToken.balanceOf(address(this)) > govAmount) {
-    //   govToken.transfer(stabilityPool, govAmount);
-    //   repaidReserves[0].amount = govAmount;
-    // }
+    // govAmount = Math.min(govAmount, govToken.balanceOf(address(this)));
+
+    // govToken.transfer(stabilityPool, govAmount);
+    // repaidReserves[0].amount = govAmount;
   }
 
   function _requireCallerIsStabilityPoolManager() internal view {
