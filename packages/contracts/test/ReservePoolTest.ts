@@ -145,7 +145,7 @@ describe('Reserve Pool', () => {
     });
   });
   describe('Withdraw (Repay)', () => {
-    it.only('should repay loss when liquidating troves', async () => {
+    it('should repay loss when liquidating troves', async () => {
       const aliceDebt = parseUnits('1000');
       await openTrove({
         from: alice,
