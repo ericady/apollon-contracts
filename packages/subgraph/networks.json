@@ -23,6 +23,9 @@
     },
     "DebtTokenManager": {
       "address": "DebtTokenManager"
+    },
+    "CollTokenManager": {
+      "address": "CollTokenManager"
     }
   }
 }
