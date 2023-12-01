@@ -2439,5 +2439,37 @@ describe('BorrowerOperations', () => {
         'OnlyOneTrove'
       );
     });
+
+    it("reduces a Trove's collateral to zero", async () => {
+      await openTrove({
+        from: alice,
+        contracts,
+        collToken: BTC,
+        collAmount: parseUnits('1', 9),
+        debts: [{ tokenAddress: STABLE, amount: parseUnits('10000') }],
+      });
+
+      await openTrove({
+        from: bob,
+        contracts,
+        collToken: BTC,
+        collAmount: parseUnits('1', 9),
+        debts: [{ tokenAddress: STABLE, amount: parseUnits('10000') }],
+      });
+
+      const aliceCollBefore = await getTroveEntireColl(contracts, alice);
+      const bobBal = await STABLE.balanceOf(bob);
+      expect(aliceCollBefore).to.be.equal(parseUnits('21000'));
+      expect(bobBal).to.be.equal(parseUnits('10000'));
+
+      // To compensate borrowing fees
+      await STABLE.connect(bob).transfer(alice, bobBal / 2n);
+
+      // Alice attempts to close trove
+      await borrowerOperations.connect(alice).closeTrove();
+
+      const aliceCollAfter = await getTroveEntireColl(contracts, alice);
+      expect(aliceCollAfter).to.be.equal(0n);
+    });
   });
 });
