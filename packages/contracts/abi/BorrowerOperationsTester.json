@@ -31,6 +31,11 @@
     },
     {
         "inputs": [],
+        "name": "InsufficientDebtToRepay",
+        "type": "error"
+    },
+    {
+        "inputs": [],
         "name": "MaxFee_gt_100_InRM",
         "type": "error"
     },

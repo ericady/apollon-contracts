@@ -2161,7 +2161,7 @@ describe('BorrowerOperations', () => {
       // TODO: should not reverted with panic error, check later
       // ).to.be.revertedWithCustomError(borrowerOperations, 'Repaid_gt_CurrentDebt');
     });
-    it("reduces the Trove's LUSD debt by the correct amount", async () => {
+    it("reduces the Trove's stable debt by the correct amount", async () => {
       const aliceBorrowAmount = parseUnits('10000');
       await openTrove({
         from: alice,
@@ -2186,6 +2186,132 @@ describe('BorrowerOperations', () => {
       const aliceDebtAfter = await getTroveEntireDebt(contracts, alice);
 
       expect(aliceDebtAfter).to.be.equal(aliceDebtBefore - repayAmount);
+    });
+
+    it('decreases stable debt in ActivePool by correct amount', async () => {
+      const aliceBorrowAmount = parseUnits('10000');
+      await openTrove({
+        from: alice,
+        contracts,
+        collToken: BTC,
+        collAmount: parseUnits('1', 9),
+        debts: [{ tokenAddress: STABLE, amount: aliceBorrowAmount }],
+      });
+      await openTrove({
+        from: bob,
+        contracts,
+        collToken: BTC,
+        collAmount: parseUnits('1', 9),
+        debts: [{ tokenAddress: STABLE, amount: aliceBorrowAmount }],
+      });
+
+      const aliceDebtBefore = await getTroveEntireDebt(contracts, alice);
+      expect(aliceDebtBefore).to.be.gt(aliceBorrowAmount);
+
+      // Check before
+      const activePool_LUSD_Before = await storagePool.getValue(STABLE, false, 0);
+      expect(activePool_LUSD_Before).to.be.gt(aliceBorrowAmount * 2n);
+
+      await borrowerOperations.connect(alice).repayDebt([{ tokenAddress: STABLE, amount: aliceDebtBefore / 10n }]);
+
+      // check after
+      const activePool_LUSD_After = await storagePool.getValue(STABLE, false, 0);
+      expect(activePool_LUSD_After).to.be.equal(activePool_LUSD_Before - aliceDebtBefore / 10n);
+    });
+
+    it('decreases user stable token balance by correct amount', async () => {
+      const borrowAmount = parseUnits('10000');
+      await openTrove({
+        from: alice,
+        contracts,
+        collToken: BTC,
+        collAmount: parseUnits('1', 9),
+        debts: [{ tokenAddress: STABLE, amount: borrowAmount }],
+      });
+      await openTrove({
+        from: bob,
+        contracts,
+        collToken: BTC,
+        collAmount: parseUnits('1', 9),
+        debts: [{ tokenAddress: STABLE, amount: borrowAmount }],
+      });
+
+      const aliceDebtBefore = await getTroveEntireDebt(contracts, alice);
+      expect(aliceDebtBefore).to.be.gt(borrowAmount);
+
+      // check before
+      const alice_StableBalance_Before = await STABLE.balanceOf(alice);
+      expect(alice_StableBalance_Before).to.be.equal(borrowAmount);
+
+      await borrowerOperations.connect(alice).repayDebt([{ tokenAddress: STABLE, amount: aliceDebtBefore / 10n }]);
+
+      // check after
+      const alice_StableBalance_After = await STABLE.balanceOf(alice);
+      expect(alice_StableBalance_After).to.be.equal(alice_StableBalance_Before - aliceDebtBefore / 10n);
+    });
+
+    it('can repay debt in Recovery Mode', async () => {
+      const borrowAmount = parseUnits('10000');
+      await openTrove({
+        from: alice,
+        contracts,
+        collToken: BTC,
+        collAmount: parseUnits('1', 9),
+        debts: [{ tokenAddress: STABLE, amount: borrowAmount }],
+      });
+      await openTrove({
+        from: bob,
+        contracts,
+        collToken: BTC,
+        collAmount: parseUnits('1', 9),
+        debts: [{ tokenAddress: STABLE, amount: borrowAmount }],
+      });
+
+      const aliceDebtBefore = await getTroveEntireDebt(contracts, alice);
+      expect(aliceDebtBefore).to.be.gt(borrowAmount);
+
+      expect(await checkRecoveryMode(contracts)).to.be.false;
+      await priceFeed.setTokenPrice(BTC, parseUnits('5000'));
+      expect(await checkRecoveryMode(contracts)).to.be.true;
+
+      await borrowerOperations.connect(alice).repayDebt([{ tokenAddress: STABLE, amount: aliceDebtBefore / 10n }]);
+
+      // Check Alice's debt: 110 (initial) - 50 (repaid)
+      const aliceDebtAfter = await getTroveEntireDebt(contracts, alice);
+      expect(aliceDebtAfter).to.be.equal(aliceDebtBefore - aliceDebtBefore / 10n);
+    });
+
+    it.only('Reverts if borrower has insufficient LUSD balance to cover his debt repayment', async () => {
+      const borrowAmount = parseUnits('10000');
+      await openTrove({
+        from: alice,
+        contracts,
+        collToken: BTC,
+        collAmount: parseUnits('1', 9),
+        debts: [{ tokenAddress: STABLE, amount: borrowAmount }],
+      });
+      await openTrove({
+        from: bob,
+        contracts,
+        collToken: BTC,
+        collAmount: parseUnits('1', 9),
+        debts: [{ tokenAddress: STABLE, amount: borrowAmount }],
+      });
+
+      const bobBalBefore = await STABLE.balanceOf(bob);
+      expect(bobBalBefore).to.be.equal(borrowAmount);
+
+      // Bob transfers all but 5 of his LUSD to Carol
+      await STABLE.connect(bob).transfer(carol, bobBalBefore - parseUnits('5'));
+
+      //Confirm B's LUSD balance has decreased to 5 LUSD
+      const bobBalAfter = await STABLE.balanceOf(bob);
+      expect(bobBalAfter).to.be.equal(parseUnits('5'));
+
+      // Bob tries to repay 6 LUSD
+      await expect(
+        borrowerOperations.connect(bob).repayDebt([{ tokenAddress: STABLE, amount: parseUnits('6') }])
+      ).to.be.revertedWithCustomError(borrowerOperations, 'InsufficientDebtToRepay');
     });
   });
 });

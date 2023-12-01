@@ -562,6 +562,7 @@ contract BorrowerOperations is LiquityBase, Ownable(msg.sender), CheckContract, 
     IDebtToken _debtToken,
     uint _repayAmount
   ) internal {
+    _requireSufficientDebtBalance(_debtToken, _borrower, _repayAmount);
     _storagePool.subtractValue(address(_debtToken), false, PoolType.Active, _repayAmount);
     _debtToken.burn(_borrower, _repayAmount);
   }
@@ -593,6 +594,10 @@ contract BorrowerOperations is LiquityBase, Ownable(msg.sender), CheckContract, 
   function _requireTroveIsNotActive(ITroveManager _troveManager, address _borrower) internal view {
     uint status = _troveManager.getTroveStatus(_borrower);
     if (status == 1) revert ActiveTrove();
+  }
+
+  function _requireSufficientDebtBalance(IDebtToken _debtToken, address _borrower, uint _debtRepayment) internal view {
+    if (_debtToken.balanceOf(_borrower) < _debtRepayment) revert InsufficientDebtToRepay();
   }
 
   // adds stableCoin debt including gas compensation if not already included
