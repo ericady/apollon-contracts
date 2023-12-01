@@ -2281,7 +2281,7 @@ describe('BorrowerOperations', () => {
       expect(aliceDebtAfter).to.be.equal(aliceDebtBefore - aliceDebtBefore / 10n);
     });
 
-    it.only('Reverts if borrower has insufficient LUSD balance to cover his debt repayment', async () => {
+    it('Reverts if borrower has insufficient stable balance to cover his debt repayment', async () => {
       const borrowAmount = parseUnits('10000');
       await openTrove({
         from: alice,
@@ -2312,6 +2312,132 @@ describe('BorrowerOperations', () => {
       await expect(
         borrowerOperations.connect(bob).repayDebt([{ tokenAddress: STABLE, amount: parseUnits('6') }])
       ).to.be.revertedWithCustomError(borrowerOperations, 'InsufficientDebtToRepay');
+    });
+  });
+  describe('adjustTrove()', () => {
+    it.skip('No adjust func', () => {});
+  });
+  describe('closeTrove()', () => {
+    it('reverts when it would lower the TCR below CCR', async () => {
+      await openTrove({
+        from: alice,
+        contracts,
+        collToken: BTC,
+        collAmount: parseUnits('1', 9),
+        debts: [{ tokenAddress: STABLE, amount: parseUnits('100') }],
+      });
+      await openTrove({
+        from: bob,
+        contracts,
+        collToken: BTC,
+        collAmount: parseUnits('1', 9),
+        debts: [{ tokenAddress: STABLE, amount: parseUnits('17500') }],
+      });
+
+      // to compensate borrowing fees
+      await STABLE.connect(bob).transfer(alice, parseUnits('10000'));
+
+      expect(await checkRecoveryMode(contracts)).to.be.false;
+
+      await expect(borrowerOperations.connect(alice).closeTrove()).to.be.revertedWithCustomError(
+        borrowerOperations,
+        'TCR_lt_CCR'
+      );
+    });
+
+    it('reverts when calling address does not have active trove', async () => {
+      await openTrove({
+        from: alice,
+        contracts,
+        collToken: BTC,
+        collAmount: parseUnits('1', 9),
+        debts: [{ tokenAddress: STABLE, amount: parseUnits('100') }],
+      });
+      await openTrove({
+        from: bob,
+        contracts,
+        collToken: BTC,
+        collAmount: parseUnits('1', 9),
+        debts: [{ tokenAddress: STABLE, amount: parseUnits('17500') }],
+      });
+
+      // Carol with no active trove attempts to close her trove
+      await expect(borrowerOperations.connect(carol).closeTrove()).to.be.revertedWithCustomError(
+        borrowerOperations,
+        'TroveClosedOrNotExist'
+      );
+    });
+
+    it('reverts when system is in Recovery Mode', async () => {
+      await openTrove({
+        from: alice,
+        contracts,
+        collToken: BTC,
+        collAmount: parseUnits('1', 9),
+        debts: [{ tokenAddress: STABLE, amount: parseUnits('10000') }],
+      });
+      await openTrove({
+        from: bob,
+        contracts,
+        collToken: BTC,
+        collAmount: parseUnits('1', 9),
+        debts: [{ tokenAddress: STABLE, amount: parseUnits('10000') }],
+      });
+      await openTrove({
+        from: carol,
+        contracts,
+        collToken: BTC,
+        collAmount: parseUnits('1', 9),
+        debts: [{ tokenAddress: STABLE, amount: parseUnits('10000') }],
+      });
+
+      // Alice transfers her LUSD to Bob and Carol so they can cover fees
+      const aliceBal = await STABLE.balanceOf(alice);
+      await STABLE.connect(alice).transfer(bob, aliceBal / 2n);
+      await STABLE.connect(alice).transfer(carol, aliceBal / 2n);
+
+      // check Recovery Mode
+      expect(await checkRecoveryMode(contracts)).to.be.false;
+
+      // Bob successfully closes his trove
+      await borrowerOperations.connect(bob).closeTrove();
+
+      await priceFeed.setTokenPrice(BTC, parseUnits('1000'));
+
+      expect(await checkRecoveryMode(contracts)).to.be.true;
+
+      // // Carol attempts to close her trove during Recovery Mode
+      await expect(borrowerOperations.connect(carol).closeTrove()).to.be.revertedWithCustomError(
+        borrowerOperations,
+        'NotAllowedInRecoveryMode'
+      );
+    });
+
+    it('reverts when trove is the only one in the system', async () => {
+      await openTrove({
+        from: alice,
+        contracts,
+        collToken: BTC,
+        collAmount: parseUnits('1', 9),
+        debts: [{ tokenAddress: STABLE, amount: parseUnits('10000') }],
+      });
+
+      // Artificially mint to Alice so she has enough to close her trove
+      await STABLE.unprotectedMint(alice, parseUnits('100000'));
+
+      // Check she has more LUSD than her trove debt
+      const aliceBal = await STABLE.balanceOf(alice);
+      const aliceDebt = await getTroveEntireDebt(contracts, alice);
+      expect(aliceBal).to.be.gt(aliceDebt);
+
+      // check Recovery Mode
+      expect(await checkRecoveryMode(contracts)).to.be.false;
+
+      // Alice attempts to close her trove
+      await expect(borrowerOperations.connect(alice).closeTrove()).to.be.revertedWithCustomError(
+        troveManager,
+        'OnlyOneTrove'
+      );
     });
   });
 });

@@ -371,6 +371,8 @@ contract BorrowerOperations is LiquityBase, Ownable(msg.sender), CheckContract, 
     address borrower = msg.sender;
     (ContractsCache memory contractsCache, LocalVariables_adjustTrove memory vars) = _prepareTroveAdjustment(borrower);
 
+    _requireNotInRecoveryMode(vars.isInRecoveryMode);
+
     uint newTCR = _getNewTCRFromTroveChange(
       vars.oldCompositeCollInUSD,
       false,
@@ -637,13 +639,6 @@ contract BorrowerOperations is LiquityBase, Ownable(msg.sender), CheckContract, 
   function _requireNonZeroDebtChange(uint _change) internal pure {
     if (_change == 0) revert ZeroDebtChange();
   }
-
-  //  function _requireNotInRecoveryMode(PriceCache memory _priceCache) internal {
-  //    require(
-  //      !storagePool.checkRecoveryMode(_priceCache),
-  //      'BorrowerOps: Operation not permitted during Recovery Mode'
-  //    );
-  //  }
 
   function _requireValidAdjustmentInCurrentMode(
     bool _isCollWithdrawal,
