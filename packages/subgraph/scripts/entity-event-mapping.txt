@@ -1,6 +1,12 @@
 entity (token-entity)
   > handleCreateToken
+    ~ coll-token-manager: handleCollTokenAdded
     ~ debt-token-manager: handleDebtTokenAdded
+entity (token-candle-entity)
+  > handleCreateTokenCandleSingleton
+    ~ debt-token-manager: handleDebtTokenAdded
+  > handleUpdateTokenCandle_low_high
+    ~ price-feed: handleTokenPriceChanged
 entity (debt-token-meta-entity)
   > handleCreateDebtTokenMeta
     ~ debt-token: handleTransfer
@@ -9,9 +15,11 @@ entity (debt-token-meta-entity)
     ~ stability-pool: handleStabilityWithdrawn
   > handleUpdateStabilityDepositAPY
     ~ stability-pool: handleStabilityOffset
-entity (token-candle-entity)
-  > handleUpdateTokenCandle
-    ~ price-feed: handleTokenPriceChanged
+entity (borrower-history-entity)
+  > handleCreateBorrowerHistory
+    ~ stability-pool: handleStabilityGainsWithdrawn
+    ~ stability-pool: handleStabilityProvided
+    ~ stability-pool: handleStabilityWithdrawn
 entity (collateral-token-meta-entity)
   > handleCreateCollateralTokenMeta
     ~ trove-manager: handleCollChanged

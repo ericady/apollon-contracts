@@ -7,7 +7,7 @@ export function handleCreateCollateralTokenMeta(
   tokenAddress: Address,
   troveManagerAddress: Address,
 ): void {
-  const collateralTokenMeta = new CollateralTokenMeta(event.transaction.hash.concat(tokenAddress));
+  const collateralTokenMeta = new CollateralTokenMeta(event.transaction.hash.concatI32(event.logIndex.toI32()));
 
   collateralTokenMeta.token = tokenAddress;
   collateralTokenMeta.timestamp = event.block.timestamp;

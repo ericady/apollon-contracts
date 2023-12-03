@@ -60,12 +60,12 @@ describe('handlePriceFeedAddressChanged()', () => {
   });
 
   test('Token entity created and stored', () => {
-    const newCreatedEvent = createDebtTokenAddedEvent(MockDebtTokenAddress);
+    const newdebtTokenAddedEvent = createDebtTokenAddedEvent(MockDebtTokenAddress);
 
     mockDebtTokenSymbol();
     mockDebtTokenPrice();
 
-    handleDebtTokenAdded(newCreatedEvent);
+    handleDebtTokenAdded(newdebtTokenAddedEvent);
 
     assert.entityCount('Token', 1);
 

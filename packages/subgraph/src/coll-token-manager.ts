@@ -6,7 +6,7 @@ import {
 import { handleCreateToken } from './entities/token-entity';
 
 export function handleCollTokenAdded(event: CollTokenAddedEvent): void {
-  handleCreateToken(event, event.params._collTokenAddress);
+  handleCreateToken(event, event.params._collTokenAddress, false);
 }
 
 export function handleCollTokenManagerInitialized(event: CollTokenManagerInitializedEvent): void {}

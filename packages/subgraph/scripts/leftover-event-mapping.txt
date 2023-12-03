@@ -2,6 +2,9 @@ contract (borrower-operations)
   > handleBorrowerOperationsInitialized
   > handleOwnershipTransferred
   > handleTroveCreated
+contract (coll-token-manager)
+  > handleCollTokenManagerInitialized
+  > handleOwnershipTransferred
 contract (debt-token-manager)
   > handleDebtTokenManagerInitialized
   > handleOwnershipTransferred
@@ -22,7 +25,6 @@ contract (stability-pool)
   > handleP_Updated
   > handleS_Updated
   > handleScaleUpdated
-  > handleStabilityGainsWithdrawn
   > handleStabilityPoolInitialized
 contract (storage-pool)
   > handleOwnershipTransferred
