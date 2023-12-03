@@ -26,6 +26,7 @@ contract BorrowerOperations is LiquityBase, Ownable, CheckContract, IBorrowerOpe
   IStoragePool public storagePool;
   IPriceFeed public priceFeed;
   address stabilityPoolAddress;
+  address swapOperations;
 
   //    ILQTYStaking public lqtyStaking;
   //    address public lqtyStakingAddress;
@@ -98,7 +99,8 @@ contract BorrowerOperations is LiquityBase, Ownable, CheckContract, IBorrowerOpe
     address _stabilityPoolAddress,
     address _priceFeedAddress,
     address _debtTokenManagerAddress,
-    address _collTokenManagerAddress
+    address _collTokenManagerAddress,
+    address _swapOperations
   ) external onlyOwner {
     checkContract(_troveManagerAddress);
     checkContract(_storagePoolAddress);
@@ -106,6 +108,7 @@ contract BorrowerOperations is LiquityBase, Ownable, CheckContract, IBorrowerOpe
     checkContract(_priceFeedAddress);
     checkContract(_debtTokenManagerAddress);
     checkContract(_collTokenManagerAddress);
+    checkContract(_swapOperations);
 
     troveManager = ITroveManager(_troveManagerAddress);
     storagePool = IStoragePool(_storagePoolAddress);
@@ -113,6 +116,7 @@ contract BorrowerOperations is LiquityBase, Ownable, CheckContract, IBorrowerOpe
     priceFeed = IPriceFeed(_priceFeedAddress);
     debtTokenManager = IDebtTokenManager(_debtTokenManagerAddress);
     collTokenManager = ICollTokenManager(_collTokenManagerAddress);
+    swapOperations = _swapOperations;
 
     emit BorrowerOperationsInitialized(
       _troveManagerAddress,
@@ -120,7 +124,8 @@ contract BorrowerOperations is LiquityBase, Ownable, CheckContract, IBorrowerOpe
       _stabilityPoolAddress,
       _priceFeedAddress,
       _debtTokenManagerAddress,
-      _collTokenManagerAddress
+      _collTokenManagerAddress,
+      _swapOperations
     );
 
     renounceOwnership();
@@ -274,6 +279,9 @@ contract BorrowerOperations is LiquityBase, Ownable, CheckContract, IBorrowerOpe
 
   // increasing debt of a trove
   function increaseDebt(TokenAmount[] memory _debts, uint _maxFeePercentage) external override {
+    // todo reuqire only from swap ops, tests need to be patched...
+    //    _requireCallerIsSwapOperations();
+
     (ContractsCache memory contractsCache, LocalVariables_adjustTrove memory vars) = _prepareTroveAdjustment(
       msg.sender
     );
@@ -538,6 +546,10 @@ contract BorrowerOperations is LiquityBase, Ownable, CheckContract, IBorrowerOpe
   }
 
   // --- 'Require' wrapper functions ---
+
+  function _requireCallerIsSwapOperations() internal view {
+    if (msg.sender != swapOperations) revert NotFromSwapOps();
+  }
 
   function _requireCallerIsBorrower(address _borrower) internal view {
     if (msg.sender != _borrower) revert NotBorrower();

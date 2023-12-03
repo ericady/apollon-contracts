@@ -14,13 +14,15 @@ interface IBorrowerOperations is IBBase {
     address _stabilityPoolAddress,
     address _priceFeedAddress,
     address _debtTokenManagerAddress,
-    address _collTokenManagerAddress
+    address _collTokenManagerAddress,
+    address _swapOperationsAddress
   );
   event TroveCreated(address _borrower, uint arrayIndex);
 
   // --- Custom Errors ---
 
   error NotFromStabilityPool();
+  error NotFromSwapOps();
   error CollWithdrawPermittedInRM();
   error ICR_lt_MCR();
   error ICR_lt_CCR();

@@ -16,6 +16,9 @@ import DebtTokenManager from '../../contracts/artifacts/contracts/DebtTokenManag
 import CollTokenManager from '../../contracts/artifacts/contracts/CollTokenManager.sol/CollTokenManager.json';
 import IERC20 from '../../contracts/artifacts/@openzeppelin/contracts/token/ERC20/IERC20.sol/IERC20.json';
 import MockERC20 from '../../contracts/artifacts/contracts/Mock/MockERC20.sol/MockERC20.json';
+import SwapERC20 from '../../contracts/artifacts/contracts/SwapERC20.sol/SwapERC20.json';
+import SwapPair from '../../contracts/artifacts/contracts/SwapPair.sol/SwapPair.json';
+import SwapOperations from '../../contracts/artifacts/contracts/SwapOperations.sol/SwapOperations.json';
 
 // todo
 // import CommunityIssuance from '../../contracts/artifacts/contracts/LQTY/CommunityIssuance.sol/CommunityIssuance.json';
@@ -154,6 +157,9 @@ const contractArtifacts = [
   PriceFeed,
   StabilityPool,
   TroveManager,
+  SwapERC20,
+  SwapPair,
+  SwapOperations,
 ];
 
 const contracts = contractArtifacts.map(({ contractName, abi }) => ({

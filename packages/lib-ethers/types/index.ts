@@ -35,7 +35,7 @@ interface BorrowerOperationsTransactions {
   openTrove(_colls: { tokenAddress: string; amount: BigNumberish }[], _overrides?: Overrides): Promise<void>;
   renounceOwnership(_overrides?: Overrides): Promise<void>;
   repayDebt(_debts: { tokenAddress: string; amount: BigNumberish }[], _overrides?: Overrides): Promise<void>;
-  setAddresses(_troveManagerAddress: string, _storagePoolAddress: string, _stabilityPoolAddress: string, _priceFeedAddress: string, _debtTokenManagerAddress: string, _collTokenManagerAddress: string, _overrides?: Overrides): Promise<void>;
+  setAddresses(_troveManagerAddress: string, _storagePoolAddress: string, _stabilityPoolAddress: string, _priceFeedAddress: string, _debtTokenManagerAddress: string, _collTokenManagerAddress: string, _swapOperations: string, _overrides?: Overrides): Promise<void>;
   transferOwnership(newOwner: string, _overrides?: Overrides): Promise<void>;
   withdrawColl(_colls: { tokenAddress: string; amount: BigNumberish }[], _overrides?: Overrides): Promise<void>;
 }
@@ -43,27 +43,13 @@ interface BorrowerOperationsTransactions {
 export interface BorrowerOperations
   extends _TypedLiquityContract<BorrowerOperationsCalls, BorrowerOperationsTransactions> {
   readonly filters: {
-    CollTokenManagerAddressChanged(_collTokenManagerAddress?: null): EventFilter;
-    DebtTokenManagerAddressChanged(_debtTokenManagerAddress?: null): EventFilter;
-    LUSDBorrowingFeePaid(_borrower?: string | null, _LUSDFee?: null): EventFilter;
+    BorrowerOperationsInitialized(_troveManagerAddress?: null, _storagePoolAddress?: null, _stabilityPoolAddress?: null, _priceFeedAddress?: null, _debtTokenManagerAddress?: null, _collTokenManagerAddress?: null, _swapOperationsAddress?: null): EventFilter;
     OwnershipTransferred(previousOwner?: string | null, newOwner?: string | null): EventFilter;
-    PriceFeedAddressChanged(_newPriceFeedAddress?: null): EventFilter;
-    StabilityPoolAddressChanged(_stabilityPoolAddress?: null): EventFilter;
-    StoragePoolAddressChanged(_storagePoolAddress?: null): EventFilter;
-    TroveCreated(_borrower?: string | null, arrayIndex?: null): EventFilter;
-    TroveManagerAddressChanged(_newTroveManagerAddress?: null): EventFilter;
-    TroveUpdated(_borrower?: string | null, _debt?: null, _coll?: null, stake?: null): EventFilter;
+    TroveCreated(_borrower?: null, arrayIndex?: null): EventFilter;
   };
-  extractEvents(logs: Log[], name: "CollTokenManagerAddressChanged"): _TypedLogDescription<{ _collTokenManagerAddress: string }>[];
-  extractEvents(logs: Log[], name: "DebtTokenManagerAddressChanged"): _TypedLogDescription<{ _debtTokenManagerAddress: string }>[];
-  extractEvents(logs: Log[], name: "LUSDBorrowingFeePaid"): _TypedLogDescription<{ _borrower: string; _LUSDFee: BigNumber }>[];
+  extractEvents(logs: Log[], name: "BorrowerOperationsInitialized"): _TypedLogDescription<{ _troveManagerAddress: string; _storagePoolAddress: string; _stabilityPoolAddress: string; _priceFeedAddress: string; _debtTokenManagerAddress: string; _collTokenManagerAddress: string; _swapOperationsAddress: string }>[];
   extractEvents(logs: Log[], name: "OwnershipTransferred"): _TypedLogDescription<{ previousOwner: string; newOwner: string }>[];
-  extractEvents(logs: Log[], name: "PriceFeedAddressChanged"): _TypedLogDescription<{ _newPriceFeedAddress: string }>[];
-  extractEvents(logs: Log[], name: "StabilityPoolAddressChanged"): _TypedLogDescription<{ _stabilityPoolAddress: string }>[];
-  extractEvents(logs: Log[], name: "StoragePoolAddressChanged"): _TypedLogDescription<{ _storagePoolAddress: string }>[];
   extractEvents(logs: Log[], name: "TroveCreated"): _TypedLogDescription<{ _borrower: string; arrayIndex: BigNumber }>[];
-  extractEvents(logs: Log[], name: "TroveManagerAddressChanged"): _TypedLogDescription<{ _newTroveManagerAddress: string }>[];
-  extractEvents(logs: Log[], name: "TroveUpdated"): _TypedLogDescription<{ _borrower: string; _debt: BigNumber; _coll: BigNumber; stake: BigNumber }>[];
 }
 
 interface RedemptionOperationsCalls {
@@ -77,7 +63,7 @@ interface RedemptionOperationsCalls {
   _100pct(_overrides?: CallOverrides): Promise<BigNumber>;
   collTokenManager(_overrides?: CallOverrides): Promise<string>;
   debtTokenManager(_overrides?: CallOverrides): Promise<string>;
-  getRedemptionFeeWithDecay(_ETHDrawn: BigNumberish, _overrides?: CallOverrides): Promise<BigNumber>;
+  getRedemptionFeeWithDecay(_collDrawn: BigNumberish, _overrides?: CallOverrides): Promise<BigNumber>;
   getRedemptionRate(_overrides?: CallOverrides): Promise<BigNumber>;
   getRedemptionRateWithDecay(_overrides?: CallOverrides): Promise<BigNumber>;
   owner(_overrides?: CallOverrides): Promise<string>;
@@ -96,23 +82,15 @@ interface RedemptionOperationsTransactions {
 export interface RedemptionOperations
   extends _TypedLiquityContract<RedemptionOperationsCalls, RedemptionOperationsTransactions> {
   readonly filters: {
-    BaseRateUpdated(_baseRate?: null): EventFilter;
-    CollTokenManagerAddressChanged(_newCollTokenManagerAddress?: null): EventFilter;
-    DebtTokenManagerAddressChanged(_newDebtTokenManagerAddress?: null): EventFilter;
     OwnershipTransferred(previousOwner?: string | null, newOwner?: string | null): EventFilter;
-    PriceFeedAddressChanged(_newPriceFeedAddress?: null): EventFilter;
-    Redemption(_attemptedLUSDAmount?: null, _actualLUSDAmount?: null, _ETHSent?: null, _ETHFee?: null): EventFilter;
-    StoragePoolAddressChanged(_storagePoolAddress?: null): EventFilter;
-    TroveManagerAddressChanged(_newTroveManagerAddress?: null): EventFilter;
+    RedeemedFromTrove(_borrower?: null, stableAmount?: null, _drawnCollAmounts?: null): EventFilter;
+    RedemptionOperationsInitialized(_troveManager?: null, _storgePool?: null, _priceFeed?: null, _debtTokenManager?: null, _collTokenManager?: null): EventFilter;
+    SuccessfulRedemption(_attemptedStableAmount?: null, _actualStableAmount?: null, _collPayouts?: null): EventFilter;
   };
-  extractEvents(logs: Log[], name: "BaseRateUpdated"): _TypedLogDescription<{ _baseRate: BigNumber }>[];
-  extractEvents(logs: Log[], name: "CollTokenManagerAddressChanged"): _TypedLogDescription<{ _newCollTokenManagerAddress: string }>[];
-  extractEvents(logs: Log[], name: "DebtTokenManagerAddressChanged"): _TypedLogDescription<{ _newDebtTokenManagerAddress: string }>[];
   extractEvents(logs: Log[], name: "OwnershipTransferred"): _TypedLogDescription<{ previousOwner: string; newOwner: string }>[];
-  extractEvents(logs: Log[], name: "PriceFeedAddressChanged"): _TypedLogDescription<{ _newPriceFeedAddress: string }>[];
-  extractEvents(logs: Log[], name: "Redemption"): _TypedLogDescription<{ _attemptedLUSDAmount: BigNumber; _actualLUSDAmount: BigNumber; _ETHSent: BigNumber; _ETHFee: BigNumber }>[];
-  extractEvents(logs: Log[], name: "StoragePoolAddressChanged"): _TypedLogDescription<{ _storagePoolAddress: string }>[];
-  extractEvents(logs: Log[], name: "TroveManagerAddressChanged"): _TypedLogDescription<{ _newTroveManagerAddress: string }>[];
+  extractEvents(logs: Log[], name: "RedeemedFromTrove"): _TypedLogDescription<{ _borrower: string; stableAmount: BigNumber; _drawnCollAmounts: { tokenAddress: string; amount: BigNumber }[] }>[];
+  extractEvents(logs: Log[], name: "RedemptionOperationsInitialized"): _TypedLogDescription<{ _troveManager: string; _storgePool: string; _priceFeed: string; _debtTokenManager: string; _collTokenManager: string }>[];
+  extractEvents(logs: Log[], name: "SuccessfulRedemption"): _TypedLogDescription<{ _attemptedStableAmount: BigNumber; _actualStableAmount: BigNumber; _collPayouts: { collToken: string; drawn: BigNumber; redemptionFee: BigNumber; sendToRedeemer: BigNumber }[] }>[];
 }
 
 interface TroveManagerCalls {
@@ -140,8 +118,8 @@ interface TroveManagerCalls {
   getBorrowingFeeWithDecay(_debtValue: BigNumberish, _overrides?: CallOverrides): Promise<BigNumber>;
   getBorrowingRate(_overrides?: CallOverrides): Promise<BigNumber>;
   getBorrowingRateWithDecay(_overrides?: CallOverrides): Promise<BigNumber>;
-  getCurrentICR(_borrower: string, _overrides?: CallOverrides): Promise<{ ICR: BigNumber; currentDebtInStable: BigNumber }>;
-  getEntireDebtAndColl(_borrower: string, _overrides?: CallOverrides): Promise<{ amounts: { tokenAddress: string; isColl: boolean; amount: BigNumber; pendingReward: BigNumber; gasCompensation: BigNumber; toLiquidate: BigNumber; toRedistribute: BigNumber; toOffset: BigNumber }[]; troveCollInStable: BigNumber; troveDebtInStable: BigNumber; troveDebtInStableWithoutGasCompensation: BigNumber }>;
+  getCurrentICR(_borrower: string, _overrides?: CallOverrides): Promise<{ ICR: BigNumber; currentDebtInUSD: BigNumber }>;
+  getEntireDebtAndColl(_borrower: string, _overrides?: CallOverrides): Promise<{ amounts: { tokenAddress: string; isColl: boolean; amount: BigNumber; pendingReward: BigNumber; gasCompensation: BigNumber; toLiquidate: BigNumber; toRedistribute: BigNumber; toOffset: BigNumber }[]; troveCollInUSD: BigNumber; troveDebtInUSD: BigNumber; troveDebtInUSDWithoutGasCompensation: BigNumber }>;
   getNominalICR(_borrower: string, _overrides?: CallOverrides): Promise<BigNumber>;
   getPendingReward(_borrower: string, _tokenAddress: string, _isColl: boolean, _overrides?: CallOverrides): Promise<BigNumber>;
   getTroveColl(_borrower: string, _overrides?: CallOverrides): Promise<{ tokenAddress: string; amount: BigNumber }[]>;
@@ -189,44 +167,32 @@ export interface TroveManager
   extends _TypedLiquityContract<TroveManagerCalls, TroveManagerTransactions> {
   readonly filters: {
     BaseRateUpdated(_baseRate?: null): EventFilter;
-    BorrowerOperationsAddressChanged(_newBorrowerOperationsAddress?: null): EventFilter;
-    CollTokenManagerAddressChanged(_newCollTokenManagerAddress?: null): EventFilter;
-    DebtTokenManagerAddressChanged(_newDebtTokenManagerAddress?: null): EventFilter;
-    LTermsUpdated(_L_ETH?: null, _L_LUSDDebt?: null): EventFilter;
+    LTermsUpdated(_liquidatedTokens?: null): EventFilter;
     LastFeeOpTimeUpdated(_lastFeeOpTime?: null): EventFilter;
-    Liquidation(liquidatedDebt?: null, liquidatedColl?: null, totalStableCoinGasCompensation?: null, totalCollGasCompensation?: null): EventFilter;
+    LiquidationSummary(liquidatedDebt?: null, liquidatedColl?: null, totalStableCoinGasCompensation?: null, totalCollGasCompensation?: null): EventFilter;
     OwnershipTransferred(previousOwner?: string | null, newOwner?: string | null): EventFilter;
-    PriceFeedAddressChanged(_newPriceFeedAddress?: null): EventFilter;
-    Redemption(_attemptedLUSDAmount?: null, _actualLUSDAmount?: null, _ETHSent?: null, _ETHFee?: null): EventFilter;
-    RedemptionManagerAddressChanged(_newRedemptionManagerAddress?: null): EventFilter;
-    StabilityPoolManagerAddressChanged(_stabilityPoolManagerAddress?: null): EventFilter;
-    StoragePoolAddressChanged(_storagePoolAddress?: null): EventFilter;
     SystemSnapshotsUpdated(_totalStakesSnapshot?: null, _totalCollateralSnapshot?: null): EventFilter;
-    TotalStakesUpdated(_newTotalStakes?: null): EventFilter;
+    TotalStakesUpdated(_totalStakes?: null): EventFilter;
+    TroveAppliedRewards(_borrower?: null, _appliedRewards?: null): EventFilter;
+    TroveClosed(_borrower?: null, _closingState?: null): EventFilter;
+    TroveCollChanged(_borrower?: null, _collTokenAddresses?: null): EventFilter;
     TroveIndexUpdated(_borrower?: null, _newIndex?: null): EventFilter;
-    TroveLiquidated(_borrower?: string | null, _debt?: null, _coll?: null, _operation?: null): EventFilter;
-    TroveSnapshotsUpdated(_L_ETH?: null, _L_LUSDDebt?: null): EventFilter;
-    TroveUpdated(_borrower?: string | null, _debt?: null, _coll?: null, _stake?: null, _operation?: null): EventFilter;
+    TroveManagerInitialized(_borrowerOperationsAddress?: null, _redemptionOperationsAddress?: null, _storagePoolAddress?: null, _stabilityPoolAddress?: null, _priceFeedAddress?: null, _debtTokenManagerAddress?: null, _collTokenManagerAddress?: null): EventFilter;
+    TroveSnapshotsUpdated(_liquidatedTokens?: null): EventFilter;
   };
   extractEvents(logs: Log[], name: "BaseRateUpdated"): _TypedLogDescription<{ _baseRate: BigNumber }>[];
-  extractEvents(logs: Log[], name: "BorrowerOperationsAddressChanged"): _TypedLogDescription<{ _newBorrowerOperationsAddress: string }>[];
-  extractEvents(logs: Log[], name: "CollTokenManagerAddressChanged"): _TypedLogDescription<{ _newCollTokenManagerAddress: string }>[];
-  extractEvents(logs: Log[], name: "DebtTokenManagerAddressChanged"): _TypedLogDescription<{ _newDebtTokenManagerAddress: string }>[];
-  extractEvents(logs: Log[], name: "LTermsUpdated"): _TypedLogDescription<{ _L_ETH: BigNumber; _L_LUSDDebt: BigNumber }>[];
+  extractEvents(logs: Log[], name: "LTermsUpdated"): _TypedLogDescription<{ _liquidatedTokens: { tokenAddress: string; isColl: boolean; amount: BigNumber }[] }>[];
   extractEvents(logs: Log[], name: "LastFeeOpTimeUpdated"): _TypedLogDescription<{ _lastFeeOpTime: BigNumber }>[];
-  extractEvents(logs: Log[], name: "Liquidation"): _TypedLogDescription<{ liquidatedDebt: { tokenAddress: string; amount: BigNumber }[]; liquidatedColl: { tokenAddress: string; amount: BigNumber }[]; totalStableCoinGasCompensation: BigNumber; totalCollGasCompensation: { tokenAddress: string; amount: BigNumber }[] }>[];
+  extractEvents(logs: Log[], name: "LiquidationSummary"): _TypedLogDescription<{ liquidatedDebt: { tokenAddress: string; amount: BigNumber }[]; liquidatedColl: { tokenAddress: string; amount: BigNumber }[]; totalStableCoinGasCompensation: BigNumber; totalCollGasCompensation: { tokenAddress: string; amount: BigNumber }[] }>[];
   extractEvents(logs: Log[], name: "OwnershipTransferred"): _TypedLogDescription<{ previousOwner: string; newOwner: string }>[];
-  extractEvents(logs: Log[], name: "PriceFeedAddressChanged"): _TypedLogDescription<{ _newPriceFeedAddress: string }>[];
-  extractEvents(logs: Log[], name: "Redemption"): _TypedLogDescription<{ _attemptedLUSDAmount: BigNumber; _actualLUSDAmount: BigNumber; _ETHSent: BigNumber; _ETHFee: BigNumber }>[];
-  extractEvents(logs: Log[], name: "RedemptionManagerAddressChanged"): _TypedLogDescription<{ _newRedemptionManagerAddress: string }>[];
-  extractEvents(logs: Log[], name: "StabilityPoolManagerAddressChanged"): _TypedLogDescription<{ _stabilityPoolManagerAddress: string }>[];
-  extractEvents(logs: Log[], name: "StoragePoolAddressChanged"): _TypedLogDescription<{ _storagePoolAddress: string }>[];
-  extractEvents(logs: Log[], name: "SystemSnapshotsUpdated"): _TypedLogDescription<{ _totalStakesSnapshot: BigNumber; _totalCollateralSnapshot: BigNumber }>[];
-  extractEvents(logs: Log[], name: "TotalStakesUpdated"): _TypedLogDescription<{ _newTotalStakes: BigNumber }>[];
+  extractEvents(logs: Log[], name: "SystemSnapshotsUpdated"): _TypedLogDescription<{ _totalStakesSnapshot: { tokenAddress: string; amount: BigNumber }[]; _totalCollateralSnapshot: { tokenAddress: string; amount: BigNumber }[] }>[];
+  extractEvents(logs: Log[], name: "TotalStakesUpdated"): _TypedLogDescription<{ _totalStakes: { tokenAddress: string; amount: BigNumber }[] }>[];
+  extractEvents(logs: Log[], name: "TroveAppliedRewards"): _TypedLogDescription<{ _borrower: string; _appliedRewards: { tokenAddress: string; isColl: boolean; amount: BigNumber }[] }>[];
+  extractEvents(logs: Log[], name: "TroveClosed"): _TypedLogDescription<{ _borrower: string; _closingState: number }>[];
+  extractEvents(logs: Log[], name: "TroveCollChanged"): _TypedLogDescription<{ _borrower: string; _collTokenAddresses: string[] }>[];
   extractEvents(logs: Log[], name: "TroveIndexUpdated"): _TypedLogDescription<{ _borrower: string; _newIndex: BigNumber }>[];
-  extractEvents(logs: Log[], name: "TroveLiquidated"): _TypedLogDescription<{ _borrower: string; _debt: BigNumber; _coll: BigNumber; _operation: number }>[];
-  extractEvents(logs: Log[], name: "TroveSnapshotsUpdated"): _TypedLogDescription<{ _L_ETH: BigNumber; _L_LUSDDebt: BigNumber }>[];
-  extractEvents(logs: Log[], name: "TroveUpdated"): _TypedLogDescription<{ _borrower: string; _debt: BigNumber; _coll: BigNumber; _stake: BigNumber; _operation: number }>[];
+  extractEvents(logs: Log[], name: "TroveManagerInitialized"): _TypedLogDescription<{ _borrowerOperationsAddress: string; _redemptionOperationsAddress: string; _storagePoolAddress: string; _stabilityPoolAddress: string; _priceFeedAddress: string; _debtTokenManagerAddress: string; _collTokenManagerAddress: string }>[];
+  extractEvents(logs: Log[], name: "TroveSnapshotsUpdated"): _TypedLogDescription<{ _liquidatedTokens: { tokenAddress: string; isColl: boolean; amount: BigNumber }[] }>[];
 }
 
 interface StoragePoolCalls {
@@ -246,6 +212,7 @@ interface StoragePoolCalls {
   getValue(_tokenAddress: string, _isColl: boolean, _poolType: BigNumberish, _overrides?: CallOverrides): Promise<BigNumber>;
   owner(_overrides?: CallOverrides): Promise<string>;
   priceFeed(_overrides?: CallOverrides): Promise<string>;
+  redemptionOperationsAddress(_overrides?: CallOverrides): Promise<string>;
   stabilityPoolManagerAddress(_overrides?: CallOverrides): Promise<string>;
   troveManagerAddress(_overrides?: CallOverrides): Promise<string>;
 }
@@ -253,7 +220,7 @@ interface StoragePoolCalls {
 interface StoragePoolTransactions {
   addValue(_tokenAddress: string, _isColl: boolean, _poolType: BigNumberish, _amount: BigNumberish, _overrides?: Overrides): Promise<void>;
   renounceOwnership(_overrides?: Overrides): Promise<void>;
-  setAddresses(_borrowerOperationsAddress: string, _troveManagerAddress: string, _stabilityPoolManagerAddress: string, _priceFeedAddress: string, _overrides?: Overrides): Promise<void>;
+  setAddresses(_borrowerOperationsAddress: string, _troveManagerAddress: string, _redemptionOperationsAddress: string, _stabilityPoolManagerAddress: string, _priceFeedAddress: string, _overrides?: Overrides): Promise<void>;
   subtractValue(_tokenAddress: string, _isColl: boolean, _poolType: BigNumberish, _amount: BigNumberish, _overrides?: Overrides): Promise<void>;
   transferBetweenTypes(_tokenAddress: string, _isColl: boolean, _fromType: BigNumberish, _toType: BigNumberish, _amount: BigNumberish, _overrides?: Overrides): Promise<void>;
   transferOwnership(newOwner: string, _overrides?: Overrides): Promise<void>;
@@ -263,19 +230,13 @@ interface StoragePoolTransactions {
 export interface StoragePool
   extends _TypedLiquityContract<StoragePoolCalls, StoragePoolTransactions> {
   readonly filters: {
-    BorrowerOperationsAddressChanged(_newBorrowerOperationsAddress?: null): EventFilter;
     OwnershipTransferred(previousOwner?: string | null, newOwner?: string | null): EventFilter;
-    PoolValueUpdated(_tokenAddress?: null, _isColl?: null, _poolType?: null, _updatedAmount?: null): EventFilter;
-    PriceFeedAddressChanged(_priceFeedAddress?: null): EventFilter;
-    StabilityPoolManagerAddressChanged(_newStabilityPoolAddress?: null): EventFilter;
-    TroveManagerAddressChanged(_newTroveManagerAddress?: null): EventFilter;
+    StoragePoolInitialized(_borrowerOperationsAddress?: null, _troveManagerAddress?: null, _redemptionOperationsAddress?: null, _stabilityPoolManagerAddress?: null, _priceFeedAddress?: null): EventFilter;
+    StoragePoolValueUpdated(_tokenAddress?: null, _isColl?: null, _poolType?: null, _updatedAmount?: null): EventFilter;
   };
-  extractEvents(logs: Log[], name: "BorrowerOperationsAddressChanged"): _TypedLogDescription<{ _newBorrowerOperationsAddress: string }>[];
   extractEvents(logs: Log[], name: "OwnershipTransferred"): _TypedLogDescription<{ previousOwner: string; newOwner: string }>[];
-  extractEvents(logs: Log[], name: "PoolValueUpdated"): _TypedLogDescription<{ _tokenAddress: string; _isColl: boolean; _poolType: number; _updatedAmount: BigNumber }>[];
-  extractEvents(logs: Log[], name: "PriceFeedAddressChanged"): _TypedLogDescription<{ _priceFeedAddress: string }>[];
-  extractEvents(logs: Log[], name: "StabilityPoolManagerAddressChanged"): _TypedLogDescription<{ _newStabilityPoolAddress: string }>[];
-  extractEvents(logs: Log[], name: "TroveManagerAddressChanged"): _TypedLogDescription<{ _newTroveManagerAddress: string }>[];
+  extractEvents(logs: Log[], name: "StoragePoolInitialized"): _TypedLogDescription<{ _borrowerOperationsAddress: string; _troveManagerAddress: string; _redemptionOperationsAddress: string; _stabilityPoolManagerAddress: string; _priceFeedAddress: string }>[];
+  extractEvents(logs: Log[], name: "StoragePoolValueUpdated"): _TypedLogDescription<{ _tokenAddress: string; _isColl: boolean; _poolType: number; _updatedAmount: BigNumber }>[];
 }
 
 interface DebtTokenCalls {
@@ -290,6 +251,7 @@ interface DebtTokenCalls {
   nonces(owner: string, _overrides?: CallOverrides): Promise<BigNumber>;
   permitTypeHash(_overrides?: CallOverrides): Promise<string>;
   priceFeed(_overrides?: CallOverrides): Promise<string>;
+  redemptionOperationsAddress(_overrides?: CallOverrides): Promise<string>;
   stabilityPoolManagerAddress(_overrides?: CallOverrides): Promise<string>;
   symbol(_overrides?: CallOverrides): Promise<string>;
   totalSupply(_overrides?: CallOverrides): Promise<BigNumber>;
@@ -313,18 +275,10 @@ export interface DebtToken
   extends _TypedLiquityContract<DebtTokenCalls, DebtTokenTransactions> {
   readonly filters: {
     Approval(owner?: string | null, spender?: string | null, value?: null): EventFilter;
-    BorrowerOperationsAddressChanged(_newBorrowerOperationsAddress?: null): EventFilter;
-    PriceFeedAddressChanged(_newPriceFeedAddress?: null): EventFilter;
-    StabilityPoolManagerAddressChanged(_stabilityPoolManagerAddress?: null): EventFilter;
     Transfer(from?: string | null, to?: string | null, value?: null): EventFilter;
-    TroveManagerAddressChanged(_troveManagerAddress?: null): EventFilter;
   };
   extractEvents(logs: Log[], name: "Approval"): _TypedLogDescription<{ owner: string; spender: string; value: BigNumber }>[];
-  extractEvents(logs: Log[], name: "BorrowerOperationsAddressChanged"): _TypedLogDescription<{ _newBorrowerOperationsAddress: string }>[];
-  extractEvents(logs: Log[], name: "PriceFeedAddressChanged"): _TypedLogDescription<{ _newPriceFeedAddress: string }>[];
-  extractEvents(logs: Log[], name: "StabilityPoolManagerAddressChanged"): _TypedLogDescription<{ _stabilityPoolManagerAddress: string }>[];
   extractEvents(logs: Log[], name: "Transfer"): _TypedLogDescription<{ from: string; to: string; value: BigNumber }>[];
-  extractEvents(logs: Log[], name: "TroveManagerAddressChanged"): _TypedLogDescription<{ _troveManagerAddress: string }>[];
 }
 
 interface PriceFeedCalls {
@@ -335,6 +289,7 @@ interface PriceFeedCalls {
   TARGET_DIGITS(_overrides?: CallOverrides): Promise<BigNumber>;
   TELLOR_DIGITS(_overrides?: CallOverrides): Promise<BigNumber>;
   TIMEOUT(_overrides?: CallOverrides): Promise<BigNumber>;
+  getAmountFromUSDValue(_token: string, _usdValue: BigNumberish, _overrides?: CallOverrides): Promise<BigNumber>;
   getPrice(_tokenAddress: string, _overrides?: CallOverrides): Promise<BigNumber>;
   getUSDValue(_token: string, _amount: BigNumberish, _overrides?: CallOverrides): Promise<BigNumber>;
   lastGoodPrice(_overrides?: CallOverrides): Promise<BigNumber>;
@@ -355,16 +310,19 @@ interface PriceFeedTransactions {
 export interface PriceFeed
   extends _TypedLiquityContract<PriceFeedCalls, PriceFeedTransactions> {
   readonly filters: {
-    LastGoodPriceUpdated(_lastGoodPrice?: null): EventFilter;
+    LastGoodPriceUpdated(_token?: null, _lastGoodPrice?: null): EventFilter;
     OwnershipTransferred(previousOwner?: string | null, newOwner?: string | null): EventFilter;
-    PriceFeedStatusChanged(newStatus?: null): EventFilter;
+    PriceFeedStatusChanged(_token?: null, newStatus?: null): EventFilter;
+    TokenPriceChanged(_token?: null): EventFilter;
   };
-  extractEvents(logs: Log[], name: "LastGoodPriceUpdated"): _TypedLogDescription<{ _lastGoodPrice: BigNumber }>[];
+  extractEvents(logs: Log[], name: "LastGoodPriceUpdated"): _TypedLogDescription<{ _token: string; _lastGoodPrice: BigNumber }>[];
   extractEvents(logs: Log[], name: "OwnershipTransferred"): _TypedLogDescription<{ previousOwner: string; newOwner: string }>[];
-  extractEvents(logs: Log[], name: "PriceFeedStatusChanged"): _TypedLogDescription<{ newStatus: number }>[];
+  extractEvents(logs: Log[], name: "PriceFeedStatusChanged"): _TypedLogDescription<{ _token: string; newStatus: number }>[];
+  extractEvents(logs: Log[], name: "TokenPriceChanged"): _TypedLogDescription<{ _token: string }>[];
 }
 
 interface MockPriceFeedCalls {
+  getAmountFromUSDValue(_token: string, _usdValue: BigNumberish, _overrides?: CallOverrides): Promise<BigNumber>;
   getPrice(_tokenAddress: string, _overrides?: CallOverrides): Promise<BigNumber>;
   getUSDValue(_token: string, _amount: BigNumberish, _overrides?: CallOverrides): Promise<BigNumber>;
 }
@@ -377,11 +335,13 @@ interface MockPriceFeedTransactions {
 export interface MockPriceFeed
   extends _TypedLiquityContract<MockPriceFeedCalls, MockPriceFeedTransactions> {
   readonly filters: {
-    LastGoodPriceUpdated(_lastGoodPrice?: null): EventFilter;
-    PriceFeedStatusChanged(newStatus?: null): EventFilter;
+    LastGoodPriceUpdated(_token?: null, _lastGoodPrice?: null): EventFilter;
+    PriceFeedStatusChanged(_token?: null, newStatus?: null): EventFilter;
+    TokenPriceChanged(_token?: null): EventFilter;
   };
-  extractEvents(logs: Log[], name: "LastGoodPriceUpdated"): _TypedLogDescription<{ _lastGoodPrice: BigNumber }>[];
-  extractEvents(logs: Log[], name: "PriceFeedStatusChanged"): _TypedLogDescription<{ newStatus: number }>[];
+  extractEvents(logs: Log[], name: "LastGoodPriceUpdated"): _TypedLogDescription<{ _token: string; _lastGoodPrice: BigNumber }>[];
+  extractEvents(logs: Log[], name: "PriceFeedStatusChanged"): _TypedLogDescription<{ _token: string; newStatus: number }>[];
+  extractEvents(logs: Log[], name: "TokenPriceChanged"): _TypedLogDescription<{ _token: string }>[];
 }
 
 interface StabilityPoolCalls {
@@ -404,6 +364,7 @@ interface StabilityPoolCalls {
   getDepositToken(_overrides?: CallOverrides): Promise<string>;
   getDepositorCollGain(_depositor: string, _collToken: string, _overrides?: CallOverrides): Promise<BigNumber>;
   getDepositorCollSnapshot(_depositor: string, _collToken: string, _overrides?: CallOverrides): Promise<BigNumber>;
+  getDepositorDeposit(_depositor: string, _overrides?: CallOverrides): Promise<BigNumber>;
   getTotalDeposit(_overrides?: CallOverrides): Promise<BigNumber>;
   getTotalGainedColl(_overrides?: CallOverrides): Promise<{ tokenAddress: string; amount: BigNumber }[]>;
   lastErrorOffset(arg0: string, _overrides?: CallOverrides): Promise<BigNumber>;
@@ -422,46 +383,44 @@ interface StabilityPoolTransactions {
   provideToSP(depositor: string, _amount: BigNumberish, _overrides?: Overrides): Promise<void>;
   renounceOwnership(_overrides?: Overrides): Promise<void>;
   transferOwnership(newOwner: string, _overrides?: Overrides): Promise<void>;
-  withdrawFromSP(user: string, debtToWithdrawal: BigNumberish, _overrides?: Overrides): Promise<void>;
-  withdrawGains(_overrides?: Overrides): Promise<void>;
+  withdrawFromSP(user: string, depositToWithdrawal: BigNumberish, _overrides?: Overrides): Promise<void>;
+  withdrawGains(user: string, _overrides?: Overrides): Promise<void>;
 }
 
 export interface StabilityPool
   extends _TypedLiquityContract<StabilityPoolCalls, StabilityPoolTransactions> {
   readonly filters: {
-    DepositSnapshotUpdated(_depositor?: string | null, _P?: null, _S?: null): EventFilter;
-    DepositTokenAddressChanged(_newDepositTokenAddress?: null): EventFilter;
+    DepositSnapshotUpdated(_depositor?: string | null): EventFilter;
     EpochUpdated(_currentEpoch?: null): EventFilter;
     OwnershipTransferred(previousOwner?: string | null, newOwner?: string | null): EventFilter;
     P_Updated(_P?: null): EventFilter;
-    PriceFeedAddressChanged(_newPriceFeedAddress?: null): EventFilter;
     S_Updated(_tokenAddress?: null, _S?: null, _epoch?: null, _scale?: null): EventFilter;
     ScaleUpdated(_currentScale?: null): EventFilter;
-    StabilityPoolCollBalanceUpdates(_tokenAddress?: null, _newBalance?: null): EventFilter;
-    StabilityPoolDepositBalanceUpdated(_newBalance?: null): EventFilter;
-    StabilityPoolManagerAddressChanged(_newStabilityPoolManagerAddress?: null): EventFilter;
-    StoragePoolAddressChanged(_newStoragePoolAddress?: null): EventFilter;
-    TroveManagerAddressChanged(_newTroveManagerAddress?: null): EventFilter;
+    StabilityGainsWithdrawn(user?: null, depositLost?: null, gainsWithdrawn?: null): EventFilter;
+    StabilityOffset(removedDeposit?: null, addedGains?: null): EventFilter;
+    StabilityPoolInitialized(stabilityPoolManagerAddress?: null, troveManagerAddress?: null, storagePoolAddress?: null, priceFeedAddress?: null, depositTokenAddress?: null): EventFilter;
+    StabilityProvided(user?: null, amount?: null): EventFilter;
+    StabilityWithdrawn(user?: null, amount?: null): EventFilter;
   };
-  extractEvents(logs: Log[], name: "DepositSnapshotUpdated"): _TypedLogDescription<{ _depositor: string; _P: BigNumber; _S: BigNumber }>[];
-  extractEvents(logs: Log[], name: "DepositTokenAddressChanged"): _TypedLogDescription<{ _newDepositTokenAddress: string }>[];
+  extractEvents(logs: Log[], name: "DepositSnapshotUpdated"): _TypedLogDescription<{ _depositor: string }>[];
   extractEvents(logs: Log[], name: "EpochUpdated"): _TypedLogDescription<{ _currentEpoch: BigNumber }>[];
   extractEvents(logs: Log[], name: "OwnershipTransferred"): _TypedLogDescription<{ previousOwner: string; newOwner: string }>[];
   extractEvents(logs: Log[], name: "P_Updated"): _TypedLogDescription<{ _P: BigNumber }>[];
-  extractEvents(logs: Log[], name: "PriceFeedAddressChanged"): _TypedLogDescription<{ _newPriceFeedAddress: string }>[];
   extractEvents(logs: Log[], name: "S_Updated"): _TypedLogDescription<{ _tokenAddress: string; _S: BigNumber; _epoch: BigNumber; _scale: BigNumber }>[];
   extractEvents(logs: Log[], name: "ScaleUpdated"): _TypedLogDescription<{ _currentScale: BigNumber }>[];
-  extractEvents(logs: Log[], name: "StabilityPoolCollBalanceUpdates"): _TypedLogDescription<{ _tokenAddress: string; _newBalance: BigNumber }>[];
-  extractEvents(logs: Log[], name: "StabilityPoolDepositBalanceUpdated"): _TypedLogDescription<{ _newBalance: BigNumber }>[];
-  extractEvents(logs: Log[], name: "StabilityPoolManagerAddressChanged"): _TypedLogDescription<{ _newStabilityPoolManagerAddress: string }>[];
-  extractEvents(logs: Log[], name: "StoragePoolAddressChanged"): _TypedLogDescription<{ _newStoragePoolAddress: string }>[];
-  extractEvents(logs: Log[], name: "TroveManagerAddressChanged"): _TypedLogDescription<{ _newTroveManagerAddress: string }>[];
+  extractEvents(logs: Log[], name: "StabilityGainsWithdrawn"): _TypedLogDescription<{ user: string; depositLost: BigNumber; gainsWithdrawn: { tokenAddress: string; amount: BigNumber }[] }>[];
+  extractEvents(logs: Log[], name: "StabilityOffset"): _TypedLogDescription<{ removedDeposit: BigNumber; addedGains: { tokenAddress: string; amount: BigNumber }[] }>[];
+  extractEvents(logs: Log[], name: "StabilityPoolInitialized"): _TypedLogDescription<{ stabilityPoolManagerAddress: string; troveManagerAddress: string; storagePoolAddress: string; priceFeedAddress: string; depositTokenAddress: string }>[];
+  extractEvents(logs: Log[], name: "StabilityProvided"): _TypedLogDescription<{ user: string; amount: BigNumber }>[];
+  extractEvents(logs: Log[], name: "StabilityWithdrawn"): _TypedLogDescription<{ user: string; amount: BigNumber }>[];
 }
 
 interface StabilityPoolManagerCalls {
   NAME(_overrides?: CallOverrides): Promise<string>;
   debtTokenManagerAddress(_overrides?: CallOverrides): Promise<string>;
   getCompoundedDeposits(_overrides?: CallOverrides): Promise<{ tokenAddress: string; amount: BigNumber }[]>;
+  getDepositorCollGains(_depositor: string, collTokenAddresses: string[], _overrides?: CallOverrides): Promise<{ tokenAddress: string; amount: BigNumber }[]>;
+  getDepositorDeposits(_depositor: string, _overrides?: CallOverrides): Promise<{ tokenAddress: string; amount: BigNumber }[]>;
   getRemainingStability(collTokenAddresses: string[], _overrides?: CallOverrides): Promise<{ stabilityPool: string; tokenAddress: string; remaining: BigNumber; debtToOffset: BigNumber; collGained: { tokenAddress: string; amount: BigNumber }[] }[]>;
   getStabilityPool(_debtToken: string, _overrides?: CallOverrides): Promise<string>;
   getStabilityPools(_overrides?: CallOverrides): Promise<string[]>;
@@ -481,30 +440,24 @@ interface StabilityPoolManagerTransactions {
   renounceOwnership(_overrides?: Overrides): Promise<void>;
   setAddresses(_troveManagerAddress: string, _priceFeedAddress: string, _storagePoolAddress: string, _debtTokenManagerAddress: string, _overrides?: Overrides): Promise<void>;
   transferOwnership(newOwner: string, _overrides?: Overrides): Promise<void>;
-  withdrawalStability(_debts: { tokenAddress: string; amount: BigNumberish }[], _overrides?: Overrides): Promise<void>;
+  withdrawGains(_overrides?: Overrides): Promise<void>;
+  withdrawStability(_debts: { tokenAddress: string; amount: BigNumberish }[], _overrides?: Overrides): Promise<void>;
 }
 
 export interface StabilityPoolManager
   extends _TypedLiquityContract<StabilityPoolManagerCalls, StabilityPoolManagerTransactions> {
   readonly filters: {
-    DebtTokenManagerAddressChanged(_debtTokenManagerAddress?: null): EventFilter;
     OwnershipTransferred(previousOwner?: string | null, newOwner?: string | null): EventFilter;
-    PriceFeedAddressChanged(_newPriceFeedAddress?: null): EventFilter;
-    StabilityPoolAdded(_stabilityPool?: null): EventFilter;
-    StoragePoolAddressChanged(_newStoragePoolAddress?: null): EventFilter;
-    TroveManagerAddressChanged(_newTroveManagerAddress?: null): EventFilter;
+    StabilityPoolAdded(stabilityPoolAddress?: null): EventFilter;
+    StabilityPoolManagerInitiated(troveManagerAddress?: null, storgePoolAddress?: null, debtTokenManagerAddress?: null, priceFeedAddress?: null): EventFilter;
   };
-  extractEvents(logs: Log[], name: "DebtTokenManagerAddressChanged"): _TypedLogDescription<{ _debtTokenManagerAddress: string }>[];
   extractEvents(logs: Log[], name: "OwnershipTransferred"): _TypedLogDescription<{ previousOwner: string; newOwner: string }>[];
-  extractEvents(logs: Log[], name: "PriceFeedAddressChanged"): _TypedLogDescription<{ _newPriceFeedAddress: string }>[];
-  extractEvents(logs: Log[], name: "StabilityPoolAdded"): _TypedLogDescription<{ _stabilityPool: string }>[];
-  extractEvents(logs: Log[], name: "StoragePoolAddressChanged"): _TypedLogDescription<{ _newStoragePoolAddress: string }>[];
-  extractEvents(logs: Log[], name: "TroveManagerAddressChanged"): _TypedLogDescription<{ _newTroveManagerAddress: string }>[];
+  extractEvents(logs: Log[], name: "StabilityPoolAdded"): _TypedLogDescription<{ stabilityPoolAddress: string }>[];
+  extractEvents(logs: Log[], name: "StabilityPoolManagerInitiated"): _TypedLogDescription<{ troveManagerAddress: string; storgePoolAddress: string; debtTokenManagerAddress: string; priceFeedAddress: string }>[];
 }
 
 interface DebtTokenManagerCalls {
   NAME(_overrides?: CallOverrides): Promise<string>;
-  borrowerOperationsAddress(_overrides?: CallOverrides): Promise<string>;
   debtTokenAddresses(arg0: BigNumberish, _overrides?: CallOverrides): Promise<string>;
   debtTokens(arg0: string, _overrides?: CallOverrides): Promise<string>;
   debtTokensArray(arg0: BigNumberish, _overrides?: CallOverrides): Promise<string>;
@@ -512,35 +465,27 @@ interface DebtTokenManagerCalls {
   getDebtTokenAddresses(_overrides?: CallOverrides): Promise<string[]>;
   getStableCoin(_overrides?: CallOverrides): Promise<string>;
   owner(_overrides?: CallOverrides): Promise<string>;
-  priceFeedAddress(_overrides?: CallOverrides): Promise<string>;
   stabilityPoolManager(_overrides?: CallOverrides): Promise<string>;
   stableCoin(_overrides?: CallOverrides): Promise<string>;
-  troveManagerAddress(_overrides?: CallOverrides): Promise<string>;
 }
 
 interface DebtTokenManagerTransactions {
   addDebtToken(_debtTokenAddress: string, _overrides?: Overrides): Promise<void>;
   renounceOwnership(_overrides?: Overrides): Promise<void>;
-  setAddresses(_troveManagerAddress: string, _borrowerOperationsAddress: string, _stabilityPoolManagerAddress: string, _priceFeedAddress: string, _overrides?: Overrides): Promise<void>;
+  setAddresses(_stabilityPoolManagerAddress: string, _overrides?: Overrides): Promise<void>;
   transferOwnership(newOwner: string, _overrides?: Overrides): Promise<void>;
 }
 
 export interface DebtTokenManager
   extends _TypedLiquityContract<DebtTokenManagerCalls, DebtTokenManagerTransactions> {
   readonly filters: {
-    BorrowerOperationsAddressChanged(_newBorrowerOperationsAddress?: null): EventFilter;
-    DebtTokenAdded(_debtToken?: null): EventFilter;
+    DebtTokenAdded(_debtTokenAddress?: null): EventFilter;
+    DebtTokenManagerInitialized(_stabilityPoolManagerAddress?: null): EventFilter;
     OwnershipTransferred(previousOwner?: string | null, newOwner?: string | null): EventFilter;
-    PriceFeedAddressChanged(_newPriceFeedAddress?: null): EventFilter;
-    StabilityPoolManagerAddressChanged(_newStabilityPoolAddress?: null): EventFilter;
-    TroveManagerAddressChanged(_troveManagerAddress?: null): EventFilter;
   };
-  extractEvents(logs: Log[], name: "BorrowerOperationsAddressChanged"): _TypedLogDescription<{ _newBorrowerOperationsAddress: string }>[];
-  extractEvents(logs: Log[], name: "DebtTokenAdded"): _TypedLogDescription<{ _debtToken: string }>[];
+  extractEvents(logs: Log[], name: "DebtTokenAdded"): _TypedLogDescription<{ _debtTokenAddress: string }>[];
+  extractEvents(logs: Log[], name: "DebtTokenManagerInitialized"): _TypedLogDescription<{ _stabilityPoolManagerAddress: string }>[];
   extractEvents(logs: Log[], name: "OwnershipTransferred"): _TypedLogDescription<{ previousOwner: string; newOwner: string }>[];
-  extractEvents(logs: Log[], name: "PriceFeedAddressChanged"): _TypedLogDescription<{ _newPriceFeedAddress: string }>[];
-  extractEvents(logs: Log[], name: "StabilityPoolManagerAddressChanged"): _TypedLogDescription<{ _newStabilityPoolAddress: string }>[];
-  extractEvents(logs: Log[], name: "TroveManagerAddressChanged"): _TypedLogDescription<{ _troveManagerAddress: string }>[];
 }
 
 interface CollTokenManagerCalls {
@@ -562,12 +507,12 @@ export interface CollTokenManager
   extends _TypedLiquityContract<CollTokenManagerCalls, CollTokenManagerTransactions> {
   readonly filters: {
     CollTokenAdded(_collTokenAddress?: null): EventFilter;
+    CollTokenManagerInitialized(_priceFeedAddress?: null): EventFilter;
     OwnershipTransferred(previousOwner?: string | null, newOwner?: string | null): EventFilter;
-    PriceFeedAddressChanged(_newPriceFeedAddress?: null): EventFilter;
   };
   extractEvents(logs: Log[], name: "CollTokenAdded"): _TypedLogDescription<{ _collTokenAddress: string }>[];
+  extractEvents(logs: Log[], name: "CollTokenManagerInitialized"): _TypedLogDescription<{ _priceFeedAddress: string }>[];
   extractEvents(logs: Log[], name: "OwnershipTransferred"): _TypedLogDescription<{ previousOwner: string; newOwner: string }>[];
-  extractEvents(logs: Log[], name: "PriceFeedAddressChanged"): _TypedLogDescription<{ _newPriceFeedAddress: string }>[];
 }
 
 interface IERC20Calls {
@@ -650,6 +595,7 @@ interface PriceFeedCalls {
   TARGET_DIGITS(_overrides?: CallOverrides): Promise<BigNumber>;
   TELLOR_DIGITS(_overrides?: CallOverrides): Promise<BigNumber>;
   TIMEOUT(_overrides?: CallOverrides): Promise<BigNumber>;
+  getAmountFromUSDValue(_token: string, _usdValue: BigNumberish, _overrides?: CallOverrides): Promise<BigNumber>;
   getPrice(_tokenAddress: string, _overrides?: CallOverrides): Promise<BigNumber>;
   getUSDValue(_token: string, _amount: BigNumberish, _overrides?: CallOverrides): Promise<BigNumber>;
   lastGoodPrice(_overrides?: CallOverrides): Promise<BigNumber>;
@@ -670,13 +616,15 @@ interface PriceFeedTransactions {
 export interface PriceFeed
   extends _TypedLiquityContract<PriceFeedCalls, PriceFeedTransactions> {
   readonly filters: {
-    LastGoodPriceUpdated(_lastGoodPrice?: null): EventFilter;
+    LastGoodPriceUpdated(_token?: null, _lastGoodPrice?: null): EventFilter;
     OwnershipTransferred(previousOwner?: string | null, newOwner?: string | null): EventFilter;
-    PriceFeedStatusChanged(newStatus?: null): EventFilter;
+    PriceFeedStatusChanged(_token?: null, newStatus?: null): EventFilter;
+    TokenPriceChanged(_token?: null): EventFilter;
   };
-  extractEvents(logs: Log[], name: "LastGoodPriceUpdated"): _TypedLogDescription<{ _lastGoodPrice: BigNumber }>[];
+  extractEvents(logs: Log[], name: "LastGoodPriceUpdated"): _TypedLogDescription<{ _token: string; _lastGoodPrice: BigNumber }>[];
   extractEvents(logs: Log[], name: "OwnershipTransferred"): _TypedLogDescription<{ previousOwner: string; newOwner: string }>[];
-  extractEvents(logs: Log[], name: "PriceFeedStatusChanged"): _TypedLogDescription<{ newStatus: number }>[];
+  extractEvents(logs: Log[], name: "PriceFeedStatusChanged"): _TypedLogDescription<{ _token: string; newStatus: number }>[];
+  extractEvents(logs: Log[], name: "TokenPriceChanged"): _TypedLogDescription<{ _token: string }>[];
 }
 
 interface StabilityPoolCalls {
@@ -699,6 +647,7 @@ interface StabilityPoolCalls {
   getDepositToken(_overrides?: CallOverrides): Promise<string>;
   getDepositorCollGain(_depositor: string, _collToken: string, _overrides?: CallOverrides): Promise<BigNumber>;
   getDepositorCollSnapshot(_depositor: string, _collToken: string, _overrides?: CallOverrides): Promise<BigNumber>;
+  getDepositorDeposit(_depositor: string, _overrides?: CallOverrides): Promise<BigNumber>;
   getTotalDeposit(_overrides?: CallOverrides): Promise<BigNumber>;
   getTotalGainedColl(_overrides?: CallOverrides): Promise<{ tokenAddress: string; amount: BigNumber }[]>;
   lastErrorOffset(arg0: string, _overrides?: CallOverrides): Promise<BigNumber>;
@@ -717,40 +666,36 @@ interface StabilityPoolTransactions {
   provideToSP(depositor: string, _amount: BigNumberish, _overrides?: Overrides): Promise<void>;
   renounceOwnership(_overrides?: Overrides): Promise<void>;
   transferOwnership(newOwner: string, _overrides?: Overrides): Promise<void>;
-  withdrawFromSP(user: string, debtToWithdrawal: BigNumberish, _overrides?: Overrides): Promise<void>;
-  withdrawGains(_overrides?: Overrides): Promise<void>;
+  withdrawFromSP(user: string, depositToWithdrawal: BigNumberish, _overrides?: Overrides): Promise<void>;
+  withdrawGains(user: string, _overrides?: Overrides): Promise<void>;
 }
 
 export interface StabilityPool
   extends _TypedLiquityContract<StabilityPoolCalls, StabilityPoolTransactions> {
   readonly filters: {
-    DepositSnapshotUpdated(_depositor?: string | null, _P?: null, _S?: null): EventFilter;
-    DepositTokenAddressChanged(_newDepositTokenAddress?: null): EventFilter;
+    DepositSnapshotUpdated(_depositor?: string | null): EventFilter;
     EpochUpdated(_currentEpoch?: null): EventFilter;
     OwnershipTransferred(previousOwner?: string | null, newOwner?: string | null): EventFilter;
     P_Updated(_P?: null): EventFilter;
-    PriceFeedAddressChanged(_newPriceFeedAddress?: null): EventFilter;
     S_Updated(_tokenAddress?: null, _S?: null, _epoch?: null, _scale?: null): EventFilter;
     ScaleUpdated(_currentScale?: null): EventFilter;
-    StabilityPoolCollBalanceUpdates(_tokenAddress?: null, _newBalance?: null): EventFilter;
-    StabilityPoolDepositBalanceUpdated(_newBalance?: null): EventFilter;
-    StabilityPoolManagerAddressChanged(_newStabilityPoolManagerAddress?: null): EventFilter;
-    StoragePoolAddressChanged(_newStoragePoolAddress?: null): EventFilter;
-    TroveManagerAddressChanged(_newTroveManagerAddress?: null): EventFilter;
+    StabilityGainsWithdrawn(user?: null, depositLost?: null, gainsWithdrawn?: null): EventFilter;
+    StabilityOffset(removedDeposit?: null, addedGains?: null): EventFilter;
+    StabilityPoolInitialized(stabilityPoolManagerAddress?: null, troveManagerAddress?: null, storagePoolAddress?: null, priceFeedAddress?: null, depositTokenAddress?: null): EventFilter;
+    StabilityProvided(user?: null, amount?: null): EventFilter;
+    StabilityWithdrawn(user?: null, amount?: null): EventFilter;
   };
-  extractEvents(logs: Log[], name: "DepositSnapshotUpdated"): _TypedLogDescription<{ _depositor: string; _P: BigNumber; _S: BigNumber }>[];
-  extractEvents(logs: Log[], name: "DepositTokenAddressChanged"): _TypedLogDescription<{ _newDepositTokenAddress: string }>[];
+  extractEvents(logs: Log[], name: "DepositSnapshotUpdated"): _TypedLogDescription<{ _depositor: string }>[];
   extractEvents(logs: Log[], name: "EpochUpdated"): _TypedLogDescription<{ _currentEpoch: BigNumber }>[];
   extractEvents(logs: Log[], name: "OwnershipTransferred"): _TypedLogDescription<{ previousOwner: string; newOwner: string }>[];
   extractEvents(logs: Log[], name: "P_Updated"): _TypedLogDescription<{ _P: BigNumber }>[];
-  extractEvents(logs: Log[], name: "PriceFeedAddressChanged"): _TypedLogDescription<{ _newPriceFeedAddress: string }>[];
   extractEvents(logs: Log[], name: "S_Updated"): _TypedLogDescription<{ _tokenAddress: string; _S: BigNumber; _epoch: BigNumber; _scale: BigNumber }>[];
   extractEvents(logs: Log[], name: "ScaleUpdated"): _TypedLogDescription<{ _currentScale: BigNumber }>[];
-  extractEvents(logs: Log[], name: "StabilityPoolCollBalanceUpdates"): _TypedLogDescription<{ _tokenAddress: string; _newBalance: BigNumber }>[];
-  extractEvents(logs: Log[], name: "StabilityPoolDepositBalanceUpdated"): _TypedLogDescription<{ _newBalance: BigNumber }>[];
-  extractEvents(logs: Log[], name: "StabilityPoolManagerAddressChanged"): _TypedLogDescription<{ _newStabilityPoolManagerAddress: string }>[];
-  extractEvents(logs: Log[], name: "StoragePoolAddressChanged"): _TypedLogDescription<{ _newStoragePoolAddress: string }>[];
-  extractEvents(logs: Log[], name: "TroveManagerAddressChanged"): _TypedLogDescription<{ _newTroveManagerAddress: string }>[];
+  extractEvents(logs: Log[], name: "StabilityGainsWithdrawn"): _TypedLogDescription<{ user: string; depositLost: BigNumber; gainsWithdrawn: { tokenAddress: string; amount: BigNumber }[] }>[];
+  extractEvents(logs: Log[], name: "StabilityOffset"): _TypedLogDescription<{ removedDeposit: BigNumber; addedGains: { tokenAddress: string; amount: BigNumber }[] }>[];
+  extractEvents(logs: Log[], name: "StabilityPoolInitialized"): _TypedLogDescription<{ stabilityPoolManagerAddress: string; troveManagerAddress: string; storagePoolAddress: string; priceFeedAddress: string; depositTokenAddress: string }>[];
+  extractEvents(logs: Log[], name: "StabilityProvided"): _TypedLogDescription<{ user: string; amount: BigNumber }>[];
+  extractEvents(logs: Log[], name: "StabilityWithdrawn"): _TypedLogDescription<{ user: string; amount: BigNumber }>[];
 }
 
 interface TroveManagerCalls {
@@ -778,8 +723,8 @@ interface TroveManagerCalls {
   getBorrowingFeeWithDecay(_debtValue: BigNumberish, _overrides?: CallOverrides): Promise<BigNumber>;
   getBorrowingRate(_overrides?: CallOverrides): Promise<BigNumber>;
   getBorrowingRateWithDecay(_overrides?: CallOverrides): Promise<BigNumber>;
-  getCurrentICR(_borrower: string, _overrides?: CallOverrides): Promise<{ ICR: BigNumber; currentDebtInStable: BigNumber }>;
-  getEntireDebtAndColl(_borrower: string, _overrides?: CallOverrides): Promise<{ amounts: { tokenAddress: string; isColl: boolean; amount: BigNumber; pendingReward: BigNumber; gasCompensation: BigNumber; toLiquidate: BigNumber; toRedistribute: BigNumber; toOffset: BigNumber }[]; troveCollInStable: BigNumber; troveDebtInStable: BigNumber; troveDebtInStableWithoutGasCompensation: BigNumber }>;
+  getCurrentICR(_borrower: string, _overrides?: CallOverrides): Promise<{ ICR: BigNumber; currentDebtInUSD: BigNumber }>;
+  getEntireDebtAndColl(_borrower: string, _overrides?: CallOverrides): Promise<{ amounts: { tokenAddress: string; isColl: boolean; amount: BigNumber; pendingReward: BigNumber; gasCompensation: BigNumber; toLiquidate: BigNumber; toRedistribute: BigNumber; toOffset: BigNumber }[]; troveCollInUSD: BigNumber; troveDebtInUSD: BigNumber; troveDebtInUSDWithoutGasCompensation: BigNumber }>;
   getNominalICR(_borrower: string, _overrides?: CallOverrides): Promise<BigNumber>;
   getPendingReward(_borrower: string, _tokenAddress: string, _isColl: boolean, _overrides?: CallOverrides): Promise<BigNumber>;
   getTroveColl(_borrower: string, _overrides?: CallOverrides): Promise<{ tokenAddress: string; amount: BigNumber }[]>;
@@ -827,42 +772,148 @@ export interface TroveManager
   extends _TypedLiquityContract<TroveManagerCalls, TroveManagerTransactions> {
   readonly filters: {
     BaseRateUpdated(_baseRate?: null): EventFilter;
-    BorrowerOperationsAddressChanged(_newBorrowerOperationsAddress?: null): EventFilter;
-    CollTokenManagerAddressChanged(_newCollTokenManagerAddress?: null): EventFilter;
-    DebtTokenManagerAddressChanged(_newDebtTokenManagerAddress?: null): EventFilter;
-    LTermsUpdated(_L_ETH?: null, _L_LUSDDebt?: null): EventFilter;
+    LTermsUpdated(_liquidatedTokens?: null): EventFilter;
     LastFeeOpTimeUpdated(_lastFeeOpTime?: null): EventFilter;
-    Liquidation(liquidatedDebt?: null, liquidatedColl?: null, totalStableCoinGasCompensation?: null, totalCollGasCompensation?: null): EventFilter;
+    LiquidationSummary(liquidatedDebt?: null, liquidatedColl?: null, totalStableCoinGasCompensation?: null, totalCollGasCompensation?: null): EventFilter;
     OwnershipTransferred(previousOwner?: string | null, newOwner?: string | null): EventFilter;
-    PriceFeedAddressChanged(_newPriceFeedAddress?: null): EventFilter;
-    Redemption(_attemptedLUSDAmount?: null, _actualLUSDAmount?: null, _ETHSent?: null, _ETHFee?: null): EventFilter;
-    RedemptionManagerAddressChanged(_newRedemptionManagerAddress?: null): EventFilter;
-    StabilityPoolManagerAddressChanged(_stabilityPoolManagerAddress?: null): EventFilter;
-    StoragePoolAddressChanged(_storagePoolAddress?: null): EventFilter;
     SystemSnapshotsUpdated(_totalStakesSnapshot?: null, _totalCollateralSnapshot?: null): EventFilter;
-    TotalStakesUpdated(_newTotalStakes?: null): EventFilter;
+    TotalStakesUpdated(_totalStakes?: null): EventFilter;
+    TroveAppliedRewards(_borrower?: null, _appliedRewards?: null): EventFilter;
+    TroveClosed(_borrower?: null, _closingState?: null): EventFilter;
+    TroveCollChanged(_borrower?: null, _collTokenAddresses?: null): EventFilter;
     TroveIndexUpdated(_borrower?: null, _newIndex?: null): EventFilter;
-    TroveLiquidated(_borrower?: string | null, _debt?: null, _coll?: null, _operation?: null): EventFilter;
-    TroveSnapshotsUpdated(_L_ETH?: null, _L_LUSDDebt?: null): EventFilter;
-    TroveUpdated(_borrower?: string | null, _debt?: null, _coll?: null, _stake?: null, _operation?: null): EventFilter;
+    TroveManagerInitialized(_borrowerOperationsAddress?: null, _redemptionOperationsAddress?: null, _storagePoolAddress?: null, _stabilityPoolAddress?: null, _priceFeedAddress?: null, _debtTokenManagerAddress?: null, _collTokenManagerAddress?: null): EventFilter;
+    TroveSnapshotsUpdated(_liquidatedTokens?: null): EventFilter;
   };
   extractEvents(logs: Log[], name: "BaseRateUpdated"): _TypedLogDescription<{ _baseRate: BigNumber }>[];
-  extractEvents(logs: Log[], name: "BorrowerOperationsAddressChanged"): _TypedLogDescription<{ _newBorrowerOperationsAddress: string }>[];
-  extractEvents(logs: Log[], name: "CollTokenManagerAddressChanged"): _TypedLogDescription<{ _newCollTokenManagerAddress: string }>[];
-  extractEvents(logs: Log[], name: "DebtTokenManagerAddressChanged"): _TypedLogDescription<{ _newDebtTokenManagerAddress: string }>[];
-  extractEvents(logs: Log[], name: "LTermsUpdated"): _TypedLogDescription<{ _L_ETH: BigNumber; _L_LUSDDebt: BigNumber }>[];
+  extractEvents(logs: Log[], name: "LTermsUpdated"): _TypedLogDescription<{ _liquidatedTokens: { tokenAddress: string; isColl: boolean; amount: BigNumber }[] }>[];
   extractEvents(logs: Log[], name: "LastFeeOpTimeUpdated"): _TypedLogDescription<{ _lastFeeOpTime: BigNumber }>[];
-  extractEvents(logs: Log[], name: "Liquidation"): _TypedLogDescription<{ liquidatedDebt: { tokenAddress: string; amount: BigNumber }[]; liquidatedColl: { tokenAddress: string; amount: BigNumber }[]; totalStableCoinGasCompensation: BigNumber; totalCollGasCompensation: { tokenAddress: string; amount: BigNumber }[] }>[];
+  extractEvents(logs: Log[], name: "LiquidationSummary"): _TypedLogDescription<{ liquidatedDebt: { tokenAddress: string; amount: BigNumber }[]; liquidatedColl: { tokenAddress: string; amount: BigNumber }[]; totalStableCoinGasCompensation: BigNumber; totalCollGasCompensation: { tokenAddress: string; amount: BigNumber }[] }>[];
   extractEvents(logs: Log[], name: "OwnershipTransferred"): _TypedLogDescription<{ previousOwner: string; newOwner: string }>[];
-  extractEvents(logs: Log[], name: "PriceFeedAddressChanged"): _TypedLogDescription<{ _newPriceFeedAddress: string }>[];
-  extractEvents(logs: Log[], name: "Redemption"): _TypedLogDescription<{ _attemptedLUSDAmount: BigNumber; _actualLUSDAmount: BigNumber; _ETHSent: BigNumber; _ETHFee: BigNumber }>[];
-  extractEvents(logs: Log[], name: "RedemptionManagerAddressChanged"): _TypedLogDescription<{ _newRedemptionManagerAddress: string }>[];
-  extractEvents(logs: Log[], name: "StabilityPoolManagerAddressChanged"): _TypedLogDescription<{ _stabilityPoolManagerAddress: string }>[];
-  extractEvents(logs: Log[], name: "StoragePoolAddressChanged"): _TypedLogDescription<{ _storagePoolAddress: string }>[];
-  extractEvents(logs: Log[], name: "SystemSnapshotsUpdated"): _TypedLogDescription<{ _totalStakesSnapshot: BigNumber; _totalCollateralSnapshot: BigNumber }>[];
-  extractEvents(logs: Log[], name: "TotalStakesUpdated"): _TypedLogDescription<{ _newTotalStakes: BigNumber }>[];
+  extractEvents(logs: Log[], name: "SystemSnapshotsUpdated"): _TypedLogDescription<{ _totalStakesSnapshot: { tokenAddress: string; amount: BigNumber }[]; _totalCollateralSnapshot: { tokenAddress: string; amount: BigNumber }[] }>[];
+  extractEvents(logs: Log[], name: "TotalStakesUpdated"): _TypedLogDescription<{ _totalStakes: { tokenAddress: string; amount: BigNumber }[] }>[];
+  extractEvents(logs: Log[], name: "TroveAppliedRewards"): _TypedLogDescription<{ _borrower: string; _appliedRewards: { tokenAddress: string; isColl: boolean; amount: BigNumber }[] }>[];
+  extractEvents(logs: Log[], name: "TroveClosed"): _TypedLogDescription<{ _borrower: string; _closingState: number }>[];
+  extractEvents(logs: Log[], name: "TroveCollChanged"): _TypedLogDescription<{ _borrower: string; _collTokenAddresses: string[] }>[];
   extractEvents(logs: Log[], name: "TroveIndexUpdated"): _TypedLogDescription<{ _borrower: string; _newIndex: BigNumber }>[];
-  extractEvents(logs: Log[], name: "TroveLiquidated"): _TypedLogDescription<{ _borrower: string; _debt: BigNumber; _coll: BigNumber; _operation: number }>[];
-  extractEvents(logs: Log[], name: "TroveSnapshotsUpdated"): _TypedLogDescription<{ _L_ETH: BigNumber; _L_LUSDDebt: BigNumber }>[];
-  extractEvents(logs: Log[], name: "TroveUpdated"): _TypedLogDescription<{ _borrower: string; _debt: BigNumber; _coll: BigNumber; _stake: BigNumber; _operation: number }>[];
+  extractEvents(logs: Log[], name: "TroveManagerInitialized"): _TypedLogDescription<{ _borrowerOperationsAddress: string; _redemptionOperationsAddress: string; _storagePoolAddress: string; _stabilityPoolAddress: string; _priceFeedAddress: string; _debtTokenManagerAddress: string; _collTokenManagerAddress: string }>[];
+  extractEvents(logs: Log[], name: "TroveSnapshotsUpdated"): _TypedLogDescription<{ _liquidatedTokens: { tokenAddress: string; isColl: boolean; amount: BigNumber }[] }>[];
+}
+
+interface SwapERC20Calls {
+  DOMAIN_SEPARATOR(_overrides?: CallOverrides): Promise<string>;
+  PERMIT_TYPEHASH(_overrides?: CallOverrides): Promise<string>;
+  allowance(arg0: string, arg1: string, _overrides?: CallOverrides): Promise<BigNumber>;
+  balanceOf(arg0: string, _overrides?: CallOverrides): Promise<BigNumber>;
+  decimals(_overrides?: CallOverrides): Promise<number>;
+  name(_overrides?: CallOverrides): Promise<string>;
+  nonces(arg0: string, _overrides?: CallOverrides): Promise<BigNumber>;
+  symbol(_overrides?: CallOverrides): Promise<string>;
+  totalSupply(_overrides?: CallOverrides): Promise<BigNumber>;
+}
+
+interface SwapERC20Transactions {
+  approve(spender: string, value: BigNumberish, _overrides?: Overrides): Promise<boolean>;
+  permit(owner: string, spender: string, value: BigNumberish, deadline: BigNumberish, v: BigNumberish, r: BytesLike, s: BytesLike, _overrides?: Overrides): Promise<void>;
+  transfer(to: string, value: BigNumberish, _overrides?: Overrides): Promise<boolean>;
+  transferFrom(from: string, to: string, value: BigNumberish, _overrides?: Overrides): Promise<boolean>;
+}
+
+export interface SwapERC20
+  extends _TypedLiquityContract<SwapERC20Calls, SwapERC20Transactions> {
+  readonly filters: {
+    Approval(owner?: string | null, spender?: string | null, value?: null): EventFilter;
+    Transfer(from?: string | null, to?: string | null, value?: null): EventFilter;
+  };
+  extractEvents(logs: Log[], name: "Approval"): _TypedLogDescription<{ owner: string; spender: string; value: BigNumber }>[];
+  extractEvents(logs: Log[], name: "Transfer"): _TypedLogDescription<{ from: string; to: string; value: BigNumber }>[];
+}
+
+interface SwapPairCalls {
+  DOMAIN_SEPARATOR(_overrides?: CallOverrides): Promise<string>;
+  MINIMUM_LIQUIDITY(_overrides?: CallOverrides): Promise<BigNumber>;
+  PERMIT_TYPEHASH(_overrides?: CallOverrides): Promise<string>;
+  allowance(arg0: string, arg1: string, _overrides?: CallOverrides): Promise<BigNumber>;
+  balanceOf(arg0: string, _overrides?: CallOverrides): Promise<BigNumber>;
+  decimals(_overrides?: CallOverrides): Promise<number>;
+  getReserves(_overrides?: CallOverrides): Promise<{ _reserve0: BigNumber; _reserve1: BigNumber; _blockTimestampLast: number }>;
+  kLast(_overrides?: CallOverrides): Promise<BigNumber>;
+  name(_overrides?: CallOverrides): Promise<string>;
+  nonces(arg0: string, _overrides?: CallOverrides): Promise<BigNumber>;
+  operations(_overrides?: CallOverrides): Promise<string>;
+  price0CumulativeLast(_overrides?: CallOverrides): Promise<BigNumber>;
+  price1CumulativeLast(_overrides?: CallOverrides): Promise<BigNumber>;
+  symbol(_overrides?: CallOverrides): Promise<string>;
+  token0(_overrides?: CallOverrides): Promise<string>;
+  token1(_overrides?: CallOverrides): Promise<string>;
+  totalSupply(_overrides?: CallOverrides): Promise<BigNumber>;
+}
+
+interface SwapPairTransactions {
+  approve(spender: string, value: BigNumberish, _overrides?: Overrides): Promise<boolean>;
+  burn(to: string, _overrides?: Overrides): Promise<{ amount0: BigNumber; amount1: BigNumber }>;
+  initialize(_token0: string, _token1: string, _overrides?: Overrides): Promise<void>;
+  mint(to: string, _overrides?: Overrides): Promise<BigNumber>;
+  permit(owner: string, spender: string, value: BigNumberish, deadline: BigNumberish, v: BigNumberish, r: BytesLike, s: BytesLike, _overrides?: Overrides): Promise<void>;
+  skim(to: string, _overrides?: Overrides): Promise<void>;
+  swap(amount0Out: BigNumberish, amount1Out: BigNumberish, to: string, data: BytesLike, _overrides?: Overrides): Promise<void>;
+  sync(_overrides?: Overrides): Promise<void>;
+  transfer(to: string, value: BigNumberish, _overrides?: Overrides): Promise<boolean>;
+  transferFrom(from: string, to: string, value: BigNumberish, _overrides?: Overrides): Promise<boolean>;
+}
+
+export interface SwapPair
+  extends _TypedLiquityContract<SwapPairCalls, SwapPairTransactions> {
+  readonly filters: {
+    Approval(owner?: string | null, spender?: string | null, value?: null): EventFilter;
+    Burn(sender?: string | null, amount0?: null, amount1?: null, to?: string | null): EventFilter;
+    Mint(sender?: string | null, amount0?: null, amount1?: null): EventFilter;
+    Swap(sender?: string | null, amount0In?: null, amount1In?: null, amount0Out?: null, amount1Out?: null, to?: string | null): EventFilter;
+    Sync(reserve0?: null, reserve1?: null): EventFilter;
+    Transfer(from?: string | null, to?: string | null, value?: null): EventFilter;
+  };
+  extractEvents(logs: Log[], name: "Approval"): _TypedLogDescription<{ owner: string; spender: string; value: BigNumber }>[];
+  extractEvents(logs: Log[], name: "Burn"): _TypedLogDescription<{ sender: string; amount0: BigNumber; amount1: BigNumber; to: string }>[];
+  extractEvents(logs: Log[], name: "Mint"): _TypedLogDescription<{ sender: string; amount0: BigNumber; amount1: BigNumber }>[];
+  extractEvents(logs: Log[], name: "Swap"): _TypedLogDescription<{ sender: string; amount0In: BigNumber; amount1In: BigNumber; amount0Out: BigNumber; amount1Out: BigNumber; to: string }>[];
+  extractEvents(logs: Log[], name: "Sync"): _TypedLogDescription<{ reserve0: BigNumber; reserve1: BigNumber }>[];
+  extractEvents(logs: Log[], name: "Transfer"): _TypedLogDescription<{ from: string; to: string; value: BigNumber }>[];
+}
+
+interface SwapOperationsCalls {
+  allPairs(arg0: BigNumberish, _overrides?: CallOverrides): Promise<string>;
+  allPairsLength(_overrides?: CallOverrides): Promise<BigNumber>;
+  borrowerOperations(_overrides?: CallOverrides): Promise<string>;
+  feeTo(_overrides?: CallOverrides): Promise<string>;
+  getAmountIn(amountOut: BigNumberish, reserveIn: BigNumberish, reserveOut: BigNumberish, _overrides?: CallOverrides): Promise<BigNumber>;
+  getAmountOut(amountIn: BigNumberish, reserveIn: BigNumberish, reserveOut: BigNumberish, _overrides?: CallOverrides): Promise<BigNumber>;
+  getAmountsIn(amountOut: BigNumberish, path: string[], _overrides?: CallOverrides): Promise<BigNumber[]>;
+  getAmountsOut(amountIn: BigNumberish, path: string[], _overrides?: CallOverrides): Promise<BigNumber[]>;
+  getFeeTo(_overrides?: CallOverrides): Promise<string>;
+  getPair(arg0: string, arg1: string, _overrides?: CallOverrides): Promise<string>;
+  owner(_overrides?: CallOverrides): Promise<string>;
+  priceFeed(_overrides?: CallOverrides): Promise<string>;
+  quote(amountA: BigNumberish, reserveA: BigNumberish, reserveB: BigNumberish, _overrides?: CallOverrides): Promise<BigNumber>;
+}
+
+interface SwapOperationsTransactions {
+  addLiquidity(tokenA: string, tokenB: string, amountADesired: BigNumberish, amountBDesired: BigNumberish, amountAMin: BigNumberish, amountBMin: BigNumberish, to: string, deadline: BigNumberish, _overrides?: Overrides): Promise<{ amountA: BigNumber; amountB: BigNumber; liquidity: BigNumber }>;
+  createPair(tokenA: string, tokenB: string, _overrides?: Overrides): Promise<string>;
+  removeLiquidity(tokenA: string, tokenB: string, liquidity: BigNumberish, amountAMin: BigNumberish, amountBMin: BigNumberish, to: string, deadline: BigNumberish, _overrides?: Overrides): Promise<{ amountA: BigNumber; amountB: BigNumber }>;
+  renounceOwnership(_overrides?: Overrides): Promise<void>;
+  swapExactTokensForTokens(amountIn: BigNumberish, amountOutMin: BigNumberish, path: string[], to: string, deadline: BigNumberish, _overrides?: Overrides): Promise<BigNumber[]>;
+  swapTokensForExactTokens(amountOut: BigNumberish, amountInMax: BigNumberish, path: string[], to: string, deadline: BigNumberish, _overrides?: Overrides): Promise<BigNumber[]>;
+  transferOwnership(newOwner: string, _overrides?: Overrides): Promise<void>;
+}
+
+export interface SwapOperations
+  extends _TypedLiquityContract<SwapOperationsCalls, SwapOperationsTransactions> {
+  readonly filters: {
+    OwnershipTransferred(previousOwner?: string | null, newOwner?: string | null): EventFilter;
+    PairCreated(token0?: string | null, token1?: string | null, pair?: null, null?: null): EventFilter;
+    SwapOperationsInitialized(borrowerOperations?: null, priceFeed?: null): EventFilter;
+  };
+  extractEvents(logs: Log[], name: "OwnershipTransferred"): _TypedLogDescription<{ previousOwner: string; newOwner: string }>[];
+  extractEvents(logs: Log[], name: "PairCreated"): _TypedLogDescription<[string, string, string, BigNumber]>[];
+  extractEvents(logs: Log[], name: "SwapOperationsInitialized"): _TypedLogDescription<{ borrowerOperations: string; priceFeed: string }>[];
 }

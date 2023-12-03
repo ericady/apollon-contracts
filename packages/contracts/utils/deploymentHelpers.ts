@@ -2,6 +2,7 @@ import { ethers } from 'hardhat';
 import {
   CollTokenManager,
   DebtTokenManager,
+  SwapOperations,
   MockERC20,
   MockPriceFeed,
   RedemptionOperations,
@@ -21,6 +22,7 @@ export interface Contracts {
   collTokenManager: CollTokenManager;
   debtTokenManager: DebtTokenManager;
   priceFeed: MockPriceFeed;
+  swapOperations: SwapOperations;
   collToken: any;
   debtToken: any;
 }
@@ -50,6 +52,9 @@ export const deployCore = async (): Promise<Contracts> => {
   const priceFeedFactory = await ethers.getContractFactory('MockPriceFeed');
   const priceFeed = await priceFeedFactory.deploy();
 
+  const swapOperationsFactory = await ethers.getContractFactory('SwapOperations');
+  const swapOperations = await swapOperationsFactory.deploy(borrowerOperations, priceFeed);
+
   return {
     borrowerOperations,
     redemptionOperations,
@@ -59,6 +64,7 @@ export const deployCore = async (): Promise<Contracts> => {
     collTokenManager,
     debtTokenManager,
     priceFeed,
+    swapOperations,
     collToken: undefined,
     debtToken: undefined,
   };
@@ -82,7 +88,8 @@ export const connectCoreContracts = async (contracts: Contracts) => {
     contracts.stabilityPoolManager,
     contracts.priceFeed,
     contracts.debtTokenManager,
-    contracts.collTokenManager
+    contracts.collTokenManager,
+    contracts.swapOperations
   );
 
   await contracts.redemptionOperations.setAddresses(

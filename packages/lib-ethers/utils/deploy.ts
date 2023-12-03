@@ -54,12 +54,29 @@ const deployContracts = async (
   const [storagePool, startBlock] = await deployContractAndGetBlockNumber(deployer, getContractFactory, 'StoragePool', {
     ...overrides,
   });
+  const borrowerOperations = await deployContract(deployer, getContractFactory, 'BorrowerOperations', {
+    ...overrides,
+  });
+  const priceFeed = await deployContract(
+    deployer,
+    getContractFactory,
+    priceFeedIsTestnet ? 'MockPriceFeed' : 'PriceFeed',
+    { ...overrides }
+  );
 
   return [
     {
-      borrowerOperations: await deployContract(deployer, getContractFactory, 'BorrowerOperations', {
-        ...overrides,
-      }),
+      borrowerOperations,
+      priceFeed,
+      storagePool,
+      swapOperations: await deployContract(
+        deployer,
+        getContractFactory,
+        'SwapOperations',
+        borrowerOperations.address,
+        priceFeed.address,
+        { ...overrides }
+      ),
       redemptionOperations: await deployContract(deployer, getContractFactory, 'RedemptionOperations', {
         ...overrides,
       }),
@@ -69,19 +86,12 @@ const deployContracts = async (
       stabilityPoolManager: await deployContract(deployer, getContractFactory, 'StabilityPoolManager', {
         ...overrides,
       }),
-      storagePool,
       collTokenManager: await deployContract(deployer, getContractFactory, 'CollTokenManager', {
         ...overrides,
       }),
       debtTokenManager: await deployContract(deployer, getContractFactory, 'DebtTokenManager', {
         ...overrides,
       }),
-      priceFeed: await deployContract(
-        deployer,
-        getContractFactory,
-        priceFeedIsTestnet ? 'MockPriceFeed' : 'PriceFeed',
-        { ...overrides }
-      ),
       // communityIssuance: await deployContract(deployer, getContractFactory, 'CommunityIssuance', {
       //   ...overrides,
       // }),
@@ -113,6 +123,7 @@ const connectContracts = async (
     debtTokenManager,
     collTokenManager,
     priceFeed,
+    swapOperations,
   }: _LiquityContracts,
   deployer: Signer,
   overrides?: Overrides
@@ -144,6 +155,7 @@ const connectContracts = async (
         priceFeed.address,
         debtTokenManager.address,
         collTokenManager.address,
+        swapOperations.address,
         { ...overrides, nonce }
       ),
 

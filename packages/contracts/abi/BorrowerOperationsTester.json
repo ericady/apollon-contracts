@@ -61,6 +61,11 @@
     },
     {
         "inputs": [],
+        "name": "NotFromSwapOps",
+        "type": "error"
+    },
+    {
+        "inputs": [],
         "name": "Repaid_gt_CurrentDebt",
         "type": "error"
     },
@@ -126,6 +131,12 @@
                 "indexed": false,
                 "internalType": "address",
                 "name": "_collTokenManagerAddress",
+                "type": "address"
+            },
+            {
+                "indexed": false,
+                "internalType": "address",
+                "name": "_swapOperationsAddress",
                 "type": "address"
             }
         ],
@@ -498,6 +509,11 @@
             {
                 "internalType": "address",
                 "name": "_collTokenManagerAddress",
+                "type": "address"
+            },
+            {
+                "internalType": "address",
+                "name": "_swapOperations",
                 "type": "address"
             }
         ],
