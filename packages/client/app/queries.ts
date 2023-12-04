@@ -8,9 +8,10 @@ export const GET_ALL_POOLS = gql`
       volume24hUSD
       liquidity {
         token {
+          id
           address
           symbol
-          priceUSD
+          priceUSD @client
           priceUSD24hAgo
         }
       }
@@ -27,9 +28,10 @@ export const GET_ALL_DEBT_TOKENS = gql`
       totalReserve24hAgo
 
       token {
+        id
         address
         symbol
-        priceUSD
+        priceUSD @client
         priceUSD24hAgo
       }
     }
@@ -49,9 +51,10 @@ export const GET_BORROWER_DEBT_TOKENS = gql`
       totalSupplyUSD
       totalSupplyUSD24hAgo
       token {
+        id
         address
         symbol
-        priceUSD
+        priceUSD @client
         isPoolToken
       }
     }
@@ -66,9 +69,10 @@ export const GET_BORROWER_POSITIONS = gql`
         openedAt
         closedAt
         token {
+          id
           address
           symbol
-          priceUSD
+          priceUSD @client
         }
         direction
         size
@@ -91,9 +95,10 @@ export const GET_LIQUIDITY_POOLS = gql`
       id
       liquidity {
         token {
+          id
           address
           symbol
-          priceUSD
+          priceUSD @client
         }
         totalAmount
       }
@@ -110,9 +115,10 @@ export const GET_BORROWER_LIQUIDITY_POOLS = gql`
       id
       liquidity {
         token {
+          id
           address
           symbol
-          priceUSD
+          priceUSD @client
         }
         totalAmount
         borrowerAmount
@@ -130,9 +136,10 @@ export const GET_BORROWER_COLLATERAL_TOKENS = gql`
   query GetCollateralTokens($borrower: String!) {
     getCollateralTokens(borrower: $borrower) {
       token {
+        id
         address
         symbol
-        priceUSD
+        priceUSD @client
       }
       walletAmount
       troveLockedAmount

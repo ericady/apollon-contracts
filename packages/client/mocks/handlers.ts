@@ -8,6 +8,7 @@ import {
   DebtTokenMeta,
   LongShortDirection,
   Pool,
+  Position,
   Query,
   QueryGetBorrowerStabilityHistoryArgs,
   QueryGetCollateralTokensArgs,
@@ -16,6 +17,7 @@ import {
   QueryGetPoolsArgs,
   QueryGetPositionsArgs,
   Token,
+  TokenAmount,
 } from '../app/generated/gql-types';
 import {
   GET_ALL_DEBT_TOKENS,
@@ -42,7 +44,9 @@ const favoritedAssets: string[] = getFavoritedAssetsFromLS();
 const now = Date.now();
 const oneDayInMs = 24 * 60 * 60 * 1000;
 
-const JUSD = {
+const JUSD: Token = {
+  id: faker.string.uuid(),
+  __typename: 'Token',
   address: '0x6cA13a4ab78dd7D657226b155873A04DB929AXXX',
   symbol: 'JUSD',
   createdAt: faker.date.past().toISOString(),
@@ -50,9 +54,12 @@ const JUSD = {
   priceUSD24hAgo: parseFloat(faker.finance.amount(1, 5000, 2)),
   isPoolToken: faker.datatype.boolean(),
 };
+
 export const tokens: Token[] = Array(10)
   .fill(null)
-  .map((_, index) => ({
+  .map<Token>((_, index) => ({
+    id: faker.string.uuid(),
+    __typename: 'Token',
     address: index <= favoritedAssets.length - 1 ? favoritedAssets[index] : faker.string.uuid(),
     symbol: faker.finance.currencyCode(),
     createdAt: faker.date.past().toISOString(),
@@ -70,6 +77,8 @@ const collateralTokens: CollateralTokenMeta[] = faker.helpers
     const totalValueLockedUSD = parseFloat(faker.finance.amount(10000, 50000, 2));
 
     return {
+      __typename: 'CollateralTokenMeta',
+      id: faker.string.uuid(),
       token: token,
       walletAmount: faker.number.float({ min: 0, max: 1000, precision: 0.0001 }),
       troveLockedAmount: faker.number.float({ min: 100, max: 110, precision: 0.0001 }),
@@ -89,6 +98,8 @@ const debtTokens: DebtTokenMeta[] = faker.helpers
     const totalReserve = parseFloat(faker.finance.amount(1000, 5000, 2));
 
     return {
+      __typename: 'DebtTokenMeta',
+      id: faker.string.uuid(),
       token: token,
       walletAmount: faker.number.float({ min: 0, max: 1000, precision: 0.0001 }),
       troveMintedAmount: faker.number.float({ min: 90, max: 100, precision: 0.0001 }),
@@ -112,9 +123,11 @@ for (let i = 0; i < tokens.length; i++) {
     const sortedPair = [tokens[i], tokens[j]];
 
     pools.push({
+      __typename: 'Pool',
       id: faker.string.uuid(),
       openingFee: faker.number.float({ min: -0.05, max: 0.05, precision: 0.0001 }),
       liquidity: sortedPair.map((token) => ({
+        __typename: 'PoolLiquidity',
         token,
         totalAmount: parseFloat(faker.finance.amount(100000, 1000000, 2)),
         borrowerAmount: null,
@@ -122,6 +135,8 @@ for (let i = 0; i < tokens.length; i++) {
       // Taking a subset of tokens for demonstration
       rewards: faker.datatype.boolean({ probability: 0.05 })
         ? faker.helpers.arrayElements(tokens, { min: 0, max: 3 }).map((token) => ({
+            __typename: 'PoolReward',
+            id: faker.string.uuid(),
             token,
             amount: parseFloat(faker.finance.amount(1, 50, 2)),
           }))
@@ -138,11 +153,12 @@ const liquidityPools = pools;
 const totalOpenPositions = faker.number.int({ min: 5, max: 90 });
 const openPositions = Array(totalOpenPositions)
   .fill(null)
-  .map(() => {
+  .map<Position>(() => {
     const openedAt = faker.date.past({ years: 1 }).getTime();
     const size = parseFloat(faker.finance.amount(1, 1000, 2));
     const token = faker.helpers.arrayElement(tokens);
     return {
+      __typename: 'Position',
       id: faker.string.uuid(),
       openedAt,
       closedAt: null,
@@ -163,7 +179,7 @@ const openPositions = Array(totalOpenPositions)
 const totalClosedPositions = faker.number.int({ min: 5, max: 90 });
 const closedPositions = Array(totalClosedPositions)
   .fill(null)
-  .map(() => {
+  .map<Position>(() => {
     const openedAt = faker.date.past({ years: 1 }).getTime();
     const closedAt = openedAt + faker.number.int({ min: 1, max: 24 * 60 * 60 * 1000 });
     const size = parseFloat(faker.finance.amount(1, 1000, 2));
@@ -174,6 +190,7 @@ const closedPositions = Array(totalClosedPositions)
       precision: 0.00001,
     });
     return {
+      __typename: 'Position',
       id: faker.string.uuid(),
       openedAt,
       closedAt,
@@ -218,7 +235,7 @@ const generateTokenValues = (maxValue: number, tokens: Token[]) => {
 
 const borrowerHistory: BorrowerHistory[] = Array(faker.number.int({ min: 5, max: 90 }))
   .fill(null)
-  .map(() => {
+  .map<BorrowerHistory>(() => {
     const type = faker.helpers.enumValue(BorrowerHistoryType);
 
     const lostAmount = parseFloat(faker.finance.amount(1, 1000, 2));
@@ -229,14 +246,24 @@ const borrowerHistory: BorrowerHistory[] = Array(faker.number.int({ min: 5, max:
     // negative amount and only on lost token for claimed rewards
     const lostToken =
       type === BorrowerHistoryType.ClaimedRewards
-        ? generateTokenValues(lostAmount, faker.helpers.arrayElements(tokens, { min: 1, max: 5 })).map((token) => ({
-            ...token,
-            amount: token.amount * -1,
-          }))
+        ? generateTokenValues(lostAmount, faker.helpers.arrayElements(tokens, { min: 1, max: 5 })).map<TokenAmount>(
+            (token) => ({
+              __typename: 'TokenAmount',
+              ...token,
+              amount: token.amount * -1,
+            }),
+          )
         : [];
     // positive amount and always bigger than any potential lost amount
-    const gainedToken = generateTokenValues(gainedAmount, faker.helpers.arrayElements(tokens, { min: 1, max: 5 }));
+    const gainedToken = generateTokenValues(
+      gainedAmount,
+      faker.helpers.arrayElements(tokens, { min: 1, max: 5 }),
+    ).map<TokenAmount>((token) => ({
+      __typename: 'TokenAmount',
+      ...token,
+    }));
     return {
+      __typename: 'BorrowerHistory',
       id: faker.string.uuid(),
       timestamp: now - faker.number.int({ min: 0, max: 29 }) * oneDayInMs,
       type,
@@ -257,6 +284,8 @@ export const handlers = [
         const shouldHaveReserve = faker.datatype.boolean();
 
         return {
+          __typename: 'DebtTokenMeta',
+          id: faker.string.uuid(),
           token: token,
           walletAmount: null,
           troveMintedAmount: null,
@@ -300,6 +329,8 @@ export const handlers = [
             .filter(({ address }) => !borrowerAddresses.includes(address))
             .map<DebtTokenMeta>((token) => {
               return {
+                __typename: 'DebtTokenMeta',
+                id: faker.string.uuid(),
                 token: token,
                 walletAmount: null,
                 troveMintedAmount: null,
@@ -320,6 +351,8 @@ export const handlers = [
       } else {
         const tokensWithoutBorrower = tokens.map<DebtTokenMeta>((token) => {
           return {
+            __typename: 'DebtTokenMeta',
+            id: faker.string.uuid(),
             token: token,
             walletAmount: null,
             troveMintedAmount: null,
@@ -351,6 +384,8 @@ export const handlers = [
           const totalValueLockedUSD = parseFloat(faker.finance.amount(10000, 50000, 2));
 
           return {
+            __typename: 'CollateralTokenMeta',
+            id: faker.string.uuid(),
             token: token,
             totalValueLockedUSD,
             totalValueLockedUSD24hAgo: parseFloat(
@@ -373,6 +408,8 @@ export const handlers = [
               const totalValueLockedUSD = parseFloat(faker.finance.amount(10000, 50000, 2));
 
               return {
+                __typename: 'CollateralTokenMeta',
+                id: faker.string.uuid(),
                 token: token,
                 totalValueLockedUSD,
                 totalValueLockedUSD24hAgo: parseFloat(
@@ -408,8 +445,10 @@ export const handlers = [
           const endCursor = positions[positions.length - 1].id;
 
           const result: Query['getPositions'] = {
+            __typename: 'PositionsPage',
             positions,
             pageInfo: {
+              __typename: 'PageInfo',
               totalCount: totalOpenPositions,
               hasNextPage,
               endCursor,
@@ -423,8 +462,10 @@ export const handlers = [
           const endCursor = positions[positions.length - 1].id;
 
           const result: Query['getPositions'] = {
+            __typename: 'PositionsPage',
             positions,
             pageInfo: {
+              __typename: 'PageInfo',
               totalCount: totalOpenPositions,
               hasNextPage,
               endCursor,
@@ -442,8 +483,10 @@ export const handlers = [
           const endCursor = positions[positions.length - 1].id;
 
           const result: Query['getPositions'] = {
+            __typename: 'PositionsPage',
             positions,
             pageInfo: {
+              __typename: 'PageInfo',
               totalCount: totalClosedPositions,
               hasNextPage,
               endCursor,
@@ -457,8 +500,10 @@ export const handlers = [
           const endCursor = positions[positions.length - 1].id;
 
           const result: Query['getPositions'] = {
+            __typename: 'PositionsPage',
             positions,
             pageInfo: {
+              __typename: 'PageInfo',
               totalCount: totalClosedPositions,
               hasNextPage,
               endCursor,
@@ -534,8 +579,10 @@ export const handlers = [
       const endCursor = history[history.length - 1].id;
 
       const result: Query['getBorrowerStabilityHistory'] = {
+        __typename: 'PoolHistoryPage',
         history,
         pageInfo: {
+          __typename: 'PageInfo',
           totalCount: totalBorrowerHistory,
           hasNextPage,
           endCursor,
@@ -549,8 +596,10 @@ export const handlers = [
       const endCursor = history[history.length - 1].id;
 
       const result: Query['getBorrowerStabilityHistory'] = {
+        __typename: 'PoolHistoryPage',
         history,
         pageInfo: {
+          __typename: 'PageInfo',
           totalCount: totalBorrowerHistory,
           hasNextPage,
           endCursor,

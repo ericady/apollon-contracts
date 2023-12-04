@@ -1,16 +1,15 @@
 'use client';
 
-import { ApolloProvider } from '@apollo/client';
 import { PaletteMode } from '@mui/material';
 import CssBaseline from '@mui/material/CssBaseline';
 import ThemeProvider from '@mui/material/styles/ThemeProvider';
 import { SnackbarProvider } from 'notistack';
 import { PropsWithChildren, useEffect, useMemo, useState } from 'react';
-import { client } from '../client';
 import { ThemeModeLocalStorageKey } from '../components/Buttons/ThemeSwitch';
 import MockServer from '../components/MockServer';
 import NavigationBar from '../components/NavigationBar/NavigationBar';
 import buildTheme from '../theme';
+import { CustomApolloProvider } from './CustomApolloProvider';
 import DeviceFallbackController from './DeviceFallbackController';
 import EthersProvider from './EthersProvider';
 import SelectedTokenProvider from './SelectedTokenProvider';
@@ -44,9 +43,9 @@ function ContextWrapper({ children }: PropsWithChildren<{}>) {
               <WalletProvider>
                 <NavigationBar themeMode={themeMode} setThemeMode={setThemeMode} />
 
-                <ApolloProvider client={client}>
+                <CustomApolloProvider>
                   <SelectedTokenProvider>{children}</SelectedTokenProvider>
-                </ApolloProvider>
+                </CustomApolloProvider>
               </WalletProvider>
             </EthersProvider>
           </MockServer>

@@ -7,12 +7,15 @@ import { useSnackbar } from 'notistack';
 import { createContext, useContext, useState } from 'react';
 
 // copied ABI from https://goerli.etherscan.io/token/0x509ee0d083ddf8ac028f2a56731412edd63223b9#writeContract
-import { DummyContractDataAbi } from '../../types/ethers-contracts/DummyContractDataAbi';
-import contractAbi from './DummyContractData.abi.json';
+
+import { DebtToken } from '../../types/ethers-contracts/DebtToken';
+import debtTokenAbi from './abis/DebtToken.json';
 
 // TODO: This is just dummy data and will be exchanged with the real implementation later.
 // https://goerli.etherscan.io/token/0x509ee0d083ddf8ac028f2a56731412edd63223b9#writeContract
-export const contractAddress = '0x509ee0d083ddf8ac028f2a56731412edd63223b9';
+// export const contractAddress = '0x509ee0d083ddf8ac028f2a56731412edd63223b9';
+// const testContract = new Contract(contractAddress, contractAbi, newProvider);
+// const contractWithSigner = testContract.connect(newSigner) as DummyContractDataAbi;
 
 declare global {
   interface Window {
@@ -20,17 +23,26 @@ declare global {
   }
 }
 
+export const Contracts = {
+  DebtToken: '0x48f322be8Acb969E1Bd4C49E3e873Ec0a469Ee9D',
+  IERC20: '0x509ee0d083ddf8ac028f2a56731412edd63223b9',
+};
+
+export type SharedContracts = {
+  debtToken: DebtToken;
+};
+
 export const EthersContext = createContext<{
   provider: BrowserProvider | null;
   signer: JsonRpcSigner | null;
   address: string;
-  contract: DummyContractDataAbi | null;
+  debtTokenContract: DebtToken | null;
   connectWallet: () => void;
 }>({
   provider: null,
   signer: null,
   address: '',
-  contract: null,
+  debtTokenContract: null,
   connectWallet: () => {},
 });
 
@@ -40,7 +52,7 @@ export default function EthersProvider({ children }: { children: React.ReactNode
   const [provider, setProvider] = useState<BrowserProvider | null>(null);
   const [signer, setSigner] = useState<JsonRpcSigner | null>(null);
   const [address, setAddress] = useState('');
-  const [contract, setContract] = useState<DummyContractDataAbi | null>(null);
+  const [debtTokenContract, setDebtTokenContract] = useState<DebtToken | null>(null);
 
   const connectWallet = async () => {
     try {
@@ -51,14 +63,12 @@ export default function EthersProvider({ children }: { children: React.ReactNode
 
         const newProvider = new BrowserProvider(window.ethereum, testNetwork);
         const newSigner = await newProvider.getSigner();
-
-        // TODO: implement real contracts
-        const testContract = new Contract(contractAddress, contractAbi, newProvider);
-        const contractWithSigner = testContract.connect(newSigner) as DummyContractDataAbi;
-
-        setContract(contractWithSigner);
         setProvider(newProvider);
         setSigner(newSigner);
+
+        const debtTokenContract = new Contract(Contracts.DebtToken, debtTokenAbi, newProvider);
+        const debtTokenContractWithSigner = debtTokenContract.connect(newSigner) as DebtToken;
+        setDebtTokenContract(debtTokenContractWithSigner);
 
         try {
           // Request account access
@@ -92,8 +102,21 @@ export default function EthersProvider({ children }: { children: React.ReactNode
     }
   };
 
+  // TODO: try to implement automatic login if user has been seen and allow resolving of view fields
+  // useEffect(() => {
+  //   if (typeof window.ethereum !== 'undefined') {
+  //     const testNetwork = new Network('goerli', 5);
+
+  //     const newProvider = new BrowserProvider(window.ethereum, testNetwork);
+
+  //     const debtTokenContract = new Contract(Contracts.DebtToken, debtTokenAbi, newProvider) as unknown as DebtToken;
+  //     setDebtTokenContract(debtTokenContract);
+
+  //   }
+  // }, []);
+
   return (
-    <EthersContext.Provider value={{ provider, signer, address, connectWallet, contract }}>
+    <EthersContext.Provider value={{ provider, signer, address, connectWallet, debtTokenContract }}>
       {children}
     </EthersContext.Provider>
   );
@@ -103,7 +126,7 @@ export function useEthers(): {
   provider: BrowserProvider | null;
   signer: JsonRpcSigner | null;
   address: string;
-  contract: DummyContractDataAbi | null;
+  debtTokenContract: DebtToken | null;
   connectWallet: () => void;
 } {
   const context = useContext(EthersContext);

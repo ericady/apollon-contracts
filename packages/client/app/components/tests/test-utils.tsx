@@ -1,14 +1,20 @@
-import { ApolloProvider } from '@apollo/client';
+import { ApolloClient, ApolloProvider, InMemoryCache } from '@apollo/client';
 import { ThemeProvider } from '@emotion/react';
 import { SnackbarProvider } from 'notistack';
 import { PropsWithChildren, useMemo, useState } from 'react';
 import 'whatwg-fetch';
-import { client } from '../../client';
 import { EthersContext } from '../../context/EthersProvider';
 import SelectedTokenProvider, { useSelectedToken } from '../../context/SelectedTokenProvider';
 import WalletProvider from '../../context/WalletProvider';
 import buildTheme from '../../theme';
 import MockedPositionsWithoutBorrower from './mockedResponses/GetDebtTokens.mocked.json';
+
+// This is just the default client config when testing against the dev server
+export const client = new ApolloClient({
+  // TODO: replace with your own graphql server
+  uri: 'https://flyby-router-demo.herokuapp.com/',
+  cache: new InMemoryCache(),
+});
 
 type Props = {
   shouldPreselectTokens?: boolean;
@@ -79,7 +85,7 @@ function SetupState({
   return (
     <EthersContext.Provider
       value={{
-        contract: (mockEthers?.contractMock ?? {}) as any,
+        debtTokenContract: (mockEthers?.contractMock ?? {}) as any,
         provider: {} as any,
         signer: {} as any,
         address,

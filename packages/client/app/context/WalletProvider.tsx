@@ -22,7 +22,9 @@ export default function WalletProvider({ children }: { children: React.ReactNode
 
   useEffect(() => {
     async function fetchBorrowerBalance() {
-      const balance = await provider!.getBalance(address);
+      // FIXME: Exchange for mainnet once released
+      // const balance = await provider!.getBalance(address);
+      const balance = ethers.toBigInt(1);
       const amount = ethers.formatEther(balance);
       setEtherAmount(parseFloat(amount));
     }
