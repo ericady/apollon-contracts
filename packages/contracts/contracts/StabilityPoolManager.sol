@@ -197,12 +197,13 @@ contract StabilityPoolManager is Ownable(msg.sender), CheckContract, IStabilityP
 
       // move the coll from the active pool into the stability pool
       IDebtToken stableDebt = reservePool.stableDebtToken();
+      IERC20 govToken = reservePool.govToken();
       uint stableCollIndex = remainingStability.collGained.length; // out range index as default
-      // TODO: enable when gov added
-      // uint govTokenCollIndex = remainingStability.collGained.length;
+      uint govTokenCollIndex = remainingStability.collGained.length;
 
       for (uint ii = 0; ii < remainingStability.collGained.length; ii++) {
         if (remainingStability.collGained[ii].tokenAddress == address(stableDebt)) stableCollIndex = ii;
+        if (remainingStability.collGained[ii].tokenAddress == address(govToken)) govTokenCollIndex = ii;
         if (remainingStability.collGained[ii].amount == 0) continue;
 
         storagePoolCached.withdrawalValue(
@@ -224,10 +225,10 @@ contract StabilityPoolManager is Ownable(msg.sender), CheckContract, IStabilityP
           offsetValue - gainedCollValue
         );
 
-        // add repaid stableCoin to coll gained array
+        // add repaid gov token to coll gained array
         if (repaidReserves[0].amount > 0) {
-          if (stableCollIndex >= remainingStability.collGained.length) {
-            // stablecoinIndex not found in prev loop, add to end of array
+          if (govTokenCollIndex >= remainingStability.collGained.length) {
+            // govTokenCollIndex not found in prev loop, add to end of array
             TokenAmount[] memory collGained = new TokenAmount[](remainingStability.collGained.length + 1);
             for (uint ii = 0; ii < remainingStability.collGained.length; ii++) {
               collGained[ii] = remainingStability.collGained[ii];
@@ -235,25 +236,23 @@ contract StabilityPoolManager is Ownable(msg.sender), CheckContract, IStabilityP
             collGained[remainingStability.collGained.length] = repaidReserves[0];
             remainingStability.collGained = collGained;
           } else {
-            remainingStability.collGained[stableCollIndex].amount += repaidReserves[0].amount;
+            remainingStability.collGained[govTokenCollIndex].amount += repaidReserves[0].amount;
           }
         }
-
-        // TODO: enable when gov added
-        // // add repaid gov token to coll gained array
-        // if (repaidReserves[1].amount > 0) {
-        //   if (govTokenCollIndex >= remainingStability.collGained.length) {
-        //     // govTokenCollIndex not found in prev loop, add to end of array
-        //     TokenAmount[] memory collGained = new TokenAmount[](remainingStability.collGained.length + 1);
-        //     for (uint ii = 0; ii < remainingStability.collGained.length; ii++) {
-        //       collGained[ii] = remainingStability.collGained[ii];
-        //     }
-        //     collGained[remainingStability.collGained.length] = repaidReserves[1];
-        //     remainingStability.collGained = collGained;
-        //   } else {
-        //     remainingStability.collGained[govTokenCollIndex].amount += repaidReserves[1].amount;
-        //   }
-        // }
+        // add repaid stableCoin to coll gained array
+        if (repaidReserves[1].amount > 0) {
+          if (stableCollIndex >= remainingStability.collGained.length) {
+            // stablecoinIndex not found in prev loop, add to end of array
+            TokenAmount[] memory collGained = new TokenAmount[](remainingStability.collGained.length + 1);
+            for (uint ii = 1; ii < remainingStability.collGained.length; ii++) {
+              collGained[ii] = remainingStability.collGained[ii];
+            }
+            collGained[remainingStability.collGained.length] = repaidReserves[1];
+            remainingStability.collGained = collGained;
+          } else {
+            remainingStability.collGained[stableCollIndex].amount += repaidReserves[1].amount;
+          }
+        }
       }
 
       // update internal pool stake snapshots

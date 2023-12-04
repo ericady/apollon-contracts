@@ -2,10 +2,10 @@
 
 pragma solidity ^0.8.9;
 
-import './IBase.sol';
+import './IBBase.sol';
 import './IDebtToken.sol';
 
-interface IReservePool is IBase {
+interface IReservePool is IBBase {
   event ReservePoolInitialized(
     address _stabilityPoolManager,
     address _priceFeed,
@@ -13,6 +13,7 @@ interface IReservePool is IBase {
     address _govTokenAddress
   );
   event ReserveCapChanged(uint newReserveCap, uint newGovReserveCap);
+  event WithdrewReserves(uint govAmount, uint stableAmount);
 
   error NotFromSPM();
 
@@ -21,6 +22,8 @@ interface IReservePool is IBase {
   function govReserveCap() external view returns (uint);
 
   function stableDebtToken() external view returns (IDebtToken);
+
+  function govToken() external view returns (IERC20);
 
   function isReserveCapReached() external view returns (bool, bool);
 

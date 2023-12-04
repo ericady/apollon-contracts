@@ -60,6 +60,25 @@
         "type": "event"
     },
     {
+        "anonymous": false,
+        "inputs": [
+            {
+                "indexed": false,
+                "internalType": "uint256",
+                "name": "govAmount",
+                "type": "uint256"
+            },
+            {
+                "indexed": false,
+                "internalType": "uint256",
+                "name": "stableAmount",
+                "type": "uint256"
+            }
+        ],
+        "name": "WithdrewReserves",
+        "type": "event"
+    },
+    {
         "inputs": [],
         "name": "govReserveCap",
         "outputs": [
@@ -67,6 +86,19 @@
                 "internalType": "uint256",
                 "name": "",
                 "type": "uint256"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [],
+        "name": "govToken",
+        "outputs": [
+            {
+                "internalType": "contract IERC20",
+                "name": "",
+                "type": "address"
             }
         ],
         "stateMutability": "view",

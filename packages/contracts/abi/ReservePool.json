@@ -111,6 +111,25 @@
         "type": "event"
     },
     {
+        "anonymous": false,
+        "inputs": [
+            {
+                "indexed": false,
+                "internalType": "uint256",
+                "name": "govAmount",
+                "type": "uint256"
+            },
+            {
+                "indexed": false,
+                "internalType": "uint256",
+                "name": "stableAmount",
+                "type": "uint256"
+            }
+        ],
+        "name": "WithdrewReserves",
+        "type": "event"
+    },
+    {
         "inputs": [],
         "name": "BORROWING_FEE_FLOOR",
         "outputs": [

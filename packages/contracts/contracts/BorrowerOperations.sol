@@ -545,6 +545,7 @@ contract BorrowerOperations is LiquityBase, Ownable(msg.sender), CheckContract, 
     (bool stableCapReached, ) = reservePool.isReserveCapReached();
     if (reserveFee > 0 && !stableCapReached) {
       _debtToken.mint(address(reservePool), reserveFee);
+      emit SentBorrowingFeesToReserve(_borrower, reserveFee);
     } else {
       reserveFee = 0;
     }

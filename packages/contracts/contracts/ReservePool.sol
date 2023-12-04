@@ -52,20 +52,35 @@ contract ReservePool is LiquityBase, Ownable(msg.sender), CheckContract, IReserv
     stableReserveCap = newStableReserveCap;
     govReserveCap = newGovReserveCap;
     emit ReserveCapChanged(newStableReserveCap, govReserveCap);
+
+    uint stableBal = stableDebtToken.balanceOf(address(this));
+    uint govBal = govToken.balanceOf(address(this));
+    uint stableOffset = stableBal > newStableReserveCap ? stableBal - newStableReserveCap : 0;
+    uint govOffset = govBal > newGovReserveCap ? govBal - newGovReserveCap : 0;
+    if (stableOffset > 0 || govOffset > 0) {
+      address[] memory collTokens = new address[](2);
+      collTokens[0] = address(govToken);
+      collTokens[1] = address(stableDebtToken);
+      RemainingStability[] memory remainingStabilities = stabilityPoolManager.getRemainingStability(collTokens);
+      for (uint i = 0; i < remainingStabilities.length; i++) {
+        remainingStabilities[i].collGained[0].amount += govOffset / remainingStabilities.length;
+        remainingStabilities[i].collGained[1].amount += stableOffset / remainingStabilities.length;
+      }
+      stabilityPoolManager.offset(remainingStabilities);
+    }
   }
 
   function isReserveCapReached() external view returns (bool stableCapReached, bool govCapReached) {
     stableCapReached = stableDebtToken.balanceOf(address(this)) >= stableReserveCap;
-    // TODO: enable when gov token implemented
-    // govCapReached = govToken.balanceOf(address(this)) >= govReserveCap;
+    govCapReached = govToken.balanceOf(address(this)) >= govReserveCap;
   }
 
   /**
    * @notice Withdraw reserves to stability pool to repay possible loss when offset debts
-   * @dev Withdraw 50:50 reserves of stable tokens and gov tokens
+   * @dev Try to withdraw with gov tokens first, when not enough then stablecoins.
    * @param stabilityPool Address of stability pool
    * @param withdrawAmount USD value of amounts to withdraw (same as stable debt token amount)
-   * @return repaidReserves TokenAmount array of reserves repaid, [stableCoin, govToken]
+   * @return repaidReserves TokenAmount array of reserves repaid, [govToken, stablecoin]
    */
   function withdrawValue(
     address stabilityPool,
@@ -73,21 +88,22 @@ contract ReservePool is LiquityBase, Ownable(msg.sender), CheckContract, IReserv
   ) external returns (TokenAmount[] memory repaidReserves) {
     _requireCallerIsStabilityPoolManager();
 
-    repaidReserves = new TokenAmount[](1);
-    repaidReserves[0].tokenAddress = address(stableDebtToken);
+    repaidReserves = new TokenAmount[](2);
+    repaidReserves[0].tokenAddress = address(govToken);
+    repaidReserves[1].tokenAddress = address(stableDebtToken);
 
-    uint stableAmount = withdrawAmount / 2;
+    uint govTokenPrice = priceFeed.getPrice(address(govToken));
+    uint govAmount = (withdrawAmount * 1e18) / govTokenPrice;
+    govAmount = Math.min(govAmount, govToken.balanceOf(address(this)));
+    govToken.transfer(stabilityPool, govAmount);
+    repaidReserves[0].amount = govAmount;
+
+    uint stableAmount = withdrawAmount - (govAmount * govTokenPrice) / 1e18;
     stableAmount = Math.min(stableAmount, stableDebtToken.balanceOf(address(this)));
     stableDebtToken.transfer(stabilityPool, stableAmount);
     repaidReserves[0].amount = stableAmount;
 
-    // TODO: enable when gov token implemented
-    // repaidReserves[1].tokenAddress = address(govToken);
-    // uint govAmount = (stableAmount * 1e18) / priceFeed.getPrice(address(govToken));
-    // govAmount = Math.min(govAmount, govToken.balanceOf(address(this)));
-
-    // govToken.transfer(stabilityPool, govAmount);
-    // repaidReserves[0].amount = govAmount;
+    emit WithdrewReserves(govAmount, stableAmount);
   }
 
   function _requireCallerIsStabilityPoolManager() internal view {
