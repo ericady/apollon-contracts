@@ -162,6 +162,10 @@ export const getTroveEntireDebt = async (contracts: Contracts, trove: SignerWith
   return (await contracts.troveManager.getEntireDebtAndColl(trove)).troveDebtInUSD;
 };
 
+export const getTroveStake = async (contracts: Contracts, trove: SignerWithAddress) => {
+  return await contracts.troveManager.getTroveStake(trove);
+};
+
 export const checkRecoveryMode = async (contracts: Contracts) => {
   return (await contracts.storagePool.checkRecoveryMode()).isInRecoveryMode;
 };

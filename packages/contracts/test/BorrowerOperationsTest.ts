@@ -23,6 +23,7 @@ import {
   getTroveEntireColl,
   getTroveEntireDebt,
   openTrove,
+  getTroveStake,
 } from '../utils/testHelper';
 import { parseUnits } from 'ethers';
 
@@ -2470,6 +2471,70 @@ describe('BorrowerOperations', () => {
 
       const aliceCollAfter = await getTroveEntireColl(contracts, alice);
       expect(aliceCollAfter).to.be.equal(0n);
+    });
+
+    it("reduces a Trove's debt to zero", async () => {
+      await openTrove({
+        from: alice,
+        contracts,
+        collToken: BTC,
+        collAmount: parseUnits('1', 9),
+        debts: [{ tokenAddress: STABLE, amount: parseUnits('10000') }],
+      });
+
+      await openTrove({
+        from: bob,
+        contracts,
+        collToken: BTC,
+        collAmount: parseUnits('1', 9),
+        debts: [{ tokenAddress: STABLE, amount: parseUnits('10000') }],
+      });
+
+      const aliceDebtBefore = await getTroveEntireColl(contracts, alice);
+      const bobBal = await STABLE.balanceOf(bob);
+      expect(aliceDebtBefore).to.be.gt(parseUnits('10000'));
+      expect(bobBal).to.be.equal(parseUnits('10000'));
+
+      // To compensate borrowing fees
+      await STABLE.connect(bob).transfer(alice, bobBal / 2n);
+
+      // Alice attempts to close trove
+      await borrowerOperations.connect(alice).closeTrove();
+
+      const aliceDebtAfter = await getTroveEntireDebt(contracts, alice);
+      expect(aliceDebtAfter).to.be.equal(0n);
+    });
+
+    it("sets Trove's stake to zero", async () => {
+      await openTrove({
+        from: alice,
+        contracts,
+        collToken: BTC,
+        collAmount: parseUnits('1', 9),
+        debts: [{ tokenAddress: STABLE, amount: parseUnits('10000') }],
+      });
+
+      await openTrove({
+        from: bob,
+        contracts,
+        collToken: BTC,
+        collAmount: parseUnits('1', 9),
+        debts: [{ tokenAddress: STABLE, amount: parseUnits('10000') }],
+      });
+
+      const aliceStakeBefore = await getTroveStake(contracts, alice);
+      const bobBal = await STABLE.balanceOf(bob);
+      expect(aliceStakeBefore).to.be.gte(parseUnits('21000'));
+      expect(bobBal).to.be.equal(parseUnits('10000'));
+
+      // To compensate borrowing fees
+      await STABLE.connect(bob).transfer(alice, bobBal / 2n);
+
+      // Alice attempts to close trove
+      await borrowerOperations.connect(alice).closeTrove();
+
+      const aliceStakeAfter = await getTroveStake(contracts, alice);
+      expect(aliceStakeAfter).to.be.equal(0n);
     });
   });
 });
