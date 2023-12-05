@@ -2,12 +2,10 @@
 
 import { Button } from '@mui/material';
 import { BrowserProvider, Contract, Eip1193Provider, JsonRpcSigner, Network } from 'ethers';
+import { AddressLike } from 'ethers/address';
 import Link from 'next/link';
 import { useSnackbar } from 'notistack';
 import { createContext, useContext, useState } from 'react';
-
-// copied ABI from https://goerli.etherscan.io/token/0x509ee0d083ddf8ac028f2a56731412edd63223b9#writeContract
-
 import { DebtToken } from '../../types/ethers-contracts/DebtToken';
 import debtTokenAbi from './abis/DebtToken.json';
 
@@ -24,7 +22,9 @@ declare global {
 }
 
 export const Contracts = {
-  DebtToken: '0x48f322be8Acb969E1Bd4C49E3e873Ec0a469Ee9D',
+  DebtToken: {
+    JUSD: '0x48f322be8Acb969E1Bd4C49E3e873Ec0a469Ee9D',
+  },
   IERC20: '0x509ee0d083ddf8ac028f2a56731412edd63223b9',
 };
 
@@ -35,7 +35,7 @@ export type SharedContracts = {
 export const EthersContext = createContext<{
   provider: BrowserProvider | null;
   signer: JsonRpcSigner | null;
-  address: string;
+  address: AddressLike;
   debtTokenContract: DebtToken | null;
   connectWallet: () => void;
 }>({
@@ -51,7 +51,7 @@ export default function EthersProvider({ children }: { children: React.ReactNode
 
   const [provider, setProvider] = useState<BrowserProvider | null>(null);
   const [signer, setSigner] = useState<JsonRpcSigner | null>(null);
-  const [address, setAddress] = useState('');
+  const [address, setAddress] = useState<AddressLike>('');
   const [debtTokenContract, setDebtTokenContract] = useState<DebtToken | null>(null);
 
   const connectWallet = async () => {
@@ -66,7 +66,7 @@ export default function EthersProvider({ children }: { children: React.ReactNode
         setProvider(newProvider);
         setSigner(newSigner);
 
-        const debtTokenContract = new Contract(Contracts.DebtToken, debtTokenAbi, newProvider);
+        const debtTokenContract = new Contract(Contracts.DebtToken.JUSD, debtTokenAbi, newProvider);
         const debtTokenContractWithSigner = debtTokenContract.connect(newSigner) as DebtToken;
         setDebtTokenContract(debtTokenContractWithSigner);
 
@@ -125,7 +125,7 @@ export default function EthersProvider({ children }: { children: React.ReactNode
 export function useEthers(): {
   provider: BrowserProvider | null;
   signer: JsonRpcSigner | null;
-  address: string;
+  address: AddressLike;
   debtTokenContract: DebtToken | null;
   connectWallet: () => void;
 } {
