@@ -7,6 +7,7 @@ import Link from 'next/link';
 import { useSnackbar } from 'notistack';
 import { createContext, useContext, useState } from 'react';
 import { DebtToken } from '../../types/ethers-contracts/DebtToken';
+import { ContractDataFreshnessManager } from './CustomApolloProvider';
 import debtTokenAbi from './abis/DebtToken.json';
 
 // TODO: This is just dummy data and will be exchanged with the real implementation later.
@@ -24,19 +25,29 @@ declare global {
 export const Contracts = {
   DebtToken: {
     JUSD: '0x48f322be8Acb969E1Bd4C49E3e873Ec0a469Ee9D',
+    DebtToken1: '0x48f322be8Acb969E1Bd4C49E3a873Ec0a469Ee9D',
+    DebtToken2: '0x48f322be8Acb969E1Bd4C49E3b873Ec0a469Ee9D',
+    DebtToken3: '0x48f322be8Acb969E1Bd4C49E3c873Ec0a469Ee9D',
+    DebtToken4: '0x48f322be8Acb969E1Bd4C49E3d873Ec0a469Ee9D',
+    DebtToken5: '0x48f322be8Acb969E1Bd4C49E3f873Ec0a469Ee9D',
+    DebtToken6: '0x48f322be8Acb969E1Bd4C49E3g873Ec0a469Ee9D',
   },
-  IERC20: '0x509ee0d083ddf8ac028f2a56731412edd63223b9',
-};
+  ERC20: {
+    Ethereum: '0x509ee0d083ddf8ac028f2a56731412edd63223b8',
+  },
+} as const;
 
 export type SharedContracts = {
   debtToken: DebtToken;
 };
 
+// TODO: Remove Partial
+type AllDebtTokenContracts = Partial<{ [Key in keyof (typeof ContractDataFreshnessManager)['DebtToken']]: DebtToken }>;
 export const EthersContext = createContext<{
   provider: BrowserProvider | null;
   signer: JsonRpcSigner | null;
   address: AddressLike;
-  debtTokenContract: DebtToken | null;
+  debtTokenContract: AllDebtTokenContracts | null;
   connectWallet: () => void;
 }>({
   provider: null,
@@ -52,7 +63,7 @@ export default function EthersProvider({ children }: { children: React.ReactNode
   const [provider, setProvider] = useState<BrowserProvider | null>(null);
   const [signer, setSigner] = useState<JsonRpcSigner | null>(null);
   const [address, setAddress] = useState<AddressLike>('');
-  const [debtTokenContract, setDebtTokenContract] = useState<DebtToken | null>(null);
+  const [debtTokenContract, setDebtTokenContract] = useState<AllDebtTokenContracts | null>(null);
 
   const connectWallet = async () => {
     try {
@@ -68,7 +79,7 @@ export default function EthersProvider({ children }: { children: React.ReactNode
 
         const debtTokenContract = new Contract(Contracts.DebtToken.JUSD, debtTokenAbi, newProvider);
         const debtTokenContractWithSigner = debtTokenContract.connect(newSigner) as DebtToken;
-        setDebtTokenContract(debtTokenContractWithSigner);
+        setDebtTokenContract({ [Contracts.DebtToken.JUSD]: debtTokenContractWithSigner });
 
         try {
           // Request account access
