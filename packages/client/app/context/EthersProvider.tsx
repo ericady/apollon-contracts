@@ -1,11 +1,12 @@
 'use client';
 
 import { Button } from '@mui/material';
-import { BrowserProvider, Contract, Eip1193Provider, JsonRpcSigner, Network } from 'ethers';
+import { Contract, Eip1193Provider, JsonRpcSigner } from 'ethers';
 import { AddressLike } from 'ethers/address';
+import { JsonRpcProvider } from 'ethers/providers';
 import Link from 'next/link';
 import { useSnackbar } from 'notistack';
-import { createContext, useContext, useState } from 'react';
+import { createContext, useContext, useEffect, useState } from 'react';
 import { DebtToken } from '../../types/ethers-contracts/DebtToken';
 import { ContractDataFreshnessManager } from './CustomApolloProvider';
 import debtTokenAbi from './abis/DebtToken.json';
@@ -22,9 +23,10 @@ declare global {
   }
 }
 
+// TODO: These are the demo/production contracts. Replace them with the real ones.
 export const Contracts = {
   DebtToken: {
-    JUSD: '0x48f322be8Acb969E1Bd4C49E3e873Ec0a469Ee9D',
+    JUSD: '0x5121BBb216D4B8E830801136472eED608AF756f4',
     DebtToken1: '0x48f322be8Acb969E1Bd4C49E3a873Ec0a469Ee9D',
     DebtToken2: '0x48f322be8Acb969E1Bd4C49E3b873Ec0a469Ee9D',
     DebtToken3: '0x48f322be8Acb969E1Bd4C49E3c873Ec0a469Ee9D',
@@ -37,49 +39,48 @@ export const Contracts = {
   },
 } as const;
 
-export type SharedContracts = {
-  debtToken: DebtToken;
-};
-
 // TODO: Remove Partial
 type AllDebtTokenContracts = Partial<{ [Key in keyof (typeof ContractDataFreshnessManager)['DebtToken']]: DebtToken }>;
+
 export const EthersContext = createContext<{
-  provider: BrowserProvider | null;
+  // provider: BrowserProvider | null;
+  provider: JsonRpcProvider | null;
   signer: JsonRpcSigner | null;
   address: AddressLike;
-  debtTokenContract: AllDebtTokenContracts | null;
+  debtTokenContract: AllDebtTokenContracts;
   connectWallet: () => void;
 }>({
   provider: null,
   signer: null,
   address: '',
-  debtTokenContract: null,
+  debtTokenContract: undefined as any,
   connectWallet: () => {},
 });
 
-export default function EthersProvider({ children }: { children: React.ReactNode }): JSX.Element {
-  const { enqueueSnackbar } = useSnackbar();
+// Connetion to local ganache.
+const provider = new JsonRpcProvider('http://0.0.0.0:8545', { name: 'ganache', chainId: 1337 });
 
-  const [provider, setProvider] = useState<BrowserProvider | null>(null);
+// TODO: Implement network change: https://docs.ethers.org/v5/concepts/best-practices/
+// const testNetwork = new Network('goerli', 5);
+// const newProvider = new BrowserProvider(window.ethereum, testNetwork);
+
+export default function EthersProvider({ children }: { children: React.ReactNode }) {
+  const { enqueueSnackbar } = useSnackbar();
+  // const [provider, setProvider] = useState<BrowserProvider | null>(null);
   const [signer, setSigner] = useState<JsonRpcSigner | null>(null);
   const [address, setAddress] = useState<AddressLike>('');
-  const [debtTokenContract, setDebtTokenContract] = useState<AllDebtTokenContracts | null>(null);
+  const [debtTokenContracts, setDebtTokenContracts] = useState<AllDebtTokenContracts>();
 
   const connectWallet = async () => {
     try {
       if (typeof window.ethereum !== 'undefined') {
         // Opens Meta Mask
-        // TODO: Implement network change: https://docs.ethers.org/v5/concepts/best-practices/
-        const testNetwork = new Network('goerli', 5);
-
-        const newProvider = new BrowserProvider(window.ethereum, testNetwork);
-        const newSigner = await newProvider.getSigner();
-        setProvider(newProvider);
+        const newSigner = await provider!.getSigner();
         setSigner(newSigner);
 
-        const debtTokenContract = new Contract(Contracts.DebtToken.JUSD, debtTokenAbi, newProvider);
+        const debtTokenContract = new Contract(Contracts.DebtToken.JUSD, debtTokenAbi, provider);
         const debtTokenContractWithSigner = debtTokenContract.connect(newSigner) as DebtToken;
-        setDebtTokenContract({ [Contracts.DebtToken.JUSD]: debtTokenContractWithSigner });
+        setDebtTokenContracts({ [Contracts.DebtToken.JUSD]: debtTokenContractWithSigner });
 
         try {
           // Request account access
@@ -114,30 +115,28 @@ export default function EthersProvider({ children }: { children: React.ReactNode
   };
 
   // TODO: try to implement automatic login if user has been seen and allow resolving of view fields
-  // useEffect(() => {
-  //   if (typeof window.ethereum !== 'undefined') {
-  //     const testNetwork = new Network('goerli', 5);
 
-  //     const newProvider = new BrowserProvider(window.ethereum, testNetwork);
+  // This use effect initializes the contracts to do initial read operations.
+  useEffect(() => {
+    const debtTokenContract = new Contract(Contracts.DebtToken.JUSD, debtTokenAbi, provider) as unknown as DebtToken;
+    setDebtTokenContracts({ [Contracts.DebtToken.JUSD]: debtTokenContract });
+  }, []);
 
-  //     const debtTokenContract = new Contract(Contracts.DebtToken, debtTokenAbi, newProvider) as unknown as DebtToken;
-  //     setDebtTokenContract(debtTokenContract);
-
-  //   }
-  // }, []);
+  if (!debtTokenContracts) return null;
 
   return (
-    <EthersContext.Provider value={{ provider, signer, address, connectWallet, debtTokenContract }}>
+    <EthersContext.Provider value={{ provider, signer, address, connectWallet, debtTokenContract: debtTokenContracts }}>
       {children}
     </EthersContext.Provider>
   );
 }
 
 export function useEthers(): {
-  provider: BrowserProvider | null;
+  provider: JsonRpcProvider | null;
+  // provider: BrowserProvider | null;
   signer: JsonRpcSigner | null;
   address: AddressLike;
-  debtTokenContract: DebtToken | null;
+  debtTokenContract: AllDebtTokenContracts;
   connectWallet: () => void;
 } {
   const context = useContext(EthersContext);

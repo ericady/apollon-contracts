@@ -1,5 +1,5 @@
 import { ApolloClient, ApolloProvider, InMemoryCache, ReactiveVar, makeVar } from '@apollo/client';
-import { AddressLike } from 'ethers';
+import { ethers } from 'ethers';
 import { PropsWithChildren, useEffect } from 'react';
 import { DebtToken } from '../../types/ethers-contracts';
 import { Contracts, useEthers } from './EthersProvider';
@@ -34,11 +34,12 @@ export const ContractDataFreshnessManager: ContractDataFreshnessManager<typeof C
     [Contracts.DebtToken.DebtToken6]: {},
     [Contracts.DebtToken.JUSD]: {
       priceUSD: {
-        fetch: async (debtTokenContract: DebtToken, borrower: AddressLike) => {
-          // const balance = debtTokenContract.balanceOf(borrower);
-          const balance = Math.random() * 1000;
+        fetch: async (debtTokenContract: DebtToken) => {
           ContractDataFreshnessManager.DebtToken[Contracts.DebtToken.JUSD]!.priceUSD.lastFetched = Date.now();
-          ContractDataFreshnessManager.DebtToken[Contracts.DebtToken.JUSD]!.priceUSD.value(balance);
+          const priceUSD = await debtTokenContract.getPrice();
+          console.log('priceUSD: ', priceUSD);
+          // const balance = Math.random() * 1000;
+          ContractDataFreshnessManager.DebtToken[Contracts.DebtToken.JUSD]!.priceUSD.value(ethers.toNumber(priceUSD));
         },
         value: makeVar(0),
         lastFetched: 0,
@@ -76,7 +77,7 @@ export function CustomApolloProvider({ children }: PropsWithChildren<{}>) {
                 ) {
                   // Make smart contract call using the address
                   ContractDataFreshnessManager.DebtToken[Contracts.DebtToken.JUSD].priceUSD.fetch(
-                    debtTokenContract!,
+                    debtTokenContract[Contracts.DebtToken.JUSD],
                     borrower,
                   );
                 }
@@ -130,7 +131,9 @@ export function CustomApolloProvider({ children }: PropsWithChildren<{}>) {
 
   useEffect(() => {
     const intervall = setInterval(() => {
-      ContractDataFreshness[Contracts.DebtToken.JUSD].priceUSD.fetch(debtTokenContract!, borrower);
+      ContractDataFreshnessManager.DebtToken[Contracts.DebtToken.JUSD].priceUSD.fetch(
+        debtTokenContract[Contracts.DebtToken.JUSD],
+      );
     }, 1000 * 10);
 
     return () => {
