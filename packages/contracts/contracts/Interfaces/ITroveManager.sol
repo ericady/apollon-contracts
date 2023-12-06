@@ -135,7 +135,7 @@ interface ITroveManager is IBBase {
 
   function setTroveStatus(address _borrower, uint num) external;
 
-  function getTroveStake(address _borrower) external view returns (uint);
+  function getTroveStakeValue(address _borrower) external view returns (uint);
 
   function increaseTroveColl(address _borrower, TokenAmount[] memory _collTokenAmounts) external;
 

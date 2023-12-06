@@ -1189,16 +1189,22 @@ contract TroveManager is LiquityBase, Ownable(msg.sender), CheckContract, ITrove
     return uint(Troves[_borrower].status);
   }
 
+  /**
+   * @notice Get Borrower's staked token amount, not in USD value
+   * @param _borrower Address of borrower
+   * @param _token Address of collateral token
+   * @return stakes Staked amount of given collateral token of user
+   */
   function getTroveStakes(address _borrower, address _token) external view override returns (uint) {
     return Troves[_borrower].stakes[_token];
   }
 
   /**
    * @notice Return borrowers staked value in USD
-   * @param _borrower Borrower
-   * @return stakedUSDValue
+   * @param _borrower Address of borrower
+   * @return stakedUSDValue USD value of total staked collaterals of borrower
    */
-  function getTroveStake(address _borrower) external view override returns (uint) {
+  function getTroveStakeValue(address _borrower) external view override returns (uint) {
     return _calculateTrovesStake(_borrower);
   }
 

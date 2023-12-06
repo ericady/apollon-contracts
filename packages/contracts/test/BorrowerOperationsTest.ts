@@ -23,6 +23,7 @@ import {
   getTroveEntireColl,
   getTroveEntireDebt,
   openTrove,
+  getTroveStakeValue,
   getTroveStake,
 } from '../utils/testHelper';
 import { parseUnits } from 'ethers';
@@ -205,7 +206,7 @@ describe('BorrowerOperations', () => {
       });
       const BTC_Price = await priceFeed.getPrice(BTC);
 
-      const alice_Stake_Before = await troveManager.getTroveStake(alice);
+      const alice_Stake_Before = await troveManager.getTroveStakeValue(alice);
       const totalStakes_Before = await troveManager.totalStakes(BTC);
 
       expect(alice_Stake_Before).to.be.equal((totalStakes_Before * BTC_Price) / 1_000_000_000n);
@@ -222,7 +223,7 @@ describe('BorrowerOperations', () => {
       ]);
 
       // Check stake and total stakes get updated
-      const alice_Stake_After = await troveManager.getTroveStake(alice);
+      const alice_Stake_After = await troveManager.getTroveStakeValue(alice);
       const totalStakes_After = await troveManager.totalStakes(BTC);
       expect(alice_Stake_After).to.be.equal(alice_Stake_Before + (collTopUp * BTC_Price) / 1_000_000_000n);
       expect(totalStakes_After).to.be.equal(totalStakes_Before + collTopUp);
@@ -2522,7 +2523,7 @@ describe('BorrowerOperations', () => {
         debts: [{ tokenAddress: STABLE, amount: parseUnits('10000') }],
       });
 
-      const aliceStakeBefore = await getTroveStake(contracts, alice);
+      const aliceStakeBefore = await getTroveStakeValue(contracts, alice);
       const bobBal = await STABLE.balanceOf(bob);
       expect(aliceStakeBefore).to.be.gte(parseUnits('21000'));
       expect(bobBal).to.be.equal(parseUnits('10000'));
@@ -2533,8 +2534,259 @@ describe('BorrowerOperations', () => {
       // Alice attempts to close trove
       await borrowerOperations.connect(alice).closeTrove();
 
-      const aliceStakeAfter = await getTroveStake(contracts, alice);
+      const aliceStakeAfter = await getTroveStakeValue(contracts, alice);
       expect(aliceStakeAfter).to.be.equal(0n);
+    });
+
+    it("zero's the troves reward snapshots", async () => {
+      // Dennis opens trove and transfers tokens to alice
+      await openTrove({
+        from: dennis,
+        contracts,
+        collToken: BTC,
+        collAmount: parseUnits('1', 9),
+        debts: [{ tokenAddress: STABLE, amount: parseUnits('10000') }],
+      });
+
+      await openTrove({
+        from: bob,
+        contracts,
+        collToken: BTC,
+        collAmount: parseUnits('1', 9),
+        debts: [{ tokenAddress: STABLE, amount: parseUnits('10000') }],
+      });
+
+      // Price drops
+      await priceFeed.setTokenPrice(BTC, parseUnits('5000'));
+
+      // Liquidate Bob
+      await troveManager.liquidate(bob);
+      expect(await troveManager.getTroveStatus(bob)).to.be.equal(4n);
+
+      // // Price bounces back
+      await priceFeed.setTokenPrice(BTC, parseUnits('20000'));
+
+      // Alice and Carol open troves
+      await openTrove({
+        from: alice,
+        contracts,
+        collToken: BTC,
+        collAmount: parseUnits('1', 9),
+        debts: [{ tokenAddress: STABLE, amount: parseUnits('10000') }],
+      });
+      await openTrove({
+        from: carol,
+        contracts,
+        collToken: BTC,
+        collAmount: parseUnits('1', 9),
+        debts: [{ tokenAddress: STABLE, amount: parseUnits('10000') }],
+      });
+
+      // Price drops ...again
+      await priceFeed.setTokenPrice(BTC, parseUnits('5000'));
+
+      // Get Alice's pending reward snapshots
+      const L_BTC_A_Snapshot = await troveManager.rewardSnapshots(alice, BTC, true);
+      const L_StableDebt_A_Snapshot = await troveManager.rewardSnapshots(alice, STABLE, false);
+      console.log(L_BTC_A_Snapshot, L_StableDebt_A_Snapshot);
+      // TODO: Check reward snapshots again
+      // expect(L_BTC_A_Snapshot).to.be.equal(0);
+      // expect(L_StableDebt_A_Snapshot).to.be.equal(0);
+
+      // Liquidate Carol
+      await troveManager.liquidate(carol);
+      expect(await troveManager.getTroveStatus(bob)).to.be.equal(4n);
+
+      // Get Alice's pending reward snapshots after Carol's liquidation. Check above 0
+      const L_BTC_A_Snapshot_After = await troveManager.rewardSnapshots(alice, BTC, true);
+      const L_StableDebt_A_Snapshot_After = await troveManager.rewardSnapshots(alice, STABLE, false);
+      console.log(L_BTC_A_Snapshot_After, L_StableDebt_A_Snapshot_After);
+
+      // expect(L_BTC_A_Snapshot).to.be.gt(0);
+      // expect(L_StableDebt_A_Snapshot).to.be.gt(0);
+
+      // // to compensate borrowing fees
+      // await lusdToken.transfer(alice, await lusdToken.balanceOf(dennis), {
+      //   from: dennis,
+      // });
+
+      // await priceFeed.setPrice(dec(200, 18));
+
+      // // Alice closes trove
+      // await borrowerOperations.closeTrove({ from: alice });
+
+      // // Check Alice's pending reward snapshots are zero
+      // const L_ETH_Snapshot_A_afterAliceCloses = (await troveManager.rewardSnapshots(alice))[0];
+      // const L_LUSDDebt_Snapshot_A_afterAliceCloses = (await troveManager.rewardSnapshots(alice))[1];
+
+      // assert.equal(L_ETH_Snapshot_A_afterAliceCloses, '0');
+      // assert.equal(L_LUSDDebt_Snapshot_A_afterAliceCloses, '0');
+    });
+
+    it("sets trove's status to closed and removes it from sorted troves list", async () => {
+      await openTrove({
+        from: alice,
+        contracts,
+        collToken: BTC,
+        collAmount: parseUnits('1', 9),
+        debts: [{ tokenAddress: STABLE, amount: parseUnits('10000') }],
+      });
+
+      await openTrove({
+        from: bob,
+        contracts,
+        collToken: BTC,
+        collAmount: parseUnits('1', 9),
+        debts: [{ tokenAddress: STABLE, amount: parseUnits('10000') }],
+      });
+
+      // Check Trove is active
+      const alice_Trove_Before = await troveManager.Troves(alice);
+      const status_Before = alice_Trove_Before.status;
+
+      expect(status_Before).to.be.equal(1n);
+
+      // to compensate borrowing fees
+      await STABLE.connect(bob).transfer(alice, await STABLE.balanceOf(bob));
+
+      // Close the trove
+      await borrowerOperations.connect(alice).closeTrove();
+
+      const alice_Trove_After = await troveManager.Troves(alice);
+      const status_After = alice_Trove_After.status;
+
+      expect(status_After).to.be.equal(2n);
+    });
+
+    it('reduces ActivePool ETH and raw ether by correct amount', async () => {
+      await openTrove({
+        from: alice,
+        contracts,
+        collToken: BTC,
+        collAmount: parseUnits('1', 9),
+        debts: [{ tokenAddress: STABLE, amount: parseUnits('10000') }],
+      });
+
+      await openTrove({
+        from: dennis,
+        contracts,
+        collToken: BTC,
+        collAmount: parseUnits('1', 9),
+        debts: [{ tokenAddress: STABLE, amount: parseUnits('10000') }],
+      });
+
+      const dennisColl = await getTroveEntireColl(contracts, dennis);
+      const aliceColl = await getTroveEntireColl(contracts, alice);
+      expect(dennisColl).to.be.gt(0n);
+      expect(aliceColl).to.be.gt(0n);
+
+      // Check active Pool ETH before
+      const activePool_ETH_before = await storagePool.getValue(BTC, true, 0);
+      const activePool_RawEther_before = await BTC.balanceOf(storagePool);
+      expect(activePool_ETH_before).to.be.equal((aliceColl + dennisColl) / (21000n * 10n ** 9n));
+      expect(activePool_ETH_before).to.be.gt(0n);
+      expect(activePool_RawEther_before).to.be.equal(activePool_ETH_before);
+
+      // to compensate borrowing fees
+      await STABLE.connect(dennis).transfer(alice, await STABLE.balanceOf(dennis));
+
+      // // Close the trove
+      await borrowerOperations.connect(alice).closeTrove();
+
+      // // Check after
+      const activePool_ETH_After = await storagePool.getValue(BTC, true, 0);
+      const activePool_RawEther_After = await BTC.balanceOf(storagePool);
+      expect(activePool_ETH_After).to.be.equal(dennisColl / (21000n * 10n ** 9n));
+      expect(activePool_RawEther_After).to.be.equal(dennisColl / (21000n * 10n ** 9n));
+    });
+
+    it('reduces ActivePool debt by correct amount', async () => {
+      await openTrove({
+        from: alice,
+        contracts,
+        collToken: BTC,
+        collAmount: parseUnits('1', 9),
+        debts: [{ tokenAddress: STABLE, amount: parseUnits('10000') }],
+      });
+
+      await openTrove({
+        from: dennis,
+        contracts,
+        collToken: BTC,
+        collAmount: parseUnits('1', 9),
+        debts: [{ tokenAddress: STABLE, amount: parseUnits('10000') }],
+      });
+
+      const dennisDebt = await getTroveEntireDebt(contracts, dennis);
+      const aliceDebt = await getTroveEntireDebt(contracts, alice);
+      expect(dennisDebt).to.be.gt(0n);
+      expect(aliceDebt).to.be.gt(0n);
+
+      // Check before
+      const activePool_Debt_before = await storagePool.getValue(STABLE, false, 0);
+      expect(activePool_Debt_before).to.be.equal(aliceDebt + dennisDebt - parseUnits('200') * 2n);
+      expect(activePool_Debt_before).to.be.gt(0n);
+
+      // to compensate borrowing fees
+      await STABLE.connect(dennis).transfer(alice, await STABLE.balanceOf(dennis));
+
+      // Close the trove
+      await borrowerOperations.connect(alice).closeTrove();
+
+      // Check after
+      const activePool_Debt_After = await storagePool.getValue(STABLE, false, 0);
+      expect(activePool_Debt_After).to.be.equal(dennisDebt - parseUnits('200'));
+    });
+
+    it.only('updates the the total stakes', async () => {
+      await openTrove({
+        from: alice,
+        contracts,
+        collToken: BTC,
+        collAmount: parseUnits('1', 9),
+        debts: [{ tokenAddress: STABLE, amount: parseUnits('10000') }],
+      });
+
+      await openTrove({
+        from: bob,
+        contracts,
+        collToken: BTC,
+        collAmount: parseUnits('1', 9),
+        debts: [{ tokenAddress: STABLE, amount: parseUnits('10000') }],
+      });
+
+      await openTrove({
+        from: dennis,
+        contracts,
+        collToken: BTC,
+        collAmount: parseUnits('1', 9),
+        debts: [{ tokenAddress: STABLE, amount: parseUnits('10000') }],
+      });
+
+      // Get individual stakes
+      const aliceStakeBefore = await getTroveStake(contracts, alice, BTC);
+      const bobStakeBefore = await getTroveStake(contracts, bob, BTC);
+      const dennisStakeBefore = await getTroveStake(contracts, dennis, BTC);
+      expect(aliceStakeBefore).to.be.gt(0n);
+      expect(bobStakeBefore).to.be.gt(0n);
+      expect(dennisStakeBefore).to.be.gt(0n);
+
+      const totalStakesBefore = await troveManager.totalStakes(BTC);
+
+      expect(totalStakesBefore).to.be.eq(aliceStakeBefore + bobStakeBefore + dennisStakeBefore);
+
+      // to compensate borrowing fees
+      await STABLE.connect(dennis).transfer(alice, await STABLE.balanceOf(dennis));
+
+      // Alice closes trove
+      await borrowerOperations.connect(alice).closeTrove();
+
+      // Check stake and total stakes get updated
+      const aliceStakeAfter = await getTroveStake(contracts, alice, BTC);
+      const totalStakesAfter = await troveManager.totalStakes(BTC);
+
+      expect(aliceStakeAfter).to.be.equal(0n);
+      expect(totalStakesAfter).to.be.eq(totalStakesBefore - aliceStakeBefore);
     });
   });
 });

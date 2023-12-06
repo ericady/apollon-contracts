@@ -868,7 +868,7 @@
                 "type": "address"
             }
         ],
-        "name": "getTroveStake",
+        "name": "getTroveStakeValue",
         "outputs": [
             {
                 "internalType": "uint256",

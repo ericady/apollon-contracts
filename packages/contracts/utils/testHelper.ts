@@ -4,7 +4,7 @@ import { MockDebtToken, MockERC20, StabilityPoolManager, contracts } from '../ty
 import { Contracts } from './deploymentHelpers';
 import { ethers } from 'hardhat';
 import { expect } from 'chai';
-import { ContractTransactionReceipt, ContractTransactionResponse } from 'ethers';
+import { AddressLike, Contract, ContractTransactionReceipt, ContractTransactionResponse } from 'ethers';
 import { parseUnits } from 'ethers';
 
 export const MAX_BORROWING_FEE = parseUnits('0.05');
@@ -162,8 +162,12 @@ export const getTroveEntireDebt = async (contracts: Contracts, trove: SignerWith
   return (await contracts.troveManager.getEntireDebtAndColl(trove)).troveDebtInUSD;
 };
 
-export const getTroveStake = async (contracts: Contracts, trove: SignerWithAddress) => {
-  return await contracts.troveManager.getTroveStake(trove);
+export const getTroveStakeValue = async (contracts: Contracts, trove: SignerWithAddress) => {
+  return await contracts.troveManager.getTroveStakeValue(trove);
+};
+
+export const getTroveStake = async (contracts: Contracts, trove: SignerWithAddress, token: AddressLike) => {
+  return await contracts.troveManager.getTroveStakes(trove, token);
 };
 
 export const checkRecoveryMode = async (contracts: Contracts) => {
