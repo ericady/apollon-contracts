@@ -1880,7 +1880,7 @@ describe('BorrowerOperations', () => {
       expect(alice_LUSDBalance_After).to.be.equal(alice_LUSDBalance_Before - aliceDebt + parseUnits('200'));
     });
 
-    it.only('applies pending rewards', async () => {
+    it('applies pending rewards', async () => {
       await open(whale, parseUnits('100', 9), parseUnits('20000'));
       await open(alice, parseUnits('2', 9), parseUnits('15000'));
       await open(bob, parseUnits('1', 9), parseUnits('5000'));
@@ -1956,6 +1956,22 @@ describe('BorrowerOperations', () => {
       expect(defaultPool_ETH_afterBobCloses).to.be.closeTo(0, 100000n);
       // TODO: original test was close to 100k
       expect(defaultPool_LUSDDebt_afterBobCloses).to.be.closeTo(0, 300000n);
+    });
+
+    it('reverts if borrower has insufficient LUSD balance to repay his entire debt', async () => {
+      await open(alice, parseUnits('2', 9), parseUnits('15000'));
+      await open(bob, parseUnits('1', 9), parseUnits('5000'));
+
+      //Confirm Bob's LUSD balance is less than his trove debt
+      const B_LUSDBal = await STABLE.balanceOf(bob);
+      const B_troveDebt = await getTroveEntireDebt(contracts, bob);
+
+      expect(B_LUSDBal).to.be.lt(B_troveDebt);
+
+      await expect(borrowerOperations.connect(bob).closeTrove()).to.be.revertedWithCustomError(
+        borrowerOperations,
+        'InsufficientDebtToRepay'
+      );
     });
   });
 });
