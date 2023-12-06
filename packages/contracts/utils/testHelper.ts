@@ -201,6 +201,7 @@ export const getEmittedLiquidationValues = async (
     const collGasComp = logData.args[3];
     return [liquidatedDebt, liquidatedColl, stableGasComp, collGasComp];
   }
+  return [];
 };
 
 export const TimeValues = {

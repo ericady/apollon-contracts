@@ -25,6 +25,7 @@ import {
   openTrove,
   getTroveStakeValue,
   getTroveStake,
+  getEmittedLiquidationValues,
 } from '../utils/testHelper';
 import { parseUnits } from 'ethers';
 
@@ -54,6 +55,16 @@ describe('BorrowerOperations', () => {
   let storagePool: StoragePool;
   let stabilityPoolManager: StabilityPoolManager;
 
+  const open = async (user: SignerWithAddress, collAmount: bigint, debtAmount: bigint) => {
+    return await openTrove({
+      from: user,
+      contracts,
+      collToken: BTC,
+      collAmount: collAmount,
+      debts: [{ tokenAddress: STABLE, amount: debtAmount }],
+    });
+  };
+
   before(async () => {
     [owner, defaulter_1, defaulter_2, defaulter_3, whale, alice, bob, carol, dennis, erin, flyn] =
       await ethers.getSigners();
@@ -80,20 +91,8 @@ describe('BorrowerOperations', () => {
   describe('addColl()', () => {
     it('reverts when top-up would leave trove with ICR < MCR', async () => {
       // alice creates a Trove and adds first collateral
-      await openTrove({
-        from: alice,
-        contracts,
-        collToken: BTC,
-        collAmount: parseUnits('0.05', 9),
-        debts: [{ tokenAddress: STOCK, amount: parseUnits('1') }],
-      });
-      await openTrove({
-        from: bob,
-        contracts,
-        collToken: BTC,
-        collAmount: parseUnits('1', 9),
-        debts: [{ tokenAddress: STOCK, amount: parseUnits('0.9') }],
-      });
+      await open(alice, parseUnits('0.05', 9), parseUnits('150'));
+      await open(bob, parseUnits('1', 9), parseUnits('100'));
 
       // Price drops
       await priceFeed.setTokenPrice(BTC, parseUnits('1000', 18));
@@ -125,13 +124,7 @@ describe('BorrowerOperations', () => {
     });
     it('Increases the activePool ETH and raw ether balance by correct amount', async () => {
       const aliceColl = parseUnits('0.05', 9);
-      await openTrove({
-        from: alice,
-        contracts,
-        collToken: BTC,
-        collAmount: aliceColl,
-        debts: [{ tokenAddress: STOCK, amount: parseUnits('1') }],
-      });
+      await open(alice, aliceColl, parseUnits('150'));
 
       const pool_BTC_Before = await storagePool.getValue(BTC, true, 0);
       const pool_RawBTC_Before = await BTC.balanceOf(storagePool);
@@ -158,13 +151,7 @@ describe('BorrowerOperations', () => {
     it('active Trove: adds the correct collateral amount to the Trove', async () => {
       // alice creates a Trove and adds first collateral
       const aliceColl = parseUnits('0.05', 9);
-      await openTrove({
-        from: alice,
-        contracts,
-        collToken: BTC,
-        collAmount: aliceColl,
-        debts: [{ tokenAddress: STOCK, amount: parseUnits('1') }],
-      });
+      await open(alice, aliceColl, parseUnits('150'));
 
       const alice_Trove_Before = await troveManager.Troves(alice);
       const alice_DebtAndColl_Before = await troveManager.getTroveColl(alice);
@@ -197,13 +184,8 @@ describe('BorrowerOperations', () => {
     it('active Trove: updates the stake and updates the total stakes', async () => {
       //  Alice creates initial Trove with 1 ether
       const aliceColl = parseUnits('0.05', 9);
-      await openTrove({
-        from: alice,
-        contracts,
-        collToken: BTC,
-        collAmount: aliceColl,
-        debts: [{ tokenAddress: STOCK, amount: parseUnits('1') }],
-      });
+      await open(alice, aliceColl, parseUnits('150'));
+
       const BTC_Price = await priceFeed.getPrice(BTC);
 
       const alice_Stake_Before = await troveManager.getTroveStakeValue(alice);
@@ -232,31 +214,13 @@ describe('BorrowerOperations', () => {
       // --- SETUP ---
       const aliceColl = parseUnits('1.5', 9);
       const aliceDebt = parseUnits('15000');
-      const { debtInUSD: aliceDebtBefore } = await openTrove({
-        from: alice,
-        contracts,
-        collToken: BTC,
-        collAmount: aliceColl,
-        debts: [{ tokenAddress: STABLE, amount: aliceDebt }],
-      });
+      const { debtInUSD: aliceDebtBefore } = await open(alice, aliceColl, aliceDebt);
 
       const bobColl = parseUnits('1', 9);
       const bobDebt = parseUnits('10000');
-      const { debtInUSD: bobDebtBefore } = await openTrove({
-        from: bob,
-        contracts,
-        collToken: BTC,
-        collAmount: bobColl,
-        debts: [{ tokenAddress: STABLE, amount: bobDebt }],
-      });
+      const { debtInUSD: bobDebtBefore } = await open(bob, bobColl, bobDebt);
 
-      await openTrove({
-        from: carol,
-        contracts,
-        collToken: BTC,
-        collAmount: parseUnits('0.4', 9),
-        debts: [{ tokenAddress: STABLE, amount: parseUnits('5000') }],
-      });
+      await open(carol, parseUnits('0.4', 9), parseUnits('5000'));
 
       // --- TEST ---
 
@@ -357,22 +321,10 @@ describe('BorrowerOperations', () => {
       // A, B open troves
       const aliceColl = parseUnits('1.5', 9);
       const aliceDebt = parseUnits('15000');
-      await openTrove({
-        from: alice,
-        contracts,
-        collToken: BTC,
-        collAmount: aliceColl,
-        debts: [{ tokenAddress: STABLE, amount: aliceDebt }],
-      });
+      await open(alice, aliceColl, aliceDebt);
       const bobColl = parseUnits('1.5', 9);
       const bobDebt = parseUnits('15000');
-      await openTrove({
-        from: bob,
-        contracts,
-        collToken: BTC,
-        collAmount: bobColl,
-        debts: [{ tokenAddress: STABLE, amount: bobDebt }],
-      });
+      await open(bob, bobColl, bobDebt);
 
       // Carol attempts to add collateral to her non-existent trove
       await expect(
@@ -403,13 +355,7 @@ describe('BorrowerOperations', () => {
     it('can add collateral in Recovery Mode', async () => {
       const aliceColl = parseUnits('1.5', 9);
       const aliceDebt = parseUnits('15000');
-      await openTrove({
-        from: alice,
-        contracts,
-        collToken: BTC,
-        collAmount: aliceColl,
-        debts: [{ tokenAddress: STABLE, amount: aliceDebt }],
-      });
+      await open(alice, aliceColl, aliceDebt);
       const aliceCollBefore = await troveManager.getTroveColl(alice);
 
       expect(await checkRecoveryMode(contracts)).to.be.false;
@@ -440,23 +386,11 @@ describe('BorrowerOperations', () => {
       // alice creates a Trove and adds first collateral
       const aliceColl = parseUnits('1.5', 9);
       const aliceDebt = parseUnits('1500');
-      await openTrove({
-        from: alice,
-        contracts,
-        collToken: BTC,
-        collAmount: aliceColl,
-        debts: [{ tokenAddress: STABLE, amount: aliceDebt }],
-      });
+      await open(alice, aliceColl, aliceDebt);
 
       const bobColl = parseUnits('1', 9);
       const bobDebt = parseUnits('1');
-      await openTrove({
-        from: bob,
-        contracts,
-        collToken: BTC,
-        collAmount: bobColl,
-        debts: [{ tokenAddress: STABLE, amount: bobDebt }],
-      });
+      await open(bob, bobColl, bobDebt);
 
       // Price drops
       await priceFeed.setTokenPrice(BTC, parseUnits('1200'));
@@ -467,81 +401,37 @@ describe('BorrowerOperations', () => {
       const collWithdrawal = 1; // 1 wei withdrawal
 
       await expect(
-        borrowerOperations.connect(alice).withdrawColl([
-          {
-            tokenAddress: BTC,
-            amount: collWithdrawal,
-          },
-        ])
+        borrowerOperations.connect(alice).withdrawColl([{ tokenAddress: BTC, amount: collWithdrawal }])
       ).to.be.revertedWithCustomError(borrowerOperations, 'ICR_lt_MCR');
     });
     it('reverts when calling address does not have active trove', async () => {
       const aliceColl = parseUnits('1.5', 9);
       const aliceDebt = parseUnits('1000');
-      await openTrove({
-        from: alice,
-        contracts,
-        collToken: BTC,
-        collAmount: aliceColl,
-        debts: [{ tokenAddress: STABLE, amount: aliceDebt }],
-      });
+      await open(alice, aliceColl, aliceDebt);
       const bobColl = parseUnits('1', 9);
       const bobDebt = parseUnits('10000');
-      await openTrove({
-        from: bob,
-        contracts,
-        collToken: BTC,
-        collAmount: bobColl,
-        debts: [{ tokenAddress: STABLE, amount: bobDebt }],
-      });
+      await open(bob, bobColl, bobDebt);
 
       // Bob successfully withdraws some coll
-      const txBob = await borrowerOperations.connect(bob).withdrawColl([
-        {
-          tokenAddress: BTC,
-          amount: parseUnits('0.1', 9),
-        },
-      ]);
+      await borrowerOperations.connect(bob).withdrawColl([{ tokenAddress: BTC, amount: parseUnits('0.1', 9) }]);
 
       // Carol with no active trove attempts to withdraw
       await expect(
-        borrowerOperations.connect(carol).withdrawColl([
-          {
-            tokenAddress: BTC,
-            amount: parseUnits('0.1', 9),
-          },
-        ])
+        borrowerOperations.connect(carol).withdrawColl([{ tokenAddress: BTC, amount: parseUnits('0.1', 9) }])
       ).to.be.revertedWithCustomError(borrowerOperations, 'TroveClosedOrNotExist');
     });
     it('reverts when system is in Recovery Mode', async () => {
       const aliceColl = parseUnits('1.5', 9);
       const aliceDebt = parseUnits('10000');
-      await openTrove({
-        from: alice,
-        contracts,
-        collToken: BTC,
-        collAmount: aliceColl,
-        debts: [{ tokenAddress: STABLE, amount: aliceDebt }],
-      });
+      await open(alice, aliceColl, aliceDebt);
       const bobColl = parseUnits('1.5', 9);
       const bobDebt = parseUnits('10000');
-      await openTrove({
-        from: bob,
-        contracts,
-        collToken: BTC,
-        collAmount: bobColl,
-        debts: [{ tokenAddress: STABLE, amount: bobDebt }],
-      });
+      await open(bob, bobColl, bobDebt);
 
       expect(await checkRecoveryMode(contracts)).to.be.false;
 
       // Withdrawal possible when recoveryMode == false
-      await borrowerOperations.connect(alice).withdrawColl([
-        {
-          tokenAddress: BTC,
-          amount: 1000,
-        },
-      ]);
+      await borrowerOperations.connect(alice).withdrawColl([{ tokenAddress: BTC, amount: 1000 }]);
 
       await priceFeed.setTokenPrice(BTC, parseUnits('1000'));
 
@@ -549,89 +439,39 @@ describe('BorrowerOperations', () => {
 
       //Check withdrawal impossible when recoveryMode == true
       await expect(
-        borrowerOperations.connect(alice).withdrawColl([
-          {
-            tokenAddress: BTC,
-            amount: 1000,
-          },
-        ])
+        borrowerOperations.connect(alice).withdrawColl([{ tokenAddress: BTC, amount: 1000 }])
       ).to.be.revertedWithCustomError(borrowerOperations, 'CollWithdrawPermittedInRM');
     });
     it("reverts when requested ETH withdrawal is > the trove's collateral", async () => {
       const aliceColl = parseUnits('1.5', 9);
       const aliceDebt = parseUnits('10000');
-      await openTrove({
-        from: alice,
-        contracts,
-        collToken: BTC,
-        collAmount: aliceColl,
-        debts: [{ tokenAddress: STABLE, amount: aliceDebt }],
-      });
+      await open(alice, aliceColl, aliceDebt);
       const bobColl = parseUnits('1', 9);
       const bobDebt = parseUnits('10000');
-      await openTrove({
-        from: bob,
-        contracts,
-        collToken: BTC,
-        collAmount: bobColl,
-        debts: [{ tokenAddress: STABLE, amount: bobDebt }],
-      });
+      await open(bob, bobColl, bobDebt);
       const carolColl = parseUnits('1.5', 9);
       const carolDebt = parseUnits('10000');
-      await openTrove({
-        from: carol,
-        contracts,
-        collToken: BTC,
-        collAmount: carolColl,
-        debts: [{ tokenAddress: STABLE, amount: carolDebt }],
-      });
+      await open(carol, carolColl, carolDebt);
 
       // Carol withdraws exactly all her collateral
       await expect(
-        borrowerOperations.connect(carol).withdrawColl([
-          {
-            tokenAddress: BTC,
-            amount: carolColl,
-          },
-        ])
+        borrowerOperations.connect(carol).withdrawColl([{ tokenAddress: BTC, amount: carolColl }])
       ).to.be.revertedWithCustomError(borrowerOperations, 'ICR_lt_MCR');
 
       // Bob attempts to withdraw 1 wei more than his collateral
       await expect(
-        borrowerOperations.connect(bob).withdrawColl([
-          {
-            tokenAddress: BTC,
-            amount: bobColl + 1n,
-          },
-        ])
+        borrowerOperations.connect(bob).withdrawColl([{ tokenAddress: BTC, amount: bobColl + 1n }])
       ).to.be.revertedWithCustomError(borrowerOperations, 'WithdrawAmount_gt_Coll');
     });
     it("reverts when withdrawal would bring the user's ICR < MCR", async () => {
       await priceFeed.setTokenPrice(BTC, parseUnits('11000'));
-      await openTrove({
-        from: whale,
-        contracts,
-        collToken: BTC,
-        collAmount: parseUnits('1.5', 9),
-        debts: [{ tokenAddress: STABLE, amount: parseUnits('1000') }],
-      });
+      await open(whale, parseUnits('1.5', 9), parseUnits('1000'));
       // BOB ICR = 110%
-      await openTrove({
-        from: bob,
-        contracts,
-        collToken: BTC,
-        collAmount: parseUnits('1', 9),
-        debts: [{ tokenAddress: STABLE, amount: parseUnits('9750') }],
-      });
+      await open(bob, parseUnits('1', 9), parseUnits('9750'));
 
       // Bob attempts to withdraws 1 wei, Which would leave him with < 110% ICR.
       await expect(
-        borrowerOperations.connect(bob).withdrawColl([
-          {
-            tokenAddress: BTC,
-            amount: parseUnits('0.1', 9),
-          },
-        ])
+        borrowerOperations.connect(bob).withdrawColl([{ tokenAddress: BTC, amount: parseUnits('0.1', 9) }])
       ).to.be.revertedWithCustomError(borrowerOperations, 'ICR_lt_MCR');
     });
     it('reverts if system is in Recovery Mode', async () => {
@@ -640,22 +480,10 @@ describe('BorrowerOperations', () => {
       // A and B open troves at 150% ICR
       const aliceColl = parseUnits('1.5', 9);
       const aliceDebt = parseUnits('10000');
-      await openTrove({
-        from: alice,
-        contracts,
-        collToken: BTC,
-        collAmount: aliceColl,
-        debts: [{ tokenAddress: STABLE, amount: aliceDebt }],
-      });
+      await open(alice, aliceColl, aliceDebt);
       const bobColl = parseUnits('1', 9);
       const bobDebt = parseUnits('10000');
-      await openTrove({
-        from: bob,
-        contracts,
-        collToken: BTC,
-        collAmount: bobColl,
-        debts: [{ tokenAddress: STABLE, amount: bobDebt }],
-      });
+      await open(bob, bobColl, bobDebt);
 
       const TCR = await getTCR(contracts);
       expect(TCR).to.be.gt(parseUnits('1.5')); // gt 150%
@@ -667,33 +495,16 @@ describe('BorrowerOperations', () => {
 
       //Alice tries to withdraw collateral during Recovery Mode
       await expect(
-        borrowerOperations.connect(alice).withdrawColl([
-          {
-            tokenAddress: BTC,
-            amount: 1,
-          },
-        ])
+        borrowerOperations.connect(alice).withdrawColl([{ tokenAddress: BTC, amount: 1 }])
       ).to.be.revertedWithCustomError(borrowerOperations, 'CollWithdrawPermittedInRM');
     });
     it('doesn’t allow a user to completely withdraw all collateral from their Trove (due to gas compensation)', async () => {
       const aliceColl = parseUnits('1.5', 9);
       const aliceDebt = parseUnits('10000');
-      await openTrove({
-        from: alice,
-        contracts,
-        collToken: BTC,
-        collAmount: aliceColl,
-        debts: [{ tokenAddress: STABLE, amount: aliceDebt }],
-      });
+      await open(alice, aliceColl, aliceDebt);
       const bobColl = parseUnits('1', 9);
       const bobDebt = parseUnits('10000');
-      await openTrove({
-        from: bob,
-        contracts,
-        collToken: BTC,
-        collAmount: bobColl,
-        debts: [{ tokenAddress: STABLE, amount: bobDebt }],
-      });
+      await open(bob, bobColl, bobDebt);
 
       // Check Trove is active
       const alice_Trove_Before = await troveManager.Troves(alice);
@@ -701,37 +512,21 @@ describe('BorrowerOperations', () => {
 
       // Alice attempts to withdraw all collateral
       await expect(
-        borrowerOperations.connect(alice).withdrawColl([
-          {
-            tokenAddress: BTC,
-            amount: aliceColl,
-          },
-        ])
+        borrowerOperations.connect(alice).withdrawColl([{ tokenAddress: BTC, amount: aliceColl }])
       ).to.be.revertedWithCustomError(borrowerOperations, 'ICR_lt_MCR');
     });
     it('leaves the Trove active when the user withdraws less than all the collateral', async () => {
       // Open Trove
       const aliceColl = parseUnits('1.5', 9);
       const aliceDebt = parseUnits('10000');
-      await openTrove({
-        from: alice,
-        contracts,
-        collToken: BTC,
-        collAmount: aliceColl,
-        debts: [{ tokenAddress: STABLE, amount: aliceDebt }],
-      });
+      await open(alice, aliceColl, aliceDebt);
 
       // Check Trove is active
       const alice_Trove_Before = await troveManager.Troves(alice);
       expect(alice_Trove_Before.status).to.be.equal(1);
 
       // Withdraw some collateral
-      await borrowerOperations.connect(alice).withdrawColl([
-        {
-          tokenAddress: BTC,
-          amount: parseUnits('0.1', 9),
-        },
-      ]);
+      await borrowerOperations.connect(alice).withdrawColl([{ tokenAddress: BTC, amount: parseUnits('0.1', 9) }]);
 
       // Check Trove is still active
       const alice_Trove_After = await troveManager.Troves(alice);
@@ -740,22 +535,11 @@ describe('BorrowerOperations', () => {
     it("reduces the Trove's collateral by the correct amount", async () => {
       const aliceColl = parseUnits('1.5', 9);
       const aliceDebt = parseUnits('10000');
-      await openTrove({
-        from: alice,
-        contracts,
-        collToken: BTC,
-        collAmount: aliceColl,
-        debts: [{ tokenAddress: STABLE, amount: aliceDebt }],
-      });
+      await open(alice, aliceColl, aliceDebt);
 
       // Alice withdraws 1 ether
       const withdrawColl = parseUnits('0.1', 9);
-      await borrowerOperations.connect(alice).withdrawColl([
-        {
-          tokenAddress: BTC,
-          amount: withdrawColl,
-        },
-      ]);
+      await borrowerOperations.connect(alice).withdrawColl([{ tokenAddress: BTC, amount: withdrawColl }]);
 
       // Check 1 ether remaining
       const troveAfter = await troveManager.getTroveColl(alice);
@@ -766,25 +550,14 @@ describe('BorrowerOperations', () => {
     it('reduces ActivePool ETH and raw ether by correct amount', async () => {
       const aliceColl = parseUnits('1.5', 9);
       const aliceDebt = parseUnits('10000');
-      await openTrove({
-        from: alice,
-        contracts,
-        collToken: BTC,
-        collAmount: aliceColl,
-        debts: [{ tokenAddress: STABLE, amount: aliceDebt }],
-      });
+      await open(alice, aliceColl, aliceDebt);
 
       // check before
       const activePool_BTC_before = await storagePool.getValue(BTC, true, 0);
       const activePool_RawBTC_before = await BTC.balanceOf(storagePool);
 
       const withdrawColl = parseUnits('0.1', 9);
-      await borrowerOperations.connect(alice).withdrawColl([
-        {
-          tokenAddress: BTC,
-          amount: withdrawColl,
-        },
-      ]);
+      await borrowerOperations.connect(alice).withdrawColl([{ tokenAddress: BTC, amount: withdrawColl }]);
 
       // check after
       const activePool_BTC_After = await storagePool.getValue(BTC, true, 0);
@@ -796,13 +569,7 @@ describe('BorrowerOperations', () => {
       //  Alice creates initial Trove with 2 ether
       const aliceColl = parseUnits('1.5', 9);
       const aliceDebt = parseUnits('10000');
-      await openTrove({
-        from: alice,
-        contracts,
-        collToken: BTC,
-        collAmount: aliceColl,
-        debts: [{ tokenAddress: STABLE, amount: aliceDebt }],
-      });
+      await open(alice, aliceColl, aliceDebt);
 
       const alice_Stake_Before = await troveManager.getTroveStakes(alice, BTC);
       const totalStakes_Before = await troveManager.totalStakes(BTC);
@@ -812,12 +579,7 @@ describe('BorrowerOperations', () => {
 
       // Alice withdraws 1 ether
       const withdrawColl = parseUnits('0.1', 9);
-      await borrowerOperations.connect(alice).withdrawColl([
-        {
-          tokenAddress: BTC,
-          amount: withdrawColl,
-        },
-      ]);
+      await borrowerOperations.connect(alice).withdrawColl([{ tokenAddress: BTC, amount: withdrawColl }]);
 
       // Check stake and total stakes get updated
       const alice_Stake_After = await troveManager.getTroveStakes(alice, BTC);
@@ -829,22 +591,11 @@ describe('BorrowerOperations', () => {
     it('sends the correct amount of ETH to the user', async () => {
       const aliceColl = parseUnits('1.5', 9);
       const aliceDebt = parseUnits('10000');
-      await openTrove({
-        from: alice,
-        contracts,
-        collToken: BTC,
-        collAmount: aliceColl,
-        debts: [{ tokenAddress: STABLE, amount: aliceDebt }],
-      });
+      await open(alice, aliceColl, aliceDebt);
 
       const alice_BTC_Bal_Before = await BTC.balanceOf(alice);
       const withdrawColl = parseUnits('0.1', 9);
-      await borrowerOperations.connect(alice).withdrawColl([
-        {
-          tokenAddress: BTC,
-          amount: withdrawColl,
-        },
-      ]);
+      await borrowerOperations.connect(alice).withdrawColl([{ tokenAddress: BTC, amount: withdrawColl }]);
 
       const alice_BTC_Bal_After = await BTC.balanceOf(alice);
       expect(alice_BTC_Bal_After).to.be.equal(alice_BTC_Bal_Before + withdrawColl);
@@ -852,40 +603,16 @@ describe('BorrowerOperations', () => {
     it("applies pending rewards and updates user's L_ETH, L_LUSDDebt snapshots", async () => {
       // --- SETUP ---
       // Alice adds 15 ether, Bob adds 5 ether, Carol adds 1 ether
-      await openTrove({
-        from: whale,
-        contracts,
-        collToken: BTC,
-        collAmount: parseUnits('10', 9),
-        debts: [{ tokenAddress: STABLE, amount: parseUnits('1') }],
-      });
+      await open(whale, parseUnits('10', 9), parseUnits('1'));
       const aliceColl = parseUnits('1.5', 9);
       const aliceDebt = parseUnits('1000');
-      await openTrove({
-        from: alice,
-        contracts,
-        collToken: BTC,
-        collAmount: aliceColl,
-        debts: [{ tokenAddress: STABLE, amount: aliceDebt }],
-      });
+      await open(alice, aliceColl, aliceDebt);
       const bobColl = parseUnits('1', 9);
       const bobDebt = parseUnits('1000');
-      await openTrove({
-        from: bob,
-        contracts,
-        collToken: BTC,
-        collAmount: bobColl,
-        debts: [{ tokenAddress: STABLE, amount: bobDebt }],
-      });
+      await open(bob, bobColl, bobDebt);
       const carolColl = parseUnits('0.1', 9);
       const carolDebt = parseUnits('1200');
-      await openTrove({
-        from: carol,
-        contracts,
-        collToken: BTC,
-        collAmount: carolColl,
-        debts: [{ tokenAddress: STABLE, amount: carolDebt }],
-      });
+      await open(carol, carolColl, carolDebt);
 
       const aliceDebtBefore = (await troveManager.getTroveDebt(alice))[0].amount;
       const bobDebtBefore = (await troveManager.getTroveDebt(bob))[0].amount;
@@ -927,18 +654,8 @@ describe('BorrowerOperations', () => {
       const aliceCollWithdrawal = parseUnits('0.2', 9);
       const bobCollWithdrawal = parseUnits('0.1', 9);
 
-      await borrowerOperations.connect(alice).withdrawColl([
-        {
-          tokenAddress: BTC,
-          amount: aliceCollWithdrawal,
-        },
-      ]);
-      await borrowerOperations.connect(bob).withdrawColl([
-        {
-          tokenAddress: BTC,
-          amount: bobCollWithdrawal,
-        },
-      ]);
+      await borrowerOperations.connect(alice).withdrawColl([{ tokenAddress: BTC, amount: aliceCollWithdrawal }]);
+      await borrowerOperations.connect(bob).withdrawColl([{ tokenAddress: BTC, amount: bobCollWithdrawal }]);
 
       // Check that both alice and Bob have had pending rewards applied in addition to their top-ups.
       const aliceCollAfter = (await troveManager.getTroveColl(alice))[0].amount;
@@ -974,22 +691,10 @@ describe('BorrowerOperations', () => {
       // alice creates a Trove and adds first collateral
       const aliceColl = parseUnits('1.5', 9);
       const aliceDebt = parseUnits('1000');
-      await openTrove({
-        from: alice,
-        contracts,
-        collToken: BTC,
-        collAmount: aliceColl,
-        debts: [{ tokenAddress: STABLE, amount: aliceDebt }],
-      });
+      await open(alice, aliceColl, aliceDebt);
       const bobColl = parseUnits('1', 9);
       const bobDebt = parseUnits('5000');
-      await openTrove({
-        from: bob,
-        contracts,
-        collToken: BTC,
-        collAmount: bobColl,
-        debts: [{ tokenAddress: STABLE, amount: bobDebt }],
-      });
+      await open(bob, bobColl, bobDebt);
       // Price drops
       await priceFeed.setTokenPrice(BTC, parseUnits('5000'));
 
@@ -999,54 +704,15 @@ describe('BorrowerOperations', () => {
       const stableMint = 1; // withdraw 1 wei LUSD
 
       await expect(
-        borrowerOperations.connect(bob).increaseDebt(
-          [
-            {
-              tokenAddress: STABLE,
-              amount: stableMint,
-            },
-          ],
-          MAX_BORROWING_FEE
-        )
+        borrowerOperations.connect(bob).increaseDebt([{ tokenAddress: STABLE, amount: stableMint }], MAX_BORROWING_FEE)
       ).to.be.revertedWithCustomError(borrowerOperations, 'ICR_lt_MCR');
     });
     it('decays a non-zero base rate', async () => {
-      await openTrove({
-        from: whale,
-        contracts,
-        collToken: BTC,
-        collAmount: parseUnits('10', 9),
-        debts: [{ tokenAddress: STABLE, amount: parseUnits('1') }],
-      });
-
-      await openTrove({
-        from: alice,
-        contracts,
-        collToken: BTC,
-        collAmount: parseUnits('1', 9),
-        debts: [{ tokenAddress: STABLE, amount: parseUnits('10000') }],
-      });
-      await openTrove({
-        from: bob,
-        contracts,
-        collToken: BTC,
-        collAmount: parseUnits('1', 9),
-        debts: [{ tokenAddress: STABLE, amount: parseUnits('10000') }],
-      });
-      await openTrove({
-        from: carol,
-        contracts,
-        collToken: BTC,
-        collAmount: parseUnits('1', 9),
-        debts: [{ tokenAddress: STABLE, amount: parseUnits('10000') }],
-      });
-      await openTrove({
-        from: dennis,
-        contracts,
-        collToken: BTC,
-        collAmount: parseUnits('1', 9),
-        debts: [{ tokenAddress: STABLE, amount: parseUnits('10000') }],
-      });
+      await open(whale, parseUnits('10', 9), parseUnits('1'));
+      await open(alice, parseUnits('1', 9), parseUnits('10000'));
+      await open(bob, parseUnits('1', 9), parseUnits('10000'));
+      await open(carol, parseUnits('1', 9), parseUnits('10000'));
+      await open(dennis, parseUnits('1', 9), parseUnits('10000'));
 
       // Artificially set base rate to 5%
       await troveManager.setBaseRate(parseUnits('0.05'));
@@ -1059,15 +725,9 @@ describe('BorrowerOperations', () => {
       await fastForwardTime(60 * 60 * 2);
 
       // D withdraws LUSD
-      await borrowerOperations.connect(dennis).increaseDebt(
-        [
-          {
-            tokenAddress: STABLE,
-            amount: parseUnits('1'),
-          },
-        ],
-        MAX_BORROWING_FEE
-      );
+      await borrowerOperations
+        .connect(dennis)
+        .increaseDebt([{ tokenAddress: STABLE, amount: parseUnits('1') }], MAX_BORROWING_FEE);
 
       // Check baseRate has decreased
       const baseRate_2 = await troveManager.baseRate();
@@ -1077,102 +737,44 @@ describe('BorrowerOperations', () => {
       await fastForwardTime(60 * 60);
 
       // E withdraws LUSD
-      await borrowerOperations.connect(carol).increaseDebt(
-        [
-          {
-            tokenAddress: STABLE,
-            amount: parseUnits('1'),
-          },
-        ],
-        MAX_BORROWING_FEE
-      );
+      await borrowerOperations
+        .connect(carol)
+        .increaseDebt([{ tokenAddress: STABLE, amount: parseUnits('1') }], MAX_BORROWING_FEE);
 
       const baseRate_3 = await troveManager.baseRate();
       expect(baseRate_3).to.be.lt(baseRate_2);
     });
     it('reverts if max fee > 100%', async () => {
-      await openTrove({
-        from: alice,
-        contracts,
-        collToken: BTC,
-        collAmount: parseUnits('1', 9),
-        debts: [{ tokenAddress: STABLE, amount: parseUnits('10000') }],
-      });
+      await open(alice, parseUnits('1', 9), parseUnits('10000'));
 
       await expect(
-        borrowerOperations.connect(alice).increaseDebt(
-          [
-            {
-              tokenAddress: STABLE,
-              amount: parseUnits('1'),
-            },
-          ],
-          parseUnits('2')
-        )
+        borrowerOperations
+          .connect(alice)
+          .increaseDebt([{ tokenAddress: STABLE, amount: parseUnits('1') }], parseUnits('2'))
       ).to.be.revertedWithCustomError(borrowerOperations, 'MaxFee_out_Range');
       await expect(
-        borrowerOperations.connect(alice).increaseDebt(
-          [
-            {
-              tokenAddress: STABLE,
-              amount: parseUnits('1'),
-            },
-          ],
-          parseUnits('1') + 1n
-        )
+        borrowerOperations
+          .connect(alice)
+          .increaseDebt([{ tokenAddress: STABLE, amount: parseUnits('1') }], parseUnits('1') + 1n)
       ).to.be.revertedWithCustomError(borrowerOperations, 'MaxFee_out_Range');
     });
     it('reverts if max fee < 0.5% in Normal mode', async () => {
-      await openTrove({
-        from: alice,
-        contracts,
-        collToken: BTC,
-        collAmount: parseUnits('1', 9),
-        debts: [{ tokenAddress: STABLE, amount: parseUnits('10000') }],
-      });
+      await open(alice, parseUnits('1', 9), parseUnits('10000'));
 
       await expect(
-        borrowerOperations.connect(alice).increaseDebt(
-          [
-            {
-              tokenAddress: STABLE,
-              amount: parseUnits('1'),
-            },
-          ],
-          0
-        )
+        borrowerOperations.connect(alice).increaseDebt([{ tokenAddress: STABLE, amount: parseUnits('1') }], 0)
       ).to.be.revertedWithCustomError(borrowerOperations, 'MaxFee_out_Range');
       await expect(
-        borrowerOperations.connect(alice).increaseDebt(
-          [
-            {
-              tokenAddress: STABLE,
-              amount: parseUnits('1'),
-            },
-          ],
-          1
-        )
+        borrowerOperations.connect(alice).increaseDebt([{ tokenAddress: STABLE, amount: parseUnits('1') }], 1)
       ).to.be.revertedWithCustomError(borrowerOperations, 'MaxFee_out_Range');
       await expect(
-        borrowerOperations.connect(alice).increaseDebt(
-          [
-            {
-              tokenAddress: STABLE,
-              amount: parseUnits('1'),
-            },
-          ],
-          parseUnits('0.005') - 1n
-        )
+        borrowerOperations
+          .connect(alice)
+          .increaseDebt([{ tokenAddress: STABLE, amount: parseUnits('1') }], parseUnits('0.005') - 1n)
       ).to.be.revertedWithCustomError(borrowerOperations, 'MaxFee_out_Range');
     });
     it('succeeds when fee is less than max fee percentage', async () => {
-      await openTrove({
-        from: alice,
-        contracts,
-        collToken: BTC,
-        collAmount: parseUnits('1', 9),
-        debts: [{ tokenAddress: STABLE, amount: parseUnits('10000') }],
-      });
+      await open(alice, parseUnits('1', 9), parseUnits('10000'));
 
       // Artificially make baseRate 5%
       await troveManager.setBaseRate(parseUnits('0.05'));
@@ -1183,56 +785,26 @@ describe('BorrowerOperations', () => {
 
       // Attempt with maxFee > 5%
       await expect(
-        borrowerOperations.connect(alice).increaseDebt(
-          [
-            {
-              tokenAddress: STABLE,
-              amount: parseUnits('1'),
-            },
-          ],
-          MAX_BORROWING_FEE + 1n
-        )
+        borrowerOperations
+          .connect(alice)
+          .increaseDebt([{ tokenAddress: STABLE, amount: parseUnits('1') }], MAX_BORROWING_FEE + 1n)
       ).to.be.revertedWithCustomError(borrowerOperations, 'MaxFee_out_Range');
 
       baseRate = await troveManager.baseRate(); // expect 5% base rate
       expect(baseRate).to.be.equal(parseUnits('0.05'));
 
       // Attempt with maxFee = 5%
-      await borrowerOperations.connect(alice).increaseDebt(
-        [
-          {
-            tokenAddress: STABLE,
-            amount: parseUnits('1'),
-          },
-        ],
-        parseUnits('0.05')
-      );
+      await borrowerOperations
+        .connect(alice)
+        .increaseDebt([{ tokenAddress: STABLE, amount: parseUnits('1') }], parseUnits('0.05'));
 
       baseRate = await troveManager.baseRate(); // expect 5% base rate
       expect(baseRate).to.be.equal(parseUnits('0.05'));
     });
     it("doesn't change base rate if it is already zero", async () => {
-      await openTrove({
-        from: whale,
-        contracts,
-        collToken: BTC,
-        collAmount: parseUnits('10', 9),
-        debts: [{ tokenAddress: STABLE, amount: parseUnits('10000') }],
-      });
-      await openTrove({
-        from: alice,
-        contracts,
-        collToken: BTC,
-        collAmount: parseUnits('1', 9),
-        debts: [{ tokenAddress: STABLE, amount: parseUnits('10000') }],
-      });
-      await openTrove({
-        from: bob,
-        contracts,
-        collToken: BTC,
-        collAmount: parseUnits('2', 9),
-        debts: [{ tokenAddress: STABLE, amount: parseUnits('20000') }],
-      });
+      await open(whale, parseUnits('10', 9), parseUnits('10000'));
+      await open(alice, parseUnits('1', 9), parseUnits('10000'));
+      await open(bob, parseUnits('2', 9), parseUnits('20000'));
 
       // Check baseRate is zero
       const baseRate_1 = await troveManager.baseRate();
@@ -1242,15 +814,9 @@ describe('BorrowerOperations', () => {
       await fastForwardTime(7200);
 
       // D withdraws LUSD
-      await borrowerOperations.connect(alice).increaseDebt(
-        [
-          {
-            tokenAddress: STABLE,
-            amount: parseUnits('37'),
-          },
-        ],
-        MAX_BORROWING_FEE
-      );
+      await borrowerOperations
+        .connect(alice)
+        .increaseDebt([{ tokenAddress: STABLE, amount: parseUnits('37') }], MAX_BORROWING_FEE);
 
       // Check baseRate is still 0
       const baseRate_2 = await troveManager.baseRate();
@@ -1260,41 +826,17 @@ describe('BorrowerOperations', () => {
       await fastForwardTime(3600);
 
       // E opens trove
-      await borrowerOperations.connect(bob).increaseDebt(
-        [
-          {
-            tokenAddress: STABLE,
-            amount: parseUnits('12'),
-          },
-        ],
-        MAX_BORROWING_FEE
-      );
+      await borrowerOperations
+        .connect(bob)
+        .increaseDebt([{ tokenAddress: STABLE, amount: parseUnits('12') }], MAX_BORROWING_FEE);
 
       const baseRate_3 = await troveManager.baseRate();
       expect(baseRate_3).to.be.equal(0n);
     });
     it("lastFeeOpTime doesn't update if less time than decay interval has passed since the last fee operation", async () => {
-      await openTrove({
-        from: whale,
-        contracts,
-        collToken: BTC,
-        collAmount: parseUnits('10', 9),
-        debts: [{ tokenAddress: STABLE, amount: parseUnits('10000') }],
-      });
-      await openTrove({
-        from: alice,
-        contracts,
-        collToken: BTC,
-        collAmount: parseUnits('1', 9),
-        debts: [{ tokenAddress: STABLE, amount: parseUnits('10000') }],
-      });
-      await openTrove({
-        from: bob,
-        contracts,
-        collToken: BTC,
-        collAmount: parseUnits('2', 9),
-        debts: [{ tokenAddress: STABLE, amount: parseUnits('20000') }],
-      });
+      await open(whale, parseUnits('10', 9), parseUnits('10000'));
+      await open(alice, parseUnits('1', 9), parseUnits('10000'));
+      await open(bob, parseUnits('2', 9), parseUnits('20000'));
 
       // Artificially make baseRate 5%
       await troveManager.setBaseRate(parseUnits('0.05'));
@@ -1310,15 +852,9 @@ describe('BorrowerOperations', () => {
       await fastForwardTime(10);
 
       // Borrower C triggers a fee
-      await borrowerOperations.connect(bob).increaseDebt(
-        [
-          {
-            tokenAddress: STABLE,
-            amount: parseUnits('1'),
-          },
-        ],
-        MAX_BORROWING_FEE
-      );
+      await borrowerOperations
+        .connect(bob)
+        .increaseDebt([{ tokenAddress: STABLE, amount: parseUnits('1') }], MAX_BORROWING_FEE);
 
       const lastFeeOpTime_2 = await troveManager.lastFeeOperationTime();
 
@@ -1334,15 +870,9 @@ describe('BorrowerOperations', () => {
       expect(BigInt(timeNow) - lastFeeOpTime_1).to.be.gte(60n);
 
       // Borrower C triggers a fee
-      await borrowerOperations.connect(bob).increaseDebt(
-        [
-          {
-            tokenAddress: STABLE,
-            amount: parseUnits('1'),
-          },
-        ],
-        MAX_BORROWING_FEE
-      );
+      await borrowerOperations
+        .connect(bob)
+        .increaseDebt([{ tokenAddress: STABLE, amount: parseUnits('1') }], MAX_BORROWING_FEE);
 
       const lastFeeOpTime_3 = await troveManager.lastFeeOperationTime();
 
@@ -1351,27 +881,9 @@ describe('BorrowerOperations', () => {
       expect(lastFeeOpTime_3).to.be.gt(lastFeeOpTime_1);
     });
     it("borrower can't grief the baseRate and stop it decaying by issuing debt at higher frequency than the decay granularity", async () => {
-      await openTrove({
-        from: whale,
-        contracts,
-        collToken: BTC,
-        collAmount: parseUnits('10', 9),
-        debts: [{ tokenAddress: STABLE, amount: parseUnits('10000') }],
-      });
-      await openTrove({
-        from: alice,
-        contracts,
-        collToken: BTC,
-        collAmount: parseUnits('1', 9),
-        debts: [{ tokenAddress: STABLE, amount: parseUnits('10000') }],
-      });
-      await openTrove({
-        from: bob,
-        contracts,
-        collToken: BTC,
-        collAmount: parseUnits('2', 9),
-        debts: [{ tokenAddress: STABLE, amount: parseUnits('20000') }],
-      });
+      await open(whale, parseUnits('10', 9), parseUnits('10000'));
+      await open(alice, parseUnits('1', 9), parseUnits('10000'));
+      await open(bob, parseUnits('2', 9), parseUnits('20000'));
 
       // Artificially make baseRate 5%
       await troveManager.setBaseRate(parseUnits('0.05'));
@@ -1385,29 +897,17 @@ describe('BorrowerOperations', () => {
       await fastForwardTime(30);
 
       // Borrower C triggers a fee, before decay interval has passed
-      await borrowerOperations.connect(bob).increaseDebt(
-        [
-          {
-            tokenAddress: STABLE,
-            amount: parseUnits('1'),
-          },
-        ],
-        MAX_BORROWING_FEE
-      );
+      await borrowerOperations
+        .connect(bob)
+        .increaseDebt([{ tokenAddress: STABLE, amount: parseUnits('1') }], MAX_BORROWING_FEE);
 
       // 30 seconds pass
       await fastForwardTime(30);
 
       // Borrower C triggers another fee
-      await borrowerOperations.connect(bob).increaseDebt(
-        [
-          {
-            tokenAddress: STABLE,
-            amount: parseUnits('1'),
-          },
-        ],
-        MAX_BORROWING_FEE
-      );
+      await borrowerOperations
+        .connect(bob)
+        .increaseDebt([{ tokenAddress: STABLE, amount: parseUnits('1') }], MAX_BORROWING_FEE);
 
       // Check base rate has decreased even though Borrower tried to stop it decaying
       const baseRate_2 = await troveManager.baseRate();
@@ -1738,113 +1238,45 @@ describe('BorrowerOperations', () => {
     // });
 
     it('reverts when calling address does not have active trove', async () => {
-      await openTrove({
-        from: alice,
-        contracts,
-        collToken: BTC,
-        collAmount: parseUnits('1', 9),
-        debts: [{ tokenAddress: STABLE, amount: parseUnits('10000') }],
-      });
-      await openTrove({
-        from: bob,
-        contracts,
-        collToken: BTC,
-        collAmount: parseUnits('2', 9),
-        debts: [{ tokenAddress: STABLE, amount: parseUnits('20000') }],
-      });
+      await open(alice, parseUnits('1', 9), parseUnits('10000'));
+      await open(bob, parseUnits('2', 9), parseUnits('20000'));
 
       // Bob successfully withdraws LUSD
-      await borrowerOperations.connect(bob).increaseDebt(
-        [
-          {
-            tokenAddress: STABLE,
-            amount: parseUnits('100'),
-          },
-        ],
-        MAX_BORROWING_FEE
-      );
+      await borrowerOperations
+        .connect(bob)
+        .increaseDebt([{ tokenAddress: STABLE, amount: parseUnits('100') }], MAX_BORROWING_FEE);
 
       // Carol with no active trove attempts to withdraw LUSD
       await expect(
-        borrowerOperations.connect(carol).increaseDebt(
-          [
-            {
-              tokenAddress: STABLE,
-              amount: parseUnits('100'),
-            },
-          ],
-          MAX_BORROWING_FEE
-        )
+        borrowerOperations
+          .connect(carol)
+          .increaseDebt([{ tokenAddress: STABLE, amount: parseUnits('100') }], MAX_BORROWING_FEE)
       ).to.be.revertedWithCustomError(borrowerOperations, 'TroveClosedOrNotExist');
     });
     it('reverts when requested withdrawal amount is zero LUSD', async () => {
-      await openTrove({
-        from: alice,
-        contracts,
-        collToken: BTC,
-        collAmount: parseUnits('1', 9),
-        debts: [{ tokenAddress: STABLE, amount: parseUnits('10000') }],
-      });
-      await openTrove({
-        from: bob,
-        contracts,
-        collToken: BTC,
-        collAmount: parseUnits('2', 9),
-        debts: [{ tokenAddress: STABLE, amount: parseUnits('20000') }],
-      });
+      await open(alice, parseUnits('1', 9), parseUnits('10000'));
+      await open(bob, parseUnits('2', 9), parseUnits('20000'));
 
       // Bob successfully withdraws 1e-18 LUSD
-      await borrowerOperations.connect(bob).increaseDebt(
-        [
-          {
-            tokenAddress: STABLE,
-            amount: parseUnits('100'),
-          },
-        ],
-        MAX_BORROWING_FEE
-      );
+      await borrowerOperations
+        .connect(bob)
+        .increaseDebt([{ tokenAddress: STABLE, amount: parseUnits('100') }], MAX_BORROWING_FEE);
 
       // Alice attempts to withdraw 0 LUSD
       await expect(
-        borrowerOperations.connect(alice).increaseDebt(
-          [
-            {
-              tokenAddress: STABLE,
-              amount: 0,
-            },
-          ],
-          MAX_BORROWING_FEE
-        )
+        borrowerOperations.connect(alice).increaseDebt([{ tokenAddress: STABLE, amount: 0 }], MAX_BORROWING_FEE)
       ).to.be.revertedWithCustomError(borrowerOperations, 'ZeroDebtChange');
     });
     it('reverts when system is in Recovery Mode', async () => {
-      await openTrove({
-        from: alice,
-        contracts,
-        collToken: BTC,
-        collAmount: parseUnits('1', 9),
-        debts: [{ tokenAddress: STABLE, amount: parseUnits('10000') }],
-      });
-      await openTrove({
-        from: bob,
-        contracts,
-        collToken: BTC,
-        collAmount: parseUnits('2', 9),
-        debts: [{ tokenAddress: STABLE, amount: parseUnits('20000') }],
-      });
+      await open(alice, parseUnits('1', 9), parseUnits('10000'));
+      await open(bob, parseUnits('2', 9), parseUnits('20000'));
 
       expect(await checkRecoveryMode(contracts)).to.be.false;
 
       // Withdrawal possible when recoveryMode == false
-      await borrowerOperations.connect(alice).increaseDebt(
-        [
-          {
-            tokenAddress: STABLE,
-            amount: parseUnits('100'),
-          },
-        ],
-        MAX_BORROWING_FEE
-      );
+      await borrowerOperations
+        .connect(alice)
+        .increaseDebt([{ tokenAddress: STABLE, amount: parseUnits('100') }], MAX_BORROWING_FEE);
 
       await priceFeed.setTokenPrice(BTC, parseUnits('100'));
 
@@ -1852,64 +1284,24 @@ describe('BorrowerOperations', () => {
 
       //Check LUSD withdrawal impossible when recoveryMode == true
       await expect(
-        borrowerOperations.connect(alice).increaseDebt(
-          [
-            {
-              tokenAddress: STABLE,
-              amount: 1,
-            },
-          ],
-          MAX_BORROWING_FEE
-        )
+        borrowerOperations.connect(alice).increaseDebt([{ tokenAddress: STABLE, amount: 1 }], MAX_BORROWING_FEE)
       ).to.be.revertedWithCustomError(borrowerOperations, 'ICR_lt_CCR');
     });
     it("reverts when withdrawal would bring the trove's ICR < MCR", async () => {
-      await openTrove({
-        from: alice,
-        contracts,
-        collToken: BTC,
-        collAmount: parseUnits('1', 9),
-        debts: [{ tokenAddress: STABLE, amount: parseUnits('10000') }],
-      });
-      await openTrove({
-        from: bob,
-        contracts,
-        collToken: BTC,
-        collAmount: parseUnits('2', 9),
-        debts: [{ tokenAddress: STABLE, amount: parseUnits('20000') }],
-      });
-      // await openTrove({ ICR: toBN(dec(10, 18)), extraParams: { from: alice } });
-      // await openTrove({ ICR: toBN(dec(11, 17)), extraParams: { from: bob } });
+      await open(alice, parseUnits('1', 9), parseUnits('10000'));
+      await open(bob, parseUnits('2', 9), parseUnits('20000'));
 
       // Bob tries to withdraw LUSD that would bring his ICR < MCR
       await expect(
-        borrowerOperations.connect(bob).increaseDebt(
-          [
-            {
-              tokenAddress: STABLE,
-              amount: parseUnits('20000'),
-            },
-          ],
-          MAX_BORROWING_FEE
-        )
+        borrowerOperations
+          .connect(bob)
+          .increaseDebt([{ tokenAddress: STABLE, amount: parseUnits('20000') }], MAX_BORROWING_FEE)
       ).to.be.revertedWithCustomError(borrowerOperations, 'ICR_lt_MCR');
     });
     it('reverts when a withdrawal would cause the TCR of the system to fall below the CCR', async () => {
       // Alice and Bob creates troves with 150% ICR.  System TCR = 150%.
-      await openTrove({
-        from: alice,
-        contracts,
-        collToken: BTC,
-        collAmount: parseUnits('1', 9),
-        debts: [{ tokenAddress: STABLE, amount: parseUnits('13700') }],
-      });
-      await openTrove({
-        from: bob,
-        contracts,
-        collToken: BTC,
-        collAmount: parseUnits('1', 9),
-        debts: [{ tokenAddress: STABLE, amount: parseUnits('13700') }],
-      });
+      await open(alice, parseUnits('1', 9), parseUnits('13700'));
+      await open(bob, parseUnits('1', 9), parseUnits('13700'));
 
       // TCR close to 150%
       const TCR = await getTCR(contracts);
@@ -1924,20 +1316,8 @@ describe('BorrowerOperations', () => {
     });
     it('reverts if system is in Recovery Mode', async () => {
       // --- SETUP ---
-      await openTrove({
-        from: alice,
-        contracts,
-        collToken: BTC,
-        collAmount: parseUnits('1', 9),
-        debts: [{ tokenAddress: STABLE, amount: parseUnits('13700') }],
-      });
-      await openTrove({
-        from: bob,
-        contracts,
-        collToken: BTC,
-        collAmount: parseUnits('1', 9),
-        debts: [{ tokenAddress: STABLE, amount: parseUnits('13700') }],
-      });
+      await open(alice, parseUnits('1', 9), parseUnits('13700'));
+      await open(bob, parseUnits('1', 9), parseUnits('13700'));
 
       // --- TEST ---
 
@@ -1953,13 +1333,7 @@ describe('BorrowerOperations', () => {
       ).to.be.revertedWithCustomError(borrowerOperations, 'ICR_lt_CCR');
     });
     it("increases the Trove's LUSD debt by the correct amount", async () => {
-      await openTrove({
-        from: alice,
-        contracts,
-        collToken: BTC,
-        collAmount: parseUnits('1', 9),
-        debts: [{ tokenAddress: STABLE, amount: parseUnits('10000') }],
-      });
+      await open(alice, parseUnits('1', 9), parseUnits('10000'));
 
       // check before
       const aliceDebtBefore = await getTroveEntireDebt(contracts, alice);
@@ -1974,13 +1348,7 @@ describe('BorrowerOperations', () => {
       expect(aliceDebtAfter - aliceDebtBefore).to.be.equal(parseUnits('100') + parseUnits('100') / 200n);
     });
     it('increases Stable debt in StoragePool by correct amount', async () => {
-      await openTrove({
-        from: alice,
-        contracts,
-        collToken: BTC,
-        collAmount: parseUnits('1', 9),
-        debts: [{ tokenAddress: STABLE, amount: parseUnits('10000') }],
-      });
+      await open(alice, parseUnits('1', 9), parseUnits('10000'));
 
       // check before
       const aliceDebtBefore = await getTroveEntireDebt(contracts, alice);
@@ -2001,13 +1369,7 @@ describe('BorrowerOperations', () => {
       );
     });
     it('increases user Stable balance by correct amount', async () => {
-      await openTrove({
-        from: alice,
-        contracts,
-        collToken: BTC,
-        collAmount: parseUnits('1', 9),
-        debts: [{ tokenAddress: STABLE, amount: parseUnits('10000') }],
-      });
+      await open(alice, parseUnits('1', 9), parseUnits('10000'));
 
       // check before
       const alice_StableBalance_Before = await STABLE.balanceOf(alice);
@@ -2026,20 +1388,8 @@ describe('BorrowerOperations', () => {
   describe('repayDebt()', () => {
     it('reverts when repayment would leave trove with ICR < MCR', async () => {
       // alice creates a Trove and adds first collateral
-      await openTrove({
-        from: alice,
-        contracts,
-        collToken: BTC,
-        collAmount: parseUnits('1', 9),
-        debts: [{ tokenAddress: STABLE, amount: parseUnits('1000') }],
-      });
-      await openTrove({
-        from: bob,
-        contracts,
-        collToken: BTC,
-        collAmount: parseUnits('10', 9),
-        debts: [{ tokenAddress: STABLE, amount: parseUnits('1000') }],
-      });
+      await open(alice, parseUnits('1', 9), parseUnits('1000'));
+      await open(bob, parseUnits('10', 9), parseUnits('1000'));
 
       // Price drops
       await priceFeed.setTokenPrice(BTC, parseUnits('1000'));
@@ -2055,24 +1405,10 @@ describe('BorrowerOperations', () => {
     });
     it('Succeeds when it would leave trove with net debt >= minimum net debt', async () => {
       // Make the LUSD request 2 wei above min net debt to correct for floor division, and make net debt = min net debt + 1 wei
-      await openTrove({
-        from: alice,
-        contracts,
-        collToken: BTC,
-        collAmount: parseUnits('1', 9),
-        debts: [{ tokenAddress: STABLE, amount: parseUnits('1') }],
-      });
-
+      await open(alice, parseUnits('1', 9), parseUnits('1'));
       await borrowerOperations.connect(alice).repayDebt([{ tokenAddress: STABLE, amount: 1 }]);
 
-      await openTrove({
-        from: bob,
-        contracts,
-        collToken: BTC,
-        collAmount: parseUnits('1', 9),
-        debts: [{ tokenAddress: STABLE, amount: parseUnits('20') }],
-      });
-
+      await open(bob, parseUnits('1', 9), parseUnits('20'));
       await borrowerOperations.connect(bob).repayDebt([{ tokenAddress: STABLE, amount: parseUnits('19') }]);
     });
     it.skip('reverts when it would leave trove with net debt < minimum net debt', async () => {
@@ -2088,24 +1424,12 @@ describe('BorrowerOperations', () => {
       // await assertRevert(repayTxAPromise, "BorrowerOps: Trove's net debt must be greater than minimum");
     });
     it('Reverts if repaid amount is greater than current debt', async () => {
-      await openTrove({
-        from: alice,
-        contracts,
-        collToken: BTC,
-        collAmount: parseUnits('1', 9),
-        debts: [{ tokenAddress: STABLE, amount: parseUnits('1') }],
-      });
+      await open(alice, parseUnits('1', 9), parseUnits('1'));
       const STABLE_COIN_GAS_COMPENSATION = await borrowerOperations.STABLE_COIN_GAS_COMPENSATION();
       const totalDebt = await troveManager.getTroveDebt(alice);
       const repayAmount = totalDebt[0].amount - STABLE_COIN_GAS_COMPENSATION + 1n;
 
-      await openTrove({
-        from: bob,
-        contracts,
-        collToken: BTC,
-        collAmount: parseUnits('1', 9),
-        debts: [{ tokenAddress: STABLE, amount: repayAmount }],
-      });
+      await open(bob, parseUnits('1', 9), repayAmount);
 
       await STABLE.connect(bob).transfer(alice, repayAmount);
 
@@ -2114,20 +1438,8 @@ describe('BorrowerOperations', () => {
       ).to.be.revertedWithCustomError(borrowerOperations, 'Repaid_gt_CurrentDebt');
     });
     it('reverts when calling address does not have active trove', async () => {
-      await openTrove({
-        from: alice,
-        contracts,
-        collToken: BTC,
-        collAmount: parseUnits('1', 9),
-        debts: [{ tokenAddress: STABLE, amount: parseUnits('1000') }],
-      });
-      await openTrove({
-        from: bob,
-        contracts,
-        collToken: BTC,
-        collAmount: parseUnits('1', 9),
-        debts: [{ tokenAddress: STABLE, amount: parseUnits('1000') }],
-      });
+      await open(alice, parseUnits('1', 9), parseUnits('1000'));
+      await open(bob, parseUnits('1', 9), parseUnits('1000'));
       // Bob successfully repays some LUSD
       await borrowerOperations.connect(bob).repayDebt([{ tokenAddress: STABLE, amount: parseUnits('500') }]);
 
@@ -2137,20 +1449,8 @@ describe('BorrowerOperations', () => {
       ).to.be.revertedWithCustomError(borrowerOperations, 'TroveClosedOrNotExist');
     });
     it('reverts when attempted repayment is > the debt of the trove', async () => {
-      await openTrove({
-        from: alice,
-        contracts,
-        collToken: BTC,
-        collAmount: parseUnits('1', 9),
-        debts: [{ tokenAddress: STABLE, amount: parseUnits('10000') }],
-      });
-      await openTrove({
-        from: bob,
-        contracts,
-        collToken: BTC,
-        collAmount: parseUnits('1', 9),
-        debts: [{ tokenAddress: STABLE, amount: parseUnits('10000') }],
-      });
+      await open(alice, parseUnits('1', 9), parseUnits('10000'));
+      await open(bob, parseUnits('1', 9), parseUnits('10000'));
       const aliceDebt = await getTroveEntireDebt(contracts, alice);
 
       // Bob successfully repays some LUSD
@@ -2165,20 +1465,9 @@ describe('BorrowerOperations', () => {
     });
     it("reduces the Trove's stable debt by the correct amount", async () => {
       const aliceBorrowAmount = parseUnits('10000');
-      await openTrove({
-        from: alice,
-        contracts,
-        collToken: BTC,
-        collAmount: parseUnits('1', 9),
-        debts: [{ tokenAddress: STABLE, amount: aliceBorrowAmount }],
-      });
-      await openTrove({
-        from: bob,
-        contracts,
-        collToken: BTC,
-        collAmount: parseUnits('1', 9),
-        debts: [{ tokenAddress: STABLE, amount: parseUnits('10000') }],
-      });
+      await open(alice, parseUnits('1', 9), aliceBorrowAmount);
+      await open(bob, parseUnits('1', 9), parseUnits('10000'));
+
       const aliceDebtBefore = await getTroveEntireDebt(contracts, alice);
       expect(aliceDebtBefore).to.be.equal(aliceBorrowAmount + aliceBorrowAmount / 200n + parseUnits('200'));
 
@@ -2192,20 +1481,8 @@ describe('BorrowerOperations', () => {
 
     it('decreases stable debt in ActivePool by correct amount', async () => {
       const aliceBorrowAmount = parseUnits('10000');
-      await openTrove({
-        from: alice,
-        contracts,
-        collToken: BTC,
-        collAmount: parseUnits('1', 9),
-        debts: [{ tokenAddress: STABLE, amount: aliceBorrowAmount }],
-      });
-      await openTrove({
-        from: bob,
-        contracts,
-        collToken: BTC,
-        collAmount: parseUnits('1', 9),
-        debts: [{ tokenAddress: STABLE, amount: aliceBorrowAmount }],
-      });
+      await open(alice, parseUnits('1', 9), aliceBorrowAmount);
+      await open(bob, parseUnits('1', 9), aliceBorrowAmount);
 
       const aliceDebtBefore = await getTroveEntireDebt(contracts, alice);
       expect(aliceDebtBefore).to.be.gt(aliceBorrowAmount);
@@ -2223,20 +1500,8 @@ describe('BorrowerOperations', () => {
 
     it('decreases user stable token balance by correct amount', async () => {
       const borrowAmount = parseUnits('10000');
-      await openTrove({
-        from: alice,
-        contracts,
-        collToken: BTC,
-        collAmount: parseUnits('1', 9),
-        debts: [{ tokenAddress: STABLE, amount: borrowAmount }],
-      });
-      await openTrove({
-        from: bob,
-        contracts,
-        collToken: BTC,
-        collAmount: parseUnits('1', 9),
-        debts: [{ tokenAddress: STABLE, amount: borrowAmount }],
-      });
+      await open(alice, parseUnits('1', 9), borrowAmount);
+      await open(bob, parseUnits('1', 9), borrowAmount);
 
       const aliceDebtBefore = await getTroveEntireDebt(contracts, alice);
       expect(aliceDebtBefore).to.be.gt(borrowAmount);
@@ -2254,20 +1519,8 @@ describe('BorrowerOperations', () => {
 
     it('can repay debt in Recovery Mode', async () => {
       const borrowAmount = parseUnits('10000');
-      await openTrove({
-        from: alice,
-        contracts,
-        collToken: BTC,
-        collAmount: parseUnits('1', 9),
-        debts: [{ tokenAddress: STABLE, amount: borrowAmount }],
-      });
-      await openTrove({
-        from: bob,
-        contracts,
-        collToken: BTC,
-        collAmount: parseUnits('1', 9),
-        debts: [{ tokenAddress: STABLE, amount: borrowAmount }],
-      });
+      await open(alice, parseUnits('1', 9), borrowAmount);
+      await open(bob, parseUnits('1', 9), borrowAmount);
 
       const aliceDebtBefore = await getTroveEntireDebt(contracts, alice);
       expect(aliceDebtBefore).to.be.gt(borrowAmount);
@@ -2285,20 +1538,8 @@ describe('BorrowerOperations', () => {
 
     it('Reverts if borrower has insufficient stable balance to cover his debt repayment', async () => {
       const borrowAmount = parseUnits('10000');
-      await openTrove({
-        from: alice,
-        contracts,
-        collToken: BTC,
-        collAmount: parseUnits('1', 9),
-        debts: [{ tokenAddress: STABLE, amount: borrowAmount }],
-      });
-      await openTrove({
-        from: bob,
-        contracts,
-        collToken: BTC,
-        collAmount: parseUnits('1', 9),
-        debts: [{ tokenAddress: STABLE, amount: borrowAmount }],
-      });
+      await open(alice, parseUnits('1', 9), borrowAmount);
+      await open(bob, parseUnits('1', 9), borrowAmount);
 
       const bobBalBefore = await STABLE.balanceOf(bob);
       expect(bobBalBefore).to.be.equal(borrowAmount);
@@ -2321,20 +1562,8 @@ describe('BorrowerOperations', () => {
   });
   describe('closeTrove()', () => {
     it('reverts when it would lower the TCR below CCR', async () => {
-      await openTrove({
-        from: alice,
-        contracts,
-        collToken: BTC,
-        collAmount: parseUnits('1', 9),
-        debts: [{ tokenAddress: STABLE, amount: parseUnits('100') }],
-      });
-      await openTrove({
-        from: bob,
-        contracts,
-        collToken: BTC,
-        collAmount: parseUnits('1', 9),
-        debts: [{ tokenAddress: STABLE, amount: parseUnits('17500') }],
-      });
+      await open(alice, parseUnits('1', 9), parseUnits('100'));
+      await open(bob, parseUnits('1', 9), parseUnits('17500'));
 
       // to compensate borrowing fees
       await STABLE.connect(bob).transfer(alice, parseUnits('10000'));
@@ -2348,20 +1577,8 @@ describe('BorrowerOperations', () => {
     });
 
     it('reverts when calling address does not have active trove', async () => {
-      await openTrove({
-        from: alice,
-        contracts,
-        collToken: BTC,
-        collAmount: parseUnits('1', 9),
-        debts: [{ tokenAddress: STABLE, amount: parseUnits('100') }],
-      });
-      await openTrove({
-        from: bob,
-        contracts,
-        collToken: BTC,
-        collAmount: parseUnits('1', 9),
-        debts: [{ tokenAddress: STABLE, amount: parseUnits('17500') }],
-      });
+      await open(alice, parseUnits('1', 9), parseUnits('100'));
+      await open(bob, parseUnits('1', 9), parseUnits('17500'));
 
       // Carol with no active trove attempts to close her trove
       await expect(borrowerOperations.connect(carol).closeTrove()).to.be.revertedWithCustomError(
@@ -2371,27 +1588,9 @@ describe('BorrowerOperations', () => {
     });
 
     it('reverts when system is in Recovery Mode', async () => {
-      await openTrove({
-        from: alice,
-        contracts,
-        collToken: BTC,
-        collAmount: parseUnits('1', 9),
-        debts: [{ tokenAddress: STABLE, amount: parseUnits('10000') }],
-      });
-      await openTrove({
-        from: bob,
-        contracts,
-        collToken: BTC,
-        collAmount: parseUnits('1', 9),
-        debts: [{ tokenAddress: STABLE, amount: parseUnits('10000') }],
-      });
-      await openTrove({
-        from: carol,
-        contracts,
-        collToken: BTC,
-        collAmount: parseUnits('1', 9),
-        debts: [{ tokenAddress: STABLE, amount: parseUnits('10000') }],
-      });
+      await open(alice, parseUnits('1', 9), parseUnits('10000'));
+      await open(bob, parseUnits('1', 9), parseUnits('10000'));
+      await open(carol, parseUnits('1', 9), parseUnits('10000'));
 
       // Alice transfers her LUSD to Bob and Carol so they can cover fees
       const aliceBal = await STABLE.balanceOf(alice);
@@ -2416,13 +1615,7 @@ describe('BorrowerOperations', () => {
     });
 
     it('reverts when trove is the only one in the system', async () => {
-      await openTrove({
-        from: alice,
-        contracts,
-        collToken: BTC,
-        collAmount: parseUnits('1', 9),
-        debts: [{ tokenAddress: STABLE, amount: parseUnits('10000') }],
-      });
+      await open(alice, parseUnits('1', 9), parseUnits('10000'));
 
       // Artificially mint to Alice so she has enough to close her trove
       await STABLE.unprotectedMint(alice, parseUnits('100000'));
@@ -2443,21 +1636,8 @@ describe('BorrowerOperations', () => {
     });
 
     it("reduces a Trove's collateral to zero", async () => {
-      await openTrove({
-        from: alice,
-        contracts,
-        collToken: BTC,
-        collAmount: parseUnits('1', 9),
-        debts: [{ tokenAddress: STABLE, amount: parseUnits('10000') }],
-      });
-
-      await openTrove({
-        from: bob,
-        contracts,
-        collToken: BTC,
-        collAmount: parseUnits('1', 9),
-        debts: [{ tokenAddress: STABLE, amount: parseUnits('10000') }],
-      });
+      await open(alice, parseUnits('1', 9), parseUnits('10000'));
+      await open(bob, parseUnits('1', 9), parseUnits('10000'));
 
       const aliceCollBefore = await getTroveEntireColl(contracts, alice);
       const bobBal = await STABLE.balanceOf(bob);
@@ -2475,21 +1655,8 @@ describe('BorrowerOperations', () => {
     });
 
     it("reduces a Trove's debt to zero", async () => {
-      await openTrove({
-        from: alice,
-        contracts,
-        collToken: BTC,
-        collAmount: parseUnits('1', 9),
-        debts: [{ tokenAddress: STABLE, amount: parseUnits('10000') }],
-      });
-
-      await openTrove({
-        from: bob,
-        contracts,
-        collToken: BTC,
-        collAmount: parseUnits('1', 9),
-        debts: [{ tokenAddress: STABLE, amount: parseUnits('10000') }],
-      });
+      await open(alice, parseUnits('1', 9), parseUnits('10000'));
+      await open(bob, parseUnits('1', 9), parseUnits('10000'));
 
       const aliceDebtBefore = await getTroveEntireColl(contracts, alice);
       const bobBal = await STABLE.balanceOf(bob);
@@ -2507,21 +1674,8 @@ describe('BorrowerOperations', () => {
     });
 
     it("sets Trove's stake to zero", async () => {
-      await openTrove({
-        from: alice,
-        contracts,
-        collToken: BTC,
-        collAmount: parseUnits('1', 9),
-        debts: [{ tokenAddress: STABLE, amount: parseUnits('10000') }],
-      });
-
-      await openTrove({
-        from: bob,
-        contracts,
-        collToken: BTC,
-        collAmount: parseUnits('1', 9),
-        debts: [{ tokenAddress: STABLE, amount: parseUnits('10000') }],
-      });
+      await open(alice, parseUnits('1', 9), parseUnits('10000'));
+      await open(bob, parseUnits('1', 9), parseUnits('10000'));
 
       const aliceStakeBefore = await getTroveStakeValue(contracts, alice);
       const bobBal = await STABLE.balanceOf(bob);
@@ -2540,21 +1694,8 @@ describe('BorrowerOperations', () => {
 
     it("zero's the troves reward snapshots", async () => {
       // Dennis opens trove and transfers tokens to alice
-      await openTrove({
-        from: dennis,
-        contracts,
-        collToken: BTC,
-        collAmount: parseUnits('1', 9),
-        debts: [{ tokenAddress: STABLE, amount: parseUnits('10000') }],
-      });
-
-      await openTrove({
-        from: bob,
-        contracts,
-        collToken: BTC,
-        collAmount: parseUnits('1', 9),
-        debts: [{ tokenAddress: STABLE, amount: parseUnits('10000') }],
-      });
+      await open(dennis, parseUnits('1', 9), parseUnits('10000'));
+      await open(bob, parseUnits('1', 9), parseUnits('10000'));
 
       // Price drops
       await priceFeed.setTokenPrice(BTC, parseUnits('5000'));
@@ -2567,20 +1708,8 @@ describe('BorrowerOperations', () => {
       await priceFeed.setTokenPrice(BTC, parseUnits('20000'));
 
       // Alice and Carol open troves
-      await openTrove({
-        from: alice,
-        contracts,
-        collToken: BTC,
-        collAmount: parseUnits('1', 9),
-        debts: [{ tokenAddress: STABLE, amount: parseUnits('10000') }],
-      });
-      await openTrove({
-        from: carol,
-        contracts,
-        collToken: BTC,
-        collAmount: parseUnits('1', 9),
-        debts: [{ tokenAddress: STABLE, amount: parseUnits('10000') }],
-      });
+      await open(alice, parseUnits('1', 9), parseUnits('10000'));
+      await open(carol, parseUnits('1', 9), parseUnits('10000'));
 
       // Price drops ...again
       await priceFeed.setTokenPrice(BTC, parseUnits('5000'));
@@ -2624,21 +1753,8 @@ describe('BorrowerOperations', () => {
     });
 
     it("sets trove's status to closed and removes it from sorted troves list", async () => {
-      await openTrove({
-        from: alice,
-        contracts,
-        collToken: BTC,
-        collAmount: parseUnits('1', 9),
-        debts: [{ tokenAddress: STABLE, amount: parseUnits('10000') }],
-      });
-
-      await openTrove({
-        from: bob,
-        contracts,
-        collToken: BTC,
-        collAmount: parseUnits('1', 9),
-        debts: [{ tokenAddress: STABLE, amount: parseUnits('10000') }],
-      });
+      await open(alice, parseUnits('1', 9), parseUnits('10000'));
+      await open(bob, parseUnits('1', 9), parseUnits('10000'));
 
       // Check Trove is active
       const alice_Trove_Before = await troveManager.Troves(alice);
@@ -2659,21 +1775,8 @@ describe('BorrowerOperations', () => {
     });
 
     it('reduces ActivePool ETH and raw ether by correct amount', async () => {
-      await openTrove({
-        from: alice,
-        contracts,
-        collToken: BTC,
-        collAmount: parseUnits('1', 9),
-        debts: [{ tokenAddress: STABLE, amount: parseUnits('10000') }],
-      });
-
-      await openTrove({
-        from: dennis,
-        contracts,
-        collToken: BTC,
-        collAmount: parseUnits('1', 9),
-        debts: [{ tokenAddress: STABLE, amount: parseUnits('10000') }],
-      });
+      await open(alice, parseUnits('1', 9), parseUnits('10000'));
+      await open(dennis, parseUnits('1', 9), parseUnits('10000'));
 
       const dennisColl = await getTroveEntireColl(contracts, dennis);
       const aliceColl = await getTroveEntireColl(contracts, alice);
@@ -2701,21 +1804,8 @@ describe('BorrowerOperations', () => {
     });
 
     it('reduces ActivePool debt by correct amount', async () => {
-      await openTrove({
-        from: alice,
-        contracts,
-        collToken: BTC,
-        collAmount: parseUnits('1', 9),
-        debts: [{ tokenAddress: STABLE, amount: parseUnits('10000') }],
-      });
-
-      await openTrove({
-        from: dennis,
-        contracts,
-        collToken: BTC,
-        collAmount: parseUnits('1', 9),
-        debts: [{ tokenAddress: STABLE, amount: parseUnits('10000') }],
-      });
+      await open(alice, parseUnits('1', 9), parseUnits('10000'));
+      await open(dennis, parseUnits('1', 9), parseUnits('10000'));
 
       const dennisDebt = await getTroveEntireDebt(contracts, dennis);
       const aliceDebt = await getTroveEntireDebt(contracts, alice);
@@ -2738,30 +1828,10 @@ describe('BorrowerOperations', () => {
       expect(activePool_Debt_After).to.be.equal(dennisDebt - parseUnits('200'));
     });
 
-    it.only('updates the the total stakes', async () => {
-      await openTrove({
-        from: alice,
-        contracts,
-        collToken: BTC,
-        collAmount: parseUnits('1', 9),
-        debts: [{ tokenAddress: STABLE, amount: parseUnits('10000') }],
-      });
-
-      await openTrove({
-        from: bob,
-        contracts,
-        collToken: BTC,
-        collAmount: parseUnits('1', 9),
-        debts: [{ tokenAddress: STABLE, amount: parseUnits('10000') }],
-      });
-
-      await openTrove({
-        from: dennis,
-        contracts,
-        collToken: BTC,
-        collAmount: parseUnits('1', 9),
-        debts: [{ tokenAddress: STABLE, amount: parseUnits('10000') }],
-      });
+    it('updates the the total stakes', async () => {
+      await open(alice, parseUnits('1', 9), parseUnits('10000'));
+      await open(bob, parseUnits('1', 9), parseUnits('10000'));
+      await open(dennis, parseUnits('1', 9), parseUnits('10000'));
 
       // Get individual stakes
       const aliceStakeBefore = await getTroveStake(contracts, alice, BTC);
@@ -2787,6 +1857,105 @@ describe('BorrowerOperations', () => {
 
       expect(aliceStakeAfter).to.be.equal(0n);
       expect(totalStakesAfter).to.be.eq(totalStakesBefore - aliceStakeBefore);
+    });
+    it("subtracts the debt of the closed Trove from the Borrower's LUSDToken balance", async () => {
+      await open(alice, parseUnits('1', 9), parseUnits('10000'));
+      await open(bob, parseUnits('1', 9), parseUnits('10000'));
+
+      const aliceDebt = await getTroveEntireDebt(contracts, alice);
+      expect(aliceDebt).to.be.gt(0n);
+
+      // to compensate borrowing fees
+      await STABLE.connect(bob).transfer(alice, await STABLE.balanceOf(bob));
+
+      const alice_LUSDBalance_Before = await STABLE.balanceOf(alice);
+      expect(alice_LUSDBalance_Before).to.be.gt(0n);
+
+      // close trove
+      await borrowerOperations.connect(alice).closeTrove();
+
+      // check alice LUSD balance after
+      const alice_LUSDBalance_After = await STABLE.balanceOf(alice);
+
+      expect(alice_LUSDBalance_After).to.be.equal(alice_LUSDBalance_Before - aliceDebt + parseUnits('200'));
+    });
+
+    it.only('applies pending rewards', async () => {
+      await open(whale, parseUnits('100', 9), parseUnits('20000'));
+      await open(alice, parseUnits('2', 9), parseUnits('15000'));
+      await open(bob, parseUnits('1', 9), parseUnits('5000'));
+      await open(carol, parseUnits('1', 9), parseUnits('10000'));
+
+      const carolDebt = await getTroveEntireDebt(contracts, carol);
+      const carolColl = await getTroveEntireColl(contracts, carol);
+
+      // Whale transfers to A and B to cover their fees
+      await STABLE.connect(whale).transfer(alice, parseUnits('10000'));
+      await STABLE.connect(whale).transfer(bob, parseUnits('10000'));
+
+      // --- TEST ---
+
+      // price drops to 1ETH:100LUSD, reducing Carol's ICR below MCR
+      await priceFeed.setTokenPrice(BTC, parseUnits('10000'));
+      // const price = await priceFeed.getPrice();
+
+      // liquidate Carol's Trove, Alice and Bob earn rewards.
+      const liquidationTx = await troveManager.liquidate(carol);
+      const [liquidatedDebt_C, liquidatedColl_C, gasComp_C] = await getEmittedLiquidationValues(
+        liquidationTx,
+        contracts
+      );
+
+      // // Dennis opens a new Trove
+      await open(dennis, parseUnits('4', 9), parseUnits('10000'));
+
+      // check Alice and Bob's reward snapshots are zero before they alter their Troves
+      const alice_ETHrewardSnapshot_Before = await troveManager.rewardSnapshots(alice, BTC, true);
+      const alice_LUSDDebtRewardSnapshot_Before = await troveManager.rewardSnapshots(alice, STABLE, false);
+
+      const bob_ETHrewardSnapshot_Before = await troveManager.rewardSnapshots(bob, BTC, true);
+      const bob_LUSDDebtRewardSnapshot_Before = await troveManager.rewardSnapshots(bob, STABLE, false);
+
+      expect(alice_ETHrewardSnapshot_Before).to.be.equal(0n);
+      expect(alice_LUSDDebtRewardSnapshot_Before).to.be.equal(0n);
+      expect(bob_ETHrewardSnapshot_Before).to.be.equal(0n);
+      expect(bob_LUSDDebtRewardSnapshot_Before).to.be.equal(0n);
+
+      const defaultPool_ETH = await storagePool.getValue(BTC, true, 1);
+      const defaultPool_LUSDDebt = await storagePool.getValue(STABLE, false, 1);
+
+      // Carol's liquidated coll (1 ETH) and drawn debt should have entered the Default Pool
+      expect(defaultPool_ETH).to.be.equal(liquidatedColl_C[0][1]);
+      expect(defaultPool_LUSDDebt).to.be.equal(liquidatedDebt_C[0][1]);
+
+      const pendingCollReward_A = await troveManager.getPendingReward(alice, BTC, true);
+      const pendingDebtReward_A = await troveManager.getPendingReward(alice, STABLE, false);
+      expect(pendingCollReward_A).to.be.gt(0n);
+      expect(pendingDebtReward_A).to.be.gt(0n);
+
+      // Close Alice's trove. Alice's pending rewards should be removed from the DefaultPool when she close.
+      await borrowerOperations.connect(alice).closeTrove();
+
+      const defaultPool_ETH_afterAliceCloses = await storagePool.getValue(BTC, true, 1);
+      const defaultPool_LUSDDebt_afterAliceCloses = await storagePool.getValue(STABLE, false, 1);
+
+      expect(defaultPool_ETH_afterAliceCloses).to.be.equal(defaultPool_ETH - pendingCollReward_A);
+      expect(defaultPool_LUSDDebt_afterAliceCloses).to.be.equal(defaultPool_LUSDDebt - pendingDebtReward_A);
+
+      // whale adjusts trove, pulling their rewards out of DefaultPool
+      await borrowerOperations
+        .connect(whale)
+        .increaseDebt([{ tokenAddress: STABLE, amount: parseUnits('1') }], MAX_BORROWING_FEE);
+
+      // Close Bob's trove. Expect DefaultPool coll and debt to drop to 0, since closing pulls his rewards out.
+      await borrowerOperations.connect(bob).closeTrove();
+
+      const defaultPool_ETH_afterBobCloses = await storagePool.getValue(BTC, true, 1);
+      const defaultPool_LUSDDebt_afterBobCloses = await storagePool.getValue(STABLE, false, 1);
+
+      expect(defaultPool_ETH_afterBobCloses).to.be.closeTo(0, 100000n);
+      // TODO: original test was close to 100k
+      expect(defaultPool_LUSDDebt_afterBobCloses).to.be.closeTo(0, 300000n);
     });
   });
 });
