@@ -188,18 +188,6 @@
             {
                 "indexed": false,
                 "internalType": "address",
-                "name": "storagePoolAddress",
-                "type": "address"
-            },
-            {
-                "indexed": false,
-                "internalType": "address",
-                "name": "priceFeedAddress",
-                "type": "address"
-            },
-            {
-                "indexed": false,
-                "internalType": "address",
                 "name": "depositTokenAddress",
                 "type": "address"
             }

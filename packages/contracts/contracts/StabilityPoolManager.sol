@@ -278,13 +278,7 @@ contract StabilityPoolManager is Ownable(msg.sender), CheckContract, IStabilityP
     if (msg.sender != debtTokenManagerAddress) revert Unauthorized();
     if (address(stabilityPools[_debtToken]) != address(0)) revert PoolExist();
 
-    IStabilityPool stabilityPool = new StabilityPool(
-      address(this),
-      troveManagerAddress,
-      address(priceFeed),
-      address(storagePool),
-      address(_debtToken)
-    );
+    IStabilityPool stabilityPool = new StabilityPool(address(this), troveManagerAddress, address(_debtToken));
 
     stabilityPools[_debtToken] = stabilityPool;
     stabilityPoolsArray.push(stabilityPool);

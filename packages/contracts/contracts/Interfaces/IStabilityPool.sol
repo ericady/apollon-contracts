@@ -11,8 +11,6 @@ interface IStabilityPool is IBase {
   event StabilityPoolInitialized(
     address stabilityPoolManagerAddress,
     address troveManagerAddress,
-    address storagePoolAddress,
-    address priceFeedAddress,
     address depositTokenAddress
   );
 

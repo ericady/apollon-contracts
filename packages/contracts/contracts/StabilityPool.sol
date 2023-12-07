@@ -9,8 +9,6 @@ import './Interfaces/ITroveManager.sol';
 import './Interfaces/IDebtToken.sol';
 import './Dependencies/LiquityBase.sol';
 import './Dependencies/CheckContract.sol';
-import './Interfaces/IPriceFeed.sol';
-import './Interfaces/IStoragePool.sol';
 
 /*
  * The Stability Pool holds debt tokens deposited by Stability Pool depositors.
@@ -146,8 +144,6 @@ contract StabilityPool is LiquityBase, CheckContract, IStabilityPool {
   string public constant NAME = 'StabilityPool';
 
   ITroveManager public troveManager;
-  IPriceFeed public priceFeed;
-  IStoragePool public storagePool;
   address public stabilityPoolManagerAddress;
 
   // --- Data structures ---
@@ -204,32 +200,16 @@ contract StabilityPool is LiquityBase, CheckContract, IStabilityPool {
 
   mapping(address => uint) public lastErrorOffset; // [tokenAddress] value, Error trackers for the error correction in the offset calculation
 
-  constructor(
-    address _stabilityPoolManagerAddress,
-    address _troveManagerAddress,
-    address _priceFeedAddress,
-    address _storagePoolAddress,
-    address _depositTokenAddress
-  ) {
+  constructor(address _stabilityPoolManagerAddress, address _troveManagerAddress, address _depositTokenAddress) {
     checkContract(_stabilityPoolManagerAddress);
     checkContract(_troveManagerAddress);
-    checkContract(_priceFeedAddress);
-    checkContract(_storagePoolAddress);
     checkContract(_depositTokenAddress);
 
     stabilityPoolManagerAddress = _stabilityPoolManagerAddress;
     troveManager = ITroveManager(_troveManagerAddress);
-    priceFeed = IPriceFeed(_priceFeedAddress);
-    storagePool = IStoragePool(_storagePoolAddress);
     depositToken = IDebtToken(_depositTokenAddress);
 
-    emit StabilityPoolInitialized(
-      _stabilityPoolManagerAddress,
-      _troveManagerAddress,
-      _storagePoolAddress,
-      _priceFeedAddress,
-      _depositTokenAddress
-    );
+    emit StabilityPoolInitialized(_stabilityPoolManagerAddress, _troveManagerAddress, _depositTokenAddress);
   }
 
   // --- Getters for public variables. Required by IPool interface ---

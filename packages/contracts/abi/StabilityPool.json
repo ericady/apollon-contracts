@@ -13,16 +13,6 @@
             },
             {
                 "internalType": "address",
-                "name": "_priceFeedAddress",
-                "type": "address"
-            },
-            {
-                "internalType": "address",
-                "name": "_storagePoolAddress",
-                "type": "address"
-            },
-            {
-                "internalType": "address",
                 "name": "_depositTokenAddress",
                 "type": "address"
             }
@@ -224,18 +214,6 @@
                 "indexed": false,
                 "internalType": "address",
                 "name": "troveManagerAddress",
-                "type": "address"
-            },
-            {
-                "indexed": false,
-                "internalType": "address",
-                "name": "storagePoolAddress",
-                "type": "address"
-            },
-            {
-                "indexed": false,
-                "internalType": "address",
-                "name": "priceFeedAddress",
                 "type": "address"
             },
             {
@@ -745,19 +723,6 @@
         "type": "function"
     },
     {
-        "inputs": [],
-        "name": "priceFeed",
-        "outputs": [
-            {
-                "internalType": "contract IPriceFeed",
-                "name": "",
-                "type": "address"
-            }
-        ],
-        "stateMutability": "view",
-        "type": "function"
-    },
-    {
         "inputs": [
             {
                 "internalType": "address",
@@ -781,19 +746,6 @@
         "outputs": [
             {
                 "internalType": "address",
-                "name": "",
-                "type": "address"
-            }
-        ],
-        "stateMutability": "view",
-        "type": "function"
-    },
-    {
-        "inputs": [],
-        "name": "storagePool",
-        "outputs": [
-            {
-                "internalType": "contract IStoragePool",
                 "name": "",
                 "type": "address"
             }
