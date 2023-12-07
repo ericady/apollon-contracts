@@ -4,6 +4,7 @@ pragma solidity ^0.8.9;
 
 import '@openzeppelin/contracts/access/Ownable.sol';
 import '@openzeppelin/contracts/utils/math/Math.sol';
+import '@openzeppelin/contracts/token/ERC20/extensions/IERC20Metadata.sol';
 
 import './Dependencies/LiquityBase.sol';
 import './Dependencies/CheckContract.sol';
@@ -79,31 +80,27 @@ contract ReservePool is LiquityBase, Ownable(msg.sender), CheckContract, IReserv
    * @notice Withdraw reserves to stability pool to repay possible loss when offset debts
    * @dev Try to withdraw with gov tokens first, when not enough then stablecoins.
    * @param stabilityPool Address of stability pool
-   * @param withdrawAmount USD value of amounts to withdraw (same as stable debt token amount)
-   * @return repaidReserves TokenAmount array of reserves repaid, [govToken, stablecoin]
+   * @param withdrawAmountInUSD USD value of amounts to withdraw (same as stable debt token amount)
+   * @return usedGov Gov token amount of withdrawn
+   * @return usedStable Stable token amount of withdrawn
    */
   function withdrawValue(
     address stabilityPool,
-    uint withdrawAmount
-  ) external returns (TokenAmount[] memory repaidReserves) {
+    uint withdrawAmountInUSD
+  ) external returns (uint usedGov, uint usedStable) {
     _requireCallerIsStabilityPoolManager();
 
-    repaidReserves = new TokenAmount[](2);
-    repaidReserves[0].tokenAddress = address(govToken);
-    repaidReserves[1].tokenAddress = address(stableDebtToken);
-
+    uint govDecimal = IERC20Metadata(address(govToken)).decimals();
     uint govTokenPrice = priceFeed.getPrice(address(govToken));
-    uint govAmount = (withdrawAmount * 1e18) / govTokenPrice;
-    govAmount = Math.min(govAmount, govToken.balanceOf(address(this)));
-    govToken.transfer(stabilityPool, govAmount);
-    repaidReserves[0].amount = govAmount;
+    usedGov = (withdrawAmountInUSD * 10 ** govDecimal) / govTokenPrice;
+    usedGov = Math.min(usedGov, govToken.balanceOf(address(this)));
+    govToken.transfer(stabilityPool, usedGov);
 
-    uint stableAmount = withdrawAmount - (govAmount * govTokenPrice) / 1e18;
-    stableAmount = Math.min(stableAmount, stableDebtToken.balanceOf(address(this)));
-    stableDebtToken.transfer(stabilityPool, stableAmount);
-    repaidReserves[0].amount = stableAmount;
+    usedStable = withdrawAmountInUSD - (usedGov * govTokenPrice) / 10 ** govDecimal;
+    usedStable = Math.min(usedStable, stableDebtToken.balanceOf(address(this)));
+    stableDebtToken.transfer(stabilityPool, usedStable);
 
-    emit WithdrewReserves(govAmount, stableAmount);
+    emit WithdrewReserves(usedGov, usedStable);
   }
 
   function _requireCallerIsStabilityPoolManager() internal view {

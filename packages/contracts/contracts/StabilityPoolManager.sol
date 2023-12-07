@@ -220,37 +220,43 @@ contract StabilityPoolManager is Ownable(msg.sender), CheckContract, IStabilityP
       uint offsetValue = priceFeed.getUSDValue(remainingStability.tokenAddress, remainingStability.debtToOffset);
       if (offsetValue > gainedCollValue) {
         // Repay loss from reserve pool
-        TokenAmount[] memory repaidReserves = reservePool.withdrawValue(
+        (uint repaidGov, uint repaidStable) = reservePool.withdrawValue(
           stabilityPoolAddress,
           offsetValue - gainedCollValue
         );
 
         // add repaid gov token to coll gained array
-        if (repaidReserves[0].amount > 0) {
+        if (repaidGov > 0) {
           if (govTokenCollIndex >= remainingStability.collGained.length) {
             // govTokenCollIndex not found in prev loop, add to end of array
             TokenAmount[] memory collGained = new TokenAmount[](remainingStability.collGained.length + 1);
             for (uint ii = 0; ii < remainingStability.collGained.length; ii++) {
               collGained[ii] = remainingStability.collGained[ii];
             }
-            collGained[remainingStability.collGained.length] = repaidReserves[0];
+            collGained[remainingStability.collGained.length] = TokenAmount({
+              tokenAddress: address(govToken),
+              amount: repaidGov
+            });
             remainingStability.collGained = collGained;
           } else {
-            remainingStability.collGained[govTokenCollIndex].amount += repaidReserves[0].amount;
+            remainingStability.collGained[govTokenCollIndex].amount += repaidGov;
           }
         }
         // add repaid stableCoin to coll gained array
-        if (repaidReserves[1].amount > 0) {
+        if (repaidStable > 0) {
           if (stableCollIndex >= remainingStability.collGained.length) {
             // stablecoinIndex not found in prev loop, add to end of array
             TokenAmount[] memory collGained = new TokenAmount[](remainingStability.collGained.length + 1);
             for (uint ii = 1; ii < remainingStability.collGained.length; ii++) {
               collGained[ii] = remainingStability.collGained[ii];
             }
-            collGained[remainingStability.collGained.length] = repaidReserves[1];
+            collGained[remainingStability.collGained.length] = TokenAmount({
+              tokenAddress: address(stableDebt),
+              amount: repaidStable
+            });
             remainingStability.collGained = collGained;
           } else {
-            remainingStability.collGained[stableCollIndex].amount += repaidReserves[1].amount;
+            remainingStability.collGained[stableCollIndex].amount += repaidStable;
           }
         }
       }

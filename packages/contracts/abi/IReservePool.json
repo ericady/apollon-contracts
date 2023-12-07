@@ -164,21 +164,14 @@
         "name": "withdrawValue",
         "outputs": [
             {
-                "components": [
-                    {
-                        "internalType": "address",
-                        "name": "tokenAddress",
-                        "type": "address"
-                    },
-                    {
-                        "internalType": "uint256",
-                        "name": "amount",
-                        "type": "uint256"
-                    }
-                ],
-                "internalType": "struct IBase.TokenAmount[]",
-                "name": "",
-                "type": "tuple[]"
+                "internalType": "uint256",
+                "name": "usedGov",
+                "type": "uint256"
+            },
+            {
+                "internalType": "uint256",
+                "name": "usedStable",
+                "type": "uint256"
             }
         ],
         "stateMutability": "nonpayable",

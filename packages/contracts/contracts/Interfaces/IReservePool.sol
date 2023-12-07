@@ -27,5 +27,5 @@ interface IReservePool is IBBase {
 
   function isReserveCapReached() external view returns (bool, bool);
 
-  function withdrawValue(address stabilityPool, uint withdrawAmount) external returns (TokenAmount[] memory);
+  function withdrawValue(address stabilityPool, uint withdrawAmount) external returns (uint usedGov, uint usedStable);
 }
