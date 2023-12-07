@@ -10,7 +10,7 @@ import './Interfaces/IBorrowerOperations.sol';
 import './Interfaces/IPriceFeed.sol';
 import './Dependencies/CheckContract.sol';
 
-contract SwapOperations is ISwapOperations, Ownable, CheckContract {
+contract SwapOperations is ISwapOperations, Ownable(msg.sender), CheckContract {
   IBorrowerOperations public borrowerOperations;
   IPriceFeed public priceFeed;
 
