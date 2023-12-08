@@ -22,6 +22,7 @@ import mockPriceFeedAbi from '../abi/MockPriceFeed.json';
 import collTokenManagerAbi from '../abi/CollTokenManager.json';
 import stabilityPoolManagerAbi from '../abi/StabilityPoolManager.json';
 import swapOperationsAbi from '../abi/SwapOperations.json';
+import reservePoolAbi from '../abi/ReservePool.json';
 
 import {
   BorrowerOperations,
@@ -36,6 +37,7 @@ import {
   MockERC20,
   StabilityPoolManager,
   SwapOperations,
+  ReservePool,
 } from '../types';
 
 import { EthersProvider, EthersSigner } from './types';
@@ -159,6 +161,7 @@ export interface _LiquityContracts {
   collTokenManager: CollTokenManager;
   stabilityPoolManager: StabilityPoolManager;
   swapOperations: SwapOperations;
+  reservePool: ReservePool;
 
   // todo
   // communityIssuance: CommunityIssuance;
@@ -195,6 +198,7 @@ const getAbi = (priceFeedIsTestnet: boolean, uniTokenIsMock: boolean): LiquityCo
   collTokenManager: collTokenManagerAbi,
   stabilityPoolManager: stabilityPoolManagerAbi,
   swapOperations: swapOperationsAbi,
+  reservePool: reservePoolAbi,
 
   // todo
   // communityIssuance: communityIssuanceAbi,

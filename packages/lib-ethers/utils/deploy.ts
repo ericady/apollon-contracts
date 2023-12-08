@@ -73,11 +73,14 @@ const deployContracts = async (
         deployer,
         getContractFactory,
         'SwapOperations',
-        borrowerOperations.address,
-        priceFeed.address,
+        borrowerOperations,
+        priceFeed,
         { ...overrides }
       ),
       redemptionOperations: await deployContract(deployer, getContractFactory, 'RedemptionOperations', {
+        ...overrides,
+      }),
+      reservePool: await deployContract(deployer, getContractFactory, 'ReservePool', {
         ...overrides,
       }),
       troveManager: await deployContract(deployer, getContractFactory, 'TroveManager', {
@@ -124,13 +127,12 @@ const connectContracts = async (
     collTokenManager,
     priceFeed,
     swapOperations,
+    reservePool,
   }: _LiquityContracts,
   deployer: Signer,
   overrides?: Overrides
 ) => {
-  if (!deployer.provider) {
-    throw new Error('Signer must have a provider.');
-  }
+  if (!deployer.provider) throw new Error('Signer must have a provider.');
 
   const txCount = await deployer.provider.getTransactionCount(deployer.getAddress());
 
@@ -152,6 +154,7 @@ const connectContracts = async (
         troveManager.address,
         storagePool.address,
         stabilityPoolManager.address,
+        reservePool.address,
         priceFeed.address,
         debtTokenManager.address,
         collTokenManager.address,
@@ -187,6 +190,7 @@ const connectContracts = async (
         troveManager.address,
         priceFeed.address,
         storagePool.address,
+        reservePool.address,
         debtTokenManager.address,
         { ...overrides, nonce }
       ),
@@ -232,6 +236,7 @@ const connectContracts = async (
 const deployAndConnectDebtTokens = async (
   _isDev: boolean,
   {
+    reservePool,
     borrowerOperations,
     troveManager,
     redemptionOperations,
@@ -247,6 +252,7 @@ const deployAndConnectDebtTokens = async (
   const debtTokenNames = [{ name: 'jUSD', symbol: 'jUSD', version: '1.0', isStable: true }];
   if (_isDev) debtTokenNames.push({ name: 'STOCK', symbol: 'STOCK', version: '1.0', isStable: false });
 
+  let stableCoinAddress;
   for (const { name, symbol, version, isStable } of debtTokenNames) {
     const debtTokenAddress = await deployContract(
       deployer,
@@ -266,7 +272,19 @@ const deployAndConnectDebtTokens = async (
     await debtTokenManager.addDebtToken(debtTokenAddress, { ...overrides });
     deployment.debtTokens[name] = debtTokenAddress;
     log(`Added debt token ${name} at ${debtTokenAddress}`);
+
+    if (isStable) stableCoinAddress = debtTokenAddress;
   }
+
+  await reservePool.setAddresses(
+    stabilityPoolManager.address,
+    priceFeed.address,
+    stableCoinAddress,
+    stableCoinAddress, // todo use correct gov token address
+    1000000, // todo specify correct numbers...
+    1000000,
+    { ...overrides }
+  );
 };
 
 // const deployMockUniToken = (

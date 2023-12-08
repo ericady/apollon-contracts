@@ -11,7 +11,34 @@
   },
   {
     "inputs": [],
+    "name": "NotFromReservePool",
+    "type": "error"
+  },
+  {
+    "inputs": [],
     "name": "NotFromTroveManager",
+    "type": "error"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "owner",
+        "type": "address"
+      }
+    ],
+    "name": "OwnableInvalidOwner",
+    "type": "error"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "account",
+        "type": "address"
+      }
+    ],
+    "name": "OwnableUnauthorizedAccount",
     "type": "error"
   },
   {
@@ -79,6 +106,12 @@
         "indexed": false,
         "internalType": "address",
         "name": "storgePoolAddress",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "address",
+        "name": "reservePoolAddress",
         "type": "address"
       },
       {
@@ -410,10 +443,10 @@
   },
   {
     "inputs": [],
-    "name": "priceFeedAddress",
+    "name": "priceFeed",
     "outputs": [
       {
-        "internalType": "address",
+        "internalType": "contract IPriceFeed",
         "name": "",
         "type": "address"
       }
@@ -454,6 +487,19 @@
     "type": "function"
   },
   {
+    "inputs": [],
+    "name": "reservePool",
+    "outputs": [
+      {
+        "internalType": "contract IReservePool",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
     "inputs": [
       {
         "internalType": "address",
@@ -468,6 +514,11 @@
       {
         "internalType": "address",
         "name": "_storagePoolAddress",
+        "type": "address"
+      },
+      {
+        "internalType": "address",
+        "name": "_reservePoolAddress",
         "type": "address"
       },
       {

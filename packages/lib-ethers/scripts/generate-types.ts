@@ -19,6 +19,7 @@ import MockERC20 from '../../contracts/artifacts/contracts/Mock/MockERC20.sol/Mo
 import SwapERC20 from '../../contracts/artifacts/contracts/SwapERC20.sol/SwapERC20.json';
 import SwapPair from '../../contracts/artifacts/contracts/SwapPair.sol/SwapPair.json';
 import SwapOperations from '../../contracts/artifacts/contracts/SwapOperations.sol/SwapOperations.json';
+import ReservePool from '../../contracts/artifacts/contracts/ReservePool.sol/ReservePool.json';
 
 // todo
 // import CommunityIssuance from '../../contracts/artifacts/contracts/LQTY/CommunityIssuance.sol/CommunityIssuance.json';
@@ -160,6 +161,7 @@ const contractArtifacts = [
   SwapERC20,
   SwapPair,
   SwapOperations,
+  ReservePool,
 ];
 
 const contracts = contractArtifacts.map(({ contractName, abi }) => ({

@@ -50,6 +50,28 @@
     "type": "error"
   },
   {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "owner",
+        "type": "address"
+      }
+    ],
+    "name": "OwnableInvalidOwner",
+    "type": "error"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "account",
+        "type": "address"
+      }
+    ],
+    "name": "OwnableUnauthorizedAccount",
+    "type": "error"
+  },
+  {
     "inputs": [],
     "name": "ZeroAddress",
     "type": "error"
@@ -560,7 +582,20 @@
   },
   {
     "inputs": [],
-    "name": "SECONDS_IN_ONE_MINUTE",
+    "name": "REDEMPTION_FEE_FLOOR",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "RESERVE_FEE",
     "outputs": [
       {
         "internalType": "uint256",
@@ -1148,7 +1183,7 @@
         "type": "address"
       }
     ],
-    "name": "getTroveStake",
+    "name": "getTroveStakeValue",
     "outputs": [
       {
         "internalType": "uint256",
