@@ -35,7 +35,10 @@ export const Contracts = {
     DebtToken6: '0x48f322be8Acb969E1Bd4C49E3g873Ec0a469Ee9D',
   },
   ERC20: {
-    Ethereum: '0x509ee0d083ddf8ac028f2a56731412edd63223b8',
+    ETH: '0x509ee0d083ddf8ac028f2a56731412edd63223a8',
+    BTC: '0x509ee0d083ddf8ac028f2a56731412edd63223b8',
+    USDT: '0x509ee0d083ddf8ac028f2a56731412edd63223c8',
+    DEFI: '0x509ee0d083ddf8ac028f2a56731412edd63223d8',
   },
 } as const;
 
@@ -58,7 +61,7 @@ export const EthersContext = createContext<{
 });
 
 // Connetion to local ganache.
-const provider = new JsonRpcProvider('http://0.0.0.0:8545', { name: 'ganache', chainId: 1337 });
+const provider = new JsonRpcProvider('http://0.0.0.0:8545', { name: 'localhost', chainId: 31337 });
 
 // TODO: Implement network change: https://docs.ethers.org/v5/concepts/best-practices/
 // const testNetwork = new Network('goerli', 5);

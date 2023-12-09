@@ -1,5 +1,5 @@
 {
-  "development": {
+  "localhost": {
     "DebtToken": {
       "address": "DebtToken"
     },

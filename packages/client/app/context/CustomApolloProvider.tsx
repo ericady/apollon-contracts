@@ -1,8 +1,11 @@
-import { ApolloClient, ApolloProvider, InMemoryCache, ReactiveVar, makeVar } from '@apollo/client';
-import { ethers } from 'ethers';
+import { ApolloClient, ApolloProvider, InMemoryCache, ReactiveVar, gql, makeVar } from '@apollo/client';
+import { AddressLike, ethers } from 'ethers';
 import { PropsWithChildren, useEffect } from 'react';
 import { DebtToken } from '../../types/ethers-contracts';
 import { Contracts, useEthers } from './EthersProvider';
+import { TOKEN_FRAGMENT } from '../queries';
+import { TokenFragmentFragment } from '../generated/gql-types';
+
 
 // Define the structure for each property in ContractDataFreshness
 type ContractData = Record<
@@ -23,7 +26,10 @@ type ContractDataFreshnessManager<T> = {
 // FIXME: This is also not perfectly typesafe. The keys are not required.
 export const ContractDataFreshnessManager: ContractDataFreshnessManager<typeof Contracts> = {
   ERC20: {
-    [Contracts.ERC20.Ethereum]: {},
+    [Contracts.ERC20.ETH]: {},
+    [Contracts.ERC20.BTC]: {},
+    [Contracts.ERC20.DEFI]: {},
+    [Contracts.ERC20.USDT]: {},
   },
   DebtToken: {
     [Contracts.DebtToken.DebtToken1]: {},
@@ -38,8 +44,20 @@ export const ContractDataFreshnessManager: ContractDataFreshnessManager<typeof C
           ContractDataFreshnessManager.DebtToken[Contracts.DebtToken.JUSD]!.priceUSD.lastFetched = Date.now();
           const priceUSD = await debtTokenContract.getPrice();
           console.log('priceUSD: ', priceUSD);
-          // const balance = Math.random() * 1000;
           ContractDataFreshnessManager.DebtToken[Contracts.DebtToken.JUSD]!.priceUSD.value(ethers.toNumber(priceUSD));
+        },
+        value: makeVar(0),
+        lastFetched: 0,
+        timeout: 1000 * 5,
+      },
+      walletAmount: {
+        fetch: async (debtTokenContract: DebtToken, borrower: AddressLike) => {
+          ContractDataFreshnessManager.DebtToken[Contracts.DebtToken.JUSD]!.walletAmount.lastFetched = Date.now();
+          // const borrowerBalance = await debtTokenContract.balanceOf(borrower);
+          // console.log('borrowerBalance: ', borrowerBalance);
+          ContractDataFreshnessManager.DebtToken[Contracts.DebtToken.JUSD]!.walletAmount.value(
+            Math.random() * 1000,
+          );
         },
         value: makeVar(0),
         lastFetched: 0,
@@ -60,16 +78,17 @@ export function CustomApolloProvider({ children }: PropsWithChildren<{}>) {
   const { debtTokenContract, address: borrower } = useEthers();
 
   const client = new ApolloClient({
-    // TODO: replace with your own graphql server
-    uri: 'https://flyby-router-demo.herokuapp.com/',
+    // TODO: replace with our deployed graphql endpoint
+    uri: 'http://localhost:8000/subgraphs/name/subgraph',
 
     connectToDevTools: true,
     cache: new InMemoryCache({
       typePolicies: {
         Token: {
           fields: {
+            // TODO: Make it address aware
             priceUSD: {
-              read(existing, { readField }) {
+              read(_, { readField }) {
                 const address = readField('address');
                 if (
                   address &&
@@ -83,6 +102,36 @@ export function CustomApolloProvider({ children }: PropsWithChildren<{}>) {
                 }
 
                 return ContractDataFreshnessManager.DebtToken[Contracts.DebtToken.JUSD].priceUSD.value();
+              },
+            },
+          },
+        },
+
+        DebtTokenMeta: {
+          fields: {
+            walletAmount: {
+              read(_, { readField, cache, toReference }) {
+                const token = readField('token');
+
+                const tokenData = cache.readFragment<TokenFragmentFragment>({
+                  id: token.__ref,
+                  fragment: TOKEN_FRAGMENT,
+                });
+
+                console.log('tokenData?.address: ', tokenData?.address);
+
+                if (
+                  tokenData?.address &&
+                  isFieldOutdated(ContractDataFreshnessManager.DebtToken[Contracts.DebtToken.JUSD], 'walletAmount')
+                ) {
+                  // Make smart contract call using the address
+                  ContractDataFreshnessManager.DebtToken[Contracts.DebtToken.JUSD].walletAmount.fetch(
+                    debtTokenContract[Contracts.DebtToken.JUSD],
+                    borrower,
+                  );
+                }
+
+                return ContractDataFreshnessManager.DebtToken[Contracts.DebtToken.JUSD].walletAmount.value();
               },
             },
           },
@@ -130,14 +179,17 @@ export function CustomApolloProvider({ children }: PropsWithChildren<{}>) {
   });
 
   useEffect(() => {
-    const intervall = setInterval(() => {
-      ContractDataFreshnessManager.DebtToken[Contracts.DebtToken.JUSD].priceUSD.fetch(
-        debtTokenContract[Contracts.DebtToken.JUSD],
-      );
+    const priceUSDIntervall = setInterval(() => {
+      if (isFieldOutdated(ContractDataFreshnessManager.DebtToken[Contracts.DebtToken.JUSD], 'priceUSD')) {
+        ContractDataFreshnessManager.DebtToken[Contracts.DebtToken.JUSD].priceUSD.fetch(
+          debtTokenContract[Contracts.DebtToken.JUSD],
+        );
+      }
+      // This can be any interval you want but it guarantees data freshness if its not already fresh.
     }, 1000 * 10);
 
     return () => {
-      clearInterval(intervall);
+      clearInterval(priceUSDIntervall);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);

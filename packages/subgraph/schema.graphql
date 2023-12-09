@@ -18,7 +18,7 @@ type Token @entity {
 
 type DebtTokenMeta @entity(immutable: true) {
   id: Bytes!
-  token: Bytes!
+  token: Token! @relation(name: "TokenToDebtTokenMeta")
   timestamp: BigInt!
 
   # global

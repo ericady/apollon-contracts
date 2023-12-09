@@ -60,6 +60,10 @@ const config: HardhatUserConfig = {
     ],
   },
   networks: {
+    localhost: {
+      chainId: 31337,
+      url:"http://0.0.0.0:8545"
+    },
     hardhat: {
       accounts: accountsList,
       gas: 10000000, // tx gas limit

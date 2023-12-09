@@ -194,7 +194,7 @@ export type TokenAmount = {
 export type GetAllPoolsQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type GetAllPoolsQuery = { __typename: 'Query', getPools: Array<{ __typename: 'Pool', id: string, openingFee: number, volume24hUSD: number, liquidity: Array<{ __typename: 'PoolLiquidity', token: { __typename: 'Token', address: string, symbol: string, priceUSD: number, priceUSD24hAgo: number } }> }> };
+export type GetAllPoolsQuery = { __typename: 'Query', getPools: Array<{ __typename: 'Pool', id: string, openingFee: number, volume24hUSD: number, liquidity: Array<{ __typename: 'PoolLiquidity', token: { __typename: 'Token', id: string, address: string, symbol: string, priceUSD: number, priceUSD24hAgo: number } }> }> };
 
 export type GetDebtTokensQueryVariables = Exact<{ [key: string]: never; }>;
 
@@ -206,7 +206,7 @@ export type GetBorrowerDebtTokensQueryVariables = Exact<{
 }>;
 
 
-export type GetBorrowerDebtTokensQuery = { __typename: 'Query', getDebtTokens: Array<{ __typename: 'DebtTokenMeta', troveMintedAmount?: number | null, walletAmount?: number | null, stabilityLostAmount?: number | null, stabilityCompoundAmount?: number | null, stabilityDepositAPY: number, totalDepositedStability: number, totalSupplyUSD: number, totalSupplyUSD24hAgo: number, token: { __typename: 'Token', address: string, symbol: string, priceUSD: number, isPoolToken: boolean } }> };
+export type GetBorrowerDebtTokensQuery = { __typename: 'Query', getDebtTokens: Array<{ __typename: 'DebtTokenMeta', troveMintedAmount?: number | null, walletAmount?: number | null, stabilityLostAmount?: number | null, stabilityCompoundAmount?: number | null, stabilityDepositAPY: number, totalDepositedStability: number, totalSupplyUSD: number, totalSupplyUSD24hAgo: number, token: { __typename: 'Token', id: string, address: string, symbol: string, priceUSD: number, isPoolToken: boolean } }> };
 
 export type GetBorrowerPositionsQueryVariables = Exact<{
   borrower: Scalars['String']['input'];
@@ -215,26 +215,26 @@ export type GetBorrowerPositionsQueryVariables = Exact<{
 }>;
 
 
-export type GetBorrowerPositionsQuery = { __typename: 'Query', getPositions: { __typename: 'PositionsPage', positions: Array<{ __typename: 'Position', id: string, openedAt: number, closedAt?: number | null, direction: LongShortDirection, size: number, totalPriceInStable: number, feesInStable: number, profitInStable?: number | null, token: { __typename: 'Token', address: string, symbol: string, priceUSD: number } }>, pageInfo: { __typename: 'PageInfo', totalCount: number, hasNextPage: boolean, endCursor: string } } };
+export type GetBorrowerPositionsQuery = { __typename: 'Query', getPositions: { __typename: 'PositionsPage', positions: Array<{ __typename: 'Position', id: string, openedAt: number, closedAt?: number | null, direction: LongShortDirection, size: number, totalPriceInStable: number, feesInStable: number, profitInStable?: number | null, token: { __typename: 'Token', id: string, address: string, symbol: string, priceUSD: number } }>, pageInfo: { __typename: 'PageInfo', totalCount: number, hasNextPage: boolean, endCursor: string } } };
 
 export type GetLiquidityPoolsQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type GetLiquidityPoolsQuery = { __typename: 'Query', getPools: Array<{ __typename: 'Pool', id: string, liquidityDepositAPY: number, volume24hUSD: number, volume24hUSD24hAgo: number, liquidity: Array<{ __typename: 'PoolLiquidity', totalAmount: number, token: { __typename: 'Token', address: string, symbol: string, priceUSD: number } }> }> };
+export type GetLiquidityPoolsQuery = { __typename: 'Query', getPools: Array<{ __typename: 'Pool', id: string, liquidityDepositAPY: number, volume24hUSD: number, volume24hUSD24hAgo: number, liquidity: Array<{ __typename: 'PoolLiquidity', totalAmount: number, token: { __typename: 'Token', id: string, address: string, symbol: string, priceUSD: number } }> }> };
 
 export type GetBorrowerLiquidityPoolsQueryVariables = Exact<{
   borrower: Scalars['String']['input'];
 }>;
 
 
-export type GetBorrowerLiquidityPoolsQuery = { __typename: 'Query', getPools: Array<{ __typename: 'Pool', id: string, liquidityDepositAPY: number, volume24hUSD: number, volume24hUSD24hAgo: number, liquidity: Array<{ __typename: 'PoolLiquidity', totalAmount: number, borrowerAmount?: number | null, token: { __typename: 'Token', address: string, symbol: string, priceUSD: number } }> }> };
+export type GetBorrowerLiquidityPoolsQuery = { __typename: 'Query', getPools: Array<{ __typename: 'Pool', id: string, liquidityDepositAPY: number, volume24hUSD: number, volume24hUSD24hAgo: number, liquidity: Array<{ __typename: 'PoolLiquidity', totalAmount: number, borrowerAmount?: number | null, token: { __typename: 'Token', id: string, address: string, symbol: string, priceUSD: number } }> }> };
 
 export type GetCollateralTokensQueryVariables = Exact<{
   borrower: Scalars['String']['input'];
 }>;
 
 
-export type GetCollateralTokensQuery = { __typename: 'Query', getCollateralTokens: Array<{ __typename: 'CollateralTokenMeta', walletAmount?: number | null, troveLockedAmount?: number | null, stabilityGainedAmount?: number | null, totalValueLockedUSD: number, totalValueLockedUSD24hAgo: number, token: { __typename: 'Token', address: string, symbol: string, priceUSD: number } }> };
+export type GetCollateralTokensQuery = { __typename: 'Query', getCollateralTokens: Array<{ __typename: 'CollateralTokenMeta', walletAmount?: number | null, troveLockedAmount?: number | null, stabilityGainedAmount?: number | null, totalValueLockedUSD: number, totalValueLockedUSD24hAgo: number, token: { __typename: 'Token', id: string, address: string, symbol: string, priceUSD: number } }> };
 
 export type GetBorrowerStabilityHistoryQueryVariables = Exact<{
   borrower: Scalars['String']['input'];
@@ -262,3 +262,5 @@ export type GetReserveUsdHistoryQueryVariables = Exact<{ [key: string]: never; }
 
 
 export type GetReserveUsdHistoryQuery = { __typename: 'Query', getReserveUSDHistory: Array<Array<number>> };
+
+export type TokenFragmentFragment = { __typename: 'Token', address: string };

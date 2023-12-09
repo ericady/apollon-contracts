@@ -42,7 +42,7 @@ export const GET_BORROWER_DEBT_TOKENS = gql`
   query GetBorrowerDebtTokens($borrower: String!) {
     getDebtTokens(borrower: $borrower) {
       troveMintedAmount
-      walletAmount
+      walletAmount @client
       stabilityLostAmount
       stabilityCompoundAmount
 
@@ -202,3 +202,14 @@ export const GET_RESERVE_USD_HISTORY = gql`
     getReserveUSDHistory
   }
 `;
+
+
+
+// -------------------- Fragments for the cache --------------------
+
+export const TOKEN_FRAGMENT = gql`
+  fragment TokenFragment on Token {
+    address
+  }
+`;
+
