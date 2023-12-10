@@ -60,6 +60,16 @@
     {
         "inputs": [
             {
+                "internalType": "address",
+                "name": "_borrower",
+                "type": "address"
+            },
+            {
+                "internalType": "address",
+                "name": "_to",
+                "type": "address"
+            },
+            {
                 "components": [
                     {
                         "internalType": "address",

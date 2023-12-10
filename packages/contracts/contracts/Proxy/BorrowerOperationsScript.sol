@@ -26,8 +26,8 @@ contract BorrowerOperationsScript is CheckContract, IBase {
     borrowerOperations.withdrawColl(_colls);
   }
 
-  function increaseDebt(TokenAmount[] memory _debts, uint _maxFeePercentage) external {
-    borrowerOperations.increaseDebt(_debts, _maxFeePercentage);
+  function increaseDebt(address _borrower, address _to, TokenAmount[] memory _debts, uint _maxFeePercentage) external {
+    borrowerOperations.increaseDebt(_borrower, _to, _debts, _maxFeePercentage);
   }
 
   function repayDebt(TokenAmount[] memory _debts) external {

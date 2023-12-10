@@ -7,6 +7,7 @@ import '@openzeppelin/contracts/access/Ownable.sol';
 import './SwapPair.sol';
 import './Interfaces/ISwapOperations.sol';
 import './Interfaces/IBorrowerOperations.sol';
+import './Interfaces/IDebtTokenManager.sol';
 import './Interfaces/IPriceFeed.sol';
 import './Dependencies/CheckContract.sol';
 import './Interfaces/ITroveManager.sol';
@@ -15,6 +16,7 @@ contract SwapOperations is ISwapOperations, Ownable(msg.sender), CheckContract {
   ITroveManager public troveManager;
   IBorrowerOperations public borrowerOperations;
   IPriceFeed public priceFeed;
+  IDebtTokenManager public debtTokenManager;
 
   mapping(address => mapping(address => address)) public getPair;
   address[] public allPairs;
@@ -22,16 +24,30 @@ contract SwapOperations is ISwapOperations, Ownable(msg.sender), CheckContract {
   // todo reward flow, where should the swap fees flow to...
   address public feeTo; // gets used by the pairs itself
 
-  constructor(address _borrowerOperationsAddress, address _troveManagerAddress, address _priceFeedAddress) {
+  function setAddresses(
+    address _borrowerOperationsAddress,
+    address _troveManagerAddress,
+    address _priceFeedAddress,
+    address _debtTokenManager
+  ) external onlyOwner {
     checkContract(_borrowerOperationsAddress);
     checkContract(_troveManagerAddress);
     checkContract(_priceFeedAddress);
+    checkContract(_debtTokenManager);
 
     borrowerOperations = IBorrowerOperations(_borrowerOperationsAddress);
     troveManager = ITroveManager(_troveManagerAddress);
     priceFeed = IPriceFeed(_priceFeedAddress);
+    debtTokenManager = IDebtTokenManager(_debtTokenManager);
 
-    emit SwapOperationsInitialized(_borrowerOperationsAddress, _troveManagerAddress, _priceFeedAddress);
+    emit SwapOperationsInitialized(
+      _borrowerOperationsAddress,
+      _troveManagerAddress,
+      _priceFeedAddress,
+      _debtTokenManager
+    );
+
+    renounceOwnership();
   }
 
   modifier ensure(uint deadline) {
@@ -192,7 +208,7 @@ contract SwapOperations is ISwapOperations, Ownable(msg.sender), CheckContract {
       TokenAmount[] memory debtsToMint = new TokenAmount[](2);
       debtsToMint[0] = TokenAmount(tokenA, vars.fromMintA);
       debtsToMint[1] = TokenAmount(tokenB, vars.fromMintB);
-      borrowerOperations.increaseDebtFromPoolMint(msg.sender, vars.pair, debtsToMint, _maxMintFeePercentage);
+      borrowerOperations.increaseDebt(msg.sender, vars.pair, debtsToMint, _maxMintFeePercentage);
     }
 
     // transfer tokens sourced from senders balance
@@ -283,6 +299,60 @@ contract SwapOperations is ISwapOperations, Ownable(msg.sender), CheckContract {
     if (amounts[0] > amountInMax) revert ExcessiveInputAmount();
     safeTransferFrom(path[0], msg.sender, getPair[path[0]][path[1]], amounts[0]);
     _swap(amounts, path, to);
+  }
+
+  function openLongPosition(
+    uint stableToMintIn,
+    uint debtOutMin,
+    address debtTokenAddress,
+    address to,
+    uint _maxMintFeePercentage,
+    uint deadline
+  ) external override returns (uint[] memory amounts) {
+    address[] memory path = new address[](2);
+    path[0] = address(debtTokenManager.getStableCoin());
+    path[1] = debtTokenAddress;
+
+    return _openPosition(stableToMintIn, debtOutMin, path, to, _maxMintFeePercentage);
+  }
+
+  function openShortPosition(
+    uint debtToMintIn,
+    uint stableOutMin,
+    address debtTokenAddress,
+    address to,
+    uint _maxMintFeePercentage,
+    uint deadline
+  ) external override returns (uint[] memory amounts) {
+    address[] memory path = new address[](2);
+    path[0] = debtTokenAddress;
+    path[1] = address(debtTokenManager.getStableCoin());
+
+    return _openPosition(debtToMintIn, stableOutMin, path, to, _maxMintFeePercentage);
+  }
+
+  function _openPosition(
+    uint amountIn,
+    uint amountOutMin,
+    address[] memory path,
+    address to,
+    uint _maxMintFeePercentage
+  ) internal returns (uint[] memory amounts) {
+    address pair = getPair[path[0]][path[1]];
+    if (pair == address(0)) revert PairDoesNotExist();
+
+    amounts = getAmountsOut(amountIn, path);
+    if (amounts[amounts.length - 1] < amountOutMin) revert InsufficientOutputAmount();
+
+    // mint the debt token and transfer it to the pair
+    TokenAmount[] memory debtsToMint = new TokenAmount[](1);
+    debtsToMint[0] = TokenAmount(path[0], amounts[0]);
+    borrowerOperations.increaseDebt(msg.sender, pair, debtsToMint, _maxMintFeePercentage);
+
+    // execute the swap
+    _swap(amounts, path, to);
+
+    return amounts;
   }
 
   // **** HELPER FUNCTIONS ****

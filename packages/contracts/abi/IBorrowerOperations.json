@@ -253,6 +253,16 @@
     {
         "inputs": [
             {
+                "internalType": "address",
+                "name": "_borrower",
+                "type": "address"
+            },
+            {
+                "internalType": "address",
+                "name": "_to",
+                "type": "address"
+            },
+            {
                 "components": [
                     {
                         "internalType": "address",
@@ -276,46 +286,6 @@
             }
         ],
         "name": "increaseDebt",
-        "outputs": [],
-        "stateMutability": "nonpayable",
-        "type": "function"
-    },
-    {
-        "inputs": [
-            {
-                "internalType": "address",
-                "name": "_borrower",
-                "type": "address"
-            },
-            {
-                "internalType": "address",
-                "name": "_targetPool",
-                "type": "address"
-            },
-            {
-                "components": [
-                    {
-                        "internalType": "address",
-                        "name": "tokenAddress",
-                        "type": "address"
-                    },
-                    {
-                        "internalType": "uint256",
-                        "name": "amount",
-                        "type": "uint256"
-                    }
-                ],
-                "internalType": "struct IBase.TokenAmount[]",
-                "name": "_debts",
-                "type": "tuple[]"
-            },
-            {
-                "internalType": "uint256",
-                "name": "_maxFeePercentage",
-                "type": "uint256"
-            }
-        ],
-        "name": "increaseDebtFromPoolMint",
         "outputs": [],
         "stateMutability": "nonpayable",
         "type": "function"

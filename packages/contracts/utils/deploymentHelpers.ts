@@ -30,7 +30,7 @@ export interface Contracts {
 }
 
 export const deployCore = async (): Promise<Contracts> => {
-  const borrowerOperationsFactory = await ethers.getContractFactory('BorrowerOperationsTester');
+  const borrowerOperationsFactory = await ethers.getContractFactory('MockBorrowerOperations');
   const borrowerOperations = await borrowerOperationsFactory.deploy();
 
   const redemptionOperationsFactory = await ethers.getContractFactory('RedemptionOperations');
@@ -58,7 +58,7 @@ export const deployCore = async (): Promise<Contracts> => {
   const priceFeed = await priceFeedFactory.deploy();
 
   const swapOperationsFactory = await ethers.getContractFactory('SwapOperations');
-  const swapOperations = await swapOperationsFactory.deploy(borrowerOperations, troveManager, priceFeed);
+  const swapOperations = await swapOperationsFactory.deploy();
 
   return {
     borrowerOperations,
@@ -124,6 +124,13 @@ export const connectCoreContracts = async (contracts: Contracts) => {
     contracts.priceFeed,
     contracts.storagePool,
     contracts.reservePool,
+    contracts.debtTokenManager
+  );
+
+  await contracts.swapOperations.setAddresses(
+    contracts.borrowerOperations,
+    contracts.troveManager,
+    contracts.priceFeed,
     contracts.debtTokenManager
   );
 };

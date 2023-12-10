@@ -123,4 +123,26 @@ describe('SwapOperations', () => {
       // todo
     });
   });
+
+  describe('positions', () => {
+    it('open long without trove, should fail', async () => {
+      // todo
+    });
+
+    it('open long with unknown debt token', async () => {
+      // todo
+    });
+
+    it('open long with no enough collateral, should fail', async () => {
+      // todo
+    });
+
+    it('open long', async () => {
+      // todo
+    });
+
+    it('same for shorts', async () => {
+      // todo
+    });
+  });
 });

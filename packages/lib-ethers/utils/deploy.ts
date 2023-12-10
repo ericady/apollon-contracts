@@ -54,34 +54,23 @@ const deployContracts = async (
   const [storagePool, startBlock] = await deployContractAndGetBlockNumber(deployer, getContractFactory, 'StoragePool', {
     ...overrides,
   });
-  const borrowerOperations = await deployContract(deployer, getContractFactory, 'BorrowerOperations', {
-    ...overrides,
-  });
-  const troveManager = await deployContract(deployer, getContractFactory, 'TroveManager', {
-    ...overrides,
-  });
-  const priceFeed = await deployContract(
-    deployer,
-    getContractFactory,
-    priceFeedIsTestnet ? 'MockPriceFeed' : 'PriceFeed',
-    { ...overrides }
-  );
 
   return [
     {
-      borrowerOperations,
-      troveManager,
-      priceFeed,
       storagePool,
-      swapOperations: await deployContract(
+      borrowerOperations: await deployContract(deployer, getContractFactory, 'BorrowerOperations', {
+        ...overrides,
+      }),
+      troveManager: await deployContract(deployer, getContractFactory, 'TroveManager', {
+        ...overrides,
+      }),
+      priceFeed: await deployContract(
         deployer,
         getContractFactory,
-        'SwapOperations',
-        borrowerOperations,
-        troveManager,
-        priceFeed,
+        priceFeedIsTestnet ? 'MockPriceFeed' : 'PriceFeed',
         { ...overrides }
       ),
+      swapOperations: await deployContract(deployer, getContractFactory, 'SwapOperations', { ...overrides }),
       redemptionOperations: await deployContract(deployer, getContractFactory, 'RedemptionOperations', {
         ...overrides,
       }),
@@ -193,6 +182,15 @@ const connectContracts = async (
         priceFeed.address,
         storagePool.address,
         reservePool.address,
+        debtTokenManager.address,
+        { ...overrides, nonce }
+      ),
+
+    nonce =>
+      swapOperations.setAddresses(
+        borrowerOperations.address,
+        troveManager.address,
+        priceFeed.address,
         debtTokenManager.address,
         { ...overrides, nonce }
       ),

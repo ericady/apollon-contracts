@@ -20,7 +20,12 @@ interface ISwapOperations is IBBase {
   error InvalidPath();
   error TransferFromFailed();
 
-  event SwapOperationsInitialized(address borrowerOperations, address troveManager, address priceFeed);
+  event SwapOperationsInitialized(
+    address borrowerOperations,
+    address troveManager,
+    address priceFeed,
+    address debtTokenManager
+  );
   event PairCreated(address indexed token0, address indexed token1, address pair, uint);
 
   // **** GETTER ****
@@ -81,6 +86,24 @@ interface ISwapOperations is IBBase {
     uint amountInMax,
     address[] calldata path,
     address to,
+    uint deadline
+  ) external returns (uint[] memory amounts);
+
+  function openLongPosition(
+    uint stableToMintIn,
+    uint debtOutMin,
+    address debtTokenAddress,
+    address to,
+    uint _maxMintFeePercentage,
+    uint deadline
+  ) external returns (uint[] memory amounts);
+
+  function openShortPosition(
+    uint debtToMintIn,
+    uint stableOutMin,
+    address debtTokenAddress,
+    address to,
+    uint _maxMintFeePercentage,
     uint deadline
   ) external returns (uint[] memory amounts);
 }

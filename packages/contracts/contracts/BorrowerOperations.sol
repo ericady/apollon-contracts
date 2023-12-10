@@ -283,63 +283,18 @@ contract BorrowerOperations is LiquityBase, Ownable(msg.sender), CheckContract, 
     _finaliseTrove(true, false, contractsCache, vars, borrower);
   }
 
-  // increasing debt of a trove
-  // todo patch function for position opening
-  function increaseDebt(TokenAmount[] memory _debts, uint _maxFeePercentage) external override {
-    // todo reuqire only from swap ops, tests need to be patched...
-    //    _requireCallerIsSwapOperations();
-
-    (ContractsCache memory contractsCache, LocalVariables_adjustTrove memory vars) = _prepareTroveAdjustment(
-      msg.sender
-    );
-
-    _requireValidMaxFeePercentage(_maxFeePercentage, vars.isInRecoveryMode);
-
-    // checking if new debt is above the minimum
-    for (uint i = 0; i < _debts.length; i++) _requireNonZeroDebtChange(_debts[i].amount);
-
-    (
-      DebtTokenAmount[] memory debtsToAdd,
-      DebtTokenAmount memory stableCoinAmount
-    ) = _getDebtTokenAmountsWithFetchedPrices(contractsCache.debtTokenManager, _debts);
-
-    // adding the borrowing fee to the net debt
-    uint borrowingFeesPaid = 0;
-    if (!vars.isInRecoveryMode)
-      borrowingFeesPaid = _addBorrowingFees(
-        contractsCache.troveManager,
-        debtsToAdd,
-        stableCoinAmount,
-        _maxFeePercentage
-      );
-
-    vars.newCompositeDebtInUSD += _getCompositeDebt(debtsToAdd);
-    contractsCache.troveManager.increaseTroveDebt(msg.sender, debtsToAdd);
-
-    for (uint i = 0; i < debtsToAdd.length; i++) {
-      DebtTokenAmount memory debtTokenAmount = debtsToAdd[i];
-      _poolAddDebt(
-        msg.sender,
-        contractsCache.storagePool,
-        debtTokenAmount.debtToken,
-        debtTokenAmount.netDebt,
-        debtTokenAmount.borrowingFee
-      );
-    }
-
-    _finaliseTrove(false, true, contractsCache, vars, msg.sender);
-  }
-
-  // increasing debt off a trove
-  function increaseDebtFromPoolMint(
+  function increaseDebt(
     address _borrower,
-    address _targetPool,
+    address _to,
     TokenAmount[] memory _debts,
     uint _maxFeePercentage
   ) external override {
-    // todo reuqire only from swap ops, tests need to be patched...
-    //    _requireCallerIsSwapOperations();
+    _requireCallerIsSwapOperations();
+    _increaseDebt(_borrower, _to, _debts, _maxFeePercentage);
+  }
 
+  // increasing debt off a trove
+  function _increaseDebt(address _borrower, address _to, TokenAmount[] memory _debts, uint _maxFeePercentage) internal {
     (ContractsCache memory contractsCache, LocalVariables_adjustTrove memory vars) = _prepareTroveAdjustment(_borrower);
 
     _requireValidMaxFeePercentage(_maxFeePercentage, vars.isInRecoveryMode);
@@ -368,7 +323,7 @@ contract BorrowerOperations is LiquityBase, Ownable(msg.sender), CheckContract, 
     for (uint i = 0; i < debtsToAdd.length; i++) {
       DebtTokenAmount memory debtTokenAmount = debtsToAdd[i];
       _poolAddDebt(
-        _targetPool,
+        _to,
         contractsCache.storagePool,
         debtTokenAmount.debtToken,
         debtTokenAmount.netDebt,
