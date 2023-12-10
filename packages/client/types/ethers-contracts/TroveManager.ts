@@ -163,7 +163,6 @@ export interface TroveManagerInterface extends Interface {
 
   getEvent(
     nameOrSignatureOrTopic:
-      | "TroveCollChanged"
       | "BaseRateUpdated"
       | "LTermsUpdated"
       | "LastFeeOpTimeUpdated"
@@ -173,6 +172,7 @@ export interface TroveManagerInterface extends Interface {
       | "TotalStakesUpdated"
       | "TroveAppliedRewards"
       | "TroveClosed"
+      | "TroveCollChanged"
       | "TroveIndexUpdated"
       | "TroveManagerInitialized"
       | "TroveSnapshotsUpdated"
@@ -641,22 +641,6 @@ export interface TroveManagerInterface extends Interface {
   ): Result;
 }
 
-export namespace TroveCollChangedEvent {
-  export type InputTuple = [
-    _borrower: AddressLike,
-    _collTokenAddresses: AddressLike[]
-  ];
-  export type OutputTuple = [_borrower: string, _collTokenAddresses: string[]];
-  export interface OutputObject {
-    _borrower: string;
-    _collTokenAddresses: string[];
-  }
-  export type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
-  export type Filter = TypedDeferredTopicFilter<Event>;
-  export type Log = TypedEventLog<Event>;
-  export type LogDescription = TypedLogDescription<Event>;
-}
-
 export namespace BaseRateUpdatedEvent {
   export type InputTuple = [_baseRate: BigNumberish];
   export type OutputTuple = [_baseRate: bigint];
@@ -790,6 +774,22 @@ export namespace TroveClosedEvent {
   export interface OutputObject {
     _borrower: string;
     _closingState: bigint;
+  }
+  export type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
+  export type Filter = TypedDeferredTopicFilter<Event>;
+  export type Log = TypedEventLog<Event>;
+  export type LogDescription = TypedLogDescription<Event>;
+}
+
+export namespace TroveCollChangedEvent {
+  export type InputTuple = [
+    _borrower: AddressLike,
+    _collTokenAddresses: AddressLike[]
+  ];
+  export type OutputTuple = [_borrower: string, _collTokenAddresses: string[]];
+  export interface OutputObject {
+    _borrower: string;
+    _collTokenAddresses: string[];
   }
   export type Event = TypedContractEvent<InputTuple, OutputTuple, OutputObject>;
   export type Filter = TypedDeferredTopicFilter<Event>;
@@ -999,7 +999,7 @@ export interface TroveManager extends BaseContract {
 
   getCurrentICR: TypedContractMethod<
     [_borrower: AddressLike],
-    [[bigint, bigint] & { ICR: bigint; currentDebtInStable: bigint }],
+    [[bigint, bigint] & { ICR: bigint; currentDebtInUSD: bigint }],
     "view"
   >;
 
@@ -1008,9 +1008,9 @@ export interface TroveManager extends BaseContract {
     [
       [IBase.RAmountStructOutput[], bigint, bigint, bigint] & {
         amounts: IBase.RAmountStructOutput[];
-        troveCollInStable: bigint;
-        troveDebtInStable: bigint;
-        troveDebtInStableWithoutGasCompensation: bigint;
+        troveCollInUSD: bigint;
+        troveDebtInUSD: bigint;
+        troveDebtInUSDWithoutGasCompensation: bigint;
       }
     ],
     "view"
@@ -1291,7 +1291,7 @@ export interface TroveManager extends BaseContract {
     nameOrSignature: "getCurrentICR"
   ): TypedContractMethod<
     [_borrower: AddressLike],
-    [[bigint, bigint] & { ICR: bigint; currentDebtInStable: bigint }],
+    [[bigint, bigint] & { ICR: bigint; currentDebtInUSD: bigint }],
     "view"
   >;
   getFunction(
@@ -1301,9 +1301,9 @@ export interface TroveManager extends BaseContract {
     [
       [IBase.RAmountStructOutput[], bigint, bigint, bigint] & {
         amounts: IBase.RAmountStructOutput[];
-        troveCollInStable: bigint;
-        troveDebtInStable: bigint;
-        troveDebtInStableWithoutGasCompensation: bigint;
+        troveCollInUSD: bigint;
+        troveDebtInUSD: bigint;
+        troveDebtInUSDWithoutGasCompensation: bigint;
       }
     ],
     "view"
@@ -1459,13 +1459,6 @@ export interface TroveManager extends BaseContract {
   ): TypedContractMethod<[_borrower: AddressLike], [void], "nonpayable">;
 
   getEvent(
-    key: "TroveCollChanged"
-  ): TypedContractEvent<
-    TroveCollChangedEvent.InputTuple,
-    TroveCollChangedEvent.OutputTuple,
-    TroveCollChangedEvent.OutputObject
-  >;
-  getEvent(
     key: "BaseRateUpdated"
   ): TypedContractEvent<
     BaseRateUpdatedEvent.InputTuple,
@@ -1529,6 +1522,13 @@ export interface TroveManager extends BaseContract {
     TroveClosedEvent.OutputObject
   >;
   getEvent(
+    key: "TroveCollChanged"
+  ): TypedContractEvent<
+    TroveCollChangedEvent.InputTuple,
+    TroveCollChangedEvent.OutputTuple,
+    TroveCollChangedEvent.OutputObject
+  >;
+  getEvent(
     key: "TroveIndexUpdated"
   ): TypedContractEvent<
     TroveIndexUpdatedEvent.InputTuple,
@@ -1551,17 +1551,6 @@ export interface TroveManager extends BaseContract {
   >;
 
   filters: {
-    "TroveCollChanged(address,address[])": TypedContractEvent<
-      TroveCollChangedEvent.InputTuple,
-      TroveCollChangedEvent.OutputTuple,
-      TroveCollChangedEvent.OutputObject
-    >;
-    TroveCollChanged: TypedContractEvent<
-      TroveCollChangedEvent.InputTuple,
-      TroveCollChangedEvent.OutputTuple,
-      TroveCollChangedEvent.OutputObject
-    >;
-
     "BaseRateUpdated(uint256)": TypedContractEvent<
       BaseRateUpdatedEvent.InputTuple,
       BaseRateUpdatedEvent.OutputTuple,
@@ -1659,6 +1648,17 @@ export interface TroveManager extends BaseContract {
       TroveClosedEvent.InputTuple,
       TroveClosedEvent.OutputTuple,
       TroveClosedEvent.OutputObject
+    >;
+
+    "TroveCollChanged(address,address[])": TypedContractEvent<
+      TroveCollChangedEvent.InputTuple,
+      TroveCollChangedEvent.OutputTuple,
+      TroveCollChangedEvent.OutputObject
+    >;
+    TroveCollChanged: TypedContractEvent<
+      TroveCollChangedEvent.InputTuple,
+      TroveCollChangedEvent.OutputTuple,
+      TroveCollChangedEvent.OutputObject
     >;
 
     "TroveIndexUpdated(address,uint256)": TypedContractEvent<

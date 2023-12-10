@@ -66,6 +66,8 @@ export interface StabilityPoolManagerInterface extends Interface {
       | "addStabilityPool"
       | "debtTokenManagerAddress"
       | "getCompoundedDeposits"
+      | "getDepositorCollGains"
+      | "getDepositorDeposits"
       | "getRemainingStability"
       | "getStabilityPool"
       | "getStabilityPools"
@@ -104,6 +106,14 @@ export interface StabilityPoolManagerInterface extends Interface {
   encodeFunctionData(
     functionFragment: "getCompoundedDeposits",
     values?: undefined
+  ): string;
+  encodeFunctionData(
+    functionFragment: "getDepositorCollGains",
+    values: [AddressLike, AddressLike[]]
+  ): string;
+  encodeFunctionData(
+    functionFragment: "getDepositorDeposits",
+    values: [AddressLike]
   ): string;
   encodeFunctionData(
     functionFragment: "getRemainingStability",
@@ -182,6 +192,14 @@ export interface StabilityPoolManagerInterface extends Interface {
   ): Result;
   decodeFunctionResult(
     functionFragment: "getCompoundedDeposits",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "getDepositorCollGains",
+    data: BytesLike
+  ): Result;
+  decodeFunctionResult(
+    functionFragment: "getDepositorDeposits",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
@@ -357,6 +375,18 @@ export interface StabilityPoolManager extends BaseContract {
     "view"
   >;
 
+  getDepositorCollGains: TypedContractMethod<
+    [_depositor: AddressLike, collTokenAddresses: AddressLike[]],
+    [IBase.TokenAmountStructOutput[]],
+    "view"
+  >;
+
+  getDepositorDeposits: TypedContractMethod<
+    [_depositor: AddressLike],
+    [IBase.TokenAmountStructOutput[]],
+    "view"
+  >;
+
   getRemainingStability: TypedContractMethod<
     [collTokenAddresses: AddressLike[]],
     [IBBase.RemainingStabilityStructOutput[]],
@@ -448,6 +478,20 @@ export interface StabilityPoolManager extends BaseContract {
   getFunction(
     nameOrSignature: "getCompoundedDeposits"
   ): TypedContractMethod<[], [IBase.TokenAmountStructOutput[]], "view">;
+  getFunction(
+    nameOrSignature: "getDepositorCollGains"
+  ): TypedContractMethod<
+    [_depositor: AddressLike, collTokenAddresses: AddressLike[]],
+    [IBase.TokenAmountStructOutput[]],
+    "view"
+  >;
+  getFunction(
+    nameOrSignature: "getDepositorDeposits"
+  ): TypedContractMethod<
+    [_depositor: AddressLike],
+    [IBase.TokenAmountStructOutput[]],
+    "view"
+  >;
   getFunction(
     nameOrSignature: "getRemainingStability"
   ): TypedContractMethod<

@@ -57,7 +57,7 @@ export interface StabilityPoolInterface extends Interface {
       | "getDepositToken"
       | "getDepositorCollGain"
       | "getDepositorCollSnapshot"
-      | "getStabilityAPY"
+      | "getDepositorDeposit"
       | "getTotalDeposit"
       | "getTotalGainedColl"
       | "lastErrorOffset"
@@ -154,8 +154,8 @@ export interface StabilityPoolInterface extends Interface {
     values: [AddressLike, AddressLike]
   ): string;
   encodeFunctionData(
-    functionFragment: "getStabilityAPY",
-    values?: undefined
+    functionFragment: "getDepositorDeposit",
+    values: [AddressLike]
   ): string;
   encodeFunctionData(
     functionFragment: "getTotalDeposit",
@@ -279,7 +279,7 @@ export interface StabilityPoolInterface extends Interface {
     data: BytesLike
   ): Result;
   decodeFunctionResult(
-    functionFragment: "getStabilityAPY",
+    functionFragment: "getDepositorDeposit",
     data: BytesLike
   ): Result;
   decodeFunctionResult(
@@ -625,7 +625,11 @@ export interface StabilityPool extends BaseContract {
     "view"
   >;
 
-  getStabilityAPY: TypedContractMethod<[], [bigint], "view">;
+  getDepositorDeposit: TypedContractMethod<
+    [_depositor: AddressLike],
+    [bigint],
+    "view"
+  >;
 
   getTotalDeposit: TypedContractMethod<[], [bigint], "view">;
 
@@ -757,8 +761,8 @@ export interface StabilityPool extends BaseContract {
     "view"
   >;
   getFunction(
-    nameOrSignature: "getStabilityAPY"
-  ): TypedContractMethod<[], [bigint], "view">;
+    nameOrSignature: "getDepositorDeposit"
+  ): TypedContractMethod<[_depositor: AddressLike], [bigint], "view">;
   getFunction(
     nameOrSignature: "getTotalDeposit"
   ): TypedContractMethod<[], [bigint], "view">;

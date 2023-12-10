@@ -14,7 +14,7 @@
     "test:component:integration": "playwright test -c playwright-ct.config.ts",
     "test:component:integration:watch": "PWTEST_WATCH=1 playwright test -c playwright-ct.config.ts",
     "test:e2e": "NEXT_PUBLIC_API_MOCKING=e2e playwright test",
-    "codegen": "npx graphql-codegen && npx typechain --target=ethers-v6 app/context/abis/*.json"
+    "codegen": "node scripts/syncAbis.js && npx graphql-codegen && npx typechain --target=ethers-v6 app/context/abis/*.json"
   },
   "dependencies": {
     "@apollo/client": "3.8.1",

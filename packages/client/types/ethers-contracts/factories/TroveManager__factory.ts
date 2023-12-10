@@ -71,25 +71,6 @@ const _abi = [
     inputs: [
       {
         indexed: false,
-        internalType: "address",
-        name: "_borrower",
-        type: "address",
-      },
-      {
-        indexed: false,
-        internalType: "address[]",
-        name: "_collTokenAddresses",
-        type: "address[]",
-      },
-    ],
-    name: "TroveCollChanged",
-    type: "event",
-  },
-  {
-    anonymous: false,
-    inputs: [
-      {
-        indexed: false,
         internalType: "uint256",
         name: "_baseRate",
         type: "uint256",
@@ -348,6 +329,25 @@ const _abi = [
       },
     ],
     name: "TroveClosed",
+    type: "event",
+  },
+  {
+    anonymous: false,
+    inputs: [
+      {
+        indexed: false,
+        internalType: "address",
+        name: "_borrower",
+        type: "address",
+      },
+      {
+        indexed: false,
+        internalType: "address[]",
+        name: "_collTokenAddresses",
+        type: "address[]",
+      },
+    ],
+    name: "TroveCollChanged",
     type: "event",
   },
   {
@@ -941,7 +941,7 @@ const _abi = [
       },
       {
         internalType: "uint256",
-        name: "currentDebtInStable",
+        name: "currentDebtInUSD",
         type: "uint256",
       },
     ],
@@ -1007,17 +1007,17 @@ const _abi = [
       },
       {
         internalType: "uint256",
-        name: "troveCollInStable",
+        name: "troveCollInUSD",
         type: "uint256",
       },
       {
         internalType: "uint256",
-        name: "troveDebtInStable",
+        name: "troveDebtInUSD",
         type: "uint256",
       },
       {
         internalType: "uint256",
-        name: "troveDebtInStableWithoutGasCompensation",
+        name: "troveDebtInUSDWithoutGasCompensation",
         type: "uint256",
       },
     ],

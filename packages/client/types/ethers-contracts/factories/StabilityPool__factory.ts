@@ -626,8 +626,14 @@ const _abi = [
     type: "function",
   },
   {
-    inputs: [],
-    name: "getStabilityAPY",
+    inputs: [
+      {
+        internalType: "address",
+        name: "_depositor",
+        type: "address",
+      },
+    ],
+    name: "getDepositorDeposit",
     outputs: [
       {
         internalType: "uint256",
