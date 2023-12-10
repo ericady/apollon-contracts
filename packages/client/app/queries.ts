@@ -203,8 +203,6 @@ export const GET_RESERVE_USD_HISTORY = gql`
   }
 `;
 
-
-
 // -------------------- Fragments for the cache --------------------
 
 export const TOKEN_FRAGMENT = gql`
@@ -212,4 +210,3 @@ export const TOKEN_FRAGMENT = gql`
     address
   }
 `;
-

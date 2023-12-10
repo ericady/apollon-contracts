@@ -1,7 +1,7 @@
 import { Address, BigInt, ethereum } from '@graphprotocol/graph-ts';
 import { DebtToken } from '../../generated/DebtToken/DebtToken';
 import { StabilityOffsetAddedGainsStruct } from '../../generated/StabilityPool/StabilityPool';
-import { DebtTokenMeta, Token } from '../../generated/schema';
+import { DebtTokenMeta } from '../../generated/schema';
 
 export function handleCreateDebtTokenMeta(event: ethereum.Event, tokenAddress: Address): void {
   const debtTokenMeta = new DebtTokenMeta(event.transaction.hash.concatI32(event.logIndex.toI32()));
