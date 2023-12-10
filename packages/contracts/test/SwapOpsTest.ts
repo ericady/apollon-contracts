@@ -84,7 +84,7 @@ describe('SwapOperations', () => {
     // todo
   });
 
-  describe('liquidity removal', () => {
+  describe('remove liquidity', () => {
     it('todo default uniswap tests...', async () => {
       // todo
     });
@@ -102,6 +102,24 @@ describe('SwapOperations', () => {
     });
 
     it('huge debts, partial repay expected', async () => {
+      // todo
+    });
+  });
+
+  describe('add liquidity', () => {
+    it('todo default uniswap tests...', async () => {
+      // todo
+    });
+
+    it('borrower has enough funds for the op, no trove needed', async () => {
+      // todo
+    });
+
+    it('low collateral trove, minting should fail because of bad trove CR', async () => {
+      // todo
+    });
+
+    it('high collateral trove, missing token should be minted from senders trove', async () => {
       // todo
     });
   });

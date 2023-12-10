@@ -54,6 +54,7 @@ interface ISwapOperations is IBBase {
     uint amountBDesired,
     uint amountAMin,
     uint amountBMin,
+    uint _maxMintFeePercentage,
     uint deadline
   ) external returns (uint amountA, uint amountB, uint liquidity);
 

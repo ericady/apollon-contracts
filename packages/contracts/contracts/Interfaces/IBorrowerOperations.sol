@@ -51,6 +51,13 @@ interface IBorrowerOperations is IBBase {
 
   function increaseDebt(TokenAmount[] memory _debts, uint _maxFeePercentage) external;
 
+  function increaseDebtFromPoolMint(
+    address _borrower,
+    address _targetPool,
+    TokenAmount[] memory _debts,
+    uint _maxFeePercentage
+  ) external;
+
   function repayDebt(TokenAmount[] memory _debts) external;
 
   function repayDebtFromPoolBurn(address borrower, TokenAmount[] memory _debts) external;

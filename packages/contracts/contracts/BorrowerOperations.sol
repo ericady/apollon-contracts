@@ -284,6 +284,7 @@ contract BorrowerOperations is LiquityBase, Ownable(msg.sender), CheckContract, 
   }
 
   // increasing debt of a trove
+  // todo patch function for position opening
   function increaseDebt(TokenAmount[] memory _debts, uint _maxFeePercentage) external override {
     // todo reuqire only from swap ops, tests need to be patched...
     //    _requireCallerIsSwapOperations();
@@ -327,6 +328,55 @@ contract BorrowerOperations is LiquityBase, Ownable(msg.sender), CheckContract, 
     }
 
     _finaliseTrove(false, true, contractsCache, vars, msg.sender);
+  }
+
+  // increasing debt off a trove
+  function increaseDebtFromPoolMint(
+    address _borrower,
+    address _targetPool,
+    TokenAmount[] memory _debts,
+    uint _maxFeePercentage
+  ) external override {
+    // todo reuqire only from swap ops, tests need to be patched...
+    //    _requireCallerIsSwapOperations();
+
+    (ContractsCache memory contractsCache, LocalVariables_adjustTrove memory vars) = _prepareTroveAdjustment(_borrower);
+
+    _requireValidMaxFeePercentage(_maxFeePercentage, vars.isInRecoveryMode);
+
+    // checking if new debt is above the minimum
+    for (uint i = 0; i < _debts.length; i++) _requireNonZeroDebtChange(_debts[i].amount);
+
+    (
+      DebtTokenAmount[] memory debtsToAdd,
+      DebtTokenAmount memory stableCoinAmount
+    ) = _getDebtTokenAmountsWithFetchedPrices(contractsCache.debtTokenManager, _debts);
+
+    // adding the borrowing fee to the net debt
+    uint borrowingFeesPaid = 0;
+    if (!vars.isInRecoveryMode)
+      borrowingFeesPaid = _addBorrowingFees(
+        contractsCache.troveManager,
+        debtsToAdd,
+        stableCoinAmount,
+        _maxFeePercentage
+      );
+
+    vars.newCompositeDebtInUSD += _getCompositeDebt(debtsToAdd);
+    contractsCache.troveManager.increaseTroveDebt(_borrower, debtsToAdd);
+
+    for (uint i = 0; i < debtsToAdd.length; i++) {
+      DebtTokenAmount memory debtTokenAmount = debtsToAdd[i];
+      _poolAddDebt(
+        _targetPool,
+        contractsCache.storagePool,
+        debtTokenAmount.debtToken,
+        debtTokenAmount.netDebt,
+        debtTokenAmount.borrowingFee
+      );
+    }
+
+    _finaliseTrove(false, true, contractsCache, vars, _borrower);
   }
 
   // repay debt of a trove
@@ -554,17 +604,8 @@ contract BorrowerOperations is LiquityBase, Ownable(msg.sender), CheckContract, 
     _pool.withdrawalValue(_borrower, _collAddress, true, _poolType, _amount);
   }
 
-  /**
-   * @notice Increase debt of Borrower and distribute borrowing fees
-   * @dev Cut reserve fee from borrowing fees and send to the reserve pool, rest borrowing fees to staking pool
-   * @param _borrower Borrower address
-   * @param _storagePool Cached storage pool interface
-   * @param _debtToken Debt token to borrow
-   * @param _netDebtIncrease Debt amount to borrow
-   * @param _borrowingFee Borrowing fee
-   */
   function _poolAddDebt(
-    address _borrower,
+    address _tokenRecipient,
     IStoragePool _storagePool,
     IDebtToken _debtToken,
     uint _netDebtIncrease,
@@ -572,14 +613,14 @@ contract BorrowerOperations is LiquityBase, Ownable(msg.sender), CheckContract, 
   ) internal {
     _storagePool.addValue(address(_debtToken), false, PoolType.Active, _netDebtIncrease);
     uint mintAmount = _netDebtIncrease - _borrowingFee;
-    if (mintAmount > 0) _debtToken.mint(_borrower, mintAmount);
+    if (mintAmount > 0) _debtToken.mint(_tokenRecipient, mintAmount);
 
     // Cut reserve fees from borrowing fee and mint to the reserve pool
     uint reserveFee = (_borrowingFee * RESERVE_FEE) / 1e18;
     (bool stableCapReached, ) = reservePool.isReserveCapReached();
     if (reserveFee > 0 && !stableCapReached) {
       _debtToken.mint(address(reservePool), reserveFee);
-      emit SentBorrowingFeesToReserve(_borrower, reserveFee);
+      emit SentBorrowingFeesToReserve(_tokenRecipient, reserveFee);
     } else {
       reserveFee = 0;
     }

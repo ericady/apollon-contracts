@@ -136,6 +136,16 @@ contract SwapOperations is ISwapOperations, Ownable(msg.sender), CheckContract {
 
   // **** LIQUIDITY FUNCTIONS ****
 
+  struct ProvidingVars {
+    address pair;
+    uint senderBalanceA;
+    uint senderBalanceB;
+    uint fromBalanceA;
+    uint fromBalanceB;
+    uint fromMintA;
+    uint fromMintB;
+  }
+
   function addLiquidity(
     address tokenA,
     address tokenB,
@@ -143,9 +153,12 @@ contract SwapOperations is ISwapOperations, Ownable(msg.sender), CheckContract {
     uint amountBDesired,
     uint amountAMin,
     uint amountBMin,
+    uint _maxMintFeePercentage,
     uint deadline
   ) external virtual override ensure(deadline) returns (uint amountA, uint amountB, uint liquidity) {
-    if (getPair[tokenA][tokenB] == address(0)) revert PairDoesNotExist();
+    ProvidingVars memory vars;
+    vars.pair = getPair[tokenA][tokenB];
+    if (vars.pair == address(0)) revert PairDoesNotExist();
 
     {
       (uint reserveA, uint reserveB) = getReserves(tokenA, tokenB);
@@ -165,16 +178,28 @@ contract SwapOperations is ISwapOperations, Ownable(msg.sender), CheckContract {
       }
     }
 
-    address sender = msg.sender;
-    address pair = getPair[tokenA][tokenB];
+    vars.senderBalanceA = IERC20(tokenA).balanceOf(msg.sender);
+    vars.senderBalanceB = IERC20(tokenB).balanceOf(msg.sender);
 
-    // todo check if the user has enough to deposit dierctly
-    // if not, then try to mint the missing amount
-    // abourt is the mintin would put the trove in liquidation
+    vars.fromBalanceA = LiquityMath._min(vars.senderBalanceA, amountA);
+    vars.fromBalanceB = LiquityMath._min(vars.senderBalanceB, amountB);
 
-    safeTransferFrom(tokenA, sender, pair, amountA);
-    safeTransferFrom(tokenB, sender, pair, amountB);
-    liquidity = ISwapPair(pair).mint(sender);
+    vars.fromMintA = amountA - vars.fromBalanceA;
+    vars.fromMintB = amountB - vars.fromBalanceB;
+
+    // mint new tokens if the sender did not have enough
+    if (vars.fromMintA != 0 || vars.fromMintB != 0) {
+      TokenAmount[] memory debtsToMint = new TokenAmount[](2);
+      debtsToMint[0] = TokenAmount(tokenA, vars.fromMintA);
+      debtsToMint[1] = TokenAmount(tokenB, vars.fromMintB);
+      borrowerOperations.increaseDebtFromPoolMint(msg.sender, vars.pair, debtsToMint, _maxMintFeePercentage);
+    }
+
+    // transfer tokens sourced from senders balance
+    if (vars.fromBalanceA != 0) safeTransferFrom(tokenA, msg.sender, vars.pair, vars.fromBalanceA);
+    if (vars.fromBalanceB != 0) safeTransferFrom(tokenB, msg.sender, vars.pair, vars.fromBalanceB);
+
+    liquidity = ISwapPair(vars.pair).mint(msg.sender);
   }
 
   struct RemovalVars {
