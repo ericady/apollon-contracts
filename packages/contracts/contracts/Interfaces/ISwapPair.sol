@@ -26,6 +26,8 @@ interface ISwapPair is ISwapERC20 {
     uint amount1In,
     uint amount0Out,
     uint amount1Out,
+    uint amount0Fee,
+    uint amount1Fee,
     address indexed to
   );
   event Sync(uint112 reserve0, uint112 reserve1);
@@ -52,6 +54,7 @@ interface ISwapPair is ISwapERC20 {
 
   function burn(
     address to,
+    uint liquidity,
     uint debt0,
     uint debt1
   ) external returns (uint amount0, uint amount1, uint burned0, uint burned1);

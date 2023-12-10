@@ -80,6 +80,10 @@ describe('SwapOperations', () => {
     // todo
   });
 
+  it('liquidity token should not be transferable', async () => {
+    // todo
+  });
+
   describe('liquidity removal', () => {
     it('todo default uniswap tests...', async () => {
       // todo

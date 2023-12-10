@@ -167,9 +167,23 @@ contract SwapOperations is ISwapOperations, Ownable(msg.sender), CheckContract {
 
     address sender = msg.sender;
     address pair = getPair[tokenA][tokenB];
+
+    // todo check if the user has enough to deposit dierctly
+    // if not, then try to mint the missing amount
+    // abourt is the mintin would put the trove in liquidation
+
     safeTransferFrom(tokenA, sender, pair, amountA);
     safeTransferFrom(tokenB, sender, pair, amountB);
     liquidity = ISwapPair(pair).mint(sender);
+  }
+
+  struct RemovalVars {
+    address token0;
+    address token1;
+    uint amount0;
+    uint amount1;
+    uint burned0;
+    uint burned1;
   }
 
   function removeLiquidity(
@@ -180,34 +194,28 @@ contract SwapOperations is ISwapOperations, Ownable(msg.sender), CheckContract {
     uint amountBMin,
     uint deadline
   ) public virtual override ensure(deadline) returns (uint amountA, uint amountB) {
+    RemovalVars memory vars;
+    (vars.token0, vars.token1) = sortTokens(tokenA, tokenB);
+
+    // receive tokens from pair
     address pair = getPair[tokenA][tokenB];
-    (address token0, address token1) = sortTokens(tokenA, tokenB);
-
-    ISwapPair(pair).transferFrom(msg.sender, pair, liquidity); // send liquidity to pair
-
-    // stack depth workaround
-    uint amount0;
-    uint amount1;
-    {
+    (vars.amount0, vars.amount1, vars.burned0, vars.burned1) = ISwapPair(pair).burn(
+      msg.sender,
+      liquidity,
       // check if there are some debts which has to be repaid first
-      uint debt0 = troveManager.getTroveRepayableDebt(msg.sender, token0);
-      uint debt1 = troveManager.getTroveRepayableDebt(msg.sender, token1);
+      troveManager.getTroveRepayableDebt(msg.sender, vars.token0),
+      troveManager.getTroveRepayableDebt(msg.sender, vars.token1)
+    );
 
-      // receive tokens from pair
-      uint burned0;
-      uint burned1;
-      (amount0, amount1, burned0, burned1) = ISwapPair(pair).burn(msg.sender, debt0, debt1);
-
-      // handle trove debt repayment
-      if (burned0 != 0 || burned1 != 0) {
-        TokenAmount[] memory debtsToRepay = new TokenAmount[](2);
-        debtsToRepay[0] = TokenAmount(token0, burned0);
-        debtsToRepay[1] = TokenAmount(token1, burned1);
-        borrowerOperations.repayDebtFromPoolBurn(msg.sender, debtsToRepay);
-      }
+    // handle trove debt repayment
+    if (vars.burned0 != 0 || vars.burned1 != 0) {
+      TokenAmount[] memory debtsToRepay = new TokenAmount[](2);
+      debtsToRepay[0] = TokenAmount(vars.token0, vars.burned0);
+      debtsToRepay[1] = TokenAmount(vars.token1, vars.burned1);
+      borrowerOperations.repayDebtFromPoolBurn(msg.sender, debtsToRepay);
     }
 
-    (amountA, amountB) = tokenA == token0 ? (amount0, amount1) : (amount1, amount0);
+    (amountA, amountB) = tokenA == vars.token0 ? (vars.amount0, vars.amount1) : (vars.amount1, vars.amount0);
     if (amountA < amountAMin) revert InsufficientAAmount();
     if (amountB < amountBMin) revert InsufficientBAmount();
   }
