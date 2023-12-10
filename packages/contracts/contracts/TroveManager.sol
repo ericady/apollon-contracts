@@ -1231,6 +1231,16 @@ contract TroveManager is LiquityBase, Ownable(msg.sender), CheckContract, ITrove
     return debts;
   }
 
+  function getTroveRepayableDebt(
+    address _borrower,
+    address _debtTokenAddress
+  ) external view override returns (uint amount) {
+    Trove storage trove = Troves[_borrower];
+    if (trove.status != Status.active) return 0;
+
+    return trove.debts[IDebtToken(_debtTokenAddress)] + getPendingReward(_borrower, _debtTokenAddress, false);
+  }
+
   function getTroveColl(address _borrower) external view override returns (TokenAmount[] memory colls) {
     Trove storage trove = Troves[_borrower];
     if (trove.status != Status.active) return new TokenAmount[](0);

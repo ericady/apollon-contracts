@@ -16,6 +16,7 @@ interface ISwapPair is ISwapERC20 {
   error InsufficientLiquidity();
   error InvalidTo();
   error K();
+  error NotFromSwapOperations();
 
   event Mint(address indexed sender, uint amount0, uint amount1);
   event Burn(address indexed sender, uint amount0, uint amount1, address indexed to);
@@ -28,6 +29,8 @@ interface ISwapPair is ISwapERC20 {
     address indexed to
   );
   event Sync(uint112 reserve0, uint112 reserve1);
+
+  // **** GETTER ****
 
   function MINIMUM_LIQUIDITY() external pure returns (uint);
 
@@ -43,9 +46,15 @@ interface ISwapPair is ISwapERC20 {
 
   function kLast() external view returns (uint);
 
+  // **** OPERATIONS ****
+
   function mint(address to) external returns (uint liquidity);
 
-  function burn(address to) external returns (uint amount0, uint amount1);
+  function burn(
+    address to,
+    uint debt0,
+    uint debt1
+  ) external returns (uint amount0, uint amount1, uint burned0, uint burned1);
 
   function swap(uint amount0Out, uint amount1Out, address to, bytes calldata data) external;
 

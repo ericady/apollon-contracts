@@ -2,7 +2,9 @@
 
 pragma solidity ^0.8.9;
 
-interface ISwapOperations {
+import './IBBase.sol';
+
+interface ISwapOperations is IBBase {
   error Forbidden();
   error IdenticalAddresses();
   error PairExists();
@@ -18,8 +20,10 @@ interface ISwapOperations {
   error InvalidPath();
   error TransferFromFailed();
 
-  event SwapOperationsInitialized(address borrowerOperations, address priceFeed);
+  event SwapOperationsInitialized(address borrowerOperations, address troveManager, address priceFeed);
   event PairCreated(address indexed token0, address indexed token1, address pair, uint);
+
+  // **** GETTER ****
 
   function getFeeTo() external view returns (address);
 
@@ -41,6 +45,8 @@ interface ISwapOperations {
 
   function getAmountsIn(uint amountOut, address[] calldata path) external view returns (uint[] memory amounts);
 
+  // **** OPERATIONS ****
+
   function addLiquidity(
     address tokenA,
     address tokenB,
@@ -48,17 +54,16 @@ interface ISwapOperations {
     uint amountBDesired,
     uint amountAMin,
     uint amountBMin,
-    address to,
     uint deadline
   ) external returns (uint amountA, uint amountB, uint liquidity);
 
+  // automatically repays any related open loans from the borrower (msg.sender)
   function removeLiquidity(
     address tokenA,
     address tokenB,
     uint liquidity,
     uint amountAMin,
     uint amountBMin,
-    address to,
     uint deadline
   ) external returns (uint amountA, uint amountB);
 

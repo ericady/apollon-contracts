@@ -1248,6 +1248,30 @@
                 "internalType": "address",
                 "name": "_borrower",
                 "type": "address"
+            },
+            {
+                "internalType": "address",
+                "name": "_debtTokenAddress",
+                "type": "address"
+            }
+        ],
+        "name": "getTroveRepayableDebt",
+        "outputs": [
+            {
+                "internalType": "uint256",
+                "name": "amount",
+                "type": "uint256"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "address",
+                "name": "_borrower",
+                "type": "address"
             }
         ],
         "name": "getTroveStakeValue",

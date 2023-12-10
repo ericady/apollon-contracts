@@ -104,6 +104,8 @@ contract SwapPair is ISwapPair, SwapERC20 {
 
   // this low-level function should be called from a contract which performs important safety checks
   function mint(address to) external lock returns (uint liquidity) {
+    _requireCallerIsOperations();
+
     (uint112 _reserve0, uint112 _reserve1, ) = getReserves(); // gas savings
     uint balance0 = IERC20(token0).balanceOf(address(this));
     uint balance1 = IERC20(token1).balanceOf(address(this));
@@ -128,29 +130,49 @@ contract SwapPair is ISwapPair, SwapERC20 {
   }
 
   // this low-level function should be called from a contract which performs important safety checks
-  function burn(address to) external lock returns (uint amount0, uint amount1) {
-    (uint112 _reserve0, uint112 _reserve1, ) = getReserves(); // gas savings
+  // directly burns debt tokens if the user has any left to repay
+  function burn(
+    address to,
+    uint debt0,
+    uint debt1
+  ) external lock returns (uint amount0, uint amount1, uint burned0, uint burned1) {
+    _requireCallerIsOperations();
+
+    (uint112 _reserve0, uint112 _reserve1, ) = getReserves();
+    bool isFeeOn = _mintFee(_reserve0, _reserve1);
+
     address _token0 = token0; // gas savings
     address _token1 = token1; // gas savings
+
     uint balance0 = IERC20(_token0).balanceOf(address(this));
     uint balance1 = IERC20(_token1).balanceOf(address(this));
-    uint liquidity = balanceOf[address(this)];
 
-    bool feeOn = _mintFee(_reserve0, _reserve1);
-    uint _totalSupply = totalSupply; // gas savings, must be defined here since totalSupply can update in _mintFee
-    amount0 = (liquidity * balance0) / _totalSupply; // using balances ensures pro-rata distribution
-    amount1 = (liquidity * balance1) / _totalSupply; // using balances ensures pro-rata distribution
+    {
+      uint liquidity = balanceOf[address(this)];
 
-    if (amount0 == 0 || amount1 == 0) revert InsufficientLiquidityBurned();
-    _burn(address(this), liquidity);
-    _safeTransfer(_token0, to, amount0);
-    _safeTransfer(_token1, to, amount1);
+      uint _totalSupply = totalSupply; // gas savings, must be defined here since totalSupply can update in _mintFee
+      amount0 = (liquidity * balance0) / _totalSupply; // using balances ensures pro-rata distribution
+      amount1 = (liquidity * balance1) / _totalSupply; // using balances ensures pro-rata distribution
+
+      if (amount0 == 0 || amount1 == 0) revert InsufficientLiquidityBurned();
+      _burn(address(this), liquidity);
+    }
+
+    // check if the user as any debts left to repay
+    burned0 = LiquityMath._min(debt0, amount0);
+    burned1 = LiquityMath._min(debt1, amount1);
+    if (burned0 != 0) IDebtToken(_token0).burn(address(this), burned0);
+    if (burned1 != 0) IDebtToken(_token1).burn(address(this), burned1);
+
+    // payout whats left
+    _safeTransfer(_token0, to, amount0 - burned0);
+    _safeTransfer(_token1, to, amount1 - burned1);
 
     balance0 = IERC20(_token0).balanceOf(address(this));
     balance1 = IERC20(_token1).balanceOf(address(this));
     _update(balance0, balance1, _reserve0, _reserve1);
 
-    if (feeOn) kLast = reserve0 * reserve1; // reserve0 and reserve1 are up-to-date
+    if (isFeeOn) kLast = reserve0 * reserve1; // reserve0 and reserve1 are up-to-date
     emit Burn(msg.sender, amount0, amount1, to);
   }
 
@@ -202,5 +224,9 @@ contract SwapPair is ISwapPair, SwapERC20 {
   // force reserves to match balances
   function sync() external lock {
     _update(IERC20(token0).balanceOf(address(this)), IERC20(token1).balanceOf(address(this)), reserve0, reserve1);
+  }
+
+  function _requireCallerIsOperations() internal view {
+    if (msg.sender != address(operations)) revert NotFromSwapOperations();
   }
 }

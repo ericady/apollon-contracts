@@ -56,6 +56,11 @@
     },
     {
         "inputs": [],
+        "name": "NotFromSwapOperations",
+        "type": "error"
+    },
+    {
+        "inputs": [],
         "name": "Overflow",
         "type": "error"
     },
@@ -349,6 +354,16 @@
                 "internalType": "address",
                 "name": "to",
                 "type": "address"
+            },
+            {
+                "internalType": "uint256",
+                "name": "debt0",
+                "type": "uint256"
+            },
+            {
+                "internalType": "uint256",
+                "name": "debt1",
+                "type": "uint256"
             }
         ],
         "name": "burn",
@@ -361,6 +376,16 @@
             {
                 "internalType": "uint256",
                 "name": "amount1",
+                "type": "uint256"
+            },
+            {
+                "internalType": "uint256",
+                "name": "burned0",
+                "type": "uint256"
+            },
+            {
+                "internalType": "uint256",
+                "name": "burned1",
                 "type": "uint256"
             }
         ],

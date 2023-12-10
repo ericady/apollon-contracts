@@ -8,6 +8,11 @@
             },
             {
                 "internalType": "address",
+                "name": "_troveManagerAddress",
+                "type": "address"
+            },
+            {
+                "internalType": "address",
                 "name": "_priceFeedAddress",
                 "type": "address"
             }
@@ -23,6 +28,11 @@
     {
         "inputs": [],
         "name": "Expired",
+        "type": "error"
+    },
+    {
+        "inputs": [],
+        "name": "FeeExceedMaxPercentage",
         "type": "error"
     },
     {
@@ -179,6 +189,12 @@
             {
                 "indexed": false,
                 "internalType": "address",
+                "name": "troveManager",
+                "type": "address"
+            },
+            {
+                "indexed": false,
+                "internalType": "address",
                 "name": "priceFeed",
                 "type": "address"
             }
@@ -217,11 +233,6 @@
                 "internalType": "uint256",
                 "name": "amountBMin",
                 "type": "uint256"
-            },
-            {
-                "internalType": "address",
-                "name": "to",
-                "type": "address"
             },
             {
                 "internalType": "uint256",
@@ -558,11 +569,6 @@
                 "type": "uint256"
             },
             {
-                "internalType": "address",
-                "name": "to",
-                "type": "address"
-            },
-            {
                 "internalType": "uint256",
                 "name": "deadline",
                 "type": "uint256"
@@ -680,6 +686,19 @@
         "name": "transferOwnership",
         "outputs": [],
         "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [],
+        "name": "troveManager",
+        "outputs": [
+            {
+                "internalType": "contract ITroveManager",
+                "name": "",
+                "type": "address"
+            }
+        ],
+        "stateMutability": "view",
         "type": "function"
     }
 ]

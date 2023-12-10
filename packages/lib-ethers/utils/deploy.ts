@@ -57,6 +57,9 @@ const deployContracts = async (
   const borrowerOperations = await deployContract(deployer, getContractFactory, 'BorrowerOperations', {
     ...overrides,
   });
+  const troveManager = await deployContract(deployer, getContractFactory, 'TroveManager', {
+    ...overrides,
+  });
   const priceFeed = await deployContract(
     deployer,
     getContractFactory,
@@ -67,6 +70,7 @@ const deployContracts = async (
   return [
     {
       borrowerOperations,
+      troveManager,
       priceFeed,
       storagePool,
       swapOperations: await deployContract(
@@ -74,6 +78,7 @@ const deployContracts = async (
         getContractFactory,
         'SwapOperations',
         borrowerOperations,
+        troveManager,
         priceFeed,
         { ...overrides }
       ),
@@ -81,9 +86,6 @@ const deployContracts = async (
         ...overrides,
       }),
       reservePool: await deployContract(deployer, getContractFactory, 'ReservePool', {
-        ...overrides,
-      }),
-      troveManager: await deployContract(deployer, getContractFactory, 'TroveManager', {
         ...overrides,
       }),
       stabilityPoolManager: await deployContract(deployer, getContractFactory, 'StabilityPoolManager', {

@@ -53,6 +53,8 @@ interface IBorrowerOperations is IBBase {
 
   function repayDebt(TokenAmount[] memory _debts) external;
 
+  function repayDebtFromPoolBurn(address borrower, TokenAmount[] memory _debts) external;
+
   function closeTrove() external;
 
   function getCompositeDebt(DebtTokenAmount[] memory _debts) external view returns (uint);

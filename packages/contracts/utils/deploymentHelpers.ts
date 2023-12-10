@@ -58,7 +58,7 @@ export const deployCore = async (): Promise<Contracts> => {
   const priceFeed = await priceFeedFactory.deploy();
 
   const swapOperationsFactory = await ethers.getContractFactory('SwapOperations');
-  const swapOperations = await swapOperationsFactory.deploy(borrowerOperations, priceFeed);
+  const swapOperations = await swapOperationsFactory.deploy(borrowerOperations, troveManager, priceFeed);
 
   return {
     borrowerOperations,

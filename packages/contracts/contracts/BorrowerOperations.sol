@@ -332,12 +332,51 @@ contract BorrowerOperations is LiquityBase, Ownable(msg.sender), CheckContract, 
   // repay debt of a trove
   function repayDebt(TokenAmount[] memory _debts) external override {
     address borrower = msg.sender;
-    (ContractsCache memory contractsCache, LocalVariables_adjustTrove memory vars) = _prepareTroveAdjustment(borrower);
 
-    (DebtTokenAmount[] memory debtsToRemove, ) = _getDebtTokenAmountsWithFetchedPrices(
-      contractsCache.debtTokenManager,
-      _debts
-    );
+    (ContractsCache memory contractsCache, LocalVariables_adjustTrove memory vars) = _prepareTroveAdjustment(borrower);
+    DebtTokenAmount[] memory debtsToRemove = _handleRepayStates(contractsCache, vars, borrower, _debts);
+
+    for (uint i = 0; i < debtsToRemove.length; i++) {
+      DebtTokenAmount memory debtTokenAmount = debtsToRemove[i];
+      _poolRepayDebt(
+        borrower,
+        contractsCache.storagePool,
+        debtTokenAmount.debtToken,
+        debtTokenAmount.netDebt // it is not possible to repay the gasComp, this happens only when the trove is closed
+      );
+    }
+
+    _finaliseTrove(false, false, contractsCache, vars, borrower);
+  }
+
+  // repay debt of a trove directly from swap ops after pool liquidity removal (burning)
+  // the debt tokens are directly burned from the swap ops
+  function repayDebtFromPoolBurn(address borrower, TokenAmount[] memory _debts) external override {
+    _requireCallerIsSwapOperations();
+
+    (ContractsCache memory contractsCache, LocalVariables_adjustTrove memory vars) = _prepareTroveAdjustment(borrower);
+    DebtTokenAmount[] memory debtsToRemove = _handleRepayStates(contractsCache, vars, borrower, _debts);
+
+    for (uint i = 0; i < debtsToRemove.length; i++) {
+      DebtTokenAmount memory debtTokenAmount = debtsToRemove[i];
+      contractsCache.storagePool.subtractValue(
+        address(debtTokenAmount.debtToken),
+        false,
+        PoolType.Active,
+        debtTokenAmount.netDebt
+      );
+    }
+
+    _finaliseTrove(false, false, contractsCache, vars, borrower);
+  }
+
+  function _handleRepayStates(
+    ContractsCache memory contractsCache,
+    LocalVariables_adjustTrove memory vars,
+    address borrower,
+    TokenAmount[] memory _debts
+  ) internal returns (DebtTokenAmount[] memory debtsToRemove) {
+    (debtsToRemove, ) = _getDebtTokenAmountsWithFetchedPrices(contractsCache.debtTokenManager, _debts);
     vars.newCompositeDebtInUSD -= _getCompositeDebt(debtsToRemove);
     contractsCache.troveManager.decreaseTroveDebt(borrower, debtsToRemove);
 
@@ -355,16 +394,9 @@ contract BorrowerOperations is LiquityBase, Ownable(msg.sender), CheckContract, 
       _requireAtLeastMinNetDebt(existingDebt.netDebt, debtTokenAmount.netDebt);
       if (debtTokenAmount.debtToken.isStableCoin())
         _requireValidStableCoinRepayment(existingDebt.netDebt, debtTokenAmount.netDebt);
-
-      _poolRepayDebt(
-        borrower,
-        contractsCache.storagePool,
-        debtTokenAmount.debtToken,
-        debtTokenAmount.netDebt // it is not possible to repay the gasComp, this happens only when the trove is closed
-      );
     }
 
-    _finaliseTrove(false, false, contractsCache, vars, borrower);
+    return debtsToRemove;
   }
 
   function closeTrove() external override {

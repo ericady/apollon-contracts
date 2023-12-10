@@ -9,8 +9,10 @@ import './Interfaces/ISwapOperations.sol';
 import './Interfaces/IBorrowerOperations.sol';
 import './Interfaces/IPriceFeed.sol';
 import './Dependencies/CheckContract.sol';
+import './Interfaces/ITroveManager.sol';
 
 contract SwapOperations is ISwapOperations, Ownable(msg.sender), CheckContract {
+  ITroveManager public troveManager;
   IBorrowerOperations public borrowerOperations;
   IPriceFeed public priceFeed;
 
@@ -20,14 +22,16 @@ contract SwapOperations is ISwapOperations, Ownable(msg.sender), CheckContract {
   // todo reward flow, where should the swap fees flow to...
   address public feeTo; // gets used by the pairs itself
 
-  constructor(address _borrowerOperationsAddress, address _priceFeedAddress) {
+  constructor(address _borrowerOperationsAddress, address _troveManagerAddress, address _priceFeedAddress) {
     checkContract(_borrowerOperationsAddress);
+    checkContract(_troveManagerAddress);
     checkContract(_priceFeedAddress);
 
     borrowerOperations = IBorrowerOperations(_borrowerOperationsAddress);
+    troveManager = ITroveManager(_troveManagerAddress);
     priceFeed = IPriceFeed(_priceFeedAddress);
 
-    emit SwapOperationsInitialized(_borrowerOperationsAddress, _priceFeedAddress);
+    emit SwapOperationsInitialized(_borrowerOperationsAddress, _troveManagerAddress, _priceFeedAddress);
   }
 
   modifier ensure(uint deadline) {
@@ -139,7 +143,6 @@ contract SwapOperations is ISwapOperations, Ownable(msg.sender), CheckContract {
     uint amountBDesired,
     uint amountAMin,
     uint amountBMin,
-    address to,
     uint deadline
   ) external virtual override ensure(deadline) returns (uint amountA, uint amountB, uint liquidity) {
     if (getPair[tokenA][tokenB] == address(0)) revert PairDoesNotExist();
@@ -162,10 +165,11 @@ contract SwapOperations is ISwapOperations, Ownable(msg.sender), CheckContract {
       }
     }
 
+    address sender = msg.sender;
     address pair = getPair[tokenA][tokenB];
-    safeTransferFrom(tokenA, msg.sender, pair, amountA);
-    safeTransferFrom(tokenB, msg.sender, pair, amountB);
-    liquidity = ISwapPair(pair).mint(to);
+    safeTransferFrom(tokenA, sender, pair, amountA);
+    safeTransferFrom(tokenB, sender, pair, amountB);
+    liquidity = ISwapPair(pair).mint(sender);
   }
 
   function removeLiquidity(
@@ -174,15 +178,36 @@ contract SwapOperations is ISwapOperations, Ownable(msg.sender), CheckContract {
     uint liquidity,
     uint amountAMin,
     uint amountBMin,
-    address to,
     uint deadline
   ) public virtual override ensure(deadline) returns (uint amountA, uint amountB) {
     address pair = getPair[tokenA][tokenB];
-    ISwapPair(pair).transferFrom(msg.sender, pair, liquidity); // send liquidity to pair
-    (uint amount0, uint amount1) = ISwapPair(pair).burn(to);
-    (address token0, ) = sortTokens(tokenA, tokenB);
-    (amountA, amountB) = tokenA == token0 ? (amount0, amount1) : (amount1, amount0);
+    (address token0, address token1) = sortTokens(tokenA, tokenB);
 
+    ISwapPair(pair).transferFrom(msg.sender, pair, liquidity); // send liquidity to pair
+
+    // stack depth workaround
+    uint amount0;
+    uint amount1;
+    {
+      // check if there are some debts which has to be repaid first
+      uint debt0 = troveManager.getTroveRepayableDebt(msg.sender, token0);
+      uint debt1 = troveManager.getTroveRepayableDebt(msg.sender, token1);
+
+      // receive tokens from pair
+      uint burned0;
+      uint burned1;
+      (amount0, amount1, burned0, burned1) = ISwapPair(pair).burn(msg.sender, debt0, debt1);
+
+      // handle trove debt repayment
+      if (burned0 != 0 || burned1 != 0) {
+        TokenAmount[] memory debtsToRepay = new TokenAmount[](2);
+        debtsToRepay[0] = TokenAmount(token0, burned0);
+        debtsToRepay[1] = TokenAmount(token1, burned1);
+        borrowerOperations.repayDebtFromPoolBurn(msg.sender, debtsToRepay);
+      }
+    }
+
+    (amountA, amountB) = tokenA == token0 ? (amount0, amount1) : (amount1, amount0);
     if (amountA < amountAMin) revert InsufficientAAmount();
     if (amountB < amountBMin) revert InsufficientBAmount();
   }
