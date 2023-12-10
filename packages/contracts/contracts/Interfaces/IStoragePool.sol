@@ -49,6 +49,8 @@ interface IStoragePool is IBase {
 
   function getEntireSystemDebt() external view returns (uint entireSystemDebt);
 
+  function getTokenTotalAmount(address _tokenAddress, bool _isColl) external view returns (uint);
+
   function checkRecoveryMode()
     external
     view

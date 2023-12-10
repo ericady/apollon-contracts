@@ -160,6 +160,10 @@ contract StoragePool is LiquityBase, Ownable(msg.sender), CheckContract, IStorag
     return entireSystemDebt;
   }
 
+  function getTokenTotalAmount(address _tokenAddress, bool _isColl) external view override returns (uint) {
+    return poolEntries[_tokenAddress][_isColl].totalAmount;
+  }
+
   function checkRecoveryMode()
     external
     view

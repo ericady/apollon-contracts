@@ -283,7 +283,9 @@ contract StabilityPool is LiquityBase, CheckContract, IStabilityPool {
 
     // coll gain and deposit payout
     _payoutCollGains(user, remainingDeposit);
-    _sendDepositToDepositor(user, depositToWithdrawal);
+
+    depositToken.transfer(user, depositToWithdrawal);
+    totalDeposits -= depositToWithdrawal;
 
     // update current deposit snapshot
     uint newDeposit = remainingDeposit - depositToWithdrawal;
@@ -651,15 +653,6 @@ contract StabilityPool is LiquityBase, CheckContract, IStabilityPool {
     if (compoundedStake < _initialStake / 1e9) return 0;
 
     return compoundedStake;
-  }
-
-  // --- Sender functions ---
-
-  function _sendDepositToDepositor(address _depositor, uint _amount) internal {
-    if (_amount == 0) return;
-
-    depositToken.transfer(_depositor, _amount);
-    totalDeposits -= _amount;
   }
 
   // --- Stability Pool Deposit Functionality ---

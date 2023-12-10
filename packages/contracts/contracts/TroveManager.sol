@@ -1250,6 +1250,16 @@ contract TroveManager is LiquityBase, Ownable(msg.sender), CheckContract, ITrove
       colls[i] = TokenAmount(trove.collTokens[i], trove.colls[trove.collTokens[i]]);
   }
 
+  function getTroveWithdrawableColl(
+    address _borrower,
+    address _collTokenAddress
+  ) external view override returns (uint amount) {
+    Trove storage trove = Troves[_borrower];
+    if (trove.status != Status.active) return 0;
+
+    return trove.colls[_collTokenAddress] + getPendingReward(_borrower, _collTokenAddress, true);
+  }
+
   // --- Trove property setters, called by BorrowerOperations ---
 
   function setTroveStatus(address _borrower, uint _num) external override {

@@ -1336,6 +1336,30 @@
                 "type": "address"
             },
             {
+                "internalType": "address",
+                "name": "_collTokenAddress",
+                "type": "address"
+            }
+        ],
+        "name": "getTroveWithdrawableColl",
+        "outputs": [
+            {
+                "internalType": "uint256",
+                "name": "amount",
+                "type": "uint256"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "address",
+                "name": "_borrower",
+                "type": "address"
+            },
+            {
                 "components": [
                     {
                         "internalType": "address",

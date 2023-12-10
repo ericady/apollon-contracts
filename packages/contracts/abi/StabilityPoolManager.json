@@ -236,6 +236,54 @@
                 "internalType": "address",
                 "name": "_depositor",
                 "type": "address"
+            },
+            {
+                "internalType": "address",
+                "name": "_debtTokenAddress",
+                "type": "address"
+            }
+        ],
+        "name": "getDepositorCompoundedDeposit",
+        "outputs": [
+            {
+                "internalType": "uint256",
+                "name": "amount",
+                "type": "uint256"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "address",
+                "name": "_depositor",
+                "type": "address"
+            },
+            {
+                "internalType": "address",
+                "name": "_debtTokenAddress",
+                "type": "address"
+            }
+        ],
+        "name": "getDepositorDeposit",
+        "outputs": [
+            {
+                "internalType": "uint256",
+                "name": "amount",
+                "type": "uint256"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "address",
+                "name": "_depositor",
+                "type": "address"
             }
         ],
         "name": "getDepositorDeposits",
@@ -346,6 +394,25 @@
                 "internalType": "contract IStabilityPool[]",
                 "name": "",
                 "type": "address[]"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "address",
+                "name": "_debtTokenAddress",
+                "type": "address"
+            }
+        ],
+        "name": "getTotalDeposit",
+        "outputs": [
+            {
+                "internalType": "uint256",
+                "name": "amount",
+                "type": "uint256"
             }
         ],
         "stateMutability": "view",

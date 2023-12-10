@@ -32,9 +32,18 @@ interface IStabilityPoolManager is IBBase {
 
   function getTotalDeposits() external view returns (TokenAmount[] memory deposits);
 
+  function getTotalDeposit(address _debtTokenAddress) external view returns (uint amount);
+
   function getDepositorDeposits(address _depositor) external view returns (TokenAmount[] memory deposits);
 
+  function getDepositorDeposit(address _depositor, address _debtTokenAddress) external view returns (uint amount);
+
   function getCompoundedDeposits() external view returns (TokenAmount[] memory deposits);
+
+  function getDepositorCompoundedDeposit(
+    address _depositor,
+    address _debtTokenAddress
+  ) external view returns (uint amount);
 
   function getDepositorCollGains(
     address _depositor,

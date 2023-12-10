@@ -106,6 +106,12 @@ contract StabilityPoolManager is Ownable(msg.sender), CheckContract, IStabilityP
     return deposits;
   }
 
+  function getTotalDeposit(address _debtTokenAddress) external view returns (uint amount) {
+    IStabilityPool pool = stabilityPools[IDebtToken(_debtTokenAddress)];
+    if (address(pool) == address(0)) return 0;
+    return pool.getTotalDeposit();
+  }
+
   function getCompoundedDeposits() external view override returns (TokenAmount[] memory deposits) {
     deposits = new TokenAmount[](stabilityPoolsArray.length);
     for (uint i = 0; i < stabilityPoolsArray.length; i++) {
@@ -128,6 +134,24 @@ contract StabilityPoolManager is Ownable(msg.sender), CheckContract, IStabilityP
     }
 
     return deposits;
+  }
+
+  function getDepositorDeposit(
+    address _depositor,
+    address _debtTokenAddress
+  ) external view override returns (uint amount) {
+    IStabilityPool pool = stabilityPools[IDebtToken(_debtTokenAddress)];
+    if (address(pool) == address(0)) return 0;
+    return pool.getDepositorDeposit(_depositor);
+  }
+
+  function getDepositorCompoundedDeposit(
+    address _depositor,
+    address _debtTokenAddress
+  ) external view override returns (uint amount) {
+    IStabilityPool pool = stabilityPools[IDebtToken(_debtTokenAddress)];
+    if (address(pool) == address(0)) return 0;
+    return pool.getCompoundedDebtDeposit(_depositor);
   }
 
   function getDepositorCollGains(
