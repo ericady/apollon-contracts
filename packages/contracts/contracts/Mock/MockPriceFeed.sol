@@ -32,14 +32,6 @@ contract MockPriceFeed is IPriceFeed {
     return _price;
   }
 
-  // todo...
-  function fetchPrice() external override returns (uint256) {
-    // Fire an event just like the mainnet version would.
-    // This lets the subgraph rely on events to get the latest price even when developing locally.
-    emit LastGoodPriceUpdated(address(this), _price); // todo...
-    return _price;
-  }
-
   function setTokenPrice(address tokenAddress, uint256 price) external returns (bool) {
     tokenPrices[tokenAddress] = price;
     return true;
