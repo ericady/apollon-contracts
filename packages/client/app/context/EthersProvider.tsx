@@ -7,9 +7,11 @@ import { JsonRpcProvider } from 'ethers/providers';
 import Link from 'next/link';
 import { useSnackbar } from 'notistack';
 import { createContext, useContext, useEffect, useState } from 'react';
+import { TroveManager } from '../../types/ethers-contracts';
 import { DebtToken } from '../../types/ethers-contracts/DebtToken';
-import { ContractDataFreshnessManager } from './CustomApolloProvider';
+import { SchemaDataFreshnessManager } from './CustomApolloProvider';
 import debtTokenAbi from './abis/DebtToken.json';
+import troveManagerAbi from './abis/TroveManager.json';
 
 // TODO: This is just dummy data and will be exchanged with the real implementation later.
 // https://goerli.etherscan.io/token/0x509ee0d083ddf8ac028f2a56731412edd63223b9#writeContract
@@ -40,23 +42,26 @@ export const Contracts = {
     USDT: '0x509ee0d083ddf8ac028f2a56731412edd63223c8',
     DEFI: '0x509ee0d083ddf8ac028f2a56731412edd63223d8',
   },
+  TroveManager: '0x509ee0d083ddf8ac028f2a56731412edd63223e8',
 } as const;
 
 // TODO: Remove Partial
-type AllDebtTokenContracts = Partial<{ [Key in keyof (typeof ContractDataFreshnessManager)['DebtToken']]: DebtToken }>;
+type AllDebtTokenContracts = Partial<{ [Key in keyof (typeof SchemaDataFreshnessManager)['DebtToken']]: DebtToken }>;
 
 export const EthersContext = createContext<{
   // provider: BrowserProvider | null;
   provider: JsonRpcProvider | null;
   signer: JsonRpcSigner | null;
   address: AddressLike;
-  debtTokenContract: AllDebtTokenContracts;
+  debtTokenContracts: AllDebtTokenContracts;
+  troveManagerContract: TroveManager;
   connectWallet: () => void;
 }>({
   provider: null,
   signer: null,
   address: '',
-  debtTokenContract: undefined as any,
+  debtTokenContracts: undefined as any,
+  troveManagerContract: undefined as any,
   connectWallet: () => {},
 });
 
@@ -73,6 +78,7 @@ export default function EthersProvider({ children }: { children: React.ReactNode
   const [signer, setSigner] = useState<JsonRpcSigner | null>(null);
   const [address, setAddress] = useState<AddressLike>('');
   const [debtTokenContracts, setDebtTokenContracts] = useState<AllDebtTokenContracts>();
+  const [troveManagerContract, setTroveManagerContract] = useState<TroveManager>();
 
   const connectWallet = async () => {
     try {
@@ -84,6 +90,14 @@ export default function EthersProvider({ children }: { children: React.ReactNode
         const debtTokenContract = new Contract(Contracts.DebtToken.JUSD, debtTokenAbi, provider);
         const debtTokenContractWithSigner = debtTokenContract.connect(newSigner) as DebtToken;
         setDebtTokenContracts({ [Contracts.DebtToken.JUSD]: debtTokenContractWithSigner });
+
+        const troveManagerContract = new Contract(
+          Contracts.TroveManager,
+          troveManagerAbi,
+          provider,
+        ) as unknown as TroveManager;
+        const troveManagerContractWithSigner = troveManagerContract.connect(newSigner) as TroveManager;
+        setTroveManagerContract(troveManagerContractWithSigner);
 
         try {
           // Request account access
@@ -123,12 +137,21 @@ export default function EthersProvider({ children }: { children: React.ReactNode
   useEffect(() => {
     const debtTokenContract = new Contract(Contracts.DebtToken.JUSD, debtTokenAbi, provider) as unknown as DebtToken;
     setDebtTokenContracts({ [Contracts.DebtToken.JUSD]: debtTokenContract });
+
+    const troveManagerContract = new Contract(
+      Contracts.TroveManager,
+      troveManagerAbi,
+      provider,
+    ) as unknown as TroveManager;
+    setTroveManagerContract(troveManagerContract);
   }, []);
 
-  if (!debtTokenContracts) return null;
+  if (!debtTokenContracts || !troveManagerContract) return null;
 
   return (
-    <EthersContext.Provider value={{ provider, signer, address, connectWallet, debtTokenContract: debtTokenContracts }}>
+    <EthersContext.Provider
+      value={{ provider, signer, address, connectWallet, debtTokenContracts, troveManagerContract }}
+    >
       {children}
     </EthersContext.Provider>
   );
@@ -140,6 +163,7 @@ export function useEthers(): {
   signer: JsonRpcSigner | null;
   address: AddressLike;
   debtTokenContract: AllDebtTokenContracts;
+  troveManagerContract: TroveManager;
   connectWallet: () => void;
 } {
   const context = useContext(EthersContext);

@@ -85,7 +85,7 @@ function SetupState({
   return (
     <EthersContext.Provider
       value={{
-        debtTokenContract: (mockEthers?.contractMock ?? {}) as any,
+        debtTokenContracts: (mockEthers?.contractMock ?? {}) as any,
         provider: {} as any,
         signer: {} as any,
         address,
