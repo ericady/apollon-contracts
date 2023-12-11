@@ -718,6 +718,245 @@
         "inputs": [
             {
                 "internalType": "address",
+                "name": "_account",
+                "type": "address"
+            },
+            {
+                "internalType": "uint256",
+                "name": "_amount",
+                "type": "uint256"
+            },
+            {
+                "internalType": "contract IDebtToken",
+                "name": "_debtToken",
+                "type": "address"
+            }
+        ],
+        "name": "testDebtToken_burn",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "address",
+                "name": "_account",
+                "type": "address"
+            },
+            {
+                "internalType": "uint256",
+                "name": "_amount",
+                "type": "uint256"
+            },
+            {
+                "internalType": "contract IDebtToken",
+                "name": "_debtToken",
+                "type": "address"
+            }
+        ],
+        "name": "testDebtToken_mint",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "address",
+                "name": "_tokenAddress",
+                "type": "address"
+            },
+            {
+                "internalType": "bool",
+                "name": "_isColl",
+                "type": "bool"
+            },
+            {
+                "internalType": "enum IBase.PoolType",
+                "name": "_poolType",
+                "type": "uint8"
+            },
+            {
+                "internalType": "uint256",
+                "name": "_amount",
+                "type": "uint256"
+            }
+        ],
+        "name": "testStoragePool_addValue",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "address",
+                "name": "_tokenAddress",
+                "type": "address"
+            },
+            {
+                "internalType": "bool",
+                "name": "_isColl",
+                "type": "bool"
+            },
+            {
+                "internalType": "enum IBase.PoolType",
+                "name": "_poolType",
+                "type": "uint8"
+            },
+            {
+                "internalType": "uint256",
+                "name": "_amount",
+                "type": "uint256"
+            }
+        ],
+        "name": "testStoragePool_subtractValue",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "address",
+                "name": "_tokenAddress",
+                "type": "address"
+            },
+            {
+                "internalType": "bool",
+                "name": "_isColl",
+                "type": "bool"
+            },
+            {
+                "internalType": "enum IBase.PoolType",
+                "name": "_fromType",
+                "type": "uint8"
+            },
+            {
+                "internalType": "enum IBase.PoolType",
+                "name": "_toType",
+                "type": "uint8"
+            },
+            {
+                "internalType": "uint256",
+                "name": "_amount",
+                "type": "uint256"
+            }
+        ],
+        "name": "testStoragePool_transferBetweenTypes",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "address",
+                "name": "_receiver",
+                "type": "address"
+            },
+            {
+                "internalType": "address",
+                "name": "_tokenAddress",
+                "type": "address"
+            },
+            {
+                "internalType": "bool",
+                "name": "_isColl",
+                "type": "bool"
+            },
+            {
+                "internalType": "enum IBase.PoolType",
+                "name": "_poolType",
+                "type": "uint8"
+            },
+            {
+                "internalType": "uint256",
+                "name": "_amount",
+                "type": "uint256"
+            }
+        ],
+        "name": "testStoragePool_withdrawalValue",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "address[]",
+                "name": "collTokenAddresses",
+                "type": "address[]"
+            },
+            {
+                "internalType": "address",
+                "name": "_borrower",
+                "type": "address"
+            }
+        ],
+        "name": "testTroveManager_closeTrove",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "address",
+                "name": "_borrower",
+                "type": "address"
+            },
+            {
+                "components": [
+                    {
+                        "internalType": "contract IDebtToken",
+                        "name": "debtToken",
+                        "type": "address"
+                    },
+                    {
+                        "internalType": "uint256",
+                        "name": "netDebt",
+                        "type": "uint256"
+                    },
+                    {
+                        "internalType": "uint256",
+                        "name": "borrowingFee",
+                        "type": "uint256"
+                    }
+                ],
+                "internalType": "struct IBBase.DebtTokenAmount[]",
+                "name": "_debtTokenAmounts",
+                "type": "tuple[]"
+            }
+        ],
+        "name": "testTroveManager_increaseTroveDebt",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "address",
+                "name": "_borrower",
+                "type": "address"
+            },
+            {
+                "internalType": "uint256",
+                "name": "_num",
+                "type": "uint256"
+            }
+        ],
+        "name": "testTroveManager_setTroveStatus",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "address",
                 "name": "newOwner",
                 "type": "address"
             }
