@@ -98,12 +98,14 @@ type PoolReward {
 }
 
 type Pool {
+  # "Pool" + TokenA(JUSD) + TokenB
   id: ID!
   # Percent value applied when opening the first position for this pool. Can be negative and positive.
-  openingFee: Float!
+  swapFee: Float!
   liquidity: [PoolLiquidity!]!
   rewards: [PoolReward!]!
   liquidityDepositAPY: Float!
+  # TODO: was
   volume24hUSD: Float!
   volume24hUSD24hAgo: Float!
 }

@@ -1,7 +1,7 @@
 # # Custom
 
 # Singleton entity to store the ID of the last created Token
-
+# TODO: wasa mapper for swap pools PairCreated event
 type Token @entity {
   # contract address
   id: Bytes!
@@ -11,6 +11,7 @@ type Token @entity {
   #
   # priceUSD: BigInt!
   # TODO: Fetch this from the client side and get it from the TradingView entities
+  # TODO: wasa Lookup from the candle chart on TokenPriceChanged event.
   # priceUSD24hAgo: BigInt!
   #
   isPoolToken: Boolean!
@@ -121,6 +122,7 @@ type CollateralTokenMeta @entity(immutable: true) {
 #   # unique Byte combination of tokenA + tokenB
 #   id: Bytes!
 #   token: Bytes!
+#   TODO: wasa Swap event swapPair.getReserves 
 #   totalAmount: BigInt!
 # }
 
@@ -150,11 +152,11 @@ type CollateralTokenMeta @entity(immutable: true) {
 # }
 
 # type Pool @entity {
-#   # "Pool" + TokenA + TokenB
+#   # "Pool" + TokenA (JUSD) + TokenB
 #   id: Bytes!
 
 #   # Percent value applied when opening the first position for this pool. Can be negative and positive.
-#   openingFee: BigInt!
+#   swapFee: BigInt!
 #   # Just linked once, always updated for all users
 #   liquidity: [PoolLiquidity!]! @relation(name: "PoolLiquidityToPool")
 #   # TODO: Must be calculated in the subgraph but when
@@ -246,3 +248,5 @@ type TokenCandle @entity(immutable: true) {
   volume: BigInt!
   candleSize: Int!
 }
+
+# TODO: wasa have one candle for 24h that is used for the trading volume

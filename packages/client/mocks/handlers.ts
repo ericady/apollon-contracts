@@ -125,7 +125,7 @@ for (let i = 0; i < tokens.length; i++) {
     pools.push({
       __typename: 'Pool',
       id: faker.string.uuid(),
-      openingFee: faker.number.float({ min: -0.05, max: 0.05, precision: 0.0001 }),
+      swapFee: faker.number.float({ min: -0.05, max: 0.05, precision: 0.0001 }),
       liquidity: sortedPair.map((token) => ({
         __typename: 'PoolLiquidity',
         token,

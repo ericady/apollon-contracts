@@ -9,7 +9,7 @@ import {
 } from '@apollo/client';
 import { AddressLike, ethers } from 'ethers';
 import { PropsWithChildren, useEffect } from 'react';
-import { DebtToken, TroveManager } from '../../types/ethers-contracts';
+import { DebtToken, SwapPair, TroveManager } from '../../types/ethers-contracts';
 import { TokenFragmentFragment } from '../generated/gql-types';
 import { TOKEN_FRAGMENT } from '../queries';
 import { Contracts, useEthers } from './EthersProvider';
@@ -170,6 +170,17 @@ const getProductionCacheConfig = ({
       },
     },
   },
+
+  Pool: {
+    fields: {
+      swapFee: {
+        read(_, { readField }) {
+          // FIXME: Needs to be implemented on SwapPair.sol https://www.notion.so/08d56d02a4c34590bbc9233f48fea2ab?v=ceb084e514cf4a60aa3f43dd58980ef3&p=4100448866dd45f5b10b93123271b604&pm=s
+          return 0;
+        },
+      },
+    },
+  },
 });
 
 type ContractData<T> = Record<
@@ -246,10 +257,17 @@ export const SchemaDataFreshnessManager: ContractDataFreshnessManager<typeof Con
     [Contracts.DebtToken.DebtToken6]: {},
     [Contracts.DebtToken.JUSD]: {
       priceUSD: {
-        fetch: async (debtTokenContract: DebtToken) => {
+        fetch: async (debtTokenContract: DebtToken, swapPairContract: SwapPair) => {
           SchemaDataFreshnessManager.DebtToken[Contracts.DebtToken.JUSD]!.priceUSD.lastFetched = Date.now();
-          const priceUSD = await debtTokenContract.getPrice();
-          SchemaDataFreshnessManager.DebtToken[Contracts.DebtToken.JUSD]!.priceUSD.value(ethers.toNumber(priceUSD));
+          // FIXME: Refactor this to be more efficient => use query to fetch from cache
+          const priceJUSD = await debtTokenContract.getPrice();
+
+          const [reserveA, reserveB] = await swapPairContract.getReserves();
+          const priceTokenInJUSD = (reserveA / reserveB) * priceJUSD;
+
+          SchemaDataFreshnessManager.DebtToken[Contracts.DebtToken.JUSD]!.priceUSD.value(
+            ethers.toNumber(priceTokenInJUSD),
+          );
         },
         value: makeVar(0),
         lastFetched: 0,
@@ -294,6 +312,7 @@ export const SchemaDataFreshnessManager: ContractDataFreshnessManager<typeof Con
     },
   },
   TroveManager: undefined,
+  SwapOperations: undefined,
 };
 
 // FIXME: The cache needs to be initialized with the contracts data.

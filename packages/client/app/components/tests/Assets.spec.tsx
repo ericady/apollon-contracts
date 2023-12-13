@@ -59,7 +59,7 @@ test.describe('Assets', () => {
     );
 
     // Only the Table headers are shown
-    await expect(component).toHaveText('AssetsType$OF %%');
+    await expect(component).toHaveText('AssetsType$SF %%');
 
     const element = page.getByTestId('apollon-assets-loader');
     await expect(element).toBeVisible();

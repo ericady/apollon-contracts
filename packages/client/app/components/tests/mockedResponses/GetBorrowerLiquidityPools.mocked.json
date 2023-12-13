@@ -3,7 +3,7 @@
     "getPools": [
       {
         "id": "344b8e7c-2aca-4f4d-a6d0-347db601d248",
-        "openingFee": -0.0373,
+        "swapFee": -0.0373,
         "liquidity": [
           {
             "token": {

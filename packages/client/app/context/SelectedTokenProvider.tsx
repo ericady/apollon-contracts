@@ -7,7 +7,7 @@ import { GetDebtTokensQuery, GetDebtTokensQueryVariables } from '../generated/gq
 import { GET_ALL_DEBT_TOKENS } from '../queries';
 
 export type SelectedToken = {
-  openingFee: number;
+  swapFee: number;
   change: number;
   isFavorite: boolean;
   address: string;

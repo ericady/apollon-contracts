@@ -16,7 +16,7 @@ function AssetsLoader() {
             <HeaderCell title="Type" cellProps={{ sx: { p: 0.5, pl: 2 } }} />
             <HeaderCell title="$" cellProps={{ align: 'right', sx: { p: 0.5 } }} />
             <HeaderCell
-              title="OF %"
+              title="SF %"
               cellProps={{ align: 'right', sx: { p: 0.5 } }}
               // TODO: Add Tooltip text
               tooltipProps={{ title: 'TODO: Add Description', arrow: true, placement: 'right' }}

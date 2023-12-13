@@ -40,7 +40,7 @@ function TradingViewHeader() {
           Opening Fee
           <Box sx={{ color: 'text.primary', display: 'inline' }}>
             {' '}
-            {selectedToken ? displayPercentage(selectedToken.openingFee, 'positive') : ' -'}
+            {selectedToken ? displayPercentage(selectedToken.swapFee, 'positive') : ' -'}
           </Box>
         </Typography>
       </div>

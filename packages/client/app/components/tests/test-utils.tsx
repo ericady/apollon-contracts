@@ -63,7 +63,7 @@ function SetupState({
       address,
       change: 0.01,
       isFavorite: true,
-      openingFee: 0.05,
+      swapFee: 0.05,
       priceUSD,
       symbol,
       priceUSD24hAgo,

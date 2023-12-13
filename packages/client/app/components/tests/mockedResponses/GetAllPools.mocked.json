@@ -3,7 +3,7 @@
     "getPools": [
       {
         "id": "515a250f-30da-493f-bb31-a43f60329399",
-        "openingFee": 0.0386,
+        "swapFee": 0.0386,
         "liquidity": [
           {
             "token": {
@@ -37,7 +37,7 @@
       },
       {
         "id": "19fc9868-d49d-4744-9f76-f99e219aff72",
-        "openingFee": 0.035,
+        "swapFee": 0.035,
         "liquidity": [
           {
             "token": {
@@ -71,7 +71,7 @@
       },
       {
         "id": "89832bcb-468f-4c0d-a463-2f7b9f411500",
-        "openingFee": 0.0436,
+        "swapFee": 0.0436,
         "liquidity": [
           {
             "token": {
@@ -105,7 +105,7 @@
       },
       {
         "id": "35b26ed9-8ab0-436b-a29d-6ddc47f8580d",
-        "openingFee": -0.0303,
+        "swapFee": -0.0303,
         "liquidity": [
           {
             "token": {
@@ -139,7 +139,7 @@
       },
       {
         "id": "6c0cdfd5-b8bf-4555-900b-3ae2b862a9cd",
-        "openingFee": -0.037,
+        "swapFee": -0.037,
         "liquidity": [
           {
             "token": {
@@ -173,7 +173,7 @@
       },
       {
         "id": "ce9728e1-10f7-40c6-8f0b-2d0bb3384461",
-        "openingFee": 0.038,
+        "swapFee": 0.038,
         "liquidity": [
           {
             "token": {
@@ -207,7 +207,7 @@
       },
       {
         "id": "f414fd79-580b-4d19-ab94-4dca549d4a0c",
-        "openingFee": -0.0083,
+        "swapFee": -0.0083,
         "liquidity": [
           {
             "token": {
@@ -241,7 +241,7 @@
       },
       {
         "id": "e5d80341-2cff-47fa-b80b-411e9614678d",
-        "openingFee": 0.0267,
+        "swapFee": 0.0267,
         "liquidity": [
           {
             "token": {
@@ -275,7 +275,7 @@
       },
       {
         "id": "238b7784-9436-42f5-b604-ced8dff0c5e3",
-        "openingFee": -0.0301,
+        "swapFee": -0.0301,
         "liquidity": [
           {
             "token": {
@@ -309,7 +309,7 @@
       },
       {
         "id": "422ee7d8-f90a-4dcc-a48b-4faad173bc80",
-        "openingFee": 0.0225,
+        "swapFee": 0.0225,
         "liquidity": [
           {
             "token": {
@@ -343,7 +343,7 @@
       },
       {
         "id": "f0457367-0f63-44cd-8279-1567639595b8",
-        "openingFee": -0.0236,
+        "swapFee": -0.0236,
         "liquidity": [
           {
             "token": {
@@ -377,7 +377,7 @@
       },
       {
         "id": "80e33f49-031a-4f11-a074-472222341f60",
-        "openingFee": 0.0111,
+        "swapFee": 0.0111,
         "liquidity": [
           {
             "token": {
@@ -411,7 +411,7 @@
       },
       {
         "id": "e85f9129-e1e7-47d4-9464-9e9b02f6391c",
-        "openingFee": 0.0028,
+        "swapFee": 0.0028,
         "liquidity": [
           {
             "token": {
@@ -445,7 +445,7 @@
       },
       {
         "id": "c3e07551-d019-4997-80c1-9d0073c1e7e3",
-        "openingFee": 0.0148,
+        "swapFee": 0.0148,
         "liquidity": [
           {
             "token": {
@@ -479,7 +479,7 @@
       },
       {
         "id": "f3d1c3db-7fc1-4b42-8e4c-5186aefc141b",
-        "openingFee": -0.0352,
+        "swapFee": -0.0352,
         "liquidity": [
           {
             "token": {
@@ -513,7 +513,7 @@
       },
       {
         "id": "185ba84a-540b-4850-9b23-fc5d94d6979a",
-        "openingFee": -0.0148,
+        "swapFee": -0.0148,
         "liquidity": [
           {
             "token": {
@@ -547,7 +547,7 @@
       },
       {
         "id": "307a85b4-25fb-4df2-b88a-40243c943d91",
-        "openingFee": -0.0378,
+        "swapFee": -0.0378,
         "liquidity": [
           {
             "token": {
@@ -581,7 +581,7 @@
       },
       {
         "id": "5a4a98a5-9af8-447b-80a1-f587486cfea8",
-        "openingFee": -0.05,
+        "swapFee": -0.05,
         "liquidity": [
           {
             "token": {
@@ -615,7 +615,7 @@
       },
       {
         "id": "e6be15c5-20a6-46b0-9791-06cb20e6390c",
-        "openingFee": -0.0262,
+        "swapFee": -0.0262,
         "liquidity": [
           {
             "token": {
@@ -661,7 +661,7 @@
       },
       {
         "id": "cae7e371-60d4-45df-b89f-9c4aa08fddf0",
-        "openingFee": 0.0151,
+        "swapFee": 0.0151,
         "liquidity": [
           {
             "token": {
@@ -695,7 +695,7 @@
       },
       {
         "id": "2e971f1a-8518-4e21-ab5c-dee830539fad",
-        "openingFee": 0.0202,
+        "swapFee": 0.0202,
         "liquidity": [
           {
             "token": {
@@ -729,7 +729,7 @@
       },
       {
         "id": "9df88f8d-6f2d-462b-8183-ead8ddab455c",
-        "openingFee": 0.0212,
+        "swapFee": 0.0212,
         "liquidity": [
           {
             "token": {
@@ -763,7 +763,7 @@
       },
       {
         "id": "415d575d-003f-4b5b-b410-4b43baf98d6f",
-        "openingFee": 0.0328,
+        "swapFee": 0.0328,
         "liquidity": [
           {
             "token": {
@@ -797,7 +797,7 @@
       },
       {
         "id": "88a8d45a-aece-40fc-bbe8-8e882beb21b6",
-        "openingFee": -0.0126,
+        "swapFee": -0.0126,
         "liquidity": [
           {
             "token": {
@@ -831,7 +831,7 @@
       },
       {
         "id": "556b6ac8-77c3-4f4d-8b8a-0d231cdd2297",
-        "openingFee": 0.0086,
+        "swapFee": 0.0086,
         "liquidity": [
           {
             "token": {
@@ -865,7 +865,7 @@
       },
       {
         "id": "5d64b669-fda9-4ded-a606-639474ea6215",
-        "openingFee": 0.0153,
+        "swapFee": 0.0153,
         "liquidity": [
           {
             "token": {
@@ -899,7 +899,7 @@
       },
       {
         "id": "f0231764-7e56-4a27-a5f5-87d74fac06ec",
-        "openingFee": -0.0297,
+        "swapFee": -0.0297,
         "liquidity": [
           {
             "token": {
@@ -933,7 +933,7 @@
       },
       {
         "id": "3221de73-05f4-4b83-822d-84a46dd3474d",
-        "openingFee": -0.0185,
+        "swapFee": -0.0185,
         "liquidity": [
           {
             "token": {
@@ -967,7 +967,7 @@
       },
       {
         "id": "5dcd1187-c882-4d2b-a8c9-2ae7c136acbc",
-        "openingFee": -0.021,
+        "swapFee": -0.021,
         "liquidity": [
           {
             "token": {
@@ -1001,7 +1001,7 @@
       },
       {
         "id": "d75237e4-3375-4f72-b33e-956dc8cdb1eb",
-        "openingFee": -0.0087,
+        "swapFee": -0.0087,
         "liquidity": [
           {
             "token": {
@@ -1035,7 +1035,7 @@
       },
       {
         "id": "e22c46e4-051b-45db-aa04-354280c5e35a",
-        "openingFee": 0.0451,
+        "swapFee": 0.0451,
         "liquidity": [
           {
             "token": {
@@ -1069,7 +1069,7 @@
       },
       {
         "id": "15cb3f33-cb59-4979-9c4b-71afdc650ad8",
-        "openingFee": -0.0217,
+        "swapFee": -0.0217,
         "liquidity": [
           {
             "token": {
@@ -1103,7 +1103,7 @@
       },
       {
         "id": "f419f303-f9b2-4fba-89fa-49c6a91ea9ae",
-        "openingFee": -0.0173,
+        "swapFee": -0.0173,
         "liquidity": [
           {
             "token": {
@@ -1137,7 +1137,7 @@
       },
       {
         "id": "1b70560f-5298-4fd3-b7a6-1e042f76714a",
-        "openingFee": -0.0493,
+        "swapFee": -0.0493,
         "liquidity": [
           {
             "token": {
@@ -1171,7 +1171,7 @@
       },
       {
         "id": "1c8a7661-82f4-486e-98e4-1cc9c7580d67",
-        "openingFee": 0.0423,
+        "swapFee": 0.0423,
         "liquidity": [
           {
             "token": {
@@ -1205,7 +1205,7 @@
       },
       {
         "id": "a6c13e95-64ed-4c86-9813-b464ec351901",
-        "openingFee": -0.0238,
+        "swapFee": -0.0238,
         "liquidity": [
           {
             "token": {
@@ -1239,7 +1239,7 @@
       },
       {
         "id": "8c22d153-7865-4706-95ce-026d21aecec7",
-        "openingFee": 0.0367,
+        "swapFee": 0.0367,
         "liquidity": [
           {
             "token": {
@@ -1273,7 +1273,7 @@
       },
       {
         "id": "a1b88c92-a8a7-43bd-af9d-649e9bebafad",
-        "openingFee": 0.0045,
+        "swapFee": 0.0045,
         "liquidity": [
           {
             "token": {
@@ -1307,7 +1307,7 @@
       },
       {
         "id": "0db9764b-56b3-4ba6-b58a-557d10d730a4",
-        "openingFee": 0.0193,
+        "swapFee": 0.0193,
         "liquidity": [
           {
             "token": {
@@ -1341,7 +1341,7 @@
       },
       {
         "id": "7690aef3-845c-4007-a6ae-f8f3a38fb0b6",
-        "openingFee": 0.0393,
+        "swapFee": 0.0393,
         "liquidity": [
           {
             "token": {
@@ -1375,7 +1375,7 @@
       },
       {
         "id": "de31ca87-cd7e-46c0-9835-a69394f1503f",
-        "openingFee": 0.0126,
+        "swapFee": 0.0126,
         "liquidity": [
           {
             "token": {
@@ -1409,7 +1409,7 @@
       },
       {
         "id": "6c936909-3439-4ad6-a384-a2a7dcecb36c",
-        "openingFee": -0.0009,
+        "swapFee": -0.0009,
         "liquidity": [
           {
             "token": {
@@ -1443,7 +1443,7 @@
       },
       {
         "id": "e5f57ea5-b315-424f-9344-930e357eaba4",
-        "openingFee": -0.0419,
+        "swapFee": -0.0419,
         "liquidity": [
           {
             "token": {
@@ -1477,7 +1477,7 @@
       },
       {
         "id": "3bfdda10-3536-436e-a207-0d7612b58f67",
-        "openingFee": 0.0015,
+        "swapFee": 0.0015,
         "liquidity": [
           {
             "token": {
@@ -1511,7 +1511,7 @@
       },
       {
         "id": "197761f8-4c1a-4306-82d7-f8027e188958",
-        "openingFee": -0.0301,
+        "swapFee": -0.0301,
         "liquidity": [
           {
             "token": {
@@ -1545,7 +1545,7 @@
       },
       {
         "id": "08eb2210-9430-47bc-99fc-3660c677d704",
-        "openingFee": -0.0302,
+        "swapFee": -0.0302,
         "liquidity": [
           {
             "token": {
@@ -1579,7 +1579,7 @@
       },
       {
         "id": "20538b1d-971b-4b92-a40c-8765895512f6",
-        "openingFee": -0.0418,
+        "swapFee": -0.0418,
         "liquidity": [
           {
             "token": {
@@ -1613,7 +1613,7 @@
       },
       {
         "id": "1332641f-0526-41e9-819b-d22c1f6b9ea3",
-        "openingFee": 0.0071,
+        "swapFee": 0.0071,
         "liquidity": [
           {
             "token": {
@@ -1647,7 +1647,7 @@
       },
       {
         "id": "0502daad-6b2f-4cb3-8396-9a17bac4e642",
-        "openingFee": -0.0373,
+        "swapFee": -0.0373,
         "liquidity": [
           {
             "token": {
@@ -1681,7 +1681,7 @@
       },
       {
         "id": "bef01c15-3e57-4bbc-8e05-0417dad976d1",
-        "openingFee": 0.019,
+        "swapFee": 0.019,
         "liquidity": [
           {
             "token": {
@@ -1715,7 +1715,7 @@
       },
       {
         "id": "4984dfeb-0a13-4811-951a-12f636ba235c",
-        "openingFee": 0.0483,
+        "swapFee": 0.0483,
         "liquidity": [
           {
             "token": {
@@ -1749,7 +1749,7 @@
       },
       {
         "id": "2945856e-f1c0-44b8-8599-c0835e023ef1",
-        "openingFee": -0.0327,
+        "swapFee": -0.0327,
         "liquidity": [
           {
             "token": {
@@ -1783,7 +1783,7 @@
       },
       {
         "id": "a173dd55-6752-4f34-8a48-97ca8e5c7a9c",
-        "openingFee": 0.045,
+        "swapFee": 0.045,
         "liquidity": [
           {
             "token": {
@@ -1817,7 +1817,7 @@
       },
       {
         "id": "93fc3dbb-c777-426e-93df-86fb5992339d",
-        "openingFee": -0.0484,
+        "swapFee": -0.0484,
         "liquidity": [
           {
             "token": {
@@ -1851,7 +1851,7 @@
       },
       {
         "id": "459d385e-c2d1-4d47-aae5-0c870b0b33b4",
-        "openingFee": 0.0003,
+        "swapFee": 0.0003,
         "liquidity": [
           {
             "token": {

@@ -32,8 +32,9 @@ function Assets() {
     setFavoritedAssets(JSON.parse(window.localStorage.getItem(FAVORITE_ASSETS_LOCALSTORAGE_KEY) ?? '[]'));
   }, []);
 
-  const { selectedToken, setSelectedToken } = useSelectedToken();
+  const { selectedToken, setSelectedToken, JUSDToken } = useSelectedToken();
 
+  // TODO: Implement a filter for only JUSD to subgraph
   const { data } = useQuery<GetAllPoolsQuery, GetAllPoolsQueryVariables>(GET_ALL_POOLS);
 
   const tokens = useMemo<SelectedToken[]>(() => {
@@ -45,13 +46,13 @@ function Assets() {
 
     // get token address from local storage and set isFavorite if it is present
     return jUSDPools
-      .map(({ liquidity, openingFee, volume24hUSD }) => {
+      .map(({ liquidity, swapFee, volume24hUSD }) => {
         const [tokenA, tokenB] = liquidity;
         const token = tokenA.token.symbol === JUSD_SYMBOL ? tokenB.token : tokenA.token;
 
         return {
           ...token,
-          openingFee,
+          swapFee,
           // calculate change over last 24h
           change: (token.priceUSD - token.priceUSD24hAgo) / token.priceUSD24hAgo,
           isFavorite: favoritedAssets.find((address) => token.address === address) !== undefined ? true : false,
@@ -106,23 +107,31 @@ function Assets() {
             <TableHead sx={{ borderBottom: '1px solid', borderBottomColor: 'background.paper' }}>
               <TableRow>
                 <HeaderCell title="Type" cellProps={{ sx: { p: 0.5, pl: 2 } }} />
-                <HeaderCell title="$" cellProps={{ align: 'right', sx: { p: 0.5 } }} />
+                <HeaderCell title="jUSD" cellProps={{ align: 'right', sx: { p: 0.5 } }} />
                 <HeaderCell
-                  title="OF %"
+                  title="SF %"
                   cellProps={{ align: 'right', sx: { p: 0.5 } }}
                   tooltipProps={{
-                    title: 'Opening Fee, one time fee to open a new position.',
+                    title: 'Dynamic swap fee, which is based on the difference between oracle and DEX price.',
                     arrow: true,
                     placement: 'right',
                   }}
                 />
-                <HeaderCell title="%" cellProps={{ align: 'right', sx: { p: 0.5 } }} />
+                <HeaderCell
+                  title="24h"
+                  cellProps={{ align: 'right', sx: { p: 0.5 } }}
+                  tooltipProps={{
+                    title: '24h price movement.',
+                    arrow: true,
+                    placement: 'right',
+                  }}
+                />
                 <HeaderCell title="" cellProps={{ sx: { p: 0.5, pr: 2 } }} />
               </TableRow>
             </TableHead>
             <TableBody>
               {tokens.map((token) => {
-                const { address, isFavorite, symbol, priceUSD, change, openingFee } = token;
+                const { address, isFavorite, symbol, priceUSD, change, swapFee } = token;
 
                 return (
                   <TableRow
@@ -137,11 +146,13 @@ function Assets() {
                       <Typography fontWeight={400}>{symbol}</Typography>
                     </TableCell>
                     <TableCell sx={{ p: 0.5 }} align="right">
-                      <Typography fontWeight={400}>{stdFormatter.format(priceUSD)}</Typography>
+                      <Typography fontWeight={400}>
+                        {JUSDToken ? stdFormatter.format(priceUSD / JUSDToken.priceUSD) : '-'}
+                      </Typography>
                     </TableCell>
                     <TableCell sx={{ p: 0.5 }} align="right" width={60}>
-                      <Typography fontWeight={400} sx={{ color: openingFee > 0 ? 'success.main' : 'error.main' }}>
-                        {displayPercentage(openingFee, 'omit')}
+                      <Typography fontWeight={400} sx={{ color: swapFee > 0 ? 'success.main' : 'error.main' }}>
+                        {displayPercentage(swapFee, 'omit')}
                       </Typography>
                     </TableCell>
                     <TableCell sx={{ p: 0.5 }} align="right" width={80}>

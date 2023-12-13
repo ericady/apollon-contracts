@@ -4,7 +4,7 @@ export const GET_ALL_POOLS = gql`
   query GetAllPools {
     getPools {
       id
-      openingFee
+      swapFee @client
       volume24hUSD
       liquidity {
         token {
