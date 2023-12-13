@@ -19,6 +19,14 @@ export const GET_ALL_POOLS = gql`
   }
 `;
 
+export const GET_SELECTED_TOKEN = gql`
+  query GetSelectedToken($address: String!) {
+    getToken(address: $address) {
+      priceUSDOracle @client
+    }
+  }
+`;
+
 export const GET_ALL_DEBT_TOKENS = gql`
   query GetDebtTokens {
     getDebtTokens {

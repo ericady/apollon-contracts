@@ -132,6 +132,7 @@ export type Query = {
   getPools: Array<Pool>;
   getPositions: PositionsPage;
   getReserveUSDHistory: Array<Array<Scalars['Int']['output']>>;
+  getToken: Token;
 };
 
 
@@ -174,6 +175,11 @@ export type QueryGetPositionsArgs = {
   isOpen: Scalars['Boolean']['input'];
 };
 
+
+export type QueryGetTokenArgs = {
+  address: Scalars['String']['input'];
+};
+
 export type Token = {
   __typename: 'Token';
   address: Scalars['String']['output'];
@@ -182,6 +188,7 @@ export type Token = {
   isPoolToken: Scalars['Boolean']['output'];
   priceUSD: Scalars['Float']['output'];
   priceUSD24hAgo: Scalars['Float']['output'];
+  priceUSDOracle: Scalars['Float']['output'];
   symbol: Scalars['String']['output'];
 };
 
@@ -195,6 +202,13 @@ export type GetAllPoolsQueryVariables = Exact<{ [key: string]: never; }>;
 
 
 export type GetAllPoolsQuery = { __typename: 'Query', getPools: Array<{ __typename: 'Pool', id: string, swapFee: number, volume24hUSD: number, liquidity: Array<{ __typename: 'PoolLiquidity', token: { __typename: 'Token', id: string, address: string, symbol: string, priceUSD: number, priceUSD24hAgo: number } }> }> };
+
+export type GetSelectedTokenQueryVariables = Exact<{
+  address: Scalars['String']['input'];
+}>;
+
+
+export type GetSelectedTokenQuery = { __typename: 'Query', getToken: { __typename: 'Token', priceUSDOracle: number } };
 
 export type GetDebtTokensQueryVariables = Exact<{ [key: string]: never; }>;
 

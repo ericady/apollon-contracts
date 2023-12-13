@@ -1,9 +1,19 @@
+import { useQuery } from '@apollo/client';
 import { Box, Typography } from '@mui/material';
 import { useSelectedToken } from '../../context/SelectedTokenProvider';
-import { displayPercentage, roundCurrency } from '../../utils/math';
+import { GetSelectedTokenQuery, GetSelectedTokenQueryVariables } from '../../generated/gql-types';
+import { GET_SELECTED_TOKEN } from '../../queries';
+import { displayPercentage, percentageChange, roundCurrency } from '../../utils/math';
 
 function TradingViewHeader() {
   const { selectedToken } = useSelectedToken();
+
+  const { data } = useQuery<GetSelectedTokenQuery, GetSelectedTokenQueryVariables>(GET_SELECTED_TOKEN, {
+    variables: {
+      address: selectedToken?.address as string,
+    },
+    skip: !selectedToken,
+  });
 
   return (
     <div
@@ -28,30 +38,43 @@ function TradingViewHeader() {
         />
 
         <Typography variant="subtitle1" fontFamily="Space Grotesk Variable">
-          Pool <Box sx={{ color: 'text.primary', display: 'inline' }}> -</Box>
+          24h Volume
+          <Box sx={{ color: 'text.primary', display: 'inline', ml: '8px' }}>
+            {selectedToken ? roundCurrency(selectedToken.volume24hUSD) : '-'}
+          </Box>{' '}
+          $
         </Typography>
+
         <Typography variant="subtitle1" fontFamily="Space Grotesk Variable">
-          Oracle <Box sx={{ color: 'text.primary', display: 'inline' }}> -</Box>
+          Pool{' '}
+          <Box sx={{ color: 'text.primary', display: 'inline' }}>{selectedToken ? selectedToken.priceUSD : ' -'}</Box>
         </Typography>
+
         <Typography variant="subtitle1" fontFamily="Space Grotesk Variable">
-          Premium <Box sx={{ color: 'text.primary', display: 'inline' }}> -</Box>
+          Oracle{' '}
+          <Box sx={{ color: 'text.primary', display: 'inline' }}>
+            {data ? roundCurrency(data.getToken.priceUSDOracle) : ' -'}
+          </Box>
         </Typography>
+
         <Typography variant="subtitle1" fontFamily="Space Grotesk Variable">
-          Opening Fee
+          Premium{' '}
           <Box sx={{ color: 'text.primary', display: 'inline' }}>
             {' '}
-            {selectedToken ? displayPercentage(selectedToken.swapFee, 'positive') : ' -'}
+            {data && selectedToken
+              ? displayPercentage(percentageChange(selectedToken.priceUSD, data.getToken.priceUSDOracle), 'positive')
+              : ' -'}
+          </Box>
+        </Typography>
+
+        <Typography variant="subtitle1" fontFamily="Space Grotesk Variable">
+          Swap Fee
+          <Box sx={{ color: 'text.primary', display: 'inline' }}>
+            {' '}
+            {selectedToken ? displayPercentage(selectedToken.swapFee) : ' -'}
           </Box>
         </Typography>
       </div>
-
-      <Typography variant="subtitle1" fontWeight={400} fontFamily="Inter Variable">
-        24h Volume
-        <Box sx={{ color: 'text.primary', display: 'inline', ml: '8px' }}>
-          {selectedToken ? roundCurrency(selectedToken.volume24hUSD) : '-'}
-        </Box>{' '}
-        $
-      </Typography>
     </div>
   );
 }

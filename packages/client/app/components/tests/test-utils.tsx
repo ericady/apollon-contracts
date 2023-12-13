@@ -3,7 +3,7 @@ import { ThemeProvider } from '@emotion/react';
 import { SnackbarProvider } from 'notistack';
 import { PropsWithChildren, useMemo, useState } from 'react';
 import 'whatwg-fetch';
-import { EthersContext } from '../../context/EthersProvider';
+import { EthersContext, useEthers } from '../../context/EthersProvider';
 import SelectedTokenProvider, { useSelectedToken } from '../../context/SelectedTokenProvider';
 import WalletProvider from '../../context/WalletProvider';
 import buildTheme from '../../theme';
@@ -21,7 +21,7 @@ type Props = {
   shouldConnectWallet?: boolean;
   shouldConnectWalletDelayed?: boolean;
   mockEthers?: {
-    contractMock?: Record<string, jest.Mock>;
+    contractMock?: Record<keyof ReturnType<typeof useEthers>['contracts'], jest.Mock | Record<string, jest.Mock>>;
     connectWalletMock?: jest.Mock;
   };
 };
@@ -85,7 +85,7 @@ function SetupState({
   return (
     <EthersContext.Provider
       value={{
-        debtTokenContracts: (mockEthers?.contractMock ?? {}) as any,
+        contracts: mockEthers?.contractMock ? mockEthers.contractMock : ({} as any),
         provider: {} as any,
         signer: {} as any,
         address,

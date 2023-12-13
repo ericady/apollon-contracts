@@ -16,6 +16,7 @@ import {
   QueryGetPoolPriceHistoryArgs,
   QueryGetPoolsArgs,
   QueryGetPositionsArgs,
+  QueryGetTokenArgs,
   Token,
   TokenAmount,
 } from '../app/generated/gql-types';
@@ -32,6 +33,7 @@ import {
   GET_DEBT_USD_HISTORY,
   GET_LIQUIDITY_POOLS,
   GET_RESERVE_USD_HISTORY,
+  GET_SELECTED_TOKEN,
 } from '../app/queries';
 
 const getFavoritedAssetsFromLS = () => {
@@ -52,6 +54,7 @@ const JUSD: Token = {
   createdAt: faker.date.past().toISOString(),
   priceUSD: parseFloat(faker.finance.amount(1, 5000, 2)),
   priceUSD24hAgo: parseFloat(faker.finance.amount(1, 5000, 2)),
+  priceUSDOracle: parseFloat(faker.finance.amount(1, 5000, 2)),
   isPoolToken: faker.datatype.boolean(),
 };
 
@@ -65,6 +68,7 @@ export const tokens: Token[] = Array(10)
     createdAt: faker.date.past().toISOString(),
     priceUSD: parseFloat(faker.finance.amount(1, 5000, 2)),
     priceUSD24hAgo: parseFloat(faker.finance.amount(1, 5000, 2)),
+    priceUSDOracle: parseFloat(faker.finance.amount(1, 5000, 2)),
     isPoolToken: faker.datatype.boolean(),
   }))
   .concat(JUSD);
@@ -372,6 +376,15 @@ export const handlers = [
       }
     },
   ),
+
+  // GetSelectedToken
+  graphql.query<{ getToken: Query['getToken'] }, QueryGetTokenArgs>(GET_SELECTED_TOKEN, (req, res, ctx) => {
+    const { address } = req.variables;
+
+    const getToken = tokens.find((token) => token.address === address)!;
+
+    return res(ctx.data({ getToken }));
+  }),
 
   // GetCollateralTokens
   graphql.query<{ getCollateralTokens: Query['getCollateralTokens'] }, QueryGetCollateralTokensArgs>(

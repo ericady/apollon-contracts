@@ -6,6 +6,7 @@ type Token {
   #
   priceUSD: Float!
   priceUSD24hAgo: Float!
+  priceUSDOracle: Float!
   #
   isPoolToken: Boolean!
 }
@@ -46,6 +47,8 @@ type Query {
   # the same token can be returned twice, if it is used as debt and collateral
   getDebtTokens(borrower: String): [DebtTokenMeta!]!
   getCollateralTokens(borrower: String): [CollateralTokenMeta!]!
+  # TODO: Rename this for the subgraph query
+  getToken(address: String!): Token!
 }
 
 enum LongShortDirection {

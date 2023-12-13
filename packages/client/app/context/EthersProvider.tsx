@@ -6,8 +6,7 @@ import { JsonRpcProvider } from 'ethers/providers';
 import Link from 'next/link';
 import { useSnackbar } from 'notistack';
 import { createContext, useContext, useEffect, useState } from 'react';
-import { SwapOperations, SwapPair, TroveManager } from '../../types/ethers-contracts';
-import { DebtToken } from '../../types/ethers-contracts/DebtToken';
+import { DebtToken, SwapOperations, SwapPair, TroveManager } from '../../generated/types';
 import { SchemaDataFreshnessManager } from './CustomApolloProvider';
 import debtTokenAbi from './abis/DebtToken.json';
 import swapOperationsAbi from './abis/SwapOperations.json';
@@ -62,19 +61,23 @@ export const EthersContext = createContext<{
   provider: JsonRpcProvider | null;
   signer: JsonRpcSigner | null;
   address: string;
-  debtTokenContracts: AllDebtTokenContracts;
-  troveManagerContract: TroveManager;
-  swapOperationsContract: SwapOperations;
-  swapPairContracts: AllSwapPairContracts;
+  contracts: {
+    debtTokenContracts: AllDebtTokenContracts;
+    troveManagerContract: TroveManager;
+    swapOperationsContract: SwapOperations;
+    swapPairContracts: AllSwapPairContracts;
+  };
   connectWallet: () => void;
 }>({
   provider: null,
   signer: null,
   address: '',
-  debtTokenContracts: undefined as any,
-  troveManagerContract: undefined as any,
-  swapOperationsContract: undefined as any,
-  swapPairContracts: undefined as any,
+  contracts: {
+    debtTokenContracts: undefined,
+    troveManagerContract: undefined,
+    swapOperationsContract: undefined,
+    swapPairContracts: undefined,
+  } as any,
   connectWallet: () => {},
 });
 
@@ -196,10 +199,12 @@ export default function EthersProvider({ children }: { children: React.ReactNode
         signer,
         address,
         connectWallet,
-        debtTokenContracts,
-        troveManagerContract,
-        swapOperationsContract,
-        swapPairContracts,
+        contracts: {
+          debtTokenContracts,
+          troveManagerContract,
+          swapOperationsContract,
+          swapPairContracts,
+        },
       }}
     >
       {children}
@@ -212,10 +217,12 @@ export function useEthers(): {
   // provider: BrowserProvider | null;
   signer: JsonRpcSigner | null;
   address: string;
-  debtTokenContracts: AllDebtTokenContracts;
-  troveManagerContract: TroveManager;
-  swapOperationsContract: SwapOperations;
-  swapPairContracts: AllSwapPairContracts;
+  contracts: {
+    debtTokenContracts: AllDebtTokenContracts;
+    troveManagerContract: TroveManager;
+    swapOperationsContract: SwapOperations;
+    swapPairContracts: AllSwapPairContracts;
+  };
   connectWallet: () => void;
 } {
   const context = useContext(EthersContext);

@@ -3,6 +3,7 @@ import { SetupServer } from 'msw/node';
 import Assets from '../Features/Assets/Assets';
 import { integrationSuiteSetup, integrationTestSetup } from './integration-test.setup';
 import MockedPoolsData from './mockedResponses/GetAllPools.mocked.json';
+import MockedPositionsWithoutBorrower from './mockedResponses/GetDebtTokens.mocked.json';
 import { IntegrationWrapper } from './test-utils';
 
 let server: SetupServer;
@@ -24,13 +25,18 @@ test.afterAll(() => {
 });
 
 test.describe('Assets', () => {
-  test('should render Assets with mocked data', async ({ mount, page }) => {
+  test.only('should render Assets with mocked data', async ({ mount, page }) => {
     // We need to mock the exact same data to generate the exact same snapshot
     await page.route('https://flyby-router-demo.herokuapp.com/', async (route) => {
       if (JSON.parse(route.request().postData()!).operationName === 'GetAllPools') {
         return route.fulfill({
           status: 200,
           body: JSON.stringify(MockedPoolsData),
+        });
+      } else if (JSON.parse(route.request().postData()!).operationName === 'GetDebtTokens') {
+        return route.fulfill({
+          status: 200,
+          body: JSON.stringify(MockedPositionsWithoutBorrower),
         });
       } else {
         return route.abort();
