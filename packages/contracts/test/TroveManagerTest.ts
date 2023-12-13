@@ -430,5 +430,61 @@ describe('TroveManager', () => {
       const btcStableBalanceAfter = await storagePool.getValue(BTC, true, 0);
       assert.equal(btcStableBalanceAfter, btcStableBalanceBefore - expectedBTCPayout);
     });
+
+    it('Should add collateral to the trove and update the stats', async function () {
+      await whaleShrimpTroveInit(contracts, signers, false);
+
+      const collAmountToAdd = parseUnits('0.0001', 9);
+      const bobAddress = bob.address;
+      const borrowerOperationsAddress = await borrowerOperations.getAddress();
+      const storagePoolAddress = await storagePool.getAddress();
+      const btcAddress = await BTC.getAddress();
+
+      await expect(BTC.unprotectedMint(bobAddress, collAmountToAdd))
+        .to.emit(BTC, 'Transfer')
+        .withArgs(ethers.ZeroAddress, bobAddress, collAmountToAdd);
+
+      await expect(BTC.connect(bob).approve(borrowerOperationsAddress, collAmountToAdd))
+        .to.emit(BTC, 'Approval')
+        .withArgs(bobAddress, borrowerOperationsAddress, collAmountToAdd);
+
+      const prevPoolValue = await storagePool.getValue(BTC, true, 0);
+      const prevTotalCollateralStake = await troveManager.totalStakes(btcAddress);
+      const prevTroveStake = await troveManager.getTroveStakes(bobAddress, btcAddress);
+
+      await expect(borrowerOperations.connect(bob).addColl([{ tokenAddress: BTC, amount: collAmountToAdd }]))
+        .to.emit(storagePool, 'StoragePoolValueUpdated')
+        .withArgs(btcAddress, true, '0', prevPoolValue + collAmountToAdd)
+        .and.to.emit(BTC, 'Transfer')
+        .withArgs(bobAddress, storagePoolAddress, collAmountToAdd);
+
+      const newPoolValue = await storagePool.getValue(BTC, true, 0);
+      const newTotalCollateralStake = await troveManager.totalStakes(btcAddress);
+      const newTroveStake = await troveManager.getTroveStakes(bobAddress, btcAddress);
+
+      expect(newPoolValue).to.be.equal(prevPoolValue + collAmountToAdd);
+      expect(newTotalCollateralStake).to.be.equal(prevTotalCollateralStake + collAmountToAdd);
+      expect(newTroveStake).to.be.equal(prevTroveStake + collAmountToAdd);
+    });
+  });
+
+  describe('TroveOwners', () => {
+    it('Should add new trove owner to the Trove Owners array', async function () {
+      const prevTroveOwnersCount = await troveManager.getTroveOwnersCount();
+
+      await openTrove({
+        from: whale,
+        contracts,
+        collToken: contracts.collToken.BTC,
+        collAmount: parseUnits('1', 9),
+        debts: [{ tokenAddress: STABLE, amount: parseUnits('1850') }],
+      });
+
+      const oTrove = await troveManager.Troves(whale.address);
+      const newTroveOwnersCount = await troveManager.getTroveOwnersCount();
+
+      expect(oTrove.arrayIndex).to.be.equal(prevTroveOwnersCount);
+      expect(newTroveOwnersCount).to.be.equal(prevTroveOwnersCount + '1');
+    });
   });
 });
