@@ -87,7 +87,7 @@ describe('TroveManager', () => {
         const trove = await troveManager.getTroveStatus(defaulter_1);
         assert.equal(trove, 3n); // closedByLiquidation
 
-        const troveStake = await troveManager.getTroveStakes(defaulter_1, BTC);
+        const troveStake = await troveManager.getTroveStakeValue(defaulter_1);
         assert.equal(troveStake, 0n);
 
         const troveDebt = await troveManager.getTroveDebt(defaulter_1);

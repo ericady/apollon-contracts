@@ -4,7 +4,7 @@ import { MockDebtToken, MockERC20, StabilityPoolManager, contracts } from '../ty
 import { Contracts } from './deploymentHelpers';
 import { ethers } from 'hardhat';
 import { expect } from 'chai';
-import { AddressLike, Contract, ContractTransactionReceipt, ContractTransactionResponse } from 'ethers';
+import { AddressLike, ContractTransactionResponse } from 'ethers';
 import { parseUnits } from 'ethers';
 
 export const MAX_BORROWING_FEE = parseUnits('0.05');
@@ -43,7 +43,7 @@ export const increaseDebt = async (
   debts: any[],
   maxFeePercentage = MAX_BORROWING_FEE
 ) => {
-  return { tx: await contracts.borrowerOperations.connect(from).increaseDebt(debts, maxFeePercentage) };
+  return { tx: await contracts.borrowerOperations.connect(from).increaseDebts(debts, maxFeePercentage) };
 };
 
 export const getStabilityPool = async (contracts: Contracts, debt: MockDebtToken) => {

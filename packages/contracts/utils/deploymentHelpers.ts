@@ -12,6 +12,7 @@ import {
   StabilityPoolManagerTester,
   StoragePool,
   ReservePool,
+  MockBorrowerOperations,
 } from '../typechain';
 import { parseUnits } from 'ethers';
 

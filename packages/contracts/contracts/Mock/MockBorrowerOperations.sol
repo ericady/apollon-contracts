@@ -8,7 +8,7 @@ import '../BorrowerOperations.sol';
 for testing the parent's internal functions. */
 
 contract MockBorrowerOperations is BorrowerOperations {
-  function increaseDebt(TokenAmount[] memory _debts, uint _maxFeePercentage) external {
+  function increaseDebts(TokenAmount[] memory _debts, uint _maxFeePercentage) external {
     // separate minting is allowed for better testing
     // _requireCallerIsSwapOperations();
 
