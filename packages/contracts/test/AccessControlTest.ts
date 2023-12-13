@@ -101,7 +101,7 @@ describe('Access Control: Apollon functions with the caller restricted to Apollo
 
     // closeTrove
     it('closeTrove(): reverts when called by an account that is not BorrowerOperations', async () => {
-      await expect(troveManager.closeTrove([], bob)).to.be.revertedWithCustomError(
+      await expect(troveManager.closeTroveByProtocol([], bob, 0)).to.be.revertedWithCustomError(
         troveManager,
         'NotFromBorrowerOrRedemptionOps'
       );

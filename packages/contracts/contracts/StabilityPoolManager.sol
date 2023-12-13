@@ -18,7 +18,7 @@ import './StabilityPool.sol';
 contract StabilityPoolManager is Ownable(msg.sender), CheckContract, IStabilityPoolManager {
   string public constant NAME = 'StabilityPoolManager';
 
-  address public troveManagerAddress;
+  address public liquidationOperationsAddress;
   IStoragePool public storagePool;
   IReservePool public reservePool;
   IPriceFeed public priceFeed;
@@ -32,26 +32,26 @@ contract StabilityPoolManager is Ownable(msg.sender), CheckContract, IStabilityP
   // --- Dependency setter ---
 
   function setAddresses(
-    address _troveManagerAddress,
+    address _liquidationOperationsAddress,
     address _priceFeedAddress,
     address _storagePoolAddress,
     address _reservePoolAddress,
     address _debtTokenManagerAddress
   ) external onlyOwner {
-    checkContract(_troveManagerAddress);
+    checkContract(_liquidationOperationsAddress);
     checkContract(_priceFeedAddress);
     checkContract(_storagePoolAddress);
     checkContract(_reservePoolAddress);
     checkContract(_debtTokenManagerAddress);
 
-    troveManagerAddress = _troveManagerAddress;
+    liquidationOperationsAddress = _liquidationOperationsAddress;
     priceFeed = IPriceFeed(_priceFeedAddress);
     storagePool = IStoragePool(_storagePoolAddress);
     reservePool = IReservePool(_reservePoolAddress);
     debtTokenManagerAddress = _debtTokenManagerAddress;
 
     emit StabilityPoolManagerInitiated(
-      _troveManagerAddress,
+      _liquidationOperationsAddress,
       _storagePoolAddress,
       _reservePoolAddress,
       _debtTokenManagerAddress,
@@ -208,7 +208,7 @@ contract StabilityPoolManager is Ownable(msg.sender), CheckContract, IStabilityP
   }
 
   function offset(RemainingStability[] memory _toOffset) external override {
-    _requireCallerIsTroveManager();
+    _requireCallerIsLiquidationOps();
 
     IStoragePool storagePoolCached = storagePool;
     for (uint i = 0; i < _toOffset.length; i++) {
@@ -302,7 +302,7 @@ contract StabilityPoolManager is Ownable(msg.sender), CheckContract, IStabilityP
     if (msg.sender != debtTokenManagerAddress) revert Unauthorized();
     if (address(stabilityPools[_debtToken]) != address(0)) revert PoolExist();
 
-    IStabilityPool stabilityPool = new StabilityPool(address(this), troveManagerAddress, address(_debtToken));
+    IStabilityPool stabilityPool = new StabilityPool(address(this), address(_debtToken));
 
     stabilityPools[_debtToken] = stabilityPool;
     stabilityPoolsArray.push(stabilityPool);
@@ -315,8 +315,8 @@ contract StabilityPoolManager is Ownable(msg.sender), CheckContract, IStabilityP
     }
   }
 
-  function _requireCallerIsTroveManager() internal view {
-    if (msg.sender != troveManagerAddress) revert NotFromTroveManager();
+  function _requireCallerIsLiquidationOps() internal view {
+    if (msg.sender != liquidationOperationsAddress) revert NotFromLiquidationOps();
   }
 
   function _requireCallerIsReservePool() internal view {

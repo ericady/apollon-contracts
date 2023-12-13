@@ -182,12 +182,6 @@
             {
                 "indexed": false,
                 "internalType": "address",
-                "name": "troveManagerAddress",
-                "type": "address"
-            },
-            {
-                "indexed": false,
-                "internalType": "address",
                 "name": "depositTokenAddress",
                 "type": "address"
             }

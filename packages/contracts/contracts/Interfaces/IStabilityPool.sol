@@ -8,11 +8,7 @@ import './IBase.sol';
 interface IStabilityPool is IBase {
   // --- Events ---
 
-  event StabilityPoolInitialized(
-    address stabilityPoolManagerAddress,
-    address troveManagerAddress,
-    address depositTokenAddress
-  );
+  event StabilityPoolInitialized(address stabilityPoolManagerAddress, address depositTokenAddress);
 
   event StabilityProvided(address user, uint amount);
   event StabilityWithdrawn(address user, uint amount);

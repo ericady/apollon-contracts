@@ -6,7 +6,7 @@ import {
   MockTroveManager,
   StabilityPoolManager,
   StoragePool,
-  BorrowerOperationsTester,
+  LiquidationOperations,
   RedemptionOperations,
 } from '../typechain';
 import { Contracts, deployCore, connectCoreContracts, deployAndLinkToken } from '../utils/deploymentHelpers';
@@ -40,9 +40,9 @@ describe('TroveManager', () => {
   let priceFeed: MockPriceFeed;
   let troveManager: MockTroveManager;
 
-  let borrowerOperations: BorrowerOperationsTester;
   let stabilityPoolManager: StabilityPoolManager;
   let redemptionOperations: RedemptionOperations;
+  let liquidationOperations: LiquidationOperations;
   let contracts: Contracts;
 
   let redemptionFee: bigint;
@@ -60,7 +60,7 @@ describe('TroveManager', () => {
     priceFeed = contracts.priceFeed;
     troveManager = contracts.troveManager;
     redemptionOperations = contracts.redemptionOperations;
-    borrowerOperations = contracts.borrowerOperations;
+    liquidationOperations = contracts.liquidationOperations;
     storagePool = contracts.storagePool;
     stabilityPoolManager = contracts.stabilityPoolManager;
 
@@ -82,7 +82,7 @@ describe('TroveManager', () => {
         assert.isFalse(isRecoveryMode);
 
         // liquidate
-        await troveManager.liquidate(defaulter_1);
+        await liquidationOperations.liquidate(defaulter_1);
 
         const trove = await troveManager.getTroveStatus(defaulter_1);
         assert.equal(trove, 3n); // closedByLiquidation
@@ -110,7 +110,7 @@ describe('TroveManager', () => {
         expect(activePoolDebt_Before).to.be.gt(parseUnits('6000'));
 
         // liquidate
-        await troveManager.liquidate(defaulter_1);
+        await liquidationOperations.liquidate(defaulter_1);
 
         const storageActivePool_After = await storagePool.getValue(BTC, true, 0);
         assert.equal(storageActivePool_After, storageActivePool_Before - parseUnits('0.02', 9));
@@ -136,7 +136,7 @@ describe('TroveManager', () => {
         expect(defaultPoolDebtBefore).to.be.equal(0n);
 
         // liquidate
-        await troveManager.liquidate(defaulter_1);
+        await liquidationOperations.liquidate(defaulter_1);
 
         const liquidatedColl = parseUnits('0.02', 9);
         const defaultPollCollAfter = await storagePool.getValue(BTC, true, 1);
@@ -160,7 +160,7 @@ describe('TroveManager', () => {
         assert.equal(stakes_Before, parseUnits('5.04', 9));
 
         // liquidate
-        await troveManager.liquidate(defaulter_1);
+        await liquidationOperations.liquidate(defaulter_1);
 
         const stakes_After = await troveManager.totalStakes(BTC);
         assert.equal(stakes_After, parseUnits('5.02', 9));
@@ -189,7 +189,7 @@ describe('TroveManager', () => {
         assert.equal(trove_2, defaulter_2.address);
 
         // liquidate
-        await troveManager.liquidate(defaulter_1);
+        await liquidationOperations.liquidate(defaulter_1);
 
         const totalTroveOwners_after = await troveManager.getTroveOwnersCount();
         assert.equal(totalTroveOwners_after, 6n);
@@ -221,7 +221,7 @@ describe('TroveManager', () => {
         assert.equal(totalCollateralSnapshot_Before, 0n);
 
         // liquidate
-        await troveManager.liquidate(defaulter_1);
+        await liquidationOperations.liquidate(defaulter_1);
 
         const totalStakes_After = await troveManager.totalStakes(BTC);
         const totalStakesSnapshot_After = await troveManager.totalStakesSnapshot(BTC);
@@ -246,7 +246,7 @@ describe('TroveManager', () => {
         assert.isFalse(isRecoveryMode);
 
         // 1. liquidation
-        await troveManager.liquidate(defaulter_1);
+        await liquidationOperations.liquidate(defaulter_1);
 
         const defaulterBTC = parseUnits('0.02', 9);
         const defaulterBTCWithoutFee = defaulterBTC - (await troveManager.getCollGasCompensation(defaulterBTC));
@@ -268,7 +268,7 @@ describe('TroveManager', () => {
         // 2. liquidation
         const defaulterStableRewards = await troveManager.getPendingReward(defaulter_2, STABLE, false);
         const defaulterBTCRewards = await troveManager.getPendingReward(defaulter_2, BTC, true);
-        await troveManager.liquidate(defaulter_2);
+        await liquidationOperations.liquidate(defaulter_2);
 
         remainingActiveBTC -= defaulterBTC;
         const totalStakeB = await priceFeed.getUSDValue(BTC, remainingActiveBTC);
@@ -291,16 +291,16 @@ describe('TroveManager', () => {
       });
 
       it('reverts if trove is non-existent', async () => {
-        const tx = troveManager.liquidate(alice);
+        const tx = liquidationOperations.liquidate(alice);
         await assertRevert(tx, 'InvalidTrove');
       });
 
       it('reverts if trove is already closedByLiquidation', async () => {
         await whaleShrimpTroveInit(contracts, signers, false);
         await priceFeed.setTokenPrice(BTC, parseUnits('5000'));
-        await troveManager.liquidate(defaulter_1);
+        await liquidationOperations.liquidate(defaulter_1);
 
-        await assertRevert(troveManager.liquidate(defaulter_1), 'InvalidTrove');
+        await assertRevert(liquidationOperations.liquidate(defaulter_1), 'InvalidTrove');
       });
 
       it('reverts if trove has been closed', async () => {
@@ -317,12 +317,12 @@ describe('TroveManager', () => {
           collAmount: parseUnits('0.02', 9), // 0.02 BTC
         });
         await contracts.borrowerOperations.connect(defaulter_3).closeTrove();
-        await assertRevert(troveManager.liquidate(defaulter_3), 'InvalidTrove');
+        await assertRevert(liquidationOperations.liquidate(defaulter_3), 'InvalidTrove');
       });
 
       it('does nothing if trove has >= 110% ICR', async () => {
         await whaleShrimpTroveInit(contracts, signers, false);
-        await assertRevert(troveManager.liquidate(alice), 'NoLiquidatableTrove');
+        await assertRevert(liquidationOperations.liquidate(alice), 'NoLiquidatableTrove');
       });
 
       // todo
@@ -343,12 +343,12 @@ describe('TroveManager', () => {
 
         // defaulter gets liquidated
         await priceFeed.setTokenPrice(BTC, parseUnits('5000'));
-        await troveManager.liquidate(defaulter_1);
+        await liquidationOperations.liquidate(defaulter_1);
 
         const stabilityPool = await getStabilityPool(contracts, STABLE);
         const spGainBefore = await stabilityPool.getDepositorCollGain(erin, BTC);
 
-        await assertRevert(troveManager.liquidate(erin), 'InvalidTrove');
+        await assertRevert(liquidationOperations.liquidate(erin), 'InvalidTrove');
 
         const spGainAfter = await stabilityPool.getDepositorCollGain(erin, BTC);
         assert.equal(spGainBefore, spGainAfter);
@@ -364,7 +364,7 @@ describe('TroveManager', () => {
 
         // defaulter gets liquidated
         await priceFeed.setTokenPrice(BTC, parseUnits('5000'));
-        await troveManager.liquidate(defaulter_1);
+        await liquidationOperations.liquidate(defaulter_1);
 
         const btcBalanceAfter = await BTC.balanceOf(defaulter_1);
         assert.equal(btcBalanceBefore, btcBalanceAfter);
@@ -380,7 +380,7 @@ describe('TroveManager', () => {
         expect(d1ICRBefore).to.be.equal(d2ICRBefore);
 
         // defaulter gets liquidated
-        await troveManager.liquidate(defaulter_1);
+        await liquidationOperations.liquidate(defaulter_1);
 
         const [aliceICRAfter] = await troveManager.getCurrentICR(alice);
         const [d2ICRAfter] = await troveManager.getCurrentICR(defaulter_2);
@@ -390,7 +390,7 @@ describe('TroveManager', () => {
         expect(d2ICRAfter).to.be.gt(d2ICRBefore);
 
         // defaulter gets liquidated
-        await troveManager.liquidate(defaulter_2);
+        await liquidationOperations.liquidate(defaulter_2);
 
         const [aliceICRAfter2] = await troveManager.getCurrentICR(alice);
         expect(aliceICRAfter2).to.be.gt(aliceICRAfter);

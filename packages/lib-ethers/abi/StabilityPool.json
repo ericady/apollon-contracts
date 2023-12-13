@@ -8,11 +8,6 @@
       },
       {
         "internalType": "address",
-        "name": "_troveManagerAddress",
-        "type": "address"
-      },
-      {
-        "internalType": "address",
         "name": "_depositTokenAddress",
         "type": "address"
       }
@@ -208,12 +203,6 @@
         "indexed": false,
         "internalType": "address",
         "name": "stabilityPoolManagerAddress",
-        "type": "address"
-      },
-      {
-        "indexed": false,
-        "internalType": "address",
-        "name": "troveManagerAddress",
         "type": "address"
       },
       {
@@ -780,19 +769,6 @@
         "internalType": "uint256",
         "name": "",
         "type": "uint256"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [],
-    "name": "troveManager",
-    "outputs": [
-      {
-        "internalType": "contract ITroveManager",
-        "name": "",
-        "type": "address"
       }
     ],
     "stateMutability": "view",

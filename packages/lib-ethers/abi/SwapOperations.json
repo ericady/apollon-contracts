@@ -1,21 +1,5 @@
 [
   {
-    "inputs": [
-      {
-        "internalType": "address",
-        "name": "_borrowerOperationsAddress",
-        "type": "address"
-      },
-      {
-        "internalType": "address",
-        "name": "_priceFeedAddress",
-        "type": "address"
-      }
-    ],
-    "stateMutability": "nonpayable",
-    "type": "constructor"
-  },
-  {
     "inputs": [],
     "name": "ExcessiveInputAmount",
     "type": "error"
@@ -23,6 +7,11 @@
   {
     "inputs": [],
     "name": "Expired",
+    "type": "error"
+  },
+  {
+    "inputs": [],
+    "name": "FeeExceedMaxPercentage",
     "type": "error"
   },
   {
@@ -179,7 +168,19 @@
       {
         "indexed": false,
         "internalType": "address",
+        "name": "troveManager",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "address",
         "name": "priceFeed",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "address",
+        "name": "debtTokenManager",
         "type": "address"
       }
     ],
@@ -219,9 +220,9 @@
         "type": "uint256"
       },
       {
-        "internalType": "address",
-        "name": "to",
-        "type": "address"
+        "internalType": "uint256",
+        "name": "_maxMintFeePercentage",
+        "type": "uint256"
       },
       {
         "internalType": "uint256",
@@ -317,6 +318,19 @@
       }
     ],
     "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "debtTokenManager",
+    "outputs": [
+      {
+        "internalType": "contract IDebtTokenManager",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
     "type": "function"
   },
   {
@@ -476,6 +490,94 @@
     "type": "function"
   },
   {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "stableToMintIn",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "debtOutMin",
+        "type": "uint256"
+      },
+      {
+        "internalType": "address",
+        "name": "debtTokenAddress",
+        "type": "address"
+      },
+      {
+        "internalType": "address",
+        "name": "to",
+        "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "_maxMintFeePercentage",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "deadline",
+        "type": "uint256"
+      }
+    ],
+    "name": "openLongPosition",
+    "outputs": [
+      {
+        "internalType": "uint256[]",
+        "name": "amounts",
+        "type": "uint256[]"
+      }
+    ],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "uint256",
+        "name": "debtToMintIn",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "stableOutMin",
+        "type": "uint256"
+      },
+      {
+        "internalType": "address",
+        "name": "debtTokenAddress",
+        "type": "address"
+      },
+      {
+        "internalType": "address",
+        "name": "to",
+        "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "_maxMintFeePercentage",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "deadline",
+        "type": "uint256"
+      }
+    ],
+    "name": "openShortPosition",
+    "outputs": [
+      {
+        "internalType": "uint256[]",
+        "name": "amounts",
+        "type": "uint256[]"
+      }
+    ],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
     "inputs": [],
     "name": "owner",
     "outputs": [
@@ -558,11 +660,6 @@
         "type": "uint256"
       },
       {
-        "internalType": "address",
-        "name": "to",
-        "type": "address"
-      },
-      {
         "internalType": "uint256",
         "name": "deadline",
         "type": "uint256"
@@ -587,6 +684,34 @@
   {
     "inputs": [],
     "name": "renounceOwnership",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "_borrowerOperationsAddress",
+        "type": "address"
+      },
+      {
+        "internalType": "address",
+        "name": "_troveManagerAddress",
+        "type": "address"
+      },
+      {
+        "internalType": "address",
+        "name": "_priceFeedAddress",
+        "type": "address"
+      },
+      {
+        "internalType": "address",
+        "name": "_debtTokenManager",
+        "type": "address"
+      }
+    ],
+    "name": "setAddresses",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
@@ -680,6 +805,19 @@
     "name": "transferOwnership",
     "outputs": [],
     "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "troveManager",
+    "outputs": [
+      {
+        "internalType": "contract ITroveManager",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
     "type": "function"
   }
 ]

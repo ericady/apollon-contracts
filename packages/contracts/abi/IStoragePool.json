@@ -33,6 +33,12 @@
             {
                 "indexed": false,
                 "internalType": "address",
+                "name": "_liquidationOperationsAddress",
+                "type": "address"
+            },
+            {
+                "indexed": false,
+                "internalType": "address",
                 "name": "_stabilityPoolManagerAddress",
                 "type": "address"
             },

@@ -12,6 +12,7 @@ interface IStoragePool is IBase {
     address _borrowerOperationsAddress,
     address _troveManagerAddress,
     address _redemptionOperationsAddress,
+    address _liquidationOperationsAddress,
     address _stabilityPoolManagerAddress,
     address _priceFeedAddress
   );

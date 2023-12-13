@@ -7,6 +7,14 @@ import './IDebtToken.sol';
 import './IStabilityPool.sol';
 
 interface IBBase is IBase {
+  enum Status {
+    nonExistent,
+    active,
+    closedByOwner,
+    closedByLiquidationInNormalMode,
+    closedByLiquidationInRecoveryMode
+  }
+
   struct DebtTokenAmount {
     IDebtToken debtToken;
     uint netDebt;

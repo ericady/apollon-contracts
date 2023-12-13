@@ -460,6 +460,16 @@
   {
     "inputs": [
       {
+        "internalType": "address",
+        "name": "_borrower",
+        "type": "address"
+      },
+      {
+        "internalType": "address",
+        "name": "_to",
+        "type": "address"
+      },
+      {
         "components": [
           {
             "internalType": "address",
@@ -566,6 +576,36 @@
       }
     ],
     "name": "repayDebt",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "borrower",
+        "type": "address"
+      },
+      {
+        "components": [
+          {
+            "internalType": "address",
+            "name": "tokenAddress",
+            "type": "address"
+          },
+          {
+            "internalType": "uint256",
+            "name": "amount",
+            "type": "uint256"
+          }
+        ],
+        "internalType": "struct IBase.TokenAmount[]",
+        "name": "_debts",
+        "type": "tuple[]"
+      }
+    ],
+    "name": "repayDebtFromPoolBurn",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"

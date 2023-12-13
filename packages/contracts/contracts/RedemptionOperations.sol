@@ -17,7 +17,7 @@ import './Interfaces/IRedemptionOperations.sol';
 import './Interfaces/ITroveManager.sol';
 
 contract RedemptionOperations is LiquityBase, Ownable(msg.sender), CheckContract, IRedemptionOperations {
-  string public constant NAME = 'RedemptionManager';
+  string public constant NAME = 'RedemptionOperations';
 
   // --- Connected contract declarations ---
 

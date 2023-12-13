@@ -5,7 +5,6 @@ pragma solidity ^0.8.9;
 import './Interfaces/IBorrowerOperations.sol';
 import './Interfaces/IStabilityPool.sol';
 import './Interfaces/IBorrowerOperations.sol';
-import './Interfaces/ITroveManager.sol';
 import './Interfaces/IDebtToken.sol';
 import './Dependencies/LiquityBase.sol';
 import './Dependencies/CheckContract.sol';
@@ -143,7 +142,6 @@ import './Dependencies/CheckContract.sol';
 contract StabilityPool is LiquityBase, CheckContract, IStabilityPool {
   string public constant NAME = 'StabilityPool';
 
-  ITroveManager public troveManager;
   address public stabilityPoolManagerAddress;
 
   // --- Data structures ---
@@ -200,16 +198,14 @@ contract StabilityPool is LiquityBase, CheckContract, IStabilityPool {
 
   mapping(address => uint) public lastErrorOffset; // [tokenAddress] value, Error trackers for the error correction in the offset calculation
 
-  constructor(address _stabilityPoolManagerAddress, address _troveManagerAddress, address _depositTokenAddress) {
+  constructor(address _stabilityPoolManagerAddress, address _depositTokenAddress) {
     checkContract(_stabilityPoolManagerAddress);
-    checkContract(_troveManagerAddress);
     checkContract(_depositTokenAddress);
 
     stabilityPoolManagerAddress = _stabilityPoolManagerAddress;
-    troveManager = ITroveManager(_troveManagerAddress);
     depositToken = IDebtToken(_depositTokenAddress);
 
-    emit StabilityPoolInitialized(_stabilityPoolManagerAddress, _troveManagerAddress, _depositTokenAddress);
+    emit StabilityPoolInitialized(_stabilityPoolManagerAddress, _depositTokenAddress);
   }
 
   // --- Getters for public variables. Required by IPool interface ---
@@ -699,9 +695,5 @@ contract StabilityPool is LiquityBase, CheckContract, IStabilityPool {
 
   function _requireNonZeroAmount(uint _amount) internal pure {
     if (_amount == 0) revert ZeroAmount();
-  }
-
-  function _requireUserHasTrove(address _depositor) internal view {
-    if (troveManager.getTroveStatus(_depositor) != 1) revert NotOneTrove();
   }
 }

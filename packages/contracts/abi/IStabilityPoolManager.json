@@ -6,12 +6,12 @@
     },
     {
         "inputs": [],
-        "name": "NotFromReservePool",
+        "name": "NotFromLiquidationOps",
         "type": "error"
     },
     {
         "inputs": [],
-        "name": "NotFromTroveManager",
+        "name": "NotFromReservePool",
         "type": "error"
     },
     {
@@ -48,7 +48,7 @@
             {
                 "indexed": false,
                 "internalType": "address",
-                "name": "troveManagerAddress",
+                "name": "liquidationOperationsAddress",
                 "type": "address"
             },
             {

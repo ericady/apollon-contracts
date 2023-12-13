@@ -2,7 +2,8 @@ import { SignerWithAddress } from '@nomicfoundation/hardhat-ethers/signers';
 import { ethers } from 'hardhat';
 import { Contracts, connectCoreContracts, deployAndLinkToken, deployCore } from '../utils/deploymentHelpers';
 import {
-  BorrowerOperationsTester,
+  MockBorrowerOperations,
+  LiquidationOperations,
   MockDebtToken,
   MockERC20,
   MockPriceFeed,
@@ -46,9 +47,10 @@ describe('StabilityPool', () => {
   let contracts: Contracts;
   let priceFeed: MockPriceFeed;
   let troveManager: TroveManager;
-  let borrowerOperations: BorrowerOperationsTester;
+  let borrowerOperations: MockBorrowerOperations;
   let storagePool: StoragePool;
   let stabilityPoolManager: StabilityPoolManager;
+  let liquidationOperations: LiquidationOperations;
 
   before(async () => {
     signers = await ethers.getSigners();
@@ -66,6 +68,7 @@ describe('StabilityPool', () => {
       borrowerOperations = contracts.borrowerOperations;
       storagePool = contracts.storagePool;
       stabilityPoolManager = contracts.stabilityPoolManager;
+      liquidationOperations = contracts.liquidationOperations;
 
       STABLE = contracts.debtToken.STABLE;
       STOCK = contracts.debtToken.STOCK;
@@ -182,9 +185,9 @@ describe('StabilityPool', () => {
           ?.amount;
 
         // Troves are closed
-        await troveManager.liquidate(defaulter_1);
+        await liquidationOperations.liquidate(defaulter_1);
         expect(await troveManager.getTroveStatus(defaulter_1)).to.be.equal(3n);
-        await troveManager.liquidate(defaulter_2);
+        await liquidationOperations.liquidate(defaulter_2);
         expect(await troveManager.getTroveStatus(defaulter_2)).to.be.equal(3n);
 
         // Confirm SP has decreased
@@ -289,8 +292,8 @@ describe('StabilityPool', () => {
         // 2 users with Trove with 2 STOCK drawn are closed
         // 0.04 BTC -> 50% to the whale, 50% to alice
         // pool is empty after that
-        await troveManager.liquidate(defaulter_1);
-        await troveManager.liquidate(defaulter_2);
+        await liquidationOperations.liquidate(defaulter_1);
+        await liquidationOperations.liquidate(defaulter_2);
 
         const alice_compoundedDeposit_1 = await stockPool.getCompoundedDebtDeposit(alice);
         expect(alice_compoundedDeposit_1).to.be.equal(0n); // all debt was consumed
@@ -328,7 +331,7 @@ describe('StabilityPool', () => {
 
         // Defaulter 3 Trove is closed
         // 0.02 BTC, 50% alice, 50% bob
-        await troveManager.liquidate(defaulter_3);
+        await liquidationOperations.liquidate(defaulter_3);
 
         const P_2 = await stockPool.P();
         expect(P_2).to.be.lt(P_1);
@@ -431,8 +434,8 @@ describe('StabilityPool', () => {
         await priceFeed.setTokenPrice(BTC, parseUnits('9500'));
 
         // Defaulters are liquidated
-        await troveManager.liquidate(defaulter_1);
-        await troveManager.liquidate(defaulter_2);
+        await liquidationOperations.liquidate(defaulter_1);
+        await liquidationOperations.liquidate(defaulter_2);
 
         const activeDebt_Before = await storagePool.getValue(STABLE, false, 0);
         const defaultedDebt_Before = await storagePool.getValue(STABLE, false, 1);
@@ -539,7 +542,7 @@ describe('StabilityPool', () => {
         await priceFeed.setTokenPrice(BTC, parseUnits('100'));
 
         // Liquidate bob
-        await troveManager.liquidate(bob);
+        await liquidationOperations.liquidate(bob);
 
         // Check Bob's trove has been removed from the system
         expect(await troveManager.getTroveStatus(bob)).to.be.equal(4n); // check Bob's trove status was closed by liquidation in recovery mode
@@ -617,7 +620,7 @@ describe('StabilityPool', () => {
 
         // Price drops, defaulter is liquidated, A, B, C, D earn btc
         await priceFeed.setTokenPrice(BTC, parseUnits('9500'));
-        await troveManager.liquidate(defaulter_1);
+        await liquidationOperations.liquidate(defaulter_1);
 
         // Price bounces back
         await priceFeed.setTokenPrice(BTC, parseUnits('21000'));
@@ -727,11 +730,11 @@ describe('StabilityPool', () => {
         // 2 users with Trove with stable drawn are closed
         // @ts-ignore
         const [liquidatedDebts_1] = await getEmittedLiquidationValues(
-          await troveManager.liquidate(defaulter_1),
+          await liquidationOperations.liquidate(defaulter_1),
           contracts
         );
         const [liquidatedDebts_2] = await getEmittedLiquidationValues(
-          await troveManager.liquidate(defaulter_2),
+          await liquidationOperations.liquidate(defaulter_2),
           contracts
         );
 
@@ -787,11 +790,11 @@ describe('StabilityPool', () => {
         // 2 users with Trove with stable drawn are closed
         // @ts-ignore
         const [liquidatedDebts_1] = await getEmittedLiquidationValues(
-          await troveManager.liquidate(defaulter_1),
+          await liquidationOperations.liquidate(defaulter_1),
           contracts
         );
         const [liquidatedDebts_2] = await getEmittedLiquidationValues(
-          await troveManager.liquidate(defaulter_2),
+          await liquidationOperations.liquidate(defaulter_2),
           contracts
         );
 
@@ -818,8 +821,8 @@ describe('StabilityPool', () => {
         await priceFeed.setTokenPrice(BTC, parseUnits('5000'));
 
         // 2 users with Trove with stable drawn are closed
-        await troveManager.liquidate(defaulter_1);
-        await troveManager.liquidate(defaulter_2);
+        await liquidationOperations.liquidate(defaulter_1);
+        await liquidationOperations.liquidate(defaulter_2);
 
         // Alice retrieves all of her entitled stable:
         await stabilityPoolManager
@@ -870,8 +873,8 @@ describe('StabilityPool', () => {
         await priceFeed.setTokenPrice(BTC, parseUnits('5000'));
 
         // 2 defaulters liquidated
-        await troveManager.liquidate(defaulter_1);
-        await troveManager.liquidate(defaulter_2);
+        await liquidationOperations.liquidate(defaulter_1);
+        await liquidationOperations.liquidate(defaulter_2);
 
         // Alice retrieves part of her entitled stable
         await stabilityPoolManager
@@ -898,7 +901,7 @@ describe('StabilityPool', () => {
         // 2 users with Trove with stable drawn are closed
         // @ts-ignore
         const [, liquidatedColls] = await getEmittedLiquidationValues(
-          await troveManager.liquidate(defaulter_1),
+          await liquidationOperations.liquidate(defaulter_1),
           contracts
         );
 
@@ -933,7 +936,7 @@ describe('StabilityPool', () => {
 
         // price drops: defaulters' Troves fall below MCR, alice and whale Trove remain active
         await priceFeed.setTokenPrice(BTC, parseUnits('5000'));
-        await troveManager.liquidate(defaulter_1);
+        await liquidationOperations.liquidate(defaulter_1);
 
         // All depositors attempt to withdraw
         await stabilityPoolManager
@@ -956,7 +959,7 @@ describe('StabilityPool', () => {
 
         // price drops: defaulters' Troves fall below MCR, alice and whale Trove remain active
         await priceFeed.setTokenPrice(BTC, parseUnits('5000'));
-        await troveManager.liquidate(defaulter_1);
+        await liquidationOperations.liquidate(defaulter_1);
 
         // Bob issues a further 1000 stable from his trove
         await increaseDebt(bob, contracts, [{ tokenAddress: STABLE, amount: parseUnits('1000') }]);
@@ -985,8 +988,8 @@ describe('StabilityPool', () => {
 
         // price drops: defaulters' Troves fall below MCR, alice and whale Trove remain active
         await priceFeed.setTokenPrice(BTC, parseUnits('5000'));
-        await troveManager.liquidate(defaulter_1);
-        await troveManager.liquidate(defaulter_2);
+        await liquidationOperations.liquidate(defaulter_1);
+        await liquidationOperations.liquidate(defaulter_2);
 
         const stabilityPool = await getStabilityPool(contracts, STABLE);
         const alice_Deposit_Before = (await stabilityPool.getCompoundedDebtDeposit(alice)).toString();
@@ -1010,8 +1013,8 @@ describe('StabilityPool', () => {
 
         // price drops: defaulters' Troves fall below MCR, alice and whale Trove remain active
         await priceFeed.setTokenPrice(BTC, parseUnits('5000'));
-        await troveManager.liquidate(defaulter_1);
-        await troveManager.liquidate(defaulter_2);
+        await liquidationOperations.liquidate(defaulter_1);
+        await liquidationOperations.liquidate(defaulter_2);
 
         const activeDebt_Before = await storagePool.getValue(STABLE, false, 0);
         const defaultedDebt_Before = await storagePool.getValue(STABLE, false, 1);
@@ -1043,8 +1046,8 @@ describe('StabilityPool', () => {
 
         // price drops: defaulters' Troves fall below MCR, alice and whale Trove remain active
         await priceFeed.setTokenPrice(BTC, parseUnits('5000'));
-        await troveManager.liquidate(defaulter_1);
-        await troveManager.liquidate(defaulter_2);
+        await liquidationOperations.liquidate(defaulter_1);
+        await liquidationOperations.liquidate(defaulter_2);
 
         // Get debt, collateral and ICR of all existing troves
         const whale_Debt_Before = (await troveManager.getTroveDebt(whale))[0][1];
@@ -1122,7 +1125,7 @@ describe('StabilityPool', () => {
         await whaleShrimpTroveInit(contracts, signers);
 
         await priceFeed.setTokenPrice(BTC, parseUnits('5000'));
-        await troveManager.liquidate(defaulter_1);
+        await liquidationOperations.liquidate(defaulter_1);
 
         // Dennis opens trove and deposits to Stability Pool
         await stabilityPoolManager
@@ -1161,7 +1164,7 @@ describe('StabilityPool', () => {
         await whaleShrimpTroveInit(contracts, signers);
 
         await priceFeed.setTokenPrice(BTC, parseUnits('5000'));
-        await troveManager.liquidate(defaulter_1);
+        await liquidationOperations.liquidate(defaulter_1);
 
         const alice_Stable_Balance_Before = await STABLE.balanceOf(alice);
         const bob_Stable_Balance_Before = await STABLE.balanceOf(bob);
@@ -1202,7 +1205,7 @@ describe('StabilityPool', () => {
         const stabilityPool = await getStabilityPool(contracts, STABLE);
 
         await priceFeed.setTokenPrice(BTC, parseUnits('5000'));
-        await troveManager.liquidate(defaulter_1);
+        await liquidationOperations.liquidate(defaulter_1);
 
         const [isRecoveryModeBefore] = await storagePool.checkRecoveryMode();
         assert.isFalse(isRecoveryModeBefore);
@@ -1285,7 +1288,7 @@ describe('StabilityPool', () => {
           debts: [{ tokenAddress: STABLE, amount: parseUnits('7000') }],
         });
         await priceFeed.setTokenPrice(BTC, parseUnits('5000'));
-        await troveManager.liquidate(erin);
+        await liquidationOperations.liquidate(erin);
 
         const LUSDinSP = await stabilityPool.getTotalDeposit();
         assert.equal(LUSDinSP, 0n);
@@ -1306,7 +1309,7 @@ describe('StabilityPool', () => {
           .provideStability([{ tokenAddress: STABLE, amount: parseUnits('1000') }]);
 
         // Liquidation 2
-        await troveManager.liquidate(defaulter_2);
+        await liquidationOperations.liquidate(defaulter_2);
 
         // Check Alice and Bob have not received ETH gain from liquidation 2 while their deposit was 0
         const alice_ETHGain_2 = await stabilityPool.getDepositorCollGain(alice, BTC);
@@ -1323,7 +1326,7 @@ describe('StabilityPool', () => {
         const aliceBTCBefore = await BTC.balanceOf(alice);
 
         await priceFeed.setTokenPrice(BTC, parseUnits('5000'));
-        await troveManager.liquidate(defaulter_1);
+        await liquidationOperations.liquidate(defaulter_1);
 
         const stabilityPool = await getStabilityPool(contracts, STABLE);
         const btcGainA = await stabilityPool.getDepositorCollGain(alice, BTC);
@@ -1344,7 +1347,7 @@ describe('StabilityPool', () => {
         const stabilityPool = await getStabilityPool(contracts, STABLE);
 
         await priceFeed.setTokenPrice(BTC, parseUnits('5000'));
-        await troveManager.liquidate(defaulter_1);
+        await liquidationOperations.liquidate(defaulter_1);
 
         await stabilityPoolManager.connect(alice).withdrawGains();
 
@@ -1371,7 +1374,7 @@ describe('StabilityPool', () => {
         const stabilityPool = await getStabilityPool(contracts, STABLE);
 
         await priceFeed.setTokenPrice(BTC, parseUnits('5000'));
-        await troveManager.liquidate(defaulter_1);
+        await liquidationOperations.liquidate(defaulter_1);
 
         // All depositors attempt to withdraw
         await stabilityPoolManager.connect(alice).withdrawGains();
@@ -1392,7 +1395,7 @@ describe('StabilityPool', () => {
         const carol_Collateral_Before = await BTC.balanceOf(carol);
 
         await priceFeed.setTokenPrice(BTC, parseUnits('5000'));
-        await troveManager.liquidate(defaulter_1);
+        await liquidationOperations.liquidate(defaulter_1);
 
         await priceFeed.setTokenPrice(BTC, parseUnits('5'));
         const [isRecoveryModeB] = await storagePool.checkRecoveryMode();

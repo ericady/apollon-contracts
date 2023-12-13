@@ -15,6 +15,7 @@ import {
 import storagePoolAbi from '../abi/StoragePool.json';
 import borrowerOperationsAbi from '../abi/BorrowerOperations.json';
 import redemptionOperationsAbi from '../abi/RedemptionOperations.json';
+import liquidationOperationsAbi from '../abi/LiquidationOperations.json';
 import troveManagerAbi from '../abi/TroveManager.json';
 import debtTokenManagerAbi from '../abi/DebtTokenManager.json';
 import priceFeedAbi from '../abi/PriceFeed.json';
@@ -27,6 +28,7 @@ import reservePoolAbi from '../abi/ReservePool.json';
 import {
   BorrowerOperations,
   RedemptionOperations,
+  LiquidationOperations,
   TroveManager,
   PriceFeed,
   IERC20,
@@ -155,6 +157,7 @@ export interface _LiquityContracts {
   storagePool: StoragePool;
   borrowerOperations: BorrowerOperations;
   redemptionOperations: RedemptionOperations;
+  liquidationOperations: LiquidationOperations;
   troveManager: TroveManager;
   debtTokenManager: DebtTokenManager;
   priceFeed: PriceFeed | MockPriceFeed;
@@ -192,6 +195,7 @@ const getAbi = (priceFeedIsTestnet: boolean, uniTokenIsMock: boolean): LiquityCo
   storagePool: storagePoolAbi,
   borrowerOperations: borrowerOperationsAbi,
   redemptionOperations: redemptionOperationsAbi,
+  liquidationOperations: liquidationOperationsAbi,
   troveManager: troveManagerAbi,
   debtTokenManager: debtTokenManagerAbi,
   priceFeed: priceFeedIsTestnet ? mockPriceFeedAbi : priceFeedAbi,

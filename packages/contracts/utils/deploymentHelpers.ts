@@ -6,17 +6,19 @@ import {
   MockERC20,
   MockPriceFeed,
   RedemptionOperations,
+  LiquidationOperations,
+  MockBorrowerOperations,
   MockTroveManager,
   StabilityPoolManagerTester,
   StoragePool,
   ReservePool,
 } from '../typechain';
 import { parseUnits } from 'ethers';
-import { BorrowerOperationsTester } from '../typechain/contracts/TestContracts/BorrowerOperationsTester';
 
 export interface Contracts {
-  borrowerOperations: BorrowerOperationsTester;
+  borrowerOperations: MockBorrowerOperations;
   redemptionOperations: RedemptionOperations;
+  liquidationOperations: LiquidationOperations;
   troveManager: MockTroveManager;
   stabilityPoolManager: StabilityPoolManagerTester;
   storagePool: StoragePool;
@@ -35,6 +37,9 @@ export const deployCore = async (): Promise<Contracts> => {
 
   const redemptionOperationsFactory = await ethers.getContractFactory('RedemptionOperations');
   const redemptionOperations = await redemptionOperationsFactory.deploy();
+
+  const liquidationOperationsFactory = await ethers.getContractFactory('LiquidationOperations');
+  const liquidationOperations = await liquidationOperationsFactory.deploy();
 
   const troveManagerFactory = await ethers.getContractFactory('MockTroveManager');
   const troveManager = await troveManagerFactory.deploy();
@@ -63,6 +68,7 @@ export const deployCore = async (): Promise<Contracts> => {
   return {
     borrowerOperations,
     redemptionOperations,
+    liquidationOperations,
     troveManager,
     stabilityPoolManager,
     storagePool,
@@ -81,11 +87,9 @@ export const connectCoreContracts = async (contracts: Contracts) => {
   await contracts.troveManager.setAddresses(
     contracts.borrowerOperations,
     contracts.redemptionOperations,
+    contracts.liquidationOperations,
     contracts.storagePool,
-    contracts.stabilityPoolManager,
-    contracts.priceFeed,
-    contracts.debtTokenManager,
-    contracts.collTokenManager
+    contracts.priceFeed
   );
 
   await contracts.borrowerOperations.setAddresses(
@@ -107,10 +111,20 @@ export const connectCoreContracts = async (contracts: Contracts) => {
     contracts.collTokenManager
   );
 
+  await contracts.liquidationOperations.setAddresses(
+    contracts.troveManager,
+    contracts.storagePool,
+    contracts.priceFeed,
+    contracts.debtTokenManager,
+    contracts.collTokenManager,
+    contracts.stabilityPoolManager
+  );
+
   await contracts.storagePool.setAddresses(
     contracts.borrowerOperations,
     contracts.troveManager,
     contracts.redemptionOperations,
+    contracts.liquidationOperations,
     contracts.stabilityPoolManager,
     contracts.priceFeed
   );
@@ -120,7 +134,7 @@ export const connectCoreContracts = async (contracts: Contracts) => {
   await contracts.collTokenManager.setAddresses(contracts.priceFeed);
 
   await contracts.stabilityPoolManager.setAddresses(
-    contracts.troveManager,
+    contracts.liquidationOperations,
     contracts.priceFeed,
     contracts.storagePool,
     contracts.reservePool,

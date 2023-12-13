@@ -1,11 +1,6 @@
 [
     {
         "inputs": [],
-        "name": "EmptyArray",
-        "type": "error"
-    },
-    {
-        "inputs": [],
         "name": "ExceedDebtBalance",
         "type": "error"
     },
@@ -27,11 +22,6 @@
     {
         "inputs": [],
         "name": "LessThanMCR",
-        "type": "error"
-    },
-    {
-        "inputs": [],
-        "name": "NoLiquidatableTrove",
         "type": "error"
     },
     {
@@ -103,73 +93,6 @@
             }
         ],
         "name": "LastFeeOpTimeUpdated",
-        "type": "event"
-    },
-    {
-        "anonymous": false,
-        "inputs": [
-            {
-                "components": [
-                    {
-                        "internalType": "address",
-                        "name": "tokenAddress",
-                        "type": "address"
-                    },
-                    {
-                        "internalType": "uint256",
-                        "name": "amount",
-                        "type": "uint256"
-                    }
-                ],
-                "indexed": false,
-                "internalType": "struct IBase.TokenAmount[]",
-                "name": "liquidatedDebt",
-                "type": "tuple[]"
-            },
-            {
-                "components": [
-                    {
-                        "internalType": "address",
-                        "name": "tokenAddress",
-                        "type": "address"
-                    },
-                    {
-                        "internalType": "uint256",
-                        "name": "amount",
-                        "type": "uint256"
-                    }
-                ],
-                "indexed": false,
-                "internalType": "struct IBase.TokenAmount[]",
-                "name": "liquidatedColl",
-                "type": "tuple[]"
-            },
-            {
-                "indexed": false,
-                "internalType": "uint256",
-                "name": "totalStableCoinGasCompensation",
-                "type": "uint256"
-            },
-            {
-                "components": [
-                    {
-                        "internalType": "address",
-                        "name": "tokenAddress",
-                        "type": "address"
-                    },
-                    {
-                        "internalType": "uint256",
-                        "name": "amount",
-                        "type": "uint256"
-                    }
-                ],
-                "indexed": false,
-                "internalType": "struct IBase.TokenAmount[]",
-                "name": "totalCollGasCompensation",
-                "type": "tuple[]"
-            }
-        ],
-        "name": "LiquidationSummary",
         "type": "event"
     },
     {
@@ -287,7 +210,7 @@
             },
             {
                 "indexed": false,
-                "internalType": "enum ITroveManager.Status",
+                "internalType": "enum IBBase.Status",
                 "name": "_closingState",
                 "type": "uint8"
             }
@@ -351,31 +274,19 @@
             {
                 "indexed": false,
                 "internalType": "address",
+                "name": "_liquidationOperationsAddress",
+                "type": "address"
+            },
+            {
+                "indexed": false,
+                "internalType": "address",
                 "name": "_storagePoolAddress",
                 "type": "address"
             },
             {
                 "indexed": false,
                 "internalType": "address",
-                "name": "_stabilityPoolAddress",
-                "type": "address"
-            },
-            {
-                "indexed": false,
-                "internalType": "address",
                 "name": "_priceFeedAddress",
-                "type": "address"
-            },
-            {
-                "indexed": false,
-                "internalType": "address",
-                "name": "_debtTokenManagerAddress",
-                "type": "address"
-            },
-            {
-                "indexed": false,
-                "internalType": "address",
-                "name": "_collTokenManagerAddress",
                 "type": "address"
             }
         ],
@@ -423,9 +334,9 @@
         "name": "addTroveOwnerToArray",
         "outputs": [
             {
-                "internalType": "uint256",
+                "internalType": "uint128",
                 "name": "index",
-                "type": "uint256"
+                "type": "uint128"
             }
         ],
         "stateMutability": "nonpayable",
@@ -440,19 +351,6 @@
             }
         ],
         "name": "applyPendingRewards",
-        "outputs": [],
-        "stateMutability": "nonpayable",
-        "type": "function"
-    },
-    {
-        "inputs": [
-            {
-                "internalType": "address[]",
-                "name": "_troveArray",
-                "type": "address[]"
-            }
-        ],
-        "name": "batchLiquidateTroves",
         "outputs": [],
         "stateMutability": "nonpayable",
         "type": "function"
@@ -481,9 +379,14 @@
                 "internalType": "address",
                 "name": "_borrower",
                 "type": "address"
+            },
+            {
+                "internalType": "enum IBBase.Status",
+                "name": "closedStatus",
+                "type": "uint8"
             }
         ],
-        "name": "closeTrove",
+        "name": "closeTroveByProtocol",
         "outputs": [],
         "stateMutability": "nonpayable",
         "type": "function"
@@ -1043,7 +946,48 @@
                 "type": "address"
             }
         ],
-        "name": "liquidate",
+        "name": "isTroveActive",
+        "outputs": [
+            {
+                "internalType": "bool",
+                "name": "",
+                "type": "bool"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "address[]",
+                "name": "collTokenAddresses",
+                "type": "address[]"
+            },
+            {
+                "components": [
+                    {
+                        "internalType": "address",
+                        "name": "tokenAddress",
+                        "type": "address"
+                    },
+                    {
+                        "internalType": "bool",
+                        "name": "isColl",
+                        "type": "bool"
+                    },
+                    {
+                        "internalType": "uint256",
+                        "name": "amount",
+                        "type": "uint256"
+                    }
+                ],
+                "internalType": "struct IBase.CAmount[]",
+                "name": "toRedistribute",
+                "type": "tuple[]"
+            }
+        ],
+        "name": "redistributeDebtAndColl",
         "outputs": [],
         "stateMutability": "nonpayable",
         "type": "function"
@@ -1116,6 +1060,31 @@
             }
         ],
         "name": "updateStakeAndTotalStakes",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "components": [
+                    {
+                        "internalType": "address",
+                        "name": "tokenAddress",
+                        "type": "address"
+                    },
+                    {
+                        "internalType": "uint256",
+                        "name": "amount",
+                        "type": "uint256"
+                    }
+                ],
+                "internalType": "struct IBase.TokenAmount[]",
+                "name": "totalCollGasCompensation",
+                "type": "tuple[]"
+            }
+        ],
+        "name": "updateSystemSnapshots_excludeCollRemainder",
         "outputs": [],
         "stateMutability": "nonpayable",
         "type": "function"

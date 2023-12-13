@@ -23,6 +23,7 @@ contract StoragePool is LiquityBase, Ownable(msg.sender), CheckContract, IStorag
   address public borrowerOperationsAddress;
   address public troveManagerAddress;
   address public redemptionOperationsAddress;
+  address public liquidationOperationsAddress;
   address public stabilityPoolManagerAddress;
   IPriceFeed public priceFeed;
 
@@ -42,18 +43,21 @@ contract StoragePool is LiquityBase, Ownable(msg.sender), CheckContract, IStorag
     address _borrowerOperationsAddress,
     address _troveManagerAddress,
     address _redemptionOperationsAddress,
+    address _liquidationOperationsAddress,
     address _stabilityPoolManagerAddress,
     address _priceFeedAddress
   ) external onlyOwner {
     checkContract(_borrowerOperationsAddress);
     checkContract(_troveManagerAddress);
     checkContract(_redemptionOperationsAddress);
+    checkContract(_liquidationOperationsAddress);
     checkContract(_stabilityPoolManagerAddress);
     checkContract(_priceFeedAddress);
 
     borrowerOperationsAddress = _borrowerOperationsAddress;
     troveManagerAddress = _troveManagerAddress;
     redemptionOperationsAddress = _redemptionOperationsAddress;
+    liquidationOperationsAddress = _liquidationOperationsAddress;
     stabilityPoolManagerAddress = _stabilityPoolManagerAddress;
     priceFeed = IPriceFeed(_priceFeedAddress);
 
@@ -61,6 +65,7 @@ contract StoragePool is LiquityBase, Ownable(msg.sender), CheckContract, IStorag
       _borrowerOperationsAddress,
       _troveManagerAddress,
       _redemptionOperationsAddress,
+      _liquidationOperationsAddress,
       _stabilityPoolManagerAddress,
       _priceFeedAddress
     );
@@ -77,7 +82,7 @@ contract StoragePool is LiquityBase, Ownable(msg.sender), CheckContract, IStorag
   // --- Pool functionality ---
 
   function addValue(address _tokenAddress, bool _isColl, PoolType _poolType, uint _amount) external override {
-    _requireCallerIsBOorTroveMorSPorRO();
+    _requireCallerIsProtocol();
 
     PoolEntry storage entry = poolEntries[_tokenAddress][_isColl];
     if (!entry.exists) {
@@ -94,7 +99,7 @@ contract StoragePool is LiquityBase, Ownable(msg.sender), CheckContract, IStorag
   }
 
   function subtractValue(address _tokenAddress, bool _isColl, PoolType _poolType, uint _amount) external override {
-    _requireCallerIsBOorTroveMorSPorRO();
+    _requireCallerIsProtocol();
     _subtractValue(_tokenAddress, _isColl, _poolType, _amount);
   }
 
@@ -105,7 +110,7 @@ contract StoragePool is LiquityBase, Ownable(msg.sender), CheckContract, IStorag
     PoolType _poolType,
     uint _amount
   ) external override {
-    _requireCallerIsBOorTroveMorSPorRO();
+    _requireCallerIsProtocol();
     _subtractValue(_tokenAddress, _isColl, _poolType, _amount);
     IERC20(_tokenAddress).transfer(_receiver, _amount);
   }
@@ -126,7 +131,7 @@ contract StoragePool is LiquityBase, Ownable(msg.sender), CheckContract, IStorag
     PoolType _toType,
     uint _amount
   ) external override {
-    _requireCallerIsBOorTroveMorSPorRO();
+    _requireCallerIsProtocol();
 
     PoolEntry storage entry = poolEntries[_tokenAddress][_isColl];
     require(entry.exists, 'StoragePool: PoolEntry does not exist');
@@ -177,12 +182,13 @@ contract StoragePool is LiquityBase, Ownable(msg.sender), CheckContract, IStorag
 
   // --- 'require' functions ---
 
-  function _requireCallerIsBOorTroveMorSPorRO() internal view {
+  function _requireCallerIsProtocol() internal view {
     if (
       msg.sender != borrowerOperationsAddress &&
       msg.sender != troveManagerAddress &&
       msg.sender != stabilityPoolManagerAddress &&
-      msg.sender != redemptionOperationsAddress
+      msg.sender != redemptionOperationsAddress &&
+      msg.sender != liquidationOperationsAddress
     ) revert NotFromBOorTroveMorSP();
   }
 }

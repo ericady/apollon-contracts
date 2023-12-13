@@ -1,0 +1,153 @@
+[
+    {
+        "inputs": [],
+        "name": "EmptyArray",
+        "type": "error"
+    },
+    {
+        "inputs": [],
+        "name": "FeeExceedMaxPercentage",
+        "type": "error"
+    },
+    {
+        "inputs": [],
+        "name": "NoLiquidatableTrove",
+        "type": "error"
+    },
+    {
+        "anonymous": false,
+        "inputs": [
+            {
+                "indexed": false,
+                "internalType": "address",
+                "name": "_troveManager",
+                "type": "address"
+            },
+            {
+                "indexed": false,
+                "internalType": "address",
+                "name": "_storgePool",
+                "type": "address"
+            },
+            {
+                "indexed": false,
+                "internalType": "address",
+                "name": "_priceFeed",
+                "type": "address"
+            },
+            {
+                "indexed": false,
+                "internalType": "address",
+                "name": "_debtTokenManager",
+                "type": "address"
+            },
+            {
+                "indexed": false,
+                "internalType": "address",
+                "name": "_collTokenManager",
+                "type": "address"
+            },
+            {
+                "indexed": false,
+                "internalType": "address",
+                "name": "_stabilityPoolManager",
+                "type": "address"
+            }
+        ],
+        "name": "LiquidationOperationsInitialized",
+        "type": "event"
+    },
+    {
+        "anonymous": false,
+        "inputs": [
+            {
+                "components": [
+                    {
+                        "internalType": "address",
+                        "name": "tokenAddress",
+                        "type": "address"
+                    },
+                    {
+                        "internalType": "uint256",
+                        "name": "amount",
+                        "type": "uint256"
+                    }
+                ],
+                "indexed": false,
+                "internalType": "struct IBase.TokenAmount[]",
+                "name": "liquidatedDebt",
+                "type": "tuple[]"
+            },
+            {
+                "components": [
+                    {
+                        "internalType": "address",
+                        "name": "tokenAddress",
+                        "type": "address"
+                    },
+                    {
+                        "internalType": "uint256",
+                        "name": "amount",
+                        "type": "uint256"
+                    }
+                ],
+                "indexed": false,
+                "internalType": "struct IBase.TokenAmount[]",
+                "name": "liquidatedColl",
+                "type": "tuple[]"
+            },
+            {
+                "indexed": false,
+                "internalType": "uint256",
+                "name": "totalStableCoinGasCompensation",
+                "type": "uint256"
+            },
+            {
+                "components": [
+                    {
+                        "internalType": "address",
+                        "name": "tokenAddress",
+                        "type": "address"
+                    },
+                    {
+                        "internalType": "uint256",
+                        "name": "amount",
+                        "type": "uint256"
+                    }
+                ],
+                "indexed": false,
+                "internalType": "struct IBase.TokenAmount[]",
+                "name": "totalCollGasCompensation",
+                "type": "tuple[]"
+            }
+        ],
+        "name": "LiquidationSummary",
+        "type": "event"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "address[]",
+                "name": "_troveArray",
+                "type": "address[]"
+            }
+        ],
+        "name": "batchLiquidateTroves",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "address",
+                "name": "_borrower",
+                "type": "address"
+            }
+        ],
+        "name": "liquidate",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    }
+]

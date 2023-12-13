@@ -2,11 +2,12 @@ import { SignerWithAddress } from '@nomicfoundation/hardhat-ethers/signers';
 import { ethers } from 'hardhat';
 import { Contracts, connectCoreContracts, deployAndLinkToken, deployCore } from '../utils/deploymentHelpers';
 import {
-  BorrowerOperationsTester,
+  MockBorrowerOperations,
   MockDebtToken,
   MockERC20,
   MockPriceFeed,
   MockTroveManager,
+  LiquidationOperations,
   StabilityPoolManager,
   StoragePool,
   TroveManager,
@@ -51,9 +52,10 @@ describe('BorrowerOperations', () => {
   let contracts: Contracts;
   let priceFeed: MockPriceFeed;
   let troveManager: MockTroveManager;
-  let borrowerOperations: BorrowerOperationsTester;
+  let borrowerOperations: MockBorrowerOperations;
   let storagePool: StoragePool;
   let stabilityPoolManager: StabilityPoolManager;
+  let liquidationOperations: LiquidationOperations;
 
   const open = async (user: SignerWithAddress, collAmount: bigint, debtAmount: bigint) => {
     return await openTrove({
@@ -80,6 +82,7 @@ describe('BorrowerOperations', () => {
     borrowerOperations = contracts.borrowerOperations;
     storagePool = contracts.storagePool;
     stabilityPoolManager = contracts.stabilityPoolManager;
+    liquidationOperations = contracts.liquidationOperations;
 
     STABLE = contracts.debtToken.STABLE;
     STOCK = contracts.debtToken.STOCK;
@@ -228,7 +231,7 @@ describe('BorrowerOperations', () => {
       await priceFeed.setTokenPrice(BTC, parseUnits('1000'));
 
       // Liquidate Carol's Trove,
-      await troveManager.liquidate(carol);
+      await liquidationOperations.liquidate(carol);
 
       const carolTroveStatus = await troveManager.getTroveStatus(carol);
       expect(carolTroveStatus).to.be.equal(4n); // closedByLiquidationInRecoveryMode
@@ -340,7 +343,7 @@ describe('BorrowerOperations', () => {
       await priceFeed.setTokenPrice(BTC, parseUnits('1000'));
 
       // Bob gets liquidated
-      await troveManager.liquidate(bob);
+      await liquidationOperations.liquidate(bob);
 
       // Bob attempts to add collateral to his closed trove
       await expect(
@@ -623,7 +626,7 @@ describe('BorrowerOperations', () => {
       await priceFeed.setTokenPrice(BTC, parseUnits('5000'));
 
       // close Carol's Trove, liquidating her 1 ether and 180LUSD.
-      await troveManager.liquidate(carol);
+      await liquidationOperations.liquidate(carol);
 
       const L_BTC = await troveManager.liquidatedTokens(BTC, true);
       const L_STABLE = await troveManager.liquidatedTokens(STABLE, false);
@@ -1701,7 +1704,7 @@ describe('BorrowerOperations', () => {
       await priceFeed.setTokenPrice(BTC, parseUnits('5000'));
 
       // Liquidate Bob
-      await troveManager.liquidate(bob);
+      await liquidationOperations.liquidate(bob);
       expect(await troveManager.getTroveStatus(bob)).to.be.equal(4n);
 
       // // Price bounces back
@@ -1723,7 +1726,7 @@ describe('BorrowerOperations', () => {
       // expect(L_StableDebt_A_Snapshot).to.be.equal(0);
 
       // Liquidate Carol
-      await troveManager.liquidate(carol);
+      await liquidationOperations.liquidate(carol);
       expect(await troveManager.getTroveStatus(bob)).to.be.equal(4n);
 
       // Get Alice's pending reward snapshots after Carol's liquidation. Check above 0
@@ -1900,7 +1903,7 @@ describe('BorrowerOperations', () => {
       // const price = await priceFeed.getPrice();
 
       // liquidate Carol's Trove, Alice and Bob earn rewards.
-      const liquidationTx = await troveManager.liquidate(carol);
+      const liquidationTx = await liquidationOperations.liquidate(carol);
       const [liquidatedDebt_C, liquidatedColl_C, gasComp_C] = await getEmittedLiquidationValues(
         liquidationTx,
         contracts

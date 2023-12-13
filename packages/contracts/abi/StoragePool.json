@@ -84,6 +84,12 @@
             {
                 "indexed": false,
                 "internalType": "address",
+                "name": "_liquidationOperationsAddress",
+                "type": "address"
+            },
+            {
+                "indexed": false,
+                "internalType": "address",
                 "name": "_stabilityPoolManagerAddress",
                 "type": "address"
             },
@@ -446,6 +452,19 @@
     },
     {
         "inputs": [],
+        "name": "liquidationOperationsAddress",
+        "outputs": [
+            {
+                "internalType": "address",
+                "name": "",
+                "type": "address"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [],
         "name": "owner",
         "outputs": [
             {
@@ -505,6 +524,11 @@
             {
                 "internalType": "address",
                 "name": "_redemptionOperationsAddress",
+                "type": "address"
+            },
+            {
+                "internalType": "address",
+                "name": "_liquidationOperationsAddress",
                 "type": "address"
             },
             {

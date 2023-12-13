@@ -449,7 +449,7 @@ contract BorrowerOperations is LiquityBase, Ownable(msg.sender), CheckContract, 
     }
 
     contractsCache.troveManager.removeStake(vars.collTokenAddresses, borrower);
-    contractsCache.troveManager.closeTrove(vars.collTokenAddresses, borrower);
+    contractsCache.troveManager.closeTroveByProtocol(vars.collTokenAddresses, borrower, Status.closedByOwner);
   }
 
   // --- Helper functions ---

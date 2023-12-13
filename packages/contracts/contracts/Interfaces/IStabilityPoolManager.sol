@@ -8,7 +8,7 @@ interface IStabilityPoolManager is IBBase {
   // --- Events ---
 
   event StabilityPoolManagerInitiated(
-    address troveManagerAddress,
+    address liquidationOperationsAddress,
     address storgePoolAddress,
     address reservePoolAddress,
     address debtTokenManagerAddress,
@@ -17,7 +17,7 @@ interface IStabilityPoolManager is IBBase {
   event StabilityPoolAdded(address stabilityPoolAddress);
 
   // --- Custom Errors ---
-  error NotFromTroveManager();
+  error NotFromLiquidationOps();
   error NotFromReservePool();
   error PoolNotExist();
   error PoolExist();
