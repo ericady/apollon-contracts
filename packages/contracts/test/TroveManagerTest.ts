@@ -291,8 +291,10 @@ describe('TroveManager', () => {
       });
 
       it('reverts if trove is non-existent', async () => {
-        const tx = liquidationOperations.liquidate(alice);
-        await assertRevert(tx, 'InvalidTrove');
+        await expect(liquidationOperations.liquidate(alice)).to.be.revertedWithCustomError(
+          liquidationOperations,
+          'NoLiquidatableTrove'
+        );
       });
 
       it('reverts if trove is already closedByLiquidation', async () => {
@@ -300,7 +302,10 @@ describe('TroveManager', () => {
         await priceFeed.setTokenPrice(BTC, parseUnits('5000'));
         await liquidationOperations.liquidate(defaulter_1);
 
-        await assertRevert(liquidationOperations.liquidate(defaulter_1), 'InvalidTrove');
+        await expect(liquidationOperations.liquidate(defaulter_1)).to.be.revertedWithCustomError(
+          liquidationOperations,
+          'NoLiquidatableTrove'
+        );
       });
 
       it('reverts if trove has been closed', async () => {
@@ -317,7 +322,10 @@ describe('TroveManager', () => {
           collAmount: parseUnits('0.02', 9), // 0.02 BTC
         });
         await contracts.borrowerOperations.connect(defaulter_3).closeTrove();
-        await assertRevert(liquidationOperations.liquidate(defaulter_3), 'InvalidTrove');
+        await expect(liquidationOperations.liquidate(defaulter_3)).to.be.revertedWithCustomError(
+          liquidationOperations,
+          'NoLiquidatableTrove'
+        );
       });
 
       it('does nothing if trove has >= 110% ICR', async () => {
@@ -348,7 +356,10 @@ describe('TroveManager', () => {
         const stabilityPool = await getStabilityPool(contracts, STABLE);
         const spGainBefore = await stabilityPool.getDepositorCollGain(erin, BTC);
 
-        await assertRevert(liquidationOperations.liquidate(erin), 'InvalidTrove');
+        await expect(liquidationOperations.liquidate(erin)).to.be.revertedWithCustomError(
+          liquidationOperations,
+          'NoLiquidatableTrove'
+        );
 
         const spGainAfter = await stabilityPool.getDepositorCollGain(erin, BTC);
         assert.equal(spGainBefore, spGainAfter);

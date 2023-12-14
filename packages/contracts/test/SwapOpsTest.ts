@@ -2,7 +2,7 @@ import { SignerWithAddress } from '@nomicfoundation/hardhat-ethers/signers';
 import { ethers } from 'hardhat';
 import { Contracts, connectCoreContracts, deployAndLinkToken, deployCore } from '../utils/deploymentHelpers';
 import {
-  BorrowerOperationsTester,
+  MockBorrowerOperations,
   MockDebtToken,
   MockERC20,
   MockPriceFeed,
@@ -46,7 +46,7 @@ describe('SwapOperations', () => {
   let contracts: Contracts;
   let priceFeed: MockPriceFeed;
   let troveManager: TroveManager;
-  let borrowerOperations: BorrowerOperationsTester;
+  let borrowerOperations: MockBorrowerOperations;
   let storagePool: StoragePool;
   let stabilityPoolManager: StabilityPoolManager;
 

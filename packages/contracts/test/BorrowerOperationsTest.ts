@@ -2058,17 +2058,10 @@ describe('BorrowerOperations', () => {
     it('Opens a trove with net debt >= minimum net debt', async () => {
       // Add 1 wei to correct for rounding error in helper function
       await BTC.unprotectedMint(alice, parseUnits('1', 9));
+      await BTC.connect(alice).approve(borrowerOperations, parseUnits('1', 9));
       await borrowerOperations.connect(alice).openTrove([{ tokenAddress: BTC, amount: parseUnits('1', 9) }]);
 
-      // const txC = await borrowerOperations.openTrove(
-      //   th._100pct,
-      //   await getNetBorrowingAmount(MIN_NET_DEBT.add(toBN(dec(47789898, 22)))),
-      //   A,
-      //   A,
-      //   { from: C, value: dec(100, 30) }
-      // );
-      // assert.isTrue(txC.receipt.status);
-      // assert.isTrue(await sortedTroves.contains(C));
+      expect(await troveManager.getTroveStatus(alice)).to.be.equal(1);
     });
   });
 });

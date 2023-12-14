@@ -6,7 +6,7 @@ import {
   TroveManager,
   StabilityPoolManager,
   StoragePool,
-  BorrowerOperationsTester,
+  MockBorrowerOperations,
 } from '../typechain';
 import { Contracts, deployCore, connectCoreContracts, deployAndLinkToken } from '../utils/deploymentHelpers';
 import { SignerWithAddress } from '@nomicfoundation/hardhat-ethers/signers';
@@ -41,7 +41,7 @@ describe('StoragePool', () => {
   let priceFeed: MockPriceFeed;
   let troveManager: TroveManager;
 
-  let borrowerOperations: BorrowerOperationsTester;
+  let borrowerOperations: MockBorrowerOperations;
 
   let stabilityPoolManager: StabilityPoolManager;
 

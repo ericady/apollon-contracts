@@ -5,7 +5,7 @@ import {
   MockPriceFeed,
   TroveManager,
   StoragePool,
-  BorrowerOperationsTester,
+  MockBorrowerOperations,
   StabilityPoolManagerTester,
 } from '../typechain';
 import { Contracts, deployCore, connectCoreContracts, deployAndLinkToken } from '../utils/deploymentHelpers';
@@ -42,7 +42,7 @@ describe('DebtToken', () => {
   let priceFeed: MockPriceFeed;
   let troveManager: TroveManager;
 
-  let borrowerOperations: BorrowerOperationsTester;
+  let borrowerOperations: MockBorrowerOperations;
 
   let stabilityPoolManager: StabilityPoolManagerTester;
 

@@ -2,7 +2,8 @@ import { SignerWithAddress } from '@nomicfoundation/hardhat-ethers/signers';
 import { ethers } from 'hardhat';
 import { Contracts, connectCoreContracts, deployAndLinkToken, deployCore } from '../utils/deploymentHelpers';
 import {
-  BorrowerOperationsTester,
+  LiquidationOperations,
+  MockBorrowerOperations,
   MockDebtToken,
   MockERC20,
   MockPriceFeed,
@@ -49,7 +50,8 @@ describe('Reserve Pool', () => {
   let contracts: Contracts;
   let priceFeed: MockPriceFeed;
   let troveManager: MockTroveManager;
-  let borrowerOperations: BorrowerOperationsTester;
+  let borrowerOperations: MockBorrowerOperations;
+  let liquidationOperations: LiquidationOperations;
   let storagePool: StoragePool;
   let reservePool: ReservePool;
   let stabilityPoolManager: StabilityPoolManager;
@@ -67,6 +69,7 @@ describe('Reserve Pool', () => {
     priceFeed = contracts.priceFeed;
     troveManager = contracts.troveManager;
     borrowerOperations = contracts.borrowerOperations;
+    liquidationOperations = contracts.liquidationOperations;
     storagePool = contracts.storagePool;
     reservePool = contracts.reservePool;
     stabilityPoolManager = contracts.stabilityPoolManager;
@@ -178,7 +181,7 @@ describe('Reserve Pool', () => {
 
       let reserveBalBefore = await STABLE.balanceOf(reservePool);
       await priceFeed.setTokenPrice(BTC, parseUnits('10000'));
-      await troveManager.liquidate(bob);
+      await liquidationOperations.liquidate(bob);
       let reserveBalAfter = await STABLE.balanceOf(reservePool);
 
       expect(reserveBalAfter).to.be.lt(reserveBalBefore);

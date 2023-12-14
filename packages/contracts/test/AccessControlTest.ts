@@ -197,10 +197,10 @@ describe('Access Control: Apollon functions with the caller restricted to Apollo
     // --- onlyTroveManager ---
 
     // offset
-    it('offset(): reverts when called by an account that is not TroveManager', async () => {
+    it('offset(): reverts when called by an account that is not LiquidationOps', async () => {
       await expect(stabilityPoolManager.offset([])).to.be.revertedWithCustomError(
         stabilityPoolManager,
-        'NotFromTroveManager'
+        'NotFromLiquidationOps'
       );
     });
 
