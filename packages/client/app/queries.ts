@@ -7,6 +7,7 @@ export const GET_ALL_POOLS = gql`
       swapFee @client
       volume24hUSD
       liquidity {
+        totalAmount
         token {
           id
           address

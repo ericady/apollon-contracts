@@ -9,14 +9,13 @@ import { FormProvider, useController, useForm } from 'react-hook-form';
 import { useEthers } from '../../../context/EthersProvider';
 import { useSelectedToken } from '../../../context/SelectedTokenProvider';
 import { WIDGET_HEIGHTS } from '../../../utils/contants';
-import { displayPercentage, roundCurrency, roundNumber } from '../../../utils/math';
+import { displayPercentage, floatToBigInt, roundCurrency, roundNumber } from '../../../utils/math';
 import InfoButton from '../../Buttons/InfoButton';
 import FeatureBox from '../../FeatureBox/FeatureBox';
 import NumberInput from '../../FormControls/NumberInput';
 import ExchangeIcon from '../../Icons/ExchangeIcon';
 import Label from '../../Label/Label';
 
-export const PROTOCOL_SWAP_FEE = 0.0009;
 export const RESULTING_POOL_SLIPPAGE = 0.02;
 
 type FieldValues = {
@@ -29,29 +28,31 @@ const Swap = () => {
   const [showSlippage, setShowSlippage] = useState(false);
   const [tradingDirection, setTradingDirection] = useState<'jUSDSpent' | 'jUSDAquired'>('jUSDSpent');
 
-  const { address } = useEthers();
+  const {
+    address,
+    contracts: { swapOperationsContract },
+  } = useEthers();
 
   const methods = useForm<FieldValues>({
     defaultValues: {
       jUSDAmount: '',
       tokenAmount: '',
-      maxSlippage: '',
+      maxSlippage: '2',
     },
-    shouldUnregister: true,
     reValidateMode: 'onChange',
   });
   const { handleSubmit, setValue, watch, control, trigger } = methods;
   const { field: jUSDField } = useController({ name: 'jUSDAmount', control });
   const { field: tokenAmountField } = useController({ name: 'tokenAmount', control });
 
-  const { selectedToken, tokenRatio } = useSelectedToken();
+  const { selectedToken, tokenRatio, JUSDToken } = useSelectedToken();
 
   const handleSwapValueChange = (variant: 'JUSD' | 'Token', value: string) => {
     const numericValue = parseFloat(value);
 
     if (variant === 'JUSD') {
       if (!isNaN(numericValue)) {
-        setValue('tokenAmount', roundNumber(numericValue / tokenRatio).toString());
+        setValue('tokenAmount', roundNumber(numericValue * tokenRatio * (1 - selectedToken!.swapFee)).toString());
         setTradingDirection('jUSDSpent');
       } else {
         setValue('tokenAmount', '');
@@ -60,7 +61,7 @@ const Swap = () => {
       setValue('jUSDAmount', value);
     } else {
       if (!isNaN(numericValue)) {
-        setValue('jUSDAmount', roundNumber(numericValue / tokenRatio).toString());
+        setValue('jUSDAmount', roundNumber(numericValue * tokenRatio * (1 - selectedToken!.swapFee)).toString());
         setTradingDirection('jUSDAquired');
       } else {
         setValue('jUSDAmount', '');
@@ -72,15 +73,57 @@ const Swap = () => {
     trigger();
   };
 
-  const onSubmit = async () => {
-    console.log('onSubmit called');
+  const onSubmit = async (data: FieldValues) => {
+    const jUSDAmount = parseFloat(data.jUSDAmount);
+    const tokenAmount = parseFloat(data.tokenAmount);
+    const maxSlippage = parseFloat(data.maxSlippage) / 100;
+    const deadline = new Date().getTime() + 1000 * 60 * 2; // 2 minutes
 
-    // TODO: Implement contract call. This is how you do a typesafe read/write call
-    // const totalSupply = await contract!.totalSupply();
-    // const approvement = await contract!.approve('0xbE8F15C2db5Fc2AFc4e17B4Dd578Fbc6e5aA9591', 0);
+    if (tradingDirection === 'jUSDSpent') {
+      await swapOperationsContract.swapTokensForExactTokens(
+        BigInt(floatToBigInt(tokenAmount)),
+        BigInt(floatToBigInt(jUSDAmount * (1 + maxSlippage))),
+        [selectedToken!.address, JUSDToken!.address],
+        address,
+        deadline,
+      );
+    } else {
+      await swapOperationsContract.swapExactTokensForTokens(
+        BigInt(floatToBigInt(tokenAmount)),
+        BigInt(floatToBigInt(jUSDAmount * (1 - maxSlippage))),
+        [selectedToken!.address, JUSDToken!.address],
+        address,
+        deadline,
+      );
+    }
   };
 
-  const jUSDSwapAmount = parseInt(watch('jUSDAmount'));
+  const jUSDAmount = parseFloat(watch('jUSDAmount'));
+  const tokenAmount = parseFloat(watch('tokenAmount'));
+
+  // TODO: Not adjusted for swap fee
+  const getPriceImpact = () => {
+    const currentPrice = selectedToken!.liqudityPair[0] / selectedToken!.liqudityPair[1];
+
+    let newPriceAfterSwap;
+    if (tradingDirection === 'jUSDSpent') {
+      // Calculate new amount of the other token after swap
+      const newY =
+        (selectedToken!.liqudityPair[1] * selectedToken!.liqudityPair[0]) /
+        (selectedToken!.liqudityPair[0] + jUSDAmount);
+      newPriceAfterSwap = jUSDAmount / (selectedToken!.liqudityPair[1] - newY);
+    } else {
+      // Calculate new amount of jUSD after swap
+      const newX =
+        (selectedToken!.liqudityPair[0] * selectedToken!.liqudityPair[1]) /
+        (selectedToken!.liqudityPair[1] + tokenAmount);
+      newPriceAfterSwap = (selectedToken!.liqudityPair[0] - newX) / tokenAmount;
+    }
+
+    // Calculate price impact
+    const priceImpact = ((newPriceAfterSwap - currentPrice) / currentPrice) * 100; // in percentage
+    return Math.abs(priceImpact) > 1 ? 1 : Math.abs(priceImpact);
+  };
 
   return (
     <FeatureBox
@@ -102,6 +145,34 @@ const Swap = () => {
         <FormProvider {...methods}>
           <form onSubmit={handleSubmit(onSubmit)}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+              <NumberInput
+                name="tokenAmount"
+                data-testid="apollon-swap-token-amount"
+                rules={{
+                  required: { value: true, message: 'You need to specify an amount.' },
+                  min: { value: 0, message: 'Amount needs to be positive.' },
+                }}
+                disabled={!selectedToken}
+                onChange={(e: ChangeEvent<HTMLInputElement>) => {
+                  tokenAmountField.onChange(e);
+                  handleSwapValueChange('Token', e.target.value);
+                }}
+                InputProps={{
+                  endAdornment: selectedToken && (
+                    <InputAdornment position="end">
+                      <Label variant="none">{selectedToken.symbol}</Label>
+                    </InputAdornment>
+                  ),
+                }}
+              />
+
+              <ExchangeIcon
+                style={{
+                  transform: tradingDirection === 'jUSDSpent' ? 'rotate(180deg)' : 'rotate(0deg)',
+                  margin: '0px 10px',
+                }}
+              />
+
               {/* TODO: Add Validation that not more than the wallet amount can be entered. */}
               <NumberInput
                 name="jUSDAmount"
@@ -123,34 +194,6 @@ const Swap = () => {
                   ),
                 }}
               />
-
-              <ExchangeIcon
-                style={{
-                  transform: tradingDirection === 'jUSDAquired' ? 'rotate(180deg)' : 'rotate(0deg)',
-                  margin: '0px 10px',
-                }}
-              />
-
-              <NumberInput
-                name="tokenAmount"
-                data-testid="apollon-swap-token-amount"
-                rules={{
-                  required: { value: true, message: 'You need to specify an amount.' },
-                  min: { value: 0, message: 'Amount needs to be positive.' },
-                }}
-                disabled={!selectedToken}
-                onChange={(e: ChangeEvent<HTMLInputElement>) => {
-                  tokenAmountField.onChange(e);
-                  handleSwapValueChange('Token', e.target.value);
-                }}
-                InputProps={{
-                  endAdornment: selectedToken && (
-                    <InputAdornment position="end">
-                      <Label variant="none">{selectedToken.symbol}</Label>
-                    </InputAdornment>
-                  ),
-                }}
-              />
             </div>
 
             {showSlippage && (
@@ -159,9 +202,9 @@ const Swap = () => {
                 data-testid="apollon-swap-slippage-amount"
                 rules={{
                   min: { value: 0, message: 'Amount needs to be positive.' },
+                  max: { value: 100, message: 'Can not specify a greater amount.' },
                 }}
                 label="Max. Slippage"
-                placeholder="5"
                 fullWidth
                 InputProps={{
                   endAdornment: <InputAdornment position="end">%</InputAdornment>,
@@ -187,7 +230,11 @@ const Swap = () => {
                 }}
               >
                 Price per unit:
-                {selectedToken ? <span>{roundCurrency(tokenRatio)} jUSD</span> : <Skeleton width="120px" />}
+                {selectedToken ? (
+                  <span>{roundCurrency(tokenRatio * (1 - selectedToken.swapFee), 4)} jUSD</span>
+                ) : (
+                  <Skeleton width="120px" />
+                )}
               </Typography>
               <Typography
                 variant="caption"
@@ -199,19 +246,10 @@ const Swap = () => {
                   marginBottom: '12px',
                 }}
               >
-                Protocol swap fee:
+                Swap fee:
                 {selectedToken ? (
                   <span data-testid="apollon-swap-protocol-fee">
-                    {displayPercentage(PROTOCOL_SWAP_FEE)} {/* TODO: issue with next */}
-                    {/* <Divider
-              orientation="vertical"
-              sx={{
-                margin: '0 5px',
-                border: '1px solid #282531',
-                height: '15px',
-              }}
-            /> */}
-                    | {!isNaN(jUSDSwapAmount) ? `${roundCurrency(jUSDSwapAmount * PROTOCOL_SWAP_FEE)} jUSD` : '-'}
+                    {displayPercentage(selectedToken.swapFee)} {/* TODO: issue with next */}
                   </span>
                 ) : (
                   <div style={{ display: 'flex', alignItems: 'center', gap: 5, width: 120 }}>
@@ -232,14 +270,18 @@ const Swap = () => {
                 }}
               >
                 Resulting pool slippage:
-                {selectedToken ? <span>{displayPercentage(RESULTING_POOL_SLIPPAGE)}</span> : <Skeleton width="120px" />}
+                {jUSDAmount || tokenAmount ? (
+                  <span>{displayPercentage(getPriceImpact())}</span>
+                ) : (
+                  <Skeleton width="120px" />
+                )}
               </Typography>
             </div>
 
             <InfoButton
               title="SWAP"
               description="The final values will be calculated after the swap."
-              disabled={!address}
+              disabled={!address || !JUSDToken}
             />
           </form>
         </FormProvider>

@@ -201,7 +201,7 @@ export type TokenAmount = {
 export type GetAllPoolsQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type GetAllPoolsQuery = { __typename: 'Query', getPools: Array<{ __typename: 'Pool', id: string, swapFee: number, volume24hUSD: number, liquidity: Array<{ __typename: 'PoolLiquidity', token: { __typename: 'Token', id: string, address: string, symbol: string, priceUSD: number, priceUSD24hAgo: number } }> }> };
+export type GetAllPoolsQuery = { __typename: 'Query', getPools: Array<{ __typename: 'Pool', id: string, swapFee: number, volume24hUSD: number, liquidity: Array<{ __typename: 'PoolLiquidity', totalAmount: number, token: { __typename: 'Token', id: string, address: string, symbol: string, priceUSD: number, priceUSD24hAgo: number } }> }> };
 
 export type GetSelectedTokenQueryVariables = Exact<{
   address: Scalars['String']['input'];

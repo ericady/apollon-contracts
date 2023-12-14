@@ -31,3 +31,9 @@ export const displayPercentage = (
     ? `${value > 0 ? '+' : ''}${roundCurrency(value * 100, decimals, decimals)} %`
     : `${roundCurrency(value * 100, decimals, decimals)} %`;
 };
+
+export function floatToBigInt(floatNumber: number, precision: number = 18) {
+  const factor = Math.pow(10, precision);
+  const bigIntNumber = BigInt(Math.round(floatNumber * factor));
+  return bigIntNumber;
+}

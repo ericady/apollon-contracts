@@ -5,13 +5,15 @@ import Swap from './Swap';
 // TODO: Write tests to expect arguments in the contract call once they are concluded
 
 describe('Swap', () => {
-  it.skip('should call function of mocked contract', async () => {
+  it('should call swapTokensForExactTokens function of mocked contract', async () => {
     const contractMock = {
-      approve: jest.fn(),
-      totalSupply: jest.fn(),
+      swapOperationsContract: {
+        swapTokensForExactTokens: jest.fn(),
+      },
     };
     const { getByRole, container } = render(
       <IntegrationWrapper
+        shouldPreselectTokens
         shouldConnectWallet
         mockEthers={{
           contractMock,
@@ -26,6 +28,11 @@ describe('Swap', () => {
     fireEvent.change(inputJUSD, { target: { value: '100' } });
 
     const submitButton = getByRole('button', { name: 'SWAP' });
+
+    await waitFor(() => {
+      expect(submitButton).toBeEnabled();
+    });
+
     fireEvent(
       submitButton,
       new MouseEvent('click', {
@@ -34,7 +41,47 @@ describe('Swap', () => {
     );
 
     await waitFor(() => {
-      expect(contractMock.approve).toHaveBeenCalled();
+      expect(contractMock.swapOperationsContract.swapTokensForExactTokens).toHaveBeenCalledTimes(1);
+    });
+  });
+
+  it('should call swapExactTokensForTokens function of mocked contract', async () => {
+    const contractMock = {
+      swapOperationsContract: {
+        swapExactTokensForTokens: jest.fn(),
+      },
+    };
+    const { getByRole, container } = render(
+      <IntegrationWrapper
+        shouldPreselectTokens
+        shouldConnectWallet
+        mockEthers={{
+          contractMock,
+        }}
+      >
+        <Swap />
+      </IntegrationWrapper>,
+    );
+
+    const inputTokenAmount = container.querySelector<HTMLInputElement>('input[name="tokenAmount"]')!;
+
+    fireEvent.change(inputTokenAmount, { target: { value: '100' } });
+
+    const submitButton = getByRole('button', { name: 'SWAP' });
+
+    await waitFor(() => {
+      expect(submitButton).toBeEnabled();
+    });
+
+    fireEvent(
+      submitButton,
+      new MouseEvent('click', {
+        bubbles: true,
+      }),
+    );
+
+    await waitFor(() => {
+      expect(contractMock.swapOperationsContract.swapExactTokensForTokens).toHaveBeenCalledTimes(1);
     });
   });
 });

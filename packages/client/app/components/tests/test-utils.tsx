@@ -1,7 +1,7 @@
 import { ApolloClient, ApolloProvider, InMemoryCache } from '@apollo/client';
 import { ThemeProvider } from '@emotion/react';
 import { SnackbarProvider } from 'notistack';
-import { PropsWithChildren, useMemo, useState } from 'react';
+import { PropsWithChildren, useEffect, useMemo, useState } from 'react';
 import 'whatwg-fetch';
 import { EthersContext, useEthers } from '../../context/EthersProvider';
 import SelectedTokenProvider, { useSelectedToken } from '../../context/SelectedTokenProvider';
@@ -21,7 +21,9 @@ type Props = {
   shouldConnectWallet?: boolean;
   shouldConnectWalletDelayed?: boolean;
   mockEthers?: {
-    contractMock?: Record<keyof ReturnType<typeof useEthers>['contracts'], jest.Mock | Record<string, jest.Mock>>;
+    contractMock?: Partial<
+      Record<keyof ReturnType<typeof useEthers>['contracts'], jest.Mock | Record<string, jest.Mock>>
+    >;
     connectWalletMock?: jest.Mock;
   };
 };
@@ -57,19 +59,23 @@ function SetupState({
   mockEthers,
 }: PropsWithChildren<Props>) {
   const { setSelectedToken, selectedToken } = useSelectedToken();
-  if (shouldPreselectTokens && !selectedToken) {
-    const { address, priceUSD, priceUSD24hAgo, symbol } = MockedPositionsWithoutBorrower.data.getDebtTokens[0].token;
-    setSelectedToken({
-      address,
-      change: 0.01,
-      isFavorite: true,
-      swapFee: 0.05,
-      priceUSD,
-      symbol,
-      priceUSD24hAgo,
-      volume24hUSD: 1000,
-    });
-  }
+
+  useEffect(() => {
+    if (shouldPreselectTokens && !selectedToken) {
+      const { address, priceUSD, priceUSD24hAgo, symbol } = MockedPositionsWithoutBorrower.data.getDebtTokens[0].token;
+      setSelectedToken({
+        address,
+        change: 0.01,
+        isFavorite: true,
+        swapFee: 0.05,
+        priceUSD,
+        symbol,
+        priceUSD24hAgo,
+        volume24hUSD: 1000,
+        liqudityPair: [1000, 1000],
+      });
+    }
+  });
 
   const [address, setAddress] = useState<string>('');
   if (shouldConnectWallet && !address) {

@@ -13,7 +13,7 @@ import { SelectedToken, useSelectedToken } from '../../../context/SelectedTokenP
 import { GetAllPoolsQuery, GetAllPoolsQueryVariables } from '../../../generated/gql-types';
 import { GET_ALL_POOLS } from '../../../queries';
 import { WIDGET_HEIGHTS } from '../../../utils/contants';
-import { displayPercentage, roundCurrency, stdFormatter } from '../../../utils/math';
+import { displayPercentage, roundCurrency } from '../../../utils/math';
 import FeatureBox from '../../FeatureBox/FeatureBox';
 import DirectionIcon from '../../Icons/DirectionIcon';
 import PinnedIcon from '../../Icons/PinnedIcon';
@@ -46,7 +46,7 @@ function Assets() {
 
     // get token address from local storage and set isFavorite if it is present
     return jUSDPools
-      .map(({ liquidity, swapFee, volume24hUSD }) => {
+      .map<SelectedToken>(({ liquidity, swapFee, volume24hUSD }) => {
         const [tokenA, tokenB] = liquidity;
         const token = tokenA.token.symbol === JUSD_SYMBOL ? tokenB.token : tokenA.token;
 
@@ -57,6 +57,10 @@ function Assets() {
           change: (token.priceUSD - token.priceUSD24hAgo) / token.priceUSD24hAgo,
           isFavorite: favoritedAssets.find((address) => token.address === address) !== undefined ? true : false,
           volume24hUSD,
+          liqudityPair:
+            tokenA.token.symbol === JUSD_SYMBOL
+              ? [tokenA.totalAmount, tokenB.totalAmount]
+              : [tokenB.totalAmount, tokenA.totalAmount],
         };
       })
       .sort((a) => (a.isFavorite ? -1 : 1));
@@ -147,7 +151,7 @@ function Assets() {
                     </TableCell>
                     <TableCell sx={{ p: 0.5 }} align="right">
                       <Typography fontWeight={400}>
-                        {JUSDToken ? stdFormatter.format(priceUSD / JUSDToken.priceUSD) : '-'}
+                        {JUSDToken ? roundCurrency(priceUSD / JUSDToken.priceUSD) : '-'}
                       </Typography>
                     </TableCell>
                     <TableCell sx={{ p: 0.5 }} align="right" width={60}>

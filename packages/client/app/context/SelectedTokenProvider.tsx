@@ -15,6 +15,7 @@ export type SelectedToken = {
   priceUSD: number;
   priceUSD24hAgo: number;
   volume24hUSD: number;
+  liqudityPair: number[];
 };
 
 export const SelectedTokenContext = createContext<{
@@ -35,7 +36,7 @@ export default function SelectedTokenProvider({ children }: { children: React.Re
   const { data } = useQuery<GetDebtTokensQuery, GetDebtTokensQueryVariables>(GET_ALL_DEBT_TOKENS);
   const JUSDToken = data?.getDebtTokens.find(({ token }) => token.symbol === JUSD_SYMBOL)?.token;
   const tokenRatio =
-    JUSDToken === undefined || selectedToken === null ? 0 : JUSDToken!.priceUSD / selectedToken!.priceUSD;
+    JUSDToken === undefined || selectedToken === null ? 0 : selectedToken!.priceUSD / JUSDToken!.priceUSD;
 
   return (
     <SelectedTokenContext.Provider
