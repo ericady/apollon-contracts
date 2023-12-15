@@ -968,19 +968,19 @@ describe('StabilityPool', () => {
         await stabilityPoolManager
           .connect(alice)
           .withdrawStability([{ tokenAddress: STABLE, amount: parseUnits('5000') }]);
-        expect((await STABLE.balanceOf(alice)) - parseUnits('983.34')).to.be.lt(parseUnits('0.1'));
+        expect((await STABLE.balanceOf(alice)) - parseUnits('983.34')).to.be.lt(10000);
 
         // bob 2/6 of 100 = 33.33
         await stabilityPoolManager
           .connect(bob)
           .withdrawStability([{ tokenAddress: STABLE, amount: parseUnits('5000') }]);
-        expect((await STABLE.balanceOf(bob)) - parseUnits('2966.67')).to.be.lt(parseUnits('0.2'));
+        expect((await STABLE.balanceOf(bob)) - parseUnits('2966.67')).to.be.lt(10000);
 
         // carol 3/6 of 100 = 50
         await stabilityPoolManager
           .connect(carol)
           .withdrawStability([{ tokenAddress: STABLE, amount: parseUnits('5000') }]);
-        expect((await STABLE.balanceOf(carol)) - parseUnits('2950')).to.be.lt(parseUnits('0.3'));
+        expect((await STABLE.balanceOf(carol)) - parseUnits('2950')).to.be.lt(10000);
       });
 
       it("doesn't impact other users Stability deposits or coll gains", async () => {
@@ -1182,7 +1182,8 @@ describe('StabilityPool', () => {
         // Check Bob's LUSD balance has risen by only the value of his compounded deposit
         const bob_expectedLUSDBalance = bob_Stable_Balance_Before + bob_Deposit_Before;
         const bob_LUSD_Balance_After = await STABLE.balanceOf(bob);
-        expect(bob_LUSD_Balance_After).to.be.closeTo(bob_expectedLUSDBalance, parseUnits('0.4'));
+        expect(bob_LUSD_Balance_After).to.be.closeTo(bob_expectedLUSDBalance, parseUnits('0.2'));
+
         // Alice attempts to withdraws 2309842309.000000000000000000 LUSD from the Stability Pool
         await stabilityPoolManager
           .connect(alice)
@@ -1191,7 +1192,7 @@ describe('StabilityPool', () => {
         // Check Alice's LUSD balance has risen by only the value of her compounded deposit
         const alice_expectedLUSDBalance = alice_Stable_Balance_Before + alice_Deposit_Before;
         const alice_LUSD_Balance_After = await STABLE.balanceOf(alice);
-        expect(alice_LUSD_Balance_After).to.be.closeTo(alice_expectedLUSDBalance, parseUnits('0.4'));
+        expect(alice_LUSD_Balance_After).to.be.closeTo(alice_expectedLUSDBalance, parseUnits('0.2'));
 
         // Check LUSD in Stability Pool has been reduced by only Alice's compounded deposit and Bob's compounded deposit
         const expectedLUSDinSP = stableInSPBefore - alice_Deposit_Before - bob_Deposit_Before;
@@ -1251,9 +1252,9 @@ describe('StabilityPool', () => {
         const bob_LUSD_Balance_After = await STABLE.balanceOf(bob);
         const carol_LUSD_Balance_After = await STABLE.balanceOf(carol);
 
-        expect(alice_LUSD_Balance_After).to.be.closeTo(alice_expectedLUSDBalance, parseUnits('0.4'));
-        expect(bob_LUSD_Balance_After).to.be.closeTo(bob_expectedLUSDBalance, parseUnits('0.4'));
-        expect(carol_LUSD_Balance_After).to.be.closeTo(carol_expectedLUSDBalance, parseUnits('0.5'));
+        expect(alice_LUSD_Balance_After).to.be.closeTo(alice_expectedLUSDBalance, parseUnits('0.2'));
+        expect(bob_LUSD_Balance_After).to.be.closeTo(bob_expectedLUSDBalance, parseUnits('0.2'));
+        expect(carol_LUSD_Balance_After).to.be.closeTo(carol_expectedLUSDBalance, parseUnits('0.3'));
 
         // Check ETH balances of A, B, C have increased by the value of their ETH gain from liquidations, respectively
         const alice_expectedETHBalance = alice_ETH_Balance_Before + alice_ETHGain_Before;
