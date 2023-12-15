@@ -133,6 +133,7 @@ export type Query = {
   getPositions: PositionsPage;
   getReserveUSDHistory: Array<Array<Scalars['Int']['output']>>;
   getToken: Token;
+  getTroveManager: TroveManager;
 };
 
 
@@ -196,6 +197,12 @@ export type TokenAmount = {
   __typename: 'TokenAmount';
   amount: Scalars['Float']['output'];
   token: Token;
+};
+
+export type TroveManager = {
+  __typename: 'TroveManager';
+  borrowingRate: Scalars['Float']['output'];
+  id: Scalars['ID']['output'];
 };
 
 export type GetAllPoolsQueryVariables = Exact<{ [key: string]: never; }>;
@@ -278,3 +285,8 @@ export type GetReserveUsdHistoryQueryVariables = Exact<{ [key: string]: never; }
 export type GetReserveUsdHistoryQuery = { __typename: 'Query', getReserveUSDHistory: Array<Array<number>> };
 
 export type TokenFragmentFragment = { __typename: 'Token', address: string };
+
+export type GetTroveManagerQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type GetTroveManagerQuery = { __typename: 'Query', getTroveManager: { __typename: 'TroveManager', id: string, borrowingRate: number } };

@@ -32,6 +32,7 @@ const Swap = () => {
     address,
     contracts: { swapOperationsContract },
   } = useEthers();
+  const { selectedToken, tokenRatio, JUSDToken } = useSelectedToken();
 
   const methods = useForm<FieldValues>({
     defaultValues: {
@@ -45,14 +46,12 @@ const Swap = () => {
   const { field: jUSDField } = useController({ name: 'jUSDAmount', control });
   const { field: tokenAmountField } = useController({ name: 'tokenAmount', control });
 
-  const { selectedToken, tokenRatio, JUSDToken } = useSelectedToken();
-
   const handleSwapValueChange = (variant: 'JUSD' | 'Token', value: string) => {
     const numericValue = parseFloat(value);
 
     if (variant === 'JUSD') {
       if (!isNaN(numericValue)) {
-        setValue('tokenAmount', roundNumber(numericValue * tokenRatio * (1 - selectedToken!.swapFee)).toString());
+        setValue('tokenAmount', roundNumber((numericValue / tokenRatio) * (1 - selectedToken!.swapFee)).toString());
         setTradingDirection('jUSDSpent');
       } else {
         setValue('tokenAmount', '');
@@ -248,9 +247,7 @@ const Swap = () => {
               >
                 Swap fee:
                 {selectedToken ? (
-                  <span data-testid="apollon-swap-protocol-fee">
-                    {displayPercentage(selectedToken.swapFee)} {/* TODO: issue with next */}
-                  </span>
+                  <span data-testid="apollon-swap-protocol-fee">{displayPercentage(selectedToken.swapFee)}</span>
                 ) : (
                   <div style={{ display: 'flex', alignItems: 'center', gap: 5, width: 120 }}>
                     <Skeleton width="55px" />

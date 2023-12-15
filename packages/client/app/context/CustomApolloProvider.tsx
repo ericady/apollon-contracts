@@ -5,6 +5,7 @@ import {
   ReactiveVar,
   Reference,
   TypePolicies,
+  TypePolicy,
   makeVar,
 } from '@apollo/client';
 import { AddressLike, ethers } from 'ethers';
@@ -16,14 +17,14 @@ import { Contracts, useEthers } from './EthersProvider';
 
 export function CustomApolloProvider({ children }: PropsWithChildren<{}>) {
   const {
-    contracts: { debtTokenContracts },
+    contracts: { debtTokenContracts, troveManagerContract },
     address: borrower,
   } = useEthers();
 
   const cacheConfig =
     process.env.NEXT_PUBLIC_CONTRACT_MOCKING === 'enabled'
-      ? {}
-      : getProductionCacheConfig({ borrower, debtTokenContracts });
+      ? { fields: {}, Query: {} }
+      : getProductionCacheConfig({ borrower, debtTokenContracts, troveManagerContract });
 
   const client = new ApolloClient({
     // TODO: replace with our deployed graphql endpoint
@@ -48,7 +49,7 @@ export function CustomApolloProvider({ children }: PropsWithChildren<{}>) {
                   positions: [...existing.positions, ...incoming.positions],
                 };
               },
-              read: (existing, args) => {
+              read: (existing) => {
                 return existing;
               },
             },
@@ -65,7 +66,7 @@ export function CustomApolloProvider({ children }: PropsWithChildren<{}>) {
                   history: [...existing.history, ...incoming.history],
                 };
               },
-              read: (existing, args) => {
+              read: (existing) => {
                 return existing;
               },
             },
@@ -99,100 +100,125 @@ export function CustomApolloProvider({ children }: PropsWithChildren<{}>) {
 const getProductionCacheConfig = ({
   borrower,
   debtTokenContracts,
+  troveManagerContract,
 }: {
   borrower: AddressLike;
   debtTokenContracts: ReturnType<typeof useEthers>['contracts']['debtTokenContracts'];
-}): TypePolicies => ({
-  Token: {
-    fields: {
-      // TODO: Make it address aware
-      priceUSD: {
-        read(_, { readField }) {
-          const address = readField('address');
-          if (address && isFieldOutdated(SchemaDataFreshnessManager.DebtToken[Contracts.DebtToken.JUSD], 'priceUSD')) {
-            // Make smart contract call using the address
-            SchemaDataFreshnessManager.DebtToken[Contracts.DebtToken.JUSD].priceUSD.fetch(
-              debtTokenContracts[Contracts.DebtToken.JUSD],
-              borrower,
-            );
-          }
+  troveManagerContract: ReturnType<typeof useEthers>['contracts']['troveManagerContract'];
+}): { fields: TypePolicies; Query: TypePolicy } => ({
+  fields: {
+    Token: {
+      fields: {
+        // TODO: Make it address aware
+        priceUSD: {
+          read(_, { readField }) {
+            const address = readField('address');
+            if (
+              address &&
+              isFieldOutdated(SchemaDataFreshnessManager.DebtToken[Contracts.DebtToken.JUSD], 'priceUSD')
+            ) {
+              // Make smart contract call using the address
+              SchemaDataFreshnessManager.DebtToken[Contracts.DebtToken.JUSD].priceUSD.fetch(
+                debtTokenContracts[Contracts.DebtToken.JUSD],
+                borrower,
+              );
+            }
 
-          return SchemaDataFreshnessManager.DebtToken[Contracts.DebtToken.JUSD].priceUSD.value();
+            return SchemaDataFreshnessManager.DebtToken[Contracts.DebtToken.JUSD].priceUSD.value();
+          },
+        },
+        priceUSDOracle: {
+          read(_, { args }) {
+            if (isFieldOutdated(SchemaDataFreshnessManager.DebtToken[Contracts.DebtToken.JUSD], 'priceUSDOracle')) {
+              const address = (args as QueryGetTokenArgs).address;
+              SchemaDataFreshnessManager.DebtToken[Contracts.DebtToken.JUSD].priceUSDOracle.fetch(
+                // FIXME: use address insteadof hardcoded contract
+                debtTokenContracts[Contracts.DebtToken.JUSD],
+              );
+            }
+
+            return SchemaDataFreshnessManager.DebtToken[Contracts.DebtToken.JUSD].priceUSDOracle.value();
+          },
         },
       },
-      priceUSDOracle: {
-        read(_, { args }) {
-          if (isFieldOutdated(SchemaDataFreshnessManager.DebtToken[Contracts.DebtToken.JUSD], 'priceUSDOracle')) {
-            const address = (args as QueryGetTokenArgs).address;
-            SchemaDataFreshnessManager.DebtToken[Contracts.DebtToken.JUSD].priceUSDOracle.fetch(
-              // FIXME: use address insteadof hardcoded contract
-              debtTokenContracts[Contracts.DebtToken.JUSD],
-            );
-          }
+    },
 
-          return SchemaDataFreshnessManager.DebtToken[Contracts.DebtToken.JUSD].priceUSDOracle.value();
+    DebtTokenMeta: {
+      fields: {
+        walletAmount: {
+          read(_, { readField, cache }) {
+            const token = readField('token') as Readonly<Reference>;
+
+            const tokenData = cache.readFragment<TokenFragmentFragment>({
+              id: token.__ref,
+              fragment: TOKEN_FRAGMENT,
+            });
+
+            if (
+              tokenData?.address &&
+              isFieldOutdated(SchemaDataFreshnessManager.DebtToken[Contracts.DebtToken.JUSD], 'walletAmount')
+            ) {
+              // Make smart contract call using the address
+              SchemaDataFreshnessManager.DebtToken[Contracts.DebtToken.JUSD].walletAmount.fetch(
+                debtTokenContracts[Contracts.DebtToken.JUSD],
+                borrower,
+              );
+            }
+
+            return SchemaDataFreshnessManager.DebtToken[Contracts.DebtToken.JUSD].walletAmount.value();
+          },
+        },
+
+        troveMintedAmount: {
+          read(_, { readField, cache }) {
+            const token = readField('token') as Readonly<Reference>;
+
+            const tokenData = cache.readFragment<TokenFragmentFragment>({
+              id: token.__ref,
+              fragment: TOKEN_FRAGMENT,
+            });
+
+            if (
+              tokenData?.address &&
+              isFieldOutdated(SchemaDataFreshnessManager.DebtToken[Contracts.DebtToken.JUSD], 'troveMintedAmount')
+            ) {
+              SchemaDataFreshnessManager.DebtToken[Contracts.DebtToken.JUSD].troveMintedAmount.fetch(
+                debtTokenContracts[Contracts.DebtToken.JUSD],
+                borrower,
+              );
+            }
+
+            return SchemaDataFreshnessManager.DebtToken[Contracts.DebtToken.JUSD].troveMintedAmount.value();
+          },
+        },
+      },
+    },
+
+    Pool: {
+      fields: {
+        swapFee: {
+          read(_, { readField }) {
+            // FIXME: Needs to be implemented on SwapPair.sol https://www.notion.so/08d56d02a4c34590bbc9233f48fea2ab?v=ceb084e514cf4a60aa3f43dd58980ef3&p=4100448866dd45f5b10b93123271b604&pm=s
+            return 0;
+          },
         },
       },
     },
   },
 
-  DebtTokenMeta: {
+  Query: {
     fields: {
-      walletAmount: {
-        read(_, { readField, cache }) {
-          const token = readField('token') as Readonly<Reference>;
-
-          const tokenData = cache.readFragment<TokenFragmentFragment>({
-            id: token.__ref,
-            fragment: TOKEN_FRAGMENT,
-          });
-
-          if (
-            tokenData?.address &&
-            isFieldOutdated(SchemaDataFreshnessManager.DebtToken[Contracts.DebtToken.JUSD], 'walletAmount')
-          ) {
-            // Make smart contract call using the address
-            SchemaDataFreshnessManager.DebtToken[Contracts.DebtToken.JUSD].walletAmount.fetch(
-              debtTokenContracts[Contracts.DebtToken.JUSD],
-              borrower,
-            );
+      getTroveManager: {
+        read: () => {
+          if (isFieldOutdated(SchemaDataFreshnessManager.TroveManager, 'borrowingRate')) {
+            SchemaDataFreshnessManager.TroveManager.borrowingRate.fetch(troveManagerContract);
           }
 
-          return SchemaDataFreshnessManager.DebtToken[Contracts.DebtToken.JUSD].walletAmount.value();
-        },
-      },
-
-      troveMintedAmount: {
-        read(_, { readField, cache }) {
-          const token = readField('token') as Readonly<Reference>;
-
-          const tokenData = cache.readFragment<TokenFragmentFragment>({
-            id: token.__ref,
-            fragment: TOKEN_FRAGMENT,
-          });
-
-          if (
-            tokenData?.address &&
-            isFieldOutdated(SchemaDataFreshnessManager.DebtToken[Contracts.DebtToken.JUSD], 'troveMintedAmount')
-          ) {
-            SchemaDataFreshnessManager.DebtToken[Contracts.DebtToken.JUSD].troveMintedAmount.fetch(
-              debtTokenContracts[Contracts.DebtToken.JUSD],
-              borrower,
-            );
-          }
-
-          return SchemaDataFreshnessManager.DebtToken[Contracts.DebtToken.JUSD].troveMintedAmount.value();
-        },
-      },
-    },
-  },
-
-  Pool: {
-    fields: {
-      swapFee: {
-        read(_, { readField }) {
-          // FIXME: Needs to be implemented on SwapPair.sol https://www.notion.so/08d56d02a4c34590bbc9233f48fea2ab?v=ceb084e514cf4a60aa3f43dd58980ef3&p=4100448866dd45f5b10b93123271b604&pm=s
-          return 0;
+          return {
+            __typename: 'TroveManager',
+            id: Contracts.TroveManager,
+            borrowingRate: SchemaDataFreshnessManager.TroveManager.borrowingRate.value(),
+          };
         },
       },
     },
@@ -215,7 +241,7 @@ type ContractDataFreshnessManager<T> = {
     ? { [Address in T[P][keyof T[P]]]: ContractData<number> }
     : T[P] extends Record<string, object>
     ? ContractData<T[P]['value']>
-    : undefined;
+    : ContractData<number>;
 };
 
 type ResolvedType<T> = T extends Promise<infer R> ? R : T;
@@ -341,8 +367,20 @@ export const SchemaDataFreshnessManager: ContractDataFreshnessManager<typeof Con
       },
     },
   },
-  TroveManager: undefined,
-  SwapOperations: undefined,
+  TroveManager: {
+    borrowingRate: {
+      fetch: async (troveManagerContract: TroveManager) => {
+        SchemaDataFreshnessManager.TroveManager.borrowingRate.lastFetched = Date.now();
+        const borrowingRate = await troveManagerContract.getBorrowingRate();
+
+        SchemaDataFreshnessManager.TroveManager.borrowingRate.value(ethers.toNumber(borrowingRate));
+      },
+      value: makeVar(0),
+      lastFetched: 0,
+      timeout: 1000 * 5,
+    },
+  },
+  SwapOperations: {},
   SwapPairs: {
     '0x509ee0d083ddf8ac028f2a56731412edd63224b9': {},
     '0x509ee0d083ddf8ac028f2a56731412edd63225b9': {},

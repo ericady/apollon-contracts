@@ -34,6 +34,7 @@ import {
   GET_LIQUIDITY_POOLS,
   GET_RESERVE_USD_HISTORY,
   GET_SELECTED_TOKEN,
+  GET_TROVEMANAGER,
 } from '../app/queries';
 
 const getFavoritedAssetsFromLS = () => {
@@ -650,14 +651,18 @@ export const handlers = [
     },
   ),
 
-  // GetBorrowerPoolHistory
-  // graphql.query<{ getBorrowerPoolHistory: Query['getBorrowerPoolHistory'] }, QueryGetBorrowerPoolHistoryArgs>(
-  //   'GetBorrowerPoolHistory',
-  //   (req, res, ctx) => {
-  //     // For this mock, we ignore the actual poolId and just generate mock data
-  //     const result = generateBorrowerHistory();
+  // -------------- Only resolved by local cache ---------------- only for local testing purposes
 
-  //     return res(ctx.data({ getBorrowerPoolHistory: result }));
-  //   },
-  // ),
+  // GetPoolPriceHistory
+  graphql.query<{ getTroveManager: Query['getTroveManager'] }>(GET_TROVEMANAGER, (req, res, ctx) => {
+    return res(
+      ctx.data({
+        getTroveManager: {
+          __typename: 'TroveManager',
+          id: faker.string.uuid(),
+          borrowingRate: faker.number.float({ min: 0, max: 0.5, precision: 0.0001 }),
+        },
+      }),
+    );
+  }),
 ];

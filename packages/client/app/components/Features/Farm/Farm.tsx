@@ -1,5 +1,6 @@
 'use client';
 
+import { useQuery } from '@apollo/client';
 import { Box, Skeleton } from '@mui/material';
 import Button from '@mui/material/Button';
 import InputAdornment from '@mui/material/InputAdornment';
@@ -10,17 +11,16 @@ import { useCallback, useState } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
 import { useEthers } from '../../../context/EthersProvider';
 import { useSelectedToken } from '../../../context/SelectedTokenProvider';
+import { GetTroveManagerQuery, GetTroveManagerQueryVariables } from '../../../generated/gql-types';
+import { GET_TROVEMANAGER } from '../../../queries';
 import { WIDGET_HEIGHTS } from '../../../utils/contants';
-import { displayPercentage, roundCurrency } from '../../../utils/math';
+import { displayPercentage, floatToBigInt, roundCurrency } from '../../../utils/math';
 import InfoButton from '../../Buttons/InfoButton';
 import FeatureBox from '../../FeatureBox/FeatureBox';
 import NumberInput from '../../FormControls/NumberInput';
 import ForwardIcon from '../../Icons/ForwardIcon';
 import Label from '../../Label/Label';
 import CollateralRatioVisualization from '../../Visualizations/CollateralRatioVisualization';
-
-export const SLIPPAGE = 0.0053;
-export const PROTOCOL_FEE = 0.002;
 
 type FieldValues = {
   farmShortValue: string;
@@ -33,19 +33,23 @@ const Farm = () => {
   const [oldRatio, setOldRatio] = useState<number | null>(null);
   const [newRatio, setNewRatio] = useState<number | null>(null);
 
-  const { address } = useEthers();
+  const {
+    address,
+    contracts: { swapOperationsContract },
+  } = useEthers();
+  const { selectedToken, tokenRatio, JUSDToken } = useSelectedToken();
+
+  const { data } = useQuery<GetTroveManagerQuery, GetTroveManagerQueryVariables>(GET_TROVEMANAGER);
 
   const methods = useForm<FieldValues>({
     defaultValues: {
       farmShortValue: '',
-      maxSlippage: '',
+      maxSlippage: '2',
     },
     shouldUnregister: true,
     reValidateMode: 'onChange',
   });
   const { handleSubmit, reset, watch } = methods;
-
-  const { selectedToken, tokenRatio } = useSelectedToken();
 
   const ratioChangeCallback = useCallback(
     (newRatio: number, oldRatio: number) => {
@@ -60,14 +64,72 @@ const Farm = () => {
     reset();
   };
 
-  const onSubmit = () => {
-    console.log('onSubmit called');
-    // TODO: Implement contract call
+  const onSubmit = async (data: FieldValues) => {
+    const farmShortValue = parseFloat(data.farmShortValue);
+    const maxSlippage = parseFloat(data.maxSlippage) / 100;
+    const deadline = new Date().getTime() + 1000 * 60 * 2; // 2 minutes
+
+    if (tabValue === 'Long') {
+      await swapOperationsContract.openLongPosition(
+        BigInt(floatToBigInt(farmShortValue)),
+        BigInt(floatToBigInt(getExpectedPositionSize() * (1 - maxSlippage))),
+        selectedToken!.address,
+        address,
+        // TODO: What is this
+        BigInt(0),
+        deadline,
+      );
+    } else {
+      await swapOperationsContract.openShortPosition(
+        BigInt(floatToBigInt(farmShortValue)),
+        BigInt(floatToBigInt(getExpectedPositionSize() * (1 - maxSlippage))),
+        selectedToken!.address,
+        address,
+        // TODO: What is this
+        BigInt(0),
+        deadline,
+      );
+    }
   };
 
   const watchFarmShortValue = parseInt(watch('farmShortValue'));
 
   const addedDebtUSD = !isNaN(watchFarmShortValue) ? watchFarmShortValue * selectedToken!.priceUSD : 0;
+  const borrowingFee = data?.getTroveManager.borrowingRate;
+
+  const getExpectedPositionSize = () => {
+    // Position size, rename in “Expected position size”, rechnung: vom input die borrowing fee abziehen (steht unten), dann über den pool dex Preis die andere Seite ermitteln und davon dann noch einmal die aktuelle swap fee abziehen
+    const expectedPositionSize =
+      tabValue === 'Long'
+        ? ((watchFarmShortValue * (1 - borrowingFee!)) / tokenRatio) * (1 - selectedToken!.swapFee)
+        : watchFarmShortValue * (1 - borrowingFee!) * tokenRatio * (1 - selectedToken!.swapFee);
+
+    return expectedPositionSize;
+  };
+
+  // TODO: Not adjusted for swap fee
+  const getPriceImpact = () => {
+    const currentPrice = selectedToken!.liqudityPair[0] / selectedToken!.liqudityPair[1];
+
+    let newPriceAfterSwap;
+    if (tabValue === 'Long') {
+      // Calculate new amount of the other token after swap
+      const newY =
+        (selectedToken!.liqudityPair[1] * selectedToken!.liqudityPair[0]) /
+        (selectedToken!.liqudityPair[0] + watchFarmShortValue);
+      newPriceAfterSwap = watchFarmShortValue / (selectedToken!.liqudityPair[1] - newY);
+    } else {
+      // Calculate new amount of jUSD after swap
+      const newX =
+        (selectedToken!.liqudityPair[0] * selectedToken!.liqudityPair[1]) /
+        (selectedToken!.liqudityPair[1] + watchFarmShortValue);
+      newPriceAfterSwap = (selectedToken!.liqudityPair[0] - newX) / watchFarmShortValue;
+    }
+
+    // Calculate price impact
+    const priceImpact = ((newPriceAfterSwap - currentPrice) / currentPrice) * 100; // in percentage
+    return Math.abs(priceImpact) > 1 ? 1 : Math.abs(priceImpact);
+  };
 
   return (
     <FeatureBox
@@ -102,7 +164,7 @@ const Farm = () => {
                   InputProps={{
                     endAdornment: selectedToken && (
                       <InputAdornment position="end">
-                        <Label variant="none">{selectedToken.symbol}</Label>
+                        <Label variant="none">{tabValue === 'Long' ? JUSDToken?.symbol : selectedToken.symbol}</Label>
                       </InputAdornment>
                     ),
                   }}
@@ -116,7 +178,6 @@ const Farm = () => {
                       min: { value: 0, message: 'Amount needs to be positive.' },
                     }}
                     label="Max. Slippage"
-                    placeholder="5"
                     fullWidth
                     InputProps={{
                       endAdornment: <InputAdornment position="end">%</InputAdornment>,
@@ -142,11 +203,21 @@ const Farm = () => {
                     marginBottom: '12px',
                   }}
                 >
-                  Position size:
+                  Expected position size:
                   {selectedToken ? (
-                    <span data-testid="apollon-farm-position-size">
-                      {!isNaN(watchFarmShortValue) ? `${roundCurrency(watchFarmShortValue * tokenRatio)} jUSD` : '-'}
-                    </span>
+                    tabValue === 'Long' ? (
+                      <span data-testid="apollon-farm-position-size">
+                        {!isNaN(watchFarmShortValue) && selectedToken && data
+                          ? `${roundCurrency(getExpectedPositionSize())} ${selectedToken.symbol}}`
+                          : '-'}
+                      </span>
+                    ) : (
+                      <span data-testid="apollon-farm-position-size">
+                        {!isNaN(watchFarmShortValue) && selectedToken && data
+                          ? `${roundCurrency(getExpectedPositionSize())} jUSD`
+                          : '-'}
+                      </span>
+                    )
                   ) : (
                     <Skeleton width="120px" />
                   )}
@@ -162,7 +233,11 @@ const Farm = () => {
                   }}
                 >
                   Price per unit:
-                  <span>{selectedToken ? `${roundCurrency(tokenRatio)} jUSD` : <Skeleton width="120px" />}</span>
+                  {selectedToken && data ? (
+                    <span>{roundCurrency(tokenRatio * (1 + selectedToken.swapFee + borrowingFee!), 4)} jUSD</span>
+                  ) : (
+                    <Skeleton width="120px" />
+                  )}
                 </Typography>
                 <Typography
                   variant="caption"
@@ -174,22 +249,9 @@ const Farm = () => {
                     marginBottom: '12px',
                   }}
                 >
-                  Protocol fee:
+                  Protocol swap fee:
                   {selectedToken ? (
-                    <span data-testid="apollon-farm-protocol-fee">
-                      {displayPercentage(PROTOCOL_FEE)} |
-                      {/* <Divider
-                    orientation="vertical"
-                    sx={{
-                      margin: '0 5px',
-                      border: '1px solid #282531',
-                      height: '15px',
-                    }}
-                  /> */}{' '}
-                      {!isNaN(watchFarmShortValue)
-                        ? `${roundCurrency(watchFarmShortValue * tokenRatio * PROTOCOL_FEE)} jUSD`
-                        : '-'}
-                    </span>
+                    <span data-testid="apollon-farm-protocol-fee"> {displayPercentage(selectedToken.swapFee)}</span>
                   ) : (
                     <div style={{ display: 'flex', alignItems: 'center', gap: 5, width: 120 }}>
                       <Skeleton width="55px" />
@@ -208,7 +270,33 @@ const Farm = () => {
                     marginBottom: '12px',
                   }}
                 >
-                  Slippage: {selectedToken ? <span>{displayPercentage(SLIPPAGE)}</span> : <Skeleton width="120px" />}
+                  Borrowing fee:
+                  {data ? (
+                    <span data-testid="apollon-farm-borrowing-fee">{displayPercentage(borrowingFee!)}</span>
+                  ) : (
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 5, width: 120 }}>
+                      <Skeleton width="55px" />
+                      |
+                      <Skeleton width="55px" />
+                    </div>
+                  )}
+                </Typography>
+                <Typography
+                  variant="caption"
+                  style={{
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'center',
+                    marginTop: '12px',
+                    marginBottom: '12px',
+                  }}
+                >
+                  Slippage:
+                  {watchFarmShortValue ? (
+                    <span>{displayPercentage(getPriceImpact())}</span>
+                  ) : (
+                    <Skeleton width="120px" />
+                  )}
                 </Typography>
               </div>
 
@@ -239,7 +327,7 @@ const Farm = () => {
                 fontSize: '20px',
               }}
             >
-              {oldRatio !== null ? displayPercentage(1, 'default', 0) : <Skeleton variant="text" width={50} />}
+              {oldRatio !== null ? displayPercentage(oldRatio, 'default', 0) : <Skeleton variant="text" width={50} />}
             </Typography>
 
             <ForwardIcon />
@@ -252,7 +340,7 @@ const Farm = () => {
                 fontSize: '20px',
               }}
             >
-              {newRatio !== null ? displayPercentage(1, 'default', 0) : <Skeleton variant="text" width={50} />}
+              {newRatio !== null ? displayPercentage(newRatio, 'default', 0) : <Skeleton variant="text" width={50} />}
             </Typography>
           </div>
         </Box>

@@ -212,10 +212,21 @@ export const GET_RESERVE_USD_HISTORY = gql`
   }
 `;
 
-// -------------------- Fragments for the cache --------------------
+// -------------------- Fragments used the cache --------------------
 
 export const TOKEN_FRAGMENT = gql`
   fragment TokenFragment on Token {
     address
+  }
+`;
+
+// -------------------- Client side queries that are only resolved by the cache --------------------
+
+export const GET_TROVEMANAGER = gql`
+  query GetTroveManager {
+    getTroveManager {
+      id
+      borrowingRate
+    }
   }
 `;

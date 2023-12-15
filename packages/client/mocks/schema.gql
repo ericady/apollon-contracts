@@ -156,3 +156,14 @@ type Query {
   getBorrowerPoolHistory(poolId: String!, borrower: String!, cursor: String): PoolHistoryPage!
   getBorrowerStabilityHistory(borrower: String!, cursor: String): PoolHistoryPage!
 }
+
+# ---------------- Client side contract calls ----------------
+
+type TroveManager {
+  id: ID!
+  borrowingRate: Float!
+}
+
+type Query {
+  getTroveManager: TroveManager!
+}
