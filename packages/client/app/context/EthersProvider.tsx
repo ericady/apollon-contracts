@@ -6,9 +6,10 @@ import { JsonRpcProvider } from 'ethers/providers';
 import Link from 'next/link';
 import { useSnackbar } from 'notistack';
 import { createContext, useContext, useEffect, useState } from 'react';
-import { DebtToken, SwapOperations, SwapPair, TroveManager } from '../../generated/types';
+import { DebtToken, ERC20, SwapOperations, SwapPair, TroveManager } from '../../generated/types';
 import { SchemaDataFreshnessManager } from './CustomApolloProvider';
 import debtTokenAbi from './abis/DebtToken.json';
+import ERC20Abi from './abis/ERC20.json';
 import swapOperationsAbi from './abis/SwapOperations.json';
 import swapPairAbi from './abis/SwapPair.json';
 import troveManagerAbi from './abis/TroveManager.json';
@@ -52,6 +53,7 @@ export const Contracts = {
 
 // TODO: Remove Partial
 type AllDebtTokenContracts = Partial<{ [Key in keyof (typeof SchemaDataFreshnessManager)['DebtToken']]: DebtToken }>;
+type AllCollateralTokenContracts = Partial<{ [Key in keyof (typeof SchemaDataFreshnessManager)['ERC20']]: ERC20 }>;
 type AllSwapPairContracts = Partial<{
   [Key in keyof (typeof Contracts)['SwapPairs']]: SwapPair;
 }>;
@@ -63,6 +65,7 @@ export const EthersContext = createContext<{
   address: string;
   contracts: {
     debtTokenContracts: AllDebtTokenContracts;
+    collateralTokenContracts: AllCollateralTokenContracts;
     troveManagerContract: TroveManager;
     swapOperationsContract: SwapOperations;
     swapPairContracts: AllSwapPairContracts;
@@ -74,6 +77,7 @@ export const EthersContext = createContext<{
   address: '',
   contracts: {
     debtTokenContracts: undefined,
+    collateralTokenContracts: undefined,
     troveManagerContract: undefined,
     swapOperationsContract: undefined,
     swapPairContracts: undefined,
@@ -94,6 +98,7 @@ export default function EthersProvider({ children }: { children: React.ReactNode
   const [signer, setSigner] = useState<JsonRpcSigner | null>(null);
   const [address, setAddress] = useState<string>('');
   const [debtTokenContracts, setDebtTokenContracts] = useState<AllDebtTokenContracts>();
+  const [collateralTokenContracts, setCollateralTokenContracts] = useState<AllCollateralTokenContracts>();
   const [troveManagerContract, setTroveManagerContract] = useState<TroveManager>();
   const [swapOperationsContract, setSwapOperationsContract] = useState<SwapOperations>();
   const [swapPairContracts, setSwapPairContracts] = useState<AllSwapPairContracts>();
@@ -108,6 +113,10 @@ export default function EthersProvider({ children }: { children: React.ReactNode
         const debtTokenContract = new Contract(Contracts.DebtToken.JUSD, debtTokenAbi, provider);
         const debtTokenContractWithSigner = debtTokenContract.connect(newSigner) as DebtToken;
         setDebtTokenContracts({ [Contracts.DebtToken.JUSD]: debtTokenContractWithSigner });
+
+        const collateralTokenContracts = new Contract(Contracts.ERC20.ETH, ERC20Abi, provider);
+        const collateralTokenContractsWithSigner = collateralTokenContracts.connect(newSigner) as ERC20;
+        setCollateralTokenContracts({ [Contracts.ERC20.ETH]: collateralTokenContractsWithSigner });
 
         const troveManagerContract = new Contract(
           Contracts.TroveManager,
@@ -168,6 +177,9 @@ export default function EthersProvider({ children }: { children: React.ReactNode
     const debtTokenContract = new Contract(Contracts.DebtToken.JUSD, debtTokenAbi, provider) as unknown as DebtToken;
     setDebtTokenContracts({ [Contracts.DebtToken.JUSD]: debtTokenContract });
 
+    const collateralTokenContracts = new Contract(Contracts.ERC20.ETH, ERC20Abi, provider) as unknown as ERC20;
+    setCollateralTokenContracts({ [Contracts.ERC20.ETH]: collateralTokenContracts });
+
     const troveManagerContract = new Contract(
       Contracts.TroveManager,
       troveManagerAbi,
@@ -190,7 +202,14 @@ export default function EthersProvider({ children }: { children: React.ReactNode
     setSwapPairContracts({ DebtToken1: swapPairContracts });
   }, []);
 
-  if (!debtTokenContracts || !troveManagerContract || !swapOperationsContract || !swapPairContracts) return null;
+  if (
+    !debtTokenContracts ||
+    !collateralTokenContracts ||
+    !troveManagerContract ||
+    !swapOperationsContract ||
+    !swapPairContracts
+  )
+    return null;
 
   return (
     <EthersContext.Provider
@@ -201,6 +220,7 @@ export default function EthersProvider({ children }: { children: React.ReactNode
         connectWallet,
         contracts: {
           debtTokenContracts,
+          collateralTokenContracts,
           troveManagerContract,
           swapOperationsContract,
           swapPairContracts,
@@ -219,6 +239,7 @@ export function useEthers(): {
   address: string;
   contracts: {
     debtTokenContracts: AllDebtTokenContracts;
+    collateralTokenContracts: AllCollateralTokenContracts;
     troveManagerContract: TroveManager;
     swapOperationsContract: SwapOperations;
     swapPairContracts: AllSwapPairContracts;
