@@ -24,7 +24,9 @@ export const openTrove = async ({
 }) => {
   await collToken.unprotectedMint(from, collAmount);
   await collToken.connect(from).approve(contracts.borrowerOperations, collAmount);
-  await contracts.borrowerOperations.connect(from).openTrove([{ tokenAddress: collToken, amount: collAmount }]);
+  const openTx = await contracts.borrowerOperations
+    .connect(from)
+    .openTrove([{ tokenAddress: collToken, amount: collAmount }]);
 
   if (debts) await increaseDebt(from, contracts, debts);
 
@@ -32,6 +34,7 @@ export const openTrove = async ({
   const debtInUSD = await getTroveEntireDebt(contracts, from);
 
   return {
+    openTx,
     collateral,
     debtInUSD,
   };
@@ -202,6 +205,20 @@ export const getEmittedLiquidationValues = async (
     return [liquidatedDebt, liquidatedColl, stableGasComp, collGasComp];
   }
   return [];
+};
+
+export const getStableFeeFromStableBorrowingEvent = async (
+  tx: ContractTransactionResponse | null,
+  contracts: Contracts
+) => {
+  const receipt = await tx?.wait();
+  for (const log of receipt?.logs ?? []) {
+    const logData = contracts.borrowerOperations.interface.parseLog(log as any);
+    // TODO: replace LUSDBorrowingFeePaid event
+    if (logData?.name !== 'LUSDBorrowingFeePaid') continue;
+    return logData.args[1];
+  }
+  return 0n;
 };
 
 export const TimeValues = {

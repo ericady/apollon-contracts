@@ -27,8 +27,10 @@ import {
   getTroveStakeValue,
   getTroveStake,
   getEmittedLiquidationValues,
+  getStableFeeFromStableBorrowingEvent,
 } from '../utils/testHelper';
 import { parseUnits } from 'ethers';
+import { time } from '@nomicfoundation/hardhat-network-helpers';
 
 describe('BorrowerOperations', () => {
   let owner: SignerWithAddress;
@@ -2062,6 +2064,457 @@ describe('BorrowerOperations', () => {
       await borrowerOperations.connect(alice).openTrove([{ tokenAddress: BTC, amount: parseUnits('1', 9) }]);
 
       expect(await troveManager.getTroveStatus(alice)).to.be.equal(1);
+    });
+
+    it('decays a non-zero base rate', async () => {
+      await open(whale, parseUnits('1', 9), parseUnits('10000'));
+      await open(alice, parseUnits('2', 9), parseUnits('20000'));
+      await open(bob, parseUnits('3', 9), parseUnits('30000'));
+      await open(carol, parseUnits('4', 9), parseUnits('40000'));
+
+      // Artificially make baseRate 5%
+      await troveManager.setBaseRate(parseUnits('0.05'));
+      await troveManager.setLastFeeOpTimeToNow();
+
+      // Check baseRate is now non-zero
+      const baseRate_1 = await troveManager.baseRate();
+      expect(baseRate_1).to.be.equal(parseUnits('0.05'));
+
+      // 2 hours pass
+      await time.increase(7200);
+
+      // D opens trove
+      await open(dennis, parseUnits('1', 9), parseUnits('1000'));
+
+      // Check baseRate has decreased
+      const baseRate_2 = await troveManager.baseRate();
+      expect(baseRate_2).to.be.lt(baseRate_1);
+
+      // 1 hour passes
+      await time.increase(3600);
+
+      // E opens trove
+      await open(erin, parseUnits('1', 9), parseUnits('1000'));
+
+      const baseRate_3 = await troveManager.baseRate();
+      expect(baseRate_3).to.be.lt(baseRate_2);
+    });
+
+    it("doesn't change base rate if it is already zero", async () => {
+      await open(whale, parseUnits('1', 9), parseUnits('10000'));
+      await open(alice, parseUnits('2', 9), parseUnits('20000'));
+      await open(bob, parseUnits('3', 9), parseUnits('30000'));
+      await open(carol, parseUnits('4', 9), parseUnits('40000'));
+
+      // Check baseRate is zero
+      const baseRate_1 = await troveManager.baseRate();
+      expect(baseRate_1).to.be.equal(0n);
+
+      // 2 hours pass
+      await time.increase(7200);
+
+      // D opens trove
+      await open(dennis, parseUnits('1', 9), parseUnits('1000'));
+
+      // Check baseRate is still 0
+      const baseRate_2 = await troveManager.baseRate();
+      expect(baseRate_2).to.be.equal(0n);
+
+      // 1 hour passes
+      await time.increase(3600);
+
+      // E opens trove
+      await open(erin, parseUnits('1', 9), parseUnits('1000'));
+
+      const baseRate_3 = await troveManager.baseRate();
+      expect(baseRate_3).to.be.equal(0n);
+    });
+
+    it("lastFeeOpTime doesn't update if less time than decay interval has passed since the last fee operation", async () => {
+      await open(whale, parseUnits('1', 9), parseUnits('10000'));
+      await open(alice, parseUnits('2', 9), parseUnits('20000'));
+      await open(bob, parseUnits('3', 9), parseUnits('30000'));
+      await open(carol, parseUnits('4', 9), parseUnits('40000'));
+
+      // Artificially make baseRate 5%
+      await troveManager.setBaseRate(parseUnits('0.05'));
+      await troveManager.setLastFeeOpTimeToNow();
+
+      // Check baseRate is now non-zero
+      const baseRate_1 = await troveManager.baseRate();
+      expect(baseRate_1).to.be.equal(parseUnits('0.05'));
+
+      const lastFeeOpTime_1 = await troveManager.lastFeeOperationTime();
+
+      // Borrower D triggers a fee
+      await open(dennis, parseUnits('1', 9), parseUnits('1000'));
+
+      const lastFeeOpTime_2 = await troveManager.lastFeeOperationTime();
+
+      // Check that the last fee operation time did not update, as borrower D's debt issuance occured
+      // since before minimum interval had passed
+      expect(lastFeeOpTime_2).to.be.eq(lastFeeOpTime_1);
+
+      // 1 minute passes
+      await time.increase(60);
+
+      // Check that now, at least one minute has passed since lastFeeOpTime_1
+      const timeNow = await time.latest();
+      expect(BigInt(timeNow) - lastFeeOpTime_1).to.be.gte(60);
+
+      // Borrower E triggers a fee
+      await open(erin, parseUnits('1', 9), parseUnits('1000'));
+
+      const lastFeeOpTime_3 = await troveManager.lastFeeOperationTime();
+
+      // Check that the last fee operation time DID update, as borrower's debt issuance occured
+      // after minimum interval had passed
+      expect(lastFeeOpTime_3).to.be.gt(lastFeeOpTime_1);
+    });
+
+    it("borrower can't grief the baseRate and stop it decaying by issuing debt at higher frequency than the decay granularity", async () => {
+      await open(whale, parseUnits('1', 9), parseUnits('10000'));
+      await open(alice, parseUnits('2', 9), parseUnits('20000'));
+      await open(bob, parseUnits('3', 9), parseUnits('30000'));
+      await open(carol, parseUnits('4', 9), parseUnits('40000'));
+
+      // Artificially make baseRate 5%
+      await troveManager.setBaseRate(parseUnits('0.05'));
+      await troveManager.setLastFeeOpTimeToNow();
+
+      // Check baseRate is non-zero
+      const baseRate_1 = await troveManager.baseRate();
+      expect(baseRate_1).to.be.gt(0);
+
+      // 59 minutes pass
+      await time.increase(3540);
+
+      // Assume Borrower also owns accounts D and E
+      // Borrower triggers a fee, before decay interval has passed
+      await open(dennis, parseUnits('1', 9), parseUnits('1000'));
+
+      // 1 minute pass
+      await time.increase(3540);
+
+      // Borrower triggers another fee
+      await open(erin, parseUnits('1', 9), parseUnits('1000'));
+
+      // Check base rate has decreased even though Borrower tried to stop it decaying
+      const baseRate_2 = await troveManager.baseRate();
+      expect(baseRate_2).to.be.lt(baseRate_1);
+    });
+
+    it.skip('borrowing at non-zero base rate sends LUSD fee to LQTY staking contract', async () => {
+      // time fast-forwards 1 year, and multisig stakes 1 LQTY
+      await time.increase(60 * 60 * 24 * 365);
+      // await lqtyToken.approve(lqtyStaking.address, dec(1, 18), {
+      //   from: multisig,
+      // });
+      // await lqtyStaking.stake(dec(1, 18), { from: multisig });
+
+      // Check LQTY LUSD balance before == 0
+      // const lqtyStaking_LUSDBalance_Before = await STABLE.balanceOf(lqtyStaking.address);
+      // expect(lqtyStaking_LUSDBalance_Before).to.be.equal(0);
+
+      await open(whale, parseUnits('1', 9), parseUnits('10000'));
+      await open(alice, parseUnits('2', 9), parseUnits('20000'));
+      await open(bob, parseUnits('3', 9), parseUnits('30000'));
+      await open(carol, parseUnits('4', 9), parseUnits('40000'));
+
+      // Artificially make baseRate 5%
+      await troveManager.setBaseRate(parseUnits('0.05'));
+      await troveManager.setLastFeeOpTimeToNow();
+
+      // Check baseRate is now non-zero
+      const baseRate_1 = await troveManager.baseRate();
+      expect(baseRate_1).to.be.gt(0);
+
+      // 2 hours pass
+      await time.increase(7200);
+
+      // D opens trove
+      await open(dennis, parseUnits('1', 9), parseUnits('1000'));
+
+      // Check LQTY LUSD balance after has increased
+      // const lqtyStaking_LUSDBalance_After = await lusdToken.balanceOf(lqtyStaking.address);
+      // assert.isTrue(lqtyStaking_LUSDBalance_After.gt(lqtyStaking_LUSDBalance_Before));
+    });
+    it.skip('borrowing at non-zero base records the (drawn debt + fee  + liq. reserve) on the Trove struct', async () => {
+      // time fast-forwards 1 year, and multisig stakes 1 LQTY
+      await time.increase(60 * 60 * 24 * 365);
+      // await lqtyToken.approve(lqtyStaking.address, dec(1, 18), {
+      //   from: multisig,
+      // });
+      // await lqtyStaking.stake(dec(1, 18), { from: multisig });
+
+      await open(whale, parseUnits('1', 9), parseUnits('10000'));
+      await open(alice, parseUnits('2', 9), parseUnits('20000'));
+      await open(bob, parseUnits('3', 9), parseUnits('30000'));
+      await open(carol, parseUnits('4', 9), parseUnits('40000'));
+
+      // Artificially make baseRate 5%
+      await troveManager.setBaseRate(parseUnits('0.05'));
+      await troveManager.setLastFeeOpTimeToNow();
+
+      // Check baseRate is now non-zero
+      const baseRate_1 = await troveManager.baseRate();
+      expect(baseRate_1).to.be.gt(0);
+
+      // 2 hours pass
+      await time.increase(7200);
+
+      const D_LUSDRequest = parseUnits('20000');
+
+      // D withdraws LUSD
+      const { openTx } = await open(dennis, parseUnits('4', 9), parseUnits('40000'));
+      const emittedFee = getStableFeeFromStableBorrowingEvent(openTx, contracts);
+      expect(emittedFee).to.be.gt(0n);
+
+      // TODO: enable later
+      // const newDebt = (await troveManager.Troves(D))[0];
+
+      // Check debt on Trove struct equals drawn debt plus emitted fee
+      // th.assertIsApproximatelyEqual(newDebt, D_LUSDRequest.add(emittedFee).add(LUSD_GAS_COMPENSATION), 100000);
+    });
+
+    it.skip('borrowing at non-zero base rate increases the LQTY staking contract LUSD fees-per-unit-staked', async () => {
+      // time fast-forwards 1 year, and multisig stakes 1 LQTY
+      await time.increase(60 * 60 * 24 * 365);
+      // await lqtyToken.approve(lqtyStaking.address, dec(1, 18), {
+      //   from: multisig,
+      // });
+      // await lqtyStaking.stake(dec(1, 18), { from: multisig });
+
+      // Check LQTY contract LUSD fees-per-unit-staked is zero
+      // const F_LUSD_Before = await lqtyStaking.F_LUSD();
+      // assert.equal(F_LUSD_Before, '0');
+
+      await open(whale, parseUnits('1', 9), parseUnits('10000'));
+      await open(alice, parseUnits('2', 9), parseUnits('20000'));
+      await open(bob, parseUnits('3', 9), parseUnits('30000'));
+      await open(carol, parseUnits('4', 9), parseUnits('40000'));
+
+      // Artificially make baseRate 5%
+      await troveManager.setBaseRate(parseUnits('0.05'));
+      await troveManager.setLastFeeOpTimeToNow();
+
+      // Check baseRate is now non-zero
+      const baseRate_1 = await troveManager.baseRate();
+      expect(baseRate_1).to.be.gt(0);
+
+      // 2 hours pass
+      await time.increase(7200);
+
+      // D opens trove
+      await open(dennis, parseUnits('1', 9), parseUnits('100'));
+
+      // Check LQTY contract LUSD fees-per-unit-staked has increased
+      // const F_LUSD_After = await lqtyStaking.F_LUSD();
+      // assert.isTrue(F_LUSD_After.gt(F_LUSD_Before));
+    });
+
+    it.skip('Borrowing at non-zero base rate sends requested amount to the user', async () => {
+      // time fast-forwards 1 year, and multisig stakes 1 LQTY
+      await time.increase(60 * 60 * 24 * 365);
+      // await lqtyToken.approve(lqtyStaking.address, dec(1, 18), {
+      //   from: multisig,
+      // });
+      // await lqtyStaking.stake(dec(1, 18), { from: multisig });
+
+      // Check LQTY Staking contract balance before == 0
+      // const lqtyStaking_LUSDBalance_Before = await lusdToken.balanceOf(lqtyStaking.address);
+      // assert.equal(lqtyStaking_LUSDBalance_Before, '0');
+
+      await open(whale, parseUnits('1', 9), parseUnits('10000'));
+      await open(alice, parseUnits('2', 9), parseUnits('20000'));
+      await open(bob, parseUnits('3', 9), parseUnits('30000'));
+      await open(carol, parseUnits('4', 9), parseUnits('40000'));
+
+      // Artificially make baseRate 5%
+      await troveManager.setBaseRate(parseUnits('0.05'));
+      await troveManager.setLastFeeOpTimeToNow();
+
+      // Check baseRate is non-zero
+      const baseRate_1 = await troveManager.baseRate();
+      expect(baseRate_1).to.be.gt(0);
+
+      // 2 hours pass
+      await time.increase(7200);
+
+      // D opens trove
+      const LUSDRequest_D = parseUnits('40000');
+      await open(dennis, parseUnits('4', 9), parseUnits('40000'));
+
+      // // Check LQTY staking LUSD balance has increased
+      // const lqtyStaking_LUSDBalance_After = await lusdToken.balanceOf(lqtyStaking.address);
+      // assert.isTrue(lqtyStaking_LUSDBalance_After.gt(lqtyStaking_LUSDBalance_Before));
+
+      // // Check D's LUSD balance now equals their requested LUSD
+      // const LUSDBalance_D = await lusdToken.balanceOf(D);
+      // assert.isTrue(LUSDRequest_D.eq(LUSDBalance_D));
+    });
+
+    it.skip('borrowing at zero base rate changes the LQTY staking contract LUSD fees-per-unit-staked', async () => {
+      await open(alice, parseUnits('1', 9), parseUnits('5000'));
+      await open(bob, parseUnits('1', 9), parseUnits('5000'));
+      await open(carol, parseUnits('1', 9), parseUnits('5000'));
+
+      // Check baseRate is zero
+      const baseRate_1 = await troveManager.baseRate();
+      expect(baseRate_1).to.be.gt(0);
+
+      // 2 hours pass
+      await time.increase(7200);
+
+      // Check LUSD reward per LQTY staked == 0
+      // const F_LUSD_Before = await lqtyStaking.F_LUSD();
+      // assert.equal(F_LUSD_Before, '0');
+
+      // // A stakes LQTY
+      // await lqtyToken.unprotectedMint(A, dec(100, 18));
+      // await lqtyStaking.stake(dec(100, 18), { from: A });
+
+      // D opens trove
+      await open(dennis, parseUnits('1', 9), parseUnits('37'));
+
+      // Check LUSD reward per LQTY staked > 0
+      // const F_LUSD_After = await lqtyStaking.F_LUSD();
+      // assert.isTrue(F_LUSD_After.gt(toBN('0')));
+    });
+
+    it.skip('Borrowing at zero base rate charges minimum fee', async () => {
+      await open(alice, parseUnits('1', 9), parseUnits('5000'));
+      await open(bob, parseUnits('1', 9), parseUnits('5000'));
+
+      const LUSDRequest = parseUnits('10000');
+      const { openTx } = await open(carol, parseUnits('1', 9), LUSDRequest);
+      // const _LUSDFee = toBN(th.getEventArgByName(txC, 'LUSDBorrowingFeePaid', '_LUSDFee'));
+
+      // const expectedFee = BORROWING_FEE_FLOOR.mul(toBN(LUSDRequest)).div(toBN(dec(1, 18)));
+      // assert.isTrue(_LUSDFee.eq(expectedFee));
+    });
+
+    it('reverts when system is in Recovery Mode and ICR < CCR', async () => {
+      await open(whale, parseUnits('1', 9), parseUnits('5000'));
+      await open(alice, parseUnits('1', 9), parseUnits('5000'));
+      expect(await checkRecoveryMode(contracts)).to.be.false;
+
+      // price drops, and Recovery Mode kicks in
+      await priceFeed.setTokenPrice(BTC, parseUnits('5000'));
+
+      expect(await checkRecoveryMode(contracts)).to.be.true;
+
+      // Bob tries to open a trove with 149% ICR during Recovery Mode
+      await expect(open(bob, parseUnits('1', 9), parseUnits('5000'))).to.be.revertedWithCustomError(
+        borrowerOperations,
+        'ICR_lt_CCR'
+      );
+    });
+
+    it('reverts when trove ICR < MCR', async () => {
+      await open(whale, parseUnits('1', 9), parseUnits('5000'));
+      await open(alice, parseUnits('1', 9), parseUnits('5000'));
+      expect(await checkRecoveryMode(contracts)).to.be.false;
+
+      // Bob attempts to open a 109% ICR trove in Normal Mode
+      await expect(open(bob, parseUnits('1', 9), parseUnits('19000'))).to.be.revertedWithCustomError(
+        borrowerOperations,
+        'ICR_lt_MCR'
+      );
+
+      // price drops, and Recovery Mode kicks in
+      await priceFeed.setTokenPrice(BTC, parseUnits('5000'));
+
+      expect(await checkRecoveryMode(contracts)).to.be.true;
+
+      // Bob attempts to open a 109% ICR trove in Recovery Mode
+      await expect(open(carol, parseUnits('1', 9), parseUnits('19000'))).to.be.revertedWithCustomError(
+        borrowerOperations,
+        'ICR_lt_MCR'
+      );
+    });
+
+    it('reverts when opening the trove would cause the TCR of the system to fall below the CCR', async () => {
+      await priceFeed.setTokenPrice(BTC, parseUnits('15000'));
+
+      // Alice creates trove with 150% ICR.  System TCR = 150%.
+      await open(alice, parseUnits('1', 9), parseUnits('9751.243')); // 9751.243 + 48.756215 + 200 = 9999.999215
+
+      const TCR = await getTCR(contracts);
+      expect(TCR).to.be.closeTo(parseUnits('1.5'), parseUnits('0.0001'));
+
+      // Bob attempts to open a trove with ICR = 149%
+      await expect(open(bob, parseUnits('1', 9), parseUnits('9752'))).to.be.revertedWithCustomError(
+        borrowerOperations,
+        'TCR_lt_CCR'
+      );
+    });
+    it('reverts if trove is already active', async () => {
+      await open(whale, parseUnits('1', 9), parseUnits('10000'));
+      await open(alice, parseUnits('1', 9), parseUnits('5000'));
+      await open(bob, parseUnits('1', 9), parseUnits('5000'));
+
+      await expect(open(bob, parseUnits('1', 9), parseUnits('5000'))).to.be.revertedWithCustomError(
+        borrowerOperations,
+        'ActiveTrove'
+      );
+
+      await expect(open(alice, parseUnits('1', 9), parseUnits('5000'))).to.be.revertedWithCustomError(
+        borrowerOperations,
+        'ActiveTrove'
+      );
+    });
+
+    it('Can open a trove with ICR >= CCR when system is in Recovery Mode', async () => {
+      await priceFeed.setTokenPrice(BTC, parseUnits('15000'));
+      // --- SETUP ---
+      //  Alice and Bob add coll and withdraw such  that the TCR is ~150%
+      await open(alice, parseUnits('1', 9), parseUnits('9751.243'));
+      await open(bob, parseUnits('1', 9), parseUnits('9751.243'));
+
+      const TCR = await getTCR(contracts);
+      expect(TCR).to.be.closeTo(parseUnits('1.5'), parseUnits('0.0001'));
+
+      // price drops to 1ETH:100LUSD, reducing TCR below 150%
+      await priceFeed.setTokenPrice(BTC, parseUnits('14900'));
+
+      expect(await checkRecoveryMode(contracts)).to.be.true;
+
+      // Carol opens at 150% ICR in Recovery Mode
+      await open(carol, parseUnits('1', 9), parseUnits('9550'));
+
+      const carol_TroveStatus = await troveManager.getTroveStatus(carol);
+      expect(carol_TroveStatus).to.be.equal(1n);
+
+      const carolICR = await troveManager.getCurrentICR(carol);
+      expect(carolICR.ICR).to.be.gt(parseUnits('1.5'));
+    });
+
+    it.skip('Reverts opening a trove with min debt when system is in Recovery Mode', async () => {
+      // TODO: check the logics again
+      // --- SETUP ---
+      //  Alice and Bob add coll and withdraw such  that the TCR is ~150%
+      await priceFeed.setTokenPrice(BTC, parseUnits('15000'));
+      // --- SETUP ---
+      //  Alice and Bob add coll and withdraw such  that the TCR is ~150%
+      await open(alice, parseUnits('1', 9), parseUnits('9751.243'));
+      await open(bob, parseUnits('1', 9), parseUnits('9751.243'));
+
+      const TCR = await getTCR(contracts);
+      expect(TCR).to.be.closeTo(parseUnits('1.5'), parseUnits('0.0001'));
+
+      // price drops to 1ETH:100LUSD, reducing TCR below 150%
+      await priceFeed.setTokenPrice(BTC, parseUnits('14900'));
+
+      expect(await checkRecoveryMode(contracts)).to.be.true;
+
+      await open(carol, parseUnits('1', 9), parseUnits('1'));
+      // await assertRevert(
+      //   borrowerOperations.openTrove(th._100pct, await getNetBorrowingAmount(MIN_NET_DEBT), carol, carol, {
+      //     from: carol,
+      //     value: dec(1, 'ether'),
+      //   })
+      // );
     });
   });
 });
