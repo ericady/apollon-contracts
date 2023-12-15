@@ -80,16 +80,16 @@ const Swap = () => {
 
     if (tradingDirection === 'jUSDSpent') {
       await swapOperationsContract.swapTokensForExactTokens(
-        BigInt(floatToBigInt(tokenAmount)),
-        BigInt(floatToBigInt(jUSDAmount * (1 + maxSlippage))),
+        floatToBigInt(tokenAmount),
+        floatToBigInt(jUSDAmount * (1 + maxSlippage)),
         [selectedToken!.address, JUSDToken!.address],
         address,
         deadline,
       );
     } else {
       await swapOperationsContract.swapExactTokensForTokens(
-        BigInt(floatToBigInt(tokenAmount)),
-        BigInt(floatToBigInt(jUSDAmount * (1 - maxSlippage))),
+        floatToBigInt(tokenAmount),
+        floatToBigInt(jUSDAmount * (1 - maxSlippage)),
         [selectedToken!.address, JUSDToken!.address],
         address,
         deadline,

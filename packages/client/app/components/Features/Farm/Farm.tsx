@@ -46,7 +46,6 @@ const Farm = () => {
       farmShortValue: '',
       maxSlippage: '2',
     },
-    shouldUnregister: true,
     reValidateMode: 'onChange',
   });
   const { handleSubmit, reset, watch } = methods;
@@ -71,8 +70,8 @@ const Farm = () => {
 
     if (tabValue === 'Long') {
       await swapOperationsContract.openLongPosition(
-        BigInt(floatToBigInt(farmShortValue)),
-        BigInt(floatToBigInt(getExpectedPositionSize() * (1 - maxSlippage))),
+        floatToBigInt(farmShortValue),
+        floatToBigInt(getExpectedPositionSize() * (1 - maxSlippage)),
         selectedToken!.address,
         address,
         // TODO: What is this
@@ -81,8 +80,8 @@ const Farm = () => {
       );
     } else {
       await swapOperationsContract.openShortPosition(
-        BigInt(floatToBigInt(farmShortValue)),
-        BigInt(floatToBigInt(getExpectedPositionSize() * (1 - maxSlippage))),
+        floatToBigInt(farmShortValue),
+        floatToBigInt(getExpectedPositionSize() * (1 - maxSlippage)),
         selectedToken!.address,
         address,
         // TODO: What is this
@@ -94,7 +93,7 @@ const Farm = () => {
 
   const watchFarmShortValue = parseInt(watch('farmShortValue'));
 
-  const addedDebtUSD = !isNaN(watchFarmShortValue) ? watchFarmShortValue * selectedToken!.priceUSD : 0;
+  const addedDebtUSD = !isNaN(watchFarmShortValue) && selectedToken ? watchFarmShortValue * selectedToken!.priceUSD : 0;
   const borrowingFee = data?.getTroveManager.borrowingRate;
 
   const getExpectedPositionSize = () => {
@@ -292,7 +291,7 @@ const Farm = () => {
                   }}
                 >
                   Slippage:
-                  {watchFarmShortValue ? (
+                  {watchFarmShortValue && selectedToken ? (
                     <span>{displayPercentage(getPriceImpact())}</span>
                   ) : (
                     <Skeleton width="120px" />
@@ -303,7 +302,7 @@ const Farm = () => {
               <InfoButton
                 title="EXECUTE"
                 description="The final values will be calculated after the swap."
-                disabled={!address}
+                disabled={!address || !JUSDToken || !selectedToken}
               />
             </div>
           </form>
