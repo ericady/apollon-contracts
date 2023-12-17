@@ -151,7 +151,7 @@ export const GET_BORROWER_COLLATERAL_TOKENS = gql`
         priceUSD @client
       }
       walletAmount @client
-      troveLockedAmount
+      troveLockedAmount @client
       stabilityGainedAmount
 
       totalValueLockedUSD

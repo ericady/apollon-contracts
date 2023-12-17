@@ -2,9 +2,9 @@
 
 import { useQuery } from '@apollo/client';
 import { createContext, useContext, useState } from 'react';
-import { JUSD_SYMBOL } from '../components/Features/Assets/Assets';
-import { GetDebtTokensQuery, GetDebtTokensQueryVariables } from '../generated/gql-types';
-import { GET_ALL_DEBT_TOKENS } from '../queries';
+import { GetCollateralTokensQuery, GetCollateralTokensQueryVariables } from '../generated/gql-types';
+import { GET_BORROWER_COLLATERAL_TOKENS } from '../queries';
+import { Contracts } from './EthersProvider';
 
 export type SelectedToken = {
   swapFee: number;
@@ -19,7 +19,7 @@ export type SelectedToken = {
 };
 
 export const SelectedTokenContext = createContext<{
-  JUSDToken: GetDebtTokensQuery['getDebtTokens'][number]['token'] | undefined;
+  JUSDToken: GetCollateralTokensQuery['getCollateralTokens'][number]['token'] | undefined;
   tokenRatio: number;
   selectedToken: SelectedToken | null;
   setSelectedToken: (asset: SelectedToken) => void;
@@ -33,8 +33,10 @@ export const SelectedTokenContext = createContext<{
 export default function SelectedTokenProvider({ children }: { children: React.ReactNode }): JSX.Element {
   const [selectedToken, setSelectedToken] = useState<SelectedToken | null>(null);
 
-  const { data } = useQuery<GetDebtTokensQuery, GetDebtTokensQueryVariables>(GET_ALL_DEBT_TOKENS);
-  const JUSDToken = data?.getDebtTokens.find(({ token }) => token.symbol === JUSD_SYMBOL)?.token;
+  const { data } = useQuery<GetCollateralTokensQuery, GetCollateralTokensQueryVariables>(
+    GET_BORROWER_COLLATERAL_TOKENS,
+  );
+  const JUSDToken = data?.getCollateralTokens.find(({ token }) => token.address === Contracts.ERC20.JUSD)?.token;
   const tokenRatio =
     JUSDToken === undefined || selectedToken === null ? 0 : selectedToken!.priceUSD / JUSDToken!.priceUSD;
 
@@ -54,10 +56,10 @@ export default function SelectedTokenProvider({ children }: { children: React.Re
 }
 
 export function useSelectedToken(): {
+  JUSDToken: GetCollateralTokensQuery['getCollateralTokens'][number]['token'] | undefined;
+  tokenRatio: number;
   selectedToken: SelectedToken | null;
   setSelectedToken: (asset: SelectedToken) => void;
-  JUSDToken: GetDebtTokensQuery['getDebtTokens'][number]['token'] | undefined;
-  tokenRatio: number;
 } {
   const context = useContext(SelectedTokenContext);
   if (context === undefined) {

@@ -5,7 +5,6 @@ import { PropsWithChildren, useEffect, useMemo, useState } from 'react';
 import 'whatwg-fetch';
 import { EthersContext, useEthers } from '../../context/EthersProvider';
 import SelectedTokenProvider, { useSelectedToken } from '../../context/SelectedTokenProvider';
-import WalletProvider from '../../context/WalletProvider';
 import buildTheme from '../../theme';
 import MockedPositionsWithoutBorrower from './mockedResponses/GetDebtTokens.mocked.json';
 
@@ -34,14 +33,12 @@ export const IntegrationWrapper = ({ children, ...stateProps }: PropsWithChildre
   return (
     <ThemeProvider theme={theme}>
       <SnackbarProvider>
-        <WalletProvider>
-          {/* Not using MockedProvider as we are using the same dev server for mocking */}
-          <ApolloProvider client={client}>
-            <SelectedTokenProvider>
-              <SetupState {...stateProps}>{children}</SetupState>
-            </SelectedTokenProvider>
-          </ApolloProvider>
-        </WalletProvider>
+        {/* Not using MockedProvider as we are using the same dev server for mocking */}
+        <ApolloProvider client={client}>
+          <SelectedTokenProvider>
+            <SetupState {...stateProps}>{children}</SetupState>
+          </SelectedTokenProvider>
+        </ApolloProvider>
       </SnackbarProvider>
     </ThemeProvider>
   );

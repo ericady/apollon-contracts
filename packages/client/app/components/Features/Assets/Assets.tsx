@@ -9,6 +9,7 @@ import TableContainer from '@mui/material/TableContainer';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import { useEffect, useMemo, useState } from 'react';
+import { Contracts } from '../../../context/EthersProvider';
 import { SelectedToken, useSelectedToken } from '../../../context/SelectedTokenProvider';
 import { GetAllPoolsQuery, GetAllPoolsQueryVariables } from '../../../generated/gql-types';
 import { GET_ALL_POOLS } from '../../../queries';
@@ -41,14 +42,14 @@ function Assets() {
     const jUSDPools =
       data?.getPools.filter(({ liquidity }) => {
         const [tokenA, tokenB] = liquidity;
-        return tokenA.token.symbol === JUSD_SYMBOL || tokenB.token.symbol === JUSD_SYMBOL;
+        return tokenA.token.address === Contracts.ERC20.JUSD || tokenB.token.address === Contracts.ERC20.JUSD;
       }) ?? [];
 
     // get token address from local storage and set isFavorite if it is present
     return jUSDPools
       .map<SelectedToken>(({ liquidity, swapFee, volume24hUSD }) => {
         const [tokenA, tokenB] = liquidity;
-        const token = tokenA.token.symbol === JUSD_SYMBOL ? tokenB.token : tokenA.token;
+        const token = tokenA.token.address === Contracts.ERC20.JUSD ? tokenB.token : tokenA.token;
 
         return {
           ...token,
@@ -58,7 +59,7 @@ function Assets() {
           isFavorite: favoritedAssets.find((address) => token.address === address) !== undefined ? true : false,
           volume24hUSD,
           liqudityPair:
-            tokenA.token.symbol === JUSD_SYMBOL
+            tokenA.token.address === Contracts.ERC20.JUSD
               ? [tokenA.totalAmount, tokenB.totalAmount]
               : [tokenB.totalAmount, tokenA.totalAmount],
         };

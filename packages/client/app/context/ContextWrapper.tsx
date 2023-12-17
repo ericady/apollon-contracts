@@ -13,7 +13,6 @@ import { CustomApolloProvider } from './CustomApolloProvider';
 import DeviceFallbackController from './DeviceFallbackController';
 import EthersProvider from './EthersProvider';
 import SelectedTokenProvider from './SelectedTokenProvider';
-import WalletProvider from './WalletProvider';
 
 function ContextWrapper({ children }: PropsWithChildren<{}>) {
   // The initial mode will be taken from LS or from the browser if the user didnt select any before.
@@ -40,13 +39,11 @@ function ContextWrapper({ children }: PropsWithChildren<{}>) {
         <DeviceFallbackController>
           <MockServer>
             <EthersProvider>
-              <WalletProvider>
-                <NavigationBar themeMode={themeMode} setThemeMode={setThemeMode} />
+              <NavigationBar themeMode={themeMode} setThemeMode={setThemeMode} />
 
-                <CustomApolloProvider>
-                  <SelectedTokenProvider>{children}</SelectedTokenProvider>
-                </CustomApolloProvider>
-              </WalletProvider>
+              <CustomApolloProvider>
+                <SelectedTokenProvider>{children}</SelectedTokenProvider>
+              </CustomApolloProvider>
             </EthersProvider>
           </MockServer>
         </DeviceFallbackController>

@@ -17,11 +17,11 @@ import Tabs from '@mui/material/Tabs';
 import Typography from '@mui/material/Typography';
 import { SyntheticEvent, useCallback, useState } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
-import { useEthers } from '../../../context/EthersProvider';
-import { useWallet } from '../../../context/WalletProvider';
+import { IBase } from '../../../../generated/types/BorrowerOperations';
+import { Contracts, useEthers } from '../../../context/EthersProvider';
 import { GetCollateralTokensQuery, GetCollateralTokensQueryVariables } from '../../../generated/gql-types';
 import { GET_BORROWER_COLLATERAL_TOKENS } from '../../../queries';
-import { displayPercentage, roundCurrency } from '../../../utils/math';
+import { displayPercentage, floatToBigInt, roundCurrency } from '../../../utils/math';
 import NumberInput from '../../FormControls/NumberInput';
 import CrossIcon from '../../Icons/CrossIcon';
 import DiamondIcon from '../../Icons/DiamondIcon';
@@ -35,7 +35,10 @@ type Props = {
 };
 
 type FieldValues = {
-  etherTokenAmount: string;
+  [Contracts.ERC20.JUSD]: string;
+  [Contracts.ERC20.DEFI]: string;
+  [Contracts.ERC20.ETH]: string;
+  [Contracts.ERC20.USDT]: string;
 };
 
 const CollateralUpdateDialog = ({ buttonVariant, buttonSx = {} }: Props) => {
@@ -44,8 +47,10 @@ const CollateralUpdateDialog = ({ buttonVariant, buttonSx = {} }: Props) => {
   const [oldRatio, setOldRatio] = useState(0);
   const [newRatio, setNewRatio] = useState(0);
 
-  const { etherAmount, etherValueUSD } = useWallet();
-  const { address } = useEthers();
+  const {
+    address,
+    contracts: { borrowerOperationsContract },
+  } = useEthers();
 
   const { data } = useQuery<GetCollateralTokensQuery, GetCollateralTokensQueryVariables>(
     GET_BORROWER_COLLATERAL_TOKENS,
@@ -58,7 +63,10 @@ const CollateralUpdateDialog = ({ buttonVariant, buttonSx = {} }: Props) => {
 
   const methods = useForm<FieldValues>({
     defaultValues: {
-      etherTokenAmount: '',
+      [Contracts.ERC20.JUSD]: '',
+      [Contracts.ERC20.DEFI]: '',
+      [Contracts.ERC20.ETH]: '',
+      [Contracts.ERC20.USDT]: '',
     },
     reValidateMode: 'onChange',
   });
@@ -77,30 +85,46 @@ const CollateralUpdateDialog = ({ buttonVariant, buttonSx = {} }: Props) => {
     reset();
   };
 
-  // TODO: Add ETH address
-  // TODO: Add ETH, BTC, YLT, jUSD
-  const depositedCollateralToDeposit: GetCollateralTokensQuery['getCollateralTokens'] =
-    data?.getCollateralTokens.filter(({ token }, index) => token.address && index === 0) ?? [];
+  const collateralToDeposit: GetCollateralTokensQuery['getCollateralTokens'] = data?.getCollateralTokens ?? [];
 
-  const fillMaxInputValue = (fieldName: keyof FieldValues) => {
+  if (collateralToDeposit.length === 0) return null;
+
+  const fillMaxInputValue = (fieldName: keyof FieldValues, index: number) => {
     if (tabValue === 'DEPOSIT') {
-      setValue(fieldName, etherAmount.toString(), { shouldValidate: true, shouldDirty: true });
+      setValue(fieldName, collateralToDeposit[index].walletAmount!.toString(), {
+        shouldValidate: true,
+        shouldDirty: true,
+      });
     } else {
-      setValue(fieldName, depositedCollateralToDeposit[0].walletAmount!.toString(), {
+      setValue(fieldName, collateralToDeposit[index].troveLockedAmount!.toString(), {
         shouldValidate: true,
         shouldDirty: true,
       });
     }
   };
 
-  const onSubmit = () => {
-    console.log('onSubmit called');
-    // TODO: Implement contract call
+  // TODO: CALL RESET ON ALL DIALOGS ON CLOSE
+  const onSubmit = async (data: FieldValues) => {
+    const tokenAmounts = Object.entries(data).map<IBase.TokenAmountStruct>(([address, amount]) => ({
+      tokenAddress: address,
+      amount: floatToBigInt(parseFloat(amount)),
+    }));
+
+    await borrowerOperationsContract.addColl(tokenAmounts);
+
+    setIsOpen(false);
   };
 
-  const etherTokenAmount = watch('etherTokenAmount');
-  const etherTokenAmountUSD =
-    (etherTokenAmount ? parseFloat(etherTokenAmount) * etherValueUSD : 0) * (tabValue === 'DEPOSIT' ? -1 : 1);
+  const allTokenAmount = watch([Contracts.ERC20.JUSD, Contracts.ERC20.DEFI, Contracts.ERC20.ETH, Contracts.ERC20.USDT]);
+  const allTokenAmountUSD =
+    allTokenAmount.reduce((acc, curr, index) => {
+      const address = [Contracts.ERC20.JUSD, Contracts.ERC20.DEFI, Contracts.ERC20.ETH, Contracts.ERC20.USDT][index];
+
+      const { token } = collateralToDeposit.find(({ token }) => token.address === address)!;
+      const { priceUSD } = token;
+
+      return acc + (isNaN(parseFloat(curr)) ? 0 : parseFloat(curr) * priceUSD);
+    }, 0) * (tabValue === 'DEPOSIT' ? -1 : 1);
 
   return (
     <>
@@ -160,84 +184,94 @@ const CollateralUpdateDialog = ({ buttonVariant, buttonSx = {} }: Props) => {
                 <Tab label="WITHDRAW" value="WITHDRAW" />
               </Tabs>
 
-              <div style={{ display: 'flex', justifyContent: 'space-between', padding: 20, height: 114 }}>
-                {tabValue === 'DEPOSIT' && (
-                  <div style={{ marginTop: 6 }}>
-                    <Label variant="success">ETH</Label>
-                    <Typography sx={{ fontWeight: '400', marginTop: '10px' }}>
-                      {roundCurrency(depositedCollateralToDeposit[0]?.walletAmount ?? 0, 5)}
-                    </Typography>
-                    <Typography variant="label" paragraph>
-                      Trove
-                    </Typography>
-                  </div>
-                )}
-                {tabValue === 'WITHDRAW' && (
-                  <div style={{ marginTop: 6 }}>
-                    <Label variant="success">ETH</Label>
-                  </div>
-                )}
+              {collateralToDeposit.map(({ walletAmount, troveLockedAmount, token: { symbol, address } }, index) => {
+                return (
+                  <div
+                    key={address}
+                    style={{ display: 'flex', justifyContent: 'space-between', padding: 20, height: 114 }}
+                  >
+                    {tabValue === 'DEPOSIT' && (
+                      <div style={{ marginTop: 6 }}>
+                        <Label variant="success">{symbol}</Label>
+                        <Typography sx={{ fontWeight: '400', marginTop: '10px' }}>
+                          {roundCurrency(walletAmount ?? 0, 5)}
+                        </Typography>
+                        <Typography variant="label" paragraph>
+                          Trove
+                        </Typography>
+                      </div>
+                    )}
+                    {tabValue === 'WITHDRAW' && (
+                      <div style={{ marginTop: 6 }}>
+                        <Label variant="success">{symbol}</Label>
+                      </div>
+                    )}
 
-                <div>
-                  <NumberInput
-                    name="etherTokenAmount"
-                    data-testid="apollon-collateral-update-dialog-ether-amount"
-                    placeholder="Value"
-                    fullWidth
-                    rules={{
-                      min: { value: 0, message: 'Amount needs to be positive.' },
-                      max:
-                        tabValue === 'DEPOSIT'
-                          ? { value: etherAmount, message: 'Your wallet does not contain the specified amount.' }
-                          : {
-                              value: depositedCollateralToDeposit[0]?.walletAmount ?? 0,
-                              message: 'Your trove does not contain the specified amount.',
-                            },
-                    }}
-                  />
-
-                  <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                     <div>
-                      {tabValue === 'DEPOSIT' && (
-                        <>
-                          <Typography
-                            variant="caption"
-                            data-testid="apollon-collateral-update-dialog-deposit-ether-funds-label"
-                            color="info.main"
-                          >
-                            {roundCurrency(etherAmount, 5)}
-                          </Typography>
-                          <Typography variant="label" paragraph>
-                            Wallet
-                          </Typography>
-                        </>
-                      )}
-                      {tabValue === 'WITHDRAW' && (
-                        <>
-                          <Typography
-                            variant="caption"
-                            data-testid="apollon-collateral-update-dialog-withdraw-ether-funds-label"
-                            color="info.main"
-                          >
-                            {roundCurrency(depositedCollateralToDeposit[0]?.walletAmount ?? 0, 5)}
-                          </Typography>
-                          <Typography variant="label" paragraph>
-                            Trove
-                          </Typography>
-                        </>
-                      )}
-                    </div>
+                      <NumberInput
+                        name={address}
+                        data-testid="apollon-collateral-update-dialog-ether-amount"
+                        placeholder="Value"
+                        fullWidth
+                        rules={{
+                          min: { value: 0, message: 'Amount needs to be positive.' },
+                          max:
+                            tabValue === 'DEPOSIT'
+                              ? {
+                                  value: walletAmount ?? 0,
+                                  message: 'Your wallet does not contain the specified amount.',
+                                }
+                              : {
+                                  value: troveLockedAmount ?? 0,
+                                  message: 'Your trove does not contain the specified amount.',
+                                },
+                        }}
+                      />
 
-                    <Button
-                      variant="undercover"
-                      sx={{ textDecoration: 'underline', p: 0, mt: 0.25, height: 25 }}
-                      onClick={() => fillMaxInputValue('etherTokenAmount')}
-                    >
-                      max
-                    </Button>
+                      <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                        <div>
+                          {tabValue === 'DEPOSIT' && (
+                            <>
+                              <Typography
+                                variant="caption"
+                                data-testid="apollon-collateral-update-dialog-deposit-ether-funds-label"
+                                color="info.main"
+                              >
+                                {roundCurrency(walletAmount ?? 0, 5)}
+                              </Typography>
+                              <Typography variant="label" paragraph>
+                                Wallet
+                              </Typography>
+                            </>
+                          )}
+                          {tabValue === 'WITHDRAW' && (
+                            <>
+                              <Typography
+                                variant="caption"
+                                data-testid="apollon-collateral-update-dialog-withdraw-ether-funds-label"
+                                color="info.main"
+                              >
+                                {roundCurrency(troveLockedAmount ?? 0, 5)}
+                              </Typography>
+                              <Typography variant="label" paragraph>
+                                Trove
+                              </Typography>
+                            </>
+                          )}
+                        </div>
+
+                        <Button
+                          variant="undercover"
+                          sx={{ textDecoration: 'underline', p: 0, mt: 0.25, height: 25 }}
+                          onClick={() => fillMaxInputValue(address as keyof FieldValues, index)}
+                        >
+                          max
+                        </Button>
+                      </div>
+                    </div>
                   </div>
-                </div>
-              </div>
+                );
+              })}
 
               <Box
                 sx={{
@@ -289,11 +323,7 @@ const CollateralUpdateDialog = ({ buttonVariant, buttonSx = {} }: Props) => {
                   </div>
                 </Box>
 
-                <CollateralRatioVisualization
-                  addedDebtUSD={etherTokenAmountUSD}
-                  callback={ratioChangeCallback}
-                  loading={parseInt(etherTokenAmount) < 0}
-                />
+                <CollateralRatioVisualization addedDebtUSD={allTokenAmountUSD} callback={ratioChangeCallback} />
               </Box>
             </DialogContent>
             <DialogActions

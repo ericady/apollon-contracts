@@ -10,21 +10,22 @@ import {
 } from '@apollo/client';
 import { AddressLike, ethers } from 'ethers';
 import { PropsWithChildren, useEffect } from 'react';
-import { DebtToken, ERC20, SwapPair, TroveManager } from '../../generated/types';
+import { DebtToken, SwapPair, TroveManager } from '../../generated/types';
 import { QueryGetTokenArgs, TokenFragmentFragment } from '../generated/gql-types';
 import { TOKEN_FRAGMENT } from '../queries';
 import { Contracts, useEthers } from './EthersProvider';
 
 export function CustomApolloProvider({ children }: PropsWithChildren<{}>) {
   const {
-    contracts: { debtTokenContracts, troveManagerContract, collateralTokenContracts },
+    provider,
+    contracts: { debtTokenContracts, troveManagerContract },
     address: borrower,
   } = useEthers();
 
   const cacheConfig =
     process.env.NEXT_PUBLIC_CONTRACT_MOCKING === 'enabled'
       ? { fields: {}, Query: {} }
-      : getProductionCacheConfig({ borrower, debtTokenContracts, troveManagerContract });
+      : getProductionCacheConfig({ provider, borrower, debtTokenContracts, troveManagerContract });
 
   const client = new ApolloClient({
     // TODO: replace with our deployed graphql endpoint
@@ -79,9 +80,9 @@ export function CustomApolloProvider({ children }: PropsWithChildren<{}>) {
   useEffect(() => {
     if (process.env.NEXT_PUBLIC_CONTRACT_MOCKING !== 'enabled') {
       const priceUSDIntervall = setInterval(() => {
-        if (isFieldOutdated(SchemaDataFreshnessManager.DebtToken[Contracts.DebtToken.JUSD], 'priceUSD')) {
-          SchemaDataFreshnessManager.DebtToken[Contracts.DebtToken.JUSD].priceUSD.fetch(
-            debtTokenContracts[Contracts.DebtToken.JUSD],
+        if (isFieldOutdated(SchemaDataFreshnessManager.DebtToken[Contracts.DebtToken.DebtToken1], 'priceUSD')) {
+          SchemaDataFreshnessManager.DebtToken[Contracts.DebtToken.DebtToken1].priceUSD.fetch(
+            debtTokenContracts[Contracts.DebtToken.DebtToken1],
           );
         }
         // This can be any interval you want but it guarantees data freshness if its not already fresh.
@@ -98,14 +99,14 @@ export function CustomApolloProvider({ children }: PropsWithChildren<{}>) {
 }
 
 const getProductionCacheConfig = ({
+  provider,
   borrower,
   debtTokenContracts,
-  collateralTokenContracts,
   troveManagerContract,
 }: {
+  provider: ReturnType<typeof useEthers>['provider'];
   borrower: AddressLike;
   debtTokenContracts: ReturnType<typeof useEthers>['contracts']['debtTokenContracts'];
-  collateralTokenContracts: ReturnType<typeof useEthers>['contracts']['collateralTokenContracts'];
   troveManagerContract: ReturnType<typeof useEthers>['contracts']['troveManagerContract'];
 }): { fields: TypePolicies; Query: TypePolicy } => ({
   fields: {
@@ -117,29 +118,31 @@ const getProductionCacheConfig = ({
             const address = readField('address');
             if (
               address &&
-              isFieldOutdated(SchemaDataFreshnessManager.DebtToken[Contracts.DebtToken.JUSD], 'priceUSD')
+              isFieldOutdated(SchemaDataFreshnessManager.DebtToken[Contracts.DebtToken.DebtToken1], 'priceUSD')
             ) {
               // Make smart contract call using the address
-              SchemaDataFreshnessManager.DebtToken[Contracts.DebtToken.JUSD].priceUSD.fetch(
-                debtTokenContracts[Contracts.DebtToken.JUSD],
+              SchemaDataFreshnessManager.DebtToken[Contracts.DebtToken.DebtToken1].priceUSD.fetch(
+                debtTokenContracts[Contracts.DebtToken.DebtToken1],
                 borrower,
               );
             }
 
-            return SchemaDataFreshnessManager.DebtToken[Contracts.DebtToken.JUSD].priceUSD.value();
+            return SchemaDataFreshnessManager.DebtToken[Contracts.DebtToken.DebtToken1].priceUSD.value();
           },
         },
         priceUSDOracle: {
           read(_, { args }) {
-            if (isFieldOutdated(SchemaDataFreshnessManager.DebtToken[Contracts.DebtToken.JUSD], 'priceUSDOracle')) {
+            if (
+              isFieldOutdated(SchemaDataFreshnessManager.DebtToken[Contracts.DebtToken.DebtToken1], 'priceUSDOracle')
+            ) {
               const address = (args as QueryGetTokenArgs).address;
-              SchemaDataFreshnessManager.DebtToken[Contracts.DebtToken.JUSD].priceUSDOracle.fetch(
+              SchemaDataFreshnessManager.DebtToken[Contracts.DebtToken.DebtToken1].priceUSDOracle.fetch(
                 // FIXME: use address insteadof hardcoded contract
-                debtTokenContracts[Contracts.DebtToken.JUSD],
+                debtTokenContracts[Contracts.DebtToken.DebtToken1],
               );
             }
 
-            return SchemaDataFreshnessManager.DebtToken[Contracts.DebtToken.JUSD].priceUSDOracle.value();
+            return SchemaDataFreshnessManager.DebtToken[Contracts.DebtToken.DebtToken1].priceUSDOracle.value();
           },
         },
       },
@@ -158,16 +161,16 @@ const getProductionCacheConfig = ({
 
             if (
               tokenData?.address &&
-              isFieldOutdated(SchemaDataFreshnessManager.DebtToken[Contracts.DebtToken.JUSD], 'walletAmount')
+              isFieldOutdated(SchemaDataFreshnessManager.DebtToken[Contracts.DebtToken.DebtToken1], 'walletAmount')
             ) {
               // Make smart contract call using the address
-              SchemaDataFreshnessManager.DebtToken[Contracts.DebtToken.JUSD].walletAmount.fetch(
-                debtTokenContracts[Contracts.DebtToken.JUSD],
+              SchemaDataFreshnessManager.DebtToken[Contracts.DebtToken.DebtToken1].walletAmount.fetch(
+                debtTokenContracts[Contracts.DebtToken.DebtToken1],
                 borrower,
               );
             }
 
-            return SchemaDataFreshnessManager.DebtToken[Contracts.DebtToken.JUSD].walletAmount.value();
+            return SchemaDataFreshnessManager.DebtToken[Contracts.DebtToken.DebtToken1].walletAmount.value();
           },
         },
 
@@ -182,15 +185,15 @@ const getProductionCacheConfig = ({
 
             if (
               tokenData?.address &&
-              isFieldOutdated(SchemaDataFreshnessManager.DebtToken[Contracts.DebtToken.JUSD], 'troveMintedAmount')
+              isFieldOutdated(SchemaDataFreshnessManager.DebtToken[Contracts.DebtToken.DebtToken1], 'troveMintedAmount')
             ) {
-              SchemaDataFreshnessManager.DebtToken[Contracts.DebtToken.JUSD].troveMintedAmount.fetch(
-                debtTokenContracts[Contracts.DebtToken.JUSD],
+              SchemaDataFreshnessManager.DebtToken[Contracts.DebtToken.DebtToken1].troveMintedAmount.fetch({
+                troveManagerContract: troveManagerContract,
                 borrower,
-              );
+              });
             }
 
-            return SchemaDataFreshnessManager.DebtToken[Contracts.DebtToken.JUSD].troveMintedAmount.value();
+            return SchemaDataFreshnessManager.DebtToken[Contracts.DebtToken.DebtToken1].troveMintedAmount.value();
           },
         },
       },
@@ -213,13 +216,34 @@ const getProductionCacheConfig = ({
               tokenData?.address &&
               isFieldOutdated(SchemaDataFreshnessManager.ERC20[Contracts.ERC20.ETH], 'walletAmount')
             ) {
-              SchemaDataFreshnessManager.ERC20[Contracts.ERC20.ETH].walletAmount.fetch(
-                collateralTokenContracts[Contracts.ERC20.ETH],
-                borrower,
-              );
+              SchemaDataFreshnessManager.ERC20[Contracts.ERC20.ETH].walletAmount.fetch(provider, tokenData.address);
             }
 
             return SchemaDataFreshnessManager.ERC20[Contracts.ERC20.ETH].walletAmount.value();
+          },
+        },
+        troveLockedAmount: {
+          read(_, { readField, cache }) {
+            const token = readField('token') as Readonly<Reference>;
+
+            const tokenData = cache.readFragment<TokenFragmentFragment>({
+              id: token.__ref,
+              fragment: TOKEN_FRAGMENT,
+            });
+
+            // FIXME: Change for dynamic address later
+
+            if (
+              tokenData?.address &&
+              isFieldOutdated(SchemaDataFreshnessManager.ERC20[Contracts.ERC20.ETH], 'walletAmount')
+            ) {
+              SchemaDataFreshnessManager.ERC20[Contracts.ERC20.ETH].troveLockedAmount.fetch({
+                troveManagerContract: troveManagerContract,
+                borrower,
+              });
+            }
+
+            return SchemaDataFreshnessManager.ERC20[Contracts.ERC20.ETH].troveLockedAmount.value();
           },
         },
       },
@@ -291,7 +315,7 @@ export const ContractDataFreshnessManager: {
     {
       [K in keyof TroveManager]: ContractValue<ReturnType<TroveManager[K]>>;
     },
-    'getTroveDebt'
+    'getTroveDebt' | 'getTroveColl'
   >;
 } = {
   TroveManager: {
@@ -301,6 +325,17 @@ export const ContractDataFreshnessManager: {
         const troveDebt = await troveManagerContract.getTroveDebt(borrower);
 
         ContractDataFreshnessManager.TroveManager.getTroveDebt.value = troveDebt;
+      },
+      value: [],
+      lastFetched: 0,
+      timeout: 1000 * 5,
+    },
+    getTroveColl: {
+      fetch: async (troveManagerContract: TroveManager, borrower: AddressLike) => {
+        ContractDataFreshnessManager.TroveManager.getTroveColl.lastFetched = Date.now();
+        const troveColl = await troveManagerContract.getTroveColl(borrower);
+
+        ContractDataFreshnessManager.TroveManager.getTroveColl.value = troveColl;
       },
       value: [],
       lastFetched: 0,
@@ -318,38 +353,56 @@ export const SchemaDataFreshnessManager: ContractDataFreshnessManager<typeof Con
   ERC20: {
     [Contracts.ERC20.ETH]: {
       walletAmount: {
-        fetch: async (collateralTokenContract: ERC20, borrower: AddressLike) => {
+        fetch: async (provider: ethers.JsonRpcProvider, address: AddressLike) => {
           SchemaDataFreshnessManager.ERC20[Contracts.ERC20.ETH].walletAmount.lastFetched = Date.now();
-          const borrowerBalance = await collateralTokenContract.balanceOf(borrower);
-          SchemaDataFreshnessManager.ERC20[Contracts.ERC20.ETH].walletAmount.value(ethers.toNumber(borrowerBalance));
+          const balanceWei = await provider.getBalance(address);
+          const balanceEther = ethers.formatEther(balanceWei);
+
+          SchemaDataFreshnessManager.ERC20[Contracts.ERC20.ETH].walletAmount.value(parseInt(balanceEther));
+        },
+        value: makeVar(0),
+        lastFetched: 0,
+        timeout: 1000 * 5,
+      },
+      troveLockedAmount: {
+        fetch: async (fetchSource?: { troveManagerContract: TroveManager; borrower: AddressLike }) => {
+          if (fetchSource) {
+            await ContractDataFreshnessManager.TroveManager.getTroveDebt.fetch(
+              fetchSource.troveManagerContract,
+              fetchSource.borrower,
+            );
+          }
+
+          SchemaDataFreshnessManager.ERC20[Contracts.ERC20.ETH].troveLockedAmount.lastFetched = Date.now();
+
+          const tokenAmount = ContractDataFreshnessManager.TroveManager.getTroveColl.value.find(
+            ({ tokenAddress }) => tokenAddress === Contracts.ERC20.ETH,
+          )?.amount;
+          if (tokenAmount) {
+            SchemaDataFreshnessManager.ERC20[Contracts.ERC20.ETH].troveLockedAmount.value(ethers.toNumber(tokenAmount));
+          }
         },
         value: makeVar(0),
         lastFetched: 0,
         timeout: 1000 * 5,
       },
     },
-    [Contracts.ERC20.BTC]: {},
+    [Contracts.ERC20.JUSD]: {},
     [Contracts.ERC20.DEFI]: {},
     [Contracts.ERC20.USDT]: {},
   },
   DebtToken: {
-    [Contracts.DebtToken.DebtToken1]: {},
-    [Contracts.DebtToken.DebtToken2]: {},
-    [Contracts.DebtToken.DebtToken3]: {},
-    [Contracts.DebtToken.DebtToken4]: {},
-    [Contracts.DebtToken.DebtToken5]: {},
-    [Contracts.DebtToken.DebtToken6]: {},
-    [Contracts.DebtToken.JUSD]: {
+    [Contracts.DebtToken.DebtToken1]: {
       priceUSD: {
         fetch: async (debtTokenContract: DebtToken, swapPairContract: SwapPair) => {
-          SchemaDataFreshnessManager.DebtToken[Contracts.DebtToken.JUSD].priceUSD.lastFetched = Date.now();
+          SchemaDataFreshnessManager.DebtToken[Contracts.DebtToken.DebtToken1].priceUSD.lastFetched = Date.now();
           // FIXME: Refactor this to be more efficient => use query to fetch from cache
           const priceJUSD = await debtTokenContract.getPrice();
 
           const [reserveA, reserveB] = await swapPairContract.getReserves();
           const priceTokenInJUSD = (reserveA / reserveB) * priceJUSD;
 
-          SchemaDataFreshnessManager.DebtToken[Contracts.DebtToken.JUSD].priceUSD.value(
+          SchemaDataFreshnessManager.DebtToken[Contracts.DebtToken.DebtToken1].priceUSD.value(
             ethers.toNumber(priceTokenInJUSD),
           );
         },
@@ -359,10 +412,10 @@ export const SchemaDataFreshnessManager: ContractDataFreshnessManager<typeof Con
       },
       priceUSDOracle: {
         fetch: async (debtTokenContract: DebtToken) => {
-          SchemaDataFreshnessManager.DebtToken[Contracts.DebtToken.JUSD]!.priceUSDOracle.lastFetched = Date.now();
+          SchemaDataFreshnessManager.DebtToken[Contracts.DebtToken.DebtToken1]!.priceUSDOracle.lastFetched = Date.now();
           const oraclePrice = await debtTokenContract.getPrice();
 
-          SchemaDataFreshnessManager.DebtToken[Contracts.DebtToken.JUSD]!.priceUSDOracle.value(
+          SchemaDataFreshnessManager.DebtToken[Contracts.DebtToken.DebtToken1]!.priceUSDOracle.value(
             ethers.toNumber(oraclePrice),
           );
         },
@@ -373,9 +426,9 @@ export const SchemaDataFreshnessManager: ContractDataFreshnessManager<typeof Con
 
       walletAmount: {
         fetch: async (debtTokenContract: DebtToken, borrower: AddressLike) => {
-          SchemaDataFreshnessManager.DebtToken[Contracts.DebtToken.JUSD].walletAmount.lastFetched = Date.now();
+          SchemaDataFreshnessManager.DebtToken[Contracts.DebtToken.DebtToken1].walletAmount.lastFetched = Date.now();
           const borrowerBalance = await debtTokenContract.balanceOf(borrower);
-          SchemaDataFreshnessManager.DebtToken[Contracts.DebtToken.JUSD].walletAmount.value(
+          SchemaDataFreshnessManager.DebtToken[Contracts.DebtToken.DebtToken1].walletAmount.value(
             ethers.toNumber(borrowerBalance),
           );
         },
@@ -392,13 +445,14 @@ export const SchemaDataFreshnessManager: ContractDataFreshnessManager<typeof Con
             );
           }
 
-          SchemaDataFreshnessManager.DebtToken[Contracts.DebtToken.JUSD].troveMintedAmount.lastFetched = Date.now();
+          SchemaDataFreshnessManager.DebtToken[Contracts.DebtToken.DebtToken1].troveMintedAmount.lastFetched =
+            Date.now();
 
           const tokenAmount = ContractDataFreshnessManager.TroveManager.getTroveDebt.value.find(
-            ({ tokenAddress }) => tokenAddress === Contracts.DebtToken.JUSD,
+            ({ tokenAddress }) => tokenAddress === Contracts.DebtToken.DebtToken1,
           )?.amount;
           if (tokenAmount) {
-            SchemaDataFreshnessManager.DebtToken[Contracts.DebtToken.JUSD].troveMintedAmount.value(
+            SchemaDataFreshnessManager.DebtToken[Contracts.DebtToken.DebtToken1].troveMintedAmount.value(
               ethers.toNumber(tokenAmount),
             );
           }
@@ -408,6 +462,11 @@ export const SchemaDataFreshnessManager: ContractDataFreshnessManager<typeof Con
         timeout: 1000 * 5,
       },
     },
+    [Contracts.DebtToken.DebtToken2]: {},
+    [Contracts.DebtToken.DebtToken3]: {},
+    [Contracts.DebtToken.DebtToken4]: {},
+    [Contracts.DebtToken.DebtToken5]: {},
+    [Contracts.DebtToken.DebtToken6]: {},
   },
   TroveManager: {
     borrowingRate: {
