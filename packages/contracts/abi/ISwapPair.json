@@ -185,15 +185,9 @@
             },
             {
                 "indexed": false,
-                "internalType": "uint256",
-                "name": "amount0Fee",
-                "type": "uint256"
-            },
-            {
-                "indexed": false,
-                "internalType": "uint256",
-                "name": "amount1Fee",
-                "type": "uint256"
+                "internalType": "uint32",
+                "name": "currentSwapFee",
+                "type": "uint32"
             },
             {
                 "indexed": true,
@@ -367,7 +361,30 @@
         "type": "function"
     },
     {
+        "inputs": [],
+        "name": "getSwapFee",
+        "outputs": [
+            {
+                "internalType": "uint32",
+                "name": "swapFee",
+                "type": "uint32"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
         "inputs": [
+            {
+                "internalType": "address",
+                "name": "",
+                "type": "address"
+            },
+            {
+                "internalType": "address",
+                "name": "",
+                "type": "address"
+            },
             {
                 "internalType": "address",
                 "name": "",
@@ -382,19 +399,6 @@
         "name": "initialize",
         "outputs": [],
         "stateMutability": "nonpayable",
-        "type": "function"
-    },
-    {
-        "inputs": [],
-        "name": "kLast",
-        "outputs": [
-            {
-                "internalType": "uint256",
-                "name": "",
-                "type": "uint256"
-            }
-        ],
-        "stateMutability": "view",
         "type": "function"
     },
     {

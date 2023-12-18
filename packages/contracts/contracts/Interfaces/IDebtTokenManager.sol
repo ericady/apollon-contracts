@@ -15,6 +15,8 @@ interface IDebtTokenManager {
 
   function getStableCoin() external view returns (IDebtToken);
 
+  function isDebtToken(address _address) external view returns (bool);
+
   function getDebtToken(address _address) external view returns (IDebtToken);
 
   function getDebtTokenAddresses() external view returns (address[] memory);

@@ -26,8 +26,7 @@ interface ISwapPair is ISwapERC20 {
     uint amount1In,
     uint amount0Out,
     uint amount1Out,
-    uint amount0Fee,
-    uint amount1Fee,
+    uint32 currentSwapFee,
     address indexed to
   );
   event Sync(uint112 reserve0, uint112 reserve1);
@@ -46,7 +45,7 @@ interface ISwapPair is ISwapERC20 {
 
   function price1CumulativeLast() external view returns (uint);
 
-  function kLast() external view returns (uint);
+  function getSwapFee() external view returns (uint32 swapFee);
 
   // **** OPERATIONS ****
 
@@ -65,5 +64,5 @@ interface ISwapPair is ISwapERC20 {
 
   function sync() external;
 
-  function initialize(address, address) external;
+  function initialize(address, address, address, address) external;
 }

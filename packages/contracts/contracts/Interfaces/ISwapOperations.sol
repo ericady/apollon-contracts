@@ -30,8 +30,6 @@ interface ISwapOperations is IBBase {
 
   // **** GETTER ****
 
-  function getFeeTo() external view returns (address);
-
   function allPairs(uint) external view returns (address pair);
 
   function allPairsLength() external view returns (uint);
@@ -42,9 +40,19 @@ interface ISwapOperations is IBBase {
 
   function quote(uint amountA, uint reserveA, uint reserveB) external pure returns (uint amountB);
 
-  function getAmountOut(uint amountIn, uint reserveIn, uint reserveOut) external pure returns (uint amountOut);
+  function getAmountOut(
+    uint amountIn,
+    uint reserveIn,
+    uint reserveOut,
+    uint32 swapFee
+  ) external pure returns (uint amountOut);
 
-  function getAmountIn(uint amountOut, uint reserveIn, uint reserveOut) external pure returns (uint amountIn);
+  function getAmountIn(
+    uint amountOut,
+    uint reserveIn,
+    uint reserveOut,
+    uint32 swapFee
+  ) external pure returns (uint amountIn);
 
   function getAmountsOut(uint amountIn, address[] calldata path) external view returns (uint[] memory amounts);
 

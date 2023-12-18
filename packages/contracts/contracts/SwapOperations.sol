@@ -5,24 +5,21 @@ pragma solidity ^0.8.9;
 import '@openzeppelin/contracts/token/ERC20/IERC20.sol';
 import '@openzeppelin/contracts/access/Ownable.sol';
 import './SwapPair.sol';
+import './Dependencies/LiquityBase.sol';
 import './Interfaces/ISwapOperations.sol';
 import './Interfaces/IBorrowerOperations.sol';
 import './Interfaces/IDebtTokenManager.sol';
-import './Interfaces/IPriceFeed.sol';
 import './Dependencies/CheckContract.sol';
 import './Interfaces/ITroveManager.sol';
 
-contract SwapOperations is ISwapOperations, Ownable(msg.sender), CheckContract {
+contract SwapOperations is ISwapOperations, Ownable(msg.sender), CheckContract, LiquityBase {
   ITroveManager public troveManager;
   IBorrowerOperations public borrowerOperations;
-  IPriceFeed public priceFeed;
+  address public priceFeedAddress;
   IDebtTokenManager public debtTokenManager;
 
   mapping(address => mapping(address => address)) public getPair;
   address[] public allPairs;
-
-  // todo reward flow, where should the swap fees flow to...
-  address public feeTo; // gets used by the pairs itself
 
   function setAddresses(
     address _borrowerOperationsAddress,
@@ -37,7 +34,7 @@ contract SwapOperations is ISwapOperations, Ownable(msg.sender), CheckContract {
 
     borrowerOperations = IBorrowerOperations(_borrowerOperationsAddress);
     troveManager = ITroveManager(_troveManagerAddress);
-    priceFeed = IPriceFeed(_priceFeedAddress);
+    priceFeedAddress = _priceFeedAddress;
     debtTokenManager = IDebtTokenManager(_debtTokenManager);
 
     emit SwapOperationsInitialized(
@@ -57,10 +54,6 @@ contract SwapOperations is ISwapOperations, Ownable(msg.sender), CheckContract {
 
   // **** PAIR MANAGEMENT ****
 
-  function getFeeTo() external view override returns (address) {
-    return feeTo;
-  }
-
   function allPairsLength() external view returns (uint) {
     return allPairs.length;
   }
@@ -78,7 +71,7 @@ contract SwapOperations is ISwapOperations, Ownable(msg.sender), CheckContract {
       pair := create2(0, add(bytecode, 32), mload(bytecode), salt)
     }
 
-    ISwapPair(pair).initialize(token0, token1);
+    ISwapPair(pair).initialize(token0, token1, address(debtTokenManager), priceFeedAddress);
     getPair[token0][token1] = pair;
     getPair[token1][token0] = pair; // populate mapping in the reverse direction
     allPairs.push(pair);
@@ -98,27 +91,29 @@ contract SwapOperations is ISwapOperations, Ownable(msg.sender), CheckContract {
   function getAmountOut(
     uint amountIn,
     uint reserveIn,
-    uint reserveOut
+    uint reserveOut,
+    uint32 swapFee
   ) public pure virtual override returns (uint amountOut) {
     if (amountIn == 0) revert InsufficientInputAmount();
     if (reserveIn == 0 || reserveOut == 0) revert InsufficientLiquidity();
 
-    uint amountInWithFee = amountIn * 997;
+    uint amountInWithFee = amountIn * (SWAP_FEE_PRECISION - swapFee);
     uint numerator = amountInWithFee * reserveOut;
-    uint denominator = reserveIn * 1000 + amountInWithFee;
+    uint denominator = reserveIn * SWAP_FEE_PRECISION + amountInWithFee;
     amountOut = numerator / denominator;
   }
 
   function getAmountIn(
     uint amountOut,
     uint reserveIn,
-    uint reserveOut
+    uint reserveOut,
+    uint32 swapFee
   ) public pure virtual override returns (uint amountIn) {
     if (amountOut == 0) revert InsufficientOutputAmount();
     if (reserveIn == 0 || reserveOut == 0) revert InsufficientLiquidity();
 
-    uint numerator = reserveIn * amountOut * 1000;
-    uint denominator = (reserveOut - amountOut) * 997;
+    uint numerator = reserveIn * amountOut * SWAP_FEE_PRECISION;
+    uint denominator = (reserveOut - amountOut) * (SWAP_FEE_PRECISION - swapFee);
     amountIn = (numerator / denominator) + 1;
   }
 
@@ -131,8 +126,8 @@ contract SwapOperations is ISwapOperations, Ownable(msg.sender), CheckContract {
     amounts = new uint[](path.length);
     amounts[0] = amountIn;
     for (uint i; i < path.length - 1; i++) {
-      (uint reserveIn, uint reserveOut) = getReserves(path[i], path[i + 1]);
-      amounts[i + 1] = getAmountOut(amounts[i], reserveIn, reserveOut);
+      (uint reserveIn, uint reserveOut, uint32 swapFee) = getReserves(path[i], path[i + 1]);
+      amounts[i + 1] = getAmountOut(amounts[i], reserveIn, reserveOut, swapFee);
     }
   }
 
@@ -145,8 +140,8 @@ contract SwapOperations is ISwapOperations, Ownable(msg.sender), CheckContract {
     amounts = new uint[](path.length);
     amounts[amounts.length - 1] = amountOut;
     for (uint i = path.length - 1; i > 0; i--) {
-      (uint reserveIn, uint reserveOut) = getReserves(path[i - 1], path[i]);
-      amounts[i - 1] = getAmountIn(amounts[i], reserveIn, reserveOut);
+      (uint reserveIn, uint reserveOut, uint32 swapFee) = getReserves(path[i - 1], path[i]);
+      amounts[i - 1] = getAmountIn(amounts[i], reserveIn, reserveOut, swapFee);
     }
   }
 
@@ -177,7 +172,7 @@ contract SwapOperations is ISwapOperations, Ownable(msg.sender), CheckContract {
     if (vars.pair == address(0)) revert PairDoesNotExist();
 
     {
-      (uint reserveA, uint reserveB) = getReserves(tokenA, tokenB);
+      (uint reserveA, uint reserveB, ) = getReserves(tokenA, tokenB);
       if (reserveA == 0 && reserveB == 0) {
         (amountA, amountB) = (amountADesired, amountBDesired);
       } else {
@@ -268,8 +263,10 @@ contract SwapOperations is ISwapOperations, Ownable(msg.sender), CheckContract {
     for (uint i; i < path.length - 1; i++) {
       (address input, address output) = (path[i], path[i + 1]);
       (address token0, ) = sortTokens(input, output);
+
       uint amountOut = amounts[i + 1];
       (uint amount0Out, uint amount1Out) = input == token0 ? (uint(0), amountOut) : (amountOut, uint(0));
+
       address to = i < path.length - 2 ? getPair[output][path[i + 2]] : _to;
       ISwapPair(getPair[input][output]).swap(amount0Out, amount1Out, to, new bytes(0));
     }
@@ -357,8 +354,14 @@ contract SwapOperations is ISwapOperations, Ownable(msg.sender), CheckContract {
 
   // **** HELPER FUNCTIONS ****
 
-  function getReserves(address tokenA, address tokenB) internal view returns (uint reserveA, uint reserveB) {
-    (uint reserve0, uint reserve1, ) = ISwapPair(getPair[tokenA][tokenB]).getReserves();
+  function getReserves(
+    address tokenA,
+    address tokenB
+  ) internal view returns (uint reserveA, uint reserveB, uint32 swapFee) {
+    ISwapPair pair = ISwapPair(getPair[tokenA][tokenB]);
+    swapFee = pair.getSwapFee();
+
+    (uint reserve0, uint reserve1, ) = pair.getReserves();
     (address token0, ) = sortTokens(tokenA, tokenB);
     (reserveA, reserveB) = tokenA == token0 ? (reserve0, reserve1) : (reserve1, reserve0);
   }

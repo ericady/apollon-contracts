@@ -4,19 +4,25 @@ pragma solidity ^0.8.9;
 
 import '@openzeppelin/contracts/token/ERC20/IERC20.sol';
 import './Dependencies/LiquityMath.sol';
+import './Dependencies/LiquityBase.sol';
 import './Dependencies/UQ112x112.sol';
 import './Interfaces/ISwapPair.sol';
 import './Interfaces/ISwapOperations.sol';
 import './Interfaces/ISwapCallee.sol';
 import './SwapERC20.sol';
+import './Interfaces/IPriceFeed.sol';
+import './Interfaces/IDebtTokenManager.sol';
 
-contract SwapPair is ISwapPair, SwapERC20 {
+contract SwapPair is ISwapPair, SwapERC20, LiquityBase {
   using UQ112x112 for uint224;
 
   uint public constant MINIMUM_LIQUIDITY = 10 ** 3;
   bytes4 private constant SELECTOR = bytes4(keccak256(bytes('transfer(address,uint256)')));
 
   address public operations;
+  IPriceFeed public priceFeed;
+  IDebtTokenManager public debtTokenManager;
+
   address public token0;
   address public token1;
 
@@ -26,18 +32,19 @@ contract SwapPair is ISwapPair, SwapERC20 {
 
   uint public price0CumulativeLast;
   uint public price1CumulativeLast;
-  uint public kLast; // reserve0 * reserve1, as of immediately after the most recent liquidity event
 
   constructor() {
     operations = msg.sender;
   }
 
   // called once by the operations at time of deployment
-  function initialize(address _token0, address _token1) external {
+  function initialize(address _token0, address _token1, address _debtTokenManager, address _priceFeedAddress) external {
     if (msg.sender != operations) revert Forbidden();
 
     token0 = _token0;
     token1 = _token1;
+    debtTokenManager = IDebtTokenManager(_debtTokenManager);
+    priceFeed = IPriceFeed(_priceFeedAddress);
   }
 
   uint private unlocked = 1;
@@ -79,29 +86,6 @@ contract SwapPair is ISwapPair, SwapERC20 {
     emit Sync(reserve0, reserve1);
   }
 
-  // if fee is on, mint liquidity equivalent to 1/6th of the growth in sqrt(k)
-  function _mintFee(uint112 _reserve0, uint112 _reserve1) private returns (bool feeOn) {
-    address feeTo = ISwapOperations(operations).getFeeTo();
-
-    feeOn = feeTo != address(0);
-    uint _kLast = kLast; // gas savings
-    if (feeOn) {
-      if (_kLast != 0) {
-        uint rootK = LiquityMath._sqrt(_reserve0 * _reserve1);
-        uint rootKLast = LiquityMath._sqrt(_kLast);
-
-        if (rootK > rootKLast) {
-          uint numerator = totalSupply * (rootK - rootKLast);
-          uint denominator = rootK * 5 + rootKLast;
-          uint liquidity = numerator / denominator;
-          if (liquidity > 0) _mint(feeTo, liquidity);
-        }
-      }
-    } else if (_kLast != 0) {
-      kLast = 0;
-    }
-  }
-
   // this low-level function should be called from a contract which performs important safety checks
   function mint(address to) external lock returns (uint liquidity) {
     _requireCallerIsOperations();
@@ -112,8 +96,7 @@ contract SwapPair is ISwapPair, SwapERC20 {
     uint amount0 = balance0 - _reserve0;
     uint amount1 = balance1 - _reserve1;
 
-    bool feeOn = _mintFee(_reserve0, _reserve1);
-    uint _totalSupply = totalSupply; // gas savings, must be defined here since totalSupply can update in _mintFee
+    uint _totalSupply = totalSupply; // gas savings
     if (_totalSupply == 0) {
       liquidity = LiquityMath._sqrt(amount0 * amount1) - MINIMUM_LIQUIDITY;
       _mint(address(0), MINIMUM_LIQUIDITY); // permanently lock the first MINIMUM_LIQUIDITY tokens
@@ -125,7 +108,6 @@ contract SwapPair is ISwapPair, SwapERC20 {
     _mint(to, liquidity);
     _update(balance0, balance1, _reserve0, _reserve1);
 
-    if (feeOn) kLast = reserve0 * reserve1; // reserve0 and reserve1 are up-to-date
     emit Mint(msg.sender, amount0, amount1);
   }
 
@@ -140,13 +122,12 @@ contract SwapPair is ISwapPair, SwapERC20 {
     _requireCallerIsOperations();
 
     (uint112 _reserve0, uint112 _reserve1, ) = getReserves();
-    bool isFeeOn = _mintFee(_reserve0, _reserve1);
 
     uint balance0 = IERC20(token0).balanceOf(address(this));
     uint balance1 = IERC20(token1).balanceOf(address(this));
 
     {
-      uint _totalSupply = totalSupply; // gas savings, must be defined here since totalSupply can update in _mintFee
+      uint _totalSupply = totalSupply; // gas savings
       amount0 = (liquidity * balance0) / _totalSupply; // using balances ensures pro-rata distribution
       amount1 = (liquidity * balance1) / _totalSupply; // using balances ensures pro-rata distribution
 
@@ -168,16 +149,32 @@ contract SwapPair is ISwapPair, SwapERC20 {
     balance1 = IERC20(token1).balanceOf(address(this));
     _update(balance0, balance1, _reserve0, _reserve1);
 
-    if (isFeeOn) kLast = reserve0 * reserve1; // reserve0 and reserve1 are up-to-date
     emit Burn(msg.sender, amount0, amount1, to);
+  }
+
+  // fee is returned in 1e6 (SWAP_FEE_PRECISION)
+  function getSwapFee() external view override returns (uint32 swapFee) {
+    // find stable coin
+    address stableCoin = address(debtTokenManager.getStableCoin());
+    address nonStableCoin = token0 == stableCoin ? token1 : token0;
+    if (!debtTokenManager.isDebtToken(nonStableCoin)) return SWAP_BASE_FEE; // no dynamic fee if the pool is not an stable/stock pool
+
+    // query prices
+    uint oraclePrice = priceFeed.getPrice(nonStableCoin);
+    uint dexPrice = (nonStableCoin == token0)
+      ? (reserve1 * DECIMAL_PRECISION) / reserve0
+      : (reserve0 * DECIMAL_PRECISION) / reserve1; // todo does the token digits matter here?
+
+    if (oraclePrice < dexPrice) return SWAP_BASE_FEE;
+    uint priceRatio = (oraclePrice * DECIMAL_PRECISION) / dexPrice;
+    return uint32((priceRatio * SWAP_BASE_FEE) / DECIMAL_PRECISION); // todo missing real fee calculation
   }
 
   // this low-level function should be called from a contract which performs important safety checks
   function swap(uint amount0Out, uint amount1Out, address to, bytes calldata data) external lock {
+    _requireCallerIsOperations();
     if (amount0Out == 0 && amount1Out == 0) revert InsufficientOutputAmount();
-
-    (uint112 _reserve0, uint112 _reserve1, ) = getReserves(); // gas savings
-    if (amount0Out > _reserve0 || amount1Out > _reserve1) revert InsufficientLiquidity();
+    if (amount0Out > reserve0 || amount1Out > reserve1) revert InsufficientLiquidity();
 
     uint balance0;
     uint balance1;
@@ -194,21 +191,20 @@ contract SwapPair is ISwapPair, SwapERC20 {
       balance1 = IERC20(_token1).balanceOf(address(this));
     }
 
-    uint amount0In = balance0 > _reserve0 - amount0Out ? balance0 - (_reserve0 - amount0Out) : 0;
-    uint amount1In = balance1 > _reserve1 - amount1Out ? balance1 - (_reserve1 - amount1Out) : 0;
+    uint amount0In = balance0 > reserve0 - amount0Out ? balance0 - (reserve0 - amount0Out) : 0;
+    uint amount1In = balance1 > reserve1 - amount1Out ? balance1 - (reserve1 - amount1Out) : 0;
     if (amount0In == 0 && amount1In == 0) revert InsufficientInputAmount();
 
+    uint32 currentSwapFee = this.getSwapFee();
     {
       // scope for reserve{0,1}Adjusted, avoids stack too deep errors
-      uint balance0Adjusted = balance0 * 1000 - (amount0In * 3);
-      uint balance1Adjusted = balance1 * 1000 - (amount1In * 3);
-      if (balance0Adjusted * balance1Adjusted < _reserve0 * _reserve1 * (1000 ** 2)) revert K();
+      uint balance0Adjusted = balance0 * SWAP_FEE_PRECISION - (amount0In * currentSwapFee);
+      uint balance1Adjusted = balance1 * SWAP_FEE_PRECISION - (amount1In * currentSwapFee);
+      if (balance0Adjusted * balance1Adjusted < reserve0 * reserve1 * (SWAP_FEE_PRECISION ** 2)) revert K();
     }
 
-    _update(balance0, balance1, _reserve0, _reserve1);
-
-    // todo add swap fee
-    emit Swap(msg.sender, amount0In, amount1In, amount0Out, amount1Out, 0, 0, to);
+    _update(balance0, balance1, reserve0, reserve1);
+    emit Swap(msg.sender, amount0In, amount1In, amount0Out, amount1Out, currentSwapFee, to);
   }
 
   // force balances to match reserves

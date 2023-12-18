@@ -272,6 +272,11 @@
                 "internalType": "uint256",
                 "name": "reserveOut",
                 "type": "uint256"
+            },
+            {
+                "internalType": "uint32",
+                "name": "swapFee",
+                "type": "uint32"
             }
         ],
         "name": "getAmountIn",
@@ -301,6 +306,11 @@
                 "internalType": "uint256",
                 "name": "reserveOut",
                 "type": "uint256"
+            },
+            {
+                "internalType": "uint32",
+                "name": "swapFee",
+                "type": "uint32"
             }
         ],
         "name": "getAmountOut",
@@ -357,19 +367,6 @@
                 "internalType": "uint256[]",
                 "name": "amounts",
                 "type": "uint256[]"
-            }
-        ],
-        "stateMutability": "view",
-        "type": "function"
-    },
-    {
-        "inputs": [],
-        "name": "getFeeTo",
-        "outputs": [
-            {
-                "internalType": "address",
-                "name": "",
-                "type": "address"
             }
         ],
         "stateMutability": "view",

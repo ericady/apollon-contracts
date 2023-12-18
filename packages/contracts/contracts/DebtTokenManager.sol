@@ -36,6 +36,10 @@ contract DebtTokenManager is Ownable(msg.sender), CheckContract, IDebtTokenManag
     return stableCoin;
   }
 
+  function isDebtToken(address _address) external view override returns (bool) {
+    return address(debtTokens[_address]) != address(0);
+  }
+
   function getDebtToken(address _address) external view override returns (IDebtToken debtToken) {
     debtToken = debtTokens[_address];
     require(address(debtToken) != address(0), 'debtToken does not exist');

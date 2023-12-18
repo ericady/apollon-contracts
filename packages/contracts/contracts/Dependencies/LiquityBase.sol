@@ -11,6 +11,8 @@ import '../Interfaces/IBase.sol';
  */
 contract LiquityBase is IBase {
   uint internal constant DECIMAL_PRECISION = 1e18;
+  uint32 public constant SWAP_FEE_PRECISION = 1e6;
+  uint32 public constant SWAP_BASE_FEE = 3e3; // 0.3%
   uint public constant _100pct = 1e18; // 1e18 == 100%
   uint public constant MCR = 1.1e18; // 110%, Minimum collateral ratio for individual troves
   uint public constant CCR = 1.5e18; // 150%, Critical system collateral ratio. If the system's total collateral ratio (TCR) falls below the CCR, Recovery Mode is triggered.
