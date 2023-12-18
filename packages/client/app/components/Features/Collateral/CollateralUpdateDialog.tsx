@@ -115,7 +115,11 @@ const CollateralUpdateDialog = ({ buttonVariant, buttonSx = {} }: Props) => {
 
     if (tokenAmounts.length === 0) return;
 
-    await borrowerOperationsContract.addColl(tokenAmounts);
+    if (tabValue === 'DEPOSIT') {
+      await borrowerOperationsContract.addColl(tokenAmounts);
+    } else {
+      await borrowerOperationsContract.withdrawColl(tokenAmounts);
+    }
 
     setIsOpen(false);
   };
