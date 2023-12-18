@@ -72,76 +72,76 @@ describe('SwapOperations', () => {
     USDT = contracts.collToken.USDT;
   });
 
-  it('should not be possible to mint directly from the borrowerOps', async () => {
+  it.skip('should not be possible to mint directly from the borrowerOps', async () => {
     // todo
   });
 
-  it('SwapPair mint/burn should be only callable from the SwapOps', async () => {
+  it.skip('SwapPair mint/burn should be only callable from the SwapOps', async () => {
     // todo
   });
 
-  it('liquidity token should not be transferable', async () => {
+  it.skip('liquidity token should not be transferable', async () => {
     // todo
   });
 
   describe('remove liquidity', () => {
-    it('todo default uniswap tests...', async () => {
+    it.skip('todo default uniswap tests...', async () => {
       // todo
     });
 
-    it('zero borrower debts (no active trove), default uniswap behavior', async () => {
+    it.skip('zero borrower debts (no active trove), default uniswap behavior', async () => {
       // todo
     });
 
-    it('empty trove (only stable gas comp debt), pool should not repay that', async () => {
+    it.skip('empty trove (only stable gas comp debt), pool should not repay that', async () => {
       // todo
     });
 
-    it('smaller debts, complete repay expected', async () => {
+    it.skip('smaller debts, complete repay expected', async () => {
       // todo
     });
 
-    it('huge debts, partial repay expected', async () => {
+    it.skip('huge debts, partial repay expected', async () => {
       // todo
     });
   });
 
   describe('add liquidity', () => {
-    it('todo default uniswap tests...', async () => {
+    it.skip('todo default uniswap tests...', async () => {
       // todo
     });
 
-    it('borrower has enough funds for the op, no trove needed', async () => {
+    it.skip('borrower has enough funds for the op, no trove needed', async () => {
       // todo
     });
 
-    it('low collateral trove, minting should fail because of bad trove CR', async () => {
+    it.skip('low collateral trove, minting should fail because of bad trove CR', async () => {
       // todo
     });
 
-    it('high collateral trove, missing token should be minted from senders trove', async () => {
+    it.skip('high collateral trove, missing token should be minted from senders trove', async () => {
       // todo
     });
   });
 
   describe('positions', () => {
-    it('open long without trove, should fail', async () => {
+    it.skip('open long without trove, should fail', async () => {
       // todo
     });
 
-    it('open long with unknown debt token', async () => {
+    it.skip('open long with unknown debt token', async () => {
       // todo
     });
 
-    it('open long with no enough collateral, should fail', async () => {
+    it.skip('open long with no enough collateral, should fail', async () => {
       // todo
     });
 
-    it('open long', async () => {
+    it.skip('open long', async () => {
       // todo
     });
 
-    it('same for shorts', async () => {
+    it.skip('same for shorts', async () => {
       // todo
     });
   });

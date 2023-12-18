@@ -5,6 +5,7 @@ import '@nomicfoundation/hardhat-network-helpers';
 import 'hardhat-abi-exporter';
 import 'hardhat-gas-reporter';
 import 'hardhat-contract-sizer';
+import 'solidity-coverage';
 import { HardhatUserConfig, subtask } from 'hardhat/config';
 import { TASK_COMPILE_SOLIDITY_GET_SOURCE_PATHS } from 'hardhat/builtin-tasks/task-names';
 

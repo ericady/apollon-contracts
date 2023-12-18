@@ -1,9 +1,11 @@
-const { accountsList } = require('./hardhatAccountsList2k.js');
+const accountsList = require('./hardhatAccountsList2k.ts');
+
 // syntax for solcover network (ganache based) is different:
 // https://hardhat.org/plugins/solidity-coverage.html#configuration
 // Link in providerOptions:
 // https://github.com/trufflesuite/ganache-core#options
-const accounts = accountsList.map(a => ({
+
+const accounts = accountsList.default.map(a => ({
   secretKey: a.privateKey,
   balance: '0xc097ce7bc90715b34b9f1000000000',
 }));
@@ -19,15 +21,16 @@ module.exports = {
   //measureFunctionCoverage: false,
 
   skipFiles: [
-    'TestContracts/',
-    'MultiTroveGetter.sol',
-    'Migrations.sol',
     'Interfaces/',
-    'LPRewards/Dependencies/',
-    'LPRewards/TestContracts/',
+    'Proxy/',
+    'Mock/',
     'Dependencies/IERC2612.sol',
-    'Dependencies/Math.sol',
+    'Dependencies/ITellor.sol',
+    'Dependencies/TellorCaller.sol',
+    'Dependencies/UQ112x112.sol',
+    'Dependencies/CheckContract.sol',
   ],
+
   // https://github.com/sc-forks/solidity-coverage/blob/master/docs/advanced.md#skipping-tests
   mocha: {
     grep: '@skip-on-coverage', // Find everything with this tag
