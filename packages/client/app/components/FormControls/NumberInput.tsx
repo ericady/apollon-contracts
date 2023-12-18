@@ -16,7 +16,7 @@ function NumberInput({ name, helperText, rules, ...textfieldProps }: Props) {
   const {
     field: { ref, ...field },
     fieldState: { error },
-  } = useController({ name, control, rules });
+  } = useController({ name, control, rules  });
 
   return (
     <TextField

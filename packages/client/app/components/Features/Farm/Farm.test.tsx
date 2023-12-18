@@ -1,4 +1,5 @@
-import { fireEvent, render, waitFor } from '@testing-library/react';
+import { render, waitFor } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import { IntegrationWrapper } from '../../tests/test-utils';
 import Farm from './Farm';
 
@@ -23,7 +24,7 @@ describe('Farm', () => {
 
     const inputJUSD = container.querySelector<HTMLInputElement>('input[name="farmShortValue"]')!;
 
-    fireEvent.change(inputJUSD, { target: { value: '100' } });
+    await userEvent.type(inputJUSD, '100');
 
     const submitButton = getByRole('button', { name: 'EXECUTE' });
 
@@ -31,16 +32,8 @@ describe('Farm', () => {
       expect(submitButton).toBeEnabled();
     });
 
-    fireEvent(
-      submitButton,
-      new MouseEvent('click', {
-        bubbles: true,
-      }),
-    );
-
-    await waitFor(() => {
-      expect(contractMock.swapOperationsContract.openLongPosition).toHaveBeenCalledTimes(1);
-    });
+    await userEvent.click(submitButton);
+    expect(contractMock.swapOperationsContract.openLongPosition).toHaveBeenCalledTimes(1);
   });
 
   it('should call openShortPosition function of mocked contract', async () => {
@@ -62,16 +55,11 @@ describe('Farm', () => {
     );
 
     const shortTab = getByRole('tab', { name: 'SHORT' });
-    fireEvent(
-      shortTab,
-      new MouseEvent('click', {
-        bubbles: true,
-      }),
-    );
+    await userEvent.click(shortTab);
 
     const inputJUSD = container.querySelector<HTMLInputElement>('input[name="farmShortValue"]')!;
 
-    fireEvent.change(inputJUSD, { target: { value: '100' } });
+    await userEvent.type(inputJUSD, '100');
 
     const submitButton = getByRole('button', { name: 'EXECUTE' });
 
@@ -79,15 +67,7 @@ describe('Farm', () => {
       expect(submitButton).toBeEnabled();
     });
 
-    fireEvent(
-      submitButton,
-      new MouseEvent('click', {
-        bubbles: true,
-      }),
-    );
-
-    await waitFor(() => {
-      expect(contractMock.swapOperationsContract.openShortPosition).toHaveBeenCalledTimes(1);
-    });
+    await userEvent.click(submitButton);
+    expect(contractMock.swapOperationsContract.openShortPosition).toHaveBeenCalledTimes(1);
   });
 });

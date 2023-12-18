@@ -107,7 +107,8 @@ const collateralTokenMeta: CollateralTokenMeta[] = collateralTokens.map<Collater
     stabilityGainedAmount: null,
   };
 });
-const userCollateralTokenMeta = faker.helpers
+
+const userColl = faker.helpers
   .arrayElements(collateralTokenMeta, { min: 0, max: collateralTokenMeta.length })
   .map((collTokenMeta) => {
     return {
@@ -117,6 +118,12 @@ const userCollateralTokenMeta = faker.helpers
       stabilityGainedAmount: faker.number.float({ min: 100, max: 500, precision: 0.0001 }),
     };
   });
+
+// Merge userCollateralTokenMeta and collateralTokenMeta but remove duplicates
+const userCollateralTokenMeta = [
+  ...userColl,
+  ...collateralTokenMeta.filter((token) => !userColl.find(({ id }) => id === token.id)),
+];
 
 const debtTokenMeta = tokens.map<DebtTokenMeta>((token) => {
   return {
@@ -137,7 +144,7 @@ const debtTokenMeta = tokens.map<DebtTokenMeta>((token) => {
   };
 });
 
-const userDebtTokenMeta = faker.helpers
+const userDebt = faker.helpers
   .arrayElements(debtTokenMeta, { min: 0, max: debtTokenMeta.length })
   .map((debtTokenMeta) => {
     return {
@@ -148,6 +155,12 @@ const userDebtTokenMeta = faker.helpers
       stabilityCompoundAmount: faker.number.float({ min: 100, max: 500, precision: 0.0001 }),
     };
   });
+
+// Merge userCollateralTokenMeta and collateralTokenMeta but remove duplicates
+const userDebtTokenMeta = [
+  ...userDebt,
+  ...debtTokenMeta.filter((token) => !userDebt.find(({ id }) => id === token.id)),
+];
 
 // Generate pools once for each pair of tokens
 export const pools: Pool[] = [];
@@ -382,10 +395,10 @@ export const handlers = [
     (req, res, ctx) => {
       const { borrower } = req.variables;
 
-      if (!borrower) {
-        return res(ctx.data({ getCollateralTokens: collateralTokenMeta }));
-      } else {
+      if (borrower) {
         return res(ctx.data({ getCollateralTokens: userCollateralTokenMeta }));
+      } else {
+        return res(ctx.data({ getCollateralTokens: collateralTokenMeta }));
       }
     },
   ),

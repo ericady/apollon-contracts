@@ -58,6 +58,7 @@ const CollateralUpdateDialog = ({ buttonVariant, buttonSx = {} }: Props) => {
       variables: {
         borrower: address,
       },
+      skip: !address,
     },
   );
 
@@ -105,10 +106,14 @@ const CollateralUpdateDialog = ({ buttonVariant, buttonSx = {} }: Props) => {
 
   // TODO: CALL RESET ON ALL DIALOGS ON CLOSE
   const onSubmit = async (data: FieldValues) => {
-    const tokenAmounts = Object.entries(data).map<IBase.TokenAmountStruct>(([address, amount]) => ({
-      tokenAddress: address,
-      amount: floatToBigInt(parseFloat(amount)),
-    }));
+    const tokenAmounts = Object.entries(data)
+      .filter(([_, amount]) => amount !== '')
+      .map<IBase.TokenAmountStruct>(([address, amount]) => ({
+        tokenAddress: address,
+        amount: floatToBigInt(parseFloat(amount)),
+      }));
+
+    if (tokenAmounts.length === 0) return;
 
     await borrowerOperationsContract.addColl(tokenAmounts);
 
@@ -119,7 +124,6 @@ const CollateralUpdateDialog = ({ buttonVariant, buttonSx = {} }: Props) => {
   const allTokenAmountUSD =
     allTokenAmount.reduce((acc, curr, index) => {
       const address = [Contracts.ERC20.JUSD, Contracts.ERC20.DEFI, Contracts.ERC20.ETH, Contracts.ERC20.USDT][index];
-
       const { token } = collateralToDeposit.find(({ token }) => token.address === address)!;
       const { priceUSD } = token;
 
@@ -210,7 +214,7 @@ const CollateralUpdateDialog = ({ buttonVariant, buttonSx = {} }: Props) => {
                     <div>
                       <NumberInput
                         name={address}
-                        data-testid="apollon-collateral-update-dialog-ether-amount"
+                        data-testid={`apollon-collateral-update-dialog-${symbol}-amount`}
                         placeholder="Value"
                         fullWidth
                         rules={{

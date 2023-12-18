@@ -1,8 +1,7 @@
-import { fireEvent, render, waitFor } from '@testing-library/react';
+import { render, waitFor } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
 import { IntegrationWrapper } from '../../tests/test-utils';
 import Swap from './Swap';
-
-// TODO: Write tests to expect arguments in the contract call once they are concluded
 
 describe('Swap', () => {
   it('should call swapTokensForExactTokens function of mocked contract', async () => {
@@ -25,7 +24,7 @@ describe('Swap', () => {
 
     const inputJUSD = container.querySelector<HTMLInputElement>('input[name="jUSDAmount"]')!;
 
-    fireEvent.change(inputJUSD, { target: { value: '100' } });
+    await userEvent.type(inputJUSD, '100');
 
     const submitButton = getByRole('button', { name: 'SWAP' });
 
@@ -33,16 +32,8 @@ describe('Swap', () => {
       expect(submitButton).toBeEnabled();
     });
 
-    fireEvent(
-      submitButton,
-      new MouseEvent('click', {
-        bubbles: true,
-      }),
-    );
-
-    await waitFor(() => {
-      expect(contractMock.swapOperationsContract.swapTokensForExactTokens).toHaveBeenCalledTimes(1);
-    });
+    await userEvent.click(submitButton);
+    expect(contractMock.swapOperationsContract.swapTokensForExactTokens).toHaveBeenCalledTimes(1);
   });
 
   it('should call swapExactTokensForTokens function of mocked contract', async () => {
@@ -65,7 +56,7 @@ describe('Swap', () => {
 
     const inputTokenAmount = container.querySelector<HTMLInputElement>('input[name="tokenAmount"]')!;
 
-    fireEvent.change(inputTokenAmount, { target: { value: '100' } });
+    await userEvent.type(inputTokenAmount, '100');
 
     const submitButton = getByRole('button', { name: 'SWAP' });
 
@@ -73,15 +64,7 @@ describe('Swap', () => {
       expect(submitButton).toBeEnabled();
     });
 
-    fireEvent(
-      submitButton,
-      new MouseEvent('click', {
-        bubbles: true,
-      }),
-    );
-
-    await waitFor(() => {
-      expect(contractMock.swapOperationsContract.swapExactTokensForTokens).toHaveBeenCalledTimes(1);
-    });
+    await userEvent.click(submitButton);
+    expect(contractMock.swapOperationsContract.swapExactTokensForTokens).toHaveBeenCalledTimes(1);
   });
 });
