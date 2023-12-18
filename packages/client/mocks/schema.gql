@@ -89,9 +89,10 @@ type Query {
 }
 
 type PoolLiquidity {
+  id: ID!
   token: Token!
   totalAmount: Float!
-  borrowerAmount: Float
+  borrowerAmount: Float!
 }
 
 type PoolReward {
@@ -108,9 +109,9 @@ type Pool {
   liquidity: [PoolLiquidity!]!
   rewards: [PoolReward!]!
   liquidityDepositAPY: Float!
-  # TODO: was
-  volume24hUSD: Float!
-  volume24hUSD24hAgo: Float!
+  # TODO: wasa
+  volume30dUSD: Float!
+  volume30dUSD30dAgo: Float!
 }
 
 type Query {

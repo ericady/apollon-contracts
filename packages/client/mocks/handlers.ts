@@ -191,8 +191,8 @@ for (let i = 0; i < allTokens.length; i++) {
           }))
         : [],
       liquidityDepositAPY: faker.number.float({ min: 0, max: 0.5, precision: 0.0001 }),
-      volume24hUSD: parseFloat(faker.finance.amount(10000, 50000, 2)),
-      volume24hUSD24hAgo: parseFloat(faker.finance.amount(10000, 50000, 2)),
+      volume30dUSD: parseFloat(faker.finance.amount(10000, 50000, 2)),
+      volume30dUSD30dAgo: parseFloat(faker.finance.amount(10000, 50000, 2)),
     });
   }
 }

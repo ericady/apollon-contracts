@@ -14,7 +14,7 @@ export type SelectedToken = {
   symbol: string;
   priceUSD: number;
   priceUSD24hAgo: number;
-  volume24hUSD: number;
+  volume30dUSD: number;
   liqudityPair: number[];
 };
 

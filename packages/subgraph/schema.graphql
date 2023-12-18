@@ -151,30 +151,33 @@ type CollateralTokenMeta @entity(immutable: true) {
 #   rewards: [PoolReward!]!
 # }
 
-# type Pool @entity {
-#   # "Pool" + TokenA (JUSD) + TokenB
-#   id: Bytes!
+type Pool @entity {
+  # "Pool" + TokenA (JUSD) + TokenB
+  id: Bytes!
 
-#   # Percent value applied when opening the first position for this pool. Can be negative and positive.
-#   swapFee: BigInt!
-#   # Just linked once, always updated for all users
-#   liquidity: [PoolLiquidity!]! @relation(name: "PoolLiquidityToPool")
-#   # TODO: Must be calculated in the subgraph but when
-#   liquidityDepositAPY: BigInt!
+  # Percent value applied when opening the first position for this pool. Can be negative and positive.
+  # swapFee: BigInt!
+  # Just linked once, always updated for all users
+  liquidity: [PoolLiquidity!]! @relation(name: "PoolLiquidityToPool")
+  # TODO: die fee in USD bitte ebenfalls im laufenden durchschnitt mitberechen, diese wird dann notwenidg um die APY zu ermitteln
+  liquidityDepositAPY: BigInt!
 
-#   # TODO: We need to aggregate all Deposits/Withdrawals and update every time a new Transaction comes in
-#   volume24hUSD: PoolVolume24h!
-#   # once the first PoolEvent of the array is > 24h ago, we can remove it from the array and push it to the 24hAgo field
-#   volume24hUSD24hAgo: PoolVolume24h!
-# }
+  # TODO: We need to aggregate all Deposits/Withdrawals and update every time a new Transaction comes in
+  volume30dUSD: PoolVolume30d!
+  # once the first PoolEvent of the array is > 24h ago, we can remove it from the array and push it to the 24hAgo field
+  volume30dUSD30dAgo: PoolVolume30d!
+}
 
-# # Aggregator, pushed old events out and lets new in, recalculating the acc value each time
-# type PoolVolume24h @entity {
-#   id: Bytes!
-#   index: Int!
-#   value: BigInt!
-# }
+# Aggregator, pushed old events out and lets new in, recalculating the acc value each time
+type PoolVolume30d @entity {
+  id: Bytes!
+  index: Int!
+  value: BigInt!
+  # die fee in USD bitte ebenfalls im laufenden durchschnitt mitberechen, diese wird dann notwenidg um die APY zu ermitteln
+  feeUSD: BigInt!
+}
 
+# alle vier events: mint, burn, swap, sync können die reserven verändern
 # enum PoolEventType {
 #   DEPOSIT
 #   WITHDRAW
@@ -186,7 +189,7 @@ type CollateralTokenMeta @entity(immutable: true) {
 #   id: String!
 #   timestamp: BigInt!
 #   # determines if value is added of deducted
-#   type: PoolEventType!
+#   type: PoolEventType! 
 #   value: BigInt!
 # }
 

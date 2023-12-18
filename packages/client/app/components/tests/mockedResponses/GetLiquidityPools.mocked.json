@@ -32,8 +32,8 @@
         ],
         "rewards": [],
         "liquidityDepositAPY": 0.2278,
-        "volume24hUSD": 34572.36,
-        "volume24hUSD24hAgo": 32299.42
+        "volume30dUSD": 34572.36,
+        "volume30dUSD30dAgo": 32299.42
       },
       {
         "id": "3411b9ca-ee5c-4ecf-bbe4-8de17b3f91d3",
@@ -66,8 +66,8 @@
         ],
         "rewards": [],
         "liquidityDepositAPY": 0.0132,
-        "volume24hUSD": 26637.53,
-        "volume24hUSD24hAgo": 46888.01
+        "volume30dUSD": 26637.53,
+        "volume30dUSD30dAgo": 46888.01
       },
       {
         "id": "70faa2cb-2d06-48a9-ba9e-b7ccb597850d",
@@ -100,8 +100,8 @@
         ],
         "rewards": [],
         "liquidityDepositAPY": 0.1629,
-        "volume24hUSD": 36483.86,
-        "volume24hUSD24hAgo": 20394.38
+        "volume30dUSD": 36483.86,
+        "volume30dUSD30dAgo": 20394.38
       },
       {
         "id": "d7d33427-8b39-4ea9-b1c9-9fdaf97de8f5",
@@ -134,8 +134,8 @@
         ],
         "rewards": [],
         "liquidityDepositAPY": 0.3898,
-        "volume24hUSD": 24886.18,
-        "volume24hUSD24hAgo": 21799.25
+        "volume30dUSD": 24886.18,
+        "volume30dUSD30dAgo": 21799.25
       },
       {
         "id": "1fbdfbbf-a6a2-466b-801d-02afd3b6ccfa",
@@ -168,8 +168,8 @@
         ],
         "rewards": [],
         "liquidityDepositAPY": 0.469,
-        "volume24hUSD": 32669.17,
-        "volume24hUSD24hAgo": 18945.31
+        "volume30dUSD": 32669.17,
+        "volume30dUSD30dAgo": 18945.31
       },
       {
         "id": "bade1902-c0b1-4908-ae05-4e3e214e48bd",
@@ -202,8 +202,8 @@
         ],
         "rewards": [],
         "liquidityDepositAPY": 0.3528,
-        "volume24hUSD": 12613.97,
-        "volume24hUSD24hAgo": 20780.7
+        "volume30dUSD": 12613.97,
+        "volume30dUSD30dAgo": 20780.7
       },
       {
         "id": "e7d066d6-bedb-4b33-bedc-78d01f1d52b0",
@@ -248,8 +248,8 @@
           }
         ],
         "liquidityDepositAPY": 0.3742,
-        "volume24hUSD": 33733.74,
-        "volume24hUSD24hAgo": 31246.45
+        "volume30dUSD": 33733.74,
+        "volume30dUSD30dAgo": 31246.45
       },
       {
         "id": "4a9194d8-ba86-4d20-ac56-4875292675e2",
@@ -282,8 +282,8 @@
         ],
         "rewards": [],
         "liquidityDepositAPY": 0.1344,
-        "volume24hUSD": 26864.06,
-        "volume24hUSD24hAgo": 22803.41
+        "volume30dUSD": 26864.06,
+        "volume30dUSD30dAgo": 22803.41
       },
       {
         "id": "44ccf2d1-fe2e-4afe-99dd-7b7459b224cb",
@@ -316,8 +316,8 @@
         ],
         "rewards": [],
         "liquidityDepositAPY": 0.1029,
-        "volume24hUSD": 43756.54,
-        "volume24hUSD24hAgo": 12211.64
+        "volume30dUSD": 43756.54,
+        "volume30dUSD30dAgo": 12211.64
       },
       {
         "id": "116229fc-b637-47d4-b71c-b36e9ae27170",
@@ -350,8 +350,8 @@
         ],
         "rewards": [],
         "liquidityDepositAPY": 0.3477,
-        "volume24hUSD": 22754.16,
-        "volume24hUSD24hAgo": 25395.53
+        "volume30dUSD": 22754.16,
+        "volume30dUSD30dAgo": 25395.53
       },
       {
         "id": "524e68bb-3000-4984-a548-f82196ff239f",
@@ -384,8 +384,8 @@
         ],
         "rewards": [],
         "liquidityDepositAPY": 0.4358,
-        "volume24hUSD": 17088.66,
-        "volume24hUSD24hAgo": 13577.86
+        "volume30dUSD": 17088.66,
+        "volume30dUSD30dAgo": 13577.86
       },
       {
         "id": "12313870-64d2-4a21-ae97-fe6601c9d974",
@@ -418,8 +418,8 @@
         ],
         "rewards": [],
         "liquidityDepositAPY": 0.062,
-        "volume24hUSD": 21090.73,
-        "volume24hUSD24hAgo": 24335.08
+        "volume30dUSD": 21090.73,
+        "volume30dUSD30dAgo": 24335.08
       },
       {
         "id": "2238506a-41e5-486a-bcf0-d7332f86c826",
@@ -452,8 +452,8 @@
         ],
         "rewards": [],
         "liquidityDepositAPY": 0.4893,
-        "volume24hUSD": 47932.78,
-        "volume24hUSD24hAgo": 30360.82
+        "volume30dUSD": 47932.78,
+        "volume30dUSD30dAgo": 30360.82
       },
       {
         "id": "03605834-7693-4d1a-b34a-b6b86741be34",
@@ -486,8 +486,8 @@
         ],
         "rewards": [],
         "liquidityDepositAPY": 0.2336,
-        "volume24hUSD": 37322.43,
-        "volume24hUSD24hAgo": 48291.56
+        "volume30dUSD": 37322.43,
+        "volume30dUSD30dAgo": 48291.56
       },
       {
         "id": "20736a4e-685f-41ce-8e8d-db7ee0785255",
@@ -520,8 +520,8 @@
         ],
         "rewards": [],
         "liquidityDepositAPY": 0.3006,
-        "volume24hUSD": 15792.15,
-        "volume24hUSD24hAgo": 25270.58
+        "volume30dUSD": 15792.15,
+        "volume30dUSD30dAgo": 25270.58
       },
       {
         "id": "f6080c32-3789-4827-99f8-db3656d8861d",
@@ -554,8 +554,8 @@
         ],
         "rewards": [],
         "liquidityDepositAPY": 0.3295,
-        "volume24hUSD": 15170.8,
-        "volume24hUSD24hAgo": 14037.47
+        "volume30dUSD": 15170.8,
+        "volume30dUSD30dAgo": 14037.47
       },
       {
         "id": "378aabad-497c-4643-bc99-13c0a2fb93d9",
@@ -588,8 +588,8 @@
         ],
         "rewards": [],
         "liquidityDepositAPY": 0.0399,
-        "volume24hUSD": 30348.06,
-        "volume24hUSD24hAgo": 15598.32
+        "volume30dUSD": 30348.06,
+        "volume30dUSD30dAgo": 15598.32
       },
       {
         "id": "35c0be35-4afd-4005-a571-7b7ecf03bf3f",
@@ -622,8 +622,8 @@
         ],
         "rewards": [],
         "liquidityDepositAPY": 0.2535,
-        "volume24hUSD": 22006.49,
-        "volume24hUSD24hAgo": 32572.76
+        "volume30dUSD": 22006.49,
+        "volume30dUSD30dAgo": 32572.76
       },
       {
         "id": "9fcc2c60-52b4-48a9-a28e-445f9ef9d9bb",
@@ -656,8 +656,8 @@
         ],
         "rewards": [],
         "liquidityDepositAPY": 0.4857,
-        "volume24hUSD": 17297.52,
-        "volume24hUSD24hAgo": 20084.53
+        "volume30dUSD": 17297.52,
+        "volume30dUSD30dAgo": 20084.53
       },
       {
         "id": "4221ef04-0fd9-449a-8e8b-2eefe300290a",
@@ -690,8 +690,8 @@
         ],
         "rewards": [],
         "liquidityDepositAPY": 0.0774,
-        "volume24hUSD": 14932.54,
-        "volume24hUSD24hAgo": 39640.25
+        "volume30dUSD": 14932.54,
+        "volume30dUSD30dAgo": 39640.25
       },
       {
         "id": "8add2e49-0559-49b1-b543-72c6f9aa79f6",
@@ -724,8 +724,8 @@
         ],
         "rewards": [],
         "liquidityDepositAPY": 0.3624,
-        "volume24hUSD": 30348.97,
-        "volume24hUSD24hAgo": 46156.82
+        "volume30dUSD": 30348.97,
+        "volume30dUSD30dAgo": 46156.82
       },
       {
         "id": "971c8b27-be48-4a66-b853-1bf16ec2899e",
@@ -758,8 +758,8 @@
         ],
         "rewards": [],
         "liquidityDepositAPY": 0.2993,
-        "volume24hUSD": 13262.37,
-        "volume24hUSD24hAgo": 37170.32
+        "volume30dUSD": 13262.37,
+        "volume30dUSD30dAgo": 37170.32
       },
       {
         "id": "1723239c-db63-460d-a06d-1740ca182911",
@@ -792,8 +792,8 @@
         ],
         "rewards": [],
         "liquidityDepositAPY": 0.0345,
-        "volume24hUSD": 44407.5,
-        "volume24hUSD24hAgo": 34081.99
+        "volume30dUSD": 44407.5,
+        "volume30dUSD30dAgo": 34081.99
       },
       {
         "id": "2e476886-cf39-44a2-8705-d84955134fd9",
@@ -826,8 +826,8 @@
         ],
         "rewards": [],
         "liquidityDepositAPY": 0.1712,
-        "volume24hUSD": 32391.93,
-        "volume24hUSD24hAgo": 35724.01
+        "volume30dUSD": 32391.93,
+        "volume30dUSD30dAgo": 35724.01
       },
       {
         "id": "2ed4521e-82b5-4695-88c5-e54164840ec8",
@@ -860,8 +860,8 @@
         ],
         "rewards": [],
         "liquidityDepositAPY": 0.4173,
-        "volume24hUSD": 41362.84,
-        "volume24hUSD24hAgo": 11469.72
+        "volume30dUSD": 41362.84,
+        "volume30dUSD30dAgo": 11469.72
       },
       {
         "id": "ec37925d-5118-4236-87fa-cb06e9c3f086",
@@ -894,8 +894,8 @@
         ],
         "rewards": [],
         "liquidityDepositAPY": 0.4677,
-        "volume24hUSD": 32929.17,
-        "volume24hUSD24hAgo": 22307.14
+        "volume30dUSD": 32929.17,
+        "volume30dUSD30dAgo": 22307.14
       },
       {
         "id": "4c54901b-1959-42b9-9fde-60115620b21e",
@@ -928,8 +928,8 @@
         ],
         "rewards": [],
         "liquidityDepositAPY": 0.0778,
-        "volume24hUSD": 36894.55,
-        "volume24hUSD24hAgo": 35185.65
+        "volume30dUSD": 36894.55,
+        "volume30dUSD30dAgo": 35185.65
       },
       {
         "id": "3af5fef0-6169-4fac-97b0-71c1030df1d2",
@@ -962,8 +962,8 @@
         ],
         "rewards": [],
         "liquidityDepositAPY": 0.3062,
-        "volume24hUSD": 21488.21,
-        "volume24hUSD24hAgo": 31625.82
+        "volume30dUSD": 21488.21,
+        "volume30dUSD30dAgo": 31625.82
       },
       {
         "id": "065a00aa-7575-4006-b869-8df069beb49d",
@@ -996,8 +996,8 @@
         ],
         "rewards": [],
         "liquidityDepositAPY": 0.3486,
-        "volume24hUSD": 39685.65,
-        "volume24hUSD24hAgo": 27329.48
+        "volume30dUSD": 39685.65,
+        "volume30dUSD30dAgo": 27329.48
       },
       {
         "id": "f218172d-e0eb-4cf9-a43e-f3293bc314f0",
@@ -1030,8 +1030,8 @@
         ],
         "rewards": [],
         "liquidityDepositAPY": 0.2938,
-        "volume24hUSD": 26973.33,
-        "volume24hUSD24hAgo": 38838.22
+        "volume30dUSD": 26973.33,
+        "volume30dUSD30dAgo": 38838.22
       },
       {
         "id": "cfa4f42f-2020-413d-9b8a-908020f482d7",
@@ -1064,8 +1064,8 @@
         ],
         "rewards": [],
         "liquidityDepositAPY": 0.4008,
-        "volume24hUSD": 13524.1,
-        "volume24hUSD24hAgo": 34202.66
+        "volume30dUSD": 13524.1,
+        "volume30dUSD30dAgo": 34202.66
       },
       {
         "id": "b5351493-bf12-4a76-9d93-f746335272e9",
@@ -1098,8 +1098,8 @@
         ],
         "rewards": [],
         "liquidityDepositAPY": 0.3486,
-        "volume24hUSD": 27637.71,
-        "volume24hUSD24hAgo": 24588.08
+        "volume30dUSD": 27637.71,
+        "volume30dUSD30dAgo": 24588.08
       },
       {
         "id": "8169373c-5462-4431-9314-0ad78ce0ddd7",
@@ -1132,8 +1132,8 @@
         ],
         "rewards": [],
         "liquidityDepositAPY": 0.4614,
-        "volume24hUSD": 24760.29,
-        "volume24hUSD24hAgo": 29201.64
+        "volume30dUSD": 24760.29,
+        "volume30dUSD30dAgo": 29201.64
       },
       {
         "id": "64f6f54f-a69a-4872-8161-fd727163624b",
@@ -1166,8 +1166,8 @@
         ],
         "rewards": [],
         "liquidityDepositAPY": 0.0633,
-        "volume24hUSD": 26143.38,
-        "volume24hUSD24hAgo": 15428.93
+        "volume30dUSD": 26143.38,
+        "volume30dUSD30dAgo": 15428.93
       },
       {
         "id": "f8b08697-261a-4735-933f-f470afe5cf0b",
@@ -1200,8 +1200,8 @@
         ],
         "rewards": [],
         "liquidityDepositAPY": 0.354,
-        "volume24hUSD": 45294.18,
-        "volume24hUSD24hAgo": 18253.07
+        "volume30dUSD": 45294.18,
+        "volume30dUSD30dAgo": 18253.07
       },
       {
         "id": "c734abb7-75b7-4c20-a83f-f7a7c014f6a5",
@@ -1234,8 +1234,8 @@
         ],
         "rewards": [],
         "liquidityDepositAPY": 0.2704,
-        "volume24hUSD": 29261.1,
-        "volume24hUSD24hAgo": 43464.14
+        "volume30dUSD": 29261.1,
+        "volume30dUSD30dAgo": 43464.14
       },
       {
         "id": "4e0a6af7-8ae3-4b0d-902d-85b0d3ac975a",
@@ -1268,8 +1268,8 @@
         ],
         "rewards": [],
         "liquidityDepositAPY": 0.0452,
-        "volume24hUSD": 38460.2,
-        "volume24hUSD24hAgo": 14659.63
+        "volume30dUSD": 38460.2,
+        "volume30dUSD30dAgo": 14659.63
       },
       {
         "id": "3cafcfa1-3269-45c6-b6e7-a2f5a06bcc7a",
@@ -1302,8 +1302,8 @@
         ],
         "rewards": [],
         "liquidityDepositAPY": 0.4313,
-        "volume24hUSD": 35549.04,
-        "volume24hUSD24hAgo": 13423.48
+        "volume30dUSD": 35549.04,
+        "volume30dUSD30dAgo": 13423.48
       },
       {
         "id": "89b517ee-6fed-47ed-8ca5-02f59c1dcdde",
@@ -1336,8 +1336,8 @@
         ],
         "rewards": [],
         "liquidityDepositAPY": 0.2401,
-        "volume24hUSD": 43958.27,
-        "volume24hUSD24hAgo": 17298.75
+        "volume30dUSD": 43958.27,
+        "volume30dUSD30dAgo": 17298.75
       },
       {
         "id": "ec61d5c1-6596-4743-8651-88af801bb577",
@@ -1370,8 +1370,8 @@
         ],
         "rewards": [],
         "liquidityDepositAPY": 0.2464,
-        "volume24hUSD": 24885.55,
-        "volume24hUSD24hAgo": 30752.84
+        "volume30dUSD": 24885.55,
+        "volume30dUSD30dAgo": 30752.84
       },
       {
         "id": "1c95f1e5-9baf-4e7f-9a0a-ef7a760eff48",
@@ -1404,8 +1404,8 @@
         ],
         "rewards": [],
         "liquidityDepositAPY": 0.2561,
-        "volume24hUSD": 37336.95,
-        "volume24hUSD24hAgo": 34203.97
+        "volume30dUSD": 37336.95,
+        "volume30dUSD30dAgo": 34203.97
       },
       {
         "id": "0834d0ad-8ef6-4e14-8cfa-df8c852e267b",
@@ -1438,8 +1438,8 @@
         ],
         "rewards": [],
         "liquidityDepositAPY": 0.1578,
-        "volume24hUSD": 25727.09,
-        "volume24hUSD24hAgo": 27547.8
+        "volume30dUSD": 25727.09,
+        "volume30dUSD30dAgo": 27547.8
       },
       {
         "id": "0c99d7a4-1ce2-4120-81d2-56686e5d723e",
@@ -1472,8 +1472,8 @@
         ],
         "rewards": [],
         "liquidityDepositAPY": 0.3159,
-        "volume24hUSD": 42511.71,
-        "volume24hUSD24hAgo": 49586.89
+        "volume30dUSD": 42511.71,
+        "volume30dUSD30dAgo": 49586.89
       },
       {
         "id": "d848734b-04d6-43d6-85fd-8161b499cb45",
@@ -1506,8 +1506,8 @@
         ],
         "rewards": [],
         "liquidityDepositAPY": 0.0752,
-        "volume24hUSD": 39843.01,
-        "volume24hUSD24hAgo": 40613.5
+        "volume30dUSD": 39843.01,
+        "volume30dUSD30dAgo": 40613.5
       },
       {
         "id": "ecafccd9-a34b-4f25-8703-5510a5a72f0c",
@@ -1540,8 +1540,8 @@
         ],
         "rewards": [],
         "liquidityDepositAPY": 0.3627,
-        "volume24hUSD": 30998.37,
-        "volume24hUSD24hAgo": 45238.59
+        "volume30dUSD": 30998.37,
+        "volume30dUSD30dAgo": 45238.59
       },
       {
         "id": "b1d857fb-0e4e-4876-ab34-01c92fc304e2",
@@ -1574,8 +1574,8 @@
         ],
         "rewards": [],
         "liquidityDepositAPY": 0.3794,
-        "volume24hUSD": 40031.11,
-        "volume24hUSD24hAgo": 11153.4
+        "volume30dUSD": 40031.11,
+        "volume30dUSD30dAgo": 11153.4
       },
       {
         "id": "33509427-90ef-4a4d-b477-a00aa1904954",
@@ -1608,8 +1608,8 @@
         ],
         "rewards": [],
         "liquidityDepositAPY": 0.3388,
-        "volume24hUSD": 44520.69,
-        "volume24hUSD24hAgo": 42189.75
+        "volume30dUSD": 44520.69,
+        "volume30dUSD30dAgo": 42189.75
       },
       {
         "id": "1fcc2ce2-534c-45cb-9e33-ec8ae6ba2531",
@@ -1642,8 +1642,8 @@
         ],
         "rewards": [],
         "liquidityDepositAPY": 0.2547,
-        "volume24hUSD": 24671.56,
-        "volume24hUSD24hAgo": 11196.78
+        "volume30dUSD": 24671.56,
+        "volume30dUSD30dAgo": 11196.78
       },
       {
         "id": "344b8e7c-2aca-4f4d-a6d0-347db601d248",
@@ -1676,8 +1676,8 @@
         ],
         "rewards": [],
         "liquidityDepositAPY": 0.0222,
-        "volume24hUSD": 31181.39,
-        "volume24hUSD24hAgo": 38359.65
+        "volume30dUSD": 31181.39,
+        "volume30dUSD30dAgo": 38359.65
       },
       {
         "id": "7fb873ad-c179-4a6d-bf74-74a5849ab424",
@@ -1710,8 +1710,8 @@
         ],
         "rewards": [],
         "liquidityDepositAPY": 0.2363,
-        "volume24hUSD": 17358.63,
-        "volume24hUSD24hAgo": 19521.52
+        "volume30dUSD": 17358.63,
+        "volume30dUSD30dAgo": 19521.52
       },
       {
         "id": "db1f9de3-4d86-406d-9d7b-02c7bde96797",
@@ -1744,8 +1744,8 @@
         ],
         "rewards": [],
         "liquidityDepositAPY": 0.3817,
-        "volume24hUSD": 41425.6,
-        "volume24hUSD24hAgo": 13209.8
+        "volume30dUSD": 41425.6,
+        "volume30dUSD30dAgo": 13209.8
       },
       {
         "id": "27484af9-f9ee-46eb-b0e7-caea948c88e8",
@@ -1778,8 +1778,8 @@
         ],
         "rewards": [],
         "liquidityDepositAPY": 0.0439,
-        "volume24hUSD": 24513.19,
-        "volume24hUSD24hAgo": 35229.95
+        "volume30dUSD": 24513.19,
+        "volume30dUSD30dAgo": 35229.95
       },
       {
         "id": "1d96e0a2-7597-4fc3-afa1-b3f2eceb1b6c",
@@ -1812,8 +1812,8 @@
         ],
         "rewards": [],
         "liquidityDepositAPY": 0.298,
-        "volume24hUSD": 42783.72,
-        "volume24hUSD24hAgo": 23160.53
+        "volume30dUSD": 42783.72,
+        "volume30dUSD30dAgo": 23160.53
       },
       {
         "id": "4183f8de-188a-40be-8add-a07e6d0a402e",
@@ -1846,8 +1846,8 @@
         ],
         "rewards": [],
         "liquidityDepositAPY": 0.2629,
-        "volume24hUSD": 18880.45,
-        "volume24hUSD24hAgo": 35238.7
+        "volume30dUSD": 18880.45,
+        "volume30dUSD30dAgo": 35238.7
       },
       {
         "id": "31574057-ea06-42d4-92e7-68108c95e9b3",
@@ -1880,8 +1880,8 @@
         ],
         "rewards": [],
         "liquidityDepositAPY": 0.2725,
-        "volume24hUSD": 27839.11,
-        "volume24hUSD24hAgo": 45923.34
+        "volume30dUSD": 27839.11,
+        "volume30dUSD30dAgo": 45923.34
       }
     ]
   }

@@ -47,7 +47,7 @@ function Assets() {
 
     // get token address from local storage and set isFavorite if it is present
     return jUSDPools
-      .map<SelectedToken>(({ liquidity, swapFee, volume24hUSD }) => {
+      .map<SelectedToken>(({ liquidity, swapFee, volume30dUSD }) => {
         const [tokenA, tokenB] = liquidity;
         const token = tokenA.token.address === Contracts.ERC20.JUSD ? tokenB.token : tokenA.token;
 
@@ -57,7 +57,7 @@ function Assets() {
           // calculate change over last 24h
           change: (token.priceUSD - token.priceUSD24hAgo) / token.priceUSD24hAgo,
           isFavorite: favoritedAssets.find((address) => token.address === address) !== undefined ? true : false,
-          volume24hUSD,
+          volume30dUSD,
           liqudityPair:
             tokenA.token.address === Contracts.ERC20.JUSD
               ? [tokenA.totalAmount, tokenB.totalAmount]

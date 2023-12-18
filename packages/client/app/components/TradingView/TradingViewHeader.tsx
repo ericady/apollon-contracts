@@ -40,7 +40,7 @@ function TradingViewHeader() {
         <Typography variant="subtitle1" fontFamily="Space Grotesk Variable">
           24h Volume
           <Box sx={{ color: 'text.primary', display: 'inline', ml: '8px' }}>
-            {selectedToken ? roundCurrency(selectedToken.volume24hUSD) : '-'}
+            {selectedToken ? roundCurrency(selectedToken.volume30dUSD) : '-'}
           </Box>{' '}
           $
         </Typography>

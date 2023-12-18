@@ -68,7 +68,7 @@ function SetupState({
         priceUSD,
         symbol,
         priceUSD24hAgo,
-        volume24hUSD: 1000,
+        volume30dUSD: 1000,
         liqudityPair: [1000, 1000],
       });
     }

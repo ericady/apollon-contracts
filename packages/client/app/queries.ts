@@ -5,7 +5,7 @@ export const GET_ALL_POOLS = gql`
     getPools {
       id
       swapFee @client
-      volume24hUSD
+      volume30dUSD
       liquidity {
         totalAmount
         token {
@@ -110,10 +110,11 @@ export const GET_LIQUIDITY_POOLS = gql`
           priceUSD @client
         }
         totalAmount
+        borrowerAmount @client
       }
       liquidityDepositAPY
-      volume24hUSD
-      volume24hUSD24hAgo
+      volume30dUSD
+      volume30dUSD30dAgo
     }
   }
 `;
@@ -130,11 +131,11 @@ export const GET_BORROWER_LIQUIDITY_POOLS = gql`
           priceUSD @client
         }
         totalAmount
-        borrowerAmount
+        borrowerAmount @client
       }
       liquidityDepositAPY
-      volume24hUSD
-      volume24hUSD24hAgo
+      volume30dUSD
+      volume30dUSD30dAgo
     }
   }
 `;
@@ -216,6 +217,7 @@ export const GET_RESERVE_USD_HISTORY = gql`
 
 export const TOKEN_FRAGMENT = gql`
   fragment TokenFragment on Token {
+    id
     address
   }
 `;

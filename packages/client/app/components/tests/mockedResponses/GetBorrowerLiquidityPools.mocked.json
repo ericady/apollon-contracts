@@ -32,8 +32,8 @@
         ],
         "rewards": [],
         "liquidityDepositAPY": 0.0222,
-        "volume24hUSD": 31181.39,
-        "volume24hUSD24hAgo": 38359.65
+        "volume30dUSD": 31181.39,
+        "volume30dUSD30dAgo": 38359.65
       }
     ]
   }

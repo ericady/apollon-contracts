@@ -77,15 +77,15 @@ function LiquidityPoolsTable({ selectedPool, setSelectedPool }: Props) {
               <HeaderCell title="" cellProps={{ align: 'right' }} />
               <HeaderCell title="" />
               <HeaderCell title="APY" cellProps={{ align: 'right' }} />
-              <HeaderCell title="24h Volume" cellProps={{ align: 'right', colSpan: 2 }} />
+              <HeaderCell title="30d Volume" cellProps={{ align: 'right', colSpan: 2 }} />
             </TableRow>
           </TableHead>
 
           <TableBody>
             {allPoolsCombined.map((pool) => {
-              const { id, liquidity, volume24hUSD, volume24hUSD24hAgo, liquidityDepositAPY } = pool;
+              const { id, liquidity, volume30dUSD, volume30dUSD30dAgo, liquidityDepositAPY } = pool;
               const [tokenA, tokenB] = liquidity;
-              const volumeChange = percentageChange(volume24hUSD, volume24hUSD24hAgo);
+              const volumeChange = percentageChange(volume30dUSD, volume30dUSD30dAgo);
 
               return (
                 <TableRow
@@ -153,7 +153,7 @@ function LiquidityPoolsTable({ selectedPool, setSelectedPool }: Props) {
 
                   <TableCell align="right" sx={{ pr: 0, pl: 1, width: '50px', maxWidth: '200px' }}>
                     <Typography variant="caption" noWrap>
-                      {stdFormatter.format(volume24hUSD)} $
+                      {stdFormatter.format(volume30dUSD)} $
                     </Typography>
                   </TableCell>
                   <TableCell align="right" width={125}>
