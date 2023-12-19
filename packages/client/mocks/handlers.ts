@@ -102,9 +102,9 @@ const collateralTokenMeta: CollateralTokenMeta[] = collateralTokens.map<Collater
     totalValueLockedUSD24hAgo: parseFloat(
       faker.finance.amount(totalValueLockedUSD * 0.9, totalValueLockedUSD * 1.2, 2),
     ),
-    walletAmount: null,
-    troveLockedAmount: null,
-    stabilityGainedAmount: null,
+    walletAmount: 0,
+    troveLockedAmount: 0,
+    stabilityGainedAmount: 0,
   };
 });
 
@@ -130,10 +130,10 @@ const debtTokenMeta = tokens.map<DebtTokenMeta>((token) => {
     __typename: 'DebtTokenMeta',
     id: faker.string.uuid(),
     token: token,
-    walletAmount: null,
-    troveMintedAmount: null,
-    stabilityLostAmount: null,
-    stabilityCompoundAmount: null,
+    walletAmount: 0,
+    troveMintedAmount: 0,
+    stabilityLostAmount: 0,
+    stabilityCompoundAmount: 0,
 
     totalDepositedStability: faker.number.float({ min: 1000, max: 5000, precision: 0.0001 }),
     totalReserve: faker.number.float({ min: 1000, max: 5000, precision: 0.0001 }),
@@ -501,12 +501,18 @@ export const handlers = [
   graphql.query<{ getPools: Query['getPools'] }, QueryGetPoolsArgs>(GET_BORROWER_LIQUIDITY_POOLS, (req, res, ctx) => {
     const { borrower } = req.variables;
     if (!borrower) {
-      throw new Error('Borrower address is required');
+      const result: Query['getPools'] = liquidityPools;
+
+      return res(ctx.data({ getPools: result }));
     }
 
     const borrowerLiquidityPools = faker.helpers.arrayElements(liquidityPools, { min: 1, max: 5 });
 
-    const result: Query['getPools'] = borrowerLiquidityPools.map((pool) => {
+    const liqudityPoolsWithoutBorrower = liquidityPools.filter(
+      (pool) => !borrowerLiquidityPools.find(({ id }) => id === pool.id),
+    );
+
+    const liqudityPoolsWithBorrower: Query['getPools'] = borrowerLiquidityPools.map((pool) => {
       return {
         ...pool,
         liquidity: pool.liquidity.map((liquidity) => ({
@@ -516,7 +522,7 @@ export const handlers = [
       };
     });
 
-    return res(ctx.data({ getPools: result }));
+    return res(ctx.data({ getPools: liqudityPoolsWithoutBorrower.concat(liqudityPoolsWithBorrower) }));
   }),
 
   // CHART DATA MOCK

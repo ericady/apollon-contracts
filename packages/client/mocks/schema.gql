@@ -15,10 +15,10 @@ type DebtTokenMeta {
   id: ID!
   token: Token!
   # borrower specific
-  walletAmount: Float
-  troveMintedAmount: Float
-  stabilityLostAmount: Float
-  stabilityCompoundAmount: Float
+  walletAmount: Float!
+  troveMintedAmount: Float!
+  stabilityLostAmount: Float!
+  stabilityCompoundAmount: Float!
 
   # global
   stabilityDepositAPY: Float!

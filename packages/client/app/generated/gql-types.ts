@@ -44,17 +44,17 @@ export type CollateralTokenMeta = {
 export type DebtTokenMeta = {
   __typename: 'DebtTokenMeta';
   id: Scalars['ID']['output'];
-  stabilityCompoundAmount?: Maybe<Scalars['Float']['output']>;
+  stabilityCompoundAmount: Scalars['Float']['output'];
   stabilityDepositAPY: Scalars['Float']['output'];
-  stabilityLostAmount?: Maybe<Scalars['Float']['output']>;
+  stabilityLostAmount: Scalars['Float']['output'];
   token: Token;
   totalDepositedStability: Scalars['Float']['output'];
   totalReserve: Scalars['Float']['output'];
   totalReserve24hAgo: Scalars['Float']['output'];
   totalSupplyUSD: Scalars['Float']['output'];
   totalSupplyUSD24hAgo: Scalars['Float']['output'];
-  troveMintedAmount?: Maybe<Scalars['Float']['output']>;
-  walletAmount?: Maybe<Scalars['Float']['output']>;
+  troveMintedAmount: Scalars['Float']['output'];
+  walletAmount: Scalars['Float']['output'];
 };
 
 export enum LongShortDirection {
@@ -228,7 +228,7 @@ export type GetBorrowerDebtTokensQueryVariables = Exact<{
 }>;
 
 
-export type GetBorrowerDebtTokensQuery = { __typename: 'Query', getDebtTokens: Array<{ __typename: 'DebtTokenMeta', troveMintedAmount?: number | null, walletAmount?: number | null, stabilityLostAmount?: number | null, stabilityCompoundAmount?: number | null, stabilityDepositAPY: number, totalDepositedStability: number, totalSupplyUSD: number, totalSupplyUSD24hAgo: number, token: { __typename: 'Token', id: string, address: string, symbol: string, priceUSD: number, isPoolToken: boolean } }> };
+export type GetBorrowerDebtTokensQuery = { __typename: 'Query', getDebtTokens: Array<{ __typename: 'DebtTokenMeta', troveMintedAmount: number, walletAmount: number, stabilityLostAmount: number, stabilityCompoundAmount: number, stabilityDepositAPY: number, totalDepositedStability: number, totalSupplyUSD: number, totalSupplyUSD24hAgo: number, token: { __typename: 'Token', id: string, address: string, symbol: string, priceUSD: number, isPoolToken: boolean } }> };
 
 export type GetBorrowerPositionsQueryVariables = Exact<{
   borrower: Scalars['String']['input'];
@@ -239,13 +239,8 @@ export type GetBorrowerPositionsQueryVariables = Exact<{
 
 export type GetBorrowerPositionsQuery = { __typename: 'Query', getPositions: { __typename: 'PositionsPage', positions: Array<{ __typename: 'Position', id: string, openedAt: number, closedAt?: number | null, direction: LongShortDirection, size: number, totalPriceInStable: number, feesInStable: number, profitInStable?: number | null, token: { __typename: 'Token', id: string, address: string, symbol: string, priceUSD: number } }>, pageInfo: { __typename: 'PageInfo', totalCount: number, hasNextPage: boolean, endCursor: string } } };
 
-export type GetLiquidityPoolsQueryVariables = Exact<{ [key: string]: never; }>;
-
-
-export type GetLiquidityPoolsQuery = { __typename: 'Query', getPools: Array<{ __typename: 'Pool', id: string, liquidityDepositAPY: number, volume30dUSD: number, volume30dUSD30dAgo: number, liquidity: Array<{ __typename: 'PoolLiquidity', totalAmount: number, borrowerAmount: number, token: { __typename: 'Token', id: string, address: string, symbol: string, priceUSD: number } }> }> };
-
 export type GetBorrowerLiquidityPoolsQueryVariables = Exact<{
-  borrower: Scalars['String']['input'];
+  borrower?: InputMaybe<Scalars['String']['input']>;
 }>;
 
 

@@ -11,17 +11,21 @@ type Props = TextFieldProps & {
  * Because the web platform can not create a reliable number input ._.
  * TODO: Exchange it with https://mui.com/base-ui/react-number-input/ some wonderful day.
  */
-function NumberInput({ name, helperText, rules, ...textfieldProps }: Props) {
+function NumberInput({ name, helperText, rules, onChange: handleCustomChange, ...textfieldProps }: Props) {
   const { control } = useFormContext();
   const {
-    field: { ref, ...field },
+    field: { ref, onChange, ...field },
     fieldState: { error },
-  } = useController({ name, control, rules  });
+  } = useController({ name, control, rules });
 
   return (
     <TextField
       {...field}
       {...textfieldProps}
+      onChange={(event) => {
+        onChange(event);
+        handleCustomChange?.(event);
+      }}
       size="small"
       inputRef={ref}
       error={!!error}

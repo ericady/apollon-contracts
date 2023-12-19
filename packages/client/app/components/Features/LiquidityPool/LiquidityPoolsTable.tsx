@@ -9,9 +9,8 @@ import {
   GetBorrowerLiquidityPoolsQuery,
   GetBorrowerLiquidityPoolsQueryVariables,
   GetLiquidityPoolsQuery,
-  GetLiquidityPoolsQueryVariables,
 } from '../../../generated/gql-types';
-import { GET_BORROWER_LIQUIDITY_POOLS, GET_LIQUIDITY_POOLS } from '../../../queries';
+import { GET_BORROWER_LIQUIDITY_POOLS } from '../../../queries';
 import { displayPercentage, percentageChange, roundCurrency, stdFormatter } from '../../../utils/math';
 import FeatureBox from '../../FeatureBox/FeatureBox';
 import DirectionIcon from '../../Icons/DirectionIcon';
@@ -28,33 +27,31 @@ type Props = {
 function LiquidityPoolsTable({ selectedPool, setSelectedPool }: Props) {
   const { address } = useEthers();
 
-  const { data: allPoolsData } = useQuery<GetLiquidityPoolsQuery, GetLiquidityPoolsQueryVariables>(GET_LIQUIDITY_POOLS);
   const { data: borrowerPoolsData, loading } = useQuery<
     GetBorrowerLiquidityPoolsQuery,
     GetBorrowerLiquidityPoolsQueryVariables
-  >(GET_BORROWER_LIQUIDITY_POOLS, { variables: { borrower: address }, skip: !address });
+  >(GET_BORROWER_LIQUIDITY_POOLS, { variables: { borrower: address } });
 
-  // filter out all the pools in borrowerPoolsData.getPools that are already included in borrowerPoolsData.getPools.
-  const allPoolsCombined: GetBorrowerLiquidityPoolsQuery['getPools'] = useMemo(
+  // sort for highest borrower participation
+  const allPoolsSorted: GetBorrowerLiquidityPoolsQuery['getPools'] = useMemo(
     () =>
-      borrowerPoolsData
-        ? borrowerPoolsData.getPools.concat(
-            allPoolsData?.getPools.filter(
-              (allPool) => !borrowerPoolsData.getPools.find((borrowerPool) => allPool.id === borrowerPool.id),
-            ) ?? [],
-          )
-        : allPoolsData?.getPools ?? [],
-    [allPoolsData, borrowerPoolsData],
+      borrowerPoolsData?.getPools.sort(
+        ({ liquidity: [liqA1, liqA2] }, { liquidity: [liqB1, liqB2] }) =>
+          liqB1.borrowerAmount * liqB1.token.priceUSD +
+          liqB2.borrowerAmount * liqB2.token.priceUSD -
+          (liqA1.borrowerAmount * liqA1.token.priceUSD + liqA2.borrowerAmount * liqA2.token.priceUSD),
+      ) ?? [],
+    [borrowerPoolsData],
   );
 
   useEffect(() => {
     // Select first pool by default
-    if (allPoolsCombined.length > 0) {
-      setSelectedPool(allPoolsCombined[0]);
+    if (allPoolsSorted.length > 0) {
+      setSelectedPool(allPoolsSorted[0]);
     }
-  }, [allPoolsCombined, setSelectedPool]);
+  }, [allPoolsSorted, setSelectedPool]);
 
-  if (!allPoolsData || (!borrowerPoolsData && loading)) return <LiquidityPoolsTableLoader />;
+  if (!borrowerPoolsData && loading) return <LiquidityPoolsTableLoader />;
 
   return (
     <FeatureBox title="Pools" noPadding headBorder="full">
@@ -82,7 +79,7 @@ function LiquidityPoolsTable({ selectedPool, setSelectedPool }: Props) {
           </TableHead>
 
           <TableBody>
-            {allPoolsCombined.map((pool) => {
+            {allPoolsSorted.map((pool) => {
               const { id, liquidity, volume30dUSD, volume30dUSD30dAgo, liquidityDepositAPY } = pool;
               const [tokenA, tokenB] = liquidity;
               const volumeChange = percentageChange(volume30dUSD, volume30dUSD30dAgo);

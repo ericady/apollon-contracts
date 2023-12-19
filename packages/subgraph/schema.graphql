@@ -1,6 +1,4 @@
-# # Custom
 
-# Singleton entity to store the ID of the last created Token
 # TODO: wasa mapper for swap pools PairCreated event
 type Token @entity {
   # contract address
@@ -9,10 +7,11 @@ type Token @entity {
   symbol: String!
   createdAt: BigInt!
   #
-  # priceUSD: BigInt!
-  # TODO: Fetch this from the client side and get it from the TradingView entities
+  # TODO: wasa 
+  # PoolPrice, update when pool ratio changes or price feed updates
+  priceUSD: BigInt!
   # TODO: wasa Lookup from the candle chart on TokenPriceChanged event.
-  # priceUSD24hAgo: BigInt!
+  priceUSD24hAgo: BigInt!
   #
   isPoolToken: Boolean!
 }
@@ -23,18 +22,18 @@ type DebtTokenMeta @entity(immutable: true) {
   timestamp: BigInt!
 
   # global
-  # TODO: Must be calculated in the subgraph
 
+  # TODO: wasa not sure how to calculate the APY, lets discuss this together
   # Es geht bei dieser Metric um einen laufenden 30 Tage Durchschnitt, welcher anzeigt wie viel die depositors in dieser Zeit, aufs Jahr hochgerechenet, verdient haben.
   # Das muss auf dem graphen berechnet werden, über das offset event. Alle offsets der letzten 30 Tage immer zusammenfassen und schauen wie groß der Profit (debt token heraus gezogen, coll token bekommen) war.
-
   # On creation of the entity we must save just the current APY
   stabilityDepositAPY: Int!
   totalDepositedStability: BigInt!
-  # TODO: Implement the event handlers to update this entity
+  # TODO: wasa Implement the event handlers to update this field
   totalReserve: BigInt!
   # TODO: Fetch this from the client side
   # totalReserve24hAgo: BigInt!
+  # TODO: wasa Implement the event handlers to update this field
   totalSupplyUSD: BigInt!
   # TODO: Fetch this from the client side
   # totalSupplyUSD24hAgo: BigInt!
@@ -77,7 +76,7 @@ type CollateralTokenMeta @entity(immutable: true) {
   timestamp: BigInt!
 
   # global
-  # TODO: Link to event when ReservePool is implemented
+  # TODO: wasa Link to event when ReservePool is implemented
   totalValueLockedUSD: BigInt!
   # TODO: Fetch this from the client side
   # totalValueLockedUSD24hAgo: BigInt!
@@ -118,13 +117,13 @@ type CollateralTokenMeta @entity(immutable: true) {
 #   profitInStable: BigInt # undefined until closed
 # }
 
-# type PoolLiquidity @entity {
-#   # unique Byte combination of tokenA + tokenB
-#   id: Bytes!
-#   token: Bytes!
-#   TODO: wasa Swap event swapPair.getReserves 
-#   totalAmount: BigInt!
-# }
+type PoolLiquidity @entity {
+  # unique Byte combination of tokenA + tokenB
+  id: Bytes!
+  token: Bytes!
+  # TODO: wasa Swap event swapPair.getReserves 
+  totalAmount: BigInt!
+}
 
 # type UserPoolLiquidity @entity {
 #   # "UserPoolLiquidity" + main Token + paired Token + borrower
@@ -152,17 +151,20 @@ type CollateralTokenMeta @entity(immutable: true) {
 # }
 
 type Pool @entity {
+  # TODO: wasa We need some distict logic to create the ID
   # "Pool" + TokenA (JUSD) + TokenB
-  id: Bytes!
+  id: String!
 
   # Percent value applied when opening the first position for this pool. Can be negative and positive.
   # swapFee: BigInt!
   # Just linked once, always updated for all users
+  # TODO: wasa update the general data on the Pool singletons
   liquidity: [PoolLiquidity!]! @relation(name: "PoolLiquidityToPool")
   # TODO: die fee in USD bitte ebenfalls im laufenden durchschnitt mitberechen, diese wird dann notwenidg um die APY zu ermitteln
+  # TODO: wasa => not sure how to do this yet, lets delay this for now
   liquidityDepositAPY: BigInt!
 
-  # TODO: We need to aggregate all Deposits/Withdrawals and update every time a new Transaction comes in
+  # TODO: wasa => We need to aggregate all Deposits/Withdrawals and update every time a new Transaction comes in
   volume30dUSD: PoolVolume30d!
   # once the first PoolEvent of the array is > 24h ago, we can remove it from the array and push it to the 24hAgo field
   volume30dUSD30dAgo: PoolVolume30d!
@@ -177,22 +179,24 @@ type PoolVolume30d @entity {
   feeUSD: BigInt!
 }
 
-# alle vier events: mint, burn, swap, sync können die reserven verändern
-# enum PoolEventType {
-#   DEPOSIT
-#   WITHDRAW
-# }
+# TODO: wasa => there are probably more => alle vier events: mint, burn, swap, sync können die reserven verändern
+enum PoolEventType {
+  DEPOSIT
+  WITHDRAW
+}
 
-# # A chunk is added once 5min are over and is deducted at the end of 24h
-# type PoolVolumeChunk @entity {
-#   # "PoolVolumeChunk" + TokenA + TokenB + index
-#   id: String!
-#   timestamp: BigInt!
-#   # determines if value is added of deducted
-#   type: PoolEventType! 
-#   value: BigInt!
-# }
+# A chunk is added once 5min are over and is deducted at the end of 30d
+type PoolVolumeChunk @entity {
+  # "PoolVolumeChunk" + TokenA + TokenB + index
+  id: String!
+  timestamp: BigInt!
+  # determines if value is added of deducted
+  type: PoolEventType! 
+  value: BigInt!
+}
 
+
+# TODO: wasa not sure about contract/event limitations of the BorrowerHistory, lets analyze this together first before implementation.
 type TokenAmount @entity(immutable: true) {
   id: Bytes!
   token: Bytes!
@@ -222,9 +226,9 @@ type BorrowerHistory @entity(immutable: true) {
 
 # CHARTS
 
-# We have different candle sizes for 5min, 1h .... TODO:
+# TODO: wasa => I would start with this.
+# We have different candle sizes for 5min, 1h .... ???
 # We add to a singleton cande and then save it as soon as the candlesize is reached
-
 type TokenCandleSingleton @entity {
   # "TokenCandleSingleton" + token + candleSize
   id: String!
@@ -251,5 +255,3 @@ type TokenCandle @entity(immutable: true) {
   volume: BigInt!
   candleSize: Int!
 }
-
-# TODO: wasa have one candle for 24h that is used for the trading volume

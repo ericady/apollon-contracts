@@ -98,29 +98,8 @@ export const GET_BORROWER_POSITIONS = gql`
   }
 `;
 
-export const GET_LIQUIDITY_POOLS = gql`
-  query GetLiquidityPools {
-    getPools {
-      id
-      liquidity {
-        token {
-          id
-          address
-          symbol
-          priceUSD @client
-        }
-        totalAmount
-        borrowerAmount @client
-      }
-      liquidityDepositAPY
-      volume30dUSD
-      volume30dUSD30dAgo
-    }
-  }
-`;
-
 export const GET_BORROWER_LIQUIDITY_POOLS = gql`
-  query GetBorrowerLiquidityPools($borrower: String!) {
+  query GetBorrowerLiquidityPools($borrower: String) {
     getPools(borrower: $borrower) {
       id
       liquidity {
