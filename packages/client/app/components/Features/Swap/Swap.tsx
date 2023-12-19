@@ -6,7 +6,7 @@ import InputAdornment from '@mui/material/InputAdornment';
 import Typography from '@mui/material/Typography';
 import { ChangeEvent, useState } from 'react';
 import { FormProvider, useController, useForm } from 'react-hook-form';
-import { useEthers } from '../../../context/EthersProvider';
+import { Contracts, useEthers } from '../../../context/EthersProvider';
 import { useSelectedToken } from '../../../context/SelectedTokenProvider';
 import { WIDGET_HEIGHTS } from '../../../utils/contants';
 import { displayPercentage, floatToBigInt, roundCurrency, roundNumber } from '../../../utils/math';
@@ -30,7 +30,7 @@ const Swap = () => {
 
   const {
     address,
-    contracts: { swapOperationsContract },
+    contracts: { swapOperationsContract, collateralTokenContracts, debtTokenContracts },
   } = useEthers();
   const { selectedToken, tokenRatio, JUSDToken } = useSelectedToken();
 
@@ -79,6 +79,7 @@ const Swap = () => {
     const deadline = new Date().getTime() + 1000 * 60 * 2; // 2 minutes
 
     if (tradingDirection === 'jUSDSpent') {
+      await collateralTokenContracts[Contracts.ERC20.JUSD]!.approve(selectedToken!.pool.id, floatToBigInt(jUSDAmount));
       await swapOperationsContract.swapTokensForExactTokens(
         floatToBigInt(tokenAmount),
         floatToBigInt(jUSDAmount * (1 + maxSlippage)),
@@ -87,6 +88,8 @@ const Swap = () => {
         deadline,
       );
     } else {
+      // @ts-ignore
+      await debtTokenContracts[selectedToken!.address].approve(selectedToken!.pool.id, floatToBigInt(tokenAmount));
       await swapOperationsContract.swapExactTokensForTokens(
         floatToBigInt(tokenAmount),
         floatToBigInt(jUSDAmount * (1 - maxSlippage)),
@@ -102,21 +105,21 @@ const Swap = () => {
 
   // TODO: Not adjusted for swap fee
   const getPriceImpact = () => {
-    const currentPrice = selectedToken!.liqudityPair[0] / selectedToken!.liqudityPair[1];
+    const {
+      pool: { liqudityPair },
+    } = selectedToken!;
+
+    const currentPrice = liqudityPair[0] / liqudityPair[1];
 
     let newPriceAfterSwap;
     if (tradingDirection === 'jUSDSpent') {
       // Calculate new amount of the other token after swap
-      const newY =
-        (selectedToken!.liqudityPair[1] * selectedToken!.liqudityPair[0]) /
-        (selectedToken!.liqudityPair[0] + jUSDAmount);
-      newPriceAfterSwap = jUSDAmount / (selectedToken!.liqudityPair[1] - newY);
+      const newY = (liqudityPair[1] * liqudityPair[0]) / (liqudityPair[0] + jUSDAmount);
+      newPriceAfterSwap = jUSDAmount / (liqudityPair[1] - newY);
     } else {
       // Calculate new amount of jUSD after swap
-      const newX =
-        (selectedToken!.liqudityPair[0] * selectedToken!.liqudityPair[1]) /
-        (selectedToken!.liqudityPair[1] + tokenAmount);
-      newPriceAfterSwap = (selectedToken!.liqudityPair[0] - newX) / tokenAmount;
+      const newX = (liqudityPair[0] * liqudityPair[1]) / (liqudityPair[1] + tokenAmount);
+      newPriceAfterSwap = (liqudityPair[0] - newX) / tokenAmount;
     }
 
     // Calculate price impact

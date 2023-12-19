@@ -1,6 +1,7 @@
 import { render, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { IntegrationWrapper } from '../../tests/test-utils';
+import { Contracts } from '../../../context/EthersProvider';
+import { IntegrationWrapper, PreselectedTestToken } from '../../tests/test-utils';
 import Swap from './Swap';
 
 describe('Swap', () => {
@@ -9,12 +10,18 @@ describe('Swap', () => {
       swapOperationsContract: {
         swapTokensForExactTokens: jest.fn(),
       },
+      collateralTokenContracts: {
+        [Contracts.ERC20.JUSD]: {
+          approve: jest.fn(),
+        },
+      },
     };
     const { getByRole, container } = render(
       <IntegrationWrapper
         shouldPreselectTokens
         shouldConnectWallet
         mockEthers={{
+          // @ts-ignore
           contractMock,
         }}
       >
@@ -33,6 +40,8 @@ describe('Swap', () => {
     });
 
     await userEvent.click(submitButton);
+
+    expect(contractMock.collateralTokenContracts[Contracts.ERC20.JUSD].approve).toHaveBeenCalledTimes(1);
     expect(contractMock.swapOperationsContract.swapTokensForExactTokens).toHaveBeenCalledTimes(1);
   });
 
@@ -41,12 +50,18 @@ describe('Swap', () => {
       swapOperationsContract: {
         swapExactTokensForTokens: jest.fn(),
       },
+      debtTokenContracts: {
+        [PreselectedTestToken.address]: {
+          approve: jest.fn(),
+        },
+      },
     };
     const { getByRole, container } = render(
       <IntegrationWrapper
         shouldPreselectTokens
         shouldConnectWallet
         mockEthers={{
+          // @ts-ignore
           contractMock,
         }}
       >
@@ -65,6 +80,8 @@ describe('Swap', () => {
     });
 
     await userEvent.click(submitButton);
+
+    expect(contractMock.debtTokenContracts[PreselectedTestToken.address].approve).toHaveBeenCalledTimes(1);
     expect(contractMock.swapOperationsContract.swapExactTokensForTokens).toHaveBeenCalledTimes(1);
   });
 });

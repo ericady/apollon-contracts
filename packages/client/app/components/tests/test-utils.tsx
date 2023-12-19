@@ -44,6 +44,8 @@ export const IntegrationWrapper = ({ children, ...stateProps }: PropsWithChildre
   );
 };
 
+export const PreselectedTestToken = MockedPositionsWithoutBorrower.data.getDebtTokens[0].token;
+
 /**
  * This component is used as a wrapper to mock library Providers and other Context state.
  * Actual calls to the modules of these libraries (ethers) must be made as a unit test because jest provides excellent module mocking.
@@ -59,7 +61,7 @@ function SetupState({
 
   useEffect(() => {
     if (shouldPreselectTokens && !selectedToken) {
-      const { address, priceUSD, priceUSD24hAgo, symbol } = MockedPositionsWithoutBorrower.data.getDebtTokens[0].token;
+      const { address, priceUSD, priceUSD24hAgo, symbol } = PreselectedTestToken;
       setSelectedToken({
         address,
         change: 0.01,
@@ -69,7 +71,10 @@ function SetupState({
         symbol,
         priceUSD24hAgo,
         volume30dUSD: 1000,
-        liqudityPair: [1000, 1000],
+        pool: {
+          id: '0xbE8F15C2db5Fc2AFc4e17B4Dd578Fbc6e5aA9592',
+          liqudityPair: [1000, 1000],
+        },
       });
     }
   });

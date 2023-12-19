@@ -152,7 +152,7 @@ type PoolLiquidity @entity {
 
 type Pool @entity {
   # TODO: wasa We need some distict logic to create the ID
-  # "Pool" + TokenA (JUSD) + TokenB
+  # This is the trainding pair address! Please hardcode it for the paired tokens or use singleton.
   id: String!
 
   # Percent value applied when opening the first position for this pool. Can be negative and positive.

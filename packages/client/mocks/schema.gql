@@ -102,7 +102,7 @@ type PoolReward {
 }
 
 type Pool {
-  # "Pool" + TokenA(JUSD) + TokenB
+  # TradingPair contract address
   id: ID!
   # Percent value applied when opening the first position for this pool. Can be negative and positive.
   swapFee: Float!

@@ -15,7 +15,10 @@ export type SelectedToken = {
   priceUSD: number;
   priceUSD24hAgo: number;
   volume30dUSD: number;
-  liqudityPair: number[];
+  pool: {
+    id: string;
+    liqudityPair: number[];
+  };
 };
 
 export const SelectedTokenContext = createContext<{

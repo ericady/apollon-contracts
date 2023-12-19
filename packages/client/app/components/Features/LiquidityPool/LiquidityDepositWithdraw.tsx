@@ -9,19 +9,21 @@ import Typography from '@mui/material/Typography';
 import { SyntheticEvent, useCallback, useEffect, useState } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
 import { DebtToken } from '../../../../generated/types';
-import { Contracts, useEthers } from '../../../context/EthersProvider';
+import { useEthers } from '../../../context/EthersProvider';
 import {
   GetBorrowerDebtTokensQuery,
   GetBorrowerDebtTokensQueryVariables,
   GetBorrowerLiquidityPoolsQuery,
 } from '../../../generated/gql-types';
 import { GET_BORROWER_DEBT_TOKENS } from '../../../queries';
-import { displayPercentage, roundCurrency } from '../../../utils/math';
+import { displayPercentage, floatToBigInt, roundCurrency } from '../../../utils/math';
 import FeatureBox from '../../FeatureBox/FeatureBox';
 import NumberInput from '../../FormControls/NumberInput';
 import ForwardIcon from '../../Icons/ForwardIcon';
 import Label from '../../Label/Label';
 import CollateralRatioVisualization from '../../Visualizations/CollateralRatioVisualization';
+
+const SLIPPAGE = 0.02;
 
 type Props = {
   selectedPool: GetBorrowerLiquidityPoolsQuery['getPools'][number];
@@ -76,10 +78,24 @@ function LiquidityDepositWithdraw({ selectedPool }: Props) {
   const onSubmit = (data: FieldValues) => {
     const tokenAAmount = data.tokenAAmount ? parseInt(data.tokenAAmount) : 0;
     const tokenBAmount = data.tokenBAmount ? parseInt(data.tokenBAmount) : 0;
+    const deadline = new Date().getTime() + 1000 * 60 * 2; // 2 minutes
+    const _maxMintFeePercentage = floatToBigInt(0.02);
 
     if (tabValue === 'DEPOSIT') {
-      (debtTokenContracts[tokenA.token.address] as DebtToken).approve(Contracts.SwapOperations, tokenAAmount);
-      (debtTokenContracts[tokenB.token.address] as DebtToken).approve(Contracts.SwapOperations, tokenBAmount);
+      // @ts-ignore
+      (debtTokenContracts[tokenA.token.address] as DebtToken).approve(selectedPool.id, tokenAAmount);
+      // @ts-ignore
+      (debtTokenContracts[tokenB.token.address] as DebtToken).approve(selectedPool.id, tokenBAmount);
+      swapOperationsContract.addLiquidity(
+        tokenA.token.address,
+        tokenB.token.address,
+        floatToBigInt(tokenAAmount),
+        floatToBigInt(tokenBAmount),
+        floatToBigInt(tokenAAmount * (1 - SLIPPAGE)),
+        floatToBigInt(tokenBAmount * (1 - SLIPPAGE)),
+        _maxMintFeePercentage,
+        deadline,
+      );
     } else {
     }
   };

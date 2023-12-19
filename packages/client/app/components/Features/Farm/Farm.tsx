@@ -67,6 +67,7 @@ const Farm = () => {
     const farmShortValue = parseFloat(data.farmShortValue);
     const maxSlippage = parseFloat(data.maxSlippage) / 100;
     const deadline = new Date().getTime() + 1000 * 60 * 2; // 2 minutes
+    const _maxMintFeePercentage = floatToBigInt(0.02);
 
     if (tabValue === 'Long') {
       await swapOperationsContract.openLongPosition(
@@ -74,8 +75,7 @@ const Farm = () => {
         floatToBigInt(getExpectedPositionSize() * (1 - maxSlippage)),
         selectedToken!.address,
         address,
-        // TODO: What is this
-        BigInt(0),
+        _maxMintFeePercentage,
         deadline,
       );
     } else {
@@ -84,8 +84,7 @@ const Farm = () => {
         floatToBigInt(getExpectedPositionSize() * (1 - maxSlippage)),
         selectedToken!.address,
         address,
-        // TODO: What is this
-        BigInt(0),
+        _maxMintFeePercentage,
         deadline,
       );
     }
@@ -108,21 +107,21 @@ const Farm = () => {
 
   // TODO: Not adjusted for swap fee
   const getPriceImpact = () => {
-    const currentPrice = selectedToken!.liqudityPair[0] / selectedToken!.liqudityPair[1];
+    const {
+      pool: { liqudityPair },
+    } = selectedToken!;
+
+    const currentPrice = liqudityPair[0] / liqudityPair[1];
 
     let newPriceAfterSwap;
     if (tabValue === 'Long') {
       // Calculate new amount of the other token after swap
-      const newY =
-        (selectedToken!.liqudityPair[1] * selectedToken!.liqudityPair[0]) /
-        (selectedToken!.liqudityPair[0] + watchFarmShortValue);
-      newPriceAfterSwap = watchFarmShortValue / (selectedToken!.liqudityPair[1] - newY);
+      const newY = (liqudityPair[1] * liqudityPair[0]) / (liqudityPair[0] + watchFarmShortValue);
+      newPriceAfterSwap = watchFarmShortValue / (liqudityPair[1] - newY);
     } else {
       // Calculate new amount of jUSD after swap
-      const newX =
-        (selectedToken!.liqudityPair[0] * selectedToken!.liqudityPair[1]) /
-        (selectedToken!.liqudityPair[1] + watchFarmShortValue);
-      newPriceAfterSwap = (selectedToken!.liqudityPair[0] - newX) / watchFarmShortValue;
+      const newX = (liqudityPair[0] * liqudityPair[1]) / (liqudityPair[1] + watchFarmShortValue);
+      newPriceAfterSwap = (liqudityPair[0] - newX) / watchFarmShortValue;
     }
 
     // Calculate price impact
