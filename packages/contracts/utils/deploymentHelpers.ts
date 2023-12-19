@@ -3,13 +3,12 @@ import {
   CollTokenManager,
   DebtTokenManager,
   SwapOperations,
-  MockERC20,
   MockPriceFeed,
   RedemptionOperations,
   LiquidationOperations,
   MockBorrowerOperations,
   MockTroveManager,
-  StabilityPoolManagerTester,
+  MockStabilityPoolManager,
   StoragePool,
   ReservePool,
 } from '../typechain';
@@ -20,7 +19,7 @@ export interface Contracts {
   redemptionOperations: RedemptionOperations;
   liquidationOperations: LiquidationOperations;
   troveManager: MockTroveManager;
-  stabilityPoolManager: StabilityPoolManagerTester;
+  stabilityPoolManager: MockStabilityPoolManager;
   storagePool: StoragePool;
   reservePool: ReservePool;
   collTokenManager: CollTokenManager;
@@ -44,7 +43,7 @@ export const deployCore = async (): Promise<Contracts> => {
   const troveManagerFactory = await ethers.getContractFactory('MockTroveManager');
   const troveManager = await troveManagerFactory.deploy();
 
-  const stabilityPoolManagerFactory = await ethers.getContractFactory('StabilityPoolManagerTester');
+  const stabilityPoolManagerFactory = await ethers.getContractFactory('MockStabilityPoolManager');
   const stabilityPoolManager = await stabilityPoolManagerFactory.deploy();
 
   const storagePoolFactory = await ethers.getContractFactory('StoragePool');
@@ -203,43 +202,3 @@ export const deployAndLinkToken = async (contracts: Contracts) => {
     parseUnits('1000000')
   );
 };
-
-// class DeploymentHelper {
-//   static async deployTesterContracts() {
-//     const testerContracts = {
-//       priceFeedTestnet: await PriceFeedTestnet.new(),
-//       troveManager: await TroveManager.new(),
-//       functionCaller: await FunctionCaller.new(),
-//       stabilityPoolManager: await StabilityPoolManager.new(),
-//       collTokenManager: await CollTokenManager.new(),
-//       debtTokenManager: await DebtTokenManager.new(),
-//       // Actual tester contract
-//       storagePool: await StoragePoolTester.new(),
-//       borrowerOperations: await BorrowerOperationsTester.new(),
-//       math: await LiquityMathTester.new(),
-//     };
-
-//     return testerContracts;
-//   }
-
-//   static async deployProxyScripts(contracts, owner, users) {
-//     const proxies = await buildUserProxies(users);
-
-//     const borrowerWrappersScript = await BorrowerWrappersScript.new(
-//       contracts.borrowerOperations.address,
-//       contracts.troveManager.address
-//     );
-//     contracts.borrowerWrappers = new BorrowerWrappersProxy(owner, proxies, borrowerWrappersScript.address);
-
-//     const borrowerOperationsScript = await BorrowerOperationsScript.new(contracts.borrowerOperations.address);
-//     contracts.borrowerOperations = new BorrowerOperationsProxy(
-//       owner,
-//       proxies,
-//       borrowerOperationsScript.address,
-//       contracts.borrowerOperations
-//     );
-
-//     const troveManagerScript = await TroveManagerScript.new(contracts.troveManager.address);
-//     contracts.troveManager = new TroveManagerProxy(owner, proxies, troveManagerScript.address, contracts.troveManager);
-//   }
-// }

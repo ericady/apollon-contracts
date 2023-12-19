@@ -6,7 +6,7 @@ import {
   TroveManager,
   StoragePool,
   MockBorrowerOperations,
-  StabilityPoolManagerTester,
+  MockStabilityPoolManager,
 } from '../typechain';
 import { Contracts, deployCore, connectCoreContracts, deployAndLinkToken } from '../utils/deploymentHelpers';
 import { SignerWithAddress } from '@nomicfoundation/hardhat-ethers/signers';
@@ -23,34 +23,18 @@ describe('DebtToken', () => {
   let owner: SignerWithAddress;
   let alice: SignerWithAddress;
   let bob: SignerWithAddress;
-  let carol: SignerWithAddress;
-  let whale: SignerWithAddress;
-  let dennis: SignerWithAddress;
-  let erin: SignerWithAddress;
-  let flyn: SignerWithAddress;
-
-  let defaulter_1: SignerWithAddress;
-  let defaulter_2: SignerWithAddress;
-  let defaulter_3: SignerWithAddress;
-
-  let storagePool: StoragePool;
 
   let STABLE: MockDebtToken;
   let STOCK: MockDebtToken;
-  let BTC: MockERC20;
-
-  let priceFeed: MockPriceFeed;
-  let troveManager: TroveManager;
-
-  let borrowerOperations: MockBorrowerOperations;
-
-  let stabilityPoolManager: StabilityPoolManagerTester;
 
   let contracts: Contracts;
+  let troveManager: TroveManager;
+  let borrowerOperations: MockBorrowerOperations;
+  let stabilityPoolManager: MockStabilityPoolManager;
 
   before(async () => {
     signers = await ethers.getSigners();
-    [owner, defaulter_1, defaulter_2, defaulter_3, whale, alice, bob, carol, dennis, erin, flyn] = signers;
+    [owner, , , , , alice, bob] = signers;
   });
 
   beforeEach(async () => {
@@ -58,15 +42,12 @@ describe('DebtToken', () => {
     await connectCoreContracts(contracts);
     await deployAndLinkToken(contracts);
 
-    priceFeed = contracts.priceFeed;
     troveManager = contracts.troveManager;
     borrowerOperations = contracts.borrowerOperations;
-    storagePool = contracts.storagePool;
     stabilityPoolManager = contracts.stabilityPoolManager;
 
     STABLE = contracts.debtToken.STABLE;
     STOCK = contracts.debtToken.STOCK;
-    BTC = contracts.collToken.BTC;
   });
 
   const getDomainSeparator = (name: string, contractAddress: string, chainId: bigint, version: string) => {

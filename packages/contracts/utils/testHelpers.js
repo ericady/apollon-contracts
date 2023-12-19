@@ -3,8 +3,6 @@
 const BN = require('bn.js');
 const web3 = require('web3');
 
-// const Destructible = artifacts.require('./TestContracts/Destructible.sol');
-
 const MoneyValues = {
   negative_5e17: '-' + web3.utils.toWei('500', 'finney'),
   negative_1e18: '-' + web3.utils.toWei('1', 'ether'),
@@ -1284,11 +1282,11 @@ class TestHelper {
 
   // --- Misc. functions  ---
 
-  static async forceSendEth(from, receiver, value) {
-    const destructible = await Destructible.new();
-    await web3.eth.sendTransaction({ to: destructible.address, from, value });
-    await destructible.destruct(receiver);
-  }
+  // static async forceSendEth(from, receiver, value) {
+  //   const destructible = await Destructible.new();
+  //   await web3.eth.sendTransaction({ to: destructible.address, from, value });
+  //   await destructible.destruct(receiver);
+  // }
 
   static hexToParam(hexValue) {
     return ('0'.repeat(64) + hexValue.slice(2)).slice(-64);

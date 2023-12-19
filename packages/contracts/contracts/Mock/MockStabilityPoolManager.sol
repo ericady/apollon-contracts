@@ -4,7 +4,7 @@ pragma solidity ^0.8.9;
 
 import '../StabilityPoolManager.sol';
 
-contract StabilityPoolManagerTester is StabilityPoolManager {
+contract MockStabilityPoolManager is StabilityPoolManager {
   // DEBTTOKEN TESTER PROXIES
   function testDebtToken_sendToPool(
     address _sender,

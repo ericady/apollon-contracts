@@ -1,13 +1,5 @@
 import { ethers } from 'hardhat';
-import {
-  MockDebtToken,
-  MockERC20,
-  MockPriceFeed,
-  TroveManager,
-  StabilityPoolManager,
-  StoragePool,
-  MockBorrowerOperations,
-} from '../typechain';
+import { MockDebtToken, MockERC20, StoragePool, MockBorrowerOperations } from '../typechain';
 import { Contracts, deployCore, connectCoreContracts, deployAndLinkToken } from '../utils/deploymentHelpers';
 import { SignerWithAddress } from '@nomicfoundation/hardhat-ethers/signers';
 import { assertRevert } from '../utils/testHelper';
@@ -19,52 +11,28 @@ describe('StoragePool', () => {
   const oneSTABLE = parseUnits('1');
 
   let signers: SignerWithAddress[];
-  let owner: SignerWithAddress;
   let alice: SignerWithAddress;
-  let bob: SignerWithAddress;
-  let carol: SignerWithAddress;
-  let whale: SignerWithAddress;
-  let dennis: SignerWithAddress;
-  let erin: SignerWithAddress;
-  let flyn: SignerWithAddress;
-
-  let defaulter_1: SignerWithAddress;
-  let defaulter_2: SignerWithAddress;
-  let defaulter_3: SignerWithAddress;
-
-  let storagePool: StoragePool;
 
   let STABLE: MockDebtToken;
-  let STOCK: MockDebtToken;
   let BTC: MockERC20;
 
-  let priceFeed: MockPriceFeed;
-  let troveManager: TroveManager;
-
+  let storagePool: StoragePool;
   let borrowerOperations: MockBorrowerOperations;
-
-  let stabilityPoolManager: StabilityPoolManager;
-
   let contracts: Contracts;
 
   before(async () => {
     signers = await ethers.getSigners();
-    [owner, defaulter_1, defaulter_2, defaulter_3, whale, alice, bob, carol, dennis, erin, flyn] = signers;
+    [, , , , , alice] = signers;
   });
 
   const commonSetup = async (contracts: Contracts) => {
     await connectCoreContracts(contracts);
-
     await deployAndLinkToken(contracts);
 
-    priceFeed = contracts.priceFeed;
-    troveManager = contracts.troveManager;
     borrowerOperations = contracts.borrowerOperations;
     storagePool = contracts.storagePool;
-    stabilityPoolManager = contracts.stabilityPoolManager;
 
     STABLE = contracts.debtToken.STABLE;
-    STOCK = contracts.debtToken.STOCK;
     BTC = contracts.collToken.BTC;
   };
 
