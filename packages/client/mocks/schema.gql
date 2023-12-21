@@ -92,7 +92,6 @@ type PoolLiquidity {
   id: ID!
   token: Token!
   totalAmount: Float!
-  borrowerAmount: Float!
 }
 
 type PoolReward {
@@ -109,9 +108,12 @@ type Pool {
   liquidity: [PoolLiquidity!]!
   rewards: [PoolReward!]!
   liquidityDepositAPY: Float!
-  # TODO: wasa
   volume30dUSD: Float!
   volume30dUSD30dAgo: Float!
+
+  totalSupply: Float!
+  # client side
+  borrowerAmount: Float!
 }
 
 type Query {

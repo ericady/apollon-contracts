@@ -32,17 +32,21 @@ function LiquidityPoolsTable({ selectedPool, setSelectedPool }: Props) {
     GetBorrowerLiquidityPoolsQueryVariables
   >(GET_BORROWER_LIQUIDITY_POOLS, { variables: { borrower: address } });
 
-  // sort for highest borrower participation
-  const allPoolsSorted: GetBorrowerLiquidityPoolsQuery['getPools'] = useMemo(
-    () =>
-      borrowerPoolsData?.getPools.sort(
-        ({ liquidity: [liqA1, liqA2] }, { liquidity: [liqB1, liqB2] }) =>
-          liqB1.borrowerAmount * liqB1.token.priceUSD +
-          liqB2.borrowerAmount * liqB2.token.priceUSD -
-          (liqA1.borrowerAmount * liqA1.token.priceUSD + liqA2.borrowerAmount * liqA2.token.priceUSD),
-      ) ?? [],
-    [borrowerPoolsData],
-  );
+  // sort for highest borrower investment
+  const allPoolsSorted: GetBorrowerLiquidityPoolsQuery['getPools'] = useMemo(() => {
+    const poolsCopy = [...(borrowerPoolsData?.getPools ?? [])];
+
+    return poolsCopy.sort(
+      (
+        { totalSupply: totalSupplyA, borrowerAmount: borrowerAmountA, liquidity: [liqA1, liqA2] },
+        { totalSupply: totalSupplyB, borrowerAmount: borrowerAmountB, liquidity: [liqB1, liqB2] },
+      ) =>
+        (borrowerAmountB / totalSupplyB) * liqA1.totalAmount * liqA1.token.priceUSD +
+        (borrowerAmountB / totalSupplyB) * liqA2.totalAmount * liqA2.token.priceUSD -
+        ((borrowerAmountA / totalSupplyA) * liqB1.totalAmount * liqB1.token.priceUSD +
+          (borrowerAmountA / totalSupplyA) * liqB2.totalAmount * liqB2.token.priceUSD),
+    );
+  }, [borrowerPoolsData]);
 
   useEffect(() => {
     // Select first pool by default
@@ -80,7 +84,15 @@ function LiquidityPoolsTable({ selectedPool, setSelectedPool }: Props) {
 
           <TableBody>
             {allPoolsSorted.map((pool) => {
-              const { id, liquidity, volume30dUSD, volume30dUSD30dAgo, liquidityDepositAPY } = pool;
+              const {
+                id,
+                liquidity,
+                volume30dUSD,
+                volume30dUSD30dAgo,
+                liquidityDepositAPY,
+                borrowerAmount,
+                totalSupply,
+              } = pool;
               const [tokenA, tokenB] = liquidity;
               const volumeChange = percentageChange(volume30dUSD, volume30dUSD30dAgo);
 
@@ -114,7 +126,7 @@ function LiquidityPoolsTable({ selectedPool, setSelectedPool }: Props) {
                           fontSize: '11.7px',
                         }}
                       >
-                        {!isNaN(tokenA.borrowerAmount!) ? roundCurrency(tokenA.borrowerAmount!) : 0}
+                        {roundCurrency((borrowerAmount / totalSupply) * tokenA.totalAmount)}
                       </span>
                     </Typography>
                   </TableCell>
@@ -138,7 +150,7 @@ function LiquidityPoolsTable({ selectedPool, setSelectedPool }: Props) {
                           fontSize: '11.7px',
                         }}
                       >
-                        {!isNaN(tokenB.borrowerAmount!) ? roundCurrency(tokenB.borrowerAmount!) : 0}
+                        {roundCurrency((borrowerAmount / totalSupply) * tokenB.totalAmount)}
                       </span>
                     </Typography>
                   </TableCell>

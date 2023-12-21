@@ -32,7 +32,6 @@ import {
   GET_COLLATERAL_RATIO_HISTORY,
   GET_COLLATERAL_USD_HISTORY,
   GET_DEBT_USD_HISTORY,
-  GET_LIQUIDITY_POOLS,
   GET_RESERVE_USD_HISTORY,
   GET_SELECTED_TOKEN,
   GET_TROVEMANAGER,
@@ -114,7 +113,7 @@ const userColl = faker.helpers
     return {
       ...collTokenMeta,
       walletAmount: faker.number.float({ min: 500, max: 1000, precision: 0.0001 }),
-      troveLockedAmount: faker.number.float({ min: 500, max: 1000, precision: 0.0001 }),
+      troveLockedAmount: faker.number.float({ min: 5000, max: 10000, precision: 0.0001 }),
       stabilityGainedAmount: faker.number.float({ min: 100, max: 500, precision: 0.0001 }),
     };
   });
@@ -150,7 +149,7 @@ const userDebt = faker.helpers
     return {
       ...debtTokenMeta,
       walletAmount: faker.number.float({ min: 100, max: 500, precision: 0.0001 }),
-      troveMintedAmount: faker.number.float({ min: 100, max: 500, precision: 0.0001 }),
+      troveMintedAmount: faker.number.float({ min: 1000, max: 5000, precision: 0.0001 }),
       stabilityLostAmount: faker.number.float({ min: 100, max: 500, precision: 0.0001 }),
       stabilityCompoundAmount: faker.number.float({ min: 100, max: 500, precision: 0.0001 }),
     };
@@ -176,10 +175,10 @@ for (let i = 0; i < allTokens.length; i++) {
       id: faker.string.uuid(),
       swapFee: faker.number.float({ min: -0.05, max: 0.05, precision: 0.0001 }),
       liquidity: sortedPair.map((token) => ({
+        id: faker.string.uuid(),
         __typename: 'PoolLiquidity',
         token,
         totalAmount: parseFloat(faker.finance.amount(100000, 1000000, 2)),
-        borrowerAmount: null,
       })),
       // Taking a subset of tokens for demonstration
       rewards: faker.datatype.boolean({ probability: 0.05 })
@@ -193,6 +192,9 @@ for (let i = 0; i < allTokens.length; i++) {
       liquidityDepositAPY: faker.number.float({ min: 0, max: 0.5, precision: 0.0001 }),
       volume30dUSD: parseFloat(faker.finance.amount(10000, 50000, 2)),
       volume30dUSD30dAgo: parseFloat(faker.finance.amount(10000, 50000, 2)),
+
+      borrowerAmount: 0,
+      totalSupply: faker.number.float({ min: 100000, max: 1000000, precision: 0.0001 }),
     });
   }
 }
@@ -338,10 +340,10 @@ export const handlers = [
           __typename: 'DebtTokenMeta',
           id: faker.string.uuid(),
           token: token,
-          walletAmount: null,
-          troveMintedAmount: null,
-          stabilityLostAmount: null,
-          stabilityCompoundAmount: null,
+          walletAmount: 0,
+          troveMintedAmount: 0,
+          stabilityLostAmount: 0,
+          stabilityCompoundAmount: 0,
 
           totalDepositedStability: parseFloat(faker.finance.amount(1000, 5000, 2)),
           totalReserve: shouldHaveReserve ? parseFloat(faker.finance.amount(1000, 5000, 2)) : 0,
@@ -491,12 +493,6 @@ export const handlers = [
     },
   ),
 
-  // GetLiquidityPools
-  graphql.query<{ getPools: Query['getPools'] }, QueryGetPoolsArgs>(GET_LIQUIDITY_POOLS, (req, res, ctx) => {
-    const result: Query['getPools'] = liquidityPools;
-
-    return res(ctx.data({ getPools: result }));
-  }),
   // GetBorrowerLiquidityPools
   graphql.query<{ getPools: Query['getPools'] }, QueryGetPoolsArgs>(GET_BORROWER_LIQUIDITY_POOLS, (req, res, ctx) => {
     const { borrower } = req.variables;
@@ -512,13 +508,13 @@ export const handlers = [
       (pool) => !borrowerLiquidityPools.find(({ id }) => id === pool.id),
     );
 
-    const liqudityPoolsWithBorrower: Query['getPools'] = borrowerLiquidityPools.map((pool) => {
+    const liqudityPoolsWithBorrower: Query['getPools'] = borrowerLiquidityPools.map<Pool>((pool) => {
       return {
         ...pool,
         liquidity: pool.liquidity.map((liquidity) => ({
           ...liquidity,
-          borrowerAmount: parseFloat(faker.finance.amount(0, 10000, 2)),
         })),
+        borrowerAmount: faker.number.float({ min: 10, max: pool.totalSupply / 100, precision: 0.0001 }),
       };
     });
 

@@ -11,13 +11,8 @@ import {
 import { AddressLike, ethers } from 'ethers';
 import { PropsWithChildren, useEffect } from 'react';
 import { DebtToken, SwapPair, TroveManager } from '../../generated/types';
-import {
-  GetDebtTokensQuery,
-  GetDebtTokensQueryVariables,
-  QueryGetTokenArgs,
-  TokenFragmentFragment,
-} from '../generated/gql-types';
-import { GET_ALL_DEBT_TOKENS, TOKEN_FRAGMENT } from '../queries';
+import { QueryGetTokenArgs, TokenFragmentFragment } from '../generated/gql-types';
+import { TOKEN_FRAGMENT } from '../queries';
 import { floatToBigInt } from '../utils/math';
 import { Contracts, useEthers } from './EthersProvider';
 
@@ -265,41 +260,23 @@ const getProductionCacheConfig = ({
             return 0;
           },
         },
-      },
-    },
 
-    PoolLiquidity: {
-      fields: {
         borrowerAmount: {
-          read(_, { readField, cache }) {
-            const token = readField('token') as Readonly<Reference>;
-
-            const tokenData = cache.readFragment<TokenFragmentFragment>({
-              id: token.__ref,
-              fragment: TOKEN_FRAGMENT,
-            });
+          read(_, { readField }) {
+            const poolAddress = readField('id') as Readonly<string>;
 
             // FIXME: Change for dynamic address later
-
             if (
-              tokenData?.address &&
+              poolAddress &&
               borrower &&
               isFieldOutdated(
                 SchemaDataFreshnessManager.SwapPairs['0x509ee0d083ddf8ac028f2a56731412edd63224b9'],
                 'borrowerAmount',
               )
             ) {
-              const debtTokens = cache.readQuery<GetDebtTokensQuery, GetDebtTokensQueryVariables>({
-                query: GET_ALL_DEBT_TOKENS,
-              })!;
-              const debtToken = debtTokens.getDebtTokens.find(({ token }) => token.id === tokenData.id)!;
-              const totalAmount = readField('totalAmount') as number;
-
               SchemaDataFreshnessManager.SwapPairs['0x509ee0d083ddf8ac028f2a56731412edd63224b9'].borrowerAmount.fetch(
                 swapPairContracts,
                 borrower,
-                totalAmount,
-                debtToken.totalReserve,
               );
             }
 
@@ -546,6 +523,24 @@ export const SchemaDataFreshnessManager: ContractDataFreshnessManager<typeof Con
 
           SchemaDataFreshnessManager.SwapPairs['0x509ee0d083ddf8ac028f2a56731412edd63224b9'].borrowerAmount.value(
             ethers.toNumber(amount),
+          );
+        },
+        value: makeVar(0),
+        lastFetched: 0,
+        timeout: 1000 * 5,
+      },
+
+      proxyTokenAmount: {
+        fetch: async (swapPairContract: SwapPair, borrower: AddressLike, totalAmount: number, totalReserve: number) => {
+          SchemaDataFreshnessManager.SwapPairs[
+            '0x509ee0d083ddf8ac028f2a56731412edd63224b9'
+          ].borrowerAmount.lastFetched = Date.now();
+          const userPoolBalance = await swapPairContract.balanceOf(borrower);
+
+          const amount = userPoolBalance / (floatToBigInt(totalReserve) * floatToBigInt(totalAmount));
+
+          SchemaDataFreshnessManager.SwapPairs['0x509ee0d083ddf8ac028f2a56731412edd63224b9'].borrowerAmount.value(
+            ethers.toNumber(userPoolBalance),
           );
         },
         value: makeVar(0),

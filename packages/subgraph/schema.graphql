@@ -168,6 +168,9 @@ type Pool @entity {
   volume30dUSD: PoolVolume30d!
   # once the first PoolEvent of the array is > 24h ago, we can remove it from the array and push it to the 24hAgo field
   volume30dUSD30dAgo: PoolVolume30d!
+
+  # TODO: wasa Proxy Token amount 
+  totalSupply: Float!
 }
 
 # Aggregator, pushed old events out and lets new in, recalculating the acc value each time

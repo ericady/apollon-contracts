@@ -4,7 +4,7 @@ import { useQuery } from '@apollo/client';
 import { createContext, useContext, useState } from 'react';
 import { GetCollateralTokensQuery, GetCollateralTokensQueryVariables } from '../generated/gql-types';
 import { GET_BORROWER_COLLATERAL_TOKENS } from '../queries';
-import { Contracts } from './EthersProvider';
+import { Contracts, useEthers } from './EthersProvider';
 
 export type SelectedToken = {
   swapFee: number;
@@ -34,10 +34,18 @@ export const SelectedTokenContext = createContext<{
 });
 
 export default function SelectedTokenProvider({ children }: { children: React.ReactNode }): JSX.Element {
+  const { address } = useEthers();
+
   const [selectedToken, setSelectedToken] = useState<SelectedToken | null>(null);
 
   const { data } = useQuery<GetCollateralTokensQuery, GetCollateralTokensQueryVariables>(
     GET_BORROWER_COLLATERAL_TOKENS,
+    {
+      fetchPolicy: 'cache-first',
+      variables: {
+        borrower: address,
+      },
+    },
   );
   const JUSDToken = data?.getCollateralTokens.find(({ token }) => token.address === Contracts.ERC20.JUSD)?.token;
   const tokenRatio =

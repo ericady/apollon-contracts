@@ -35,7 +35,7 @@ type FieldValues = {
 };
 
 function LiquidityDepositWithdraw({ selectedPool }: Props) {
-  const { liquidity } = selectedPool;
+  const { liquidity, borrowerAmount, totalSupply } = selectedPool;
   const [tokenA, tokenB] = liquidity;
 
   const {
@@ -44,7 +44,6 @@ function LiquidityDepositWithdraw({ selectedPool }: Props) {
   } = useEthers();
 
   const [tabValue, setTabValue] = useState<'DEPOSIT' | 'WITHDRAW'>('DEPOSIT');
-  const [readOnlyField, setReadOnlyField] = useState<keyof FieldValues | null>(null);
 
   const [oldRatio, setOldRatio] = useState<number | null>(null);
   const [newRatio, setNewRatio] = useState<number | null>(null);
@@ -56,9 +55,11 @@ function LiquidityDepositWithdraw({ selectedPool }: Props) {
 
   const relevantDebtTokenA = data?.getDebtTokens.find(({ token }) => token.id === tokenA.token.id) ?? {
     walletAmount: 0,
+    troveMintedAmount: 0,
   };
   const relevantDebtTokenB = data?.getDebtTokens.find(({ token }) => token.id === tokenB.token.id) ?? {
     walletAmount: 0,
+    troveMintedAmount: 0,
   };
 
   const handleChange = (_: SyntheticEvent, newValue: 'DEPOSIT' | 'WITHDRAW') => {
@@ -72,21 +73,22 @@ function LiquidityDepositWithdraw({ selectedPool }: Props) {
       tokenBAmount: '',
     },
     reValidateMode: 'onChange',
+    shouldUnregister: true,
   });
   const { handleSubmit, setValue, reset, formState, watch } = methods;
 
-  const onSubmit = (data: FieldValues) => {
-    const tokenAAmount = data.tokenAAmount ? parseInt(data.tokenAAmount) : 0;
-    const tokenBAmount = data.tokenBAmount ? parseInt(data.tokenBAmount) : 0;
+  const onSubmit = async (data: FieldValues) => {
+    const tokenAAmount = data.tokenAAmount ? parseFloat(data.tokenAAmount) : 0;
+    const tokenBAmount = data.tokenBAmount ? parseFloat(data.tokenBAmount) : 0;
     const deadline = new Date().getTime() + 1000 * 60 * 2; // 2 minutes
     const _maxMintFeePercentage = floatToBigInt(0.02);
 
     if (tabValue === 'DEPOSIT') {
       // @ts-ignore
-      (debtTokenContracts[tokenA.token.address] as DebtToken).approve(selectedPool.id, tokenAAmount);
+      await (debtTokenContracts[tokenA.token.address] as DebtToken).approve(selectedPool.id, tokenAAmount);
       // @ts-ignore
-      (debtTokenContracts[tokenB.token.address] as DebtToken).approve(selectedPool.id, tokenBAmount);
-      swapOperationsContract.addLiquidity(
+      await (debtTokenContracts[tokenB.token.address] as DebtToken).approve(selectedPool.id, tokenBAmount);
+      await swapOperationsContract.addLiquidity(
         tokenA.token.address,
         tokenB.token.address,
         floatToBigInt(tokenAAmount),
@@ -97,6 +99,19 @@ function LiquidityDepositWithdraw({ selectedPool }: Props) {
         deadline,
       );
     } else {
+      const percentageFromPool = tokenAAmount / totalSupply;
+      const percentagefromUser = tokenAAmount / borrowerAmount;
+      const tokenAAmountForWithdraw = percentageFromPool * tokenA.totalAmount;
+      const tokenBAmountForWithdraw = percentageFromPool * tokenB.totalAmount;
+
+      await swapOperationsContract.removeLiquidity(
+        tokenA.token.address,
+        tokenB.token.address,
+        floatToBigInt(percentagefromUser),
+        floatToBigInt(tokenAAmountForWithdraw * (1 - SLIPPAGE)),
+        floatToBigInt(tokenBAmountForWithdraw * (1 - SLIPPAGE)),
+        deadline,
+      );
     }
   };
 
@@ -109,7 +124,7 @@ function LiquidityDepositWithdraw({ selectedPool }: Props) {
   );
 
   useEffect(() => {
-    if (!tokenA.borrowerAmount && !tokenB.borrowerAmount) {
+    if (!borrowerAmount) {
       setTabValue('DEPOSIT');
     }
 
@@ -136,49 +151,55 @@ function LiquidityDepositWithdraw({ selectedPool }: Props) {
           shouldDirty: true,
         });
       }
-
-      setReadOnlyField(fieldName);
     } else {
     }
   };
 
   const fillMaxInputValue = (fieldName: keyof FieldValues) => {
     if (tabValue === 'DEPOSIT') {
-      if (fieldName === 'tokenAAmount' && tokenA.borrowerAmount) {
+      if (fieldName === 'tokenAAmount' && relevantDebtTokenA.walletAmount) {
         setValue(fieldName, relevantDebtTokenA.walletAmount.toString(), {
           shouldValidate: true,
           shouldDirty: true,
         });
-      } else if (fieldName === 'tokenBAmount' && tokenB.borrowerAmount) {
+        handleInput(fieldName, relevantDebtTokenA.walletAmount.toString());
+      } else if (fieldName === 'tokenBAmount' && relevantDebtTokenB.walletAmount) {
         setValue(fieldName, relevantDebtTokenB.walletAmount.toString(), {
           shouldValidate: true,
           shouldDirty: true,
         });
+        handleInput(fieldName, relevantDebtTokenB.walletAmount.toString());
       }
-
-      setReadOnlyField(fieldName);
     } else {
+      setValue(fieldName, borrowerAmount.toString(), {
+        shouldValidate: true,
+        shouldDirty: true,
+      });
     }
   };
 
   const tokenAAmount = watch('tokenAAmount');
   const tokenBAmount = watch('tokenBAmount');
 
+  // Withdraw
+  const percentageFromPool = (tokenAAmount ? parseFloat(tokenAAmount) : 0) / totalSupply;
+  const tokenAAmountForWithdraw = percentageFromPool * tokenA.totalAmount;
+  const tokenBAmountForWithdraw = percentageFromPool * tokenB.totalAmount;
+
   const addedDebtUSD =
-    ((tokenAAmount ? parseInt(tokenAAmount) * tokenA.token.priceUSD : 0) +
-      (tokenBAmount ? parseInt(tokenBAmount) * tokenB.token.priceUSD : 0)) *
-    (tabValue === 'DEPOSIT' ? -1 : 1);
+    tabValue === 'DEPOSIT'
+      ? ((tokenAAmount ? parseFloat(tokenAAmount) * tokenA.token.priceUSD : 0) +
+          (tokenBAmount ? parseFloat(tokenBAmount) * tokenB.token.priceUSD : 0)) *
+        -1
+      : tokenAAmountForWithdraw * tokenA.token.priceUSD + tokenBAmountForWithdraw * tokenB.token.priceUSD;
+
+  console.log('addedDebtUSD: ', addedDebtUSD);
 
   return (
     <FeatureBox title="Your Liquidity" noPadding headBorder="bottom" border="full">
       <Tabs value={tabValue} onChange={handleChange} variant="fullWidth" sx={{ mt: 2 }}>
         <Tab label="DEPOSIT" value="DEPOSIT" disableRipple />
-        <Tab
-          label="WITHDRAW"
-          value="WITHDRAW"
-          disableRipple
-          disabled={!tokenA.borrowerAmount && !tokenB.borrowerAmount}
-        />
+        <Tab label="WITHDRAW" value="WITHDRAW" disableRipple disabled={!borrowerAmount} />
       </Tabs>
       <FormProvider {...methods}>
         <form onSubmit={handleSubmit(onSubmit)}>
@@ -203,7 +224,7 @@ function LiquidityDepositWithdraw({ selectedPool }: Props) {
                     sx={{ fontWeight: '400', marginTop: '10px' }}
                     data-testid="apollon-liquidity-pool-deposit-token-a-funds-label"
                   >
-                    {roundCurrency(tokenA.borrowerAmount ?? 0, 5)}
+                    {roundCurrency((borrowerAmount / totalSupply) * tokenA.totalAmount, 5)}
                   </Typography>
                   <Typography variant="label">Deposited</Typography>
                 </div>
@@ -232,8 +253,8 @@ function LiquidityDepositWithdraw({ selectedPool }: Props) {
                       >
                         {tokenAAmount
                           ? roundCurrency(
-                              parseInt(tokenAAmount) < relevantDebtTokenA.walletAmount
-                                ? parseInt(tokenAAmount)
+                              parseFloat(tokenAAmount) < relevantDebtTokenA.walletAmount
+                                ? parseFloat(tokenAAmount)
                                 : relevantDebtTokenA.walletAmount,
                               5,
                             )
@@ -262,8 +283,8 @@ function LiquidityDepositWithdraw({ selectedPool }: Props) {
                       >
                         {tokenAAmount
                           ? roundCurrency(
-                              parseInt(tokenAAmount) > relevantDebtTokenA.walletAmount
-                                ? parseInt(tokenAAmount) - relevantDebtTokenA.walletAmount
+                              parseFloat(tokenAAmount) > relevantDebtTokenA.walletAmount
+                                ? parseFloat(tokenAAmount) - relevantDebtTokenA.walletAmount
                                 : 0,
                               5,
                             )
@@ -302,7 +323,7 @@ function LiquidityDepositWithdraw({ selectedPool }: Props) {
                     sx={{ fontWeight: '400', marginTop: '10px' }}
                     data-testid="apollon-liquidity-pool-deposit-token-b-funds-label"
                   >
-                    {roundCurrency(tokenB.borrowerAmount ?? 0, 5)}
+                    {roundCurrency((borrowerAmount / totalSupply) * tokenB.totalAmount, 5)}
                   </Typography>
                   <Typography variant="label">Deposited</Typography>
                 </div>
@@ -331,8 +352,8 @@ function LiquidityDepositWithdraw({ selectedPool }: Props) {
                       >
                         {tokenBAmount
                           ? roundCurrency(
-                              parseInt(tokenBAmount) < relevantDebtTokenB.walletAmount
-                                ? parseInt(tokenBAmount)
+                              parseFloat(tokenBAmount) < relevantDebtTokenB.walletAmount
+                                ? parseFloat(tokenBAmount)
                                 : relevantDebtTokenB.walletAmount,
                               5,
                             )
@@ -361,8 +382,8 @@ function LiquidityDepositWithdraw({ selectedPool }: Props) {
                       >
                         {tokenBAmount
                           ? roundCurrency(
-                              parseInt(tokenBAmount) > relevantDebtTokenB.walletAmount
-                                ? parseInt(tokenBAmount) - relevantDebtTokenB.walletAmount
+                              parseFloat(tokenBAmount) > relevantDebtTokenB.walletAmount
+                                ? parseFloat(tokenBAmount) - relevantDebtTokenB.walletAmount
                                 : 0,
                               5,
                             )
@@ -388,110 +409,128 @@ function LiquidityDepositWithdraw({ selectedPool }: Props) {
 
           {/* WITHDRAW */}
 
-          {tabValue === 'WITHDRAW' && tokenA.borrowerAmount && (
-            <Box
-              sx={{
-                height: '125px',
-                display: 'flex',
-                justifyContent: 'space-between',
-                padding: '20px',
-                borderBottom: '1px solid',
-                borderColor: 'background.paper',
-              }}
-            >
-              <div style={{ marginTop: 6 }}>
-                <Label variant="success">{tokenA.token.symbol}</Label>
-              </div>
-              {/* TODO: Each stock token must be implemented with etherjs. Cant show a label here */}
+          {tabValue === 'WITHDRAW' && borrowerAmount && (
+            <Box style={{ display: 'flex', flexDirection: 'column' }}>
+              <Box
+                sx={{
+                  height: '125px',
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  padding: '20px',
+                  borderBottom: '1px solid',
+                  borderColor: 'background.paper',
+                }}
+              >
+                <div style={{ marginTop: 6 }}>
+                  <Label variant="success">Proxy Token</Label>
+                </div>
 
-              <div>
-                <NumberInput
-                  name="tokenAAmount"
-                  data-testid="apollon-liquidity-pool-withdraw-token-a-amount"
-                  placeholder="Value"
-                  fullWidth
-                  rules={{
-                    min: { value: 0, message: 'You can only invest positive amounts.' },
-                    max: {
-                      value: tokenA.borrowerAmount!,
-                      message: 'This amount is greater than your deposited amount.',
-                    },
-                  }}
-                />
-                <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                  <div>
-                    <Typography
-                      variant="caption"
-                      data-testid="apollon-liquidity-pool-withdraw-token-a-funds-label"
-                      color="info.main"
+                <div>
+                  <NumberInput
+                    name="tokenAAmount"
+                    data-testid="apollon-liquidity-pool-withdraw-token-a-amount"
+                    placeholder="Value"
+                    fullWidth
+                    rules={{
+                      min: { value: 0, message: 'You can only invest positive amounts.' },
+                      max: {
+                        value: borrowerAmount,
+                        message: 'This amount is greater than your deposited amount.',
+                      },
+                    }}
+                  />
+                  <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                    <div>
+                      <Typography
+                        variant="caption"
+                        data-testid="apollon-liquidity-pool-withdraw-token-a-funds-label"
+                        color="info.main"
+                      >
+                        {roundCurrency(borrowerAmount, 5)}
+                      </Typography>
+                      <br />
+                      <Typography variant="label">Deposited</Typography>
+                    </div>
+                    <Button
+                      variant="undercover"
+                      sx={{ textDecoration: 'underline', p: 0, mt: 0.25, height: 25 }}
+                      onClick={() => fillMaxInputValue('tokenAAmount')}
                     >
-                      {roundCurrency(tokenA.borrowerAmount!, 5)}
-                    </Typography>
-                    <br />
-                    <Typography variant="label">Deposited</Typography>
+                      max
+                    </Button>
                   </div>
-                  <Button
-                    variant="undercover"
-                    sx={{ textDecoration: 'underline', p: 0, mt: 0.25, height: 25 }}
-                    onClick={() => fillMaxInputValue('tokenAAmount')}
-                  >
-                    max
-                  </Button>
+                </div>
+              </Box>
+
+              <div
+                style={{
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
+                  padding: '20px 20px 0 20px',
+                }}
+              >
+                <Label variant="success">{tokenA.token.symbol}</Label>
+                <div
+                  style={{
+                    display: 'flex',
+                    flexDirection: 'column',
+                    width: 250,
+                  }}
+                >
+                  <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                    <Typography component="span" style={{ marginRight: '8px' }}>
+                      {roundCurrency(tokenAAmountForWithdraw, 5)}
+                    </Typography>
+
+                    <Typography variant="label">Payout</Typography>
+                  </div>
+
+                  <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                    <Typography component="span" style={{ marginRight: '8px' }}>
+                      {tokenAAmountForWithdraw > relevantDebtTokenA.troveMintedAmount
+                        ? roundCurrency(relevantDebtTokenA.troveMintedAmount, 5)
+                        : roundCurrency(tokenAAmountForWithdraw, 5)}
+                    </Typography>
+
+                    <Typography variant="label">Debt payed of</Typography>
+                  </div>
                 </div>
               </div>
-            </Box>
-          )}
 
-          {tabValue === 'WITHDRAW' && tokenB.borrowerAmount && (
-            <Box
-              sx={{
-                height: '125px',
-                display: 'flex',
-                justifyContent: 'space-between',
-                padding: '20px',
-                borderBottom: '1px solid',
-                borderColor: 'background.paper',
-              }}
-            >
-              <div style={{ marginTop: 6 }}>
+              <div
+                style={{
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'center',
+                  padding: '20px 20px 0 20px',
+                }}
+              >
                 <Label variant="success">{tokenB.token.symbol}</Label>
-              </div>
-              {/* TODO: Each stock token must be implemented with etherjs. Cant show a label here */}
-
-              <div>
-                <NumberInput
-                  name="tokenBAmount"
-                  data-testid="apollon-liquidity-pool-withdraw-token-b-amount"
-                  placeholder="Value"
-                  fullWidth
-                  rules={{
-                    min: { value: 0, message: 'You can only invest positive amounts.' },
-                    max: {
-                      value: tokenB.borrowerAmount!,
-                      message: 'This amount is greater than your deposited amount.',
-                    },
+                <div
+                  style={{
+                    display: 'flex',
+                    flexDirection: 'column',
+                    width: 250,
                   }}
-                />
-
-                <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                  <div>
-                    <Typography
-                      variant="caption"
-                      data-testid="apollon-liquidity-pool-withdraw-token-b-funds-label"
-                      color="info.main"
-                    >
-                      {roundCurrency(tokenB.borrowerAmount!, 5)}
+                >
+                  <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                    <Typography component="span" style={{ marginRight: '8px' }}>
+                      {roundCurrency(tokenBAmountForWithdraw, 5)}
                     </Typography>
-                    <br />
-                    <Typography variant="label">Deposited</Typography>
+
+                    <Typography variant="label">Payout</Typography>
                   </div>
-                  <Button
-                    variant="undercover"
-                    sx={{ textDecoration: 'underline', p: 0, mt: 0.25, height: 25 }}
-                    onClick={() => fillMaxInputValue('tokenBAmount')}
-                  >
-                    max
-                  </Button>
+
+                  <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                    <Typography component="span" style={{ marginRight: '8px' }}>
+                      {tokenBAmountForWithdraw > relevantDebtTokenB.troveMintedAmount
+                        ? roundCurrency(relevantDebtTokenB.troveMintedAmount, 5)
+                        : roundCurrency(tokenBAmountForWithdraw, 5)}
+                    </Typography>
+
+                    <Typography variant="label">Debt payed of</Typography>
+                  </div>
                 </div>
               </div>
             </Box>

@@ -110,11 +110,14 @@ export const GET_BORROWER_LIQUIDITY_POOLS = gql`
           priceUSD @client
         }
         totalAmount
-        borrowerAmount @client
       }
       liquidityDepositAPY
       volume30dUSD
       volume30dUSD30dAgo
+
+      totalSupply
+      # client side
+      borrowerAmount @client
     }
   }
 `;
