@@ -76,7 +76,9 @@ describe('TroveManager', () => {
     describe('liquidate()', () => {
       it('closes a Trove that has ICR < MCR', async () => {
         await whaleShrimpTroveInit(contracts, signers, false);
+        console.log("LINE 79 ",await priceFeed.getPrice(BTC));        
         await priceFeed.setTokenPrice(BTC, parseUnits('5000'));
+        console.log("LINE 81 ",await priceFeed.getPrice(BTC));        
 
         const [isRecoveryMode] = await storagePool.checkRecoveryMode();
         assert.isFalse(isRecoveryMode);
