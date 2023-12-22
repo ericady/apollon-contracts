@@ -47,6 +47,8 @@ function LiquidityDepositWithdraw({ selectedPool }: Props) {
 
   const [oldRatio, setOldRatio] = useState<number | null>(null);
   const [newRatio, setNewRatio] = useState<number | null>(null);
+  const [currentDebtValueUSD, setCurrentDebtValueUSD] = useState<number | null>(null);
+  const [currentCollateralValueUSD, setCurrentCollateralValueUSD] = useState<number | null>(null);
 
   const { data } = useQuery<GetBorrowerDebtTokensQuery, GetBorrowerDebtTokensQueryVariables>(GET_BORROWER_DEBT_TOKENS, {
     variables: { borrower: address },
@@ -116,9 +118,11 @@ function LiquidityDepositWithdraw({ selectedPool }: Props) {
   };
 
   const ratioChangeCallback = useCallback(
-    (newRatio: number, oldRatio: number) => {
+    (newRatio: number, oldRatio: number, currentDebtValueUSD: number, currentCollateralValueUSD: number) => {
       setNewRatio(newRatio);
       setOldRatio(oldRatio);
+      setCurrentDebtValueUSD(currentDebtValueUSD);
+      setCurrentCollateralValueUSD(currentCollateralValueUSD);
     },
     [setNewRatio, setOldRatio],
   );
@@ -177,6 +181,42 @@ function LiquidityDepositWithdraw({ selectedPool }: Props) {
     }
   };
 
+  // TODO: Create a unit test for this, I am too stupid to do it from the top of my head
+  const fill150PercentInputValue = (fieldName: keyof FieldValues) => {
+    // Create the diff to have 150% currentCollateralValueUSD of currentDebtValueUSD
+    // if (currentDebtValueUSD && currentCollateralValueUSD && currentCollateralValueUSD / currentDebtValueUSD < 1.5) {
+    //   const diffUSD = Math.abs(currentCollateralValueUSD / 1.5 - currentDebtValueUSD);
+    //   if (relevantDebtTokenA.walletAmount === 0 && relevantDebtTokenB.walletAmount === 0) {
+    //     const tokenBTotokenARatio = (1 * tokenA.totalAmount) / tokenB.totalAmount;
+    //     const ratioWithPrice = (tokenBTotokenARatio * tokenB.token.priceUSD) / (1 * tokenA.token.priceUSD);
+    //     const diffTokenBUSD = diffUSD / ratioWithPrice;
+    //     const diffTokenBAmount = diffTokenBUSD / tokenB.token.priceUSD;
+    //     setValue('tokenBAmount', diffTokenBAmount.toString());
+    //     handleInput('tokenBAmount', diffTokenBAmount.toString());
+    //   }
+    //   const diffWalletTokenAUSD =
+    //     relevantDebtTokenA.walletAmount * tokenA.token.priceUSD -
+    //     relevantDebtTokenB.walletAmount * tokenB.token.priceUSD;
+    //   if (diffWalletTokenAUSD > 0) {
+    //     // fill tokenB with amount for complete diff
+    //     if (diffUSD < diffWalletTokenAUSD) {
+    //       const targetTokenBUSD = diffUSD / tokenB.token.priceUSD;
+    //       const targetTokenBAmount = targetTokenBUSD / tokenB.token.priceUSD;
+    //       setValue('tokenBAmount', targetTokenBAmount.toString());
+    //       handleInput('tokenBAmount', targetTokenBAmount.toString());
+    //     } else {
+    //       const restDebtToShare = diffUSD - diffWalletTokenAUSD;
+    //       const tokenBTotokenARatio = (1 * tokenA.totalAmount) / tokenB.totalAmount;
+    //       const diffTokenBUSD = restDebtToShare / (tokenBTotokenARatio + 1);
+    //       const diffTokenBAmount = diffTokenBUSD / tokenB.token.priceUSD;
+    //       setValue('tokenBAmount', diffTokenBAmount.toString());
+    //       handleInput('tokenBAmount', (relevantDebtTokenB.walletAmount + diffTokenBAmount).toString());
+    //     }
+    //   } else {
+    //   }
+    //   }
+  };
+
   const tokenAAmount = watch('tokenAAmount');
   const tokenBAmount = watch('tokenBAmount');
 
@@ -195,13 +235,11 @@ function LiquidityDepositWithdraw({ selectedPool }: Props) {
           : 0)
       : ((relevantDebtTokenA.troveMintedAmount > tokenAAmountForWithdraw
           ? tokenAAmountForWithdraw * tokenA.token.priceUSD
-          : relevantDebtTokenA.troveMintedAmount) +
+          : relevantDebtTokenA.troveMintedAmount * tokenA.token.priceUSD) +
           (relevantDebtTokenB.troveMintedAmount > tokenBAmountForWithdraw
             ? tokenBAmountForWithdraw * tokenB.token.priceUSD
-            : relevantDebtTokenB.troveMintedAmount)) *
+            : relevantDebtTokenB.troveMintedAmount * tokenB.token.priceUSD)) *
         -1;
-
-  console.log('addedDebtUSD: ', addedDebtUSD);
 
   return (
     <FeatureBox title="Your Liquidity" noPadding headBorder="bottom" border="full">
@@ -306,7 +344,7 @@ function LiquidityDepositWithdraw({ selectedPool }: Props) {
                     <Button
                       variant="undercover"
                       sx={{ textDecoration: 'underline', p: 0, mt: 0.25, height: 25 }}
-                      onClick={() => fillMaxInputValue('tokenBAmount')}
+                      onClick={() => fill150PercentInputValue('tokenAAmount')}
                     >
                       to 150%
                     </Button>
@@ -405,7 +443,7 @@ function LiquidityDepositWithdraw({ selectedPool }: Props) {
                     <Button
                       variant="undercover"
                       sx={{ textDecoration: 'underline', p: 0, mt: 0.25, height: 25 }}
-                      onClick={() => fillMaxInputValue('tokenBAmount')}
+                      onClick={() => fill150PercentInputValue('tokenBAmount')}
                     >
                       to 150%
                     </Button>

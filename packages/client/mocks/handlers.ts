@@ -113,7 +113,7 @@ const userColl = faker.helpers
     return {
       ...collTokenMeta,
       walletAmount: faker.number.float({ min: 500, max: 1000, precision: 0.0001 }),
-      troveLockedAmount: faker.number.float({ min: 5000, max: 10000, precision: 0.0001 }),
+      troveLockedAmount: faker.number.float({ min: 50000, max: 100000, precision: 0.0001 }),
       stabilityGainedAmount: faker.number.float({ min: 100, max: 500, precision: 0.0001 }),
     };
   });

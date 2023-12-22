@@ -46,7 +46,7 @@ type Props = {
    * @param newRatio is always updated on addedDebtUSD prop change. If all the debt can be extinguished it will be 0.
    * @param oldRatio will never change as long as the debt stays the same.
    */
-  callback?: (newRatio: number, oldRatio: number) => void;
+  callback?: (newRatio: number, oldRatio: number, currentDebt: number, collateralValue: number) => void;
 };
 
 // TODO: Maybe move text into this component to have more efficient state updates and uniform loading state
@@ -80,25 +80,26 @@ function CollateralRatioVisualization({
     },
   );
 
-  const getRatios = useCallback(() => {
-    const debtValue =
-      debtData?.getDebtTokens.reduce(
-        (acc, { troveMintedAmount, token }) => acc + troveMintedAmount! * token.priceUSD,
-        0,
-      ) ?? 0;
-    const collateralValue =
-      collateralData?.getCollateralTokens.reduce(
-        (acc, { troveLockedAmount, token }) => acc + troveLockedAmount! * token.priceUSD,
-        0,
-      ) ?? 0;
+  const debtValue =
+    debtData?.getDebtTokens.reduce(
+      (acc, { troveMintedAmount, token }) => acc + troveMintedAmount! * token.priceUSD,
+      0,
+    ) ?? 0;
 
+  const collateralValue =
+    collateralData?.getCollateralTokens.reduce(
+      (acc, { troveLockedAmount, token }) => acc + troveLockedAmount! * token.priceUSD,
+      0,
+    ) ?? 0;
+
+  const getRatios = useCallback(() => {
     const oldRatio = collateralValue / debtValue;
 
     const depositFillsDebt = addedDebtUSD <= -debtValue;
     const newRatio = depositFillsDebt ? 0 : collateralValue / (debtValue + addedDebtUSD);
 
     return [oldRatio, newRatio];
-  }, [addedDebtUSD, collateralData, debtData]);
+  }, [addedDebtUSD, collateralData, debtValue, collateralValue]);
 
   const isProcessing = loading || !debtData || !collateralData;
 
@@ -106,9 +107,9 @@ function CollateralRatioVisualization({
     if (!isProcessing && callback) {
       const [oldRatio, newRatio] = getRatios();
 
-      callback(newRatio, oldRatio);
+      callback(newRatio, oldRatio, debtValue, collateralValue);
     }
-  }, [isProcessing, getRatios, callback]);
+  }, [isProcessing, getRatios, callback, debtValue, collateralValue]);
 
   if (isProcessing) {
     return (
