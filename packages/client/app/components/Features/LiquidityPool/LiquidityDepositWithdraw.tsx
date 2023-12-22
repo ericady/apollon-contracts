@@ -16,7 +16,7 @@ import {
   GetBorrowerLiquidityPoolsQuery,
 } from '../../../generated/gql-types';
 import { GET_BORROWER_DEBT_TOKENS } from '../../../queries';
-import { displayPercentage, floatToBigInt, roundCurrency } from '../../../utils/math';
+import { displayPercentage, floatToBigInt, roundCurrency, roundNumber } from '../../../utils/math';
 import FeatureBox from '../../FeatureBox/FeatureBox';
 import NumberInput from '../../FormControls/NumberInput';
 import ForwardIcon from '../../Icons/ForwardIcon';
@@ -137,14 +137,13 @@ function LiquidityDepositWithdraw({ selectedPool }: Props) {
 
     if (tabValue === 'DEPOSIT') {
       if (fieldName === 'tokenAAmount') {
-        const pairValue = roundCurrency((numericValue * tokenA.totalAmount) / tokenB.totalAmount, 5);
-
+        const pairValue = roundNumber((numericValue * tokenA.totalAmount) / tokenB.totalAmount, 5);
         setValue('tokenBAmount', pairValue.toString(), {
           shouldValidate: true,
           shouldDirty: true,
         });
       } else {
-        const pairValue = roundCurrency((numericValue * tokenB.totalAmount) / tokenA.totalAmount, 5);
+        const pairValue = roundNumber((numericValue * tokenB.totalAmount) / tokenA.totalAmount, 5);
 
         setValue('tokenAAmount', pairValue.toString(), {
           shouldValidate: true,
@@ -188,10 +187,19 @@ function LiquidityDepositWithdraw({ selectedPool }: Props) {
 
   const addedDebtUSD =
     tabValue === 'DEPOSIT'
-      ? ((tokenAAmount ? parseFloat(tokenAAmount) * tokenA.token.priceUSD : 0) +
-          (tokenBAmount ? parseFloat(tokenBAmount) * tokenB.token.priceUSD : 0)) *
-        -1
-      : tokenAAmountForWithdraw * tokenA.token.priceUSD + tokenBAmountForWithdraw * tokenB.token.priceUSD;
+      ? (tokenAAmount
+          ? Math.max(parseFloat(tokenAAmount) - relevantDebtTokenA.walletAmount * tokenA.token.priceUSD, 0)
+          : 0) +
+        (tokenBAmount
+          ? Math.max(parseFloat(tokenBAmount) - relevantDebtTokenB.walletAmount * tokenB.token.priceUSD, 0)
+          : 0)
+      : ((relevantDebtTokenA.troveMintedAmount > tokenAAmountForWithdraw
+          ? tokenAAmountForWithdraw * tokenA.token.priceUSD
+          : relevantDebtTokenA.troveMintedAmount) +
+          (relevantDebtTokenB.troveMintedAmount > tokenBAmountForWithdraw
+            ? tokenBAmountForWithdraw * tokenB.token.priceUSD
+            : relevantDebtTokenB.troveMintedAmount)) *
+        -1;
 
   console.log('addedDebtUSD: ', addedDebtUSD);
 
