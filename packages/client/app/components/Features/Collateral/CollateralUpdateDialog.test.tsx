@@ -15,7 +15,7 @@ describe('CollateralUpdateDialog', () => {
       },
     };
 
-    // MOck response so tokens are always available
+    // Mock response so tokens are always available
     server.use(
       graphql.query('GetCollateralTokens', (_, res, ctx) => {
         return res(ctx.status(200), ctx.data(MockedGetCollateralTokens.data));

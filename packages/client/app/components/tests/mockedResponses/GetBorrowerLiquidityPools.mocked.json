@@ -2,38 +2,544 @@
   "data": {
     "getPools": [
       {
-        "id": "344b8e7c-2aca-4f4d-a6d0-347db601d248",
-        "swapFee": -0.0373,
+        "__typename": "Pool",
+        "id": "9141ac09-f968-4afb-9e1d-43beff3a5d39",
+        "swapFee": -0.0203,
         "liquidity": [
           {
+            "id": "11e63d52-010d-42e2-b7e6-443bb2c16c75",
+            "__typename": "PoolLiquidity",
             "token": {
-              "address": "ffaedabb-0eb8-4403-97e1-d82eeea7bf0c",
-              "symbol": "SDG",
-              "createdAt": "2023-04-09T18:48:49.496Z",
-              "priceUSD": 1094.04,
-              "priceUSD24hAgo": 2750.49,
+              "id": "92fccbe8-33d7-448b-83c8-6a558ea3557a",
+              "__typename": "Token",
+              "address": "578b9a18-7b07-4028-8354-7861f78b22ea",
+              "symbol": "KRW",
+              "createdAt": "2023-03-23T01:45:39.481Z",
+              "priceUSD": 2618.57,
+              "priceUSD24hAgo": 4073.02,
+              "priceUSDOracle": 1321.08,
               "isPoolToken": true
             },
-            "totalAmount": 564407.19,
-            "borrowerAmount": 6897.13
+            "totalAmount": 280197.28
           },
           {
+            "id": "7cbc35b6-62c7-4a52-8b1f-2192f47f4ea9",
+            "__typename": "PoolLiquidity",
             "token": {
-              "address": "0x6cA13a4ab78dd7D657226b155873A04DB929AXXX",
-              "symbol": "JUSD",
-              "createdAt": "2023-08-17T08:15:26.698Z",
-              "priceUSD": 3981.26,
-              "priceUSD24hAgo": 122.09,
+              "id": "01cd44a6-2cb8-4cb7-af9e-8627590d9043",
+              "__typename": "Token",
+              "address": "16fdb8e8-f202-4564-9af5-71b77ebc11a3",
+              "symbol": "GIP",
+              "createdAt": "2023-10-23T03:19:31.641Z",
+              "priceUSD": 228,
+              "priceUSD24hAgo": 3479.14,
+              "priceUSDOracle": 1189.83,
               "isPoolToken": true
             },
-            "totalAmount": 226889.16,
-            "borrowerAmount": 8286.38
+            "totalAmount": 114938.15
           }
         ],
         "rewards": [],
-        "liquidityDepositAPY": 0.0222,
-        "volume30dUSD": 31181.39,
-        "volume30dUSD30dAgo": 38359.65
+        "liquidityDepositAPY": 0.0608,
+        "volume30dUSD": 14063.71,
+        "volume30dUSD30dAgo": 47682.66,
+        "borrowerAmount": 10000,
+        "totalSupply": 593903.6174
+      },
+      {
+        "__typename": "Pool",
+        "id": "032e4c34-08d2-45a4-b044-132ecf28dfc4",
+        "swapFee": 0.0447,
+        "liquidity": [
+          {
+            "id": "97ecb8c6-1d5e-4828-93e3-3a1ee2ec42be",
+            "__typename": "PoolLiquidity",
+            "token": {
+              "id": "92fccbe8-33d7-448b-83c8-6a558ea3557a",
+              "__typename": "Token",
+              "address": "578b9a18-7b07-4028-8354-7861f78b22ea",
+              "symbol": "KRW",
+              "createdAt": "2023-03-23T01:45:39.481Z",
+              "priceUSD": 2618.57,
+              "priceUSD24hAgo": 4073.02,
+              "priceUSDOracle": 1321.08,
+              "isPoolToken": true
+            },
+            "totalAmount": 495058.33
+          },
+          {
+            "id": "7ad50d86-62d9-40fc-9e23-2128bae2f2f2",
+            "__typename": "PoolLiquidity",
+            "token": {
+              "id": "82162760-9e6c-4b61-8657-8c9397bfd936",
+              "__typename": "Token",
+              "address": "9f9c30ac-f30e-4513-8234-5b7768d3281f",
+              "symbol": "TRY",
+              "createdAt": "2023-12-02T03:46:49.356Z",
+              "priceUSD": 1075.91,
+              "priceUSD24hAgo": 4054.59,
+              "priceUSDOracle": 3708.69,
+              "isPoolToken": false
+            },
+            "totalAmount": 777710.96
+          }
+        ],
+        "rewards": [],
+        "liquidityDepositAPY": 0.0958,
+        "volume30dUSD": 15037.86,
+        "volume30dUSD30dAgo": 49859.01,
+        "borrowerAmount": 0,
+        "totalSupply": 371631.9056
+      },
+      {
+        "__typename": "Pool",
+        "id": "860a6b5c-4052-42e1-a4a7-f9a58cb817c7",
+        "swapFee": -0.002,
+        "liquidity": [
+          {
+            "id": "ad51c991-aa5e-4f94-ab93-eb1f41ea484b",
+            "__typename": "PoolLiquidity",
+            "token": {
+              "id": "92fccbe8-33d7-448b-83c8-6a558ea3557a",
+              "__typename": "Token",
+              "address": "578b9a18-7b07-4028-8354-7861f78b22ea",
+              "symbol": "KRW",
+              "createdAt": "2023-03-23T01:45:39.481Z",
+              "priceUSD": 2618.57,
+              "priceUSD24hAgo": 4073.02,
+              "priceUSDOracle": 1321.08,
+              "isPoolToken": true
+            },
+            "totalAmount": 482514.59
+          },
+          {
+            "id": "c81651d3-91cd-4798-a2fd-fe2371497f26",
+            "__typename": "PoolLiquidity",
+            "token": {
+              "id": "b923ca94-b67e-4edb-b780-9ab4d15c0f50",
+              "__typename": "Token",
+              "address": "677fc2f1-db71-4861-8421-099901c1bf43",
+              "symbol": "SHP",
+              "createdAt": "2023-05-24T07:35:35.165Z",
+              "priceUSD": 3620.48,
+              "priceUSD24hAgo": 2947.05,
+              "priceUSDOracle": 740.66,
+              "isPoolToken": true
+            },
+            "totalAmount": 846733.38
+          }
+        ],
+        "rewards": [],
+        "liquidityDepositAPY": 0.1246,
+        "volume30dUSD": 46382.06,
+        "volume30dUSD30dAgo": 10878.27,
+        "borrowerAmount": 0,
+        "totalSupply": 246566.2669
+      },
+      {
+        "__typename": "Pool",
+        "id": "67e3b96b-55f5-436c-abb7-7c4018771e27",
+        "swapFee": -0.0412,
+        "liquidity": [
+          {
+            "id": "4e9084c5-18f8-4fdd-99a2-ab5c193d6f1c",
+            "__typename": "PoolLiquidity",
+            "token": {
+              "id": "92fccbe8-33d7-448b-83c8-6a558ea3557a",
+              "__typename": "Token",
+              "address": "578b9a18-7b07-4028-8354-7861f78b22ea",
+              "symbol": "KRW",
+              "createdAt": "2023-03-23T01:45:39.481Z",
+              "priceUSD": 2618.57,
+              "priceUSD24hAgo": 4073.02,
+              "priceUSDOracle": 1321.08,
+              "isPoolToken": true
+            },
+            "totalAmount": 163432.65
+          },
+          {
+            "id": "404c0e80-af57-4cec-bd75-60e1c10d37d1",
+            "__typename": "PoolLiquidity",
+            "token": {
+              "id": "b65eca72-7c4d-48a1-aca3-c9b6180120db",
+              "__typename": "Token",
+              "address": "dc4ba505-5895-462d-a910-08b01c0c93de",
+              "symbol": "UYU",
+              "createdAt": "2023-05-20T22:24:44.909Z",
+              "priceUSD": 4375.93,
+              "priceUSD24hAgo": 3308.99,
+              "priceUSDOracle": 993.94,
+              "isPoolToken": false
+            },
+            "totalAmount": 968934.74
+          }
+        ],
+        "rewards": [],
+        "liquidityDepositAPY": 0.1364,
+        "volume30dUSD": 27987.47,
+        "volume30dUSD30dAgo": 33185.43,
+        "borrowerAmount": 0,
+        "totalSupply": 868677.833
+      },
+      {
+        "__typename": "Pool",
+        "id": "1f2b3a0f-6387-48c6-bf6d-748573d7df88",
+        "swapFee": -0.0462,
+        "liquidity": [
+          {
+            "id": "7f0af109-0ef9-4077-b373-d4fd8ce47b14",
+            "__typename": "PoolLiquidity",
+            "token": {
+              "id": "92fccbe8-33d7-448b-83c8-6a558ea3557a",
+              "__typename": "Token",
+              "address": "578b9a18-7b07-4028-8354-7861f78b22ea",
+              "symbol": "KRW",
+              "createdAt": "2023-03-23T01:45:39.481Z",
+              "priceUSD": 2618.57,
+              "priceUSD24hAgo": 4073.02,
+              "priceUSDOracle": 1321.08,
+              "isPoolToken": true
+            },
+            "totalAmount": 651077.5
+          },
+          {
+            "id": "078f8554-4e0c-47c3-bc07-e7cd3398ac60",
+            "__typename": "PoolLiquidity",
+            "token": {
+              "id": "23aede29-6df0-4d04-b761-ed35cf6010e1",
+              "__typename": "Token",
+              "address": "907b666b-2c09-4912-9638-8a808e308f07",
+              "symbol": "KZT",
+              "createdAt": "2023-02-07T10:07:42.556Z",
+              "priceUSD": 490.57,
+              "priceUSD24hAgo": 4099.02,
+              "priceUSDOracle": 2450.74,
+              "isPoolToken": false
+            },
+            "totalAmount": 420806.58
+          }
+        ],
+        "rewards": [],
+        "liquidityDepositAPY": 0.4329,
+        "volume30dUSD": 23498.61,
+        "volume30dUSD30dAgo": 27454.61,
+        "borrowerAmount": 0,
+        "totalSupply": 883034.3923
+      },
+      {
+        "__typename": "Pool",
+        "id": "a44640d0-0317-4f3a-8927-6a8ef1289940",
+        "swapFee": 0.0105,
+        "liquidity": [
+          {
+            "id": "2c58c77e-2fd8-45de-873d-ced7917dd791",
+            "__typename": "PoolLiquidity",
+            "token": {
+              "id": "92fccbe8-33d7-448b-83c8-6a558ea3557a",
+              "__typename": "Token",
+              "address": "578b9a18-7b07-4028-8354-7861f78b22ea",
+              "symbol": "KRW",
+              "createdAt": "2023-03-23T01:45:39.481Z",
+              "priceUSD": 2618.57,
+              "priceUSD24hAgo": 4073.02,
+              "priceUSDOracle": 1321.08,
+              "isPoolToken": true
+            },
+            "totalAmount": 960647.92
+          },
+          {
+            "id": "f9eb725e-5bbf-4d0a-8bd2-2a73f4d610fa",
+            "__typename": "PoolLiquidity",
+            "token": {
+              "id": "e1db6eb7-53ba-4e4a-9783-abc154c0d76b",
+              "__typename": "Token",
+              "address": "0c8f8d88-fb46-454c-b127-191c7c81c11f",
+              "symbol": "VUV",
+              "createdAt": "2023-07-21T16:29:14.004Z",
+              "priceUSD": 1223.73,
+              "priceUSD24hAgo": 2727.11,
+              "priceUSDOracle": 4856.92,
+              "isPoolToken": true
+            },
+            "totalAmount": 614104.82
+          }
+        ],
+        "rewards": [],
+        "liquidityDepositAPY": 0.046,
+        "volume30dUSD": 16018,
+        "volume30dUSD30dAgo": 30185.63,
+        "borrowerAmount": 0,
+        "totalSupply": 396724.714
+      },
+      {
+        "__typename": "Pool",
+        "id": "aec8bf31-81d0-46dd-be7f-00ce5548ab68",
+        "swapFee": 0.0234,
+        "liquidity": [
+          {
+            "id": "9cb11352-0621-495f-b476-163f4530f2d7",
+            "__typename": "PoolLiquidity",
+            "token": {
+              "id": "92fccbe8-33d7-448b-83c8-6a558ea3557a",
+              "__typename": "Token",
+              "address": "578b9a18-7b07-4028-8354-7861f78b22ea",
+              "symbol": "KRW",
+              "createdAt": "2023-03-23T01:45:39.481Z",
+              "priceUSD": 2618.57,
+              "priceUSD24hAgo": 4073.02,
+              "priceUSDOracle": 1321.08,
+              "isPoolToken": true
+            },
+            "totalAmount": 196767.53
+          },
+          {
+            "id": "0ef47c3e-da44-472f-9f7a-5e8285e80dea",
+            "__typename": "PoolLiquidity",
+            "token": {
+              "id": "c3a6c83a-f96e-4e46-899d-4dbd5f33a043",
+              "__typename": "Token",
+              "address": "4e426780-f669-429f-8c26-f597c43944f4",
+              "symbol": "MMK",
+              "createdAt": "2023-04-02T01:49:57.244Z",
+              "priceUSD": 3245.65,
+              "priceUSD24hAgo": 267.2,
+              "priceUSDOracle": 75.06,
+              "isPoolToken": true
+            },
+            "totalAmount": 538169.71
+          }
+        ],
+        "rewards": [],
+        "liquidityDepositAPY": 0.3484,
+        "volume30dUSD": 18410.93,
+        "volume30dUSD30dAgo": 36952.82,
+        "borrowerAmount": 0,
+        "totalSupply": 366742.4836
+      },
+      {
+        "__typename": "Pool",
+        "id": "301f793b-970e-456c-8d95-46463c67e730",
+        "swapFee": 0.0133,
+        "liquidity": [
+          {
+            "id": "65c9bbec-2cbd-4b85-b940-24de1f53fe75",
+            "__typename": "PoolLiquidity",
+            "token": {
+              "id": "92fccbe8-33d7-448b-83c8-6a558ea3557a",
+              "__typename": "Token",
+              "address": "578b9a18-7b07-4028-8354-7861f78b22ea",
+              "symbol": "KRW",
+              "createdAt": "2023-03-23T01:45:39.481Z",
+              "priceUSD": 2618.57,
+              "priceUSD24hAgo": 4073.02,
+              "priceUSDOracle": 1321.08,
+              "isPoolToken": true
+            },
+            "totalAmount": 864011.74
+          },
+          {
+            "id": "38522ee2-2882-435f-8cf9-bbf12789f562",
+            "__typename": "PoolLiquidity",
+            "token": {
+              "id": "b498da83-e91a-4212-adca-d160256829aa",
+              "__typename": "Token",
+              "address": "97f3fb2f-b544-4336-8903-c08b9b7dbe1b",
+              "symbol": "HUF",
+              "createdAt": "2023-12-14T02:57:24.504Z",
+              "priceUSD": 2624.8,
+              "priceUSD24hAgo": 302.11,
+              "priceUSDOracle": 2976.24,
+              "isPoolToken": true
+            },
+            "totalAmount": 655965.19
+          }
+        ],
+        "rewards": [],
+        "liquidityDepositAPY": 0.2655,
+        "volume30dUSD": 36237.84,
+        "volume30dUSD30dAgo": 24907.64,
+        "borrowerAmount": 0,
+        "totalSupply": 574346.4697
+      },
+      {
+        "__typename": "Pool",
+        "id": "ba5ebf08-ccbd-4d81-9353-57046df9a49f",
+        "swapFee": 0.0271,
+        "liquidity": [
+          {
+            "id": "ddbe126b-5bc1-4bee-814b-d9d1deda3330",
+            "__typename": "PoolLiquidity",
+            "token": {
+              "id": "92fccbe8-33d7-448b-83c8-6a558ea3557a",
+              "__typename": "Token",
+              "address": "578b9a18-7b07-4028-8354-7861f78b22ea",
+              "symbol": "KRW",
+              "createdAt": "2023-03-23T01:45:39.481Z",
+              "priceUSD": 2618.57,
+              "priceUSD24hAgo": 4073.02,
+              "priceUSDOracle": 1321.08,
+              "isPoolToken": true
+            },
+            "totalAmount": 424251.62
+          },
+          {
+            "id": "b67dacea-07e0-489b-8aa5-4d20d509106d",
+            "__typename": "PoolLiquidity",
+            "token": {
+              "id": "db4d43f1-9c02-453e-ac0a-fc801b6dd62e",
+              "__typename": "Token",
+              "address": "2f756cc2-d8db-474f-892d-2806b448f9cf",
+              "symbol": "TND",
+              "createdAt": "2023-01-10T17:07:03.305Z",
+              "priceUSD": 1460.25,
+              "priceUSD24hAgo": 538.32,
+              "priceUSDOracle": 2655.77,
+              "isPoolToken": false
+            },
+            "totalAmount": 282049.48
+          }
+        ],
+        "rewards": [],
+        "liquidityDepositAPY": 0.3822,
+        "volume30dUSD": 29746.19,
+        "volume30dUSD30dAgo": 35350.13,
+        "borrowerAmount": 0,
+        "totalSupply": 548229.346
+      },
+      {
+        "__typename": "Pool",
+        "id": "bdeecde0-32a4-4405-962b-65bca6b928c9",
+        "swapFee": -0.0255,
+        "liquidity": [
+          {
+            "id": "f2c3f15b-d19d-4f7a-b605-e481b7313642",
+            "__typename": "PoolLiquidity",
+            "token": {
+              "id": "92fccbe8-33d7-448b-83c8-6a558ea3557a",
+              "__typename": "Token",
+              "address": "578b9a18-7b07-4028-8354-7861f78b22ea",
+              "symbol": "KRW",
+              "createdAt": "2023-03-23T01:45:39.481Z",
+              "priceUSD": 2618.57,
+              "priceUSD24hAgo": 4073.02,
+              "priceUSDOracle": 1321.08,
+              "isPoolToken": true
+            },
+            "totalAmount": 935537.96
+          },
+          {
+            "id": "fed3fd5f-22fd-402e-a465-ab89feb52c88",
+            "__typename": "PoolLiquidity",
+            "token": {
+              "id": "6ef4904a-2113-4c1b-9dc7-05bb12d4e1e1",
+              "__typename": "Token",
+              "address": "0x509ee0d083ddf8ac028f2a56731412edd63223a8",
+              "symbol": "ETH",
+              "createdAt": "2023-06-26T04:52:41.568Z",
+              "priceUSD": 4446.9,
+              "priceUSD24hAgo": 888.37,
+              "priceUSDOracle": 840.11,
+              "isPoolToken": false
+            },
+            "totalAmount": 222787.11
+          }
+        ],
+        "rewards": [],
+        "liquidityDepositAPY": 0.0275,
+        "volume30dUSD": 45958.58,
+        "volume30dUSD30dAgo": 16974.11,
+        "borrowerAmount": 0,
+        "totalSupply": 633868.5782
+      },
+      {
+        "__typename": "Pool",
+        "id": "2cd37c9c-4495-4904-969b-bc8f1172d824",
+        "swapFee": 0.0383,
+        "liquidity": [
+          {
+            "id": "7539dd44-6b1a-47a0-8640-985df19cff9d",
+            "__typename": "PoolLiquidity",
+            "token": {
+              "id": "92fccbe8-33d7-448b-83c8-6a558ea3557a",
+              "__typename": "Token",
+              "address": "578b9a18-7b07-4028-8354-7861f78b22ea",
+              "symbol": "KRW",
+              "createdAt": "2023-03-23T01:45:39.481Z",
+              "priceUSD": 2618.57,
+              "priceUSD24hAgo": 4073.02,
+              "priceUSDOracle": 1321.08,
+              "isPoolToken": true
+            },
+            "totalAmount": 305172.42
+          },
+          {
+            "id": "9e1e4e5f-dc5f-496e-95c3-842683c6cc7f",
+            "__typename": "PoolLiquidity",
+            "token": {
+              "id": "57222370-a30c-4133-ae93-d8f5e9309649",
+              "__typename": "Token",
+              "address": "0x509ee0d083ddf8ac028f2a56731412edd63223c8",
+              "symbol": "USDT",
+              "createdAt": "2023-10-12T23:50:01.786Z",
+              "priceUSD": 4337.25,
+              "priceUSD24hAgo": 2953.5,
+              "priceUSDOracle": 4404.23,
+              "isPoolToken": false
+            },
+            "totalAmount": 307243.84
+          }
+        ],
+        "rewards": [],
+        "liquidityDepositAPY": 0.4255,
+        "volume30dUSD": 43772.89,
+        "volume30dUSD30dAgo": 49206.47,
+        "borrowerAmount": 0,
+        "totalSupply": 304412.6688
+      },
+      {
+        "__typename": "Pool",
+        "id": "4a22c671-205e-40a5-8cbf-3bad15018397",
+        "swapFee": 0.0408,
+        "liquidity": [
+          {
+            "id": "8271be37-5e46-4260-b570-74e1511c5518",
+            "__typename": "PoolLiquidity",
+            "token": {
+              "id": "92fccbe8-33d7-448b-83c8-6a558ea3557a",
+              "__typename": "Token",
+              "address": "578b9a18-7b07-4028-8354-7861f78b22ea",
+              "symbol": "KRW",
+              "createdAt": "2023-03-23T01:45:39.481Z",
+              "priceUSD": 2618.57,
+              "priceUSD24hAgo": 4073.02,
+              "priceUSDOracle": 1321.08,
+              "isPoolToken": true
+            },
+            "totalAmount": 471694.09
+          },
+          {
+            "id": "938e8d9e-0184-49fb-a216-a3bf8ccdcdaa",
+            "__typename": "PoolLiquidity",
+            "token": {
+              "id": "ccc8b346-01e6-4654-bb10-d1dde0bb3cba",
+              "__typename": "Token",
+              "address": "0x509ee0d083ddf8ac028f2a56731412edd63223d8",
+              "symbol": "DEFI",
+              "createdAt": "2023-09-16T23:09:56.629Z",
+              "priceUSD": 1887.94,
+              "priceUSD24hAgo": 683.03,
+              "priceUSDOracle": 2273.74,
+              "isPoolToken": false
+            },
+            "totalAmount": 877004.21
+          }
+        ],
+        "rewards": [],
+        "liquidityDepositAPY": 0.2298,
+        "volume30dUSD": 46740.77,
+        "volume30dUSD30dAgo": 23582.03,
+        "borrowerAmount": 0,
+        "totalSupply": 198468.7607
       }
     ]
   }
