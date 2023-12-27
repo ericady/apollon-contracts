@@ -534,6 +534,7 @@ export const SchemaDataFreshnessManager: ContractDataFreshnessManager<typeof Con
     '0x509ee0d083ddf8ac028f2a56731412edd63225b9': {},
   },
   BorrowerOperations: {},
+  StoragePool: {},
 };
 
 // FIXME: The cache needs to be initialized with the contracts data.
