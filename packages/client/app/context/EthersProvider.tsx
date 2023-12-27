@@ -51,6 +51,7 @@ export const Contracts = {
     DebtToken2: '0x509ee0d083ddf8ac028f2a56731412edd63225b9',
   },
   BorrowerOperations: '0x509ee0d083ddf8ac028f2a56731412ede63223f8',
+  StoragePool: '0x509ee0d083ddf8ac028f2a56731412edd63223s8',
 } as const;
 
 // TODO: Remove Partial

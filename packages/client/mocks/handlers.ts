@@ -98,7 +98,7 @@ const collateralTokenMeta: CollateralTokenMeta[] = collateralTokens.map<Collater
     id: faker.string.uuid(),
     token: collToken,
     totalValueLockedUSD,
-    totalValueLockedUSD24hAgo: parseFloat(
+    totalValueLockedUSD30dAverage: parseFloat(
       faker.finance.amount(totalValueLockedUSD * 0.9, totalValueLockedUSD * 1.2, 2),
     ),
     walletAmount: 0,

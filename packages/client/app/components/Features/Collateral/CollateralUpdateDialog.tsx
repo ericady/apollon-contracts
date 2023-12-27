@@ -17,6 +17,7 @@ import Tabs from '@mui/material/Tabs';
 import Typography from '@mui/material/Typography';
 import { SyntheticEvent, useCallback, useState } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
+import { ERC20 } from '../../../../generated/types';
 import { IBase } from '../../../../generated/types/BorrowerOperations';
 import { Contracts, useEthers } from '../../../context/EthersProvider';
 import { GetCollateralTokensQuery, GetCollateralTokensQueryVariables } from '../../../generated/gql-types';
@@ -27,7 +28,7 @@ import CrossIcon from '../../Icons/CrossIcon';
 import DiamondIcon from '../../Icons/DiamondIcon';
 import ForwardIcon from '../../Icons/ForwardIcon';
 import Label from '../../Label/Label';
-import CollateralRatioVisualization from '../../Visualizations/CollateralRatioVisualization';
+import CollateralRatioVisualization, { CRIT_RATIO } from '../../Visualizations/CollateralRatioVisualization';
 
 type Props = {
   buttonVariant: ButtonProps['variant'];
@@ -49,7 +50,7 @@ const CollateralUpdateDialog = ({ buttonVariant, buttonSx = {} }: Props) => {
 
   const {
     address,
-    contracts: { borrowerOperationsContract },
+    contracts: { borrowerOperationsContract, collateralTokenContracts },
   } = useEthers();
 
   const { data } = useQuery<GetCollateralTokensQuery, GetCollateralTokensQueryVariables>(
@@ -104,7 +105,8 @@ const CollateralUpdateDialog = ({ buttonVariant, buttonSx = {} }: Props) => {
     }
   };
 
-  // TODO: CALL RESET ON ALL DIALOGS ON CLOSE
+  const hasNoOpenTrove = collateralToDeposit.every(({ troveLockedAmount }) => troveLockedAmount === 0);
+
   const onSubmit = async (data: FieldValues) => {
     const tokenAmounts = Object.entries(data)
       .filter(([_, amount]) => amount !== '')
@@ -116,7 +118,17 @@ const CollateralUpdateDialog = ({ buttonVariant, buttonSx = {} }: Props) => {
     if (tokenAmounts.length === 0) return;
 
     if (tabValue === 'DEPOSIT') {
-      await borrowerOperationsContract.addColl(tokenAmounts);
+      tokenAmounts.forEach(async ({ tokenAddress, amount }) => {
+        // @ts-ignore
+        const collContract = collateralTokenContracts[tokenAddress] as ERC20;
+        await collContract.approve(Contracts.StoragePool, amount);
+      });
+
+      if (hasNoOpenTrove) {
+        borrowerOperationsContract.openTrove(tokenAmounts);
+      } else {
+        await borrowerOperationsContract.addColl(tokenAmounts);
+      }
     } else {
       await borrowerOperationsContract.withdrawColl(tokenAmounts);
     }
@@ -150,7 +162,10 @@ const CollateralUpdateDialog = ({ buttonVariant, buttonSx = {} }: Props) => {
       </Button>
       <Dialog
         open={isOpen}
-        onClose={() => setIsOpen(false)}
+        onClose={() => {
+          reset();
+          setIsOpen(false);
+        }}
         fullWidth
         // @ts-ignore
         componentsProps={{ backdrop: { 'data-testid': 'apollon-collateral-update-dialog-backdrop' } }}
@@ -189,97 +204,99 @@ const CollateralUpdateDialog = ({ buttonVariant, buttonSx = {} }: Props) => {
             >
               <Tabs value={tabValue} onChange={handleChange} variant="fullWidth" sx={{ mt: 2 }}>
                 <Tab label="DEPOSIT" value="DEPOSIT" />
-                <Tab label="WITHDRAW" value="WITHDRAW" />
+                <Tab label="WITHDRAW" value="WITHDRAW" disabled={hasNoOpenTrove} />
               </Tabs>
 
-              {collateralToDeposit.map(({ walletAmount, troveLockedAmount, token: { symbol, address } }, index) => {
-                return (
-                  <div
-                    key={address}
-                    style={{ display: 'flex', justifyContent: 'space-between', padding: 20, height: 114 }}
-                  >
-                    {tabValue === 'DEPOSIT' && (
-                      <div style={{ marginTop: 6 }}>
-                        <Label variant="success">{symbol}</Label>
-                        <Typography sx={{ fontWeight: '400', marginTop: '10px' }}>
-                          {roundCurrency(walletAmount ?? 0, 5)}
-                        </Typography>
-                        <Typography variant="label" paragraph>
-                          Trove
-                        </Typography>
-                      </div>
-                    )}
-                    {tabValue === 'WITHDRAW' && (
-                      <div style={{ marginTop: 6 }}>
-                        <Label variant="success">{symbol}</Label>
-                      </div>
-                    )}
-
-                    <div>
-                      <NumberInput
-                        name={address}
-                        data-testid={`apollon-collateral-update-dialog-${symbol}-amount`}
-                        placeholder="Value"
-                        fullWidth
-                        rules={{
-                          min: { value: 0, message: 'Amount needs to be positive.' },
-                          max:
-                            tabValue === 'DEPOSIT'
-                              ? {
-                                  value: walletAmount ?? 0,
-                                  message: 'Your wallet does not contain the specified amount.',
-                                }
-                              : {
-                                  value: troveLockedAmount ?? 0,
-                                  message: 'Your trove does not contain the specified amount.',
-                                },
-                        }}
-                      />
-
-                      <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                        <div>
-                          {tabValue === 'DEPOSIT' && (
-                            <>
-                              <Typography
-                                variant="caption"
-                                data-testid="apollon-collateral-update-dialog-deposit-ether-funds-label"
-                                color="info.main"
-                              >
-                                {roundCurrency(walletAmount ?? 0, 5)}
-                              </Typography>
-                              <Typography variant="label" paragraph>
-                                Wallet
-                              </Typography>
-                            </>
-                          )}
-                          {tabValue === 'WITHDRAW' && (
-                            <>
-                              <Typography
-                                variant="caption"
-                                data-testid="apollon-collateral-update-dialog-withdraw-ether-funds-label"
-                                color="info.main"
-                              >
-                                {roundCurrency(troveLockedAmount ?? 0, 5)}
-                              </Typography>
-                              <Typography variant="label" paragraph>
-                                Trove
-                              </Typography>
-                            </>
-                          )}
+              {collateralToDeposit
+                .filter(({ troveLockedAmount }) => tabValue === 'DEPOSIT' || troveLockedAmount !== 0)
+                .map(({ walletAmount, troveLockedAmount, token: { symbol, address } }, index) => {
+                  return (
+                    <div
+                      key={address}
+                      style={{ display: 'flex', justifyContent: 'space-between', padding: 20, height: 114 }}
+                    >
+                      {tabValue === 'DEPOSIT' && (
+                        <div style={{ marginTop: 6 }}>
+                          <Label variant="success">{symbol}</Label>
+                          <Typography sx={{ fontWeight: '400', marginTop: '10px' }}>
+                            {roundCurrency(troveLockedAmount ?? 0, 5)}
+                          </Typography>
+                          <Typography variant="label" paragraph>
+                            Trove
+                          </Typography>
                         </div>
+                      )}
+                      {tabValue === 'WITHDRAW' && (
+                        <div style={{ marginTop: 6 }}>
+                          <Label variant="success">{symbol}</Label>
+                        </div>
+                      )}
 
-                        <Button
-                          variant="undercover"
-                          sx={{ textDecoration: 'underline', p: 0, mt: 0.25, height: 25 }}
-                          onClick={() => fillMaxInputValue(address as keyof FieldValues, index)}
-                        >
-                          max
-                        </Button>
+                      <div>
+                        <NumberInput
+                          name={address}
+                          data-testid={`apollon-collateral-update-dialog-${symbol}-amount`}
+                          placeholder="Value"
+                          fullWidth
+                          rules={{
+                            min: { value: 0, message: 'Amount needs to be positive.' },
+                            max:
+                              tabValue === 'DEPOSIT'
+                                ? {
+                                    value: walletAmount ?? 0,
+                                    message: 'Your wallet does not contain the specified amount.',
+                                  }
+                                : {
+                                    value: troveLockedAmount ?? 0,
+                                    message: 'Your trove does not contain the specified amount.',
+                                  },
+                          }}
+                        />
+
+                        <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                          <div>
+                            {tabValue === 'DEPOSIT' && (
+                              <>
+                                <Typography
+                                  variant="caption"
+                                  data-testid="apollon-collateral-update-dialog-deposit-ether-funds-label"
+                                  color="info.main"
+                                >
+                                  {roundCurrency(walletAmount ?? 0, 5)}
+                                </Typography>
+                                <Typography variant="label" paragraph>
+                                  Wallet
+                                </Typography>
+                              </>
+                            )}
+                            {tabValue === 'WITHDRAW' && (
+                              <>
+                                <Typography
+                                  variant="caption"
+                                  data-testid="apollon-collateral-update-dialog-withdraw-ether-funds-label"
+                                  color="info.main"
+                                >
+                                  {roundCurrency(troveLockedAmount ?? 0, 5)}
+                                </Typography>
+                                <Typography variant="label" paragraph>
+                                  Trove
+                                </Typography>
+                              </>
+                            )}
+                          </div>
+
+                          <Button
+                            variant="undercover"
+                            sx={{ textDecoration: 'underline', p: 0, mt: 0.25, height: 25 }}
+                            onClick={() => fillMaxInputValue(address as keyof FieldValues, index)}
+                          >
+                            max
+                          </Button>
+                        </div>
                       </div>
                     </div>
-                  </div>
-                );
-              })}
+                  );
+                })}
 
               <Box
                 sx={{
@@ -343,7 +360,12 @@ const CollateralUpdateDialog = ({ buttonVariant, buttonSx = {} }: Props) => {
               }}
             >
               <div style={{ width: '100%' }}>
-                <Button type="submit" variant="outlined" sx={{ borderColor: 'primary.contrastText' }}>
+                <Button
+                  type="submit"
+                  variant="outlined"
+                  sx={{ borderColor: 'primary.contrastText' }}
+                  disabled={tabValue === 'WITHDRAW' && newRatio < CRIT_RATIO}
+                >
                   Update
                 </Button>
                 {formState.isSubmitted && !formState.isDirty && (

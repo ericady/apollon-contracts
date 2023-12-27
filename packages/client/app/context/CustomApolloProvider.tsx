@@ -392,10 +392,11 @@ export const SchemaDataFreshnessManager: ContractDataFreshnessManager<typeof Con
         lastFetched: 0,
         timeout: 1000 * 5,
       },
+      // TODO: Maybe add another field for TroveManager.getTroveWithdrawableColl => Balance Page => Collateral Table => Your Trove
       troveLockedAmount: {
         fetch: async (fetchSource?: { troveManagerContract: TroveManager; borrower: AddressLike }) => {
           if (fetchSource) {
-            await ContractDataFreshnessManager.TroveManager.getTroveDebt.fetch(
+            await ContractDataFreshnessManager.TroveManager.getTroveColl.fetch(
               fetchSource.troveManagerContract,
               fetchSource.borrower,
             );

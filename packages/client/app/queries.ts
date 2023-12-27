@@ -28,6 +28,7 @@ export const GET_SELECTED_TOKEN = gql`
   }
 `;
 
+// TODO: Maybe unite this
 export const GET_ALL_DEBT_TOKENS = gql`
   query GetDebtTokens {
     getDebtTokens {
@@ -139,7 +140,7 @@ export const GET_BORROWER_COLLATERAL_TOKENS = gql`
       stabilityGainedAmount
 
       totalValueLockedUSD
-      totalValueLockedUSD24hAgo
+      totalValueLockedUSD30dAverage
     }
   }
 `;

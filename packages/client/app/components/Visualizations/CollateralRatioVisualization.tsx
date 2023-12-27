@@ -12,6 +12,8 @@ import {
 import { GET_BORROWER_COLLATERAL_TOKENS, GET_BORROWER_DEBT_TOKENS } from '../../queries';
 import { displayPercentage } from '../../utils/math';
 
+export const CRIT_RATIO = 1.1;
+
 type Props = {
   /**
    * is used to calculate the white indicator marking the ratio after the action on the chart
@@ -54,7 +56,7 @@ type Props = {
 function CollateralRatioVisualization({
   addedDebtUSD = 0,
   callback,
-  criticalRatio = 1.1,
+  criticalRatio = CRIT_RATIO,
   scaleMax = 2,
   scaleMin = 1,
   loading = false,
@@ -99,7 +101,7 @@ function CollateralRatioVisualization({
     const newRatio = depositFillsDebt ? 0 : collateralValue / (debtValue + addedDebtUSD);
 
     return [oldRatio, newRatio];
-  }, [addedDebtUSD, collateralData, debtValue, collateralValue]);
+  }, [addedDebtUSD, collateralValue, debtValue]);
 
   const isProcessing = loading || !debtData || !collateralData;
 

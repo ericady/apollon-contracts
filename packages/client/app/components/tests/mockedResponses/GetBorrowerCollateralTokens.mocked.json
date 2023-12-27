@@ -16,7 +16,7 @@
           "isPoolToken": true
         },
         "totalValueLockedUSD": 15166.64,
-        "totalValueLockedUSD24hAgo": 17972.86,
+        "totalValueLockedUSD30dAverage": 17972.86,
         "walletAmount": 924.1909,
         "troveLockedAmount": 619.4768,
         "stabilityGainedAmount": 438.313
@@ -36,7 +36,7 @@
           "isPoolToken": true
         },
         "totalValueLockedUSD": 44093.75,
-        "totalValueLockedUSD24hAgo": 47772.87,
+        "totalValueLockedUSD30dAverage": 47772.87,
         "walletAmount": 660.1698,
         "troveLockedAmount": 770.5992,
         "stabilityGainedAmount": 488.6007
@@ -56,7 +56,7 @@
           "isPoolToken": true
         },
         "totalValueLockedUSD": 39161.09,
-        "totalValueLockedUSD24hAgo": 39327.5,
+        "totalValueLockedUSD30dAverage": 39327.5,
         "walletAmount": 976.8389,
         "troveLockedAmount": 890.9514,
         "stabilityGainedAmount": 189.6801
@@ -76,7 +76,7 @@
           "isPoolToken": false
         },
         "totalValueLockedUSD": 47948.33,
-        "totalValueLockedUSD24hAgo": 47095.67,
+        "totalValueLockedUSD30dAverage": 47095.67,
         "walletAmount": null,
         "troveLockedAmount": null,
         "stabilityGainedAmount": null

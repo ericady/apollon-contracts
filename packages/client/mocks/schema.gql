@@ -33,12 +33,12 @@ type CollateralTokenMeta {
   id: ID!
   token: Token!
   # borrower specific
-  walletAmount: Float
-  troveLockedAmount: Float
-  stabilityGainedAmount: Float
+  walletAmount: Float!
+  troveLockedAmount: Float!
+  stabilityGainedAmount: Float!
   # global
   totalValueLockedUSD: Float!
-  totalValueLockedUSD24hAgo: Float!
+  totalValueLockedUSD30dAverage: Float!
 }
 
 type Query {

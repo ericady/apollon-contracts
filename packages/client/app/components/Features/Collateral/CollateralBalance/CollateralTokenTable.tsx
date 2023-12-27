@@ -50,7 +50,7 @@ const CollateralTokenTable = () => {
             </TableHead>
             <TableBody>
               {data.getCollateralTokens.map(
-                ({ token, totalValueLockedUSD, totalValueLockedUSD24hAgo, troveLockedAmount, walletAmount }) => (
+                ({ token, totalValueLockedUSD, totalValueLockedUSD30dAverage, troveLockedAmount, walletAmount }) => (
                   <TableRow hover key={token.address}>
                     <TableCell align="right" sx={{ borderRight: '1px solid', borderColor: 'table.border' }}>
                       {roundCurrency(walletAmount ?? 0, 5)}
@@ -69,18 +69,18 @@ const CollateralTokenTable = () => {
                         <Typography
                           fontWeight={400}
                           color={
-                            percentageChange(totalValueLockedUSD, totalValueLockedUSD24hAgo) > 0
+                            percentageChange(totalValueLockedUSD, totalValueLockedUSD30dAverage) > 0
                               ? 'success.main'
                               : 'error.main'
                           }
                         >
                           {displayPercentage(
-                            percentageChange(totalValueLockedUSD, totalValueLockedUSD24hAgo),
+                            percentageChange(totalValueLockedUSD, totalValueLockedUSD30dAverage),
                             'positive',
                           )}
                         </Typography>
                         <DirectionIcon
-                          showIncrease={percentageChange(totalValueLockedUSD, totalValueLockedUSD24hAgo) > 0}
+                          showIncrease={percentageChange(totalValueLockedUSD, totalValueLockedUSD30dAverage) > 0}
                         />
                       </div>
                     </TableCell>

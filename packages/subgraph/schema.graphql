@@ -1,4 +1,3 @@
-
 # TODO: wasa mapper for swap pools PairCreated event
 type Token @entity {
   # contract address
@@ -7,7 +6,7 @@ type Token @entity {
   symbol: String!
   createdAt: BigInt!
   #
-  # TODO: wasa 
+  # TODO: wasa
   # PoolPrice, update when pool ratio changes or price feed updates
   priceUSD: BigInt!
   # TODO: wasa Lookup from the candle chart on TokenPriceChanged event.
@@ -78,8 +77,8 @@ type CollateralTokenMeta @entity(immutable: true) {
   # global
   # TODO: wasa Link to event when ReservePool is implemented
   totalValueLockedUSD: BigInt!
-  # TODO: Fetch this from the client side
-  # totalValueLockedUSD24hAgo: BigInt!
+  # TODO: 30d average => also needs an aggregator
+  totalValueLockedUSD30dAverage: BigInt!
 }
 
 # type UserCollateralTokenMeta @entity {
@@ -121,7 +120,7 @@ type PoolLiquidity @entity {
   # unique Byte combination of tokenA + tokenB
   id: Bytes!
   token: Bytes!
-  # TODO: wasa Swap event swapPair.getReserves 
+  # TODO: wasa Swap event swapPair.getReserves
   totalAmount: BigInt!
 }
 
@@ -169,7 +168,7 @@ type Pool @entity {
   # once the first PoolEvent of the array is > 24h ago, we can remove it from the array and push it to the 24hAgo field
   volume30dUSD30dAgo: PoolVolume30d!
 
-  # TODO: wasa Proxy Token amount 
+  # TODO: wasa Proxy Token amount
   totalSupply: Float!
 }
 
@@ -194,10 +193,9 @@ type PoolVolumeChunk @entity {
   id: String!
   timestamp: BigInt!
   # determines if value is added of deducted
-  type: PoolEventType! 
+  type: PoolEventType!
   value: BigInt!
 }
-
 
 # TODO: wasa not sure about contract/event limitations of the BorrowerHistory, lets analyze this together first before implementation.
 type TokenAmount @entity(immutable: true) {

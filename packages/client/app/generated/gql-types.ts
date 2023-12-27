@@ -33,12 +33,12 @@ export enum BorrowerHistoryType {
 export type CollateralTokenMeta = {
   __typename: 'CollateralTokenMeta';
   id: Scalars['ID']['output'];
-  stabilityGainedAmount?: Maybe<Scalars['Float']['output']>;
+  stabilityGainedAmount: Scalars['Float']['output'];
   token: Token;
   totalValueLockedUSD: Scalars['Float']['output'];
-  totalValueLockedUSD24hAgo: Scalars['Float']['output'];
-  troveLockedAmount?: Maybe<Scalars['Float']['output']>;
-  walletAmount?: Maybe<Scalars['Float']['output']>;
+  totalValueLockedUSD30dAverage: Scalars['Float']['output'];
+  troveLockedAmount: Scalars['Float']['output'];
+  walletAmount: Scalars['Float']['output'];
 };
 
 export type DebtTokenMeta = {
@@ -252,7 +252,7 @@ export type GetCollateralTokensQueryVariables = Exact<{
 }>;
 
 
-export type GetCollateralTokensQuery = { __typename: 'Query', getCollateralTokens: Array<{ __typename: 'CollateralTokenMeta', walletAmount?: number | null, troveLockedAmount?: number | null, stabilityGainedAmount?: number | null, totalValueLockedUSD: number, totalValueLockedUSD24hAgo: number, token: { __typename: 'Token', id: string, address: string, symbol: string, priceUSD: number } }> };
+export type GetCollateralTokensQuery = { __typename: 'Query', getCollateralTokens: Array<{ __typename: 'CollateralTokenMeta', walletAmount: number, troveLockedAmount: number, stabilityGainedAmount: number, totalValueLockedUSD: number, totalValueLockedUSD30dAverage: number, token: { __typename: 'Token', id: string, address: string, symbol: string, priceUSD: number } }> };
 
 export type GetBorrowerStabilityHistoryQueryVariables = Exact<{
   borrower: Scalars['String']['input'];

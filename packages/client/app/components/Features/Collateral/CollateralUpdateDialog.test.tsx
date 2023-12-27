@@ -2,32 +2,45 @@ import { render, waitFor } from '@testing-library/react';
 import { userEvent } from '@testing-library/user-event';
 import { graphql } from 'msw';
 import { Contracts } from '../../../context/EthersProvider';
+import { GET_BORROWER_COLLATERAL_TOKENS, GET_BORROWER_DEBT_TOKENS } from '../../../queries';
 import MockedGetCollateralTokens from '../../tests/mockedResponses/GetBorrowerCollateralTokens.mocked.json';
+import MockedGetBorrowerDebtTokens from '../../tests/mockedResponses/GetBorrowerDebtTokens.mocked.json';
 import { server } from '../../tests/setupMSW';
 import { IntegrationWrapper } from '../../tests/test-utils';
 import CollateralUpdateDialog from './CollateralUpdateDialog';
 
 describe('CollateralUpdateDialog', () => {
-  it('should call function of mocked contract', async () => {
+  it('DEPOSIT: should call function of mocked contract', async () => {
     const contractMock = {
       borrowerOperationsContract: {
         addColl: jest.fn(),
+      },
+      collateralTokenContracts: {
+        [Contracts.ERC20.JUSD]: {
+          approve: jest.fn(),
+        },
       },
     };
 
     // Mock response so tokens are always available
     server.use(
-      graphql.query('GetCollateralTokens', (_, res, ctx) => {
+      graphql.query(GET_BORROWER_COLLATERAL_TOKENS, (_, res, ctx) => {
         return res(ctx.status(200), ctx.data(MockedGetCollateralTokens.data));
+      }),
+
+      graphql.query(GET_BORROWER_DEBT_TOKENS, (_, res, ctx) => {
+        return res(ctx.status(200), ctx.data(MockedGetBorrowerDebtTokens.data));
       }),
     );
 
     const { getByRole, getByTestId } = render(
       <IntegrationWrapper
         shouldConnectWallet
-        mockEthers={{
-          contractMock,
-        }}
+        mockEthers={
+          {
+            contractMock,
+          } as any
+        }
       >
         <CollateralUpdateDialog buttonVariant="contained" />
       </IntegrationWrapper>,
@@ -42,7 +55,6 @@ describe('CollateralUpdateDialog', () => {
     );
 
     const openButton = getByRole('button', { name: 'Update' });
-
     await userEvent.click(openButton);
 
     await waitFor(() => {
@@ -61,7 +73,7 @@ describe('CollateralUpdateDialog', () => {
     ]);
   });
 
-  it('should call function of mocked contract', async () => {
+  it('WITHDRAW: should call function of mocked contract', async () => {
     const contractMock = {
       borrowerOperationsContract: {
         withdrawColl: jest.fn(),
@@ -70,8 +82,12 @@ describe('CollateralUpdateDialog', () => {
 
     // Mock response so tokens are always available
     server.use(
-      graphql.query('GetCollateralTokens', (_, res, ctx) => {
+      graphql.query(GET_BORROWER_COLLATERAL_TOKENS, (_, res, ctx) => {
         return res(ctx.status(200), ctx.data(MockedGetCollateralTokens.data));
+      }),
+
+      graphql.query(GET_BORROWER_DEBT_TOKENS, (_, res, ctx) => {
+        return res(ctx.status(200), ctx.data(MockedGetBorrowerDebtTokens.data));
       }),
     );
 
@@ -95,8 +111,15 @@ describe('CollateralUpdateDialog', () => {
     );
 
     const openButton = getByRole('button', { name: 'Update' });
-
     await userEvent.click(openButton);
+
+    await waitFor(
+      () => {
+        const openButton = getByRole('tab', { name: 'WITHDRAW' });
+        expect(openButton).toBeEnabled();
+      },
+      { timeout: 5000 },
+    );
 
     const withdrawTab = getByRole('tab', { name: 'WITHDRAW' });
     await userEvent.click(withdrawTab);

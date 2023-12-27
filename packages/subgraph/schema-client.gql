@@ -34,7 +34,7 @@ type CollateralTokenMeta {
   stabilityGainedAmount: Float
   # global
   totalValueLockedUSD: Float!
-  totalValueLockedUSD24hAgo: Float!
+  totalValueLockedUSD30dAverage: Float!
 }
 
 type Query {
@@ -79,7 +79,11 @@ type PageInfo {
 type Query {
   # returns 30 elements, cursor based pagination
   # sorted by position.openedAt DESC
-  getPositions(borrower: String!, isOpen: Boolean!, cursor: String): PositionsPage!
+  getPositions(
+    borrower: String!
+    isOpen: Boolean!
+    cursor: String
+  ): PositionsPage!
 }
 
 type PoolLiquidity {
@@ -144,6 +148,13 @@ type PoolHistoryPage {
 }
 
 type Query {
-  getBorrowerPoolHistory(poolId: String!, borrower: String!, cursor: String): PoolHistoryPage!
-  getBorrowerStabilityHistory(borrower: String!, cursor: String): PoolHistoryPage!
+  getBorrowerPoolHistory(
+    poolId: String!
+    borrower: String!
+    cursor: String
+  ): PoolHistoryPage!
+  getBorrowerStabilityHistory(
+    borrower: String!
+    cursor: String
+  ): PoolHistoryPage!
 }

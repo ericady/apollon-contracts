@@ -61,7 +61,10 @@ const StabilityUpdateDialog = () => {
 
       <Dialog
         open={isOpen}
-        onClose={() => setIsOpen(false)}
+        onClose={() => {
+          reset();
+          setIsOpen(false);
+        }}
         fullWidth
         // @ts-ignore
         componentsProps={{ backdrop: { 'data-testid': 'apollon-stability-update-dialog-backdrop' } }}
