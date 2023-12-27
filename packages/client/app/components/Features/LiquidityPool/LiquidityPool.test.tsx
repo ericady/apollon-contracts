@@ -1,8 +1,9 @@
 import { render, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import { PoolLiquidity } from '../../../generated/gql-types';
 import MockedGetBorrowerLiquidityPools from '../../tests/mockedResponses/GetBorrowerLiquidityPools.mocked.json';
 import { IntegrationWrapper } from '../../tests/test-utils';
-import LiquidityDepositWithdraw from './LiquidityDepositWithdraw';
+import LiquidityDepositWithdraw, { calculate150PercentTokenValue } from './LiquidityDepositWithdraw';
 
 // TODO: Write tests to expect arguments in the contract call once they are concluded
 
@@ -120,5 +121,25 @@ describe('LiquidityPool', () => {
         expect.any(Number),
       );
     });
+  });
+
+  // TODO: Write some more unit tests for edge cases
+  it('calculate token amount when walletAmount is 0', () => {
+    const tokenA = MockedGetBorrowerLiquidityPools.data.getPools[0].liquidity[0] as PoolLiquidity;
+    const tokenB = MockedGetBorrowerLiquidityPools.data.getPools[0].liquidity[1] as PoolLiquidity;
+    const result = calculate150PercentTokenValue(
+      1000,
+      6000,
+      tokenA,
+      tokenB,
+      { walletAmount: 0 } as any,
+      { walletAmount: 0 } as any,
+    );
+
+    const tokenAUSD = result * tokenA.token.priceUSD;
+    expect(tokenAUSD).toBeCloseTo(2474.71);
+    const tokenBUSD = ((result * tokenA.totalAmount) / tokenB.totalAmount) * tokenB.token.priceUSD;
+    expect(tokenBUSD).toBeCloseTo(525.285);
+    expect(tokenAUSD + tokenBUSD).toBeCloseTo(3000);
   });
 });

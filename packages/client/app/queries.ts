@@ -103,6 +103,7 @@ export const GET_BORROWER_LIQUIDITY_POOLS = gql`
     getPools(borrower: $borrower) {
       id
       liquidity {
+        id
         token {
           id
           address
