@@ -5,11 +5,7 @@ import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from
 import Typography from '@mui/material/Typography';
 import { useEffect, useMemo } from 'react';
 import { useEthers } from '../../../context/EthersProvider';
-import {
-  GetBorrowerLiquidityPoolsQuery,
-  GetBorrowerLiquidityPoolsQueryVariables,
-  GetLiquidityPoolsQuery,
-} from '../../../generated/gql-types';
+import { GetBorrowerLiquidityPoolsQuery, GetBorrowerLiquidityPoolsQueryVariables } from '../../../generated/gql-types';
 import { GET_BORROWER_LIQUIDITY_POOLS } from '../../../queries';
 import { displayPercentage, percentageChange, roundCurrency, stdFormatter } from '../../../utils/math';
 import FeatureBox from '../../FeatureBox/FeatureBox';
@@ -20,8 +16,8 @@ import HeaderCell from '../../Table/HeaderCell';
 import LiquidityPoolsTableLoader from './LiquidityPoolsTableLoader';
 
 type Props = {
-  selectedPool: GetLiquidityPoolsQuery['getPools'][number] | null;
-  setSelectedPool: (pool: GetLiquidityPoolsQuery['getPools'][number] | null) => void;
+  selectedPool: GetBorrowerLiquidityPoolsQuery['getPools'][number] | null;
+  setSelectedPool: (pool: GetBorrowerLiquidityPoolsQuery['getPools'][number] | null) => void;
 };
 
 function LiquidityPoolsTable({ selectedPool, setSelectedPool }: Props) {

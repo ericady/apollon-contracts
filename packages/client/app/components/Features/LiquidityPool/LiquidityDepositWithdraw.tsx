@@ -104,14 +104,13 @@ function LiquidityDepositWithdraw({ selectedPool }: Props) {
       );
     } else {
       const percentageFromPool = tokenAAmount / totalSupply;
-      const percentagefromUser = tokenAAmount / borrowerAmount;
       const tokenAAmountForWithdraw = percentageFromPool * tokenA.totalAmount;
       const tokenBAmountForWithdraw = percentageFromPool * tokenB.totalAmount;
 
       await swapOperationsContract.removeLiquidity(
         tokenA.token.address,
         tokenB.token.address,
-        floatToBigInt(percentagefromUser),
+        floatToBigInt(tokenAAmount),
         floatToBigInt(tokenAAmountForWithdraw * (1 - SLIPPAGE)),
         floatToBigInt(tokenBAmountForWithdraw * (1 - SLIPPAGE)),
         deadline,

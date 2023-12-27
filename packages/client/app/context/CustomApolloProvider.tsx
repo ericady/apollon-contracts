@@ -529,27 +529,10 @@ export const SchemaDataFreshnessManager: ContractDataFreshnessManager<typeof Con
         lastFetched: 0,
         timeout: 1000 * 5,
       },
-
-      proxyTokenAmount: {
-        fetch: async (swapPairContract: SwapPair, borrower: AddressLike, totalAmount: number, totalReserve: number) => {
-          SchemaDataFreshnessManager.SwapPairs[
-            '0x509ee0d083ddf8ac028f2a56731412edd63224b9'
-          ].borrowerAmount.lastFetched = Date.now();
-          const userPoolBalance = await swapPairContract.balanceOf(borrower);
-
-          const amount = userPoolBalance / (floatToBigInt(totalReserve) * floatToBigInt(totalAmount));
-
-          SchemaDataFreshnessManager.SwapPairs['0x509ee0d083ddf8ac028f2a56731412edd63224b9'].borrowerAmount.value(
-            ethers.toNumber(userPoolBalance),
-          );
-        },
-        value: makeVar(0),
-        lastFetched: 0,
-        timeout: 1000 * 5,
-      },
     },
     '0x509ee0d083ddf8ac028f2a56731412edd63225b9': {},
   },
+  BorrowerOperations: {},
 };
 
 // FIXME: The cache needs to be initialized with the contracts data.
