@@ -199,6 +199,32 @@ const getProductionCacheConfig = ({
             return SchemaDataFreshnessManager.DebtToken[Contracts.DebtToken.DebtToken1].troveMintedAmount.value();
           },
         },
+
+        troveRepableDebtAmount: {
+          read(_, { readField, cache }) {
+            const token = readField('token') as Readonly<Reference>;
+
+            const tokenData = cache.readFragment<TokenFragmentFragment>({
+              id: token.__ref,
+              fragment: TOKEN_FRAGMENT,
+            });
+
+            if (
+              tokenData?.address &&
+              isFieldOutdated(
+                SchemaDataFreshnessManager.DebtToken[Contracts.DebtToken.DebtToken1],
+                'troveRepableDebtAmount',
+              )
+            ) {
+              SchemaDataFreshnessManager.DebtToken[Contracts.DebtToken.DebtToken1].troveRepableDebtAmount.fetch(
+                troveManagerContract,
+                borrower,
+              );
+            }
+
+            return SchemaDataFreshnessManager.DebtToken[Contracts.DebtToken.DebtToken1].troveRepableDebtAmount.value();
+          },
+        },
       },
     },
 
@@ -439,6 +465,7 @@ export const SchemaDataFreshnessManager: ContractDataFreshnessManager<typeof Con
         lastFetched: 0,
         timeout: 1000 * 5,
       },
+
       priceUSDOracle: {
         fetch: async (debtTokenContract: DebtToken) => {
           SchemaDataFreshnessManager.DebtToken[Contracts.DebtToken.DebtToken1]!.priceUSDOracle.lastFetched = Date.now();
@@ -465,6 +492,7 @@ export const SchemaDataFreshnessManager: ContractDataFreshnessManager<typeof Con
         lastFetched: 0,
         timeout: 1000 * 5,
       },
+
       troveMintedAmount: {
         fetch: async (fetchSource?: { troveManagerContract: TroveManager; borrower: AddressLike }) => {
           if (fetchSource) {
@@ -485,6 +513,25 @@ export const SchemaDataFreshnessManager: ContractDataFreshnessManager<typeof Con
               ethers.toNumber(tokenAmount),
             );
           }
+        },
+        value: makeVar(0),
+        lastFetched: 0,
+        timeout: 1000 * 5,
+      },
+
+      troveRepableDebtAmount: {
+        fetch: async (troveManagerContract: TroveManager, borrower: AddressLike) => {
+          SchemaDataFreshnessManager.DebtToken[Contracts.DebtToken.DebtToken1].troveRepableDebtAmount.lastFetched =
+            Date.now();
+
+          const repayableDebt = await troveManagerContract.getTroveRepayableDebt(
+            borrower,
+            Contracts.DebtToken.DebtToken1,
+          );
+
+          SchemaDataFreshnessManager.DebtToken[Contracts.DebtToken.DebtToken1].troveRepableDebtAmount.value(
+            ethers.toNumber(repayableDebt),
+          );
         },
         value: makeVar(0),
         lastFetched: 0,

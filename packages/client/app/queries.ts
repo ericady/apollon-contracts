@@ -55,11 +55,12 @@ export const GET_BORROWER_DEBT_TOKENS = gql`
       walletAmount @client
       stabilityLostAmount
       stabilityCompoundAmount
+      troveRepableDebtAmount @client
 
       stabilityDepositAPY
       totalDepositedStability
       totalSupplyUSD
-      totalSupplyUSD24hAgo
+      totalSupplyUSD30dAverage
       token {
         id
         address
@@ -182,12 +183,6 @@ export const GET_COLLATERAL_USD_HISTORY = gql`
 export const GET_DEBT_USD_HISTORY = gql`
   query GetDebtUSDHistory {
     getDebtUSDHistory
-  }
-`;
-
-export const GET_COLLATERAL_RATIO_HISTORY = gql`
-  query GetCollateralRatioHistory {
-    getCollateralRatioHistory
   }
 `;
 

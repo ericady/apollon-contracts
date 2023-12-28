@@ -1,5 +1,5 @@
 import { useQuery } from '@apollo/client';
-import { Typography, useTheme } from '@mui/material';
+import { Typography } from '@mui/material';
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
 import TableCell from '@mui/material/TableCell';
@@ -17,9 +17,6 @@ import HeaderCell from '../../../Table/HeaderCell';
 import DebtTokenTableLoader from './DebtTokenTableLoader';
 
 function DebtTokenTable() {
-  const theme = useTheme();
-  const isDarkMode = theme.palette.mode === 'dark';
-
   const { address } = useEthers();
 
   const { data } = useQuery<GetBorrowerDebtTokensQuery, GetBorrowerDebtTokensQueryVariables>(GET_BORROWER_DEBT_TOKENS, {
@@ -36,30 +33,27 @@ function DebtTokenTable() {
         <Table data-testid="apollon-debt-token-table">
           <TableHead>
             <TableRow>
-              <HeaderCell title="Personal" cellProps={{ align: 'right' }} />
+              <HeaderCell title="Protocol Level" cellProps={{ align: 'right' }} />
+              <HeaderCell title="" />
+              <HeaderCell title="" />
               <HeaderCell title="" />
               <HeaderCell title="" cellProps={{ sx: { borderRight: '1px solid', borderColor: 'background.paper' } }} />
               <HeaderCell title="" />
-              <HeaderCell title="" />
-              <HeaderCell title="" />
-              <HeaderCell title="Protocol Level" cellProps={{ align: 'right' }} />
+              <HeaderCell title="Personal" cellProps={{ align: 'right' }} />
             </TableRow>
           </TableHead>
           <TableHead>
             <TableRow>
-              <HeaderCell title="Minted" cellProps={{ align: 'right' }} />
-              <HeaderCell title="Stability" cellProps={{ align: 'right' }} />
-              <HeaderCell
-                title="Token"
-                cellProps={{ sx: { borderRight: '1px solid', borderColor: 'background.paper' } }}
-              />
-              <HeaderCell title="Supply" cellProps={{ align: 'right', colSpan: 2 }} />
+              <HeaderCell title="Token" cellProps={{ align: 'right' }} />
+              <HeaderCell title="Minted" cellProps={{ align: 'center', colSpan: 2 }} />
               <HeaderCell title="Stability" cellProps={{ align: 'right' }} />
               <HeaderCell
                 title="Rewards"
-                cellProps={{ align: 'right' }}
+                cellProps={{ sx: { borderRight: '1px solid', borderColor: 'background.paper' }, align: 'right' }}
                 tooltipProps={{ title: 'APY based on the last 30 days liquidations.', arrow: true, placement: 'right' }}
               />
+              <HeaderCell title="Wallet" cellProps={{ align: 'right' }} />
+              <HeaderCell title="Debt" cellProps={{ align: 'right' }} />
             </TableRow>
           </TableHead>
           <TableBody>
@@ -70,24 +64,17 @@ function DebtTokenTable() {
                   totalDepositedStability,
                   token,
                   troveMintedAmount,
-                  stabilityCompoundAmount,
+                  troveRepableDebtAmount,
                   totalSupplyUSD,
-                  totalSupplyUSD24hAgo,
+                  totalSupplyUSD30dAverage,
                 },
                 index,
               ) => (
                 <TableRow hover key={token.address}>
-                  <TableCell align="right" sx={{ borderBottom: index === data.getDebtTokens.length - 1 ? 'none' : '' }}>
-                    {roundCurrency(troveMintedAmount!, 5)}
-                  </TableCell>
-                  <TableCell align="right" sx={{ borderBottom: index === data.getDebtTokens.length - 1 ? 'none' : '' }}>
-                    {roundCurrency(stabilityCompoundAmount!, 5)}
-                  </TableCell>
                   <TableCell
+                    align="right"
                     sx={{
                       borderBottom: index === data.getDebtTokens.length - 1 ? 'none' : '',
-                      borderRight: '1px solid',
-                      borderColor: 'table.border',
                     }}
                   >
                     <Label variant="none">{token.symbol}</Label>
@@ -109,20 +96,33 @@ function DebtTokenTable() {
                       <Typography
                         fontWeight={400}
                         color={
-                          percentageChange(totalSupplyUSD, totalSupplyUSD24hAgo) > 0 ? 'success.main' : 'error.main'
+                          percentageChange(totalSupplyUSD, totalSupplyUSD30dAverage) > 0 ? 'success.main' : 'error.main'
                         }
                       >
-                        {displayPercentage(percentageChange(totalSupplyUSD, totalSupplyUSD24hAgo), 'positive')}
+                        {displayPercentage(percentageChange(totalSupplyUSD, totalSupplyUSD30dAverage), 'positive')}
                       </Typography>
 
-                      <DirectionIcon showIncrease={percentageChange(totalSupplyUSD, totalSupplyUSD24hAgo) > 0} />
+                      <DirectionIcon showIncrease={percentageChange(totalSupplyUSD, totalSupplyUSD30dAverage) > 0} />
                     </div>
                   </TableCell>
                   <TableCell align="right" sx={{ borderBottom: index === data.getDebtTokens.length - 1 ? 'none' : '' }}>
                     {roundCurrency(totalDepositedStability)}
                   </TableCell>
-                  <TableCell align="right" sx={{ borderBottom: index === data.getDebtTokens.length - 1 ? 'none' : '' }}>
+                  <TableCell
+                    align="right"
+                    sx={{
+                      borderBottom: index === data.getDebtTokens.length - 1 ? 'none' : '',
+                      borderRight: '1px solid',
+                      borderColor: 'table.border',
+                    }}
+                  >
                     {displayPercentage(stabilityDepositAPY)}
+                  </TableCell>
+                  <TableCell align="right" sx={{ borderBottom: index === data.getDebtTokens.length - 1 ? 'none' : '' }}>
+                    {roundCurrency(troveMintedAmount, 5)}
+                  </TableCell>
+                  <TableCell align="right" sx={{ borderBottom: index === data.getDebtTokens.length - 1 ? 'none' : '' }}>
+                    {roundCurrency(troveRepableDebtAmount, 5)}
                   </TableCell>
                 </TableRow>
               ),

@@ -29,7 +29,6 @@ import {
   GET_BORROWER_LIQUIDITY_POOLS,
   GET_BORROWER_POSITIONS,
   GET_BORROWER_STABILITY_HISTORY,
-  GET_COLLATERAL_RATIO_HISTORY,
   GET_COLLATERAL_USD_HISTORY,
   GET_DEBT_USD_HISTORY,
   GET_RESERVE_USD_HISTORY,
@@ -138,7 +137,7 @@ const debtTokenMeta = tokens.map<DebtTokenMeta>((token) => {
     totalReserve: faker.number.float({ min: 1000, max: 5000, precision: 0.0001 }),
     totalReserve24hAgo: faker.number.float({ min: 1000, max: 5000, precision: 0.0001 }),
     totalSupplyUSD: parseFloat(faker.finance.amount(10000, 50000, 2)),
-    totalSupplyUSD24hAgo: parseFloat(faker.finance.amount(10000, 50000, 2)),
+    totalSupplyUSD30dAverage: parseFloat(faker.finance.amount(10000, 50000, 2)),
     stabilityDepositAPY: faker.number.float({ min: 0, max: 10, precision: 0.0001 }) / 100,
   };
 });
@@ -349,7 +348,7 @@ export const handlers = [
           totalReserve: shouldHaveReserve ? parseFloat(faker.finance.amount(1000, 5000, 2)) : 0,
           totalReserve24hAgo: shouldHaveReserve ? parseFloat(faker.finance.amount(1000, 5000, 2)) : 0,
           totalSupplyUSD: parseFloat(faker.finance.amount(10000, 50000, 2)),
-          totalSupplyUSD24hAgo: parseFloat(faker.finance.amount(10000, 50000, 2)),
+          totalSupplyUSD30dAverage: parseFloat(faker.finance.amount(10000, 50000, 2)),
           stabilityDepositAPY: faker.number.float({ min: 0.01, max: 0.1, precision: 0.01 }),
         };
       });
@@ -586,15 +585,7 @@ export const handlers = [
       return res(ctx.data({ getBorrowerStabilityHistory: result }));
     }
   }),
-  // GetCollateralRatioHistory
-  graphql.query<{ getCollateralRatioHistory: Query['getCollateralRatioHistory'] }>(
-    GET_COLLATERAL_RATIO_HISTORY,
-    (req, res, ctx) => {
-      const result = generatePoolPriceHistory();
 
-      return res(ctx.data({ getCollateralRatioHistory: result }));
-    },
-  ),
   // GetReserveUSDHistory
   graphql.query<{ getReserveUSDHistory: Query['getReserveUSDHistory'] }>(GET_RESERVE_USD_HISTORY, (req, res, ctx) => {
     const result = generatePoolPriceHistory();

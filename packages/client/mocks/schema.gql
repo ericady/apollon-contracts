@@ -19,14 +19,16 @@ type DebtTokenMeta {
   troveMintedAmount: Float!
   stabilityLostAmount: Float!
   stabilityCompoundAmount: Float!
+  troveRepableDebtAmount: Float!
 
   # global
+  # TODO: No implementation yet
   stabilityDepositAPY: Float!
   totalDepositedStability: Float!
   totalReserve: Float!
   totalReserve24hAgo: Float!
   totalSupplyUSD: Float!
-  totalSupplyUSD24hAgo: Float!
+  totalSupplyUSD30dAverage: Float!
 }
 
 type CollateralTokenMeta {

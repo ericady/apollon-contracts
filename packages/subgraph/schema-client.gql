@@ -23,7 +23,7 @@ type DebtTokenMeta {
   totalReserve: Float!
   totalReserve24hAgo: Float!
   totalSupplyUSD: Float!
-  totalSupplyUSD24hAgo: Float!
+  totalSupplyUSD30dAverage: Float!
 }
 
 type CollateralTokenMeta {

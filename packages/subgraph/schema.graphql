@@ -27,15 +27,17 @@ type DebtTokenMeta @entity(immutable: true) {
   # Das muss auf dem graphen berechnet werden, über das offset event. Alle offsets der letzten 30 Tage immer zusammenfassen und schauen wie groß der Profit (debt token heraus gezogen, coll token bekommen) war.
   # On creation of the entity we must save just the current APY
   stabilityDepositAPY: Int!
+  # event: StabilityProvided StabilityWithdrawn  StabilityOffset 
   totalDepositedStability: BigInt!
   # TODO: wasa Implement the event handlers to update this field
   totalReserve: BigInt!
   # TODO: Fetch this from the client side
   # totalReserve24hAgo: BigInt!
+  # event StoragePoolValueUpdated
   # TODO: wasa Implement the event handlers to update this field
   totalSupplyUSD: BigInt!
-  # TODO: Fetch this from the client side
-  # totalSupplyUSD24hAgo: BigInt!
+  # event StoragePoolValueUpdated
+  # totalSupplyUSD30dAverage: BigInt!
 }
 
 # Aggregator, pushed old events out and lets new in, recalculating the acc value each time

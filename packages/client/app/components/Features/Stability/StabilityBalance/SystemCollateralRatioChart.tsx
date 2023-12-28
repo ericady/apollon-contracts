@@ -3,10 +3,12 @@ import { Box, Typography, useTheme } from '@mui/material';
 import { useMemo } from 'react';
 import { CartesianGrid, Line, LineChart, Tooltip } from 'recharts';
 import {
-  GetCollateralRatioHistoryQuery,
-  GetCollateralRatioHistoryQueryVariables,
+  GetCollateralUsdHistoryQuery,
+  GetCollateralUsdHistoryQueryVariables,
+  GetDebtUsdHistoryQuery,
+  GetDebtUsdHistoryQueryVariables,
 } from '../../../../generated/gql-types';
-import { GET_COLLATERAL_RATIO_HISTORY } from '../../../../queries';
+import { GET_COLLATERAL_USD_HISTORY, GET_DEBT_USD_HISTORY } from '../../../../queries';
 import { DARK_BACKGROUND_EMPHASIS, LIGHT_BACKGROUND_EMPHASIS } from '../../../../theme';
 import { stdFormatter } from '../../../../utils/math';
 import DiagramPlaceholder from '../../../Loader/DiagramPlaceholder';
@@ -15,18 +17,26 @@ function SystemCollateralRatioChart() {
   const theme = useTheme();
   const isDarkMode = theme.palette.mode === 'dark';
 
-  const { data } = useQuery<GetCollateralRatioHistoryQuery, GetCollateralRatioHistoryQueryVariables>(
-    GET_COLLATERAL_RATIO_HISTORY,
+  const { data: collateralLockedData } = useQuery<GetCollateralUsdHistoryQuery, GetCollateralUsdHistoryQueryVariables>(
+    GET_COLLATERAL_USD_HISTORY,
+  );
+
+  const { data: debtMintedData } = useQuery<GetDebtUsdHistoryQuery, GetDebtUsdHistoryQueryVariables>(
+    GET_DEBT_USD_HISTORY,
   );
 
   const chartData = useMemo(() => {
-    return (
-      data?.getCollateralRatioHistory.map(([timeStamp, value]) => ({
-        timeStamp,
-        value,
-      })) ?? []
-    );
-  }, [data]);
+    return debtMintedData && collateralLockedData
+      ? collateralLockedData.getCollateralUSDHistory.map(([timeStamp, collateralLocked], index) => {
+          const valueMinted = debtMintedData.getDebtUSDHistory[index][1];
+
+          return {
+            timeStamp,
+            value: collateralLocked / valueMinted,
+          };
+        })
+      : [];
+  }, [collateralLockedData, debtMintedData]);
 
   if (chartData.length === 0) return <DiagramPlaceholder />;
 

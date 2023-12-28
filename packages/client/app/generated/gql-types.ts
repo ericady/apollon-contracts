@@ -52,8 +52,9 @@ export type DebtTokenMeta = {
   totalReserve: Scalars['Float']['output'];
   totalReserve24hAgo: Scalars['Float']['output'];
   totalSupplyUSD: Scalars['Float']['output'];
-  totalSupplyUSD24hAgo: Scalars['Float']['output'];
+  totalSupplyUSD30dAverage: Scalars['Float']['output'];
   troveMintedAmount: Scalars['Float']['output'];
+  troveRepableDebtAmount: Scalars['Float']['output'];
   walletAmount: Scalars['Float']['output'];
 };
 
@@ -229,7 +230,7 @@ export type GetBorrowerDebtTokensQueryVariables = Exact<{
 }>;
 
 
-export type GetBorrowerDebtTokensQuery = { __typename: 'Query', getDebtTokens: Array<{ __typename: 'DebtTokenMeta', troveMintedAmount: number, walletAmount: number, stabilityLostAmount: number, stabilityCompoundAmount: number, stabilityDepositAPY: number, totalDepositedStability: number, totalSupplyUSD: number, totalSupplyUSD24hAgo: number, token: { __typename: 'Token', id: string, address: string, symbol: string, priceUSD: number, isPoolToken: boolean } }> };
+export type GetBorrowerDebtTokensQuery = { __typename: 'Query', getDebtTokens: Array<{ __typename: 'DebtTokenMeta', troveMintedAmount: number, walletAmount: number, stabilityLostAmount: number, stabilityCompoundAmount: number, troveRepableDebtAmount: number, stabilityDepositAPY: number, totalDepositedStability: number, totalSupplyUSD: number, totalSupplyUSD30dAverage: number, token: { __typename: 'Token', id: string, address: string, symbol: string, priceUSD: number, isPoolToken: boolean } }> };
 
 export type GetBorrowerPositionsQueryVariables = Exact<{
   borrower: Scalars['String']['input'];
