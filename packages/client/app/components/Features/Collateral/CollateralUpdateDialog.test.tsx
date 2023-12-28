@@ -115,8 +115,8 @@ describe('CollateralUpdateDialog', () => {
 
     await waitFor(
       () => {
-        const openButton = getByRole('tab', { name: 'WITHDRAW' });
-        expect(openButton).toBeEnabled();
+        const withdrawTab = getByRole('tab', { name: 'WITHDRAW' });
+        expect(withdrawTab).toBeEnabled();
       },
       { timeout: 5000 },
     );

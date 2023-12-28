@@ -116,6 +116,8 @@ function LiquidityDepositWithdraw({ selectedPool }: Props) {
         deadline,
       );
     }
+
+    reset();
   };
 
   const ratioChangeCallback = useCallback(

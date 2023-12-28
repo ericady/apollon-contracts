@@ -133,6 +133,7 @@ const CollateralUpdateDialog = ({ buttonVariant, buttonSx = {} }: Props) => {
       await borrowerOperationsContract.withdrawColl(tokenAmounts);
     }
 
+    reset();
     setIsOpen(false);
   };
 

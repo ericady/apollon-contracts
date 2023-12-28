@@ -6,12 +6,14 @@ import Button from '@mui/material/Button';
 import Tab from '@mui/material/Tab';
 import Tabs from '@mui/material/Tabs';
 import Typography from '@mui/material/Typography';
-import { SyntheticEvent, useState } from 'react';
+import { SyntheticEvent, useEffect, useState } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
-import { useEthers } from '../../../context/EthersProvider';
+import { DebtToken } from '../../../../generated/types';
+import { IBase } from '../../../../generated/types/StabilityPoolManager';
+import { Contracts, useEthers } from '../../../context/EthersProvider';
 import { GetBorrowerDebtTokensQuery, GetBorrowerDebtTokensQueryVariables } from '../../../generated/gql-types';
 import { GET_BORROWER_DEBT_TOKENS } from '../../../queries';
-import { roundCurrency } from '../../../utils/math';
+import { floatToBigInt, roundCurrency } from '../../../utils/math';
 import NumberInput from '../../FormControls/NumberInput';
 import CrossIcon from '../../Icons/CrossIcon';
 import DiamondIcon from '../../Icons/DiamondIcon';
@@ -23,7 +25,10 @@ const StabilityUpdateDialog = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [tabValue, setTabValue] = useState<'DEPOSIT' | 'WITHDRAW'>('DEPOSIT');
 
-  const { address } = useEthers();
+  const {
+    address,
+    contracts: { stabilityPoolManagerContract, debtTokenContracts },
+  } = useEthers();
 
   const { data } = useQuery<GetBorrowerDebtTokensQuery, GetBorrowerDebtTokensQueryVariables>(GET_BORROWER_DEBT_TOKENS, {
     variables: {
@@ -34,9 +39,16 @@ const StabilityUpdateDialog = () => {
   const methods = useForm<FieldValues>({ reValidateMode: 'onChange' });
   const { handleSubmit, setValue, reset, formState } = methods;
 
+  useEffect(() => {
+    if (data && !formState.isDirty) {
+      const emptyValues = data!.getDebtTokens.reduce((acc, { token }) => ({ ...acc, [token.address]: '' }), {});
+      reset(emptyValues);
+    }
+  }, [data, formState.isDirty]);
+
   const handleChange = (_: SyntheticEvent, newValue: 'DEPOSIT' | 'WITHDRAW') => {
     setTabValue(newValue);
-    const emptyValues = data?.getDebtTokens.reduce((acc, { token }) => ({ ...acc, [token.address]: '' }), {});
+    const emptyValues = data!.getDebtTokens.reduce((acc, { token }) => ({ ...acc, [token.address]: '' }), {});
     reset(emptyValues);
   };
 
@@ -48,14 +60,33 @@ const StabilityUpdateDialog = () => {
     }
   };
 
-  const onSubmit = () => {
-    console.log('onSubmit called');
-    // TODO: Implement contract call
+  const onSubmit = async (data: FieldValues) => {
+    const tokenAmounts = Object.entries(data)
+      .filter(([_, amount]) => amount !== '')
+      .map<IBase.TokenAmountStruct>(([address, amount]) => ({
+        tokenAddress: address,
+        amount: floatToBigInt(parseFloat(amount)),
+      }));
+
+    if (tabValue === 'DEPOSIT') {
+      tokenAmounts.forEach(async ({ tokenAddress, amount }) => {
+        // @ts-ignore
+        const collContract = debtTokenContracts[tokenAddress] as DebtToken;
+        await collContract.approve(Contracts.StoragePool, amount);
+      });
+
+      await stabilityPoolManagerContract.provideStability(tokenAmounts);
+    } else {
+      await stabilityPoolManagerContract.withdrawStability(tokenAmounts);
+    }
+
+    reset();
+    setIsOpen(false);
   };
 
   return (
     <>
-      <Button onClick={() => setIsOpen(true)} variant="outlined" disabled={!address}>
+      <Button onClick={() => setIsOpen(true)} variant="outlined" disabled={!address || !data}>
         Update
       </Button>
 
@@ -107,97 +138,106 @@ const StabilityUpdateDialog = () => {
               </Tabs>
 
               <div style={{ overflowY: 'scroll', maxHeight: '60vh' }}>
-                {data?.getDebtTokens.map(({ token, walletAmount = 0, stabilityCompoundAmount = 0 }, index) => (
-                  <Box
-                    key={token.address}
-                    data-testid="apollon-stability-update-dialog"
-                    sx={{
-                      display: 'flex',
-                      justifyContent: 'space-between',
-                      padding: '20px',
-                      height: '114px',
-                      borderBottom: index === data.getDebtTokens.length - 1 ? 'none' : '1px solid',
-                      borderColor: 'background.paper',
-                    }}
-                  >
-                    {tabValue === 'DEPOSIT' && (
-                      <div style={{ marginTop: 6 }}>
-                        <Label variant="success">{token.symbol}</Label>
-                        <Typography sx={{ fontWeight: '400', marginTop: '10px' }}>
-                          {roundCurrency(stabilityCompoundAmount!, 5)}
-                        </Typography>
-                        <Typography variant="label" paragraph>
-                          Deposited
-                        </Typography>
-                      </div>
-                    )}
-                    {tabValue === 'WITHDRAW' && (
-                      <div style={{ marginTop: 6 }}>
-                        <Label variant="success">{token.symbol}</Label>
-                      </div>
-                    )}
-
-                    <div>
-                      <NumberInput
-                        name={token.address}
-                        data-testid="apollon-stability-update-dialog-input"
-                        placeholder="Value"
-                        fullWidth
-                        rules={{
-                          min: { value: 0, message: 'Amount needs to be positive.' },
-                          max:
-                            tabValue === 'DEPOSIT'
-                              ? { value: walletAmount!, message: 'Your wallet does not contain the specified amount.' }
-                              : {
-                                  value: stabilityCompoundAmount!,
-                                  message: 'Your deposited stability does not contain the specified amount.',
-                                },
-                        }}
-                      />
-
-                      <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                        <div>
-                          {tabValue === 'DEPOSIT' && (
-                            <>
-                              <Typography
-                                variant="caption"
-                                data-testid="apollon-stability-update-dialog-deposit-funds-label"
-                                color="info.main"
-                              >
-                                {roundCurrency(walletAmount!, 5)}
-                              </Typography>
-                              <Typography variant="label" paragraph>
-                                Wallet
-                              </Typography>
-                            </>
-                          )}
-                          {tabValue === 'WITHDRAW' && (
-                            <>
-                              <Typography
-                                variant="caption"
-                                data-testid="apollon-stability-update-dialog-withdraw-funds-label"
-                                color="info.main"
-                              >
-                                {roundCurrency(stabilityCompoundAmount!, 5)}
-                              </Typography>
-                              <Typography variant="label" paragraph>
-                                Deposited
-                              </Typography>
-                            </>
-                          )}
+                {data?.getDebtTokens
+                  .filter(
+                    ({ walletAmount, compoundedDeposit }) =>
+                      (tabValue === 'DEPOSIT' && walletAmount > 0) ||
+                      (tabValue === 'WITHDRAW' && compoundedDeposit > 0),
+                  )
+                  .map(({ token, walletAmount, compoundedDeposit }, index) => (
+                    <Box
+                      key={token.address}
+                      data-testid="apollon-stability-update-dialog"
+                      sx={{
+                        display: 'flex',
+                        justifyContent: 'space-between',
+                        padding: '20px',
+                        height: '114px',
+                        borderBottom: index === data?.getDebtTokens.length - 1 ? 'none' : '1px solid',
+                        borderColor: 'background.paper',
+                      }}
+                    >
+                      {tabValue === 'DEPOSIT' && (
+                        <div style={{ marginTop: 6 }}>
+                          <Label variant="success">{token.symbol}</Label>
+                          <Typography sx={{ fontWeight: '400', marginTop: '10px' }}>
+                            {roundCurrency(compoundedDeposit, 5)}
+                          </Typography>
+                          <Typography variant="label" paragraph>
+                            remaining deposit
+                          </Typography>
                         </div>
+                      )}
+                      {tabValue === 'WITHDRAW' && (
+                        <div style={{ marginTop: 6 }}>
+                          <Label variant="success">{token.symbol}</Label>
+                        </div>
+                      )}
 
-                        <Button
-                          variant="undercover"
-                          sx={{ textDecoration: 'underline', p: 0, mt: 0.25, height: 25 }}
-                          onClick={() => fillMaxInputValue(token.address, walletAmount!, stabilityCompoundAmount!)}
-                        >
-                          max
-                        </Button>
+                      <div>
+                        <NumberInput
+                          name={token.address}
+                          data-testid="apollon-stability-update-dialog-input"
+                          placeholder="Value"
+                          fullWidth
+                          rules={{
+                            min: { value: 0, message: 'Amount needs to be positive.' },
+                            max:
+                              tabValue === 'DEPOSIT'
+                                ? {
+                                    value: walletAmount,
+                                    message: 'Your wallet does not contain the specified amount.',
+                                  }
+                                : {
+                                    value: compoundedDeposit,
+                                    message: 'Your deposited stability does not contain the specified amount.',
+                                  },
+                          }}
+                        />
+
+                        <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                          <div>
+                            {tabValue === 'DEPOSIT' && (
+                              <>
+                                <Typography
+                                  variant="caption"
+                                  data-testid="apollon-stability-update-dialog-deposit-funds-label"
+                                  color="info.main"
+                                >
+                                  {roundCurrency(walletAmount, 5)}
+                                </Typography>
+                                <Typography variant="label" paragraph>
+                                  Wallet
+                                </Typography>
+                              </>
+                            )}
+                            {tabValue === 'WITHDRAW' && (
+                              <>
+                                <Typography
+                                  variant="caption"
+                                  data-testid="apollon-stability-update-dialog-withdraw-funds-label"
+                                  color="info.main"
+                                >
+                                  {roundCurrency(compoundedDeposit, 5)}
+                                </Typography>
+                                <Typography variant="label" paragraph>
+                                  remaining deposit
+                                </Typography>
+                              </>
+                            )}
+                          </div>
+
+                          <Button
+                            variant="undercover"
+                            sx={{ textDecoration: 'underline', p: 0, mt: 0.25, height: 25 }}
+                            onClick={() => fillMaxInputValue(token.address, walletAmount, compoundedDeposit)}
+                          >
+                            max
+                          </Button>
+                        </div>
                       </div>
-                    </div>
-                  </Box>
-                ))}
+                    </Box>
+                  ))}
               </div>
             </DialogContent>
             <DialogActions
