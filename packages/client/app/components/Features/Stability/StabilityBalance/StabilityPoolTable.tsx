@@ -47,30 +47,23 @@ function StabilityPoolTable() {
     return <StabilityPoolTableLoader />;
   }
 
-  // Sort both arrays for common tokens and in same alphabetical order.
   const rewards =
-    collateralData?.getCollateralTokens.filter(({ stabilityGainedAmount }) => stabilityGainedAmount! > 0) ?? [];
-  const stabilityLostSorted =
-    debtData?.getDebtTokens
-      .filter(({ compoundedDeposit }) => compoundedDeposit! > 0)
-      .sort((a, b) => a.token.symbol.localeCompare(b.token.symbol))
-      .sort((a, b) => (rewards.find(({ token }) => token.address === a.token.address) ? -1 : 1)) ?? [];
+    collateralData?.getCollateralTokens.filter(({ stabilityGainedAmount }) => stabilityGainedAmount > 0) ?? [];
+  const stabilityLost =
+    debtData?.getDebtTokens.filter(
+      ({ compoundedDeposit, providedStability }) => compoundedDeposit > 0 || providedStability > 0,
+    ) ?? [];
 
-  const rewardsSorted = rewards
-    .slice()
-    .sort((a, b) => a.token.symbol.localeCompare(b.token.symbol))
-    .sort((a, b) => (stabilityLostSorted.find(({ token }) => token.address === a.token.address) ? -1 : 1));
-
-  const rewardsTotalInUSD = rewardsSorted.reduce(
+  const rewardsTotalInUSD = rewards.reduce(
     (acc, { stabilityGainedAmount, token }) => acc + stabilityGainedAmount! * token.priceUSD,
     0,
   );
-  const lossTotalInUSD = stabilityLostSorted.reduce(
+  const lossTotalInUSD = stabilityLost.reduce(
     (acc, { compoundedDeposit, token }) => acc + compoundedDeposit! * token.priceUSD,
     0,
   );
 
-  const listLength = Math.max(rewardsSorted.length, stabilityLostSorted.length);
+  const listLength = Math.max(rewards.length, stabilityLost.length);
 
   return (
     <FeatureBox title="Stability Pool" noPadding border="full" borderRadius>
@@ -83,7 +76,7 @@ function StabilityPoolTable() {
             <TableHead>
               <TableRow>
                 <HeaderCell title="Provided Stability" cellProps={{ colSpan: 2 }} />
-                <HeaderCell title="Lost Stability" cellProps={{ sx: { pl: 0 } }} />
+                <HeaderCell title="Remaining" cellProps={{ sx: { pl: 0 } }} />
                 <HeaderCell title="Gained collateral" cellProps={{ align: 'right', colSpan: 2 }} />
               </TableRow>
             </TableHead>
@@ -93,12 +86,8 @@ function StabilityPoolTable() {
                   {Array(listLength)
                     .fill(null)
                     .map((_, index) => {
-                      const {
-                        compoundedDeposit,
-                        token: lostToken,
-                        providedStability,
-                      } = stabilityLostSorted[index] ?? {};
-                      const { stabilityGainedAmount, token: rewardToken } = rewardsSorted[index] ?? {};
+                      const { compoundedDeposit, token: lostToken, providedStability } = stabilityLost[index] ?? {};
+                      const { stabilityGainedAmount, token: rewardToken } = rewards[index] ?? {};
                       const noBorder = index === listLength - 1;
 
                       return (

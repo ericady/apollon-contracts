@@ -22,7 +22,6 @@ type DebtTokenMeta {
   stabilityCompoundAmount: Float!
   troveRepableDebtAmount: Float!
   
-  
   # global
   # TODO: No implementation yet
   stabilityDepositAPY: Float!
@@ -40,6 +39,7 @@ type CollateralTokenMeta {
   walletAmount: Float!
   troveLockedAmount: Float!
   stabilityGainedAmount: Float!
+  
   # global
   totalValueLockedUSD: Float!
   totalValueLockedUSD30dAverage: Float!
