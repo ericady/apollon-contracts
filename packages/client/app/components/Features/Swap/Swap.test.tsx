@@ -20,10 +20,11 @@ describe('Swap', () => {
       <IntegrationWrapper
         shouldPreselectTokens
         shouldConnectWallet
-        mockEthers={{
-          // @ts-ignore
-          contractMock,
-        }}
+        mockEthers={
+          {
+            contractMock,
+          } as any
+        }
       >
         <Swap />
       </IntegrationWrapper>,

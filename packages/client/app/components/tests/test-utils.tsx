@@ -1,5 +1,6 @@
 import { ApolloClient, ApolloProvider, InMemoryCache } from '@apollo/client';
 import { ThemeProvider } from '@emotion/react';
+import { act } from '@testing-library/react';
 import { SnackbarProvider } from 'notistack';
 import { PropsWithChildren, useEffect, useMemo, useState } from 'react';
 import 'whatwg-fetch';
@@ -81,7 +82,9 @@ function SetupState({
 
   const [address, setAddress] = useState<string>('');
   if (shouldConnectWallet && !address) {
-    setAddress('0xbE8F15C2db5Fc2AFc4e17B4Dd578Fbc6e5aA9591');
+    act(() => {
+      setAddress('0xbE8F15C2db5Fc2AFc4e17B4Dd578Fbc6e5aA9591');
+    });
   }
 
   if (shouldConnectWalletDelayed && !address) {

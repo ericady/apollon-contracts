@@ -24,7 +24,10 @@ import StabilityUpdateDialog from '../StabilityUpdateDialog';
 import StabilityPoolTableLoader from './StabilityPoolTableLoader';
 
 function StabilityPoolTable() {
-  const { address } = useEthers();
+  const {
+    address,
+    contracts: { stabilityPoolManagerContract },
+  } = useEthers();
 
   const { data: collateralData, loading: collateralDataLoading } = useQuery<
     GetCollateralTokensQuery,
@@ -55,15 +58,20 @@ function StabilityPoolTable() {
     ) ?? [];
 
   const rewardsTotalInUSD = rewards.reduce(
-    (acc, { stabilityGainedAmount, token }) => acc + stabilityGainedAmount! * token.priceUSD,
+    (acc, { stabilityGainedAmount, token }) => acc + stabilityGainedAmount * token.priceUSD,
     0,
   );
   const lossTotalInUSD = stabilityLost.reduce(
-    (acc, { compoundedDeposit, token }) => acc + compoundedDeposit! * token.priceUSD,
+    (acc, { compoundedDeposit, token, providedStability }) =>
+      acc + (providedStability - compoundedDeposit) * token.priceUSD,
     0,
   );
 
   const listLength = Math.max(rewards.length, stabilityLost.length);
+
+  const withdrawRewards = async () => {
+    await stabilityPoolManagerContract.withdrawGains();
+  };
 
   return (
     <FeatureBox title="Stability Pool" noPadding border="full" borderRadius>
@@ -151,7 +159,12 @@ function StabilityPoolTable() {
             <StabilityUpdateDialog />
           </div>
 
-          <Button variant="outlined" sx={{ marginY: '10px' }} disabled={!address}>
+          <Button
+            variant="outlined"
+            sx={{ marginY: '10px' }}
+            disabled={!address || rewards.length === 0}
+            onClick={async () => await withdrawRewards()}
+          >
             CLAIM
           </Button>
         </div>
