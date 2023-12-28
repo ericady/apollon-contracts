@@ -52,7 +52,7 @@ function StabilityPoolTable() {
     collateralData?.getCollateralTokens.filter(({ stabilityGainedAmount }) => stabilityGainedAmount! > 0) ?? [];
   const stabilityLostSorted =
     debtData?.getDebtTokens
-      .filter(({ stabilityLostAmount }) => stabilityLostAmount! > 0)
+      .filter(({ compoundedDeposit }) => compoundedDeposit! > 0)
       .sort((a, b) => a.token.symbol.localeCompare(b.token.symbol))
       .sort((a, b) => (rewards.find(({ token }) => token.address === a.token.address) ? -1 : 1)) ?? [];
 
@@ -66,7 +66,7 @@ function StabilityPoolTable() {
     0,
   );
   const lossTotalInUSD = stabilityLostSorted.reduce(
-    (acc, { stabilityLostAmount, token }) => acc + stabilityLostAmount! * token.priceUSD,
+    (acc, { compoundedDeposit, token }) => acc + compoundedDeposit! * token.priceUSD,
     0,
   );
 
@@ -82,7 +82,8 @@ function StabilityPoolTable() {
           >
             <TableHead>
               <TableRow>
-                <HeaderCell title="Lost Stability" cellProps={{ align: 'right', colSpan: 2 }} />
+                <HeaderCell title="Provided Stability" cellProps={{ colSpan: 2 }} />
+                <HeaderCell title="Lost Stability" cellProps={{ sx: { pl: 0 } }} />
                 <HeaderCell title="Gained collateral" cellProps={{ align: 'right', colSpan: 2 }} />
               </TableRow>
             </TableHead>
@@ -92,25 +93,33 @@ function StabilityPoolTable() {
                   {Array(listLength)
                     .fill(null)
                     .map((_, index) => {
-                      const { stabilityLostAmount, token: lostToken } = stabilityLostSorted[index] ?? {};
+                      const {
+                        compoundedDeposit,
+                        token: lostToken,
+                        providedStability,
+                      } = stabilityLostSorted[index] ?? {};
                       const { stabilityGainedAmount, token: rewardToken } = rewardsSorted[index] ?? {};
                       const noBorder = index === listLength - 1;
 
                       return (
                         <TableRow hover key={index}>
                           <TableCell sx={noBorder ? { borderBottom: 'none', pr: 0 } : { pr: 0 }} align="right">
-                            {!isNaN(stabilityLostAmount!) ? roundCurrency(stabilityLostAmount!, 5) : null}
+                            {!isNaN(providedStability) ? roundCurrency(providedStability, 5) : null}
                           </TableCell>
+
                           <TableCell
-                            width={50}
+                            width={40}
                             align="right"
                             sx={noBorder ? { borderBottom: 'none' } : {}}
                             data-testid="apollon-stability-pool-table-lost-token"
                           >
                             {lostToken && <Label variant="error">{lostToken.symbol}</Label>}
                           </TableCell>
+                          <TableCell sx={noBorder ? { borderBottom: 'none', pl: 0 } : { pl: 0 }}>
+                            {!isNaN(compoundedDeposit) ? roundCurrency(compoundedDeposit, 5) : null}
+                          </TableCell>
                           <TableCell sx={noBorder ? { borderBottom: 'none', pr: 0 } : { pr: 0 }} align="right">
-                            {!isNaN(stabilityGainedAmount!) ? roundCurrency(stabilityGainedAmount!, 5) : null}
+                            {!isNaN(stabilityGainedAmount) ? roundCurrency(stabilityGainedAmount, 5) : null}
                           </TableCell>
                           <TableCell
                             width={50}

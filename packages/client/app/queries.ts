@@ -53,7 +53,8 @@ export const GET_BORROWER_DEBT_TOKENS = gql`
     getDebtTokens(borrower: $borrower) {
       troveMintedAmount
       walletAmount @client
-      stabilityLostAmount
+      providedStability @client
+      compoundedDeposit
       stabilityCompoundAmount
       troveRepableDebtAmount @client
 

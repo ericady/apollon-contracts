@@ -17,10 +17,12 @@ type DebtTokenMeta {
   # borrower specific
   walletAmount: Float!
   troveMintedAmount: Float!
-  stabilityLostAmount: Float!
+  providedStability: Float!
+  compoundedDeposit: Float!
   stabilityCompoundAmount: Float!
   troveRepableDebtAmount: Float!
-
+  
+  
   # global
   # TODO: No implementation yet
   stabilityDepositAPY: Float!
@@ -169,6 +171,11 @@ type TroveManager {
   borrowingRate: Float!
 }
 
+type StabilityPoolManager {
+  id: ID!
+}
+
 type Query {
   getTroveManager: TroveManager!
+  getStabilityPoolManager: StabilityPoolManager!
 }

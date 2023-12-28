@@ -130,8 +130,10 @@ const debtTokenMeta = tokens.map<DebtTokenMeta>((token) => {
     token: token,
     walletAmount: 0,
     troveMintedAmount: 0,
-    stabilityLostAmount: 0,
+    providedStability: 0,
+    compoundedDeposit: 0,
     stabilityCompoundAmount: 0,
+    troveRepableDebtAmount: 0,
 
     totalDepositedStability: faker.number.float({ min: 1000, max: 5000, precision: 0.0001 }),
     totalReserve: faker.number.float({ min: 1000, max: 5000, precision: 0.0001 }),
@@ -149,8 +151,10 @@ const userDebt = faker.helpers
       ...debtTokenMeta,
       walletAmount: faker.number.float({ min: 100, max: 500, precision: 0.0001 }),
       troveMintedAmount: faker.number.float({ min: 1000, max: 5000, precision: 0.0001 }),
-      stabilityLostAmount: faker.number.float({ min: 100, max: 500, precision: 0.0001 }),
+      providedStability: faker.number.float({ min: 100, max: 500, precision: 0.0001 }),
+      compoundedDeposit: faker.number.float({ min: 0, max: 100, precision: 0.0001 }),
       stabilityCompoundAmount: faker.number.float({ min: 100, max: 500, precision: 0.0001 }),
+      troveRepableDebtAmount: faker.number.float({ min: 100, max: 500, precision: 0.0001 }),
     };
   });
 
@@ -341,8 +345,10 @@ export const handlers = [
           token: token,
           walletAmount: 0,
           troveMintedAmount: 0,
-          stabilityLostAmount: 0,
+          providedStability: 0,
+          compoundedDeposit: 0,
           stabilityCompoundAmount: 0,
+          troveRepableDebtAmount: 0,
 
           totalDepositedStability: parseFloat(faker.finance.amount(1000, 5000, 2)),
           totalReserve: shouldHaveReserve ? parseFloat(faker.finance.amount(1000, 5000, 2)) : 0,

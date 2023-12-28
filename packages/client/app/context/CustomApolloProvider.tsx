@@ -10,7 +10,7 @@ import {
 } from '@apollo/client';
 import { AddressLike, ethers } from 'ethers';
 import { PropsWithChildren, useEffect } from 'react';
-import { DebtToken, SwapPair, TroveManager } from '../../generated/types';
+import { DebtToken, StabilityPoolManager, SwapPair, TroveManager } from '../../generated/types';
 import { QueryGetTokenArgs, TokenFragmentFragment } from '../generated/gql-types';
 import { TOKEN_FRAGMENT } from '../queries';
 import { floatToBigInt } from '../utils/math';
@@ -19,14 +19,21 @@ import { Contracts, useEthers } from './EthersProvider';
 export function CustomApolloProvider({ children }: PropsWithChildren<{}>) {
   const {
     provider,
-    contracts: { debtTokenContracts, troveManagerContract, swapPairContracts },
+    contracts: { debtTokenContracts, troveManagerContract, swapPairContracts, stabilityPoolManagerContract },
     address: borrower,
   } = useEthers();
 
   const cacheConfig =
     process.env.NEXT_PUBLIC_CONTRACT_MOCKING === 'enabled'
       ? { fields: {}, Query: {} }
-      : getProductionCacheConfig({ provider, borrower, debtTokenContracts, troveManagerContract, swapPairContracts });
+      : getProductionCacheConfig({
+          provider,
+          borrower,
+          debtTokenContracts,
+          troveManagerContract,
+          stabilityPoolManagerContract,
+          swapPairContracts,
+        });
 
   const client = new ApolloClient({
     // TODO: replace with our deployed graphql endpoint
@@ -104,12 +111,14 @@ const getProductionCacheConfig = ({
   borrower,
   debtTokenContracts,
   troveManagerContract,
+  stabilityPoolManagerContract,
   swapPairContracts,
 }: {
   provider: ReturnType<typeof useEthers>['provider'];
   borrower: AddressLike;
   debtTokenContracts: ReturnType<typeof useEthers>['contracts']['debtTokenContracts'];
   troveManagerContract: ReturnType<typeof useEthers>['contracts']['troveManagerContract'];
+  stabilityPoolManagerContract: ReturnType<typeof useEthers>['contracts']['stabilityPoolManagerContract'];
   swapPairContracts: ReturnType<typeof useEthers>['contracts']['swapPairContracts'];
 }): { fields: TypePolicies; Query: TypePolicy } => ({
   fields: {
@@ -223,6 +232,29 @@ const getProductionCacheConfig = ({
             }
 
             return SchemaDataFreshnessManager.DebtToken[Contracts.DebtToken.DebtToken1].troveRepableDebtAmount.value();
+          },
+        },
+
+        providedStability: {
+          read(_, { readField, cache }) {
+            const token = readField('token') as Readonly<Reference>;
+
+            const tokenData = cache.readFragment<TokenFragmentFragment>({
+              id: token.__ref,
+              fragment: TOKEN_FRAGMENT,
+            });
+
+            if (
+              tokenData?.address &&
+              isFieldOutdated(SchemaDataFreshnessManager.DebtToken[Contracts.DebtToken.DebtToken1], 'providedStability')
+            ) {
+              SchemaDataFreshnessManager.DebtToken[Contracts.DebtToken.DebtToken1].providedStability.fetch(
+                stabilityPoolManagerContract,
+                borrower,
+              );
+            }
+
+            return SchemaDataFreshnessManager.DebtToken[Contracts.DebtToken.DebtToken1].providedStability.value();
           },
         },
       },
@@ -371,6 +403,12 @@ export const ContractDataFreshnessManager: {
     },
     'getTroveDebt' | 'getTroveColl'
   >;
+  StabilityPoolManager: Pick<
+    {
+      [K in keyof StabilityPoolManager]: ContractValue<ReturnType<StabilityPoolManager[K]>>;
+    },
+    'getDepositorDeposits'
+  >;
 } = {
   TroveManager: {
     getTroveDebt: {
@@ -390,6 +428,20 @@ export const ContractDataFreshnessManager: {
         const troveColl = await troveManagerContract.getTroveColl(borrower);
 
         ContractDataFreshnessManager.TroveManager.getTroveColl.value = troveColl;
+      },
+      value: [],
+      lastFetched: 0,
+      timeout: 1000 * 5,
+    },
+  },
+
+  StabilityPoolManager: {
+    getDepositorDeposits: {
+      fetch: async (stabilityPoolManagerContract: StabilityPoolManager, borrower: AddressLike) => {
+        ContractDataFreshnessManager.StabilityPoolManager.getDepositorDeposits.lastFetched = Date.now();
+        const tokenAmount = await stabilityPoolManagerContract.getDepositorDeposits(borrower);
+
+        ContractDataFreshnessManager.StabilityPoolManager.getDepositorDeposits.value = tokenAmount;
       },
       value: [],
       lastFetched: 0,
@@ -537,6 +589,32 @@ export const SchemaDataFreshnessManager: ContractDataFreshnessManager<typeof Con
         lastFetched: 0,
         timeout: 1000 * 5,
       },
+
+      providedStability: {
+        fetch: async (fetchSource?: { stabilityPoolManagerContract: StabilityPoolManager; borrower: AddressLike }) => {
+          if (fetchSource) {
+            await ContractDataFreshnessManager.StabilityPoolManager.getDepositorDeposits.fetch(
+              fetchSource.stabilityPoolManagerContract,
+              fetchSource.borrower,
+            );
+          }
+
+          SchemaDataFreshnessManager.DebtToken[Contracts.DebtToken.DebtToken1].providedStability.lastFetched =
+            Date.now();
+
+          const tokenAmount = ContractDataFreshnessManager.StabilityPoolManager.getDepositorDeposits.value.find(
+            ({ tokenAddress }) => tokenAddress === Contracts.DebtToken.DebtToken1,
+          )?.amount;
+          if (tokenAmount) {
+            SchemaDataFreshnessManager.DebtToken[Contracts.DebtToken.DebtToken1].providedStability.value(
+              ethers.toNumber(tokenAmount),
+            );
+          }
+        },
+        value: makeVar(0),
+        lastFetched: 0,
+        timeout: 1000 * 5,
+      },
     },
     [Contracts.DebtToken.DebtToken2]: {},
     [Contracts.DebtToken.DebtToken3]: {},
@@ -557,6 +635,7 @@ export const SchemaDataFreshnessManager: ContractDataFreshnessManager<typeof Con
       timeout: 1000 * 5,
     },
   },
+  StabilityPoolManager: {},
   SwapOperations: {},
   SwapPairs: {
     '0x509ee0d083ddf8ac028f2a56731412edd63224b9': {
