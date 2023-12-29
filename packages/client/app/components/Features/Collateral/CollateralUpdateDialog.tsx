@@ -37,7 +37,7 @@ type Props = {
 
 type FieldValues = {
   [Contracts.ERC20.JUSD]: string;
-  [Contracts.ERC20.DEFI]: string;
+  [Contracts.ERC20.DFI]: string;
   [Contracts.ERC20.ETH]: string;
   [Contracts.ERC20.USDT]: string;
 };
@@ -66,7 +66,7 @@ const CollateralUpdateDialog = ({ buttonVariant, buttonSx = {} }: Props) => {
   const methods = useForm<FieldValues>({
     defaultValues: {
       [Contracts.ERC20.JUSD]: '',
-      [Contracts.ERC20.DEFI]: '',
+      [Contracts.ERC20.DFI]: '',
       [Contracts.ERC20.ETH]: '',
       [Contracts.ERC20.USDT]: '',
     },
@@ -137,10 +137,10 @@ const CollateralUpdateDialog = ({ buttonVariant, buttonSx = {} }: Props) => {
     setIsOpen(false);
   };
 
-  const allTokenAmount = watch([Contracts.ERC20.JUSD, Contracts.ERC20.DEFI, Contracts.ERC20.ETH, Contracts.ERC20.USDT]);
+  const allTokenAmount = watch([Contracts.ERC20.JUSD, Contracts.ERC20.DFI, Contracts.ERC20.ETH, Contracts.ERC20.USDT]);
   const allTokenAmountUSD =
     allTokenAmount.reduce((acc, curr, index) => {
-      const address = [Contracts.ERC20.JUSD, Contracts.ERC20.DEFI, Contracts.ERC20.ETH, Contracts.ERC20.USDT][index];
+      const address = [Contracts.ERC20.JUSD, Contracts.ERC20.DFI, Contracts.ERC20.ETH, Contracts.ERC20.USDT][index];
       const { token } = collateralToDeposit.find(({ token }) => token.address === address)!;
       const { priceUSD } = token;
 
@@ -209,7 +209,10 @@ const CollateralUpdateDialog = ({ buttonVariant, buttonSx = {} }: Props) => {
               </Tabs>
 
               {collateralToDeposit
-                .filter(({ troveLockedAmount }) => tabValue === 'DEPOSIT' || troveLockedAmount !== 0)
+                .filter(
+                  ({ troveLockedAmount, walletAmount }) =>
+                    (tabValue === 'DEPOSIT' && walletAmount > 0) || (tabValue === 'WITHDRAW' && troveLockedAmount > 0),
+                )
                 .map(({ walletAmount, troveLockedAmount, token: { symbol, address } }, index) => {
                   return (
                     <div

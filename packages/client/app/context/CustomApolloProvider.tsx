@@ -52,10 +52,10 @@ export function CustomApolloProvider({ children }: PropsWithChildren<{}>) {
               keyArgs: ['isOpen'],
               // Concatenate the incoming list items with
               // the existing list items.
-              merge(existing = { positions: [] }, incoming) {
+              merge(existing = { swaps: [] }, incoming) {
                 return {
                   ...incoming,
-                  positions: [...existing.positions, ...incoming.positions],
+                  swaps: [...existing.swaps, ...incoming.swaps],
                 };
               },
               read: (existing) => {
@@ -584,7 +584,7 @@ export const SchemaDataFreshnessManager: ContractDataFreshnessManager<typeof Con
       },
     },
     [Contracts.ERC20.JUSD]: {},
-    [Contracts.ERC20.DEFI]: {},
+    [Contracts.ERC20.DFI]: {},
     [Contracts.ERC20.USDT]: {},
   },
   DebtToken: {

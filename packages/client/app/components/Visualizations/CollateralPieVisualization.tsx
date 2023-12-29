@@ -19,7 +19,7 @@ const createRenderCustomizedLabel = (isDarkMode: boolean) => (svgPropsAndData: a
 
   return (
     <g id="group1">
-      <svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" x={isRight ? x + 15 : x - 55} y={y - 15}>
+      <svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" x={isRight ? x + 15 : x - 60} y={y - 15}>
         <path
           fill={chartColor}
           d="M4 0a6.449 6.449 0 0 0 4 4 6.449 6.449 0 0 0-4 4 6.449 6.449 0 0 0-4-4 6.449 6.449 0 0 0 4-4Z"
@@ -53,7 +53,7 @@ function CollateralPieVisualization({ borrowerCollateralTokens }: Props) {
 
   if (borrowerCollateralTokens.length === 0)
     return (
-      <div style={{ width: 360, height: 280, display: 'grid', placeItems: 'center' }}>
+      <div style={{ width: 430, height: 280, display: 'grid', placeItems: 'center' }}>
         <div
           style={{
             border: `2px solid ${isDarkMode ? '#3C3945' : '#CBCBCB'}`,
@@ -73,7 +73,7 @@ function CollateralPieVisualization({ borrowerCollateralTokens }: Props) {
   const renderCustomizedLabel = createRenderCustomizedLabel(isDarkMode);
 
   return (
-    <PieChart width={360} height={280} margin={{ top: 0, right: 0, bottom: 0, left: 0 }}>
+    <PieChart width={430} height={280} margin={{ top: 0, right: 0, bottom: 0, left: 0 }}>
       <Pie
         isAnimationActive={false}
         data={borrowerCollateralTokens}

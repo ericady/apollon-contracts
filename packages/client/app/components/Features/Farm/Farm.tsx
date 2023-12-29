@@ -140,7 +140,7 @@ const Farm = () => {
         id: 'apollon-farm-widget',
       }}
     >
-      <div style={{ height: '439px', overflowY: 'scroll' }}>
+      <div style={{ height: '466px', overflowY: 'scroll' }}>
         <Tabs value={tabValue} onChange={handleTabChange} variant="fullWidth" sx={{ mx: '-15px' }}>
           <Tab label="LONG" value="Long" />
           <Tab label="SHORT" value="Short" />

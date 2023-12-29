@@ -48,7 +48,7 @@
           "id": "5a268b53-b9a6-4674-819d-388e6e09fe15",
           "__typename": "Token",
           "address": "0x509ee0d083ddf8ac028f2a56731412edd63223d8",
-          "symbol": "DEFI",
+          "symbol": "DFI",
           "createdAt": "2023-06-10T21:17:48.685Z",
           "priceUSD": 4143.67,
           "priceUSD24hAgo": 3786.08,

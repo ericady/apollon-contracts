@@ -524,7 +524,7 @@
               "id": "ccc8b346-01e6-4654-bb10-d1dde0bb3cba",
               "__typename": "Token",
               "address": "0x509ee0d083ddf8ac028f2a56731412edd63223d8",
-              "symbol": "DEFI",
+              "symbol": "DFI",
               "createdAt": "2023-09-16T23:09:56.629Z",
               "priceUSD": 1887.94,
               "priceUSD24hAgo": 683.03,

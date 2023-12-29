@@ -2,7 +2,7 @@
 
 import { Button } from '@mui/material';
 import { Contract, Eip1193Provider, JsonRpcSigner } from 'ethers';
-import { JsonRpcProvider } from 'ethers/providers';
+import { BrowserProvider, JsonRpcProvider, Network } from 'ethers/providers';
 import Link from 'next/link';
 import { useSnackbar } from 'notistack';
 import { createContext, useContext, useEffect, useState } from 'react';
@@ -51,7 +51,7 @@ export const Contracts = {
     JUSD: '0x509ee0d083ddf8ac028f2a56731412edd63223b8',
     ETH: '0x509ee0d083ddf8ac028f2a56731412edd63223a8',
     USDT: '0x509ee0d083ddf8ac028f2a56731412edd63223c8',
-    DEFI: '0x509ee0d083ddf8ac028f2a56731412edd63223d8',
+    DFI: '0x509ee0d083ddf8ac028f2a56731412edd63223d8',
   },
   TroveManager: '0x509ee0d083ddf8ac028f2a56731412edd63223e8',
   StabilityPoolManager: '0x509ee0d083ddf8as028f2a56731412edd63223f8',
@@ -73,7 +73,7 @@ type AllSwapPairContracts = Partial<{
 
 export const EthersContext = createContext<{
   // provider: BrowserProvider | null;
-  provider: JsonRpcProvider | null;
+  provider: JsonRpcProvider | BrowserProvider | null;
   signer: JsonRpcSigner | null;
   address: string;
   contracts: {
@@ -103,7 +103,12 @@ export const EthersContext = createContext<{
 });
 
 // Connetion to local ganache.
-const provider = new JsonRpcProvider('http://0.0.0.0:8545', { name: 'localhost', chainId: 31337 });
+const provider =
+  process.env.NEXT_PUBLIC_CONTRACT_MOCKING === 'enabled' &&
+  typeof window !== 'undefined' &&
+  typeof window.ethereum !== 'undefined'
+    ? new BrowserProvider(window.ethereum, new Network('goerli', 5))
+    : new JsonRpcProvider('http://0.0.0.0:8545', { name: 'localhost', chainId: 31337 });
 
 // TODO: Implement network change: https://docs.ethers.org/v5/concepts/best-practices/
 // const testNetwork = new Network('goerli', 5);
@@ -180,23 +185,6 @@ export default function EthersProvider({ children }: { children: React.ReactNode
         } catch (error) {
           enqueueSnackbar('You rejected necessary permissions. Please try again.', { variant: 'error' });
         }
-      } else {
-        // TODO: Handle this default case but its not documented correctly...
-        // setProvider(ethers.getDefaultProvider())
-        enqueueSnackbar('MetaMask extension is not installed. Please install and try again.', {
-          variant: 'error',
-          action: (
-            <Button
-              LinkComponent={Link}
-              href="https://metamask.io/"
-              variant="contained"
-              target="_blank"
-              rel="noreferrer"
-            >
-              Install
-            </Button>
-          ),
-        });
       }
     } catch {
       enqueueSnackbar('You closed the authentication window. Please try loging in again.', { variant: 'error' });
@@ -207,51 +195,66 @@ export default function EthersProvider({ children }: { children: React.ReactNode
 
   // This use effect initializes the contracts to do initial read operations.
   useEffect(() => {
-    const debtTokenContract = new Contract(
-      Contracts.DebtToken.DebtToken1,
-      debtTokenAbi,
-      provider,
-    ) as unknown as DebtToken;
-    setDebtTokenContracts({ [Contracts.DebtToken.DebtToken1]: debtTokenContract });
+    if (provider) {
+      try {
+        const debtTokenContract = new Contract(
+          Contracts.DebtToken.DebtToken1,
+          debtTokenAbi,
+          provider,
+        ) as unknown as DebtToken;
+        setDebtTokenContracts({ [Contracts.DebtToken.DebtToken1]: debtTokenContract });
 
-    const collateralTokenContracts = new Contract(Contracts.ERC20.ETH, ERC20Abi, provider) as unknown as ERC20;
-    setCollateralTokenContracts({ [Contracts.ERC20.ETH]: collateralTokenContracts });
+        const collateralTokenContracts = new Contract(Contracts.ERC20.ETH, ERC20Abi, provider) as unknown as ERC20;
+        setCollateralTokenContracts({ [Contracts.ERC20.ETH]: collateralTokenContracts });
 
-    const troveManagerContract = new Contract(
-      Contracts.TroveManager,
-      troveManagerAbi,
-      provider,
-    ) as unknown as TroveManager;
-    setTroveManagerContract(troveManagerContract);
+        const troveManagerContract = new Contract(
+          Contracts.TroveManager,
+          troveManagerAbi,
+          provider,
+        ) as unknown as TroveManager;
+        setTroveManagerContract(troveManagerContract);
 
-    const stabilityPoolManagerContract = new Contract(
-      Contracts.StabilityPoolManager,
-      stabilityPoolManagerAbi,
-      provider,
-    ) as unknown as StabilityPoolManager;
-    setStabilityPoolManagerContract(stabilityPoolManagerContract);
+        const stabilityPoolManagerContract = new Contract(
+          Contracts.StabilityPoolManager,
+          stabilityPoolManagerAbi,
+          provider,
+        ) as unknown as StabilityPoolManager;
+        setStabilityPoolManagerContract(stabilityPoolManagerContract);
 
-    const swapOperationsContract = new Contract(
-      Contracts.SwapOperations,
-      swapOperationsAbi,
-      provider,
-    ) as unknown as SwapOperations;
-    setSwapOperationsContract(swapOperationsContract);
+        const swapOperationsContract = new Contract(
+          Contracts.SwapOperations,
+          swapOperationsAbi,
+          provider,
+        ) as unknown as SwapOperations;
+        setSwapOperationsContract(swapOperationsContract);
 
-    const swapPairContracts = new Contract(
-      Contracts.SwapPairs.DebtToken1,
-      swapPairAbi,
-      provider,
-    ) as unknown as SwapPair;
-    setSwapPairContracts({ DebtToken1: swapPairContracts });
+        const swapPairContracts = new Contract(
+          Contracts.SwapPairs.DebtToken1,
+          swapPairAbi,
+          provider,
+        ) as unknown as SwapPair;
+        setSwapPairContracts({ DebtToken1: swapPairContracts });
 
-    const borrowerOperationsContract = new Contract(
-      Contracts.BorrowerOperations,
-      borrowerOperationsAbi,
-      provider,
-    ) as unknown as BorrowerOperations;
-    setBorrowerOperationsContract(borrowerOperationsContract);
-  }, []);
+        const borrowerOperationsContract = new Contract(
+          Contracts.BorrowerOperations,
+          borrowerOperationsAbi,
+          provider,
+        ) as unknown as BorrowerOperations;
+        setBorrowerOperationsContract(borrowerOperationsContract);
+      } catch (error) {
+        // console.error(error);
+      }
+    } else {
+      enqueueSnackbar('MetaMask extension is not installed. Please install and try again.', {
+        variant: 'error',
+        action: (
+          <Button LinkComponent={Link} href="https://metamask.io/" variant="contained" target="_blank" rel="noreferrer">
+            Install
+          </Button>
+        ),
+      });
+    }
+  }, [enqueueSnackbar]);
 
   if (
     !debtTokenContracts ||
@@ -288,7 +291,7 @@ export default function EthersProvider({ children }: { children: React.ReactNode
 }
 
 export function useEthers(): {
-  provider: JsonRpcProvider | null;
+  provider: JsonRpcProvider | BrowserProvider | null;
   // provider: BrowserProvider | null;
   signer: JsonRpcSigner | null;
   address: string;

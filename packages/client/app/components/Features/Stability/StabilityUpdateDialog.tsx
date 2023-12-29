@@ -44,7 +44,7 @@ const StabilityUpdateDialog = () => {
       const emptyValues = data!.getDebtTokens.reduce((acc, { token }) => ({ ...acc, [token.address]: '' }), {});
       reset(emptyValues);
     }
-  }, [data, formState.isDirty]);
+  }, [data, formState.isDirty, reset]);
 
   const handleChange = (_: SyntheticEvent, newValue: 'DEPOSIT' | 'WITHDRAW') => {
     setTabValue(newValue);
