@@ -1,16 +1,14 @@
 {
   "data": {
-    "getPositions": {
+    "getSwaps": {
       "positions": [
         {
           "id": "a40bcd66-98f3-48ab-a385-dba5c1025735",
-          "openedAt": 1693327839266,
+          "timestamp": 1693327839266,
           "closedAt": null,
           "direction": "SHORT",
           "size": 278.12,
-          "totalPriceInStable": 408.65253000000007,
-          "feesInStable": 2.56,
-          "profitInStable": null,
+          "swapFee": 2.56,
           "token": {
             "address": "0f4560bf-06f3-457f-beac-4934ef822daf",
             "symbol": "IQD",
@@ -22,13 +20,11 @@
         },
         {
           "id": "f62c40b8-abac-49cb-801b-57779d0a7cc3",
-          "openedAt": 1692981771108,
+          "timestamp": 1692981771108,
           "closedAt": null,
           "direction": "LONG",
           "size": 442.18,
-          "totalPriceInStable": 1979.7351500000002,
-          "feesInStable": 10.54,
-          "profitInStable": null,
+          "swapFee": 10.54,
           "token": {
             "address": "8cbeb5a5-8681-40a0-aff4-536d7f0d26e1",
             "symbol": "BYN",
@@ -40,13 +36,11 @@
         },
         {
           "id": "058e28a0-66a3-4d75-94b6-b1589df9e3a3",
-          "openedAt": 1691484916058,
+          "timestamp": 1691484916058,
           "closedAt": null,
           "direction": "SHORT",
           "size": 223.81,
-          "totalPriceInStable": 244.68917000000005,
-          "feesInStable": 31.92,
-          "profitInStable": null,
+          "swapFee": 31.92,
           "token": {
             "address": "1083e6d8-6ec4-4c26-9f92-27c7ad4c963e",
             "symbol": "PAB",
@@ -58,13 +52,11 @@
         },
         {
           "id": "d9974a1e-70ec-46c2-ad48-c5aa7d2cca77",
-          "openedAt": 1691059342602,
+          "timestamp": 1691059342602,
           "closedAt": null,
           "direction": "LONG",
           "size": 225.08,
-          "totalPriceInStable": 171.36533000000003,
-          "feesInStable": 45.6,
-          "profitInStable": null,
+          "swapFee": 45.6,
           "token": {
             "address": "0f4560bf-06f3-457f-beac-4934ef822daf",
             "symbol": "IQD",
@@ -76,13 +68,11 @@
         },
         {
           "id": "27d0a11d-2941-4259-a3ee-8ae6dab19511",
-          "openedAt": 1691051666389,
+          "timestamp": 1691051666389,
           "closedAt": null,
           "direction": "SHORT",
           "size": 483.99,
-          "totalPriceInStable": 108.05703000000001,
-          "feesInStable": 34.41,
-          "profitInStable": null,
+          "swapFee": 34.41,
           "token": {
             "address": "2a598068-2b54-467e-a4da-dfdb41b02357",
             "symbol": "ARS",
@@ -94,13 +84,11 @@
         },
         {
           "id": "3cb8b38a-734f-475c-9f5d-27025dd45a4d",
-          "openedAt": 1690316541190,
+          "timestamp": 1690316541190,
           "closedAt": null,
           "direction": "SHORT",
           "size": 951.01,
-          "totalPriceInStable": 375.23545000000007,
-          "feesInStable": 4.64,
-          "profitInStable": null,
+          "swapFee": 4.64,
           "token": {
             "address": "d1087d74-330e-4bd5-9e13-4445465f5298",
             "symbol": "LSL",
@@ -112,13 +100,11 @@
         },
         {
           "id": "8c3fca0f-da0b-4404-9c19-47cbfea7ced0",
-          "openedAt": 1689376554983,
+          "timestamp": 1689376554983,
           "closedAt": null,
           "direction": "LONG",
           "size": 450.35,
-          "totalPriceInStable": 1144.12687,
-          "feesInStable": 12.65,
-          "profitInStable": null,
+          "swapFee": 12.65,
           "token": {
             "address": "0df96cfa-ce48-4632-921e-582017ae69f9",
             "symbol": "BDT",
@@ -130,13 +116,11 @@
         },
         {
           "id": "d67fae42-f1d0-4ece-9717-6f7a02f494a7",
-          "openedAt": 1688725830637,
+          "timestamp": 1688725830637,
           "closedAt": null,
           "direction": "SHORT",
           "size": 185.16,
-          "totalPriceInStable": 750.9599800000001,
-          "feesInStable": 17.85,
-          "profitInStable": null,
+          "swapFee": 17.85,
           "token": {
             "address": "4f974fa2-8d46-481e-8435-b56ddf173b84",
             "symbol": "TOP",
@@ -148,13 +132,11 @@
         },
         {
           "id": "265c908f-bae4-4957-9383-07f032d3de6c",
-          "openedAt": 1686580950281,
+          "timestamp": 1686580950281,
           "closedAt": null,
           "direction": "SHORT",
           "size": 937.78,
-          "totalPriceInStable": 568.6997600000001,
-          "feesInStable": 47.11,
-          "profitInStable": null,
+          "swapFee": 47.11,
           "token": {
             "address": "0x6cA13a4ab78dd7D657226b155873A04DB929AXXX",
             "symbol": "JUSD",
@@ -166,13 +148,11 @@
         },
         {
           "id": "eecef4c6-37d0-43f9-964a-f8fed19b424f",
-          "openedAt": 1683571803307,
+          "timestamp": 1683571803307,
           "closedAt": null,
           "direction": "LONG",
           "size": 478.07,
-          "totalPriceInStable": 2981.1394000000005,
-          "feesInStable": 35.37,
-          "profitInStable": null,
+          "swapFee": 35.37,
           "token": {
             "address": "4f974fa2-8d46-481e-8435-b56ddf173b84",
             "symbol": "TOP",
@@ -184,13 +164,11 @@
         },
         {
           "id": "aacb59fd-760c-4449-b30f-509c68293f28",
-          "openedAt": 1683018196135,
+          "timestamp": 1683018196135,
           "closedAt": null,
           "direction": "LONG",
           "size": 593.36,
-          "totalPriceInStable": 1785.5747400000002,
-          "feesInStable": 39.57,
-          "profitInStable": null,
+          "swapFee": 39.57,
           "token": {
             "address": "2a598068-2b54-467e-a4da-dfdb41b02357",
             "symbol": "ARS",
@@ -202,13 +180,11 @@
         },
         {
           "id": "b6cd14ef-2a9c-4d0b-a717-7af72e3ba292",
-          "openedAt": 1681829652238,
+          "timestamp": 1681829652238,
           "closedAt": null,
           "direction": "LONG",
           "size": 62.82,
-          "totalPriceInStable": 325.22868000000005,
-          "feesInStable": 14.16,
-          "profitInStable": null,
+          "swapFee": 14.16,
           "token": {
             "address": "8cbeb5a5-8681-40a0-aff4-536d7f0d26e1",
             "symbol": "BYN",
@@ -220,13 +196,11 @@
         },
         {
           "id": "65fb7137-e20e-4de6-a014-9145d0ab9ca3",
-          "openedAt": 1681403382041,
+          "timestamp": 1681403382041,
           "closedAt": null,
           "direction": "SHORT",
           "size": 764.37,
-          "totalPriceInStable": 193.35980000000004,
-          "feesInStable": 43.24,
-          "profitInStable": null,
+          "swapFee": 43.24,
           "token": {
             "address": "28b60c4b-cb39-4c6e-bc45-ea3d3d7fed74",
             "symbol": "AMD",
@@ -238,13 +212,11 @@
         },
         {
           "id": "ae11e39a-0911-4bad-b10c-ac14149ba431",
-          "openedAt": 1680350465567,
+          "timestamp": 1680350465567,
           "closedAt": null,
           "direction": "SHORT",
           "size": 161.17,
-          "totalPriceInStable": 479.8741100000001,
-          "feesInStable": 29.9,
-          "profitInStable": null,
+          "swapFee": 29.9,
           "token": {
             "address": "0x6cA13a4ab78dd7D657226b155873A04DB929A3A4",
             "symbol": "IRR",
@@ -256,13 +228,11 @@
         },
         {
           "id": "ccbaa1f9-dc65-4272-a83d-4151eae13995",
-          "openedAt": 1679540361467,
+          "timestamp": 1679540361467,
           "closedAt": null,
           "direction": "LONG",
           "size": 930.54,
-          "totalPriceInStable": 3310.6518700000006,
-          "feesInStable": 43.88,
-          "profitInStable": null,
+          "swapFee": 43.88,
           "token": {
             "address": "0x6cA13a4ab78dd7D657226b155873A04DB929AXXX",
             "symbol": "JUSD",
@@ -274,13 +244,11 @@
         },
         {
           "id": "b2bee100-6abc-4018-8b86-d1c0864befd9",
-          "openedAt": 1676450578943,
+          "timestamp": 1676450578943,
           "closedAt": null,
           "direction": "SHORT",
           "size": 411.74,
-          "totalPriceInStable": 601.1110500000001,
-          "feesInStable": 17.68,
-          "profitInStable": null,
+          "swapFee": 17.68,
           "token": {
             "address": "8cbeb5a5-8681-40a0-aff4-536d7f0d26e1",
             "symbol": "BYN",
@@ -292,13 +260,11 @@
         },
         {
           "id": "48491df8-c14c-418d-8204-cb397d1fdad7",
-          "openedAt": 1670404715965,
+          "timestamp": 1670404715965,
           "closedAt": null,
           "direction": "LONG",
           "size": 759.85,
-          "totalPriceInStable": 823.0997000000001,
-          "feesInStable": 28.76,
-          "profitInStable": null,
+          "swapFee": 28.76,
           "token": {
             "address": "1083e6d8-6ec4-4c26-9f92-27c7ad4c963e",
             "symbol": "PAB",
@@ -310,13 +276,11 @@
         },
         {
           "id": "485dcd53-b126-4a60-9f61-91e88b4f4930",
-          "openedAt": 1670164059773,
+          "timestamp": 1670164059773,
           "closedAt": null,
           "direction": "LONG",
           "size": 730.49,
-          "totalPriceInStable": 3848.7877700000004,
-          "feesInStable": 3.72,
-          "profitInStable": null,
+          "swapFee": 3.72,
           "token": {
             "address": "777523c7-ae77-4a84-b639-9a21a711a6f7",
             "symbol": "MVR",
@@ -328,13 +292,11 @@
         },
         {
           "id": "e72cf23a-f988-4043-9647-56031768bec2",
-          "openedAt": 1668821153836,
+          "timestamp": 1668821153836,
           "closedAt": null,
           "direction": "SHORT",
           "size": 59.15,
-          "totalPriceInStable": 200.14971000000003,
-          "feesInStable": 48.87,
-          "profitInStable": null,
+          "swapFee": 48.87,
           "token": {
             "address": "2a598068-2b54-467e-a4da-dfdb41b02357",
             "symbol": "ARS",
@@ -346,13 +308,11 @@
         },
         {
           "id": "fee56892-410a-49f5-bb85-ace604906631",
-          "openedAt": 1668759971747,
+          "timestamp": 1668759971747,
           "closedAt": null,
           "direction": "SHORT",
           "size": 98.6,
-          "totalPriceInStable": 185.46341000000004,
-          "feesInStable": 4.01,
-          "profitInStable": null,
+          "swapFee": 4.01,
           "token": {
             "address": "0x6cA13a4ab78dd7D657226b155873A04DB929A3A4",
             "symbol": "IRR",
@@ -364,13 +324,11 @@
         },
         {
           "id": "4433faed-76fa-41c5-a85d-1720a636f961",
-          "openedAt": 1668727394659,
+          "timestamp": 1668727394659,
           "closedAt": null,
           "direction": "SHORT",
           "size": 365.03,
-          "totalPriceInStable": 375.02610000000004,
-          "feesInStable": 2.44,
-          "profitInStable": null,
+          "swapFee": 2.44,
           "token": {
             "address": "4f974fa2-8d46-481e-8435-b56ddf173b84",
             "symbol": "TOP",
@@ -382,13 +340,11 @@
         },
         {
           "id": "9fd6eedd-9813-427c-bb62-05aac5e01308",
-          "openedAt": 1668170723001,
+          "timestamp": 1668170723001,
           "closedAt": null,
           "direction": "LONG",
           "size": 806.89,
-          "totalPriceInStable": 4750.307510000001,
-          "feesInStable": 26.09,
-          "profitInStable": null,
+          "swapFee": 26.09,
           "token": {
             "address": "4f974fa2-8d46-481e-8435-b56ddf173b84",
             "symbol": "TOP",
@@ -400,13 +356,11 @@
         },
         {
           "id": "998b46e7-f7ea-44c2-96c1-997709d1b1b7",
-          "openedAt": 1667509196740,
+          "timestamp": 1667509196740,
           "closedAt": null,
           "direction": "LONG",
           "size": 441.46,
-          "totalPriceInStable": 114.31674000000001,
-          "feesInStable": 37.09,
-          "profitInStable": null,
+          "swapFee": 37.09,
           "token": {
             "address": "28b60c4b-cb39-4c6e-bc45-ea3d3d7fed74",
             "symbol": "AMD",
@@ -418,13 +372,11 @@
         },
         {
           "id": "cf10ae0d-e6f2-4448-b4ee-7d278470cdab",
-          "openedAt": 1667355176472,
+          "timestamp": 1667355176472,
           "closedAt": null,
           "direction": "LONG",
           "size": 558.2,
-          "totalPriceInStable": 1465.5723200000002,
-          "feesInStable": 34.66,
-          "profitInStable": null,
+          "swapFee": 34.66,
           "token": {
             "address": "8cbeb5a5-8681-40a0-aff4-536d7f0d26e1",
             "symbol": "BYN",

@@ -46,7 +46,7 @@ export function CustomApolloProvider({ children }: PropsWithChildren<{}>) {
 
         Query: {
           fields: {
-            getPositions: {
+            getSwaps: {
               // Don't cache separate results based on
               // any of this field's arguments.
               keyArgs: ['isOpen'],

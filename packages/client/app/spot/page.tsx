@@ -2,8 +2,8 @@ import 'gridstack/dist/gridstack.css';
 
 import Box from '@mui/material/Box';
 import Assets from '../components/Features/Assets/Assets';
+import BalanceTable from '../components/Features/BalanceTable/BalanceTable';
 import Farm from '../components/Features/Farm/Farm';
-import Positions from '../components/Features/Positions/Positions';
 import Swap from '../components/Features/Swap/Swap';
 import ResizeableDiv from '../components/GridStack/ResizeableDiv';
 import SpotWidgetGridStack from '../components/GridStack/SpotWidgetGridStack';
@@ -46,7 +46,7 @@ function Spot() {
         <TradingView />
         <Box>
           <ResizeableDiv>
-            <Positions />
+            <BalanceTable />
           </ResizeableDiv>
         </Box>
       </Box>

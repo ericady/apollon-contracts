@@ -21,7 +21,7 @@ type DebtTokenMeta {
   compoundedDeposit: Float!
   stabilityCompoundAmount: Float!
   troveRepableDebtAmount: Float!
-  
+
   # global
   # TODO: No implementation yet
   stabilityDepositAPY: Float!
@@ -39,7 +39,7 @@ type CollateralTokenMeta {
   walletAmount: Float!
   troveLockedAmount: Float!
   stabilityGainedAmount: Float!
-  
+
   # global
   totalValueLockedUSD: Float!
   totalValueLockedUSD30dAverage: Float!
@@ -60,22 +60,20 @@ enum LongShortDirection {
   SHORT
 }
 
-type Position {
+type SwapEvent {
   id: ID!
-  openedAt: Int!
-  closedAt: Int # undefined until closed
+  borrower: String!
+  timestamp: Int!
   #
   token: Token!
-  direction: LongShortDirection!
-  size: Float! # always positive, applied by direction
-  #
-  totalPriceInStable: Float!
-  feesInStable: Float! # protocol fees, without gas
-  profitInStable: Float # undefined until closed
+  direction: LongShortDirection! # Indicates whether the swap is LONG or SHORT
+  size: Float! # always positive, applied by direction. The size of the "non-stable" coin involved in the swap
+  totalPriceInStable: Float! # The total price at the time of the swap, always in stable coin
+  swapFee: Float! # protocol fees, without gas. Long => jUSD / Short => DebtToken
 }
 
-type PositionsPage {
-  positions: [Position!]!
+type SwapEventPage {
+  swaps: [SwapEvent!]!
   pageInfo: PageInfo!
 }
 
@@ -88,8 +86,8 @@ type PageInfo {
 
 type Query {
   # returns 30 elements, cursor based pagination
-  # sorted by position.openedAt DESC
-  getPositions(borrower: String!, isOpen: Boolean!, cursor: String): PositionsPage!
+  # sorted by position.timestamp DESC
+  getSwaps(borrower: String!, cursor: String): SwapEventPage!
 }
 
 type PoolLiquidity {

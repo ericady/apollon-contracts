@@ -74,13 +74,12 @@ export const GET_BORROWER_DEBT_TOKENS = gql`
 `;
 
 // TODO: Not yet used. Maybe remove it later.
-export const GET_BORROWER_POSITIONS = gql`
-  query GetBorrowerPositions($borrower: String!, $isOpen: Boolean!, $cursor: String) {
-    getPositions(borrower: $borrower, isOpen: $isOpen, cursor: $cursor) {
-      positions {
+export const GET_BORROWER_SWAPS = gql`
+  query GetBorrowerSwapEvents($borrower: String!, $cursor: String) {
+    getSwaps(borrower: $borrower, cursor: $cursor) {
+      swaps {
         id
-        openedAt
-        closedAt
+        timestamp
         token {
           id
           address
@@ -90,8 +89,7 @@ export const GET_BORROWER_POSITIONS = gql`
         direction
         size
         totalPriceInStable
-        feesInStable
-        profitInStable
+        swapFee
       }
       pageInfo {
         totalCount

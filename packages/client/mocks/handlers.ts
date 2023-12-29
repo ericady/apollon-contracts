@@ -9,15 +9,15 @@ import {
   DebtTokenMeta,
   LongShortDirection,
   Pool,
-  Position,
   Query,
   QueryGetBorrowerStabilityHistoryArgs,
   QueryGetCollateralTokensArgs,
   QueryGetDebtTokensArgs,
   QueryGetPoolPriceHistoryArgs,
   QueryGetPoolsArgs,
-  QueryGetPositionsArgs,
+  QueryGetSwapsArgs,
   QueryGetTokenArgs,
+  SwapEvent,
   Token,
   TokenAmount,
 } from '../app/generated/gql-types';
@@ -27,8 +27,8 @@ import {
   GET_BORROWER_COLLATERAL_TOKENS,
   GET_BORROWER_DEBT_TOKENS,
   GET_BORROWER_LIQUIDITY_POOLS,
-  GET_BORROWER_POSITIONS,
   GET_BORROWER_STABILITY_HISTORY,
+  GET_BORROWER_SWAPS,
   GET_COLLATERAL_USD_HISTORY,
   GET_DEBT_USD_HISTORY,
   GET_RESERVE_USD_HISTORY,
@@ -208,59 +208,26 @@ for (let i = 0; i < allTokens.length; i++) {
 
 const liquidityPools = pools;
 
-const totalOpenPositions = faker.number.int({ min: 5, max: 90 });
-const openPositions = Array(totalOpenPositions)
+const pastSwapEventsLength = faker.number.int({ min: 5, max: 90 });
+const pastSwapEvents = Array(pastSwapEventsLength)
   .fill(null)
-  .map<Position>(() => {
-    const openedAt = faker.date.past({ years: 1 }).getTime();
+  .map<SwapEvent>(() => {
+    const timestamp = faker.date.past({ years: 1 }).getTime();
     const size = parseFloat(faker.finance.amount(1, 1000, 2));
     const token = faker.helpers.arrayElement(tokens);
     return {
-      __typename: 'Position',
+      __typename: 'SwapEvent',
       id: faker.string.uuid(),
-      openedAt,
-      closedAt: null,
+      borrower: faker.string.uuid(),
+      totalPriceInStable: (size * token.priceUSD) / JUSD.priceUSD,
+      timestamp,
       direction: faker.helpers.enumValue(LongShortDirection),
       size,
-      totalPriceInStable: faker.number.float({
-        min: (token.priceUSD / JUSD.priceUSD) * size * 0.3,
-        max: (token.priceUSD / JUSD.priceUSD) * size * 5.5,
-        precision: 0.00001,
-      }),
-      feesInStable: parseFloat(faker.finance.amount(1, 50, 2)),
-      profitInStable: null,
+      swapFee: parseFloat(faker.finance.amount(1, 50, 2)),
       token,
     };
   })
-  .sort((a, b) => b.openedAt - a.openedAt);
-
-const totalClosedPositions = faker.number.int({ min: 5, max: 90 });
-const closedPositions = Array(totalClosedPositions)
-  .fill(null)
-  .map<Position>(() => {
-    const openedAt = faker.date.past({ years: 1 }).getTime();
-    const closedAt = openedAt + faker.number.int({ min: 1, max: 24 * 60 * 60 * 1000 });
-    const size = parseFloat(faker.finance.amount(1, 1000, 2));
-    const token = faker.helpers.arrayElement(tokens);
-    const totalPriceInStable = faker.number.float({
-      min: (token.priceUSD / JUSD.priceUSD) * size * 0.01,
-      max: (token.priceUSD / JUSD.priceUSD) * size * 5.5,
-      precision: 0.00001,
-    });
-    return {
-      __typename: 'Position',
-      id: faker.string.uuid(),
-      openedAt,
-      closedAt,
-      direction: faker.helpers.enumValue(LongShortDirection),
-      size,
-      totalPriceInStable,
-      feesInStable: parseFloat(faker.finance.amount(1, 50, 2)),
-      profitInStable: parseFloat(faker.finance.amount(totalPriceInStable * -0.5, totalPriceInStable * 2.5, 2)),
-      token,
-    };
-  })
-  .sort((a, b) => b.openedAt - a.openedAt);
+  .sort((a, b) => b.timestamp - a.timestamp);
 
 // Define a helper function to generate pool price history data
 const generatePoolPriceHistory = (): number[][] => {
@@ -414,93 +381,51 @@ export const handlers = [
     },
   ),
 
-  // GetBorrowerPositions
-  graphql.query<{ getPositions: Query['getPositions'] }, QueryGetPositionsArgs>(
-    GET_BORROWER_POSITIONS,
-    (req, res, ctx) => {
-      const { borrower, isOpen, cursor } = req.variables;
-      if (!borrower) {
-        throw new Error('Borrower address is required');
-      }
+  // GetBorrowerSwapEvents
+  graphql.query<{ getSwaps: Query['getSwaps'] }, QueryGetSwapsArgs>(GET_BORROWER_SWAPS, (req, res, ctx) => {
+    const { borrower, cursor } = req.variables;
+    if (!borrower) {
+      throw new Error('Borrower address is required');
+    }
 
-      if (isOpen) {
-        if (cursor) {
-          // find the open position with the id === cursor and return the next 30 entries from that position
-          const cursorPositionIndex = openPositions.findIndex(({ id }) => id === cursor);
-          const positions = openPositions.slice(cursorPositionIndex + 1, cursorPositionIndex + 31);
-          const hasNextPage = cursorPositionIndex + 31 < totalOpenPositions;
-          const endCursor = positions[positions.length - 1].id;
+    if (cursor) {
+      // find the closed position with the id === cursor and return the next 30 entries from that position
 
-          const result: Query['getPositions'] = {
-            __typename: 'PositionsPage',
-            positions,
-            pageInfo: {
-              __typename: 'PageInfo',
-              totalCount: totalOpenPositions,
-              hasNextPage,
-              endCursor,
-            },
-          };
-          return res(ctx.data({ getPositions: result }));
-        } else {
-          // return the first 30 open positions
-          const positions = openPositions.slice(0, 30);
-          const hasNextPage = totalOpenPositions > 30;
-          const endCursor = positions[positions.length - 1].id;
+      const cursorPositionIndex = pastSwapEvents.findIndex(({ id }) => id === cursor);
+      const positions = pastSwapEvents.slice(cursorPositionIndex + 1, cursorPositionIndex + 31);
+      const hasNextPage = cursorPositionIndex + 31 < pastSwapEventsLength;
+      const endCursor = positions[positions.length - 1].id;
 
-          const result: Query['getPositions'] = {
-            __typename: 'PositionsPage',
-            positions,
-            pageInfo: {
-              __typename: 'PageInfo',
-              totalCount: totalOpenPositions,
-              hasNextPage,
-              endCursor,
-            },
-          };
-          return res(ctx.data({ getPositions: result }));
-        }
-      } else {
-        if (cursor) {
-          // find the closed position with the id === cursor and return the next 30 entries from that position
+      const result: Query['getSwaps'] = {
+        __typename: 'SwapEventPage',
+        swaps: positions,
+        pageInfo: {
+          __typename: 'PageInfo',
+          totalCount: pastSwapEventsLength,
+          hasNextPage,
+          endCursor,
+        },
+      };
+      return res(ctx.data({ getSwaps: result }));
+    } else {
+      // return the first 30 closed positions
+      const positions = pastSwapEvents.slice(0, 30);
+      const hasNextPage = pastSwapEventsLength > 30;
+      const endCursor = positions[positions.length - 1].id;
 
-          const cursorPositionIndex = closedPositions.findIndex(({ id }) => id === cursor);
-          const positions = closedPositions.slice(cursorPositionIndex + 1, cursorPositionIndex + 31);
-          const hasNextPage = cursorPositionIndex + 31 < totalClosedPositions;
-          const endCursor = positions[positions.length - 1].id;
-
-          const result: Query['getPositions'] = {
-            __typename: 'PositionsPage',
-            positions,
-            pageInfo: {
-              __typename: 'PageInfo',
-              totalCount: totalClosedPositions,
-              hasNextPage,
-              endCursor,
-            },
-          };
-          return res(ctx.data({ getPositions: result }));
-        } else {
-          // return the first 30 closed positions
-          const positions = closedPositions.slice(0, 30);
-          const hasNextPage = totalClosedPositions > 30;
-          const endCursor = positions[positions.length - 1].id;
-
-          const result: Query['getPositions'] = {
-            __typename: 'PositionsPage',
-            positions,
-            pageInfo: {
-              __typename: 'PageInfo',
-              totalCount: totalClosedPositions,
-              hasNextPage,
-              endCursor,
-            },
-          };
-          return res(ctx.data({ getPositions: result }));
-        }
-      }
-    },
-  ),
+      const result: Query['getSwaps'] = {
+        __typename: 'SwapEventPage',
+        swaps: positions,
+        pageInfo: {
+          __typename: 'PageInfo',
+          totalCount: pastSwapEventsLength,
+          hasNextPage,
+          endCursor,
+        },
+      };
+      return res(ctx.data({ getSwaps: result }));
+    }
+  }),
 
   // GetBorrowerLiquidityPools
   graphql.query<{ getPools: Query['getPools'] }, QueryGetPoolsArgs>(GET_BORROWER_LIQUIDITY_POOLS, (req, res, ctx) => {

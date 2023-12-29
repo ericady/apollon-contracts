@@ -37,3 +37,8 @@ export function floatToBigInt(floatNumber: number, precision: number = 18) {
   const bigIntNumber = BigInt(Math.round(floatNumber * factor));
   return bigIntNumber;
 }
+
+//  die currentSwapFee wird in dem event als 1e6 angegeben → 1000000 sind 100%, 3000 sind 0.3%
+export const convertSwapFee = (swapFee: number) => {
+  return swapFee / 1000000;
+};

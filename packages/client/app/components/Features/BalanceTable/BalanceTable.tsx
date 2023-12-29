@@ -6,18 +6,18 @@ import Tab from '@mui/material/Tab';
 import Tabs from '@mui/material/Tabs';
 import { SyntheticEvent, useState } from 'react';
 import { useEthers } from '../../../context/EthersProvider';
-import { GetBorrowerPositionsQuery, GetBorrowerPositionsQueryVariables } from '../../../generated/gql-types';
-import { GET_BORROWER_POSITIONS } from '../../../queries';
+import { GetBorrowerSwapEventsQuery, GetBorrowerSwapEventsQueryVariables } from '../../../generated/gql-types';
+import { GET_BORROWER_SWAPS } from '../../../queries';
 import Label from '../../Label/Label';
 import CollateralTable from '../Collateral/CollateralTable';
 import HistoryTable from './HistoryTable';
 
-const Positions = () => {
+const BalanceTable = () => {
   const [tabValue, setTabValue] = useState<'COLLATERAL' | 'HISTORY'>('COLLATERAL');
 
   const { address } = useEthers();
 
-  // const { data: openPositions } = useQuery<GetBorrowerPositionsQuery, GetBorrowerPositionsQueryVariables>(
+  // const { data: openPositions } = useQuery<GetBorrowerSwapEventsQuery, GetBorrowerSwapEventsQueryVariables>(
   //   GET_BORROWER_POSITIONS,
   //   {
   //     variables: {
@@ -29,12 +29,11 @@ const Positions = () => {
   //     skip: !address,
   //   },
   // );
-  const { data: closedPositions } = useQuery<GetBorrowerPositionsQuery, GetBorrowerPositionsQueryVariables>(
-    GET_BORROWER_POSITIONS,
+  const { data: closedPositions } = useQuery<GetBorrowerSwapEventsQuery, GetBorrowerSwapEventsQueryVariables>(
+    GET_BORROWER_SWAPS,
     {
       variables: {
         borrower: address,
-        isOpen: false,
         cursor: null,
       },
       // Guest mode. Avoid hitting the API with invalid parameters.
@@ -72,7 +71,7 @@ const Positions = () => {
                 POSITIONS{'  '}
                 {openPositions && (
                   <Label variant="none" fixedWidth={false}>
-                    <span data-testid="apollon-positions-count">{openPositions.getPositions.pageInfo.totalCount}</span>
+                    <span data-testid="apollon-positions-count">{openPositions.getSwaps.pageInfo.totalCount}</span>
                   </Label>
                 )}
               </span>
@@ -84,10 +83,10 @@ const Positions = () => {
             value="HISTORY"
             label={
               <span>
-                HISTORY{'  '}
+                SWAPS{'  '}
                 {closedPositions && (
                   <Label variant="none" fixedWidth={false}>
-                    <span data-testid="apollon-history-count">{closedPositions.getPositions.pageInfo.totalCount}</span>
+                    <span data-testid="apollon-history-count">{closedPositions.getSwaps.pageInfo.totalCount}</span>
                   </Label>
                 )}
               </span>
@@ -113,4 +112,4 @@ const Positions = () => {
   );
 };
 
-export default Positions;
+export default BalanceTable;

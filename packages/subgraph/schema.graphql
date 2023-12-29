@@ -99,27 +99,23 @@ type CollateralTokenMeta @entity(immutable: true) {
 #   # stabilityGainedAmount: BigInt!
 # }
 
-# TODO: Positions and Pools are not yet implemented.
-# enum LongShortDirection {
-#   LONG
-#   SHORT
-# }
+enum LongShortDirection {
+  LONG
+  SHORT
+}
 
-# type Position @entity {
-#   # TODO: I need a unqiue ID to fetch the Position once its closed. What could that be?
-#   id: String!
-#   borrower: Bytes!
-#   openedAt: BigInt!
-#   closedAt: BigInt # undefined until closed
-#   #
-#   token: Bytes!
-#   direction: LongShortDirection!
-#   size: BigInt! # always positive, applied by direction
-#   #
-#   totalPriceInStable: BigInt!
-#   feesInStable: BigInt! # protocol fees, without gas
-#   profitInStable: BigInt # undefined until closed
-# }
+type SwapEvent {
+  id: ID!
+  borrower: String!
+  timestamp: Int!
+  #
+  token: Token!
+  direction: LongShortDirection! # Indicates whether the swap is LONG or SHORT
+  size: Float! # always positive, applied by direction. The size of the "non-stable" coin involved in the swap
+  totalPriceInStable: Float! # The total price at the time of the swap, always in stable coin
+  # die currentSwapFee wird in dem event als 1e6 angegeben → 1000000 sind 100%, 3000 sind 0.3%
+  swapFee: Float! # protocol fees, without gas. Long => jUSD / Short => DebtToken
+}
 
 type PoolLiquidity @entity {
   # unique Byte combination of tokenA + tokenB

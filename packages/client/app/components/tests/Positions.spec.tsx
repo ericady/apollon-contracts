@@ -1,10 +1,10 @@
 import { expect, test } from '@playwright/experimental-ct-react';
 import { SetupServer } from 'msw/node';
-import Positions from '../Features/Positions/Positions';
+import BalanceTable from '../Features/BalanceTable/BalanceTable';
 import { integrationSuiteSetup, integrationTestSetup } from './integration-test.setup';
 import MockedGetBorrowerCollateralTokens from './mockedResponses/GetBorrowerCollateralTokens.mocked.json';
 import MockedBorrowerDebtTokens from './mockedResponses/GetBorrowerDebtTokens.mocked.json';
-import MockedBorrowerPositions from './mockedResponses/GetBorrowerPositions.mocked.json';
+import MockedBorrowerPositions from './mockedResponses/GetBorrowerSwapEvents.mocked.json';
 import MockedDebtTokensWithoutBorrower from './mockedResponses/GetDebtTokens.mocked.json';
 import { IntegrationWrapper } from './test-utils';
 
@@ -42,7 +42,7 @@ test.describe('Positions', () => {
 
     const component = await mount(
       <IntegrationWrapper>
-        <Positions />
+        <BalanceTable />
       </IntegrationWrapper>,
     );
 
@@ -53,7 +53,7 @@ test.describe('Positions', () => {
     test('should have "Collateral" tab disabled', async ({ mount }) => {
       const component = await mount(
         <IntegrationWrapper>
-          <Positions />
+          <BalanceTable />
         </IntegrationWrapper>,
       );
 
@@ -66,7 +66,7 @@ test.describe('Positions', () => {
     test('should have "Positions" tab disabled', async ({ mount }) => {
       const component = await mount(
         <IntegrationWrapper>
-          <Positions />
+          <BalanceTable />
         </IntegrationWrapper>,
       );
 
@@ -79,7 +79,7 @@ test.describe('Positions', () => {
     test('should have "History" tab disabled', async ({ mount }) => {
       const component = await mount(
         <IntegrationWrapper>
-          <Positions />
+          <BalanceTable />
         </IntegrationWrapper>,
       );
 
@@ -106,7 +106,7 @@ test.describe('Positions', () => {
 
       const component = await mount(
         <IntegrationWrapper>
-          <Positions />
+          <BalanceTable />
         </IntegrationWrapper>,
       );
 
@@ -117,7 +117,7 @@ test.describe('Positions', () => {
       test('should have "Collateral" tab enabled', async ({ mount }) => {
         const component = await mount(
           <IntegrationWrapper shouldConnectWallet>
-            <Positions />
+            <BalanceTable />
           </IntegrationWrapper>,
         );
 
@@ -142,7 +142,7 @@ test.describe('Positions', () => {
 
         const component = await mount(
           <IntegrationWrapper shouldConnectWallet>
-            <Positions />
+            <BalanceTable />
           </IntegrationWrapper>,
         );
 
@@ -163,7 +163,7 @@ test.describe('Positions', () => {
       test('should have "Positions" tab enabled', async ({ mount }) => {
         const component = await mount(
           <IntegrationWrapper shouldConnectWallet>
-            <Positions />
+            <BalanceTable />
           </IntegrationWrapper>,
         );
 
@@ -183,7 +183,7 @@ test.describe('Positions', () => {
             });
           }
 
-          if (JSON.parse(route.request().postData()!).operationName === 'GetBorrowerPositions') {
+          if (JSON.parse(route.request().postData()!).operationName === 'GetBorrowerSwapEvents') {
             return route.fulfill({
               status: 200,
               body: JSON.stringify(MockedBorrowerPositions),
@@ -195,7 +195,7 @@ test.describe('Positions', () => {
 
         const component = await mount(
           <IntegrationWrapper shouldConnectWallet>
-            <Positions />
+            <BalanceTable />
           </IntegrationWrapper>,
         );
 
@@ -214,7 +214,7 @@ test.describe('Positions', () => {
       test('should display position number label in the tab', async ({ mount, page }) => {
         await mount(
           <IntegrationWrapper shouldConnectWallet>
-            <Positions />
+            <BalanceTable />
           </IntegrationWrapper>,
         );
 
@@ -231,7 +231,7 @@ test.describe('Positions', () => {
       test('should have "History" tab enabled', async ({ mount }) => {
         const component = await mount(
           <IntegrationWrapper shouldConnectWallet>
-            <Positions />
+            <BalanceTable />
           </IntegrationWrapper>,
         );
 
@@ -244,7 +244,7 @@ test.describe('Positions', () => {
       test('should render History tab with mocked data', async ({ mount, page }) => {
         // We need to mock the exact same data to generate the exact same snapshot
         await page.route('https://flyby-router-demo.herokuapp.com/', async (route) => {
-          if (JSON.parse(route.request().postData()!).operationName === 'GetBorrowerPositions') {
+          if (JSON.parse(route.request().postData()!).operationName === 'GetBorrowerSwapEvents') {
             return route.fulfill({
               status: 200,
               body: JSON.stringify(MockedBorrowerPositions),
@@ -256,7 +256,7 @@ test.describe('Positions', () => {
 
         const component = await mount(
           <IntegrationWrapper shouldConnectWallet>
-            <Positions />
+            <BalanceTable />
           </IntegrationWrapper>,
         );
 
@@ -275,7 +275,7 @@ test.describe('Positions', () => {
       test('should display history number label in the tab', async ({ mount, page }) => {
         await mount(
           <IntegrationWrapper shouldConnectWallet>
-            <Positions />
+            <BalanceTable />
           </IntegrationWrapper>,
         );
 
