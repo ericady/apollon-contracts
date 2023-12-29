@@ -35,7 +35,7 @@ export const GET_ALL_DEBT_TOKENS = gql`
       # TODO: Implement sort in query or sort server side
       totalSupplyUSD
       totalReserve
-      totalReserve24hAgo
+      totalReserve30dAverage
 
       token {
         id

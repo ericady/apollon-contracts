@@ -123,7 +123,9 @@ const userCollateralTokenMeta = [
   ...collateralTokenMeta.filter((token) => !userColl.find(({ id }) => id === token.id)),
 ];
 
-const debtTokenMeta = tokens.map<DebtTokenMeta>((token) => {
+const debtTokenMeta = tokens.map<DebtTokenMeta>((token, index) => {
+  const isGovOrStableDebtToken = index === tokens.length - 1 || index === tokens.length - 2;
+
   return {
     __typename: 'DebtTokenMeta',
     id: faker.string.uuid(),
@@ -136,8 +138,10 @@ const debtTokenMeta = tokens.map<DebtTokenMeta>((token) => {
     troveRepableDebtAmount: 0,
 
     totalDepositedStability: faker.number.float({ min: 1000, max: 5000, precision: 0.0001 }),
-    totalReserve: faker.number.float({ min: 1000, max: 5000, precision: 0.0001 }),
-    totalReserve24hAgo: faker.number.float({ min: 1000, max: 5000, precision: 0.0001 }),
+    totalReserve: isGovOrStableDebtToken ? faker.number.float({ min: 1000, max: 5000, precision: 0.0001 }) : 0,
+    totalReserve30dAverage: isGovOrStableDebtToken
+      ? faker.number.float({ min: 1000, max: 5000, precision: 0.0001 })
+      : 0,
     totalSupplyUSD: parseFloat(faker.finance.amount(10000, 50000, 2)),
     totalSupplyUSD30dAverage: parseFloat(faker.finance.amount(10000, 50000, 2)),
     stabilityDepositAPY: faker.number.float({ min: 0, max: 10, precision: 0.0001 }) / 100,
@@ -352,7 +356,7 @@ export const handlers = [
 
           totalDepositedStability: parseFloat(faker.finance.amount(1000, 5000, 2)),
           totalReserve: shouldHaveReserve ? parseFloat(faker.finance.amount(1000, 5000, 2)) : 0,
-          totalReserve24hAgo: shouldHaveReserve ? parseFloat(faker.finance.amount(1000, 5000, 2)) : 0,
+          totalReserve30dAverage: shouldHaveReserve ? parseFloat(faker.finance.amount(1000, 5000, 2)) : 0,
           totalSupplyUSD: parseFloat(faker.finance.amount(10000, 50000, 2)),
           totalSupplyUSD30dAverage: parseFloat(faker.finance.amount(10000, 50000, 2)),
           stabilityDepositAPY: faker.number.float({ min: 0.01, max: 0.1, precision: 0.01 }),

@@ -35,7 +35,7 @@ function TreasuryTable() {
             </TableRow>
           </TableHead>
           <TableBody>
-            {debtTokensInReserve.map(({ token, totalReserve, totalReserve24hAgo }, index) => (
+            {debtTokensInReserve.map(({ token, totalReserve, totalReserve30dAverage }, index) => (
               <TableRow hover key={token.address}>
                 <TableCell
                   align="right"
@@ -50,18 +50,18 @@ function TreasuryTable() {
                   align="right"
                   sx={{ borderBottom: index === debtTokensInReserve.length - 1 ? 'none' : '', pr: 0 }}
                 >
-                  {roundCurrency(totalReserve - totalReserve24hAgo, 5)}
+                  {roundCurrency(totalReserve - totalReserve30dAverage, 5)}
                 </TableCell>
                 <TableCell width={125} sx={{ borderBottom: index === debtTokensInReserve.length - 1 ? 'none' : '' }}>
                   <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                     <Typography
                       fontWeight={400}
-                      color={percentageChange(totalReserve, totalReserve24hAgo) > 0 ? 'success.main' : 'error.main'}
+                      color={percentageChange(totalReserve, totalReserve30dAverage) > 0 ? 'success.main' : 'error.main'}
                     >
-                      {displayPercentage(percentageChange(totalReserve, totalReserve24hAgo), 'positive')}
+                      {displayPercentage(percentageChange(totalReserve, totalReserve30dAverage), 'positive')}
                     </Typography>
 
-                    <DirectionIcon showIncrease={percentageChange(totalReserve, totalReserve24hAgo) > 0} />
+                    <DirectionIcon showIncrease={percentageChange(totalReserve, totalReserve30dAverage) > 0} />
                   </div>
                 </TableCell>
               </TableRow>

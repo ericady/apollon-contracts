@@ -30,9 +30,12 @@ type DebtTokenMeta @entity(immutable: true) {
   # event: StabilityProvided StabilityWithdrawn  StabilityOffset 
   totalDepositedStability: BigInt!
   # TODO: wasa Implement the event handlers to update this field
+  # - token: es gibt nur zwei, kannst du hardcoden, oder von reservePool.`stableDebtToken` und reservePool.`govToken`
+  # - deposited: `stableReserveCap` und `govReserveCap`
+  # - event: `WithdrewReserves` und borrowerOps.increaseDebt, dort haben wir aber aktuell kein Event 😟
   totalReserve: BigInt!
   # TODO: Fetch this from the client side
-  # totalReserve24hAgo: BigInt!
+  # totalReserve30dAverage: BigInt!
   # event StoragePoolValueUpdated
   # TODO: wasa Implement the event handlers to update this field
   totalSupplyUSD: BigInt!

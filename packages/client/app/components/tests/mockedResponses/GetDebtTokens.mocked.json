@@ -16,7 +16,7 @@
         "stabilityCompoundAmount": null,
         "totalDepositedStability": 4736.49,
         "totalReserve": 3991.8,
-        "totalReserve24hAgo": 4568.91,
+        "totalReserve30dAverage": 4568.91,
         "totalSupplyUSD": 13228.62,
         "totalSupplyUSD30dAverage": 47673.94,
         "stabilityDepositAPY": 0.051492
@@ -36,7 +36,7 @@
         "stabilityCompoundAmount": null,
         "totalDepositedStability": 3627.64,
         "totalReserve": 3327.15,
-        "totalReserve24hAgo": 3057.41,
+        "totalReserve30dAverage": 3057.41,
         "totalSupplyUSD": 21558.31,
         "totalSupplyUSD30dAverage": 47302.16,
         "stabilityDepositAPY": 0.08779400000000001
@@ -56,7 +56,7 @@
         "stabilityCompoundAmount": null,
         "totalDepositedStability": 2201.33,
         "totalReserve": 4421.74,
-        "totalReserve24hAgo": 2833.04,
+        "totalReserve30dAverage": 2833.04,
         "totalSupplyUSD": 35157.37,
         "totalSupplyUSD30dAverage": 37867.83,
         "stabilityDepositAPY": 0.020338
@@ -76,7 +76,7 @@
         "stabilityCompoundAmount": null,
         "totalDepositedStability": 3958.39,
         "totalReserve": 4810.86,
-        "totalReserve24hAgo": 4549.52,
+        "totalReserve30dAverage": 4549.52,
         "totalSupplyUSD": 19543.64,
         "totalSupplyUSD30dAverage": 34048.56,
         "stabilityDepositAPY": 0.07014300000000001
@@ -96,7 +96,7 @@
         "stabilityCompoundAmount": null,
         "totalDepositedStability": 3588.49,
         "totalReserve": 1285.19,
-        "totalReserve24hAgo": 4545.86,
+        "totalReserve30dAverage": 4545.86,
         "totalSupplyUSD": 35425.87,
         "totalSupplyUSD30dAverage": 27026.35,
         "stabilityDepositAPY": 0.009326
@@ -116,7 +116,7 @@
         "stabilityCompoundAmount": null,
         "totalDepositedStability": 3646.67,
         "totalReserve": 2902.85,
-        "totalReserve24hAgo": 4504.24,
+        "totalReserve30dAverage": 4504.24,
         "totalSupplyUSD": 11531.37,
         "totalSupplyUSD30dAverage": 36090.63,
         "stabilityDepositAPY": 0.078119
@@ -136,7 +136,7 @@
         "stabilityCompoundAmount": null,
         "totalDepositedStability": 2950.05,
         "totalReserve": 3420.2,
-        "totalReserve24hAgo": 1684.88,
+        "totalReserve30dAverage": 1684.88,
         "totalSupplyUSD": 32218.64,
         "totalSupplyUSD30dAverage": 39031.78,
         "stabilityDepositAPY": 0.041291
@@ -156,7 +156,7 @@
         "stabilityCompoundAmount": null,
         "totalDepositedStability": 1960.1,
         "totalReserve": 4344.66,
-        "totalReserve24hAgo": 2257.29,
+        "totalReserve30dAverage": 2257.29,
         "totalSupplyUSD": 25783.67,
         "totalSupplyUSD30dAverage": 32834.9,
         "stabilityDepositAPY": 0.031076000000000003
@@ -176,7 +176,7 @@
         "stabilityCompoundAmount": null,
         "totalDepositedStability": 4152.31,
         "totalReserve": 3528.05,
-        "totalReserve24hAgo": 2137.9,
+        "totalReserve30dAverage": 2137.9,
         "totalSupplyUSD": 38287.56,
         "totalSupplyUSD30dAverage": 36060.5,
         "stabilityDepositAPY": 0.020192
@@ -196,7 +196,7 @@
         "stabilityCompoundAmount": null,
         "totalDepositedStability": 2874.55,
         "totalReserve": 1069.61,
-        "totalReserve24hAgo": 4678.23,
+        "totalReserve30dAverage": 4678.23,
         "totalSupplyUSD": 10754.16,
         "totalSupplyUSD30dAverage": 33431.57,
         "stabilityDepositAPY": 0.083717
@@ -216,7 +216,7 @@
         "stabilityCompoundAmount": null,
         "totalDepositedStability": 2266.81,
         "totalReserve": 2185.35,
-        "totalReserve24hAgo": 2894.61,
+        "totalReserve30dAverage": 2894.61,
         "totalSupplyUSD": 39155.53,
         "totalSupplyUSD30dAverage": 38276.57,
         "stabilityDepositAPY": 0.021471

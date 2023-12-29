@@ -21,7 +21,7 @@ type DebtTokenMeta {
   stabilityDepositAPY: Float!
   totalDepositedStability: Float!
   totalReserve: Float!
-  totalReserve24hAgo: Float!
+  totalReserve30dAverage: Float!
   totalSupplyUSD: Float!
   totalSupplyUSD30dAverage: Float!
 }
