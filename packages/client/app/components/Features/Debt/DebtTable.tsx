@@ -1,5 +1,5 @@
 import { useQuery } from '@apollo/client';
-import { Box, Button, Skeleton, useTheme } from '@mui/material';
+import { Box, Button, useTheme } from '@mui/material';
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
 import TableCell from '@mui/material/TableCell';
@@ -7,18 +7,15 @@ import TableContainer from '@mui/material/TableContainer';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import Typography from '@mui/material/Typography';
-import { useCallback, useMemo, useState } from 'react';
+import { useMemo } from 'react';
 import { useEthers } from '../../../context/EthersProvider';
-import { GetCollateralTokensQuery, GetCollateralTokensQueryVariables } from '../../../generated/gql-types';
-import { GET_BORROWER_COLLATERAL_TOKENS } from '../../../queries';
-import { displayPercentage, roundCurrency, roundNumber } from '../../../utils/math';
-import DiamondIcon from '../../Icons/DiamondIcon';
+import { GetBorrowerDebtTokensQuery, GetBorrowerDebtTokensQueryVariables } from '../../../generated/gql-types';
+import { GET_BORROWER_DEBT_TOKENS } from '../../../queries';
+import { roundCurrency, roundNumber } from '../../../utils/math';
 import Label from '../../Label/Label';
 import HeaderCell from '../../Table/HeaderCell';
-import CollateralPieVisualization from '../../Visualizations/CollateralPieVisualization';
-import CollateralRatioVisualization from '../../Visualizations/CollateralRatioVisualization';
-import CollateralTableLoader from './CollateralTableLoader';
-import CollateralUpdateDialog from './CollateralUpdateDialog';
+import DebtPieVisualization from '../../Visualizations/DebtPieVisualization';
+import DebtTableLoader from './DebtTableLoader';
 
 const generateColorPalette = (paletteLength: number) => {
   // Initialize an array with the first 3 fixed colors
@@ -38,42 +35,30 @@ const generateColorPalette = (paletteLength: number) => {
   return colors.slice(0, paletteLength);
 };
 
-function CollateralTable() {
+function DebtTable() {
   const theme = useTheme();
   const isDarkMode = theme.palette.mode === 'dark';
 
   const { address } = useEthers();
 
-  const [oldRatio, setOldRatio] = useState<null | number>(null);
+  const { data } = useQuery<GetBorrowerDebtTokensQuery, GetBorrowerDebtTokensQueryVariables>(GET_BORROWER_DEBT_TOKENS, {
+    variables: { borrower: address },
+    skip: !address,
+  });
 
-  const { data } = useQuery<GetCollateralTokensQuery, GetCollateralTokensQueryVariables>(
-    GET_BORROWER_COLLATERAL_TOKENS,
-    {
-      variables: { borrower: address },
-      skip: !address,
-    },
-  );
-
-  const borrowerCollateralTokens = useMemo(() => {
-    const colorPalette: string[] = data ? generateColorPalette(data.getCollateralTokens.length) : [];
+  const borrowerDebtTokens = useMemo(() => {
+    const colorPalette: string[] = data ? generateColorPalette(data.getDebtTokens.length) : [];
 
     return (
-      data?.getCollateralTokens
-        .filter(({ troveLockedAmount, walletAmount }) => walletAmount! > 0 || troveLockedAmount! > 0)
+      data?.getDebtTokens
+        .filter(({ troveMintedAmount, walletAmount }) => walletAmount! > 0 || troveMintedAmount! > 0)
         .map((token) => ({
           ...token,
           chartColor: colorPalette.shift(),
-          troveValueUSD: roundNumber(token.troveLockedAmount ?? 0 * token.token.priceUSD),
+          troveMintedUSD: roundNumber(token.troveMintedAmount ?? 0 * token.token.priceUSD),
         })) ?? []
     );
   }, [data]);
-
-  const ratioChangeCallback = useCallback(
-    (_: number, oldRatio: number) => {
-      setOldRatio(oldRatio);
-    },
-    [setOldRatio],
-  );
 
   return (
     <div style={{ display: 'flex' }}>
@@ -85,7 +70,7 @@ function CollateralTable() {
           backgroundColor: isDarkMode ? '#1e1b27' : '#f8f8f8',
         }}
       >
-        <CollateralPieVisualization borrowerCollateralTokens={borrowerCollateralTokens} />
+        <DebtPieVisualization borrowerDebtTokens={borrowerDebtTokens} />
       </Box>
       <Box sx={{ width: '100%', borderLeft: '1px solid', borderColor: 'table.border' }}>
         <div style={{ padding: '20px' }}>
@@ -93,52 +78,36 @@ function CollateralTable() {
             style={{
               display: 'flex',
               alignItems: 'center',
-              justifyContent: 'space-between',
+              justifyContent: 'flex-end',
             }}
           >
-            <Box sx={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
-              <Typography
-                sx={{ fontFamily: 'Space Grotesk Variable', color: 'info.main', fontWeight: '700', fontSize: '20px' }}
-              >
-                {oldRatio !== null ? displayPercentage(oldRatio, 'default', 0) : <Skeleton variant="text" width={50} />}
-              </Typography>
-
-              <DiamondIcon />
-
-              <Typography variant="h4">Collateral Ratio</Typography>
-            </Box>
-
-            {!data ? (
-              <Button
-                variant="outlined"
-                sx={{
-                  width: 'auto',
-                  padding: '0 50px',
-                }}
-              >
-                Update
-              </Button>
-            ) : (
-              <CollateralUpdateDialog buttonVariant="outlined" />
-            )}
+            <Button
+              variant="outlined"
+              sx={{
+                width: 'auto',
+                padding: '0 50px',
+              }}
+              disabled
+            >
+              Repay
+            </Button>
           </div>
-          <CollateralRatioVisualization callback={ratioChangeCallback} />
         </div>
 
         {!data ? (
-          <CollateralTableLoader />
+          <DebtTableLoader />
         ) : (
           <TableContainer data-testid="apollon-collateral-table">
             <Table>
               <TableHead>
                 <TableRow>
-                  <HeaderCell title="Trove" cellProps={{ align: 'right' }} />
+                  <HeaderCell title="Debt" cellProps={{ align: 'right' }} />
                   <HeaderCell title="Wallet" cellProps={{ align: 'right' }} />
                   <HeaderCell title="Symbol" />
                 </TableRow>
               </TableHead>
               <TableBody>
-                {borrowerCollateralTokens.map(({ token, walletAmount, troveLockedAmount, chartColor }) => (
+                {borrowerDebtTokens.map(({ token, walletAmount, troveMintedAmount, chartColor }) => (
                   <TableRow hover key={token.address}>
                     <TableCell align="right">
                       <div style={{ display: 'flex', justifyContent: 'flex-end', alignItems: 'center', gap: 10 }}>
@@ -149,7 +118,7 @@ function CollateralTable() {
                           />
                         </svg>
                         <Typography color="primary.contrastText" fontWeight={400}>
-                          {roundCurrency(troveLockedAmount!, 5)}
+                          {roundCurrency(troveMintedAmount!, 5)}
                         </Typography>
                       </div>
                     </TableCell>
@@ -168,4 +137,4 @@ function CollateralTable() {
   );
 }
 
-export default CollateralTable;
+export default DebtTable;

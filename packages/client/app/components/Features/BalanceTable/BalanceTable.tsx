@@ -10,10 +10,11 @@ import { GetBorrowerSwapEventsQuery, GetBorrowerSwapEventsQueryVariables } from 
 import { GET_BORROWER_SWAPS } from '../../../queries';
 import Label from '../../Label/Label';
 import CollateralTable from '../Collateral/CollateralTable';
+import DebtTable from '../Debt/DebtTable';
 import HistoryTable from './HistoryTable';
 
 const BalanceTable = () => {
-  const [tabValue, setTabValue] = useState<'COLLATERAL' | 'HISTORY'>('COLLATERAL');
+  const [tabValue, setTabValue] = useState<'DEBT' | 'COLLATERAL' | 'HISTORY'>('DEBT');
 
   const { address } = useEthers();
 
@@ -41,12 +42,14 @@ const BalanceTable = () => {
     },
   );
 
-  const handleChange = (_: SyntheticEvent, newValue: 'COLLATERAL' | 'HISTORY') => {
+  const handleChange = (_: SyntheticEvent, newValue: 'DEBT' | 'COLLATERAL' | 'HISTORY') => {
     setTabValue(newValue);
   };
 
   const renderTableContent = () => {
     switch (tabValue) {
+      case 'DEBT':
+        return <DebtTable />;
       case 'COLLATERAL':
         return <CollateralTable />;
       // case 'POSITIONS':
@@ -63,6 +66,7 @@ const BalanceTable = () => {
     <>
       <Box>
         <Tabs value={tabValue} onChange={handleChange}>
+          <Tab label="DEBT" value="DEBT" disableRipple disabled={!address} />
           <Tab label="COLLATERAL" value="COLLATERAL" disableRipple disabled={!address} />
           {/* <Tab
             value="POSITIONS"

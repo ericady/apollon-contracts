@@ -31,7 +31,7 @@ function TreasuryTable() {
           <TableHead>
             <TableRow>
               <HeaderCell title="Deposited Token" cellProps={{ colSpan: 2, align: 'right' }} />
-              <HeaderCell title="Last 24h Difference" cellProps={{ colSpan: 2, align: 'right' }} />
+              <HeaderCell title="Difference from 30d average" cellProps={{ colSpan: 2, align: 'right' }} />
             </TableRow>
           </TableHead>
           <TableBody>
