@@ -1,7 +1,7 @@
 'use client';
 
 import { useQuery } from '@apollo/client';
-import { Box } from '@mui/material';
+import { Box, Typography } from '@mui/material';
 import Tab from '@mui/material/Tab';
 import Tabs from '@mui/material/Tabs';
 import { SyntheticEvent, useState } from 'react';
@@ -10,27 +10,25 @@ import { GetBorrowerPositionsQuery, GetBorrowerPositionsQueryVariables } from '.
 import { GET_BORROWER_POSITIONS } from '../../../queries';
 import Label from '../../Label/Label';
 import CollateralTable from '../Collateral/CollateralTable';
-import BalanceTable from './BalanceTable';
 import HistoryTable from './HistoryTable';
-import PositionsTable from './PositionsTable';
 
 const Positions = () => {
-  const [tabValue, setTabValue] = useState<'BALANCE' | 'COLLATERAL' | 'POSITIONS' | 'HISTORY'>('BALANCE');
+  const [tabValue, setTabValue] = useState<'COLLATERAL' | 'HISTORY'>('COLLATERAL');
 
   const { address } = useEthers();
 
-  const { data: openPositions } = useQuery<GetBorrowerPositionsQuery, GetBorrowerPositionsQueryVariables>(
-    GET_BORROWER_POSITIONS,
-    {
-      variables: {
-        borrower: address,
-        isOpen: true,
-        cursor: null,
-      },
-      // Guest mode. Avoid hitting the API with invalid parameters.
-      skip: !address,
-    },
-  );
+  // const { data: openPositions } = useQuery<GetBorrowerPositionsQuery, GetBorrowerPositionsQueryVariables>(
+  //   GET_BORROWER_POSITIONS,
+  //   {
+  //     variables: {
+  //       borrower: address,
+  //       isOpen: true,
+  //       cursor: null,
+  //     },
+  //     // Guest mode. Avoid hitting the API with invalid parameters.
+  //     skip: !address,
+  //   },
+  // );
   const { data: closedPositions } = useQuery<GetBorrowerPositionsQuery, GetBorrowerPositionsQueryVariables>(
     GET_BORROWER_POSITIONS,
     {
@@ -44,18 +42,16 @@ const Positions = () => {
     },
   );
 
-  const handleChange = (_: SyntheticEvent, newValue: 'BALANCE' | 'COLLATERAL' | 'POSITIONS' | 'HISTORY') => {
+  const handleChange = (_: SyntheticEvent, newValue: 'COLLATERAL' | 'HISTORY') => {
     setTabValue(newValue);
   };
 
   const renderTableContent = () => {
     switch (tabValue) {
-      case 'BALANCE':
-        return <BalanceTable />;
       case 'COLLATERAL':
         return <CollateralTable />;
-      case 'POSITIONS':
-        return <PositionsTable />;
+      // case 'POSITIONS':
+      //   return <PositionsTable />;
       case 'HISTORY':
         return <HistoryTable />;
 
@@ -68,9 +64,8 @@ const Positions = () => {
     <>
       <Box>
         <Tabs value={tabValue} onChange={handleChange}>
-          <Tab label="BALANCE" value="BALANCE" disableRipple />
           <Tab label="COLLATERAL" value="COLLATERAL" disableRipple disabled={!address} />
-          <Tab
+          {/* <Tab
             value="POSITIONS"
             label={
               <span>
@@ -84,7 +79,7 @@ const Positions = () => {
             }
             disableRipple
             disabled={!address}
-          />
+          /> */}
           <Tab
             value="HISTORY"
             label={
@@ -103,7 +98,17 @@ const Positions = () => {
         </Tabs>
       </Box>
 
-      <div style={{ height: 'calc(100% - 52px)', overflowY: 'scroll' }}>{renderTableContent()}</div>
+      <div style={{ height: 'calc(100% - 52px)', overflowY: 'scroll' }}>
+        {address ? (
+          renderTableContent()
+        ) : (
+          <div style={{ display: 'grid', placeItems: 'center', height: '100%' }}>
+            <Typography variant="h6" color="textSecondary" align="center">
+              Please log in to use this widget
+            </Typography>
+          </div>
+        )}
+      </div>
     </>
   );
 };

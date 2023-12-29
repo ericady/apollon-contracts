@@ -73,6 +73,7 @@ export const GET_BORROWER_DEBT_TOKENS = gql`
   }
 `;
 
+// TODO: Not yet used. Maybe remove it later.
 export const GET_BORROWER_POSITIONS = gql`
   query GetBorrowerPositions($borrower: String!, $isOpen: Boolean!, $cursor: String) {
     getPositions(borrower: $borrower, isOpen: $isOpen, cursor: $cursor) {
