@@ -154,6 +154,20 @@ contract StabilityPoolManager is Ownable(msg.sender), CheckContract, IStabilityP
     return pool.getCompoundedDebtDeposit(_depositor);
   }
 
+  function getDepositorCompoundedDeposits(
+    address _depositor
+  ) external view override returns (TokenAmount[] memory deposits) {
+    deposits = new TokenAmount[](stabilityPoolsArray.length);
+    for (uint i = 0; i < stabilityPoolsArray.length; i++) {
+      deposits[i] = TokenAmount(
+        address(stabilityPoolsArray[i].getDepositToken()),
+        stabilityPoolsArray[i].getCompoundedDebtDeposit(_depositor)
+      );
+    }
+
+    return deposits;
+  }
+
   function getDepositorCollGains(
     address _depositor,
     address[] memory collTokenAddresses
