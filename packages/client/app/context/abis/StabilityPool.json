@@ -8,11 +8,6 @@
             },
             {
                 "internalType": "address",
-                "name": "_troveManagerAddress",
-                "type": "address"
-            },
-            {
-                "internalType": "address",
                 "name": "_depositTokenAddress",
                 "type": "address"
             }
@@ -213,12 +208,6 @@
             {
                 "indexed": false,
                 "internalType": "address",
-                "name": "troveManagerAddress",
-                "type": "address"
-            },
-            {
-                "indexed": false,
-                "internalType": "address",
                 "name": "depositTokenAddress",
                 "type": "address"
             }
@@ -402,6 +391,32 @@
                 "internalType": "uint256",
                 "name": "",
                 "type": "uint256"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [],
+        "name": "SWAP_BASE_FEE",
+        "outputs": [
+            {
+                "internalType": "uint32",
+                "name": "",
+                "type": "uint32"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [],
+        "name": "SWAP_FEE_PRECISION",
+        "outputs": [
+            {
+                "internalType": "uint32",
+                "name": "",
+                "type": "uint32"
             }
         ],
         "stateMutability": "view",
@@ -780,19 +795,6 @@
                 "internalType": "uint256",
                 "name": "",
                 "type": "uint256"
-            }
-        ],
-        "stateMutability": "view",
-        "type": "function"
-    },
-    {
-        "inputs": [],
-        "name": "troveManager",
-        "outputs": [
-            {
-                "internalType": "contract ITroveManager",
-                "name": "",
-                "type": "address"
             }
         ],
         "stateMutability": "view",

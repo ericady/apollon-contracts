@@ -11,12 +11,12 @@
     },
     {
         "inputs": [],
-        "name": "NotFromReservePool",
+        "name": "NotFromLiquidationOps",
         "type": "error"
     },
     {
         "inputs": [],
-        "name": "NotFromTroveManager",
+        "name": "NotFromReservePool",
         "type": "error"
     },
     {
@@ -99,7 +99,7 @@
             {
                 "indexed": false,
                 "internalType": "address",
-                "name": "troveManagerAddress",
+                "name": "liquidationOperationsAddress",
                 "type": "address"
             },
             {
@@ -444,6 +444,19 @@
         "type": "function"
     },
     {
+        "inputs": [],
+        "name": "liquidationOperationsAddress",
+        "outputs": [
+            {
+                "internalType": "address",
+                "name": "",
+                "type": "address"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
         "inputs": [
             {
                 "components": [
@@ -570,7 +583,7 @@
         "inputs": [
             {
                 "internalType": "address",
-                "name": "_troveManagerAddress",
+                "name": "_liquidationOperationsAddress",
                 "type": "address"
             },
             {
@@ -661,19 +674,6 @@
         "name": "transferOwnership",
         "outputs": [],
         "stateMutability": "nonpayable",
-        "type": "function"
-    },
-    {
-        "inputs": [],
-        "name": "troveManagerAddress",
-        "outputs": [
-            {
-                "internalType": "address",
-                "name": "",
-                "type": "address"
-            }
-        ],
-        "stateMutability": "view",
         "type": "function"
     },
     {

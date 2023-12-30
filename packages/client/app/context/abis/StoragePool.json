@@ -84,6 +84,12 @@
             {
                 "indexed": false,
                 "internalType": "address",
+                "name": "_liquidationOperationsAddress",
+                "type": "address"
+            },
+            {
+                "indexed": false,
+                "internalType": "address",
                 "name": "_stabilityPoolManagerAddress",
                 "type": "address"
             },
@@ -240,6 +246,32 @@
                 "internalType": "uint256",
                 "name": "",
                 "type": "uint256"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [],
+        "name": "SWAP_BASE_FEE",
+        "outputs": [
+            {
+                "internalType": "uint32",
+                "name": "",
+                "type": "uint32"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [],
+        "name": "SWAP_FEE_PRECISION",
+        "outputs": [
+            {
+                "internalType": "uint32",
+                "name": "",
+                "type": "uint32"
             }
         ],
         "stateMutability": "view",
@@ -446,6 +478,19 @@
     },
     {
         "inputs": [],
+        "name": "liquidationOperationsAddress",
+        "outputs": [
+            {
+                "internalType": "address",
+                "name": "",
+                "type": "address"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [],
         "name": "owner",
         "outputs": [
             {
@@ -505,6 +550,11 @@
             {
                 "internalType": "address",
                 "name": "_redemptionOperationsAddress",
+                "type": "address"
+            },
+            {
+                "internalType": "address",
+                "name": "_liquidationOperationsAddress",
                 "type": "address"
             },
             {
