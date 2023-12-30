@@ -677,6 +677,7 @@ export const SchemaDataFreshnessManager: ContractDataFreshnessManager<typeof Con
           SchemaDataFreshnessManager.DebtToken[Contracts.DebtToken.DebtToken1].troveRepableDebtAmount.lastFetched =
             Date.now();
 
+          // TODO: Make it more performant with aggregate call.
           const repayableDebt = await troveManagerContract.getTroveRepayableDebt(
             borrower,
             Contracts.DebtToken.DebtToken1,

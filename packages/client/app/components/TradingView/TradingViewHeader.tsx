@@ -57,9 +57,8 @@ function TradingViewHeader() {
           $
         </Typography>
         <Typography variant="subtitle1" fontFamily="Space Grotesk Variable">
-          Premium{' '}
-          <Box sx={{ color: 'text.primary', display: 'inline' }}>
-            {' '}
+          Premium
+          <Box sx={{ color: 'text.primary', display: 'inline', ml: '8px' }}>
             {data && selectedToken
               ? displayPercentage(percentageChange(selectedToken.priceUSD, data.getToken.priceUSDOracle), 'positive')
               : ' -'}
@@ -67,8 +66,7 @@ function TradingViewHeader() {
         </Typography>
         <Typography variant="subtitle1" fontFamily="Space Grotesk Variable">
           Swap Fee
-          <Box sx={{ color: 'text.primary', display: 'inline' }}>
-            {' '}
+          <Box sx={{ color: 'text.primary', display: 'inline', ml: '8px' }}>
             {selectedToken ? displayPercentage(selectedToken.swapFee) : ' -'}
           </Box>
         </Typography>

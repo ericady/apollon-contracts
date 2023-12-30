@@ -71,8 +71,8 @@ const StabilityUpdateDialog = () => {
     if (tabValue === 'DEPOSIT') {
       tokenAmounts.forEach(async ({ tokenAddress, amount }) => {
         // @ts-ignore
-        const collContract = debtTokenContracts[tokenAddress] as DebtToken;
-        await collContract.approve(Contracts.StoragePool, amount);
+        const debtTokenContract = debtTokenContracts[tokenAddress] as DebtToken;
+        await debtTokenContract.approve(Contracts.StoragePool, amount);
       });
 
       await stabilityPoolManagerContract.provideStability(tokenAmounts);

@@ -67,7 +67,7 @@ function DebtTokenTable() {
                   stabilityDepositAPY,
                   totalDepositedStability,
                   token,
-                  troveMintedAmount,
+                  walletAmount,
                   troveRepableDebtAmount,
                   totalSupplyUSD,
                   totalSupplyUSD30dAverage,
@@ -84,7 +84,7 @@ function DebtTokenTable() {
                     <Label variant="none">{token.symbol}</Label>
                   </TableCell>
                   <TableCell align="right" sx={{ borderBottom: index === data.getDebtTokens.length - 1 ? 'none' : '' }}>
-                    {roundCurrency(troveMintedAmount, 5)}
+                    {roundCurrency(walletAmount, 5)}
                   </TableCell>
                   <TableCell
                     align="right"

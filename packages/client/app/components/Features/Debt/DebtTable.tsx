@@ -1,5 +1,5 @@
 import { useQuery } from '@apollo/client';
-import { Box, Button, useTheme } from '@mui/material';
+import { Box, useTheme } from '@mui/material';
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
 import TableCell from '@mui/material/TableCell';
@@ -16,6 +16,7 @@ import Label from '../../Label/Label';
 import HeaderCell from '../../Table/HeaderCell';
 import DebtPieVisualization from '../../Visualizations/DebtPieVisualization';
 import DebtTableLoader from './DebtTableLoader';
+import RepayDebtDialog from './RepayDebtDialog';
 
 const generateColorPalette = (paletteLength: number) => {
   // Initialize an array with the first 3 fixed colors
@@ -81,16 +82,7 @@ function DebtTable() {
               justifyContent: 'flex-end',
             }}
           >
-            <Button
-              variant="outlined"
-              sx={{
-                width: 'auto',
-                padding: '0 50px',
-              }}
-              disabled
-            >
-              Repay
-            </Button>
+            <RepayDebtDialog />
           </div>
         </div>
 
