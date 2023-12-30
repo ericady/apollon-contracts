@@ -17,14 +17,10 @@ import { parseUnits } from 'ethers';
 
 describe('TroveManager', () => {
   let signers: SignerWithAddress[];
-  let owner: SignerWithAddress;
   let alice: SignerWithAddress;
   let bob: SignerWithAddress;
-  let carol: SignerWithAddress;
   let whale: SignerWithAddress;
-  let dennis: SignerWithAddress;
   let erin: SignerWithAddress;
-  let flyn: SignerWithAddress;
 
   let defaulter_1: SignerWithAddress;
   let defaulter_2: SignerWithAddress;
@@ -45,11 +41,9 @@ describe('TroveManager', () => {
   let liquidationOperations: LiquidationOperations;
   let contracts: Contracts;
 
-  let redemptionFee: bigint;
-
   before(async () => {
     signers = await ethers.getSigners();
-    [owner, defaulter_1, defaulter_2, defaulter_3, whale, alice, bob, carol, dennis, erin, flyn] = signers;
+    [, defaulter_1, defaulter_2, defaulter_3, whale, alice, bob, , , erin] = signers;
   });
 
   beforeEach(async () => {
@@ -68,17 +62,15 @@ describe('TroveManager', () => {
     STOCK = contracts.debtToken.STOCK;
     BTC = contracts.collToken.BTC;
     USDT = contracts.collToken.USDT;
-
-    redemptionFee = await redemptionOperations.getRedemptionRate();
   });
 
   describe('in Normal Mode', () => {
     describe('liquidate()', () => {
       it('closes a Trove that has ICR < MCR', async () => {
         await whaleShrimpTroveInit(contracts, signers, false);
-        console.log("LINE 79 ",await priceFeed.getPrice(BTC));        
+        console.log('LINE 79 ', await priceFeed.getPrice(BTC));
         await priceFeed.setTokenPrice(BTC, parseUnits('5000'));
-        console.log("LINE 81 ",await priceFeed.getPrice(BTC));        
+        console.log('LINE 81 ', await priceFeed.getPrice(BTC));
 
         const [isRecoveryMode] = await storagePool.checkRecoveryMode();
         assert.isFalse(isRecoveryMode);
@@ -438,14 +430,13 @@ describe('TroveManager', () => {
 
       const collAmountToAdd = parseUnits('0.0001', 9);
       const bobAddress = bob.address;
-      const borrowerOperationsAddress = await borrowerOperations.getAddress();
+      const borrowerOperationsAddress = await contracts.borrowerOperations.getAddress();
       const storagePoolAddress = await storagePool.getAddress();
       const btcAddress = await BTC.getAddress();
 
       await expect(BTC.unprotectedMint(bobAddress, collAmountToAdd))
         .to.emit(BTC, 'Transfer')
         .withArgs(ethers.ZeroAddress, bobAddress, collAmountToAdd);
-
       await expect(BTC.connect(bob).approve(borrowerOperationsAddress, collAmountToAdd))
         .to.emit(BTC, 'Approval')
         .withArgs(bobAddress, borrowerOperationsAddress, collAmountToAdd);
@@ -454,7 +445,7 @@ describe('TroveManager', () => {
       const prevTotalCollateralStake = await troveManager.totalStakes(btcAddress);
       const prevTroveStake = await troveManager.getTroveStakes(bobAddress, btcAddress);
 
-      await expect(borrowerOperations.connect(bob).addColl([{ tokenAddress: BTC, amount: collAmountToAdd }]))
+      await expect(contracts.borrowerOperations.connect(bob).addColl([{ tokenAddress: BTC, amount: collAmountToAdd }]))
         .to.emit(storagePool, 'StoragePoolValueUpdated')
         .withArgs(btcAddress, true, '0', prevPoolValue + collAmountToAdd)
         .and.to.emit(BTC, 'Transfer')

@@ -12,7 +12,8 @@
     "prepare:compile": "hardhat compile",
     "compile:watch": "nodemon --watch contracts --ext sol --exec 'npx hardhat compile'",
     "prepare:set-version": "node scripts/set-version.js",
-    "test": "hardhat test test/**/*.ts --parallel",
+    "test": "hardhat test test/**/*.ts",
+    "test:p": "hardhat test test/**/*.ts --parallel",
     "coverage": "hardhat coverage",
     "coveralls": "cat coverage/lcov.info | coveralls",
     "migrate:local:subgraph": "truffle migrate --compile-none --network development"
