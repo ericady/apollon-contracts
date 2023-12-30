@@ -49,7 +49,7 @@ describe('CollateralUpdateDialog', () => {
     await waitFor(
       () => {
         const openButton = getByRole('button', { name: 'Update' });
-        expect(openButton).toBeDefined();
+        expect(openButton).toBeEnabled();
       },
       { timeout: 5000 },
     );
@@ -68,6 +68,7 @@ describe('CollateralUpdateDialog', () => {
     const submitButton = getByRole('button', { name: 'Update' });
     await userEvent.click(submitButton);
 
+    expect(contractMock.collateralTokenContracts[Contracts.ERC20.JUSD].approve).toHaveBeenCalledTimes(1);
     expect(contractMock.borrowerOperationsContract.addColl).toHaveBeenNthCalledWith(1, [
       { amount: 10000000000000000000n, tokenAddress: '0x509ee0d083ddf8ac028f2a56731412edd63223b8' },
     ]);

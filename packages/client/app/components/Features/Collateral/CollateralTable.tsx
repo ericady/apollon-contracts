@@ -1,5 +1,5 @@
 import { useQuery } from '@apollo/client';
-import { Box, Button, Skeleton, useTheme } from '@mui/material';
+import { Box, Skeleton, useTheme } from '@mui/material';
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
 import TableCell from '@mui/material/TableCell';
@@ -108,19 +108,7 @@ function CollateralTable() {
               <Typography variant="h4">Collateral Ratio</Typography>
             </Box>
 
-            {!data ? (
-              <Button
-                variant="outlined"
-                sx={{
-                  width: 'auto',
-                  padding: '0 50px',
-                }}
-              >
-                Update
-              </Button>
-            ) : (
-              <CollateralUpdateDialog buttonVariant="outlined" />
-            )}
+            <CollateralUpdateDialog buttonVariant="outlined" />
           </div>
           <CollateralRatioVisualization callback={ratioChangeCallback} />
         </div>

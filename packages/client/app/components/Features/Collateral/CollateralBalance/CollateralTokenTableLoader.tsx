@@ -49,16 +49,29 @@ const CollateralTokenTableLoader = () => {
                 ></TableCell>
                 <TableCell align="right" sx={{ borderRight: '1px solid', borderColor: 'table.border', padding: '2px' }}>
                   <Button
+                    variant="text"
                     sx={{
                       width: '100%',
                       p: '6px 8px',
                     }}
+                    disabled
                   >
                     Update
                   </Button>
                 </TableCell>
                 <TableCell align="right" style={{ padding: '2px' }}></TableCell>
-                <TableCell align="right" style={{ padding: '2px' }}></TableCell>
+                <TableCell style={{ borderBottom: 'none', padding: '2px' }} colSpan={2} align="right">
+                  <Button
+                    variant="text"
+                    sx={{
+                      width: '250px',
+                      p: '6px 8px',
+                    }}
+                    disabled
+                  >
+                    Close Trove
+                  </Button>
+                </TableCell>
               </TableRow>
             </TableBody>
           </Table>

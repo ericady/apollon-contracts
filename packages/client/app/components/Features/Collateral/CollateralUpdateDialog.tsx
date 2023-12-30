@@ -89,7 +89,20 @@ const CollateralUpdateDialog = ({ buttonVariant, buttonSx = {} }: Props) => {
 
   const collateralToDeposit: GetCollateralTokensQuery['getCollateralTokens'] = data?.getCollateralTokens ?? [];
 
-  if (collateralToDeposit.length === 0) return null;
+  if (collateralToDeposit.length === 0)
+    return (
+      <Button
+        variant={buttonVariant}
+        sx={{
+          width: 'auto',
+          padding: '0 50px',
+          ...buttonSx,
+        }}
+        disabled
+      >
+        Update
+      </Button>
+    );
 
   const fillMaxInputValue = (fieldName: keyof FieldValues, index: number) => {
     if (tabValue === 'DEPOSIT') {
@@ -105,7 +118,7 @@ const CollateralUpdateDialog = ({ buttonVariant, buttonSx = {} }: Props) => {
     }
   };
 
-  const hasNoOpenTrove = collateralToDeposit.every(({ troveLockedAmount }) => troveLockedAmount === 0);
+  const hasNoOpenTrove = !collateralToDeposit.some(({ troveLockedAmount }) => troveLockedAmount > 0);
 
   const onSubmit = async (data: FieldValues) => {
     const tokenAmounts = Object.entries(data)

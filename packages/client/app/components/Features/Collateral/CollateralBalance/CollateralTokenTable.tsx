@@ -16,6 +16,7 @@ import FeatureBox from '../../../FeatureBox/FeatureBox';
 import DirectionIcon from '../../../Icons/DirectionIcon';
 import Label from '../../../Label/Label';
 import HeaderCell from '../../../Table/HeaderCell';
+import CloseTroveDialog from '../CloseTroveDialog';
 import CollateralUpdateDialog from '../CollateralUpdateDialog';
 import CollateralTokenTableLoader from './CollateralTokenTableLoader';
 
@@ -90,17 +91,17 @@ const CollateralTokenTable = () => {
 
               <TableRow>
                 <TableCell
-                  align="right"
                   sx={{ borderBottom: 'none', borderRight: '1px solid', borderColor: 'table.border', padding: '2px' }}
                 ></TableCell>
                 <TableCell
-                  align="right"
                   sx={{ borderBottom: 'none', borderRight: '1px solid', borderColor: 'table.border', padding: '2px' }}
                 >
                   <CollateralUpdateDialog buttonVariant="text" buttonSx={{ p: '6px 8px', width: '100%' }} />
                 </TableCell>
-                <TableCell align="right" style={{ borderBottom: 'none', padding: '2px' }}></TableCell>
-                <TableCell align="right" style={{ borderBottom: 'none', padding: '2px' }}></TableCell>
+                <TableCell style={{ borderBottom: 'none', padding: '2px' }}></TableCell>
+                <TableCell style={{ borderBottom: 'none', padding: '2px' }} colSpan={2} align="right">
+                  <CloseTroveDialog buttonVariant="text" buttonSx={{ p: '6px 8px', width: '250px' }} />
+                </TableCell>
               </TableRow>
             </TableBody>
           </Table>

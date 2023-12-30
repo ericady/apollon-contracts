@@ -1,11 +1,11 @@
-import { render, waitFor } from '@testing-library/react';
+import { render } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { Contracts } from '../../../context/EthersProvider';
 import { IntegrationWrapper, PreselectedTestToken } from '../../tests/test-utils';
 import Swap from './Swap';
 
 describe('Swap', () => {
-  it('should call swapTokensForExactTokens function of mocked contract', async () => {
+  it('should call "swapTokensForExactTokens" function and "approve" function of collateral Token of mocked contract', async () => {
     const contractMock = {
       swapOperationsContract: {
         swapTokensForExactTokens: jest.fn(),
@@ -30,16 +30,15 @@ describe('Swap', () => {
       </IntegrationWrapper>,
     );
 
+    await new Promise((resolve) => setTimeout(resolve, 500));
+
     const inputJUSD = container.querySelector<HTMLInputElement>('input[name="jUSDAmount"]')!;
 
     await userEvent.type(inputJUSD, '100');
 
     const submitButton = getByRole('button', { name: 'SWAP' });
 
-    await waitFor(() => {
-      expect(submitButton).toBeEnabled();
-    });
-
+    expect(submitButton).toBeEnabled();
     await userEvent.click(submitButton);
 
     expect(contractMock.collateralTokenContracts[Contracts.ERC20.JUSD].approve).toHaveBeenCalledTimes(1);
@@ -70,16 +69,15 @@ describe('Swap', () => {
       </IntegrationWrapper>,
     );
 
+    await new Promise((resolve) => setTimeout(resolve, 500));
+
     const inputTokenAmount = container.querySelector<HTMLInputElement>('input[name="tokenAmount"]')!;
 
     await userEvent.type(inputTokenAmount, '100');
 
     const submitButton = getByRole('button', { name: 'SWAP' });
 
-    await waitFor(() => {
-      expect(submitButton).toBeEnabled();
-    });
-
+    expect(submitButton).toBeEnabled();
     await userEvent.click(submitButton);
 
     expect(contractMock.debtTokenContracts[PreselectedTestToken.address].approve).toHaveBeenCalledTimes(1);
