@@ -79,7 +79,7 @@ const RepayDebtDialog = () => {
           width: 'auto',
           padding: '0 50px',
         }}
-        disabled={!address || !data}
+        disabled={!address || !data?.getDebtTokens.some(({ troveRepableDebtAmount }) => troveRepableDebtAmount > 0)}
       >
         Repay
       </Button>
@@ -128,7 +128,7 @@ const RepayDebtDialog = () => {
             >
               <div style={{ overflowY: 'scroll', maxHeight: '60vh' }}>
                 {data?.getDebtTokens
-                  .filter(({ walletAmount, troveMintedAmount }) => walletAmount > 0 && troveMintedAmount > 0)
+                  .filter(({ troveRepableDebtAmount }) => troveRepableDebtAmount > 0)
                   .map(({ token, walletAmount, troveRepableDebtAmount }, index) => (
                     <Box
                       key={token.address}
