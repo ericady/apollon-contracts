@@ -271,10 +271,10 @@ const getProductionCacheConfig = ({
               tokenData?.address &&
               isFieldOutdated(SchemaDataFreshnessManager.DebtToken[Contracts.DebtToken.DebtToken1], 'compoundedDeposit')
             ) {
-              SchemaDataFreshnessManager.DebtToken[Contracts.DebtToken.DebtToken1].compoundedDeposit.fetch(
+              SchemaDataFreshnessManager.DebtToken[Contracts.DebtToken.DebtToken1].compoundedDeposit.fetch({
                 stabilityPoolManagerContract,
-                borrower,
-              );
+                depositor: borrower,
+              });
             }
 
             return SchemaDataFreshnessManager.DebtToken[Contracts.DebtToken.DebtToken1].compoundedDeposit.value();
@@ -456,7 +456,7 @@ export const ContractDataFreshnessManager: {
     {
       [K in keyof StabilityPoolManager]: ContractValue<ReturnType<StabilityPoolManager[K]>>;
     },
-    'getDepositorDeposits' | 'getDepositorCollGains'
+    'getDepositorDeposits' | 'getDepositorCollGains' | 'getDepositorCompoundedDeposits'
   >;
 } = {
   TroveManager: {
@@ -506,6 +506,18 @@ export const ContractDataFreshnessManager: {
         );
 
         ContractDataFreshnessManager.StabilityPoolManager.getDepositorCollGains.value = tokenAmount;
+      },
+      value: [],
+      lastFetched: 0,
+      timeout: 1000 * 5,
+    },
+
+    getDepositorCompoundedDeposits: {
+      fetch: async (stabilityPoolManagerContract: StabilityPoolManager, depositor: AddressLike) => {
+        ContractDataFreshnessManager.StabilityPoolManager.getDepositorCompoundedDeposits.lastFetched = Date.now();
+        const tokenAmount = await stabilityPoolManagerContract.getDepositorCompoundedDeposits(depositor);
+
+        ContractDataFreshnessManager.StabilityPoolManager.getDepositorCompoundedDeposits.value = tokenAmount;
       },
       value: [],
       lastFetched: 0,
@@ -706,14 +718,21 @@ export const SchemaDataFreshnessManager: ContractDataFreshnessManager<typeof Con
       },
 
       compoundedDeposit: {
-        fetch: async (stabilityPoolManagerContract: StabilityPoolManager, depositor: AddressLike) => {
+        fetch: async (fetchSource?: { stabilityPoolManagerContract: StabilityPoolManager; depositor: AddressLike }) => {
+          if (fetchSource) {
+            await ContractDataFreshnessManager.StabilityPoolManager.getDepositorCompoundedDeposits.fetch(
+              fetchSource.stabilityPoolManagerContract,
+              fetchSource.depositor,
+            );
+          }
+
           SchemaDataFreshnessManager.DebtToken[Contracts.DebtToken.DebtToken1].compoundedDeposit.lastFetched =
             Date.now();
 
-          const compoundedDeposit = await stabilityPoolManagerContract.getDepositorCompoundedDeposit(
-            depositor,
-            Contracts.DebtToken.DebtToken1,
-          );
+          const compoundedDeposit =
+            ContractDataFreshnessManager.StabilityPoolManager.getDepositorCompoundedDeposits.value.find(
+              ({ tokenAddress }) => tokenAddress === Contracts.DebtToken.DebtToken1,
+            )?.amount!;
 
           SchemaDataFreshnessManager.DebtToken[Contracts.DebtToken.DebtToken1].compoundedDeposit.value(
             ethers.toNumber(compoundedDeposit),

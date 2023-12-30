@@ -42,3 +42,5 @@ next-env.d.ts
 /playwright-report-integration/
 /playwright-report-e2e/
 /playwright/.cache/
+
+/generated
