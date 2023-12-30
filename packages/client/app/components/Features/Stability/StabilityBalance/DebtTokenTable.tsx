@@ -33,27 +33,31 @@ function DebtTokenTable() {
         <Table data-testid="apollon-debt-token-table">
           <TableHead>
             <TableRow>
-              <HeaderCell title="Protocol Level" cellProps={{ align: 'right' }} />
-              <HeaderCell title="" />
-              <HeaderCell title="" />
+              <HeaderCell title="Personal" cellProps={{ align: 'right' }} />
               <HeaderCell title="" />
               <HeaderCell title="" cellProps={{ sx: { borderRight: '1px solid', borderColor: 'background.paper' } }} />
               <HeaderCell title="" />
-              <HeaderCell title="Personal" cellProps={{ align: 'right' }} />
+              <HeaderCell title="" />
+              <HeaderCell title="" />
+              <HeaderCell title="Protocol Level" cellProps={{ align: 'right' }} />
             </TableRow>
           </TableHead>
           <TableHead>
             <TableRow>
               <HeaderCell title="Token" cellProps={{ align: 'right' }} />
+              <HeaderCell title="Wallet" cellProps={{ align: 'right' }} />
+              <HeaderCell
+                title="Debt"
+                cellProps={{ align: 'right', sx: { borderRight: '1px solid', borderColor: 'background.paper' } }}
+              />
+
               <HeaderCell title="Minted" cellProps={{ align: 'center', colSpan: 2 }} />
               <HeaderCell title="Stability" cellProps={{ align: 'right' }} />
               <HeaderCell
                 title="Rewards"
-                cellProps={{ sx: { borderRight: '1px solid', borderColor: 'background.paper' }, align: 'right' }}
+                cellProps={{ align: 'right' }}
                 tooltipProps={{ title: 'APY based on the last 30 days liquidations.', arrow: true, placement: 'right' }}
               />
-              <HeaderCell title="Wallet" cellProps={{ align: 'right' }} />
-              <HeaderCell title="Debt" cellProps={{ align: 'right' }} />
             </TableRow>
           </TableHead>
           <TableBody>
@@ -78,6 +82,19 @@ function DebtTokenTable() {
                     }}
                   >
                     <Label variant="none">{token.symbol}</Label>
+                  </TableCell>
+                  <TableCell align="right" sx={{ borderBottom: index === data.getDebtTokens.length - 1 ? 'none' : '' }}>
+                    {roundCurrency(troveMintedAmount, 5)}
+                  </TableCell>
+                  <TableCell
+                    align="right"
+                    sx={{
+                      borderBottom: index === data.getDebtTokens.length - 1 ? 'none' : '',
+                      borderRight: '1px solid',
+                      borderColor: 'table.border',
+                    }}
+                  >
+                    {roundCurrency(troveRepableDebtAmount, 5)}
                   </TableCell>
                   <TableCell
                     align="right"
@@ -112,17 +129,9 @@ function DebtTokenTable() {
                     align="right"
                     sx={{
                       borderBottom: index === data.getDebtTokens.length - 1 ? 'none' : '',
-                      borderRight: '1px solid',
-                      borderColor: 'table.border',
                     }}
                   >
                     {displayPercentage(stabilityDepositAPY)}
-                  </TableCell>
-                  <TableCell align="right" sx={{ borderBottom: index === data.getDebtTokens.length - 1 ? 'none' : '' }}>
-                    {roundCurrency(troveMintedAmount, 5)}
-                  </TableCell>
-                  <TableCell align="right" sx={{ borderBottom: index === data.getDebtTokens.length - 1 ? 'none' : '' }}>
-                    {roundCurrency(troveRepableDebtAmount, 5)}
                   </TableCell>
                 </TableRow>
               ),

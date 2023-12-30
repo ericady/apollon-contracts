@@ -28,7 +28,6 @@ function TradingViewHeader() {
     >
       <div style={{ display: 'flex', alignItems: 'center', gap: 20 }}>
         <Typography variant="h6">{selectedToken ? selectedToken.symbol : '-'}</Typography>
-
         <img
           src="assets/svgs/Star24_green.svg"
           alt="Green colored diamond shape"
@@ -36,7 +35,6 @@ function TradingViewHeader() {
           typeof="image/svg+xml"
           style={{ marginLeft: 10, marginRight: 10 }}
         />
-
         <Typography variant="subtitle1" fontFamily="Space Grotesk Variable">
           24h Volume
           <Box sx={{ color: 'text.primary', display: 'inline', ml: '8px' }}>
@@ -44,19 +42,20 @@ function TradingViewHeader() {
           </Box>{' '}
           $
         </Typography>
-
         <Typography variant="subtitle1" fontFamily="Space Grotesk Variable">
-          Pool{' '}
-          <Box sx={{ color: 'text.primary', display: 'inline' }}>{selectedToken ? selectedToken.priceUSD : ' -'}</Box>
+          Pool
+          <Box sx={{ color: 'text.primary', display: 'inline', ml: '8px' }}>
+            {selectedToken ? selectedToken.priceUSD : ' -'}
+          </Box>{' '}
+          $
         </Typography>
-
         <Typography variant="subtitle1" fontFamily="Space Grotesk Variable">
-          Oracle{' '}
-          <Box sx={{ color: 'text.primary', display: 'inline' }}>
+          Oracle
+          <Box sx={{ color: 'text.primary', display: 'inline', ml: '8px' }}>
             {data ? roundCurrency(data.getToken.priceUSDOracle) : ' -'}
-          </Box>
+          </Box>{' '}
+          $
         </Typography>
-
         <Typography variant="subtitle1" fontFamily="Space Grotesk Variable">
           Premium{' '}
           <Box sx={{ color: 'text.primary', display: 'inline' }}>
@@ -66,7 +65,6 @@ function TradingViewHeader() {
               : ' -'}
           </Box>
         </Typography>
-
         <Typography variant="subtitle1" fontFamily="Space Grotesk Variable">
           Swap Fee
           <Box sx={{ color: 'text.primary', display: 'inline' }}>

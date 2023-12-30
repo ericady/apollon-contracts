@@ -270,8 +270,12 @@ const Swap = () => {
                 }}
               >
                 Resulting pool slippage:
-                {jUSDAmount || tokenAmount ? (
-                  <span>{displayPercentage(getPriceImpact())}</span>
+                {JUSDToken ? (
+                  jUSDAmount || tokenAmount ? (
+                    <span>{displayPercentage(getPriceImpact())}</span>
+                  ) : (
+                    <span>{displayPercentage(0)}</span>
+                  )
                 ) : (
                   <Skeleton width="120px" />
                 )}

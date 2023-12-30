@@ -130,7 +130,7 @@ function StabilityPoolTable() {
                       );
                     })}
                   <TableRow>
-                    <TableCell sx={{ borderBottom: 'none' }}></TableCell>
+                    <TableCell sx={{ borderBottom: 'none' }} colSpan={2}></TableCell>
                     <TableCell sx={{ borderBottom: 'none' }}></TableCell>
 
                     <TableCell sx={{ borderBottom: 'none' }} colSpan={2} align="right">

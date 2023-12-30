@@ -290,8 +290,12 @@ const Farm = () => {
                   }}
                 >
                   Slippage:
-                  {watchFarmShortValue && selectedToken ? (
-                    <span>{displayPercentage(getPriceImpact())}</span>
+                  {JUSDToken ? (
+                    watchFarmShortValue && selectedToken ? (
+                      <span>{displayPercentage(getPriceImpact())}</span>
+                    ) : (
+                      <span>{displayPercentage(0)}</span>
+                    )
                   ) : (
                     <Skeleton width="120px" />
                   )}
