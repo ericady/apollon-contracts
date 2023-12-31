@@ -21,7 +21,6 @@ contract LiquityBase is IBase {
   uint public constant MAX_BORROWING_FEE = 0.05e18; // 5%
   uint public constant BORROWING_FEE_FLOOR = 0.005e18; // 0.5%
   uint public constant REDEMPTION_FEE_FLOOR = 0.005e18; // 0.5%
-  uint public constant RESERVE_FEE = 0.05e18; // 5% of Borrowing Fee
 
   // Return the coll amount of to be drawn from a trove's collateral and sent as gas compensation.
   function _getCollGasCompensation(uint _collAmount) internal pure returns (uint) {

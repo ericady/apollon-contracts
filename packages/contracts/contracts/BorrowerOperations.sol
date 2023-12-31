@@ -567,23 +567,27 @@ contract BorrowerOperations is LiquityBase, Ownable(msg.sender), CheckContract, 
     uint _borrowingFee
   ) internal {
     _storagePool.addValue(address(_debtToken), false, PoolType.Active, _netDebtIncrease);
+
+    // payout issued debt to the recipient
     uint mintAmount = _netDebtIncrease - _borrowingFee;
     if (mintAmount > 0) _debtToken.mint(_tokenRecipient, mintAmount);
 
-    // Cut reserve fees from borrowing fee and mint to the reserve pool
-    uint reserveFee = (_borrowingFee * RESERVE_FEE) / 1e18;
-    (bool stableCapReached, ) = reservePool.isReserveCapReached();
-    if (reserveFee > 0 && !stableCapReached) {
-      _debtToken.mint(address(reservePool), reserveFee);
-      emit SentBorrowingFeesToReserve(_tokenRecipient, reserveFee);
-    } else {
-      reserveFee = 0;
+    if (_borrowingFee == 0) return;
+
+    // forward the borrowing fee to the reserve pool (or gov staking)
+    uint govStakingPayout = _borrowingFee;
+    uint missingStableForReserveCap = reservePool.stableAmountUntilCap();
+    if (missingStableForReserveCap > 0) {
+      uint reserveTransfer = LiquityMath._min(_borrowingFee, missingStableForReserveCap);
+      govStakingPayout -= reserveTransfer;
+
+      _debtToken.mint(address(reservePool), reserveTransfer);
+      emit SentBorrowingFeesToReserve(_tokenRecipient, reserveTransfer);
     }
 
-    // TODO: Add remaining borrowing fees to gov token staking as rewards
-    // uint stakingRewards = _borrowingFee - reserveFee;
-    // lqtyStaking.increaseF_LUSD(reserveFee);
-    // _debtToken.mint(address(lqtyStaking), stakingRewards);
+    if (govStakingPayout > 0) {
+      // todo transfer to gov staking contract
+    }
   }
 
   function _poolRepayDebt(

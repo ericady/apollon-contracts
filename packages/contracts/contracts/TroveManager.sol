@@ -595,8 +595,8 @@ contract TroveManager is LiquityBase, Ownable(msg.sender), CheckContract, ITrove
     return trove.debts[IDebtToken(_debtTokenAddress)] + getPendingReward(_borrower, _debtTokenAddress, false);
   }
 
-  function getTroveRepayableDebts(address _borrower) external view override returns (TokenAmount[] memory) {
-    debts = getTroveDebt(_borrower);
+  function getTroveRepayableDebts(address _borrower) external view override returns (TokenAmount[] memory debts) {
+    debts = this.getTroveDebt(_borrower);
     for (uint i = 0; i < debts.length; i++)
       debts[i].amount += getPendingReward(_borrower, debts[i].tokenAddress, false);
 
@@ -625,7 +625,7 @@ contract TroveManager is LiquityBase, Ownable(msg.sender), CheckContract, ITrove
   }
 
   function getTroveWithdrawableColls(address _borrower) external view override returns (TokenAmount[] memory colls) {
-    colls = getTroveColl(_borrower);
+    colls = this.getTroveColl(_borrower);
     for (uint i = 0; i < colls.length; i++) colls[i].amount += getPendingReward(_borrower, colls[i].tokenAddress, true);
 
     return colls;

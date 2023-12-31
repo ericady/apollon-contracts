@@ -6,12 +6,12 @@
     },
     {
         "inputs": [],
-        "name": "NotContract",
+        "name": "InvalidRewardDistribution",
         "type": "error"
     },
     {
         "inputs": [],
-        "name": "NotFromSPM",
+        "name": "NotContract",
         "type": "error"
     },
     {
@@ -45,6 +45,31 @@
         "anonymous": false,
         "inputs": [
             {
+                "indexed": false,
+                "internalType": "address",
+                "name": "_stabilityPoolManager",
+                "type": "address"
+            },
+            {
+                "indexed": false,
+                "internalType": "address",
+                "name": "_reservePool",
+                "type": "address"
+            },
+            {
+                "indexed": false,
+                "internalType": "address",
+                "name": "_swapOperations",
+                "type": "address"
+            }
+        ],
+        "name": "GovSubsidyInitialized",
+        "type": "event"
+    },
+    {
+        "anonymous": false,
+        "inputs": [
+            {
                 "indexed": true,
                 "internalType": "address",
                 "name": "previousOwner",
@@ -58,75 +83,6 @@
             }
         ],
         "name": "OwnershipTransferred",
-        "type": "event"
-    },
-    {
-        "anonymous": false,
-        "inputs": [
-            {
-                "indexed": false,
-                "internalType": "uint256",
-                "name": "newReserveCap",
-                "type": "uint256"
-            },
-            {
-                "indexed": false,
-                "internalType": "uint256",
-                "name": "newGovReserveCap",
-                "type": "uint256"
-            }
-        ],
-        "name": "ReserveCapChanged",
-        "type": "event"
-    },
-    {
-        "anonymous": false,
-        "inputs": [
-            {
-                "indexed": false,
-                "internalType": "address",
-                "name": "_stabilityPoolManager",
-                "type": "address"
-            },
-            {
-                "indexed": false,
-                "internalType": "address",
-                "name": "_priceFeed",
-                "type": "address"
-            },
-            {
-                "indexed": false,
-                "internalType": "address",
-                "name": "_stableDebtTokenAddress",
-                "type": "address"
-            },
-            {
-                "indexed": false,
-                "internalType": "address",
-                "name": "_govTokenAddress",
-                "type": "address"
-            }
-        ],
-        "name": "ReservePoolInitialized",
-        "type": "event"
-    },
-    {
-        "anonymous": false,
-        "inputs": [
-            {
-                "indexed": false,
-                "internalType": "uint256",
-                "name": "govAmount",
-                "type": "uint256"
-            },
-            {
-                "indexed": false,
-                "internalType": "uint256",
-                "name": "stableAmount",
-                "type": "uint256"
-            }
-        ],
-        "name": "WithdrewReserves",
         "type": "event"
     },
     {
@@ -274,41 +230,9 @@
     },
     {
         "inputs": [],
-        "name": "govReserveCap",
-        "outputs": [
-            {
-                "internalType": "uint256",
-                "name": "",
-                "type": "uint256"
-            }
-        ],
-        "stateMutability": "view",
-        "type": "function"
-    },
-    {
-        "inputs": [],
-        "name": "govToken",
-        "outputs": [
-            {
-                "internalType": "contract IERC20",
-                "name": "",
-                "type": "address"
-            }
-        ],
-        "stateMutability": "view",
-        "type": "function"
-    },
-    {
-        "inputs": [],
-        "name": "isGovReserveCapReached",
-        "outputs": [
-            {
-                "internalType": "bool",
-                "name": "",
-                "type": "bool"
-            }
-        ],
-        "stateMutability": "view",
+        "name": "distribute",
+        "outputs": [],
+        "stateMutability": "nonpayable",
         "type": "function"
     },
     {
@@ -326,12 +250,12 @@
     },
     {
         "inputs": [],
-        "name": "priceFeed",
+        "name": "relativeReservePool",
         "outputs": [
             {
-                "internalType": "contract IPriceFeed",
+                "internalType": "uint256",
                 "name": "",
-                "type": "address"
+                "type": "uint256"
             }
         ],
         "stateMutability": "view",
@@ -339,7 +263,20 @@
     },
     {
         "inputs": [],
-        "name": "relativeStableCap",
+        "name": "relativeStabilityPoolManager",
+        "outputs": [
+            {
+                "internalType": "uint256",
+                "name": "",
+                "type": "uint256"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [],
+        "name": "relativeSwapOperations",
         "outputs": [
             {
                 "internalType": "uint256",
@@ -358,6 +295,19 @@
         "type": "function"
     },
     {
+        "inputs": [],
+        "name": "reservePool",
+        "outputs": [
+            {
+                "internalType": "contract IReservePool",
+                "name": "",
+                "type": "address"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
         "inputs": [
             {
                 "internalType": "address",
@@ -366,28 +316,13 @@
             },
             {
                 "internalType": "address",
-                "name": "_priceFeed",
+                "name": "_reservePool",
                 "type": "address"
             },
             {
                 "internalType": "address",
-                "name": "_stableDebtTokenAddress",
+                "name": "_swapOperations",
                 "type": "address"
-            },
-            {
-                "internalType": "address",
-                "name": "_govTokenAddress",
-                "type": "address"
-            },
-            {
-                "internalType": "uint256",
-                "name": "_relativeStableCap",
-                "type": "uint256"
-            },
-            {
-                "internalType": "uint256",
-                "name": "_govReserveCap",
-                "type": "uint256"
             }
         ],
         "name": "setAddresses",
@@ -396,24 +331,11 @@
         "type": "function"
     },
     {
-        "inputs": [
-            {
-                "internalType": "uint256",
-                "name": "_relativeStableCap",
-                "type": "uint256"
-            }
-        ],
-        "name": "setRelativeStableCap",
-        "outputs": [],
-        "stateMutability": "nonpayable",
-        "type": "function"
-    },
-    {
         "inputs": [],
-        "name": "stabilityPoolManagerAddress",
+        "name": "stabilityPoolManager",
         "outputs": [
             {
-                "internalType": "address",
+                "internalType": "contract IStabilityPoolManager",
                 "name": "",
                 "type": "address"
             }
@@ -423,23 +345,10 @@
     },
     {
         "inputs": [],
-        "name": "stableAmountUntilCap",
+        "name": "swapOperations",
         "outputs": [
             {
-                "internalType": "uint256",
-                "name": "",
-                "type": "uint256"
-            }
-        ],
-        "stateMutability": "view",
-        "type": "function"
-    },
-    {
-        "inputs": [],
-        "name": "stableDebtToken",
-        "outputs": [
-            {
-                "internalType": "contract IDebtToken",
+                "internalType": "contract ISwapOperations",
                 "name": "",
                 "type": "address"
             }
@@ -463,29 +372,23 @@
     {
         "inputs": [
             {
-                "internalType": "address",
-                "name": "stabilityPool",
-                "type": "address"
-            },
-            {
                 "internalType": "uint256",
-                "name": "withdrawAmountInUSD",
-                "type": "uint256"
-            }
-        ],
-        "name": "withdrawValue",
-        "outputs": [
-            {
-                "internalType": "uint256",
-                "name": "usedGov",
+                "name": "_relativeStabilityPoolManager",
                 "type": "uint256"
             },
             {
                 "internalType": "uint256",
-                "name": "usedStable",
+                "name": "_relativeReservePool",
+                "type": "uint256"
+            },
+            {
+                "internalType": "uint256",
+                "name": "_relativeSwapOperations",
                 "type": "uint256"
             }
         ],
+        "name": "updateRewardDistribution",
+        "outputs": [],
         "stateMutability": "nonpayable",
         "type": "function"
     }

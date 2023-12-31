@@ -17,13 +17,13 @@ import './Interfaces/IPriceFeed.sol';
 contract ReservePool is LiquityBase, Ownable(msg.sender), CheckContract, IReservePool {
   string public constant NAME = 'ReservePool';
 
-  IStabilityPoolManager public stabilityPoolManager;
+  address public stabilityPoolManagerAddress;
   IPriceFeed public priceFeed;
 
   IDebtToken public stableDebtToken;
-  IERC20 public govToken;
+  uint public relativeStableCap; // percentage of total issued stable coins
 
-  uint public stableReserveCap;
+  IERC20 public govToken;
   uint public govReserveCap;
 
   function setAddresses(
@@ -31,49 +31,41 @@ contract ReservePool is LiquityBase, Ownable(msg.sender), CheckContract, IReserv
     address _priceFeed,
     address _stableDebtTokenAddress,
     address _govTokenAddress,
-    uint _stableReserveCap,
+    uint _relativeStableCap,
     uint _govReserveCap
   ) external onlyOwner {
     checkContract(_stabilityPoolManager);
     checkContract(_stableDebtTokenAddress);
 
-    stabilityPoolManager = IStabilityPoolManager(_stabilityPoolManager);
+    stabilityPoolManagerAddress = _stabilityPoolManager;
     priceFeed = IPriceFeed(_priceFeed);
     stableDebtToken = IDebtToken(_stableDebtTokenAddress);
     govToken = IERC20(_govTokenAddress);
 
-    stableReserveCap = _stableReserveCap;
+    relativeStableCap = _relativeStableCap;
     govReserveCap = _govReserveCap;
 
     emit ReservePoolInitialized(_stabilityPoolManager, _priceFeed, _stableDebtTokenAddress, _govTokenAddress);
-    emit ReserveCapChanged(stableReserveCap, govReserveCap);
+    emit ReserveCapChanged(_relativeStableCap, govReserveCap);
   }
 
-  function setReserveCap(uint newStableReserveCap, uint newGovReserveCap) external onlyOwner {
-    stableReserveCap = newStableReserveCap;
-    govReserveCap = newGovReserveCap;
-    emit ReserveCapChanged(newStableReserveCap, govReserveCap);
-
-    uint stableBal = stableDebtToken.balanceOf(address(this));
-    uint govBal = govToken.balanceOf(address(this));
-    uint stableOffset = stableBal > newStableReserveCap ? stableBal - newStableReserveCap : 0;
-    uint govOffset = govBal > newGovReserveCap ? govBal - newGovReserveCap : 0;
-    if (stableOffset > 0 || govOffset > 0) {
-      address[] memory collTokens = new address[](2);
-      collTokens[0] = address(govToken);
-      collTokens[1] = address(stableDebtToken);
-      RemainingStability[] memory remainingStabilities = stabilityPoolManager.getRemainingStability(collTokens);
-      for (uint i = 0; i < remainingStabilities.length; i++) {
-        remainingStabilities[i].collGained[0].amount += govOffset / remainingStabilities.length;
-        remainingStabilities[i].collGained[1].amount += stableOffset / remainingStabilities.length;
-      }
-      stabilityPoolManager.offset(remainingStabilities);
-    }
+  function setRelativeStableCap(uint _relativeStableCap) external onlyOwner {
+    relativeStableCap = _relativeStableCap;
+    emit ReserveCapChanged(relativeStableCap, govReserveCap);
   }
 
-  function isReserveCapReached() external view returns (bool stableCapReached, bool govCapReached) {
-    stableCapReached = stableDebtToken.balanceOf(address(this)) >= stableReserveCap;
-    govCapReached = govToken.balanceOf(address(this)) >= govReserveCap;
+  function stableAmountUntilCap() external view returns (uint) {
+    uint totalStableSupply = stableDebtToken.totalSupply();
+    uint capTarget = (totalStableSupply * relativeStableCap) / DECIMAL_PRECISION;
+    uint stableBalance = stableDebtToken.balanceOf(address(this));
+
+    if (stableBalance >= capTarget) return 0;
+    return capTarget - stableBalance;
+  }
+
+  // todo...
+  function isGovReserveCapReached() external view returns (bool) {
+    return govToken.balanceOf(address(this)) >= govReserveCap;
   }
 
   /**
@@ -104,6 +96,6 @@ contract ReservePool is LiquityBase, Ownable(msg.sender), CheckContract, IReserv
   }
 
   function _requireCallerIsStabilityPoolManager() internal view {
-    if (msg.sender != address(stabilityPoolManager)) revert NotFromSPM();
+    if (msg.sender != stabilityPoolManagerAddress) revert NotFromSPM();
   }
 }

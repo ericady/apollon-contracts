@@ -6,6 +6,8 @@ import './IBBase.sol';
 import './IDebtToken.sol';
 
 interface IReservePool is IBBase {
+  error NotFromSPM();
+
   event ReservePoolInitialized(
     address _stabilityPoolManager,
     address _priceFeed,
@@ -15,17 +17,15 @@ interface IReservePool is IBBase {
   event ReserveCapChanged(uint newReserveCap, uint newGovReserveCap);
   event WithdrewReserves(uint govAmount, uint stableAmount);
 
-  error NotFromSPM();
-
-  function stableReserveCap() external view returns (uint);
-
-  function govReserveCap() external view returns (uint);
-
   function stableDebtToken() external view returns (IDebtToken);
 
   function govToken() external view returns (IERC20);
 
-  function isReserveCapReached() external view returns (bool, bool);
+  function setRelativeStableCap(uint _relativeStableCap) external;
+
+  function stableAmountUntilCap() external view returns (uint);
+
+  function isGovReserveCapReached() external view returns (bool);
 
   function withdrawValue(address stabilityPool, uint withdrawAmount) external returns (uint usedGov, uint usedStable);
 }
