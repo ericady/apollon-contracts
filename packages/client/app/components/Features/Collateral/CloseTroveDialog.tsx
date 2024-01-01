@@ -54,7 +54,9 @@ const CloseTroveDialog = ({ buttonVariant, buttonSx = {} }: Props) => {
   const hasNoOpenTrove = !collateralToDeposit.some(({ troveLockedAmount }) => troveLockedAmount > 0);
 
   const handleCloseTrove = async () => {
-    await borrowerOperationsContract.closeTrove();
+    console.log('BEFORE closeTrove');
+    const a = await borrowerOperationsContract.closeTrove();
+    console.log('AFTER closeTrove');
     setIsOpen(false);
   };
 

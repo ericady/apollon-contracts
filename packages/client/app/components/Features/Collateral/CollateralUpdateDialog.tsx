@@ -20,6 +20,7 @@ import { FormProvider, useForm } from 'react-hook-form';
 import { ERC20 } from '../../../../generated/types';
 import { IBase } from '../../../../generated/types/BorrowerOperations';
 import { Contracts, useEthers } from '../../../context/EthersProvider';
+import { useTransactionDialog } from '../../../context/TransactionDialogProvider';
 import { GetCollateralTokensQuery, GetCollateralTokensQueryVariables } from '../../../generated/gql-types';
 import { GET_BORROWER_COLLATERAL_TOKENS } from '../../../queries';
 import { displayPercentage, floatToBigInt, roundCurrency } from '../../../utils/math';
@@ -52,6 +53,7 @@ const CollateralUpdateDialog = ({ buttonVariant, buttonSx = {} }: Props) => {
     address,
     contracts: { borrowerOperationsContract, collateralTokenContracts },
   } = useEthers();
+  const { setSteps } = useTransactionDialog();
 
   const { data } = useQuery<GetCollateralTokensQuery, GetCollateralTokensQueryVariables>(
     GET_BORROWER_COLLATERAL_TOKENS,
@@ -131,17 +133,53 @@ const CollateralUpdateDialog = ({ buttonVariant, buttonSx = {} }: Props) => {
     if (tokenAmounts.length === 0) return;
 
     if (tabValue === 'DEPOSIT') {
-      tokenAmounts.forEach(async ({ tokenAddress, amount }) => {
-        // @ts-ignore
-        const collContract = collateralTokenContracts[tokenAddress] as ERC20;
-        await collContract.approve(Contracts.StoragePool, amount);
-      });
+      setSteps(
+        tokenAmounts.map(({ tokenAddress, amount }) => ({
+          title: 'Approve',
+          transaction: {
+            methodCall: async () => {
+              // @ts-ignore
+              // TODO: Make it dynamic
+              // const collContract = collateralTokenContracts[tokenAddress] as ERC20;
 
-      if (hasNoOpenTrove) {
-        borrowerOperationsContract.openTrove(tokenAmounts);
-      } else {
-        await borrowerOperationsContract.addColl(tokenAmounts);
-      }
+              const collContract = collateralTokenContracts[Contracts.ERC20.ETH] as ERC20;
+              console.log('CALL approve');
+              // const result = await collContract.approve(Contracts.StoragePool, amount);
+
+              return borrowerOperationsContract.openTrove(tokenAmounts);
+              console.log('AFTER approve');
+              // return result;
+            },
+            waitForResponseOf: [],
+          },
+        })),
+        // .concat({
+        //   title: 'Add Collateral',
+        //   transaction: {
+        //     methodCall: () => {
+        //       if (hasNoOpenTrove) {
+        //         return borrowerOperationsContract.openTrove(tokenAmounts);
+        //       } else {
+        //         return borrowerOperationsContract.addColl(tokenAmounts);
+        //       }
+        //     },
+        //     waitForResponseOf: [0, 1],
+        //   },
+        // }),
+      );
+
+      // tokenAmounts.forEach(async ({ tokenAddress, amount }) => {
+      //   // @ts-ignore
+      //   // const collContract = collateralTokenContracts[tokenAddress] as ERC20;
+      //   const collContract = collateralTokenContracts[Contracts.ERC20.ETH] as ERC20;
+      //   await collContract.approve(Contracts.StoragePool, amount);
+      // });
+
+      // if (hasNoOpenTrove) {
+      //   borrowerOperationsContract.openTrove(tokenAmounts);
+      // } else {
+      //   await borrowerOperationsContract.addColl(tokenAmounts);
+      // }
     } else {
       await borrowerOperationsContract.withdrawColl(tokenAmounts);
     }
@@ -170,7 +208,10 @@ const CollateralUpdateDialog = ({ buttonVariant, buttonSx = {} }: Props) => {
           ...buttonSx,
         }}
         onClick={() => setIsOpen(true)}
-        disabled={!address}
+        disabled={
+          !address ||
+          !collateralToDeposit.some(({ walletAmount, troveLockedAmount }) => walletAmount > 0 || troveLockedAmount > 0)
+        }
       >
         Update
       </Button>
