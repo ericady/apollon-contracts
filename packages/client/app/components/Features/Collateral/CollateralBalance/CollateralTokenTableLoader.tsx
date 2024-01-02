@@ -59,8 +59,7 @@ const CollateralTokenTableLoader = () => {
                     Update
                   </Button>
                 </TableCell>
-                <TableCell align="right" style={{ padding: '2px' }}></TableCell>
-                <TableCell style={{ borderBottom: 'none', padding: '2px' }} colSpan={2} align="right">
+                <TableCell style={{ borderBottom: 'none', padding: '2px' }} colSpan={3} align="center">
                   <Button
                     variant="text"
                     sx={{

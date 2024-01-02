@@ -98,8 +98,7 @@ const CollateralTokenTable = () => {
                 >
                   <CollateralUpdateDialog buttonVariant="text" buttonSx={{ p: '6px 8px', width: '100%' }} />
                 </TableCell>
-                <TableCell style={{ borderBottom: 'none', padding: '2px' }}></TableCell>
-                <TableCell style={{ borderBottom: 'none', padding: '2px' }} colSpan={2} align="right">
+                <TableCell style={{ borderBottom: 'none', padding: '2px' }} colSpan={3} align="center">
                   <CloseTroveDialog buttonVariant="text" buttonSx={{ p: '6px 8px', width: '250px' }} />
                 </TableCell>
               </TableRow>

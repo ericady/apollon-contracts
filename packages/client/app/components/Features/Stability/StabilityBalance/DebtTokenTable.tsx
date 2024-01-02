@@ -44,14 +44,14 @@ function DebtTokenTable() {
           </TableHead>
           <TableHead>
             <TableRow>
-              <HeaderCell title="Token" cellProps={{ align: 'right' }} />
               <HeaderCell title="Wallet" cellProps={{ align: 'right' }} />
+              <HeaderCell title="Debt" cellProps={{ align: 'right' }} />
               <HeaderCell
-                title="Debt"
+                title="Token"
                 cellProps={{ align: 'right', sx: { borderRight: '1px solid', borderColor: 'background.paper' } }}
               />
 
-              <HeaderCell title="Minted" cellProps={{ align: 'center', colSpan: 2 }} />
+              <HeaderCell title="Minted" cellProps={{ align: 'right', colSpan: 2 }} />
               <HeaderCell title="Stability" cellProps={{ align: 'right' }} />
               <HeaderCell
                 title="Rewards"
@@ -75,16 +75,16 @@ function DebtTokenTable() {
                 index,
               ) => (
                 <TableRow hover key={token.address}>
+                  <TableCell align="right" sx={{ borderBottom: index === data.getDebtTokens.length - 1 ? 'none' : '' }}>
+                    {roundCurrency(walletAmount, 5)}
+                  </TableCell>
                   <TableCell
                     align="right"
                     sx={{
                       borderBottom: index === data.getDebtTokens.length - 1 ? 'none' : '',
                     }}
                   >
-                    <Label variant="none">{token.symbol}</Label>
-                  </TableCell>
-                  <TableCell align="right" sx={{ borderBottom: index === data.getDebtTokens.length - 1 ? 'none' : '' }}>
-                    {roundCurrency(walletAmount, 5)}
+                    {roundCurrency(troveRepableDebtAmount, 5)}
                   </TableCell>
                   <TableCell
                     align="right"
@@ -94,7 +94,7 @@ function DebtTokenTable() {
                       borderColor: 'table.border',
                     }}
                   >
-                    {roundCurrency(troveRepableDebtAmount, 5)}
+                    <Label variant="none">{token.symbol}</Label>
                   </TableCell>
                   <TableCell
                     align="right"

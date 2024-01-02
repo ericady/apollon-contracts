@@ -83,8 +83,9 @@ function StabilityPoolTable() {
           >
             <TableHead>
               <TableRow>
-                <HeaderCell title="Provided Stability" cellProps={{ colSpan: 2 }} />
-                <HeaderCell title="Remaining" cellProps={{ sx: { pl: 0 } }} />
+                <HeaderCell title="Provided Stability" cellProps={{ align: 'right', sx: { pr: 0 } }} />
+                <HeaderCell title="" />
+                <HeaderCell title="Remaining" cellProps={{ align: 'right' }} />
                 <HeaderCell title="Gained collateral" cellProps={{ align: 'right', colSpan: 2 }} />
               </TableRow>
             </TableHead>
@@ -101,22 +102,21 @@ function StabilityPoolTable() {
                       return (
                         <TableRow hover key={index}>
                           <TableCell sx={noBorder ? { borderBottom: 'none', pr: 0 } : { pr: 0 }} align="right">
-                            {!isNaN(providedStability) ? roundCurrency(providedStability, 5) : null}
+                            {!isNaN(providedStability) ? roundCurrency(providedStability, 5, 5) : null}
                           </TableCell>
 
                           <TableCell
                             width={40}
-                            align="right"
                             sx={noBorder ? { borderBottom: 'none' } : {}}
                             data-testid="apollon-stability-pool-table-lost-token"
                           >
                             {lostToken && <Label variant="error">{lostToken.symbol}</Label>}
                           </TableCell>
-                          <TableCell sx={noBorder ? { borderBottom: 'none', pl: 0 } : { pl: 0 }}>
-                            {!isNaN(compoundedDeposit) ? roundCurrency(compoundedDeposit, 5) : null}
+                          <TableCell align="right" sx={noBorder ? { borderBottom: 'none', pl: 0 } : { pl: 0 }}>
+                            {!isNaN(compoundedDeposit) ? roundCurrency(compoundedDeposit, 5, 5) : null}
                           </TableCell>
                           <TableCell sx={noBorder ? { borderBottom: 'none', pr: 0 } : { pr: 0 }} align="right">
-                            {!isNaN(stabilityGainedAmount) ? roundCurrency(stabilityGainedAmount, 5) : null}
+                            {!isNaN(stabilityGainedAmount) ? roundCurrency(stabilityGainedAmount, 5, 5) : null}
                           </TableCell>
                           <TableCell
                             width={50}

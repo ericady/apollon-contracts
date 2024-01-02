@@ -493,7 +493,7 @@ function LiquidityDepositWithdraw({ selectedPool }: Props) {
                 }}
               >
                 <div style={{ marginTop: 6 }}>
-                  <Label variant="success">Proxy Token</Label>
+                  <Label variant="success">MNT-USDT</Label>
                 </div>
 
                 <div>
