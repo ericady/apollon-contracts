@@ -11,7 +11,9 @@ describe('CloseTroveDialog', () => {
   it('should call "closeTrove" function of mocked contract', async () => {
     const contractMock = {
       borrowerOperationsContract: {
-        closeTrove: jest.fn(),
+        closeTrove: jest.fn(async () => ({
+          wait: async () => {},
+        })),
       },
     };
 
@@ -49,6 +51,8 @@ describe('CloseTroveDialog', () => {
     const submitButton = getByRole('button', { name: 'Close Trove' });
     await userEvent.click(submitButton);
 
-    expect(contractMock.borrowerOperationsContract.closeTrove).toHaveBeenCalledTimes(1);
+    await waitFor(() => {
+      expect(contractMock.borrowerOperationsContract.closeTrove).toHaveBeenCalledTimes(1);
+    });
   });
 });

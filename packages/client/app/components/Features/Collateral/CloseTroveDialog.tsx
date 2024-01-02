@@ -6,6 +6,7 @@ import Button, { ButtonProps } from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
 import { useState } from 'react';
 import { useEthers } from '../../../context/EthersProvider';
+import { useTransactionDialog } from '../../../context/TransactionDialogProvider';
 import { GetCollateralTokensQuery, GetCollateralTokensQueryVariables } from '../../../generated/gql-types';
 import { GET_BORROWER_COLLATERAL_TOKENS } from '../../../queries';
 import CrossIcon from '../../Icons/CrossIcon';
@@ -23,6 +24,7 @@ const CloseTroveDialog = ({ buttonVariant, buttonSx = {} }: Props) => {
     address,
     contracts: { borrowerOperationsContract },
   } = useEthers();
+  const { setSteps } = useTransactionDialog();
 
   const { data } = useQuery<GetCollateralTokensQuery, GetCollateralTokensQueryVariables>(
     GET_BORROWER_COLLATERAL_TOKENS,
@@ -54,9 +56,18 @@ const CloseTroveDialog = ({ buttonVariant, buttonSx = {} }: Props) => {
   const hasNoOpenTrove = !collateralToDeposit.some(({ troveLockedAmount }) => troveLockedAmount > 0);
 
   const handleCloseTrove = async () => {
-    console.log('BEFORE closeTrove');
-    const a = await borrowerOperationsContract.closeTrove();
-    console.log('AFTER closeTrove');
+    setSteps([
+      {
+        title: 'Repay all debt and close trove.',
+        transaction: {
+          methodCall: () => {
+            return borrowerOperationsContract.closeTrove();
+          },
+          waitForResponseOf: [],
+        },
+      },
+    ]);
+
     setIsOpen(false);
   };
 

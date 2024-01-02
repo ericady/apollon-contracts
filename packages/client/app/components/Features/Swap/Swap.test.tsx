@@ -1,4 +1,4 @@
-import { render } from '@testing-library/react';
+import { render, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { Contracts } from '../../../context/EthersProvider';
 import { IntegrationWrapper, PreselectedTestToken } from '../../tests/test-utils';
@@ -8,11 +8,15 @@ describe('Swap', () => {
   it('should call "swapTokensForExactTokens" function and "approve" function of collateral Token of mocked contract', async () => {
     const contractMock = {
       swapOperationsContract: {
-        swapTokensForExactTokens: jest.fn(),
+        swapTokensForExactTokens: jest.fn(async () => ({
+          wait: async () => {},
+        })),
       },
       collateralTokenContracts: {
         [Contracts.ERC20.JUSD]: {
-          approve: jest.fn(),
+          approve: jest.fn(async () => ({
+            wait: async () => {},
+          })),
         },
       },
     };
@@ -41,18 +45,24 @@ describe('Swap', () => {
     expect(submitButton).toBeEnabled();
     await userEvent.click(submitButton);
 
-    expect(contractMock.collateralTokenContracts[Contracts.ERC20.JUSD].approve).toHaveBeenCalledTimes(1);
-    expect(contractMock.swapOperationsContract.swapTokensForExactTokens).toHaveBeenCalledTimes(1);
+    await waitFor(() => {
+      expect(contractMock.collateralTokenContracts[Contracts.ERC20.JUSD].approve).toHaveBeenCalledTimes(1);
+      expect(contractMock.swapOperationsContract.swapTokensForExactTokens).toHaveBeenCalledTimes(1);
+    });
   });
 
   it('should call swapExactTokensForTokens function of mocked contract', async () => {
     const contractMock = {
       swapOperationsContract: {
-        swapExactTokensForTokens: jest.fn(),
+        swapExactTokensForTokens: jest.fn(async () => ({
+          wait: async () => {},
+        })),
       },
       debtTokenContracts: {
         [PreselectedTestToken.address]: {
-          approve: jest.fn(),
+          approve: jest.fn(async () => ({
+            wait: async () => {},
+          })),
         },
       },
     };
@@ -80,7 +90,9 @@ describe('Swap', () => {
     expect(submitButton).toBeEnabled();
     await userEvent.click(submitButton);
 
-    expect(contractMock.debtTokenContracts[PreselectedTestToken.address].approve).toHaveBeenCalledTimes(1);
-    expect(contractMock.swapOperationsContract.swapExactTokensForTokens).toHaveBeenCalledTimes(1);
+    await waitFor(() => {
+      expect(contractMock.debtTokenContracts[PreselectedTestToken.address].approve).toHaveBeenCalledTimes(1);
+      expect(contractMock.swapOperationsContract.swapExactTokensForTokens).toHaveBeenCalledTimes(1);
+    });
   });
 });

@@ -199,6 +199,8 @@ export default function TransactionDialogProvider({ children }: { children: Reac
               height: 'fit-content', // Ensures that the dialog is
               width: 'fit-content', // exactly the same size as its contents
             }}
+            // @ts-ignore
+            componentsProps={{ backdrop: { 'data-testid': 'apollon-transaction-signer-dialog-backdrop' } }}
           >
             <DialogTitle
               sx={{
@@ -279,8 +281,7 @@ export default function TransactionDialogProvider({ children }: { children: Reac
 }
 
 const CircularProgressSmall = (props: CircularProgressProps) => {
-  // Set the desired size or other properties here
-  const size = 24; // for example, 20px
+  const size = 24;
 
   return <CircularProgress size={size} {...props} />;
 };

@@ -13,14 +13,20 @@ describe('LiquidityPool', () => {
 
     const contractMock = {
       swapOperationsContract: {
-        addLiquidity: jest.fn(),
+        addLiquidity: jest.fn(async () => ({
+          wait: async () => {},
+        })),
       },
       debtTokenContracts: {
         [mockedPool.liquidity[0].token.address]: {
-          approve: jest.fn(),
+          approve: jest.fn(async () => ({
+            wait: async () => {},
+          })),
         },
         [mockedPool.liquidity[1].token.address]: {
-          approve: jest.fn(),
+          approve: jest.fn(async () => ({
+            wait: async () => {},
+          })),
         },
       },
     };
@@ -79,7 +85,9 @@ describe('LiquidityPool', () => {
 
     const contractMock = {
       swapOperationsContract: {
-        removeLiquidity: jest.fn(),
+        removeLiquidity: jest.fn(async () => ({
+          wait: async () => {},
+        })),
       },
     };
 

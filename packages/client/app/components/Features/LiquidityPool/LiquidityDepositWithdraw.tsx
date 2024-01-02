@@ -10,6 +10,7 @@ import { SyntheticEvent, useCallback, useEffect, useState } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
 import { DebtToken } from '../../../../generated/types';
 import { useEthers } from '../../../context/EthersProvider';
+import { useTransactionDialog } from '../../../context/TransactionDialogProvider';
 import {
   DebtTokenMeta,
   GetBorrowerDebtTokensQuery,
@@ -44,6 +45,7 @@ function LiquidityDepositWithdraw({ selectedPool }: Props) {
     address,
     contracts: { swapOperationsContract, debtTokenContracts },
   } = useEthers();
+  const { setSteps } = useTransactionDialog();
 
   const [tabValue, setTabValue] = useState<'DEPOSIT' | 'WITHDRAW'>('DEPOSIT');
 
@@ -88,33 +90,69 @@ function LiquidityDepositWithdraw({ selectedPool }: Props) {
     const _maxMintFeePercentage = floatToBigInt(0.02);
 
     if (tabValue === 'DEPOSIT') {
-      // @ts-ignore
-      await (debtTokenContracts[tokenA.token.address] as DebtToken).approve(selectedPool.id, tokenAAmount);
-      // @ts-ignore
-      await (debtTokenContracts[tokenB.token.address] as DebtToken).approve(selectedPool.id, tokenBAmount);
-      await swapOperationsContract.addLiquidity(
-        tokenA.token.address,
-        tokenB.token.address,
-        floatToBigInt(tokenAAmount),
-        floatToBigInt(tokenBAmount),
-        floatToBigInt(tokenAAmount * (1 - SLIPPAGE)),
-        floatToBigInt(tokenBAmount * (1 - SLIPPAGE)),
-        _maxMintFeePercentage,
-        deadline,
-      );
+      setSteps([
+        {
+          title: `Approve spending of ${tokenA.token.symbol}.`,
+          transaction: {
+            methodCall: async () => {
+              // @ts-ignore
+              return (debtTokenContracts[tokenA.token.address] as DebtToken).approve(selectedPool.id, tokenAAmount);
+            },
+            waitForResponseOf: [],
+          },
+        },
+        {
+          title: `Approve spending of ${tokenB.token.symbol}.`,
+          transaction: {
+            methodCall: async () => {
+              // @ts-ignore
+              return (debtTokenContracts[tokenB.token.address] as DebtToken).approve(selectedPool.id, tokenBAmount);
+            },
+            waitForResponseOf: [],
+          },
+        },
+        {
+          title: `Add Liquidity for ${tokenA.token.symbol} and ${tokenB.token.symbol}.`,
+          transaction: {
+            methodCall: async () => {
+              return swapOperationsContract.addLiquidity(
+                tokenA.token.address,
+                tokenB.token.address,
+                floatToBigInt(tokenAAmount),
+                floatToBigInt(tokenBAmount),
+                floatToBigInt(tokenAAmount * (1 - SLIPPAGE)),
+                floatToBigInt(tokenBAmount * (1 - SLIPPAGE)),
+                _maxMintFeePercentage,
+                deadline,
+              );
+            },
+            waitForResponseOf: [0, 1],
+          },
+        },
+      ]);
     } else {
       const percentageFromPool = tokenAAmount / totalSupply;
       const tokenAAmountForWithdraw = percentageFromPool * tokenA.totalAmount;
       const tokenBAmountForWithdraw = percentageFromPool * tokenB.totalAmount;
 
-      await swapOperationsContract.removeLiquidity(
-        tokenA.token.address,
-        tokenB.token.address,
-        floatToBigInt(tokenAAmount),
-        floatToBigInt(tokenAAmountForWithdraw * (1 - SLIPPAGE)),
-        floatToBigInt(tokenBAmountForWithdraw * (1 - SLIPPAGE)),
-        deadline,
-      );
+      setSteps([
+        {
+          title: `Remove Liquidity from the ${tokenA.token.symbol}-${tokenB.token.symbol} pool.`,
+          transaction: {
+            methodCall: async () => {
+              return swapOperationsContract.removeLiquidity(
+                tokenA.token.address,
+                tokenB.token.address,
+                floatToBigInt(tokenAAmount),
+                floatToBigInt(tokenAAmountForWithdraw * (1 - SLIPPAGE)),
+                floatToBigInt(tokenBAmountForWithdraw * (1 - SLIPPAGE)),
+                deadline,
+              );
+            },
+            waitForResponseOf: [],
+          },
+        },
+      ]);
     }
 
     reset();

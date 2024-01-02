@@ -135,21 +135,20 @@ const CollateralUpdateDialog = ({ buttonVariant, buttonSx = {} }: Props) => {
     if (tabValue === 'DEPOSIT') {
       setSteps([
         ...tokenAmounts.map(({ tokenAddress, amount }) => ({
-          title: 'Approve',
+          title: `Approve ${
+            Object.entries(Contracts.ERC20).find(([_, value]) => value === tokenAddress)![0]
+          } spending.`,
           transaction: {
             methodCall: async () => {
               // @ts-ignore
-              // TODO: Make it dynamic
-              // const collContract = collateralTokenContracts[tokenAddress] as ERC20;
-
-              const collContract = collateralTokenContracts[Contracts.ERC20.ETH] as ERC20;
+              const collContract = collateralTokenContracts[tokenAddress] as ERC20;
               return collContract.approve(Contracts.StoragePool, amount);
             },
             waitForResponseOf: [],
           },
         })),
         {
-          title: 'Add Collateral',
+          title: hasNoOpenTrove ? 'Open Trove.' : 'Add Collateral to Trove.',
           transaction: {
             methodCall: () => {
               if (hasNoOpenTrove) {

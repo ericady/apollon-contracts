@@ -11,6 +11,7 @@ import { useCallback, useState } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
 import { useEthers } from '../../../context/EthersProvider';
 import { useSelectedToken } from '../../../context/SelectedTokenProvider';
+import { useTransactionDialog } from '../../../context/TransactionDialogProvider';
 import { GetTroveManagerQuery, GetTroveManagerQueryVariables } from '../../../generated/gql-types';
 import { GET_TROVEMANAGER } from '../../../queries';
 import { WIDGET_HEIGHTS } from '../../../utils/contants';
@@ -37,6 +38,7 @@ const Farm = () => {
     address,
     contracts: { swapOperationsContract },
   } = useEthers();
+  const { setSteps } = useTransactionDialog();
   const { selectedToken, tokenRatio, JUSDToken } = useSelectedToken();
 
   const { data } = useQuery<GetTroveManagerQuery, GetTroveManagerQueryVariables>(GET_TROVEMANAGER);
@@ -70,23 +72,43 @@ const Farm = () => {
     const _maxMintFeePercentage = floatToBigInt(0.02);
 
     if (tabValue === 'Long') {
-      await swapOperationsContract.openLongPosition(
-        floatToBigInt(farmShortValue),
-        floatToBigInt(getExpectedPositionSize() * (1 - maxSlippage)),
-        selectedToken!.address,
-        address,
-        _maxMintFeePercentage,
-        deadline,
-      );
+      setSteps([
+        {
+          title: 'Open Long Position',
+          transaction: {
+            methodCall: async () => {
+              return swapOperationsContract.openLongPosition(
+                floatToBigInt(farmShortValue),
+                floatToBigInt(getExpectedPositionSize() * (1 - maxSlippage)),
+                selectedToken!.address,
+                address,
+                _maxMintFeePercentage,
+                deadline,
+              );
+            },
+            waitForResponseOf: [],
+          },
+        },
+      ]);
     } else {
-      await swapOperationsContract.openShortPosition(
-        floatToBigInt(farmShortValue),
-        floatToBigInt(getExpectedPositionSize() * (1 - maxSlippage)),
-        selectedToken!.address,
-        address,
-        _maxMintFeePercentage,
-        deadline,
-      );
+      setSteps([
+        {
+          title: 'Open Short Position',
+          transaction: {
+            methodCall: async () => {
+              return swapOperationsContract.openShortPosition(
+                floatToBigInt(farmShortValue),
+                floatToBigInt(getExpectedPositionSize() * (1 - maxSlippage)),
+                selectedToken!.address,
+                address,
+                _maxMintFeePercentage,
+                deadline,
+              );
+            },
+            waitForResponseOf: [],
+          },
+        },
+      ]);
     }
   };
 

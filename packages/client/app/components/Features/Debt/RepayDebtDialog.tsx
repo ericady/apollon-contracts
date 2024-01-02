@@ -8,6 +8,7 @@ import { useEffect, useState } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
 import { IBase } from '../../../../generated/types/TroveManager';
 import { Contracts, useEthers } from '../../../context/EthersProvider';
+import { useTransactionDialog } from '../../../context/TransactionDialogProvider';
 import { GetBorrowerDebtTokensQuery, GetBorrowerDebtTokensQueryVariables } from '../../../generated/gql-types';
 import { GET_BORROWER_DEBT_TOKENS } from '../../../queries';
 import { floatToBigInt, roundCurrency } from '../../../utils/math';
@@ -25,6 +26,7 @@ const RepayDebtDialog = () => {
     address,
     contracts: { borrowerOperationsContract, debtTokenContracts },
   } = useEthers();
+  const { setSteps } = useTransactionDialog();
 
   const { data } = useQuery<GetBorrowerDebtTokensQuery, GetBorrowerDebtTokensQueryVariables>(GET_BORROWER_DEBT_TOKENS, {
     variables: {
@@ -50,8 +52,8 @@ const RepayDebtDialog = () => {
     );
   };
 
-  const onSubmit = async (data: FieldValues) => {
-    const tokenAmounts = Object.entries(data)
+  const onSubmit = async (formData: FieldValues) => {
+    const tokenAmounts = Object.entries(formData)
       .filter(([_, amount]) => amount !== '')
       .map<IBase.TokenAmountStruct>(([address, amount]) => ({
         tokenAddress: address,
@@ -64,7 +66,30 @@ const RepayDebtDialog = () => {
       await debtTokenContract.approve(Contracts.StoragePool, amount);
     });
 
-    await borrowerOperationsContract.repayDebt(tokenAmounts);
+    setSteps([
+      ...tokenAmounts.map(({ tokenAddress, amount }) => ({
+        title: `Approve ${data?.getDebtTokens.find(({ token: { address } }) => address === tokenAddress)?.token
+          .symbol} spending.`,
+        transaction: {
+          methodCall: async () => {
+            // @ts-ignore
+            const debtTokenContract = debtTokenContracts[tokenAddress] as DebtToken;
+            return debtTokenContract.approve(Contracts.StoragePool, amount);
+          },
+          waitForResponseOf: [],
+        },
+      })),
+      {
+        title: 'Repay all debt.',
+        transaction: {
+          methodCall: () => {
+            return borrowerOperationsContract.repayDebt(tokenAmounts);
+          },
+          // wait for all approvals
+          waitForResponseOf: Array.of(tokenAmounts.length).map((_, index) => index),
+        },
+      },
+    ]);
 
     reset();
     setIsOpen(false);

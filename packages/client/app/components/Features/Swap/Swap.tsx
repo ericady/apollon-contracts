@@ -8,6 +8,7 @@ import { ChangeEvent, useState } from 'react';
 import { FormProvider, useController, useForm } from 'react-hook-form';
 import { Contracts, useEthers } from '../../../context/EthersProvider';
 import { useSelectedToken } from '../../../context/SelectedTokenProvider';
+import { useTransactionDialog } from '../../../context/TransactionDialogProvider';
 import { WIDGET_HEIGHTS } from '../../../utils/contants';
 import { displayPercentage, floatToBigInt, roundCurrency, roundNumber } from '../../../utils/math';
 import InfoButton from '../../Buttons/InfoButton';
@@ -32,6 +33,7 @@ const Swap = () => {
     address,
     contracts: { swapOperationsContract, collateralTokenContracts, debtTokenContracts },
   } = useEthers();
+  const { setSteps } = useTransactionDialog();
   const { selectedToken, tokenRatio, JUSDToken } = useSelectedToken();
 
   const methods = useForm<FieldValues>({
@@ -79,24 +81,66 @@ const Swap = () => {
     const deadline = new Date().getTime() + 1000 * 60 * 2; // 2 minutes
 
     if (tradingDirection === 'jUSDSpent') {
-      await collateralTokenContracts[Contracts.ERC20.JUSD]!.approve(selectedToken!.pool.id, floatToBigInt(jUSDAmount));
-      await swapOperationsContract.swapTokensForExactTokens(
-        floatToBigInt(tokenAmount),
-        floatToBigInt(jUSDAmount * (1 + maxSlippage)),
-        [selectedToken!.address, JUSDToken!.address],
-        address,
-        deadline,
-      );
+      setSteps([
+        {
+          title: 'Approve jUSD spending.',
+          transaction: {
+            methodCall: async () => {
+              return collateralTokenContracts[Contracts.ERC20.JUSD]!.approve(
+                selectedToken!.pool.id,
+                floatToBigInt(jUSDAmount),
+              );
+            },
+            waitForResponseOf: [],
+          },
+        },
+        {
+          title: `Swap jUSD for ${selectedToken?.symbol}.`,
+          transaction: {
+            methodCall: async () => {
+              return swapOperationsContract.swapTokensForExactTokens(
+                floatToBigInt(tokenAmount),
+                floatToBigInt(jUSDAmount * (1 + maxSlippage)),
+                [selectedToken!.address, JUSDToken!.address],
+                address,
+                deadline,
+              );
+            },
+            waitForResponseOf: [0],
+          },
+        },
+      ]);
     } else {
-      // @ts-ignore
-      await debtTokenContracts[selectedToken!.address].approve(selectedToken!.pool.id, floatToBigInt(tokenAmount));
-      await swapOperationsContract.swapExactTokensForTokens(
-        floatToBigInt(tokenAmount),
-        floatToBigInt(jUSDAmount * (1 - maxSlippage)),
-        [selectedToken!.address, JUSDToken!.address],
-        address,
-        deadline,
-      );
+      setSteps([
+        {
+          title: `Approve spending of ${selectedToken?.symbol}`,
+          transaction: {
+            methodCall: async () => {
+              // @ts-ignore
+              return debtTokenContracts[selectedToken!.address].approve(
+                selectedToken!.pool.id,
+                floatToBigInt(tokenAmount),
+              );
+            },
+            waitForResponseOf: [],
+          },
+        },
+        {
+          title: `Swap ${selectedToken?.symbol} for jUSD`,
+          transaction: {
+            methodCall: async () => {
+              return swapOperationsContract.swapExactTokensForTokens(
+                floatToBigInt(tokenAmount),
+                floatToBigInt(jUSDAmount * (1 - maxSlippage)),
+                [selectedToken!.address, JUSDToken!.address],
+                address,
+                deadline,
+              );
+            },
+            waitForResponseOf: [0],
+          },
+        },
+      ]);
     }
   };
 

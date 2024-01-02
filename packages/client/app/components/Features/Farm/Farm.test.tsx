@@ -7,7 +7,9 @@ describe('Farm', () => {
   it('should call openLongPosition function of mocked contract', async () => {
     const contractMock = {
       swapOperationsContract: {
-        openLongPosition: jest.fn(),
+        openLongPosition: jest.fn(async () => ({
+          wait: async () => {},
+        })),
       },
     };
     const { getByRole, container } = render(
@@ -33,13 +35,18 @@ describe('Farm', () => {
     });
 
     await userEvent.click(submitButton);
-    expect(contractMock.swapOperationsContract.openLongPosition).toHaveBeenCalledTimes(1);
+
+    await waitFor(() => {
+      expect(contractMock.swapOperationsContract.openLongPosition).toHaveBeenCalledTimes(1);
+    });
   });
 
   it('should call openShortPosition function of mocked contract', async () => {
     const contractMock = {
       swapOperationsContract: {
-        openShortPosition: jest.fn(),
+        openShortPosition: jest.fn(async () => ({
+          wait: async () => {},
+        })),
       },
     };
     const { getByRole, container } = render(
@@ -68,6 +75,9 @@ describe('Farm', () => {
     });
 
     await userEvent.click(submitButton);
-    expect(contractMock.swapOperationsContract.openShortPosition).toHaveBeenCalledTimes(1);
+
+    await waitFor(() => {
+      expect(contractMock.swapOperationsContract.openShortPosition).toHaveBeenCalledTimes(1);
+    });
   });
 });

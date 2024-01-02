@@ -11,14 +11,20 @@ describe('RepayDebtDialog', () => {
   it('should call function "repayDebt" and 2x "approve" of mocked contract', async () => {
     const contractMock = {
       borrowerOperationsContract: {
-        repayDebt: jest.fn(),
+        repayDebt: jest.fn(async () => ({
+          wait: async () => {},
+        })),
       },
       debtTokenContracts: {
         [MockedGetBorrowerDebtTokens.data.getDebtTokens[0].token.address]: {
-          approve: jest.fn(),
+          approve: jest.fn(async () => ({
+            wait: async () => {},
+          })),
         },
         [MockedGetBorrowerDebtTokens.data.getDebtTokens[1].token.address]: {
-          approve: jest.fn(),
+          approve: jest.fn(async () => ({
+            wait: async () => {},
+          })),
         },
       },
     };
@@ -76,15 +82,17 @@ describe('RepayDebtDialog', () => {
     const submitButton = getByRole('button', { name: 'Repay Debt' });
     await userEvent.click(submitButton);
 
-    expect(
-      contractMock.debtTokenContracts[MockedGetBorrowerDebtTokens.data.getDebtTokens[0].token.address].approve,
-    ).toHaveBeenNthCalledWith(1, '0x509ee0d083ddf8ac028f2a56731412edd63223s8', 10000000000000000000n);
-    expect(
-      contractMock.debtTokenContracts[MockedGetBorrowerDebtTokens.data.getDebtTokens[1].token.address].approve,
-    ).toHaveBeenNthCalledWith(1, '0x509ee0d083ddf8ac028f2a56731412edd63223s8', 20000000000000000000n);
-    expect(contractMock.borrowerOperationsContract.repayDebt).toHaveBeenNthCalledWith(1, [
-      { amount: 10000000000000000000n, tokenAddress: '16fdb8e8-f202-4564-9af5-71b77ebc11a3' },
-      { amount: 20000000000000000000n, tokenAddress: '6a5cebfd-4a4a-4340-a3a6-9a1de5bb955c' },
-    ]);
+    await waitFor(() => {
+      expect(
+        contractMock.debtTokenContracts[MockedGetBorrowerDebtTokens.data.getDebtTokens[0].token.address].approve,
+      ).toHaveBeenNthCalledWith(1, '0x509ee0d083ddf8ac028f2a56731412edd63223s8', 10000000000000000000n);
+      expect(
+        contractMock.debtTokenContracts[MockedGetBorrowerDebtTokens.data.getDebtTokens[1].token.address].approve,
+      ).toHaveBeenNthCalledWith(1, '0x509ee0d083ddf8ac028f2a56731412edd63223s8', 20000000000000000000n);
+      expect(contractMock.borrowerOperationsContract.repayDebt).toHaveBeenNthCalledWith(1, [
+        { amount: 10000000000000000000n, tokenAddress: '16fdb8e8-f202-4564-9af5-71b77ebc11a3' },
+        { amount: 20000000000000000000n, tokenAddress: '6a5cebfd-4a4a-4340-a3a6-9a1de5bb955c' },
+      ]);
+    });
   });
 });
