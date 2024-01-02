@@ -47,6 +47,7 @@ function ThemeSwitch({ themeMode, setThemeMode }: Props) {
           },
         }}
       >
+        {/* TODO: Add proper icon later */}
         <LightModeIcon fontSize="small" color={themeMode !== 'light' ? 'disabled' : undefined} />
       </ToggleButton>
 
@@ -69,6 +70,7 @@ function ThemeSwitch({ themeMode, setThemeMode }: Props) {
           },
         }}
       >
+        {/* TODO: Add proper icon later */}
         <BedtimeIcon fontSize="small" color={themeMode !== 'dark' ? 'disabled' : undefined} />
       </ToggleButton>
     </ToggleButtonGroup>
