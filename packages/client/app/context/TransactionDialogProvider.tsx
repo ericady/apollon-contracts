@@ -16,6 +16,7 @@ import {
   Typography,
 } from '@mui/material';
 import { ContractTransactionReceipt, ContractTransactionResponse } from 'ethers/contract';
+import { useSnackbar } from 'notistack';
 import { Dispatch, ReactNode, SetStateAction, createContext, useContext, useEffect, useState } from 'react';
 import Draggable from 'react-draggable';
 import CrossIcon from '../components/Icons/CrossIcon';
@@ -37,6 +38,38 @@ type StepState = {
   error?: string;
 };
 
+/**
+ * Contracts are not yet deployed and therefore we instead show some demo steps in the client.
+ * In testing the real implementation is kept because it can be mocked.
+ */
+const createDemoSteps = (steps: TransactionStep[]): TransactionStep[] => {
+  if (process.env.NODE_ENV !== 'test') {
+    return steps.map(({ transaction, ...props }, index) => {
+      const signTimeout = Math.random() * 1000;
+      const mineTimeout = Math.random() * 1000;
+
+      return {
+        ...props,
+        transaction: {
+          methodCall: () =>
+            new Promise((res) =>
+              setTimeout(
+                () =>
+                  res({
+                    wait: () => new Promise((res) => setTimeout(() => res(true), mineTimeout)),
+                  } as any),
+                signTimeout,
+              ),
+            ),
+          waitForResponseOf: transaction.waitForResponseOf.length > 0 ? Array(index).map((_, index) => index) : [],
+        },
+      };
+    });
+  } else {
+    return steps;
+  }
+};
+
 export const TransactionDialogContext = createContext<{
   steps: TransactionStep[];
   setSteps: Dispatch<SetStateAction<TransactionStep[]>>;
@@ -46,63 +79,10 @@ export const TransactionDialogContext = createContext<{
 });
 
 export default function TransactionDialogProvider({ children }: { children: React.ReactNode }): JSX.Element {
+  const { enqueueSnackbar } = useSnackbar();
+
   const [showConfirmation, setShowConfirmation] = useState(false);
-  const [steps, setSteps] = useState<TransactionStep[]>([
-    // DEMO DATA
-    // {
-    //   title: 'Approve',
-    //   transaction: {
-    //     methodCall: () =>
-    //       new Promise((res) =>
-    //         setTimeout(
-    //           () =>
-    //             res({
-    //               wait: () => new Promise((res) => setTimeout(() => res(true), 2500)),
-    //             } as any),
-    //           3000,
-    //         ),
-    //       ),
-    //     waitForResponseOf: [],
-    //   },
-    // },
-    // {
-    //   title: 'Approve',
-    //   description: (
-    //     <Typography variant="caption" fontSize={10}>
-    //       Some optional text like: "Approve the contract to spend your tokens".
-    //     </Typography>
-    //   ),
-    //   transaction: {
-    //     methodCall: () =>
-    //       new Promise((res) =>
-    //         setTimeout(
-    //           () =>
-    //             res({
-    //               wait: () => new Promise((res) => setTimeout(() => res(true), 2000)),
-    //             } as any),
-    //           3000,
-    //         ),
-    //       ),
-    //     waitForResponseOf: [],
-    //   },
-    // },
-    // {
-    //   title: 'add Collateral',
-    //   transaction: {
-    //     methodCall: () =>
-    //       new Promise((res) =>
-    //         setTimeout(
-    //           () =>
-    //             res({
-    //               wait: () => new Promise((res) => setTimeout(() => res(true), 1000)),
-    //             } as any),
-    //           3000,
-    //         ),
-    //       ),
-    //     waitForResponseOf: [0, 1],
-    //   },
-    // },
-  ]);
+  const [steps, setSteps] = useState<TransactionStep[]>([]);
   const [stepsState, setStepsState] = useState<StepState[]>([]);
 
   const [activeStep, setActiveStep] = useState<number | undefined>(undefined);
@@ -124,44 +104,45 @@ export default function TransactionDialogProvider({ children }: { children: Reac
       // First wait if previous necessary steps have been mined
       Promise.all(waitForResponseOf.map((stepIndex) => stepsState[stepIndex].resultPromise)).then(async () => {
         // wait for signing
-        const resultPromise = await methodCall();
+        methodCall()
+          .then((resultPromise) => {
+            // set initial mining state and update it once Promise resolves.
+            setStepsState((stepsState) => {
+              const currentStep = activeStep;
+              const newStepsState = [...stepsState];
+              newStepsState[currentStep] = {
+                status: 'pending',
+                resultPromise: resultPromise
+                  .wait()
+                  .then((transactionReceipt) => {
+                    setStepsState((stepsState) => {
+                      const newStepsState = [...stepsState];
+                      newStepsState[currentStep] = { status: 'success', transactionReceipt };
+                      return newStepsState;
+                    });
+                  })
+                  .catch((error) => {
+                    newStepsState[currentStep] = { status: 'error', error };
+                    setStepsState(newStepsState);
+                  }),
+              };
+              return newStepsState;
+            });
 
-        // set initial mining state and update it once Promise resolves.
-        setStepsState((stepsState) => {
-          const currentStep = activeStep;
-          const newStepsState = [...stepsState];
-          newStepsState[currentStep] = {
-            status: 'pending',
-            resultPromise: resultPromise
-              .wait()
-              .then((transactionReceipt) => {
-                setStepsState((stepsState) => {
-                  const newStepsState = [...stepsState];
-                  newStepsState[currentStep] = { status: 'success', transactionReceipt };
-                  return newStepsState;
-                });
-              })
-              .catch((error) => {
-                newStepsState[currentStep] = { status: 'error', error };
-                setStepsState(newStepsState);
-              }),
-          };
-          return newStepsState;
-        });
-
-        if (activeStep < steps.length - 1) {
-          setActiveStep((activeStep) => (activeStep as number) + 1);
-        } else {
-          setShowConfirmation(true);
-          setTimeout(() => setActiveStep(undefined), 5000);
-        }
+            if (activeStep < steps.length - 1) {
+              setActiveStep((activeStep) => (activeStep as number) + 1);
+            } else {
+              setShowConfirmation(true);
+              setTimeout(() => setActiveStep(undefined), 5000);
+            }
+          })
+          .catch(() => {
+            enqueueSnackbar('Transaction was rejected.', { variant: 'error' });
+          });
       });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [activeStep]);
-
-  // TODO: handle exit and success screen + second initialisation
-  // const handleSetSteps: () => {};
 
   const getIcon = (status: StepState['status']) => {
     switch (status) {
@@ -180,7 +161,15 @@ export default function TransactionDialogProvider({ children }: { children: Reac
   };
 
   return (
-    <TransactionDialogContext.Provider value={{ steps, setSteps }}>
+    <TransactionDialogContext.Provider
+      value={{
+        steps,
+        // @ts-ignore
+        setSteps: (steps: TransactionStep[]) => {
+          setSteps(createDemoSteps(steps));
+        },
+      }}
+    >
       <>
         <Draggable handle={'[class*="MuiDialog-root"]'} cancel={'[class*="MuiDialogContent-root"]'}>
           <Dialog
@@ -257,7 +246,18 @@ export default function TransactionDialogProvider({ children }: { children: Reac
                     <Stepper activeStep={activeStep} orientation="vertical">
                       {steps.map(({ title, description, transaction }, index) => (
                         <Step key={index}>
-                          <StepLabel StepIconComponent={getIcon(stepsState[index]?.status)} optional={description}>
+                          <StepLabel
+                            StepIconComponent={getIcon(stepsState[index]?.status)}
+                            optional={
+                              stepsState[index]?.status === 'error' ? (
+                                <Typography variant="caption" fontSize={10} color="error">
+                                  Error: {stepsState[index]?.error}
+                                </Typography>
+                              ) : (
+                                description
+                              )
+                            }
+                          >
                             {title}{' '}
                             {transaction.waitForResponseOf.length > 0 &&
                               `(wait until step ${transaction.waitForResponseOf
