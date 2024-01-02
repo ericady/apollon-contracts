@@ -105,7 +105,7 @@ function NavigationBar({ themeMode, setThemeMode }: Props) {
             </Tabs>
           </div>
 
-          <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '24px' }}>
             <EthersAddressLabel />
 
             <ThemeSwitch themeMode={themeMode} setThemeMode={setThemeMode} />
