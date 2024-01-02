@@ -133,8 +133,8 @@ const CollateralUpdateDialog = ({ buttonVariant, buttonSx = {} }: Props) => {
     if (tokenAmounts.length === 0) return;
 
     if (tabValue === 'DEPOSIT') {
-      setSteps(
-        tokenAmounts.map(({ tokenAddress, amount }) => ({
+      setSteps([
+        ...tokenAmounts.map(({ tokenAddress, amount }) => ({
           title: 'Approve',
           transaction: {
             methodCall: async () => {
@@ -143,45 +143,36 @@ const CollateralUpdateDialog = ({ buttonVariant, buttonSx = {} }: Props) => {
               // const collContract = collateralTokenContracts[tokenAddress] as ERC20;
 
               const collContract = collateralTokenContracts[Contracts.ERC20.ETH] as ERC20;
-              console.log('CALL approve');
-              // const result = await collContract.approve(Contracts.StoragePool, amount);
-
-              return borrowerOperationsContract.openTrove(tokenAmounts);
-              console.log('AFTER approve');
-              // return result;
+              return collContract.approve(Contracts.StoragePool, amount);
             },
             waitForResponseOf: [],
           },
         })),
-        // .concat({
-        //   title: 'Add Collateral',
-        //   transaction: {
-        //     methodCall: () => {
-        //       if (hasNoOpenTrove) {
-        //         return borrowerOperationsContract.openTrove(tokenAmounts);
-        //       } else {
-        //         return borrowerOperationsContract.addColl(tokenAmounts);
-        //       }
-        //     },
-        //     waitForResponseOf: [0, 1],
-        //   },
-        // }),
-      );
-
-      // tokenAmounts.forEach(async ({ tokenAddress, amount }) => {
-      //   // @ts-ignore
-      //   // const collContract = collateralTokenContracts[tokenAddress] as ERC20;
-      //   const collContract = collateralTokenContracts[Contracts.ERC20.ETH] as ERC20;
-      //   await collContract.approve(Contracts.StoragePool, amount);
-      // });
-
-      // if (hasNoOpenTrove) {
-      //   borrowerOperationsContract.openTrove(tokenAmounts);
-      // } else {
-      //   await borrowerOperationsContract.addColl(tokenAmounts);
-      // }
+        {
+          title: 'Add Collateral',
+          transaction: {
+            methodCall: () => {
+              if (hasNoOpenTrove) {
+                return borrowerOperationsContract.openTrove(tokenAmounts);
+              } else {
+                return borrowerOperationsContract.addColl(tokenAmounts);
+              }
+            },
+            // wait for all approvals
+            waitForResponseOf: Array.of(tokenAmounts.length).map((_, index) => index),
+          },
+        },
+      ]);
     } else {
-      await borrowerOperationsContract.withdrawColl(tokenAmounts);
+      setSteps([
+        {
+          title: 'Withdraw Collateral',
+          transaction: {
+            methodCall: () => borrowerOperationsContract.withdrawColl(tokenAmounts),
+            waitForResponseOf: [],
+          },
+        },
+      ]);
     }
 
     reset();
