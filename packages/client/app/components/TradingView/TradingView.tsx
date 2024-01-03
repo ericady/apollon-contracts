@@ -1,11 +1,11 @@
 'use client';
 
 import { useTheme } from '@mui/material';
-import { ChartOptions, ColorType, CrosshairMode, LineStyle, createChart } from 'lightweight-charts';
+import { ChartOptions, ColorType, CrosshairMode, LineStyle } from 'lightweight-charts';
 import { useEffect } from 'react';
+import '../../external/charting_library/charting_library';
+import { UDFCompatibleDatafeed } from '../../external/datafeeds/udf/dist/bundle.esm';
 import TradingViewHeader from './TradingViewHeader';
-import areaSeriesDemoData from './areaSeriesDemoData.json';
-import candleStickSeriesDemoData from './candleStickSeriesDemoData.json';
 
 const chartOptionsDark: Partial<ChartOptions> = {
   grid: {
@@ -89,34 +89,58 @@ const chartOptionsLight: Partial<ChartOptions> = {
   autoSize: true,
 };
 
-function TradingView() {
+function TradingViewComponent() {
   const theme = useTheme();
   const isDarkMode = theme.palette.mode === 'dark';
 
   useEffect(() => {
-    const chart = createChart(
-      document.getElementById('apollon-trading-view')!,
-      isDarkMode ? chartOptionsDark : chartOptionsLight,
-    );
-    const areaSeries = chart.addAreaSeries({
-      lineColor: '#2962FF',
-      topColor: '#2962FF',
-      bottomColor: 'rgba(41, 98, 255, 0.28)',
-    });
-    areaSeries.setData(areaSeriesDemoData);
+    // const chart = createChart(
+    //   document.getElementById('apollon-trading-view')!,
+    //   isDarkMode ? chartOptionsDark : chartOptionsLight,
+    // );
+    // const areaSeries = chart.addAreaSeries({
+    //   lineColor: '#2962FF',
+    //   topColor: '#2962FF',
+    //   bottomColor: 'rgba(41, 98, 255, 0.28)',
+    // });
+    // areaSeries.setData(areaSeriesDemoData);
 
-    const candlestickSeries = chart.addCandlestickSeries({
-      priceLineColor: '#3dd755',
-      upColor: '#3dd755',
-      downColor: '#e04a4a',
-      borderVisible: false,
-      wickUpColor: '#3dd755',
-      wickDownColor: '#e04a4a',
-    });
-    candlestickSeries.setData(candleStickSeriesDemoData);
+    // const candlestickSeries = chart.addCandlestickSeries({
+    //   priceLineColor: '#3dd755',
+    //   upColor: '#3dd755',
+    //   downColor: '#e04a4a',
+    //   borderVisible: false,
+    //   wickUpColor: '#3dd755',
+    //   wickDownColor: '#e04a4a',
+    // });
+    // candlestickSeries.setData(candleStickSeriesDemoData);
+    if (window.TradingView) {
+      // @ts-ignore
+      new TradingView.widget({
+        container: 'apollon-trading-view',
+        locale: 'en',
+        library_path: 'charting_library/',
+        datafeed: new UDFCompatibleDatafeed('https://demo-feed-data.tradingview.com'),
+        symbol: 'AAPL',
+        // @ts-ignore
+        interval: '1D',
+        fullscreen: false,
+        debug: process.env.NODE_ENV === 'development',
+        theme: isDarkMode ? 'dark' : 'light',
+        // TODO: Maybe implement later for diffing
+        disabled_features: ['header_symbol_search', 'header_compare'],
+        overrides: {
+          'linetoolexecution.fontFamily': 'Space Grotesk Variable',
+          'linetoolorder.bodyFontFamily': 'Space Grotesk Variable',
+          'linetoolposition.bodyFontFamily': 'Space Grotesk Variable',
+          'linetoolorder.quantityFontFamily': 'Space Grotesk Variable',
+          'linetoolposition.quantityFontFamily': 'Space Grotesk Variable',
+        },
+      });
+    }
 
     return () => {
-      chart.remove();
+      // chart.remove();
     };
   }, [isDarkMode]);
 
@@ -135,4 +159,4 @@ function TradingView() {
   );
 }
 
-export default TradingView;
+export default TradingViewComponent;

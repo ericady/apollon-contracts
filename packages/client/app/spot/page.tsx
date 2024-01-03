@@ -7,7 +7,7 @@ import Farm from '../components/Features/Farm/Farm';
 import Swap from '../components/Features/Swap/Swap';
 import ResizeableDiv from '../components/GridStack/ResizeableDiv';
 import SpotWidgetGridStack from '../components/GridStack/SpotWidgetGridStack';
-import TradingView from '../components/TradingView/TradingView';
+import TradingViewComponent from '../components/TradingView/TradingView';
 
 function Spot() {
   return (
@@ -43,7 +43,7 @@ function Spot() {
           width: '80vw',
         }}
       >
-        <TradingView />
+        <TradingViewComponent />
         <Box>
           <ResizeableDiv>
             <BalanceTable />

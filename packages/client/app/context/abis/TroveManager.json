@@ -506,19 +506,6 @@
     },
     {
         "inputs": [],
-        "name": "RESERVE_FEE",
-        "outputs": [
-            {
-                "internalType": "uint256",
-                "name": "",
-                "type": "uint256"
-            }
-        ],
-        "stateMutability": "view",
-        "type": "function"
-    },
-    {
-        "inputs": [],
         "name": "STABLE_COIN_GAS_COMPENSATION",
         "outputs": [
             {
@@ -1110,6 +1097,37 @@
                 "type": "address"
             }
         ],
+        "name": "getTroveRepayableDebts",
+        "outputs": [
+            {
+                "components": [
+                    {
+                        "internalType": "address",
+                        "name": "tokenAddress",
+                        "type": "address"
+                    },
+                    {
+                        "internalType": "uint256",
+                        "name": "amount",
+                        "type": "uint256"
+                    }
+                ],
+                "internalType": "struct IBase.TokenAmount[]",
+                "name": "debts",
+                "type": "tuple[]"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "address",
+                "name": "_borrower",
+                "type": "address"
+            }
+        ],
         "name": "getTroveStakeValue",
         "outputs": [
             {
@@ -1183,6 +1201,37 @@
                 "internalType": "uint256",
                 "name": "amount",
                 "type": "uint256"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "address",
+                "name": "_borrower",
+                "type": "address"
+            }
+        ],
+        "name": "getTroveWithdrawableColls",
+        "outputs": [
+            {
+                "components": [
+                    {
+                        "internalType": "address",
+                        "name": "tokenAddress",
+                        "type": "address"
+                    },
+                    {
+                        "internalType": "uint256",
+                        "name": "amount",
+                        "type": "uint256"
+                    }
+                ],
+                "internalType": "struct IBase.TokenAmount[]",
+                "name": "colls",
+                "type": "tuple[]"
             }
         ],
         "stateMutability": "view",
