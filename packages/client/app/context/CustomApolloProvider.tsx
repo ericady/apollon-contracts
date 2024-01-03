@@ -10,8 +10,13 @@ import {
 } from '@apollo/client';
 import { AddressLike, ethers } from 'ethers';
 import { PropsWithChildren, useEffect } from 'react';
-import { DebtToken, StabilityPoolManager, SwapPair, TroveManager } from '../../generated/types';
-import { QueryGetTokenArgs, TokenFragmentFragment } from '../generated/gql-types';
+import { DebtToken, StabilityPoolManager, StoragePool, SwapPair, TroveManager } from '../../generated/types';
+import {
+  QueryGetTokenArgs,
+  SystemInfo,
+  TokenFragmentFragment,
+  TroveManager as TroveManagerType,
+} from '../generated/gql-types';
 import { TOKEN_FRAGMENT } from '../queries';
 import { floatToBigInt } from '../utils/math';
 import { Contracts, useEthers } from './EthersProvider';
@@ -19,7 +24,13 @@ import { Contracts, useEthers } from './EthersProvider';
 export function CustomApolloProvider({ children }: PropsWithChildren<{}>) {
   const {
     provider,
-    contracts: { debtTokenContracts, troveManagerContract, swapPairContracts, stabilityPoolManagerContract },
+    contracts: {
+      debtTokenContracts,
+      troveManagerContract,
+      swapPairContracts,
+      stabilityPoolManagerContract,
+      storagePoolContract,
+    },
     address: borrower,
   } = useEthers();
 
@@ -408,7 +419,22 @@ const getProductionCacheConfig = ({
             __typename: 'TroveManager',
             id: Contracts.TroveManager,
             borrowingRate: SchemaDataFreshnessManager.TroveManager.borrowingRate.value(),
-          };
+          } as TroveManagerType;
+        },
+      },
+
+      getSystemInfo: {
+        read: () => {
+          if (isFieldOutdated(ContractDataFreshnessManager.StoragePool as any, 'getDepositorDeposits')) {
+            SchemaDataFreshnessManager.StoragePool.totalCollateralRatio.fetch({ storagePoolContract });
+          }
+
+          return {
+            __typename: 'SystemInfo',
+            id: 'SystemInfo',
+            totalCollateralRatio: SchemaDataFreshnessManager.StoragePool.totalCollateralRatio.value(),
+            recoveryModeActive: false,
+          } as SystemInfo;
         },
       },
     },
@@ -457,6 +483,12 @@ export const ContractDataFreshnessManager: {
       [K in keyof StabilityPoolManager]: ContractValue<ReturnType<StabilityPoolManager[K]>>;
     },
     'getDepositorDeposits' | 'getDepositorCollGains' | 'getDepositorCompoundedDeposits'
+  >;
+  StoragePool: Pick<
+    {
+      [K in keyof StoragePool]: ContractValue<ReturnType<StoragePool[K]>>;
+    },
+    'checkRecoveryMode'
   >;
 } = {
   TroveManager: {
@@ -520,6 +552,31 @@ export const ContractDataFreshnessManager: {
         ContractDataFreshnessManager.StabilityPoolManager.getDepositorCompoundedDeposits.value = tokenAmount;
       },
       value: [],
+      lastFetched: 0,
+      timeout: 1000 * 5,
+    },
+  },
+
+  StoragePool: {
+    checkRecoveryMode: {
+      fetch: async (storagePoolContract: StoragePool) => {
+        ContractDataFreshnessManager.StoragePool.checkRecoveryMode.lastFetched = Date.now();
+        const [isInRecoveryMode, systemTCR, entireSystemColl, entireSystemDebt] =
+          await storagePoolContract.checkRecoveryMode();
+
+        ContractDataFreshnessManager.StoragePool.checkRecoveryMode.value = {
+          isInRecoveryMode,
+          TCR: systemTCR,
+          entireSystemColl,
+          entireSystemDebt,
+        } as any;
+      },
+      value: {
+        isInRecoveryMode: false,
+        TCR: BigInt(0),
+        entireSystemColl: BigInt(0),
+        entireSystemDebt: BigInt(0),
+      } as any,
       lastFetched: 0,
       timeout: 1000 * 5,
     },
@@ -788,7 +845,38 @@ export const SchemaDataFreshnessManager: ContractDataFreshnessManager<typeof Con
     '0x509ee0d083ddf8ac028f2a56731412edd63225b9': {},
   },
   BorrowerOperations: {},
-  StoragePool: {},
+  StoragePool: {
+    totalCollateralRatio: {
+      fetch: async (fetchSource?: { storagePoolContract: StoragePool }) => {
+        if (fetchSource) {
+          await ContractDataFreshnessManager.StoragePool.checkRecoveryMode.fetch(fetchSource.storagePoolContract);
+        }
+
+        SchemaDataFreshnessManager.StoragePool.totalCollateralRatio.lastFetched = Date.now();
+        const { TCR } = ContractDataFreshnessManager.StoragePool.checkRecoveryMode.value;
+
+        SchemaDataFreshnessManager.StoragePool.totalCollateralRatio.value(ethers.toNumber(TCR));
+      },
+      value: makeVar(0),
+      lastFetched: 0,
+      timeout: 1000 * 5,
+    },
+    recoveryModeActive: {
+      fetch: async (fetchSource?: { storagePoolContract: StoragePool }) => {
+        if (fetchSource) {
+          await ContractDataFreshnessManager.StoragePool.checkRecoveryMode.fetch(fetchSource.storagePoolContract);
+        }
+
+        SchemaDataFreshnessManager.StoragePool.recoveryModeActive.lastFetched = Date.now();
+        const { isInRecoveryMode } = ContractDataFreshnessManager.StoragePool.checkRecoveryMode.value;
+
+        SchemaDataFreshnessManager.StoragePool.recoveryModeActive.value(isInRecoveryMode as any);
+      },
+      value: makeVar(false as any),
+      lastFetched: 0,
+      timeout: 1000 * 5,
+    },
+  },
 };
 
 // FIXME: The cache needs to be initialized with the contracts data.

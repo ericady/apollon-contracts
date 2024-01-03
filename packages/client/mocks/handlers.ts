@@ -33,6 +33,7 @@ import {
   GET_DEBT_USD_HISTORY,
   GET_RESERVE_USD_HISTORY,
   GET_SELECTED_TOKEN,
+  GET_SYSTEMINFO,
   GET_TROVEMANAGER,
 } from '../app/queries';
 
@@ -543,7 +544,7 @@ export const handlers = [
 
   // -------------- Only resolved by local cache ---------------- only for local testing purposes
 
-  // GetPoolPriceHistory
+  // GetTroveManager
   graphql.query<{ getTroveManager: Query['getTroveManager'] }>(GET_TROVEMANAGER, (req, res, ctx) => {
     return res(
       ctx.data({
@@ -551,6 +552,20 @@ export const handlers = [
           __typename: 'TroveManager',
           id: faker.string.uuid(),
           borrowingRate: faker.number.float({ min: 0, max: 0.5, precision: 0.0001 }),
+        },
+      }),
+    );
+  }),
+
+  // GetSystemInfo
+  graphql.query<{ getSystemInfo: Query['getSystemInfo'] }>(GET_SYSTEMINFO, (req, res, ctx) => {
+    return res(
+      ctx.data({
+        getSystemInfo: {
+          __typename: 'SystemInfo',
+          id: faker.string.uuid(),
+          recoveryModeActive: faker.datatype.boolean(),
+          totalCollateralRatio: faker.number.float({ min: 0.7, max: 2.5, precision: 0.0001 }),
         },
       }),
     );

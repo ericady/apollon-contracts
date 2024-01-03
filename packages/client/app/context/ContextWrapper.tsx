@@ -40,9 +40,9 @@ function ContextWrapper({ children }: PropsWithChildren<{}>) {
         <DeviceFallbackController>
           <MockServer>
             <EthersProvider>
-              <NavigationBar themeMode={themeMode} setThemeMode={setThemeMode} />
-
               <CustomApolloProvider>
+                <NavigationBar themeMode={themeMode} setThemeMode={setThemeMode} />
+
                 <SelectedTokenProvider>
                   <TransactionDialogProvider>{children}</TransactionDialogProvider>
                 </SelectedTokenProvider>

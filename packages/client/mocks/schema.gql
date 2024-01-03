@@ -169,11 +169,13 @@ type TroveManager {
   borrowingRate: Float!
 }
 
-type StabilityPoolManager {
+type SystemInfo {
   id: ID!
+  recoveryModeActive: Boolean!
+  totalCollateralRatio: Float!
 }
 
 type Query {
   getTroveManager: TroveManager!
-  getStabilityPoolManager: StabilityPoolManager!
+  getSystemInfo: SystemInfo!
 }

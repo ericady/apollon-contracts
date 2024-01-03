@@ -9,6 +9,7 @@ import { Dispatch, SetStateAction, SyntheticEvent, useEffect, useState } from 'r
 import ThemeSwitch from '../Buttons/ThemeSwitch';
 import EthersAddressLabel from '../EthersAddressLabel/EthersAddressLabel';
 import ApollonLogo from '../Icons/ApollonLogo';
+import TCRChip from '../TCRChip/TCRChip';
 
 export const ROUTES = ['/balance', '/spot', '/pools', '/'];
 
@@ -104,6 +105,8 @@ function NavigationBar({ themeMode, setThemeMode }: Props) {
               />
             </Tabs>
           </div>
+
+          <TCRChip />
 
           <div style={{ display: 'flex', alignItems: 'center', gap: '24px' }}>
             <EthersAddressLabel />

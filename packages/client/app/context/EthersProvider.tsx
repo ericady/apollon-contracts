@@ -11,6 +11,7 @@ import {
   DebtToken,
   ERC20,
   StabilityPoolManager,
+  StoragePool,
   SwapOperations,
   SwapPair,
   TroveManager,
@@ -20,6 +21,7 @@ import borrowerOperationsAbi from './abis/BorrowerOperations.json';
 import debtTokenAbi from './abis/DebtToken.json';
 import ERC20Abi from './abis/ERC20.json';
 import stabilityPoolManagerAbi from './abis/StabilityPoolManager.json';
+import storagePoolAbi from './abis/StoragePool.json';
 import swapOperationsAbi from './abis/SwapOperations.json';
 import swapPairAbi from './abis/SwapPair.json';
 import troveManagerAbi from './abis/TroveManager.json';
@@ -84,6 +86,7 @@ export const EthersContext = createContext<{
     swapOperationsContract: SwapOperations;
     swapPairContracts: AllSwapPairContracts;
     borrowerOperationsContract: BorrowerOperations;
+    storagePoolContract: StoragePool;
   };
   connectWallet: () => void;
 }>({
@@ -98,6 +101,7 @@ export const EthersContext = createContext<{
     swapOperationsContract: undefined,
     swapPairContracts: undefined,
     borrowerOperationsContract: undefined,
+    storagePoolContract: undefined,
   } as any,
   connectWallet: () => {},
 });
@@ -126,6 +130,7 @@ export default function EthersProvider({ children }: { children: React.ReactNode
   const [swapOperationsContract, setSwapOperationsContract] = useState<SwapOperations>();
   const [swapPairContracts, setSwapPairContracts] = useState<AllSwapPairContracts>();
   const [borrowerOperationsContract, setBorrowerOperationsContract] = useState<BorrowerOperations>();
+  const [storagePoolContract, setStoragePoolContract] = useState<StoragePool>();
 
   const connectWallet = async () => {
     try {
@@ -175,6 +180,10 @@ export default function EthersProvider({ children }: { children: React.ReactNode
           newSigner,
         ) as BorrowerOperations;
         setBorrowerOperationsContract(borrowerOperationsContractWithSigner);
+
+        const storagePoolContract = new Contract(Contracts.StoragePool, storagePoolAbi, provider);
+        const storagePoolContractWithSigner = storagePoolContract.connect(newSigner) as StoragePool;
+        setStoragePoolContract(storagePoolContractWithSigner);
 
         try {
           // Request account access
@@ -241,6 +250,13 @@ export default function EthersProvider({ children }: { children: React.ReactNode
           provider,
         ) as unknown as BorrowerOperations;
         setBorrowerOperationsContract(borrowerOperationsContract);
+
+        const storagePoolContract = new Contract(
+          Contracts.StoragePool,
+          storagePoolAbi,
+          provider,
+        ) as unknown as StoragePool;
+        setStoragePoolContract(storagePoolContract);
       } catch (error) {
         // console.error(error);
       }
@@ -263,7 +279,8 @@ export default function EthersProvider({ children }: { children: React.ReactNode
     !stabilityPoolManagerContract ||
     !swapOperationsContract ||
     !swapPairContracts ||
-    !borrowerOperationsContract
+    !borrowerOperationsContract ||
+    !storagePoolContract
   )
     return null;
 
@@ -282,6 +299,7 @@ export default function EthersProvider({ children }: { children: React.ReactNode
           swapOperationsContract,
           swapPairContracts,
           borrowerOperationsContract,
+          storagePoolContract,
         },
       }}
     >
@@ -303,6 +321,7 @@ export function useEthers(): {
     swapOperationsContract: SwapOperations;
     swapPairContracts: AllSwapPairContracts;
     borrowerOperationsContract: BorrowerOperations;
+    storagePoolContract: StoragePool;
   };
   connectWallet: () => void;
 } {

@@ -211,3 +211,13 @@ export const GET_TROVEMANAGER = gql`
     }
   }
 `;
+
+export const GET_SYSTEMINFO = gql`
+  query GetSystemInfo {
+    getSystemInfo {
+      id
+      recoveryModeActive
+      totalCollateralRatio
+    }
+  }
+`;
