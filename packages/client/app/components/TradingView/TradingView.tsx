@@ -4,6 +4,7 @@ import { useTheme } from '@mui/material';
 import { ChartOptions, ColorType, CrosshairMode, LineStyle } from 'lightweight-charts';
 import { useEffect } from 'react';
 import '../../external/charting_library/charting_library';
+import { IChartingLibraryWidget } from '../../external/charting_library/charting_library';
 import { UDFCompatibleDatafeed } from '../../external/datafeeds/udf/dist/bundle.esm';
 import TradingViewHeader from './TradingViewHeader';
 
@@ -94,29 +95,10 @@ function TradingViewComponent() {
   const isDarkMode = theme.palette.mode === 'dark';
 
   useEffect(() => {
-    // const chart = createChart(
-    //   document.getElementById('apollon-trading-view')!,
-    //   isDarkMode ? chartOptionsDark : chartOptionsLight,
-    // );
-    // const areaSeries = chart.addAreaSeries({
-    //   lineColor: '#2962FF',
-    //   topColor: '#2962FF',
-    //   bottomColor: 'rgba(41, 98, 255, 0.28)',
-    // });
-    // areaSeries.setData(areaSeriesDemoData);
-
-    // const candlestickSeries = chart.addCandlestickSeries({
-    //   priceLineColor: '#3dd755',
-    //   upColor: '#3dd755',
-    //   downColor: '#e04a4a',
-    //   borderVisible: false,
-    //   wickUpColor: '#3dd755',
-    //   wickDownColor: '#e04a4a',
-    // });
-    // candlestickSeries.setData(candleStickSeriesDemoData);
+    let chart: IChartingLibraryWidget;
     if (window.TradingView) {
       // @ts-ignore
-      new TradingView.widget({
+      chart = new TradingView.widget({
         container: 'apollon-trading-view',
         locale: 'en',
         library_path: 'charting_library/',
@@ -129,6 +111,16 @@ function TradingViewComponent() {
         theme: isDarkMode ? 'dark' : 'light',
         // TODO: Maybe implement later for diffing
         disabled_features: ['header_symbol_search', 'header_compare'],
+
+        // Override in  light mode because it looks terrible
+        settings_overrides: !isDarkMode
+          ? {
+              'paneProperties.backgroundType': 'solid',
+              'paneProperties.background': '#ffffff',
+              'paneProperties.vertGridProperties.color': 'rgba(42, 46, 57, 0.06)',
+              'paneProperties.horzGridProperties.color': 'rgba(42, 46, 57, 0.06)',
+            }
+          : undefined,
         overrides: {
           'linetoolexecution.fontFamily': 'Space Grotesk Variable',
           'linetoolorder.bodyFontFamily': 'Space Grotesk Variable',
@@ -140,7 +132,7 @@ function TradingViewComponent() {
     }
 
     return () => {
-      // chart.remove();
+      chart.remove();
     };
   }, [isDarkMode]);
 
