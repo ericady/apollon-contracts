@@ -6,7 +6,7 @@ import { terser } from 'rollup-plugin-terser';
 const environment = process.env.ENV || 'development';
 const isDevelopmentEnv = environment === 'development';
 
-export default [
+const config = [
   {
     input: 'lib/udf-compatible-datafeed.js',
     output: {
@@ -24,3 +24,5 @@ export default [
     ],
   },
 ];
+
+export default config;

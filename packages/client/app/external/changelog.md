@@ -1,4 +1,3 @@
-
 ℹ️ You can check the Advanced Charts version by executing `TradingView.version()` in a browser console.
 
 <!-- markdownlint-disable no-emphasis-as-header -->
@@ -7,7 +6,7 @@
 
 ## Version 26.004
 
-*Date: Thu Nov 16 2023*
+_Date: Thu Nov 16 2023_
 
 **New Features**
 
@@ -17,7 +16,7 @@
 
 - **Added anchor option to VWAP indicator.** The VWAP indicator now has input options for source and anchor.
   - Source allows customisation of the price source for the indicator. Defaults to `hlc3`.
-  - Anchor period setting specifies how frequently the VWAP calculation will be reset. This  Defaults to `'Session'`.
+  - Anchor period setting specifies how frequently the VWAP calculation will be reset. This Defaults to `'Session'`.
 
 **Bug Fixes**
 
@@ -30,11 +29,11 @@
 **Documentation**
 
 - **New article on core trading concepts.** We have added a new article describing [trading concepts](https://www.tradingview.com/charting-library-docs/latest/trading_terminal/trading-concepts) in Trading Platform.
-Learn how to integrate trading functionality into your application using the Broker API and Trading Host.
+  Learn how to integrate trading functionality into your application using the Broker API and Trading Host.
 
 ## Version 26.003
 
-*Date: Thu Oct 05 2023*
+_Date: Thu Oct 05 2023_
 
 **Bug Fixes**
 
@@ -45,19 +44,19 @@ Learn how to integrate trading functionality into your application using the Bro
 
 ## Version 26.002
 
-*Date: Mon Sep 18 2023*
+_Date: Mon Sep 18 2023_
 
 **Improvements**
 
 - **IOrderLineAdapter and IPositionLineAdapter now support positioning with pixel units.** The
-[setLineLength](https://www.tradingview.com/charting-library-docs/latest/api/interfaces/Charting_Library.IOrderLineAdapter#setlinelength)
-method in the IOrderLineAdapter (returned by
-[createOrderLine](https://www.tradingview.com/charting-library-docs/latest/api/interfaces/Charting_Library.IChartWidgetApi#createorderline))
-and IPositionLineAdapter
-([createPositionLine](https://www.tradingview.com/charting-library-docs/latest/api/interfaces/Charting_Library.IChartWidgetApi#createpositionline))
-interfaces now support setting the unit to `'pixel'`.
+  [setLineLength](https://www.tradingview.com/charting-library-docs/latest/api/interfaces/Charting_Library.IOrderLineAdapter#setlinelength)
+  method in the IOrderLineAdapter (returned by
+  [createOrderLine](https://www.tradingview.com/charting-library-docs/latest/api/interfaces/Charting_Library.IChartWidgetApi#createorderline))
+  and IPositionLineAdapter
+  ([createPositionLine](https://www.tradingview.com/charting-library-docs/latest/api/interfaces/Charting_Library.IChartWidgetApi#createpositionline))
+  interfaces now support setting the unit to `'pixel'`.
   - Additionally, when using pixel unit, you can specify a negative number to
-  position from the left edge of the chart instead.
+    position from the left edge of the chart instead.
 - **Added keyboard navigation.** Keyboard navigation (activated via alt/opt + z keyboard shortcut) and many other accessability improvements have been added to the library.
   - A featureset [accessibility](https://www.tradingview.com/charting-library-docs/latest/customization/Featuresets#accessibility) (on by default) has been added to control this behaviour.
 - **Menu name is provided to items_processor (context menu API).** [items_processor](https://www.tradingview.com/charting-library-docs/latest/api/interfaces/Charting_Library.ContextMenuOptions#items_processor) within the [context_menu](https://www.tradingview.com/charting-library-docs/latest/api/interfaces/Charting_Library.ChartingLibraryWidgetOptions#context_menu) API now includes details about the name of menu, and the ids of the related item (such as the series, drawing, study, order, or position).
@@ -83,7 +82,7 @@ interfaces now support setting the unit to `'pixel'`.
 
 ## Version 26.001
 
-*Date: Tue Aug 08 2023*
+_Date: Tue Aug 08 2023_
 
 **New Features**
 
@@ -108,7 +107,7 @@ interfaces now support setting the unit to `'pixel'`.
 
 ## Version 26
 
-*Date: Tue Jul 18 2023*
+_Date: Tue Jul 18 2023_
 
 **Breaking Changes**
 
@@ -140,14 +139,14 @@ interfaces now support setting the unit to `'pixel'`.
 
 ## Version 25.002
 
-*Date: Wed Jul 12 2023*
+_Date: Wed Jul 12 2023_
 
 **New Features**
 
 - **Add 52 Week High/Low study.**
 - **Enable hiding price scales when all studies or series are hidden.** Adds the `hide_price_scale_if_all_sources_hidden` feature. When enabled price scales will be hidden when all studies (or the main series) attached to the price scale are hidden.
 - **Option to always show legend values for studies on mobile.** By default, when on mobile, the legend won't display any values for studies.
-Enabling this new `always_show_legend_values_on_mobile` featureset allows you to display the values.
+  Enabling this new `always_show_legend_values_on_mobile` featureset allows you to display the values.
 
 **Improvements**
 
@@ -163,7 +162,7 @@ Enabling this new `always_show_legend_values_on_mobile` featureset allows you to
 
 ## Version 25.001
 
-*Date: Mon Jun 26 2023*
+_Date: Mon Jun 26 2023_
 
 **Breaking Changes**
 
@@ -211,7 +210,7 @@ Enabling this new `always_show_legend_values_on_mobile` featureset allows you to
 
 ## Version 25
 
-*Date: Mon May 22 2023*
+_Date: Mon May 22 2023_
 
 **Breaking Changes**
 
@@ -269,13 +268,13 @@ Enabling this new `always_show_legend_values_on_mobile` featureset allows you to
 
 ## Version 24.004
 
-*Date: Mon Apr 24 2023*
+_Date: Mon Apr 24 2023_
 
 **New Features**
 
 - **Indicators can now be favorited.** Indicators can now be favorited by tapping on the star icon to the left of the
-indicator name. Favorited indicators will appear at the top of the indicator
-list.
+  indicator name. Favorited indicators will appear at the top of the indicator
+  list.
   - The `items_favoriting` featureset should be enabled. [more info](https://www.tradingview.com/charting-library-docs/latest/customization/Featuresets)
 - **Adding two featuresets to hide the right_toolbar or its tabs.** There are 2 new featuresets `hide_right_toolbar` & `hide_right_toolbar_tabs` plus an additional WidgetBar API [changeWidgetBarVisibility](https://www.tradingview.com/charting-library-docs/latest/api/interfaces/Charting_Library.IWidgetbarApi#changeWidgetBarVisibility) to control the right toolbar.
   - `hide_right_toolbar` allows you to instantiate the toolbar without showing it in the UI.
@@ -290,7 +289,7 @@ list.
   - Passing `ClearMarksMode.BarMarks` will only remove bar marks.
   - Passing `ClearMarksMode.TimeScaleMarks` will only remove TimeScale marks.
 - **`BREAKING CHANGE` Discrepancy in chart style/type methods.** Only TypeScript breaking change as an interface has been renamed to better reflect its purpose.
-`SeriesStyle` is now [SeriesType](https://www.tradingview.com/charting-library-docs/latest/api/enums/Charting_Library.SeriesType).
+  `SeriesStyle` is now [SeriesType](https://www.tradingview.com/charting-library-docs/latest/api/enums/Charting_Library.SeriesType).
 
 **Bug Fixes**
 
@@ -302,16 +301,16 @@ list.
 
 - **New Key Features article.** We have added the [Key Features](https://www.tradingview.com/charting-library-docs/latest/getting_started/Key-Features) article that lists features supported/unsupported in Advanced Charts and Trading Platform.
 - **How to connect data via Datafeed API.** We have added a new [tutorial on connecting data via Datafeed API](https://www.tradingview.com/charting-library-docs/latest/tutorials/implement_datafeed_tutorial/).
-It will help you implement datafeed and real-time data streaming to Advanced Charts step-by-step.
+  It will help you implement datafeed and real-time data streaming to Advanced Charts step-by-step.
 
 **Other**
 
 - **Incorrect watermark property key.** Deprecated `symbolWatermarkProperties` property has now been removed.
-Please use [settings_adapter](https://www.tradingview.com/charting-library-docs/latest/api/interfaces/Charting_Library.ChartingLibraryWidgetOptions#settings_adapter) with `symbolWatermark` key instead or `applyOverrides` to change values.
+  Please use [settings_adapter](https://www.tradingview.com/charting-library-docs/latest/api/interfaces/Charting_Library.ChartingLibraryWidgetOptions#settings_adapter) with `symbolWatermark` key instead or `applyOverrides` to change values.
 
 ## Version 24.003
 
-*Date: Tue Apr 11 2023*
+_Date: Tue Apr 11 2023_
 
 **New Features**
 
@@ -374,6 +373,7 @@ Please use [settings_adapter](https://www.tradingview.com/charting-library-docs/
 
   - setUserEditEnabled(false) should mask all icons except the "eye".
   - setUserEditEnabled(true) should restore all the icons.
+
 - `priceFormatter` could previously only be used for main series. `priceFormatter` now applies to secondary series as well.
 - `right_toolbar` featureset didn't have a default `on` value.
 - Empty time frames at the bottom toolbar if `data_status: endofday`
