@@ -30,6 +30,7 @@ function ThemeSwitch({ themeMode, setThemeMode }: Props) {
     >
       <ToggleButton
         value="light"
+        disabled={themeMode === 'light'}
         aria-label="toggle light mode"
         sx={{
           borderRadius: 25,
@@ -53,6 +54,7 @@ function ThemeSwitch({ themeMode, setThemeMode }: Props) {
 
       <ToggleButton
         value="dark"
+        disabled={themeMode === 'dark'}
         aria-label="toggle light mode"
         sx={{
           borderRadius: 25,
