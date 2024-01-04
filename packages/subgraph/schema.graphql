@@ -1,3 +1,11 @@
+# SINGLETON FOR SYSTEM INFO
+type SystemInfo @entity {
+  # "SystemInfo"
+  id: String!
+  timestamp: BigInt!
+  stableCoin: Bytes!
+}
+
 # TODO: wasa mapper for swap pools PairCreated event
 type Token @entity {
   # contract address

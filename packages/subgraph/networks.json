@@ -29,6 +29,9 @@
     },
     "Contract": {
       "address": "contract-name=SwapOperations"
+    },
+    "SwapPair": {
+      "address": "SwapPair"
     }
   }
 }
