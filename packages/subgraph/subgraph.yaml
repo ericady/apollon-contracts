@@ -319,6 +319,9 @@ dataSources:
       file: ./src/swap-operations.ts
 
   # ALL THE SWAPPAIRS
+
+  # ONLY JUSD Swappairs!
+  # These update the prices of the tokens and candle charts
   - kind: ethereum
     name: SwapPair
     network: localhost
@@ -354,3 +357,6 @@ dataSources:
         - event: Transfer(indexed address,indexed address,uint256)
           handler: handleTransfer
       file: ./src/swap-pair.ts
+
+# ONLY non-JUSD Swappairs!
+# These just update the trading volume
