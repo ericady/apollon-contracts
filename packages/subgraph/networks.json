@@ -26,6 +26,9 @@
     },
     "CollTokenManager": {
       "address": "CollTokenManager"
+    },
+    "Contract": {
+      "address": "contract-name=SwapOperations"
     }
   }
 }

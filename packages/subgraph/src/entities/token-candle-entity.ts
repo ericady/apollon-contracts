@@ -2,15 +2,16 @@ import { Address, BigInt, Int8, ethereum } from '@graphprotocol/graph-ts';
 import { DebtToken } from '../../generated/DebtToken/DebtToken';
 import { TokenCandle, TokenCandleSingleton } from '../../generated/schema';
 
-const CandleSizes = [1, 5, 15, 30, 60, 240, 1440];
+// 1min, 10min, 1hour, 6hour, 1day, 1week
+const CandleSizes = [1, 10, 60, 360, 1440, 10080];
 
 /**
  * Initializes the Singleton once for a new Token
  */
 export function handleCreateTokenCandleSingleton(event: ethereum.Event, tokenAddress: Address): void {
   let candleSingleton: TokenCandleSingleton | null;
-  const debtTokenContract = DebtToken.bind(tokenAddress);
-  const tokenPrice = debtTokenContract.getPrice();
+  // TODO: How to get initialized price?
+  const tokenPrice = BigInt.fromI64(0);
 
   for (let i = 0; i < CandleSizes.length; i++) {
     candleSingleton = TokenCandleSingleton.load(
@@ -29,7 +30,6 @@ export function handleCreateTokenCandleSingleton(event: ethereum.Event, tokenAdd
       candleSingleton.high = tokenPrice;
       candleSingleton.low = tokenPrice;
       candleSingleton.close = BigInt.fromI32(0);
-      // TODO: Implement with swap pools
       candleSingleton.volume = BigInt.fromI32(0);
 
       candleSingleton.save();

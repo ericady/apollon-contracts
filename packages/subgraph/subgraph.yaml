@@ -6,7 +6,7 @@ dataSources:
     name: TroveManager
     network: localhost
     source:
-      address: '0x25309189268017d8C79C8dacCbF44EC25C12FEB4'
+      address: "0x25309189268017d8C79C8dacCbF44EC25C12FEB4"
       abi: TroveManager
       startBlock: 0
     mapping:
@@ -61,7 +61,7 @@ dataSources:
     name: StoragePool
     network: localhost
     source:
-      address: '0x25309189268017d8C79C8dacCbF44EC25C12FEB4'
+      address: "0x25309189268017d8C79C8dacCbF44EC25C12FEB4"
       abi: StoragePool
       startBlock: 0
     mapping:
@@ -87,7 +87,7 @@ dataSources:
     name: StabilityPool
     network: localhost
     source:
-      address: '0x25309189268017d8C79C8dacCbF44EC25C12FEB4'
+      address: "0x25309189268017d8C79C8dacCbF44EC25C12FEB4"
       abi: StabilityPool
       startBlock: 0
     mapping:
@@ -137,7 +137,7 @@ dataSources:
     name: StabilityPoolManager
     network: localhost
     source:
-      address: '0x25309189268017d8C79C8dacCbF44EC25C12FEB4'
+      address: "0x25309189268017d8C79C8dacCbF44EC25C12FEB4"
       abi: StabilityPoolManager
       startBlock: 0
     mapping:
@@ -163,7 +163,7 @@ dataSources:
     name: DebtToken
     network: localhost
     source:
-      address: '0x7f1667b13768d15fedd4ab3b006b4c2174410593'
+      address: "0x7f1667b13768d15fedd4ab3b006b4c2174410593"
       abi: DebtToken
       startBlock: 8
     mapping:
@@ -186,7 +186,7 @@ dataSources:
     name: PriceFeed
     network: localhost
     source:
-      address: '0x25309189268017d8C79C8dacCbF44EC25C12FEB4'
+      address: "0x25309189268017d8C79C8dacCbF44EC25C12FEB4"
       abi: PriceFeed
       startBlock: 0
     mapping:
@@ -215,7 +215,7 @@ dataSources:
     name: BorrowerOperations
     network: localhost
     source:
-      address: '0x25309189268017d8C79C8dacCbF44EC25C12FEB4'
+      address: "0x25309189268017d8C79C8dacCbF44EC25C12FEB4"
       abi: BorrowerOperations
       startBlock: 0
     mapping:
@@ -241,7 +241,7 @@ dataSources:
     name: DebtTokenManager
     network: localhost
     source:
-      address: '0xa2e37cc979911806a70f583697bcfcb31b989b08'
+      address: "0xa2e37cc979911806a70f583697bcfcb31b989b08"
       abi: DebtTokenManager
       startBlock: 6
     mapping:
@@ -267,9 +267,9 @@ dataSources:
       file: ./src/debt-token-manager.ts
   - kind: ethereum
     name: CollTokenManager
-    network: development
+    network: localhost
     source:
-      address: '0x25309189268017d8C79C8dacCbF44EC25C12FEB4'
+      address: "0x25309189268017d8C79C8dacCbF44EC25C12FEB4"
       abi: CollTokenManager
       startBlock: 0
     mapping:
@@ -291,3 +291,29 @@ dataSources:
         - event: OwnershipTransferred(indexed address,indexed address)
           handler: handleOwnershipTransferred
       file: ./src/coll-token-manager.ts
+  - kind: ethereum
+    name: SwapOperations
+    network: localhost
+    source:
+      address: "0x25309189268017d8C79C8dacCbF44EC25C12FEB4"
+      abi: SwapOperations
+      startBlock: 0
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      entities:
+        - ContractOwnershipTransferred
+        - PairCreated
+        - SwapOperationsInitialized
+      abis:
+        - name: SwapOperations
+          file: ./abis/SwapOperations.json
+      eventHandlers:
+        - event: OwnershipTransferred(indexed address,indexed address)
+          handler: handleOwnershipTransferred
+        - event: PairCreated(indexed address,indexed address,address,uint256)
+          handler: handlePairCreated
+        - event: SwapOperationsInitialized(address,address,address,address)
+          handler: handleSwapOperationsInitialized
+      file: ./src/swap-operations.ts

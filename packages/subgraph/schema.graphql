@@ -104,17 +104,17 @@ enum LongShortDirection {
   SHORT
 }
 
-type SwapEvent {
+type SwapEvent @entity(immutable: true) {
   id: ID!
   borrower: String!
   timestamp: Int!
   #
   token: Token!
   direction: LongShortDirection! # Indicates whether the swap is LONG or SHORT
-  size: Float! # always positive, applied by direction. The size of the "non-stable" coin involved in the swap
-  totalPriceInStable: Float! # The total price at the time of the swap, always in stable coin
+  size: BigInt! # always positive, applied by direction. The size of the "non-stable" coin involved in the swap
+  totalPriceInStable: BigInt! # The total price at the time of the swap, always in stable coin
   # die currentSwapFee wird in dem event als 1e6 angegeben → 1000000 sind 100%, 3000 sind 0.3%
-  swapFee: Float! # protocol fees, without gas. Long => jUSD / Short => DebtToken
+  swapFee: BigInt! # protocol fees, without gas. Long => jUSD / Short => DebtToken
 }
 
 type PoolLiquidity @entity {
@@ -170,7 +170,7 @@ type Pool @entity {
   volume30dUSD30dAgo: PoolVolume30d!
 
   # TODO: wasa Proxy Token amount
-  totalSupply: Float!
+  totalSupply: BigInt!
 }
 
 # Aggregator, pushed old events out and lets new in, recalculating the acc value each time
