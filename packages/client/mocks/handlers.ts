@@ -559,13 +559,15 @@ export const handlers = [
 
   // GetSystemInfo
   graphql.query<{ getSystemInfo: Query['getSystemInfo'] }>(GET_SYSTEMINFO, (req, res, ctx) => {
+    const totalCollateralRatio = faker.number.float({ min: 0.9, max: 2.5, precision: 0.0001 });
+
     return res(
       ctx.data({
         getSystemInfo: {
           __typename: 'SystemInfo',
           id: faker.string.uuid(),
-          recoveryModeActive: faker.datatype.boolean(),
-          totalCollateralRatio: faker.number.float({ min: 0.7, max: 2.5, precision: 0.0001 }),
+          recoveryModeActive: totalCollateralRatio < 1.5,
+          totalCollateralRatio,
         },
       }),
     );

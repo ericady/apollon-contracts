@@ -104,9 +104,9 @@ function NavigationBar({ themeMode, setThemeMode }: Props) {
                 disableRipple
               />
             </Tabs>
-          </div>
 
-          <TCRChip />
+            <TCRChip />
+          </div>
 
           <div style={{ display: 'flex', alignItems: 'center', gap: '24px' }}>
             <EthersAddressLabel />

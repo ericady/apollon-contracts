@@ -116,8 +116,8 @@ export type Query = {
   getPoolPriceHistory: Array<Array<Scalars['Int']['output']>>;
   getPools: Array<Pool>;
   getReserveUSDHistory: Array<Array<Scalars['Int']['output']>>;
-  getStabilityPoolManager: StabilityPoolManager;
   getSwaps: SwapEventPage;
+  getSystemInfo: SystemInfo;
   getToken: Token;
   getTroveManager: TroveManager;
 };
@@ -166,11 +166,6 @@ export type QueryGetTokenArgs = {
   address: Scalars['String']['input'];
 };
 
-export type StabilityPoolManager = {
-  __typename: 'StabilityPoolManager';
-  id: Scalars['ID']['output'];
-};
-
 export type SwapEvent = {
   __typename: 'SwapEvent';
   borrower: Scalars['String']['output'];
@@ -187,6 +182,13 @@ export type SwapEventPage = {
   __typename: 'SwapEventPage';
   pageInfo: PageInfo;
   swaps: Array<SwapEvent>;
+};
+
+export type SystemInfo = {
+  __typename: 'SystemInfo';
+  id: Scalars['ID']['output'];
+  recoveryModeActive: Scalars['Boolean']['output'];
+  totalCollateralRatio: Scalars['Float']['output'];
 };
 
 export type Token = {
@@ -287,3 +289,8 @@ export type GetTroveManagerQueryVariables = Exact<{ [key: string]: never; }>;
 
 
 export type GetTroveManagerQuery = { __typename: 'Query', getTroveManager: { __typename: 'TroveManager', id: string, borrowingRate: number } };
+
+export type GetSystemInfoQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type GetSystemInfoQuery = { __typename: 'Query', getSystemInfo: { __typename: 'SystemInfo', id: string, recoveryModeActive: boolean, totalCollateralRatio: number } };
