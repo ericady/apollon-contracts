@@ -64,6 +64,11 @@ export enum LongShortDirection {
   Short = 'SHORT'
 }
 
+export enum OrderDirection {
+  Asc = 'asc',
+  Desc = 'desc'
+}
+
 export type PageInfo = {
   __typename: 'PageInfo';
   endCursor: Scalars['String']['output'];
@@ -120,6 +125,8 @@ export type Query = {
   getSystemInfo: SystemInfo;
   getToken: Token;
   getTroveManager: TroveManager;
+  tokenCandleSingleton: TokenCandleSingleton;
+  tokenCandles: Array<TokenCandle>;
 };
 
 
@@ -166,6 +173,18 @@ export type QueryGetTokenArgs = {
   address: Scalars['String']['input'];
 };
 
+
+export type QueryTokenCandleSingletonArgs = {
+  id: Scalars['ID']['input'];
+};
+
+
+export type QueryTokenCandlesArgs = {
+  orderBy?: InputMaybe<TokenCandle_OrderBy>;
+  orderDirection?: InputMaybe<OrderDirection>;
+  where?: InputMaybe<TokenCandle_Filter>;
+};
+
 export type SwapEvent = {
   __typename: 'SwapEvent';
   borrower: Scalars['String']['output'];
@@ -208,6 +227,63 @@ export type TokenAmount = {
   amount: Scalars['Float']['output'];
   token: Token;
 };
+
+export type TokenCandle = {
+  __typename: 'TokenCandle';
+  candleSize: Scalars['Int']['output'];
+  close: Scalars['Int']['output'];
+  high: Scalars['Int']['output'];
+  id: Scalars['String']['output'];
+  low: Scalars['Int']['output'];
+  open: Scalars['Int']['output'];
+  timestamp: Scalars['Int']['output'];
+  token: Token;
+  volume: Scalars['Int']['output'];
+};
+
+export type TokenCandleSingleton = {
+  __typename: 'TokenCandleSingleton';
+  candleSize: Scalars['Int']['output'];
+  close: Scalars['Int']['output'];
+  high: Scalars['Int']['output'];
+  id: Scalars['String']['output'];
+  low: Scalars['Int']['output'];
+  open: Scalars['Int']['output'];
+  timestamp: Scalars['Int']['output'];
+  token: Token;
+  volume: Scalars['Int']['output'];
+};
+
+export type TokenCandle_Filter = {
+  candleSize?: InputMaybe<Scalars['Int']['input']>;
+  timestamp?: InputMaybe<Scalars['Int']['input']>;
+  timestamp_gt?: InputMaybe<Scalars['Int']['input']>;
+  timestamp_gte?: InputMaybe<Scalars['Int']['input']>;
+  timestamp_in?: InputMaybe<Array<Scalars['Int']['input']>>;
+  timestamp_lt?: InputMaybe<Scalars['Int']['input']>;
+  timestamp_lte?: InputMaybe<Scalars['Int']['input']>;
+  timestamp_not?: InputMaybe<Scalars['Int']['input']>;
+  timestamp_not_in?: InputMaybe<Array<Scalars['Int']['input']>>;
+  token?: InputMaybe<Scalars['String']['input']>;
+};
+
+export enum TokenCandle_OrderBy {
+  CandleSize = 'candleSize',
+  Close = 'close',
+  High = 'high',
+  Id = 'id',
+  Low = 'low',
+  Open = 'open',
+  Timestamp = 'timestamp',
+  Token = 'token',
+  TokenAddress = 'token__address',
+  TokenCreatedAt = 'token__createdAt',
+  TokenId = 'token__id',
+  TokenIsPoolToken = 'token__isPoolToken',
+  TokenPriceUsd = 'token__priceUSD',
+  TokenSymbol = 'token__symbol',
+  Volume = 'volume'
+}
 
 export type TroveManager = {
   __typename: 'TroveManager';
@@ -282,6 +358,20 @@ export type GetReserveUsdHistoryQueryVariables = Exact<{ [key: string]: never; }
 
 
 export type GetReserveUsdHistoryQuery = { __typename: 'Query', getReserveUSDHistory: Array<Array<number>> };
+
+export type GetTradingViewCandlesQueryVariables = Exact<{
+  where: TokenCandle_Filter;
+}>;
+
+
+export type GetTradingViewCandlesQuery = { __typename: 'Query', tokenCandles: Array<{ __typename: 'TokenCandle', id: string, timestamp: number, open: number, high: number, low: number, close: number, volume: number }> };
+
+export type GetTradingViewLatestCandleQueryVariables = Exact<{
+  currentCandleId: Scalars['ID']['input'];
+}>;
+
+
+export type GetTradingViewLatestCandleQuery = { __typename: 'Query', tokenCandleSingleton: { __typename: 'TokenCandleSingleton', id: string, timestamp: number, open: number, high: number, low: number, close: number, volume: number } };
 
 export type TokenFragmentFragment = { __typename: 'Token', id: string, address: string };
 

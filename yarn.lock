@@ -9841,6 +9841,7 @@ __metadata:
     "@fontsource-variable/inter": 5.0.8
     "@fontsource-variable/space-grotesk": 5.0.8
     "@graphql-codegen/cli": ^5.0.0
+    "@graphql-codegen/schema-ast": ^4.0.0
     "@graphql-codegen/typescript": ^4.0.1
     "@graphql-codegen/typescript-operations": ^4.0.1
     "@mui/icons-material": 5.14.3

@@ -2,19 +2,21 @@ entity (token-entity)
   > handleCreateToken
     ~ coll-token-manager: handleCollTokenAdded
     ~ debt-token-manager: handleDebtTokenAdded
-entity (token-candle-entity)
-  > handleCreateTokenCandleSingleton
-    ~ debt-token-manager: handleDebtTokenAdded
-  > handleUpdateTokenCandle_low_high
-    ~ price-feed: handleTokenPriceChanged
+    ~ swap-operations: handlePairCreated
 entity (debt-token-meta-entity)
   > handleCreateDebtTokenMeta
+    ~ debt-token-manager: handleDebtTokenAdded
     ~ debt-token: handleTransfer
     ~ stability-pool: handleStabilityOffset
     ~ stability-pool: handleStabilityProvided
     ~ stability-pool: handleStabilityWithdrawn
   > handleUpdateStabilityDepositAPY
     ~ stability-pool: handleStabilityOffset
+entity (token-candle-entity)
+  > handleUpdateTokenCandle_low_high
+    ~ price-feed: handleTokenPriceChanged
+  > handleCreateTokenCandleSingleton
+    ~ swap-operations: handlePairCreated
 entity (borrower-history-entity)
   > handleCreateBorrowerHistory
     ~ stability-pool: handleStabilityGainsWithdrawn

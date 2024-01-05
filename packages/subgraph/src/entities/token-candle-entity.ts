@@ -1,4 +1,4 @@
-import { Address, BigInt, Int8, ethereum } from '@graphprotocol/graph-ts';
+import { Address, BigInt, ethereum } from '@graphprotocol/graph-ts';
 import { DebtToken } from '../../generated/DebtToken/DebtToken';
 import { SwapPair } from '../../generated/SwapPair/SwapPair';
 import { SystemInfo, TokenCandle, TokenCandleSingleton } from '../../generated/schema';
@@ -44,26 +44,27 @@ export function handleCreateTokenCandleSingleton(event: ethereum.Event, tokenAdd
 export function handleUpdateTokenCandle_low_high(
   event: ethereum.Event,
   swapPair: Address,
-  token: { pairPosition: number; address: Address },
+  pairPosition: number,
+  pairToken: Address,
 ): BigInt {
   // calculate price from ratio to stable and oraclePrice
   const systemInfo = SystemInfo.load(`SystemInfo`)!;
-  const stableCoinContract = DebtToken.bind(systemInfo.stableCoin);
+  const stableCoinContract = DebtToken.bind(systemInfo.stableCoin as Address);
   const stablePrice = stableCoinContract.getPrice();
   const swapPairReserves = SwapPair.bind(swapPair).getReserves();
   const tokenPriceInStable =
-    token.pairPosition === 0
+    pairPosition === 0
       ? swapPairReserves.get_reserve0().div(swapPairReserves.get_reserve1())
       : swapPairReserves.get_reserve1().div(swapPairReserves.get_reserve0());
   const tokenPriceUSD = tokenPriceInStable.times(stablePrice);
 
   for (let i = 0; i < CandleSizes.length; i++) {
     const candleSingleton = TokenCandleSingleton.load(
-      `TokenCandleSingleton-${token.address.toHexString()}-${CandleSizes[i].toString()}`,
+      `TokenCandleSingleton-${swapPair.toHexString()}-${CandleSizes[i].toString()}`,
     )!;
 
     if (candleSingleton.timestamp.plus(BigInt.fromI32(CandleSizes[i] * 1000)) < event.block.timestamp) {
-      handleCloseCandle(event, token, CandleSizes[i], tokenPriceUSD);
+      handleCloseCandle(event, pairToken, CandleSizes[i], tokenPriceUSD);
     } else {
       if (candleSingleton.low.gt(tokenPriceUSD)) {
         candleSingleton.low = tokenPriceUSD;
@@ -84,34 +85,28 @@ export function handleUpdateTokenCandle_low_high(
 export function handleUpdateTokenCandle_volume(
   event: ethereum.Event,
   swapPair: Address,
-  token: { pairPosition: number; address: Address },
+  pairPosition: number,
+  pairToken: Address,
   additionalTradeVolume: BigInt,
 ): void {
   // calculate price from ratio to stable and oraclePrice
-  // only calculate when necessary
-  let tokenPriceUSD: BigInt | undefined;
-  function calculateTokenPrice(): void {
-    const systemInfo = SystemInfo.load(`SystemInfo`)!;
-    const stableCoinContract = DebtToken.bind(systemInfo.stableCoin);
-    const stablePrice = stableCoinContract.getPrice();
-    const swapPairReserves = SwapPair.bind(swapPair).getReserves();
-    const tokenPriceInStable =
-      token.pairPosition === 0
-        ? swapPairReserves.get_reserve0().div(swapPairReserves.get_reserve1())
-        : swapPairReserves.get_reserve1().div(swapPairReserves.get_reserve0());
-    tokenPriceUSD = tokenPriceInStable.times(stablePrice);
-  }
+  const systemInfo = SystemInfo.load(`SystemInfo`)!;
+  const stableCoinContract = DebtToken.bind(systemInfo.stableCoin as Address);
+  const stablePrice = stableCoinContract.getPrice();
+  const swapPairReserves = SwapPair.bind(swapPair).getReserves();
+  const tokenPriceInStable =
+    pairPosition === 0
+      ? swapPairReserves.get_reserve0().div(swapPairReserves.get_reserve1())
+      : swapPairReserves.get_reserve1().div(swapPairReserves.get_reserve0());
+  const tokenPriceUSD = tokenPriceInStable.times(stablePrice);
 
   for (let i = 0; i < CandleSizes.length; i++) {
     const candleSingleton = TokenCandleSingleton.load(
-      `TokenCandleSingleton-${token.address.toHexString()}-${CandleSizes[i].toString()}`,
+      `TokenCandleSingleton-${pairToken.toHexString()}-${CandleSizes[i].toString()}`,
     )!;
 
     if (candleSingleton.timestamp.plus(BigInt.fromI32(CandleSizes[i] * 1000)) < event.block.timestamp) {
-      if (tokenPriceUSD === undefined) {
-        calculateTokenPrice();
-      }
-      handleCloseCandle(event, token, CandleSizes[i], tokenPriceUSD!, additionalTradeVolume);
+      handleCloseCandle(event, pairToken, CandleSizes[i], tokenPriceUSD, additionalTradeVolume);
     } else {
       candleSingleton.volume = candleSingleton.volume.plus(additionalTradeVolume);
       candleSingleton.save();
@@ -121,18 +116,18 @@ export function handleUpdateTokenCandle_volume(
 
 export function handleCloseCandle(
   event: ethereum.Event,
-  token: { pairPosition: number; address: Address },
-  candleSize: Int8,
+  pairToken: Address,
+  candleSize: i32,
   tokenPriceUSD: BigInt,
-  initialTradeVolume?: BigInt,
+  initialTradeVolume: BigInt = BigInt.fromI32(0),
 ): void {
   const candleSingleton = TokenCandleSingleton.load(
-    `TokenCandleSingleton-${token.address.toHexString()}-${candleSize.toString()}`,
+    `TokenCandleSingleton-${pairToken.toHexString()}-${candleSize.toString()}`,
   )!;
 
   // Save away new closed candle
   const newClosedCandle = new TokenCandle(event.transaction.hash.concatI32(event.logIndex.toI32()));
-  newClosedCandle.token = token.address;
+  newClosedCandle.token = pairToken;
   newClosedCandle.candleSize = candleSize;
   newClosedCandle.timestamp = candleSingleton.timestamp;
   newClosedCandle.open = candleSingleton.open;
@@ -148,7 +143,7 @@ export function handleCloseCandle(
   candleSingleton.high = tokenPriceUSD;
   candleSingleton.low = tokenPriceUSD;
   candleSingleton.close = BigInt.fromI32(0);
-  candleSingleton.volume = initialTradeVolume ? initialTradeVolume : BigInt.fromI32(0);
+  candleSingleton.volume = initialTradeVolume;
 
   candleSingleton.save();
 }

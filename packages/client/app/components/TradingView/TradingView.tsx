@@ -1,5 +1,6 @@
 'use client';
 
+import { useApolloClient } from '@apollo/client';
 import { useTheme } from '@mui/material';
 import { useEffect } from 'react';
 import '../../external/charting_library/charting_library';
@@ -9,11 +10,15 @@ import {
   LibrarySymbolInfo,
   ResolutionString,
 } from '../../external/charting_library/charting_library';
+import { GetTradingViewCandlesQuery, GetTradingViewCandlesQueryVariables } from '../../generated/gql-types';
+import { GET_TRADING_VIEW_CANDLES } from '../../queries';
 import TradingViewHeader from './TradingViewHeader';
 
 function TradingViewComponent() {
   const theme = useTheme();
   const isDarkMode = theme.palette.mode === 'dark';
+
+  const client = useApolloClient();
 
   useEffect(() => {
     let chart: IChartingLibraryWidget;
@@ -90,44 +95,44 @@ function TradingViewComponent() {
           },
 
           getBars(symbolInfo, resolution, periodParams, onHistoryCallback, onErrorCallback) {
-            // Calculate the time for each bar based on the resolution
-            const resolutionMultiplier = {
-              '1': 60 * 1000, // 1 minute in milliseconds
-              '10': 10 * 60 * 1000, // 5 minutes
-              '60': 60 * 60 * 1000, // 1 hour
-              '360': 6 * 60 * 60 * 1000, // 6 hour
-              '1D': 24 * 60 * 60 * 1000, // 1 day
-              '1W': 7 * 24 * 60 * 60 * 1000, // 1 day
+            const resolutionMapper = {
+              '1': 1, // 1 minute in milliseconds
+              '10': 10, // 5 minutes
+              '60': 60, // 1 hour
+              '360': 360, // 6 hour
+              '1D': 1440, // 1 day
+              '1W': 10080, // 1 day
               // Add more resolutions as needed
             };
 
-            let bars = [];
-            let time = periodParams.from * 1000; // Convert from seconds to milliseconds
-
-            // Generate bars up to 'periodParams.to' or 'periodParams.countBack' number of bars
-            while (time < periodParams.to * 1000 && bars.length < periodParams.countBack) {
-              // Randomly generate OHLC values (modify logic as needed)
-              let open = Math.random() * 100 + 100; // Random value between 100 and 200
-              let close = Math.random() * 100 + 100;
-              let high = Math.max(open, close) + Math.random() * 10;
-              let low = Math.min(open, close) - Math.random() * 10;
-              let volume = Math.random() * 1000; // Random volume
-
-              // Add the bar to the array
-              bars.push({ time, open, high, low, close, volume });
-
-              // Increment time by the resolution interval
-              // @ts-ignore
-              time += resolutionMultiplier[resolution];
-            }
-
-            // TODO: Implement fetching from GQL API
-
-            if (bars.length) {
-              onHistoryCallback(bars, { noData: false });
-            } else {
-              onHistoryCallback([], { noData: true });
-            }
+            client
+              .query<GetTradingViewCandlesQuery, GetTradingViewCandlesQueryVariables>({
+                query: GET_TRADING_VIEW_CANDLES,
+                variables: {
+                  where: {
+                    // @ts-ignore
+                    candleSize: resolutionMapper[resolution],
+                    timestamp_gte: periodParams.from,
+                    timestamp_lte: periodParams.to,
+                    token: symbolInfo.full_name,
+                  },
+                },
+              })
+              .then((res) => {
+                console.log('res: ', res);
+                const bars = res.data.tokenCandles.map(({ close, high, low, open, timestamp, volume }) => ({
+                  close,
+                  high,
+                  low,
+                  open,
+                  time: timestamp,
+                  volume,
+                }));
+                onHistoryCallback(bars, { noData: false });
+              })
+              .catch(() => {
+                onErrorCallback('Error fetching candles');
+              });
           },
 
           // Only updates the most recent bar. Not needed yet.
@@ -139,7 +144,7 @@ function TradingViewComponent() {
         // @ts-ignore
         // interval: '1D',
         autosize: true,
-        debug: process.env.NODE_ENV === 'development',
+        // debug: process.env.NODE_ENV === 'development',
         theme: isDarkMode ? 'dark' : 'light',
         // TODO: Maybe implement later for diffing
         disabled_features: ['header_symbol_search', 'header_compare'],

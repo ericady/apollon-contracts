@@ -14,7 +14,8 @@
     "test:component:integration": "",
     "test:component:integration:watch": "PWTEST_WATCH=1 playwright test -c playwright-ct.config.ts",
     "test:e2e": "NEXT_PUBLIC_API_MOCKING=e2e playwright test",
-    "codegen": "node scripts/syncAbis.js && npx graphql-codegen && npx typechain --target=ethers-v6 --out-dir=generated/types app/context/abis/*.json"
+    "codegen:types": "node scripts/syncAbis.js && graphql-codegen && typechain --target=ethers-v6 --out-dir=generated/types app/context/abis/*.json",
+    "codegen:schema": "graphql-codegen -c codegen-get-schema.yml"
   },
   "dependencies": {
     "@apollo/client": "3.8.1",
@@ -38,6 +39,7 @@
   "devDependencies": {
     "@faker-js/faker": "^8.0.2",
     "@graphql-codegen/cli": "^5.0.0",
+    "@graphql-codegen/schema-ast": "^4.0.0",
     "@graphql-codegen/typescript": "^4.0.1",
     "@graphql-codegen/typescript-operations": "^4.0.1",
     "@playwright/experimental-ct-react": "1.37.0",

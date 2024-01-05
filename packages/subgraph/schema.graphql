@@ -17,8 +17,8 @@ type Token @entity {
   # TODO: wasa
   # PoolPrice, update when pool ratio changes or price feed updates
   priceUSD: BigInt!
-  # TODO: wasa Lookup from the candle chart on TokenPriceChanged event.
-  priceUSD24hAgo: BigInt!
+  # TODO: Do it from the client side, too difficult to implement in the graph, just fetch minute candle
+  # priceUSD24hAgo: BigInt!
   #
   isPoolToken: Boolean!
 }
@@ -237,7 +237,8 @@ type BorrowerHistory @entity(immutable: true) {
 # CHARTS
 
 # TODO: wasa => I would start with this.
-# We have different candle sizes for 5min, 1h .... ???
+# 1min, 10min, 1hour, 6hour, 1day, 1week
+# const CandleSizes = [1, 10, 60, 360, 1440, 10080];
 # We add to a singleton cande and then save it as soon as the candlesize is reached
 type TokenCandleSingleton @entity {
   # "TokenCandleSingleton" + token + candleSize
@@ -256,7 +257,7 @@ type TokenCandleSingleton @entity {
 
 type TokenCandle @entity(immutable: true) {
   id: Bytes!
-  token: Bytes! @relation(name: "TokenToTokenCandle")
+  token: Token! @relation(name: "TokenToTokenCandle")
   timestamp: BigInt!
   open: BigInt!
   high: BigInt!

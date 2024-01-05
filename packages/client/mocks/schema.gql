@@ -1,3 +1,5 @@
+scalar Int
+
 type Token {
   id: ID!
   address: String! # contract address, used as id
@@ -178,4 +180,72 @@ type SystemInfo {
 type Query {
   getTroveManager: TroveManager!
   getSystemInfo: SystemInfo!
+}
+
+# TRADING VIEW
+
+# 1min, 10min, 1hour, 6hour, 1day, 1week
+# const CandleSizes = [1, 10, 60, 360, 1440, 10080];
+type TokenCandle {
+  id: String!
+  token: Token!
+  timestamp: Int!
+  open: Int!
+  high: Int!
+  low: Int!
+  close: Int!
+  volume: Int!
+  candleSize: Int!
+}
+type TokenCandleSingleton {
+  id: String!
+  token: Token!
+  timestamp: Int!
+  open: Int!
+  high: Int!
+  low: Int!
+  close: Int!
+  volume: Int!
+  candleSize: Int!
+}
+
+input TokenCandle_filter {
+  candleSize: Int
+  timestamp: Int
+  timestamp_gt: Int
+  timestamp_gte: Int
+  timestamp_in: [Int!]
+  timestamp_lt: Int
+  timestamp_lte: Int
+  timestamp_not: Int
+  timestamp_not_in: [Int!]
+  token: String
+}
+
+enum TokenCandle_orderBy {
+  candleSize
+  close
+  high
+  id
+  low
+  open
+  timestamp
+  token
+  token__address
+  token__createdAt
+  token__id
+  token__isPoolToken
+  token__priceUSD
+  token__symbol
+  volume
+}
+
+enum OrderDirection {
+  asc
+  desc
+}
+
+type Query {
+  tokenCandles(orderBy: TokenCandle_orderBy, orderDirection: OrderDirection, where: TokenCandle_filter): [TokenCandle!]!
+  tokenCandleSingleton(id: ID!): TokenCandleSingleton!
 }

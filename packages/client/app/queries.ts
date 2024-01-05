@@ -192,7 +192,38 @@ export const GET_RESERVE_USD_HISTORY = gql`
   }
 `;
 
-// -------------------- Fragments used the cache --------------------
+// TRADING VIEW
+
+export const GET_TRADING_VIEW_CANDLES = gql`
+  query GetTradingViewCandles($where: TokenCandle_filter!) {
+    tokenCandles(where: $where, orderBy: timestamp, orderDirection: desc) {
+      id
+      timestamp
+      open
+      high
+      low
+      close
+      volume
+    }
+  }
+`;
+
+export const GET_TRADING_VIEW_LATEST_CANDLE = gql`
+  query GetTradingViewLatestCandle($currentCandleId: ID!) {
+    # "TokenCandleSingleton" + token + candleSize
+    tokenCandleSingleton(id: $currentCandleId) {
+      id
+      timestamp
+      open
+      high
+      low
+      close
+      volume
+    }
+  }
+`;
+
+// -------------------- Fragments used by the cache itself --------------------
 
 export const TOKEN_FRAGMENT = gql`
   fragment TokenFragment on Token {

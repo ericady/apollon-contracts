@@ -30,6 +30,12 @@ contract (storage-pool)
   > handleOwnershipTransferred
   > handleStoragePoolInitialized
   > handleStoragePoolValueUpdated
+contract (swap-operations)
+  > handleOwnershipTransferred
+  > handleSwapOperationsInitialized
+contract (swap-pair)
+  > handleApproval
+  > handleTransfer
 contract (trove-manager)
   > handleBaseRateUpdated
   > handleLTermsUpdated

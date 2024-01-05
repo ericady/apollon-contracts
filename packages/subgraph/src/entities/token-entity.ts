@@ -1,4 +1,4 @@
-import { Address, ethereum } from '@graphprotocol/graph-ts';
+import { Address, BigInt, ethereum } from '@graphprotocol/graph-ts';
 import { DebtToken } from '../../generated/DebtToken/DebtToken';
 import { Token } from '../../generated/schema';
 import { ERC20 } from '../types/ERC20';
@@ -24,4 +24,12 @@ export function handleCreateToken(event: ethereum.Event, tokenAddress: Address, 
   newToken.isPoolToken = isDebtToken;
 
   newToken.save();
+}
+
+export function handleUpdateToken_priceUSD(event: ethereum.Event, tokenAddress: Address, priceUSD: BigInt): void {
+  const tokenEntity = Token.load(tokenAddress)!;
+
+  tokenEntity.priceUSD = priceUSD;
+
+  tokenEntity.save();
 }
