@@ -1,7 +1,7 @@
 {
   "localhost": {
     "DebtToken": {
-      "address": "DebtToken"
+      "address": "0x7F1667b13768D15fedD4ab3B006B4C2174410593"
     },
     "StabilityPool": {
       "address": "StabilityPool"
@@ -26,9 +26,6 @@
     },
     "CollTokenManager": {
       "address": "CollTokenManager"
-    },
-    "Contract": {
-      "address": "contract-name=SwapOperations"
     },
     "SwapPair": {
       "address": "SwapPair"

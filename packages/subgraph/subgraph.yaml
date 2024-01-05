@@ -6,7 +6,7 @@ dataSources:
     name: TroveManager
     network: localhost
     source:
-      address: "0x25309189268017d8C79C8dacCbF44EC25C12FEB4"
+      address: '0x25309189268017d8C79C8dacCbF44EC25C12FEB4'
       abi: TroveManager
       startBlock: 0
     mapping:
@@ -36,8 +36,6 @@ dataSources:
           handler: handleLTermsUpdated
         - event: LastFeeOpTimeUpdated(uint256)
           handler: handleLastFeeOpTimeUpdated
-        - event: LiquidationSummary((address,uint256)[],(address,uint256)[],uint256,(address,uint256)[])
-          handler: handleLiquidationSummary
         - event: OwnershipTransferred(indexed address,indexed address)
           handler: handleOwnershipTransferred
         - event: SystemSnapshotsUpdated((address,uint256)[],(address,uint256)[])
@@ -50,8 +48,6 @@ dataSources:
           handler: handleTroveClosed
         - event: TroveIndexUpdated(address,uint256)
           handler: handleTroveIndexUpdated
-        - event: TroveManagerInitialized(address,address,address,address,address,address,address)
-          handler: handleTroveManagerInitialized
         - event: TroveSnapshotsUpdated((address,bool,uint256)[])
           handler: handleTroveSnapshotsUpdated
         - event: TroveCollChanged(address,address[])
@@ -61,7 +57,7 @@ dataSources:
     name: StoragePool
     network: localhost
     source:
-      address: "0x25309189268017d8C79C8dacCbF44EC25C12FEB4"
+      address: '0x25309189268017d8C79C8dacCbF44EC25C12FEB4'
       abi: StoragePool
       startBlock: 0
     mapping:
@@ -78,8 +74,6 @@ dataSources:
       eventHandlers:
         - event: OwnershipTransferred(indexed address,indexed address)
           handler: handleOwnershipTransferred
-        - event: StoragePoolInitialized(address,address,address,address,address)
-          handler: handleStoragePoolInitialized
         - event: StoragePoolValueUpdated(address,bool,uint8,uint256)
           handler: handleStoragePoolValueUpdated
       file: ./src/storage-pool.ts
@@ -87,7 +81,7 @@ dataSources:
     name: StabilityPool
     network: localhost
     source:
-      address: "0x25309189268017d8C79C8dacCbF44EC25C12FEB4"
+      address: '0x25309189268017d8C79C8dacCbF44EC25C12FEB4'
       abi: StabilityPool
       startBlock: 0
     mapping:
@@ -114,8 +108,6 @@ dataSources:
           handler: handleDepositSnapshotUpdated
         - event: EpochUpdated(uint128)
           handler: handleEpochUpdated
-        - event: OwnershipTransferred(indexed address,indexed address)
-          handler: handleOwnershipTransferred
         - event: P_Updated(uint256)
           handler: handleP_Updated
         - event: S_Updated(address,uint256,uint128,uint128)
@@ -126,8 +118,6 @@ dataSources:
           handler: handleStabilityGainsWithdrawn
         - event: StabilityOffset(uint256,(address,uint256)[])
           handler: handleStabilityOffset
-        - event: StabilityPoolInitialized(address,address,address,address,address)
-          handler: handleStabilityPoolInitialized
         - event: StabilityProvided(address,uint256)
           handler: handleStabilityProvided
         - event: StabilityWithdrawn(address,uint256)
@@ -137,7 +127,7 @@ dataSources:
     name: StabilityPoolManager
     network: localhost
     source:
-      address: "0x25309189268017d8C79C8dacCbF44EC25C12FEB4"
+      address: '0x25309189268017d8C79C8dacCbF44EC25C12FEB4'
       abi: StabilityPoolManager
       startBlock: 0
     mapping:
@@ -156,16 +146,14 @@ dataSources:
           handler: handleOwnershipTransferred
         - event: StabilityPoolAdded(address)
           handler: handleStabilityPoolAdded
-        - event: StabilityPoolManagerInitiated(address,address,address,address)
-          handler: handleStabilityPoolManagerInitiated
       file: ./src/stability-pool-manager.ts
   - kind: ethereum
     name: DebtToken
     network: localhost
     source:
-      address: "0x7f1667b13768d15fedd4ab3b006b4c2174410593"
+      address: '0x7F1667b13768D15fedD4ab3B006B4C2174410593'
       abi: DebtToken
-      startBlock: 8
+      startBlock: 0
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.7
@@ -186,7 +174,7 @@ dataSources:
     name: PriceFeed
     network: localhost
     source:
-      address: "0x25309189268017d8C79C8dacCbF44EC25C12FEB4"
+      address: '0x25309189268017d8C79C8dacCbF44EC25C12FEB4'
       abi: PriceFeed
       startBlock: 0
     mapping:
@@ -215,7 +203,7 @@ dataSources:
     name: BorrowerOperations
     network: localhost
     source:
-      address: "0x25309189268017d8C79C8dacCbF44EC25C12FEB4"
+      address: '0x25309189268017d8C79C8dacCbF44EC25C12FEB4'
       abi: BorrowerOperations
       startBlock: 0
     mapping:
@@ -230,8 +218,6 @@ dataSources:
         - name: BorrowerOperations
           file: ./abis/BorrowerOperations.json
       eventHandlers:
-        - event: BorrowerOperationsInitialized(address,address,address,address,address,address)
-          handler: handleBorrowerOperationsInitialized
         - event: OwnershipTransferred(indexed address,indexed address)
           handler: handleOwnershipTransferred
         - event: TroveCreated(address,uint256)
@@ -241,7 +227,7 @@ dataSources:
     name: DebtTokenManager
     network: localhost
     source:
-      address: "0xa2e37cc979911806a70f583697bcfcb31b989b08"
+      address: '0xa2e37cc979911806a70f583697bcfcb31b989b08'
       abi: DebtTokenManager
       startBlock: 6
     mapping:
@@ -269,7 +255,7 @@ dataSources:
     name: CollTokenManager
     network: localhost
     source:
-      address: "0x25309189268017d8C79C8dacCbF44EC25C12FEB4"
+      address: '0x25309189268017d8C79C8dacCbF44EC25C12FEB4'
       abi: CollTokenManager
       startBlock: 0
     mapping:
@@ -295,7 +281,7 @@ dataSources:
     name: SwapOperations
     network: localhost
     source:
-      address: "0x25309189268017d8C79C8dacCbF44EC25C12FEB4"
+      address: '0x25309189268017d8C79C8dacCbF44EC25C12FEB4'
       abi: SwapOperations
       startBlock: 0
     mapping:
@@ -326,7 +312,7 @@ dataSources:
     name: SwapPair
     network: localhost
     source:
-      address: "0x25309189268017d8C79C8dacCbF44EC25C12FEB4"
+      address: '0x25309189268017d8C79C8dacCbF44EC25C12FEB4'
       abi: SwapPair
       startBlock: 0
     mapping:
@@ -357,6 +343,5 @@ dataSources:
         - event: Transfer(indexed address,indexed address,uint256)
           handler: handleTransfer
       file: ./src/swap-pair.ts
-
 # ONLY non-JUSD Swappairs!
 # These just update the trading volume

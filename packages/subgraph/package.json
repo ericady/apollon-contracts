@@ -12,7 +12,7 @@
     "test:unit:local": "graph test -d",
     "prettier:check": "prettier --check **/*.{js,jsx,mjs,ts,tsx,json,css,md}",
     "create:overview": "node scripts/createEventOverview.js && node scripts/createLeftoverEventOverview.js",
-    "sync:abis": "node scripts/syncAbis.js"
+    "sync:abis": "node scripts/syncAbis.js && prettier --write abis"
   },
   "installConfig": {
     "hoistingLimits": "workspaces"

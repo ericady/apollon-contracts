@@ -15,6 +15,28 @@
     "type": "error"
   },
   {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "owner",
+        "type": "address"
+      }
+    ],
+    "name": "OwnableInvalidOwner",
+    "type": "error"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "account",
+        "type": "address"
+      }
+    ],
+    "name": "OwnableUnauthorizedAccount",
+    "type": "error"
+  },
+  {
     "inputs": [],
     "name": "ZeroAddress",
     "type": "error"
@@ -57,6 +79,12 @@
         "indexed": false,
         "internalType": "address",
         "name": "_redemptionOperationsAddress",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "address",
+        "name": "_liquidationOperationsAddress",
         "type": "address"
       },
       {
@@ -134,6 +162,19 @@
   },
   {
     "inputs": [],
+    "name": "MAX_BORROWING_FEE",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
     "name": "MCR",
     "outputs": [
       {
@@ -173,12 +214,51 @@
   },
   {
     "inputs": [],
+    "name": "REDEMPTION_FEE_FLOOR",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
     "name": "STABLE_COIN_GAS_COMPENSATION",
     "outputs": [
       {
         "internalType": "uint256",
         "name": "",
         "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "SWAP_BASE_FEE",
+    "outputs": [
+      {
+        "internalType": "uint32",
+        "name": "",
+        "type": "uint32"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "SWAP_FEE_PRECISION",
+    "outputs": [
+      {
+        "internalType": "uint32",
+        "name": "",
+        "type": "uint32"
       }
     ],
     "stateMutability": "view",
@@ -341,6 +421,30 @@
         "internalType": "bool",
         "name": "_isColl",
         "type": "bool"
+      }
+    ],
+    "name": "getTokenTotalAmount",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "_tokenAddress",
+        "type": "address"
+      },
+      {
+        "internalType": "bool",
+        "name": "_isColl",
+        "type": "bool"
       },
       {
         "internalType": "enum IBase.PoolType",
@@ -354,6 +458,19 @@
         "internalType": "uint256",
         "name": "",
         "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "liquidationOperationsAddress",
+    "outputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
       }
     ],
     "stateMutability": "view",
@@ -420,6 +537,11 @@
       {
         "internalType": "address",
         "name": "_redemptionOperationsAddress",
+        "type": "address"
+      },
+      {
+        "internalType": "address",
+        "name": "_liquidationOperationsAddress",
         "type": "address"
       },
       {

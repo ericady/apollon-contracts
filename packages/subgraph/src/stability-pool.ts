@@ -1,13 +1,11 @@
 import {
   DepositSnapshotUpdated as DepositSnapshotUpdatedEvent,
   EpochUpdated as EpochUpdatedEvent,
-  OwnershipTransferred as OwnershipTransferredEvent,
   P_Updated as P_UpdatedEvent,
   S_Updated as S_UpdatedEvent,
   ScaleUpdated as ScaleUpdatedEvent,
   StabilityGainsWithdrawn as StabilityGainsWithdrawnEvent,
   StabilityOffset as StabilityOffsetEvent,
-  StabilityPoolInitialized as StabilityPoolInitializedEvent,
   StabilityProvided as StabilityProvidedEvent,
   StabilityWithdrawn as StabilityWithdrawnEvent,
 } from '../generated/StabilityPool/StabilityPool';
@@ -17,8 +15,6 @@ import { handleCreateDebtTokenMeta, handleUpdateStabilityDepositAPY } from './en
 export function handleDepositSnapshotUpdated(event: DepositSnapshotUpdatedEvent): void {}
 
 export function handleEpochUpdated(event: EpochUpdatedEvent): void {}
-
-export function handleOwnershipTransferred(event: OwnershipTransferredEvent): void {}
 
 export function handleP_Updated(event: P_UpdatedEvent): void {}
 
@@ -35,8 +31,6 @@ export function handleStabilityOffset(event: StabilityOffsetEvent): void {
   // stabilityDepositAPY changed
   handleCreateDebtTokenMeta(event, event.address);
 }
-
-export function handleStabilityPoolInitialized(event: StabilityPoolInitializedEvent): void {}
 
 export function handleStabilityProvided(event: StabilityProvidedEvent): void {
   // totalDepositedStability changed
