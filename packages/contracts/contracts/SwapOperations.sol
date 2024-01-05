@@ -368,8 +368,12 @@ contract SwapOperations is ISwapOperations, Ownable(msg.sender), CheckContract, 
 
   function sortTokens(address tokenA, address tokenB) internal pure returns (address token0, address token1) {
     if (tokenA == tokenB) revert IdenticalAddresses();
-    (token0, token1) = tokenA < tokenB ? (tokenA, tokenB) : (tokenB, tokenA);
-    if (token0 == address(0)) revert ZeroAddress();
+    if (tokenA == address(0) || tokenB == address(0)) revert ZeroAddress();
+
+    address stableCoin = address(debtTokenManager.getStableCoin());
+    if (tokenA == stableCoin) return (tokenA, tokenB);
+    if (tokenB == stableCoin) return (tokenB, tokenA);
+    return tokenA < tokenB ? (tokenA, tokenB) : (tokenB, tokenA);
   }
 
   function safeTransferFrom(address token, address from, address to, uint256 value) internal {
