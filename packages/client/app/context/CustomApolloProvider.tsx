@@ -44,6 +44,7 @@ export function CustomApolloProvider({ children }: PropsWithChildren<{}>) {
           troveManagerContract,
           stabilityPoolManagerContract,
           swapPairContracts,
+          storagePoolContract,
         });
 
   const client = new ApolloClient({
@@ -124,6 +125,7 @@ const getProductionCacheConfig = ({
   troveManagerContract,
   stabilityPoolManagerContract,
   swapPairContracts,
+  storagePoolContract,
 }: {
   provider: ReturnType<typeof useEthers>['provider'];
   borrower: AddressLike;
@@ -131,6 +133,7 @@ const getProductionCacheConfig = ({
   troveManagerContract: ReturnType<typeof useEthers>['contracts']['troveManagerContract'];
   stabilityPoolManagerContract: ReturnType<typeof useEthers>['contracts']['stabilityPoolManagerContract'];
   swapPairContracts: ReturnType<typeof useEthers>['contracts']['swapPairContracts'];
+  storagePoolContract: ReturnType<typeof useEthers>['contracts']['storagePoolContract'];
 }): { fields: TypePolicies; Query: TypePolicy } => ({
   fields: {
     Token: {
