@@ -366,7 +366,7 @@ contract SwapOperations is ISwapOperations, Ownable(msg.sender), CheckContract, 
     (reserveA, reserveB) = tokenA == token0 ? (reserve0, reserve1) : (reserve1, reserve0);
   }
 
-  function sortTokens(address tokenA, address tokenB) internal pure returns (address token0, address token1) {
+  function sortTokens(address tokenA, address tokenB) internal view returns (address token0, address token1) {
     if (tokenA == tokenB) revert IdenticalAddresses();
     if (tokenA == address(0) || tokenB == address(0)) revert ZeroAddress();
 
