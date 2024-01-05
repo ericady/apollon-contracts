@@ -8,10 +8,20 @@ import {
   StoragePool,
   LiquidationOperations,
   RedemptionOperations,
+  StabilityPool,
 } from '../typechain';
 import { Contracts, deployCore, connectCoreContracts, deployAndLinkToken } from '../utils/deploymentHelpers';
 import { SignerWithAddress } from '@nomicfoundation/hardhat-ethers/signers';
-import { assertRevert, getStabilityPool, openTrove, whaleShrimpTroveInit } from '../utils/testHelper';
+import {
+  TimeValues,
+  assertRevert,
+  fastForwardTime,
+  getStabilityPool,
+  openTrove,
+  whaleShrimpTroveInit,
+  getTCR,
+  TroveStatus,
+} from '../utils/testHelper';
 import { assert, expect } from 'chai';
 import { parseUnits } from 'ethers';
 
@@ -21,6 +31,7 @@ describe('TroveManager', () => {
   let bob: SignerWithAddress;
   let whale: SignerWithAddress;
   let erin: SignerWithAddress;
+  let carol: SignerWithAddress;
 
   let defaulter_1: SignerWithAddress;
   let defaulter_2: SignerWithAddress;
@@ -40,10 +51,11 @@ describe('TroveManager', () => {
   let redemptionOperations: RedemptionOperations;
   let liquidationOperations: LiquidationOperations;
   let contracts: Contracts;
+  let stabilityPool: StabilityPool;
 
   before(async () => {
     signers = await ethers.getSigners();
-    [, defaulter_1, defaulter_2, defaulter_3, whale, alice, bob, , , erin] = signers;
+    [, defaulter_1, defaulter_2, defaulter_3, whale, alice, bob, carol, erin] = signers;
   });
 
   beforeEach(async () => {
@@ -478,6 +490,95 @@ describe('TroveManager', () => {
 
       expect(oTrove.arrayIndex).to.be.equal(prevTroveOwnersCount);
       expect(newTroveOwnersCount).to.be.equal(prevTroveOwnersCount + '1');
+    });
+  });
+
+  describe('getPendingReward()', () => {
+    it('liquidates a Trove that a) was skipped in a previous liquidation and b) has pending rewards', async () => {
+      await whaleShrimpTroveInit(contracts, signers, true);
+      // const stabilityPool = await getStabilityPool(contracts, STABLE);
+      const aliceDebtBefore = (await troveManager.getTroveDebt(alice))[0].amount;
+      let priceBefore = await priceFeed.getPrice(BTC);
+
+      //decrease price
+      await priceFeed.setTokenPrice(BTC, parseUnits('5000'));
+      let priceAfter = await priceFeed.getPrice(BTC);
+
+      // Confirm system is not in Recovery Mode
+      const [isRecoveryModeBefore] = await storagePool.checkRecoveryMode();
+      assert.isFalse(isRecoveryModeBefore);
+
+      // defaulter_1 gets liquidated, creates pending rewards for all
+      await liquidationOperations.liquidate(defaulter_1);
+      const defaulter_1_Status = await troveManager.getTroveStatus(defaulter_1);
+      assert.equal(defaulter_1_Status.toString(), TroveStatus.CLOSED_BY_LIQUIDATION_IN_NORMAL_MODE.toString());
+      const aliceBtcRewardBefore = await troveManager.getPendingReward(alice, BTC, true);
+
+      //defaulter_1 gets liquidated, adds 10 STABLE coin to the SP, but less than alice's deb
+      await stabilityPoolManager
+        .connect(defaulter_1)
+        .provideStability([{ tokenAddress: STABLE, amount: parseUnits('10') }]);
+
+      //drop price again
+      await priceFeed.setTokenPrice(BTC, parseUnits('50'));
+      const price = await priceFeed.getPrice(BTC);
+      console.log('🔥 ~ file: TroveManagerTest.ts:520 ~ it ~ price:', price);
+
+      //check recovery mode
+      const [isRecoveryModeAfter] = await storagePool.checkRecoveryMode();
+      assert.isTrue(isRecoveryModeAfter);
+
+      // Confirm alice has ICR > TCR
+      const TCR = await getTCR(contracts);
+      const ICR_C = await troveManager.getCurrentICR(alice);
+      expect(ICR_C[0]).to.be.gt(TCR);
+
+      // Attempt to liquidate alice and bob, which skips alice in the liquidation since it is immune
+      const liquidate_bob = await liquidationOperations.liquidate(bob);
+      const liquidate_bobReceipt = await liquidate_bob.wait();
+      assert.isTrue(!!liquidate_bobReceipt?.status);
+
+      //Working In Progress!!!!
+    });
+    it('Reward not affected after coll. price change', async () => {
+      await whaleShrimpTroveInit(contracts, signers);
+      //drop price
+      await priceFeed.setTokenPrice(BTC, parseUnits('5000'));
+      const [isRecoveryMode] = await storagePool.checkRecoveryMode();
+      assert.isFalse(isRecoveryMode);
+
+      //liquidate defaulter_1
+      await liquidationOperations.liquidate(defaulter_1);
+      const defaulter_1TroveStatus = await troveManager.getTroveStatus(defaulter_1);
+      assert.equal(defaulter_1TroveStatus.toString(), TroveStatus.CLOSED_BY_LIQUIDATION_IN_NORMAL_MODE.toString());
+
+      const carolBtcRewardBefore = await troveManager.getPendingReward(carol, BTC, true);
+      const amountBeforePriceChange = await priceFeed.getAmountFromUSDValue(BTC, carolBtcRewardBefore);
+      //price drop again
+      await priceFeed.setTokenPrice(BTC, parseUnits('3000'));
+      const isRecoveryModeAfterPriceChange = await storagePool.checkRecoveryMode();
+      assert.isFalse(isRecoveryModeAfterPriceChange[0]);
+
+      const carolBtcRewardAfter = await troveManager.getPendingReward(carol, BTC, true);
+      const amountAfterPriceChange = await priceFeed.getAmountFromUSDValue(BTC, carolBtcRewardAfter);
+      assert.equal(amountBeforePriceChange, amountAfterPriceChange);
+    });
+    it('Returns 0 if there is no pending reward', async () => {
+      await whaleShrimpTroveInit(contracts, signers, false);
+      const [isRecoveryMode] = await storagePool.checkRecoveryMode();
+      assert.isFalse(isRecoveryMode);
+
+      //decrease price
+      await priceFeed.setTokenPrice(BTC, parseUnits('5000'));
+      await liquidationOperations.liquidate(defaulter_1);
+      const defaulter_1TroveStatus = await troveManager.getTroveStatus(defaulter_1);
+      assert.equal(defaulter_1TroveStatus.toString(), TroveStatus.CLOSED_BY_LIQUIDATION_IN_NORMAL_MODE.toString());
+      const defaulter_3Snapshot_L_LUSDDebt = await troveManager.rewardSnapshots(defaulter_3, STABLE, false);
+      assert.equal(defaulter_3Snapshot_L_LUSDDebt.toString(), '0');
+
+      //after price drop
+      const defaulter_3PendingReward = await troveManager.getPendingReward(defaulter_3, BTC, true);
+      assert.equal(defaulter_3PendingReward.toString(), '0');
     });
   });
 });

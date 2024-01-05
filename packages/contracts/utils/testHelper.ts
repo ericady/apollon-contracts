@@ -233,3 +233,12 @@ export const TimeValues = {
   MINUTES_IN_ONE_MONTH: 60 * 24 * 30,
   MINUTES_IN_ONE_YEAR: 60 * 24 * 365,
 };
+
+//added trove status
+export const TroveStatus = {
+  NON_EXISTENT: 0,
+  ACTIVE: 1,
+  CLOSED_BY_OWNER: 2,
+  CLOSED_BY_LIQUIDATION_IN_NORMAL_MODE: 3,
+  CLOSED_BY_LIQUIDATION_IN_RECOVERY_MODE: 4,
+};
