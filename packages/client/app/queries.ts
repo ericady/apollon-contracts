@@ -89,6 +89,7 @@ export const GET_BORROWER_SWAPS = gql`
     swapEvents(first: $first, orderBy: timestamp, orderDirection: desc, skip: $skip, where: $where) {
       id
       timestamp
+      timestamp
       token {
         id
         address
