@@ -22,6 +22,8 @@ import {
 import { GET_TRADING_VIEW_CANDLES, GET_TRADING_VIEW_LATEST_CANDLE } from '../../queries';
 import TradingViewHeader from './TradingViewHeader';
 
+const devMode = process.env.NEXT_PUBLIC_API_MOCKING === 'enabled';
+
 function TradingViewComponent() {
   const theme = useTheme();
   const isDarkMode = theme.palette.mode === 'dark';
@@ -55,7 +57,7 @@ function TradingViewComponent() {
   }, [data]);
 
   useEffect(() => {
-    if (currentChart.current && selectedToken) {
+    if (currentChart.current && selectedToken && !devMode) {
       currentChart.current.setSymbol(selectedToken.symbol, '1D' as ResolutionString, () => {});
     }
   }, [selectedToken]);
@@ -68,117 +70,116 @@ function TradingViewComponent() {
         locale: 'en',
         library_path: 'charting_library/',
 
-        datafeed:
-          process.env.NEXT_PUBLIC_API_MOCKING === 'enabled'
-            ? new UDFCompatibleDatafeed('https://demo-feed-data.tradingview.com')
-            : {
-                getQuotes(symbols, onDataCallback, onErrorCallback) {
-                  console.log('Quotes', symbols);
-                },
-                searchSymbols(userInput, exchange, symbolType, onResult) {
-                  console.log('Search Symbols', userInput, exchange, symbolType);
-                },
-                subscribeBars(symbolInfo, resolution, onTick, listenerGuid, onResetCacheNeededCallback) {
-                  updateLatestCandleCallback.current = onTick;
-                },
-                unsubscribeBars(listenerGuid) {
-                  updateLatestCandleCallback.current = undefined;
-                },
-                subscribeQuotes(symbols, fastSymbols, onRealtimeCallback, listenerGUID) {
-                  console.log('Subscribe Quotes', symbols, fastSymbols, listenerGUID);
-                },
-                unsubscribeQuotes(listenerGUID) {
-                  console.log('Unsubscribe Quotes', listenerGUID);
-                },
-
-                onReady(callback) {
-                  const config: DatafeedConfiguration = {
-                    currency_codes: ['USD'],
-                    symbols_types: [],
-                    supported_resolutions: ['1', '10', '60', '360', '1D', '1W'] as ResolutionString[],
-                    supports_marks: false,
-                    supports_timescale_marks: false,
-                    supports_time: false,
-                  };
-                  callback(config);
-                },
-                // Not enabled yet
-                // searchSymbols()
-
-                resolveSymbol: async (symbolName, onSymbolResolvedCallback, onResolveErrorCallback, extension) => {
-                  try {
-                    const symbolInfo: LibrarySymbolInfo = {
-                      ticker: symbolName,
-                      name: symbolName,
-                      full_name: symbolName,
-                      description: '',
-                      type: '',
-                      session: '24x7',
-                      timezone: 'Etc/UTC',
-                      exchange: '',
-                      minmov: 1,
-                      pricescale: 100,
-                      has_intraday: true,
-                      visible_plots_set: 'ohlcv',
-                      has_weekly_and_monthly: true,
-                      supported_resolutions: ['1', '10', '60', '360', '1D', '1W'] as ResolutionString[],
-                      volume_precision: 2,
-                      data_status: 'streaming',
-                      format: 'price',
-                      listed_exchange: '',
-                    };
-                    onSymbolResolvedCallback(symbolInfo);
-                  } catch (err: any) {
-                    onResolveErrorCallback(err.message);
-                  }
-                },
-
-                getBars(symbolInfo, resolution, periodParams, onHistoryCallback, onErrorCallback) {
-                  const resolutionMapper = {
-                    '1': 1, // 1 minute in milliseconds
-                    '10': 10, // 5 minutes
-                    '60': 60, // 1 hour
-                    '360': 360, // 6 hour
-                    '1D': 1440, // 1 day
-                    '1W': 10080, // 1 day
-                    // Add more resolutions as needed
-                  };
-
-                  client
-                    .query<GetTradingViewCandlesQuery, GetTradingViewCandlesQueryVariables>({
-                      query: GET_TRADING_VIEW_CANDLES,
-                      variables: {
-                        where: {
-                          // @ts-ignore
-                          candleSize: resolutionMapper[resolution],
-                          timestamp_gte: periodParams.from,
-                          timestamp_lte: periodParams.to,
-                          token: symbolInfo.full_name,
-                        },
-                      },
-                    })
-                    .then((res) => {
-                      const bars = res.data.tokenCandles.map(({ close, high, low, open, timestamp, volume }) => ({
-                        close,
-                        high,
-                        low,
-                        open,
-                        time: timestamp,
-                        volume,
-                      }));
-                      onHistoryCallback(bars, { noData: false });
-                    })
-                    .catch(() => {
-                      onErrorCallback('Error fetching candles');
-                    });
-                },
-
-                // Only updates the most recent bar. Not needed yet.
-                // subscribeBars() also needs unsubscribeBars()
+        datafeed: devMode
+          ? new UDFCompatibleDatafeed('https://demo-feed-data.tradingview.com')
+          : {
+              getQuotes(symbols, onDataCallback, onErrorCallback) {
+                console.log('Quotes', symbols);
+              },
+              searchSymbols(userInput, exchange, symbolType, onResult) {
+                console.log('Search Symbols', userInput, exchange, symbolType);
+              },
+              subscribeBars(symbolInfo, resolution, onTick, listenerGuid, onResetCacheNeededCallback) {
+                updateLatestCandleCallback.current = onTick;
+              },
+              unsubscribeBars(listenerGuid) {
+                updateLatestCandleCallback.current = undefined;
+              },
+              subscribeQuotes(symbols, fastSymbols, onRealtimeCallback, listenerGUID) {
+                console.log('Subscribe Quotes', symbols, fastSymbols, listenerGUID);
+              },
+              unsubscribeQuotes(listenerGUID) {
+                console.log('Unsubscribe Quotes', listenerGUID);
               },
 
+              onReady(callback) {
+                const config: DatafeedConfiguration = {
+                  currency_codes: ['USD'],
+                  symbols_types: [],
+                  supported_resolutions: ['1', '10', '60', '360', '1D', '1W'] as ResolutionString[],
+                  supports_marks: false,
+                  supports_timescale_marks: false,
+                  supports_time: false,
+                };
+                callback(config);
+              },
+              // Not enabled yet
+              // searchSymbols()
+
+              resolveSymbol: async (symbolName, onSymbolResolvedCallback, onResolveErrorCallback, extension) => {
+                try {
+                  const symbolInfo: LibrarySymbolInfo = {
+                    ticker: symbolName,
+                    name: symbolName,
+                    full_name: symbolName,
+                    description: '',
+                    type: '',
+                    session: '24x7',
+                    timezone: 'Etc/UTC',
+                    exchange: '',
+                    minmov: 1,
+                    pricescale: 100,
+                    has_intraday: true,
+                    visible_plots_set: 'ohlcv',
+                    has_weekly_and_monthly: true,
+                    supported_resolutions: ['1', '10', '60', '360', '1D', '1W'] as ResolutionString[],
+                    volume_precision: 2,
+                    data_status: 'streaming',
+                    format: 'price',
+                    listed_exchange: '',
+                  };
+                  onSymbolResolvedCallback(symbolInfo);
+                } catch (err: any) {
+                  onResolveErrorCallback(err.message);
+                }
+              },
+
+              getBars(symbolInfo, resolution, periodParams, onHistoryCallback, onErrorCallback) {
+                const resolutionMapper = {
+                  '1': 1, // 1 minute in milliseconds
+                  '10': 10, // 5 minutes
+                  '60': 60, // 1 hour
+                  '360': 360, // 6 hour
+                  '1D': 1440, // 1 day
+                  '1W': 10080, // 1 day
+                  // Add more resolutions as needed
+                };
+
+                client
+                  .query<GetTradingViewCandlesQuery, GetTradingViewCandlesQueryVariables>({
+                    query: GET_TRADING_VIEW_CANDLES,
+                    variables: {
+                      where: {
+                        // @ts-ignore
+                        candleSize: resolutionMapper[resolution],
+                        timestamp_gte: periodParams.from,
+                        timestamp_lte: periodParams.to,
+                        token: symbolInfo.full_name,
+                      },
+                    },
+                  })
+                  .then((res) => {
+                    const bars = res.data.tokenCandles.map(({ close, high, low, open, timestamp, volume }) => ({
+                      close,
+                      high,
+                      low,
+                      open,
+                      time: timestamp,
+                      volume,
+                    }));
+                    onHistoryCallback(bars, { noData: false });
+                  })
+                  .catch(() => {
+                    onErrorCallback('Error fetching candles');
+                  });
+              },
+
+              // Only updates the most recent bar. Not needed yet.
+              // subscribeBars() also needs unsubscribeBars()
+            },
+
         // General config
-        symbol: selectedToken.symbol,
+        symbol: process.env.NEXT_PUBLIC_API_MOCKING === 'enabled' ? 'AAPL' : selectedToken.symbol,
         // @ts-ignore
         // interval: '1D',
         autosize: true,
