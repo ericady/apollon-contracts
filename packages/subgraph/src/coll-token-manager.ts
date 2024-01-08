@@ -7,6 +7,8 @@ import { handleCreateToken } from './entities/token-entity';
 
 export function handleCollTokenAdded(event: CollTokenAddedEvent): void {
   handleCreateToken(event, event.params._collTokenAddress, false);
+  // TODO:
+  // implement CollateralTokenMeta
 }
 
 export function handleCollTokenManagerInitialized(event: CollTokenManagerInitializedEvent): void {}

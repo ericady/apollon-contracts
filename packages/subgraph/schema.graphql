@@ -35,7 +35,7 @@ type DebtTokenMeta @entity(immutable: true) {
   # Das muss auf dem graphen berechnet werden, über das offset event. Alle offsets der letzten 30 Tage immer zusammenfassen und schauen wie groß der Profit (debt token heraus gezogen, coll token bekommen) war.
   # On creation of the entity we must save just the current APY
   stabilityDepositAPY: Int!
-  # event: StabilityProvided StabilityWithdrawn  StabilityOffset 
+  # event: StabilityProvided StabilityWithdrawn  StabilityOffset
   totalDepositedStability: BigInt!
   # TODO: wasa Implement the event handlers to update this field
   # - token: es gibt nur zwei, kannst du hardcoden, oder von reservePool.`stableDebtToken` und reservePool.`govToken`
@@ -115,7 +115,7 @@ enum LongShortDirection {
 type SwapEvent @entity(immutable: true) {
   id: ID!
   borrower: String!
-  timestamp: Int!
+  timestamp: BigInt!
   #
   token: Token!
   direction: LongShortDirection! # Indicates whether the swap is LONG or SHORT
@@ -160,7 +160,7 @@ type PoolLiquidity @entity {
 
 type Pool @entity {
   # TODO: wasa We need some distict logic to create the ID
-  # This is the trainding pair address! Please hardcode it for the paired tokens or use singleton.
+  # `Pool-${token0.toHexString()}-${token1.toHexString()}`
   id: String!
 
   # Percent value applied when opening the first position for this pool. Can be negative and positive.
@@ -190,19 +190,11 @@ type PoolVolume30d @entity {
   feeUSD: BigInt!
 }
 
-# TODO: wasa => there are probably more => alle vier events: mint, burn, swap, sync können die reserven verändern
-enum PoolEventType {
-  DEPOSIT
-  WITHDRAW
-}
-
 # A chunk is added once 5min are over and is deducted at the end of 30d
 type PoolVolumeChunk @entity {
   # "PoolVolumeChunk" + TokenA + TokenB + index
   id: String!
   timestamp: BigInt!
-  # determines if value is added of deducted
-  type: PoolEventType!
   value: BigInt!
 }
 
