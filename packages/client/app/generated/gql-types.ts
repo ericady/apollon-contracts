@@ -367,7 +367,7 @@ export type GetTradingViewCandlesQueryVariables = Exact<{
 export type GetTradingViewCandlesQuery = { __typename: 'Query', tokenCandles: Array<{ __typename: 'TokenCandle', id: string, timestamp: number, open: number, high: number, low: number, close: number, volume: number }> };
 
 export type GetTradingViewLatestCandleQueryVariables = Exact<{
-  currentCandleId: Scalars['ID']['input'];
+  id: Scalars['ID']['input'];
 }>;
 
 

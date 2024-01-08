@@ -17,11 +17,13 @@ import {
   QueryGetPoolsArgs,
   QueryGetSwapsArgs,
   QueryGetTokenArgs,
+  QueryTokenCandleSingletonArgs,
   QueryTokenCandlesArgs,
   SwapEvent,
   Token,
   TokenAmount,
   TokenCandle,
+  TokenCandleSingleton,
 } from '../app/generated/gql-types';
 import {
   GET_ALL_DEBT_TOKENS,
@@ -37,6 +39,7 @@ import {
   GET_SELECTED_TOKEN,
   GET_SYSTEMINFO,
   GET_TRADING_VIEW_CANDLES,
+  GET_TRADING_VIEW_LATEST_CANDLE,
   GET_TROVEMANAGER,
 } from '../app/queries';
 
@@ -536,7 +539,6 @@ export const handlers = [
   graphql.query<{ tokenCandles: Query['tokenCandles'] }, QueryTokenCandlesArgs>(
     GET_TRADING_VIEW_CANDLES,
     (req, res, ctx) => {
-      console.log('req.variables: ', req.variables);
       const { orderBy, orderDirection, where } = req.variables;
 
       const resolutionMultiplier = {
@@ -578,6 +580,39 @@ export const handlers = [
             token: tokens[0],
             id: faker.string.uuid(),
           })),
+        }),
+      );
+    },
+  ),
+
+  // GetTradingViewCandles
+  graphql.query<{ tokenCandleSingleton: Query['tokenCandleSingleton'] }, QueryTokenCandleSingletonArgs>(
+    GET_TRADING_VIEW_LATEST_CANDLE,
+    (req, res, ctx) => {
+      const { id } = req.variables;
+
+      let open = Math.random() * 100 + 100; // Random value between 100 and 200
+      let close = Math.random() * 100 + 100;
+      let high = Math.max(open, close) + Math.random() * 10;
+      let low = Math.min(open, close) - Math.random() * 10;
+      let volume = Math.random() * 1000; // Random volume
+
+      const randomCandle: TokenCandleSingleton = {
+        id,
+        __typename: 'TokenCandleSingleton',
+        timestamp: Date.now(),
+        token: tokens[0],
+        candleSize: 60,
+        open,
+        close,
+        high,
+        low,
+        volume,
+      };
+
+      return res(
+        ctx.data({
+          tokenCandleSingleton: randomCandle,
         }),
       );
     },

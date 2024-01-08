@@ -209,9 +209,9 @@ export const GET_TRADING_VIEW_CANDLES = gql`
 `;
 
 export const GET_TRADING_VIEW_LATEST_CANDLE = gql`
-  query GetTradingViewLatestCandle($currentCandleId: ID!) {
+  query GetTradingViewLatestCandle($id: ID!) {
     # "TokenCandleSingleton" + token + candleSize
-    tokenCandleSingleton(id: $currentCandleId) {
+    tokenCandleSingleton(id: $id) {
       id
       timestamp
       open
