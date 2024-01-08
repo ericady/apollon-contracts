@@ -12,7 +12,7 @@ export const GET_ALL_POOLS = gql`
           id
           address
           symbol
-          priceUSD @client
+          priceUSD
           priceUSD24hAgo
         }
       }
@@ -41,7 +41,7 @@ export const GET_ALL_DEBT_TOKENS = gql`
         id
         address
         symbol
-        priceUSD @client
+        priceUSD
         priceUSD24hAgo
       }
     }
@@ -66,7 +66,7 @@ export const GET_BORROWER_DEBT_TOKENS = gql`
         id
         address
         symbol
-        priceUSD @client
+        priceUSD
         isPoolToken
       }
     }
@@ -84,7 +84,7 @@ export const GET_BORROWER_SWAPS = gql`
           id
           address
           symbol
-          priceUSD @client
+          priceUSD
         }
         direction
         size
@@ -110,7 +110,7 @@ export const GET_BORROWER_LIQUIDITY_POOLS = gql`
           id
           address
           symbol
-          priceUSD @client
+          priceUSD
         }
         totalAmount
       }
@@ -134,7 +134,7 @@ export const GET_BORROWER_COLLATERAL_TOKENS = gql`
         id
         address
         symbol
-        priceUSD @client
+        priceUSD
       }
       walletAmount @client
       troveLockedAmount @client

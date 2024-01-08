@@ -9,7 +9,7 @@ import {
   makeVar,
 } from '@apollo/client';
 import { AddressLike, ethers } from 'ethers';
-import { PropsWithChildren, useEffect } from 'react';
+import { PropsWithChildren } from 'react';
 import { DebtToken, StabilityPoolManager, StoragePool, SwapPair, TroveManager } from '../../generated/types';
 import {
   QueryGetTokenArgs,
@@ -97,23 +97,24 @@ export function CustomApolloProvider({ children }: PropsWithChildren<{}>) {
     }),
   });
 
-  useEffect(() => {
-    if (process.env.NEXT_PUBLIC_CONTRACT_MOCKING !== 'enabled') {
-      const priceUSDIntervall = setInterval(() => {
-        if (isFieldOutdated(SchemaDataFreshnessManager.DebtToken[Contracts.DebtToken.DebtToken1], 'priceUSD')) {
-          SchemaDataFreshnessManager.DebtToken[Contracts.DebtToken.DebtToken1].priceUSD.fetch(
-            debtTokenContracts[Contracts.DebtToken.DebtToken1],
-          );
-        }
-        // This can be any interval you want but it guarantees data freshness if its not already fresh.
-      }, 1000 * 10);
+  // TODO: Implement periodic Updates
+  // useEffect(() => {
+  //   if (process.env.NEXT_PUBLIC_CONTRACT_MOCKING !== 'enabled') {
+  //     const priceUSDIntervall = setInterval(() => {
+  //       if (isFieldOutdated(SchemaDataFreshnessManager.DebtToken[Contracts.DebtToken.DebtToken1], 'priceUSD')) {
+  //         SchemaDataFreshnessManager.DebtToken[Contracts.DebtToken.DebtToken1].priceUSD.fetch(
+  //           debtTokenContracts[Contracts.DebtToken.DebtToken1],
+  //         );
+  //       }
+  //       // This can be any interval you want but it guarantees data freshness if its not already fresh.
+  //     }, 1000 * 10);
 
-      return () => {
-        clearInterval(priceUSDIntervall);
-      };
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  //     return () => {
+  //       clearInterval(priceUSDIntervall);
+  //     };
+  //   }
+  //   // eslint-disable-next-line react-hooks/exhaustive-deps
+  // }, []);
 
   return <ApolloProvider client={client}>{children}</ApolloProvider>;
 }
@@ -138,24 +139,6 @@ const getProductionCacheConfig = ({
   fields: {
     Token: {
       fields: {
-        // TODO: Make it address aware
-        priceUSD: {
-          read(_, { readField }) {
-            const address = readField('address');
-            if (
-              address &&
-              isFieldOutdated(SchemaDataFreshnessManager.DebtToken[Contracts.DebtToken.DebtToken1], 'priceUSD')
-            ) {
-              // Make smart contract call using the address
-              SchemaDataFreshnessManager.DebtToken[Contracts.DebtToken.DebtToken1].priceUSD.fetch(
-                debtTokenContracts[Contracts.DebtToken.DebtToken1],
-                borrower,
-              );
-            }
-
-            return SchemaDataFreshnessManager.DebtToken[Contracts.DebtToken.DebtToken1].priceUSD.value();
-          },
-        },
         priceUSDOracle: {
           read(_, { args }) {
             if (
@@ -661,24 +644,6 @@ export const SchemaDataFreshnessManager: ContractDataFreshnessManager<typeof Con
   },
   DebtToken: {
     [Contracts.DebtToken.DebtToken1]: {
-      priceUSD: {
-        fetch: async (debtTokenContract: DebtToken, swapPairContract: SwapPair) => {
-          SchemaDataFreshnessManager.DebtToken[Contracts.DebtToken.DebtToken1].priceUSD.lastFetched = Date.now();
-          // FIXME: Refactor this to be more efficient => use query to fetch from cache
-          const priceJUSD = await debtTokenContract.getPrice();
-
-          const [reserveA, reserveB] = await swapPairContract.getReserves();
-          const priceTokenInJUSD = (reserveA / reserveB) * priceJUSD;
-
-          SchemaDataFreshnessManager.DebtToken[Contracts.DebtToken.DebtToken1].priceUSD.value(
-            ethers.toNumber(priceTokenInJUSD),
-          );
-        },
-        value: makeVar(0),
-        lastFetched: 0,
-        timeout: 1000 * 5,
-      },
-
       priceUSDOracle: {
         fetch: async (debtTokenContract: DebtToken) => {
           SchemaDataFreshnessManager.DebtToken[Contracts.DebtToken.DebtToken1]!.priceUSDOracle.lastFetched = Date.now();
