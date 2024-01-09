@@ -181,7 +181,7 @@ function TradingViewComponent() {
             },
 
         // General config
-        symbol: process.env.NEXT_PUBLIC_API_MOCKING === 'enabled' ? 'AAPL' : selectedToken.symbol,
+        symbol: devMode ? 'AAPL' : selectedToken.symbol,
         autosize: true,
 
         debug: process.env.NODE_ENV === 'development',
