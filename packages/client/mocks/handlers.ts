@@ -42,6 +42,8 @@ import {
   GET_TRADING_VIEW_LATEST_CANDLE,
   GET_TROVEMANAGER,
 } from '../app/queries';
+import { ethers } from 'ethers';
+import { floatToBigInt } from '../app/utils/math';
 
 const getFavoritedAssetsFromLS = () => {
   return typeof window !== 'undefined'
@@ -564,7 +566,7 @@ export const handlers = [
         let volume = Math.random() * 1000; // Random volume
 
         // Add the bar to the array
-        bars.push({ timestamp, open, high, low, close, volume });
+        bars.push({ timestamp, open: open.toString(), high: high.toString(), low: low.toString(), close: close.toString(), volume: volume.toString() });
 
         // Increment time by the resolution interval
         // @ts-ignore
@@ -601,13 +603,13 @@ export const handlers = [
         id,
         __typename: 'TokenCandleSingleton',
         timestamp: Date.now(),
-        token: tokens[0],
+        token: tokens[0].address,
         candleSize: 60,
-        open,
-        close,
-        high,
-        low,
-        volume,
+        open: open.toString(),
+        close: close.toString(),
+        high: high.toString(),
+        low: low.toString(),
+        volume: volume.toString(),
       };
 
       return res(

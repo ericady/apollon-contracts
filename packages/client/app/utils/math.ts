@@ -1,3 +1,5 @@
+import { ethers } from "ethers";
+
 export const stdFormatter = new Intl.NumberFormat('en-US', {
   minimumFractionDigits: 2,
   maximumFractionDigits: 2,
@@ -33,9 +35,31 @@ export const displayPercentage = (
 };
 
 export function floatToBigInt(floatNumber: number, precision: number = 18) {
-  const factor = Math.pow(10, precision);
-  const bigIntNumber = BigInt(Math.round(floatNumber * factor));
-  return bigIntNumber;
+  // const factor = Math.pow(10, precision);
+  // const bigIntNumber = BigInt(Math.round(floatNumber * factor));
+  // return bigIntNumber;
+
+   // Convert the float to a string to handle precision
+   const floatString = floatNumber.toString();
+
+   // Use ethers.js utility to parse the float string into a BigInt
+   // This will account for the decimal places and convert accordingly
+   const bigIntValue = ethers.parseUnits(floatString, precision);
+ 
+   return bigIntValue;
+}
+
+export function bigIntStringToFloat(bigIntValue: string, decimals = 18) {
+  const asBigint = ethers.parseUnits(bigIntValue, decimals)
+
+  // Use ethers.js utility to format the BigInt value into a string
+  // This takes into account the decimal places
+  const formattedString = ethers.formatUnits(asBigint, decimals);
+
+  // Convert the formatted string to a float
+  const floatValue = parseFloat(formattedString);
+
+  return floatValue;
 }
 
 //  die currentSwapFee wird in dem event als 1e6 angegeben → 1000000 sind 100%, 3000 sind 0.3%

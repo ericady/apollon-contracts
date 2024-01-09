@@ -8,3 +8,6 @@ generates:
       - 'typescript-operations'
     config:
       nonOptionalTypename: true
+      scalars:
+        BigInt: string
+        Bytes: string

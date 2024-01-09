@@ -12,6 +12,8 @@ export type Scalars = {
   Boolean: { input: boolean; output: boolean; }
   Int: { input: number; output: number; }
   Float: { input: number; output: number; }
+  BigInt: { input: string; output: string; }
+  Bytes: { input: string; output: string; }
 };
 
 export type BorrowerHistory = {
@@ -231,27 +233,27 @@ export type TokenAmount = {
 export type TokenCandle = {
   __typename: 'TokenCandle';
   candleSize: Scalars['Int']['output'];
-  close: Scalars['Int']['output'];
-  high: Scalars['Int']['output'];
-  id: Scalars['String']['output'];
-  low: Scalars['Int']['output'];
-  open: Scalars['Int']['output'];
+  close: Scalars['BigInt']['output'];
+  high: Scalars['BigInt']['output'];
+  id: Scalars['Bytes']['output'];
+  low: Scalars['BigInt']['output'];
+  open: Scalars['BigInt']['output'];
   timestamp: Scalars['Int']['output'];
   token: Token;
-  volume: Scalars['Int']['output'];
+  volume: Scalars['BigInt']['output'];
 };
 
 export type TokenCandleSingleton = {
   __typename: 'TokenCandleSingleton';
   candleSize: Scalars['Int']['output'];
-  close: Scalars['Int']['output'];
-  high: Scalars['Int']['output'];
+  close: Scalars['BigInt']['output'];
+  high: Scalars['BigInt']['output'];
   id: Scalars['String']['output'];
-  low: Scalars['Int']['output'];
-  open: Scalars['Int']['output'];
+  low: Scalars['BigInt']['output'];
+  open: Scalars['BigInt']['output'];
   timestamp: Scalars['Int']['output'];
-  token: Token;
-  volume: Scalars['Int']['output'];
+  token: Scalars['Bytes']['output'];
+  volume: Scalars['BigInt']['output'];
 };
 
 export type TokenCandle_Filter = {
@@ -364,14 +366,14 @@ export type GetTradingViewCandlesQueryVariables = Exact<{
 }>;
 
 
-export type GetTradingViewCandlesQuery = { __typename: 'Query', tokenCandles: Array<{ __typename: 'TokenCandle', id: string, timestamp: number, open: number, high: number, low: number, close: number, volume: number }> };
+export type GetTradingViewCandlesQuery = { __typename: 'Query', tokenCandles: Array<{ __typename: 'TokenCandle', id: string, timestamp: number, open: string, high: string, low: string, close: string, volume: string }> };
 
 export type GetTradingViewLatestCandleQueryVariables = Exact<{
   id: Scalars['ID']['input'];
 }>;
 
 
-export type GetTradingViewLatestCandleQuery = { __typename: 'Query', tokenCandleSingleton: { __typename: 'TokenCandleSingleton', id: string, timestamp: number, open: number, high: number, low: number, close: number, volume: number } };
+export type GetTradingViewLatestCandleQuery = { __typename: 'Query', tokenCandleSingleton: { __typename: 'TokenCandleSingleton', id: string, timestamp: number, open: string, high: string, low: string, close: string, volume: string } };
 
 export type TokenFragmentFragment = { __typename: 'Token', id: string, address: string };
 

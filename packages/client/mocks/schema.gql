@@ -1,4 +1,5 @@
-scalar Int
+scalar BigInt
+scalar Bytes
 
 type Token {
   id: ID!
@@ -187,26 +188,26 @@ type Query {
 # 1min, 10min, 1hour, 6hour, 1day, 1week
 # const CandleSizes = [1, 10, 60, 360, 1440, 10080];
 type TokenCandle {
-  id: String!
-  token: Token!
-  timestamp: Int!
-  open: Int!
-  high: Int!
-  low: Int!
-  close: Int!
-  volume: Int!
+  id: Bytes!
   candleSize: Int!
+  close: BigInt!
+  high: BigInt!
+  low: BigInt!
+  open: BigInt!
+  timestamp: Int!
+  token: Token!
+  volume: BigInt!
 }
 type TokenCandleSingleton {
-  id: String!
-  token: Token!
-  timestamp: Int!
-  open: Int!
-  high: Int!
-  low: Int!
-  close: Int!
-  volume: Int!
   candleSize: Int!
+  close: BigInt!
+  high: BigInt!
+  id: String!
+  low: BigInt!
+  open: BigInt!
+  timestamp: Int!
+  token: Bytes!
+  volume: BigInt!
 }
 
 input TokenCandle_filter {

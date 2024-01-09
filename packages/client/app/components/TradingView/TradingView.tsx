@@ -21,8 +21,10 @@ import {
 } from '../../generated/gql-types';
 import { GET_TRADING_VIEW_CANDLES, GET_TRADING_VIEW_LATEST_CANDLE } from '../../queries';
 import TradingViewHeader from './TradingViewHeader';
+import { bigIntStringToFloat } from '../../utils/math';
 
-const devMode = process.env.NEXT_PUBLIC_API_MOCKING === 'enabled';
+// const devMode = process.env.NEXT_PUBLIC_API_MOCKING === 'enabled';
+const devMode = false;
 
 function TradingViewComponent() {
   const theme = useTheme();
@@ -52,7 +54,7 @@ function TradingViewComponent() {
       const {
         tokenCandleSingleton: { close, high, low, open, timestamp, volume },
       } = data;
-      updateLatestCandleCallback.current({ time: timestamp, open, high, low, close, volume });
+      updateLatestCandleCallback.current({ time: timestamp, open: bigIntStringToFloat(open), high: bigIntStringToFloat(high), low: bigIntStringToFloat(low), close: bigIntStringToFloat(close), volume: bigIntStringToFloat(volume) });
     }
   }, [data]);
 
@@ -160,12 +162,12 @@ function TradingViewComponent() {
                   })
                   .then((res) => {
                     const bars = res.data.tokenCandles.map(({ close, high, low, open, timestamp, volume }) => ({
-                      close,
-                      high,
-                      low,
-                      open,
+                      close: bigIntStringToFloat(close),
+                      high: bigIntStringToFloat(high),
+                      low: bigIntStringToFloat(low),
+                      open: bigIntStringToFloat(open),
                       time: timestamp,
-                      volume,
+                      volume: bigIntStringToFloat(volume),
                     }));
                     onHistoryCallback(bars, { noData: false });
                   })

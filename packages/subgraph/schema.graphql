@@ -2,7 +2,7 @@
 type SystemInfo @entity {
   # "SystemInfo"
   id: String!
-  timestamp: BigInt!
+  timestamp: Int!
   stableCoin: Bytes!
 }
 
@@ -26,7 +26,7 @@ type Token @entity {
 type DebtTokenMeta @entity(immutable: true) {
   id: Bytes!
   token: Token! @relation(name: "TokenToDebtTokenMeta")
-  timestamp: BigInt!
+  timestamp: Int!
 
   # global
 
@@ -64,7 +64,7 @@ type StabilityDepositAPY @entity {
 type StabilityDepositChunk @entity {
   # "StabilityDepositChunk" + token + index
   id: String!
-  timestamp: BigInt!
+  timestamp: Int!
   profit: BigInt!
   volume: BigInt!
 }
@@ -85,7 +85,7 @@ type StabilityDepositChunk @entity {
 type CollateralTokenMeta @entity(immutable: true) {
   id: Bytes!
   token: Bytes!
-  timestamp: BigInt!
+  timestamp: Int!
 
   # global
   # TODO: wasa Link to event when ReservePool is implemented
@@ -115,7 +115,7 @@ enum LongShortDirection {
 type SwapEvent @entity(immutable: true) {
   id: ID!
   borrower: String!
-  timestamp: BigInt!
+  timestamp: Int!
   #
   token: Token!
   direction: LongShortDirection! # Indicates whether the swap is LONG or SHORT
@@ -194,7 +194,7 @@ type PoolVolume30d @entity {
 type PoolVolumeChunk @entity {
   # "PoolVolumeChunk" + TokenA + TokenB + index
   id: String!
-  timestamp: BigInt!
+  timestamp: Int!
   value: BigInt!
 }
 
@@ -215,7 +215,7 @@ type BorrowerHistory @entity(immutable: true) {
   id: Bytes!
   pool: Bytes!
   borrower: Bytes!
-  timestamp: BigInt!
+  timestamp: Int!
   # Group transactions together in accumulated view
   block: Int!
   type: BorrowerHistoryType!
@@ -237,7 +237,7 @@ type TokenCandleSingleton @entity {
   id: String!
   token: Bytes!
   # last candle + candleSize
-  timestamp: BigInt!
+  timestamp: Int!
   # last candle
   open: BigInt!
   high: BigInt!
@@ -250,7 +250,7 @@ type TokenCandleSingleton @entity {
 type TokenCandle @entity(immutable: true) {
   id: Bytes!
   token: Token! @relation(name: "TokenToTokenCandle")
-  timestamp: BigInt!
+  timestamp: Int!
   open: BigInt!
   high: BigInt!
   low: BigInt!
