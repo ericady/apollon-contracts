@@ -29,6 +29,9 @@
     },
     "SwapPair": {
       "address": "SwapPair"
+    },
+    "ReservePool": {
+      "address": "ReservePool"
     }
   }
 }

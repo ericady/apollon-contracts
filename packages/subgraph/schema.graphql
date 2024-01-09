@@ -2,7 +2,7 @@
 type SystemInfo @entity {
   # "SystemInfo"
   id: String!
-  timestamp: Int!
+  timestamp: BigInt!
   stableCoin: Bytes!
 }
 
@@ -26,7 +26,7 @@ type Token @entity {
 type DebtTokenMeta @entity(immutable: true) {
   id: Bytes!
   token: Token! @relation(name: "TokenToDebtTokenMeta")
-  timestamp: Int!
+  timestamp: BigInt!
 
   # global
 
@@ -45,7 +45,6 @@ type DebtTokenMeta @entity(immutable: true) {
   # TODO: Fetch this from the client side
   # totalReserve30dAverage: BigInt!
   # event StoragePoolValueUpdated
-  # TODO: wasa Implement the event handlers to update this field
   totalSupplyUSD: BigInt!
   # event StoragePoolValueUpdated
   # totalSupplyUSD30dAverage: BigInt!
@@ -64,7 +63,7 @@ type StabilityDepositAPY @entity {
 type StabilityDepositChunk @entity {
   # "StabilityDepositChunk" + token + index
   id: String!
-  timestamp: Int!
+  timestamp: BigInt!
   profit: BigInt!
   volume: BigInt!
 }
@@ -85,7 +84,7 @@ type StabilityDepositChunk @entity {
 type CollateralTokenMeta @entity(immutable: true) {
   id: Bytes!
   token: Bytes!
-  timestamp: Int!
+  timestamp: BigInt!
 
   # global
   # TODO: wasa Link to event when ReservePool is implemented
@@ -115,7 +114,7 @@ enum LongShortDirection {
 type SwapEvent @entity(immutable: true) {
   id: ID!
   borrower: String!
-  timestamp: Int!
+  timestamp: BigInt!
   #
   token: Token!
   direction: LongShortDirection! # Indicates whether the swap is LONG or SHORT
@@ -194,7 +193,7 @@ type PoolVolume30d @entity {
 type PoolVolumeChunk @entity {
   # "PoolVolumeChunk" + TokenA + TokenB + index
   id: String!
-  timestamp: Int!
+  timestamp: BigInt!
   value: BigInt!
 }
 
@@ -215,7 +214,7 @@ type BorrowerHistory @entity(immutable: true) {
   id: Bytes!
   pool: Bytes!
   borrower: Bytes!
-  timestamp: Int!
+  timestamp: BigInt!
   # Group transactions together in accumulated view
   block: Int!
   type: BorrowerHistoryType!
@@ -237,7 +236,7 @@ type TokenCandleSingleton @entity {
   id: String!
   token: Bytes!
   # last candle + candleSize
-  timestamp: Int!
+  timestamp: BigInt!
   # last candle
   open: BigInt!
   high: BigInt!
@@ -250,7 +249,7 @@ type TokenCandleSingleton @entity {
 type TokenCandle @entity(immutable: true) {
   id: Bytes!
   token: Token! @relation(name: "TokenToTokenCandle")
-  timestamp: Int!
+  timestamp: BigInt!
   open: BigInt!
   high: BigInt!
   low: BigInt!
