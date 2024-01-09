@@ -50,11 +50,11 @@ export function floatToBigInt(floatNumber: number, precision: number = 18) {
 }
 
 export function bigIntStringToFloat(bigIntValue: string, decimals = 18) {
-  const asBigint = ethers.parseUnits(bigIntValue, decimals)
+  const bigint = BigInt(bigIntValue)
 
   // Use ethers.js utility to format the BigInt value into a string
   // This takes into account the decimal places
-  const formattedString = ethers.formatUnits(asBigint, decimals);
+  const formattedString = ethers.formatUnits(bigint, decimals);
 
   // Convert the formatted string to a float
   const floatValue = parseFloat(formattedString);

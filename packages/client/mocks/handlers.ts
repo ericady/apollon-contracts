@@ -566,7 +566,7 @@ export const handlers = [
         let volume = Math.random() * 1000; // Random volume
 
         // Add the bar to the array
-        bars.push({ timestamp, open: open.toString(), high: high.toString(), low: low.toString(), close: close.toString(), volume: volume.toString() });
+        bars.push({ timestamp, open: ethers.parseEther(open.toString()).toString(), high: ethers.parseEther(open.toString()).toString(), low: ethers.parseEther(low.toString()).toString(), close: ethers.parseEther(close.toString()).toString(), volume: ethers.parseEther(volume.toString()).toString() });
 
         // Increment time by the resolution interval
         // @ts-ignore
@@ -605,11 +605,11 @@ export const handlers = [
         timestamp: Date.now(),
         token: tokens[0].address,
         candleSize: 60,
-        open: open.toString(),
-        close: close.toString(),
-        high: high.toString(),
-        low: low.toString(),
-        volume: volume.toString(),
+        open: ethers.parseEther(open.toString()).toString(),
+        close: ethers.parseEther(close.toString()).toString(),
+        high: ethers.parseEther(high.toString()).toString(),
+        low: ethers.parseEther(low.toString()).toString(),
+        volume: ethers.parseEther(volume.toString()).toString(),
       };
 
       return res(
