@@ -37,8 +37,8 @@ function TradingViewComponent() {
   const { data } = useQuery<GetTradingViewLatestCandleQuery, GetTradingViewLatestCandleQueryVariables>(
     GET_TRADING_VIEW_LATEST_CANDLE,
     {
-      // TODO: That is right around the block time but use Subscriptions instead
-      pollInterval: 30000,
+      // TODO: Can not use Subscriptions. Better alterantive?
+      pollInterval: 5000,
       skip: !selectedToken,
       variables: {
         id: `TokenCandleSingleton-${selectedToken?.address}-60`,
@@ -180,11 +180,9 @@ function TradingViewComponent() {
 
         // General config
         symbol: process.env.NEXT_PUBLIC_API_MOCKING === 'enabled' ? 'AAPL' : selectedToken.symbol,
-        // @ts-ignore
-        // interval: '1D',
         autosize: true,
 
-        // debug: process.env.NODE_ENV === 'development',
+        debug: process.env.NODE_ENV === 'development',
         theme: isDarkMode ? 'dark' : 'light',
         // TODO: Maybe implement later for diffing
         disabled_features: ['header_symbol_search', 'header_compare'],
