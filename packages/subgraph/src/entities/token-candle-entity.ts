@@ -63,7 +63,7 @@ export function handleUpdateTokenCandle_low_high(
       `TokenCandleSingleton-${swapPair.toHexString()}-${CandleSizes[i].toString()}`,
     )!;
 
-    if (candleSingleton.timestamp.plus(BigInt.fromI32(CandleSizes[i] * 1000)) < event.block.timestamp) {
+    if (candleSingleton.timestamp.plus(BigInt.fromI32(CandleSizes[i] * 60)) < event.block.timestamp) {
       handleCloseCandle(event, pairToken, CandleSizes[i], tokenPriceUSD);
     } else {
       if (candleSingleton.low.gt(tokenPriceUSD)) {
@@ -105,7 +105,7 @@ export function handleUpdateTokenCandle_volume(
       `TokenCandleSingleton-${pairToken.toHexString()}-${CandleSizes[i].toString()}`,
     )!;
 
-    if (candleSingleton.timestamp.plus(BigInt.fromI32(CandleSizes[i] * 1000)) < event.block.timestamp) {
+    if (candleSingleton.timestamp.plus(BigInt.fromI32(CandleSizes[i] * 60)) < event.block.timestamp) {
       handleCloseCandle(event, pairToken, CandleSizes[i], tokenPriceUSD, additionalTradeVolume);
     } else {
       candleSingleton.volume = candleSingleton.volume.plus(additionalTradeVolume);

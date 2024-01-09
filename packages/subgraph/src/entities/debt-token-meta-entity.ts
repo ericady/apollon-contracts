@@ -5,7 +5,7 @@ import { DebtToken } from '../../generated/DebtToken/DebtToken';
 import { ReservePool } from '../../generated/ReservePool/ReservePool';
 import { StabilityOffsetAddedGainsStruct, StabilityPool } from '../../generated/StabilityPool/StabilityPool';
 import { StabilityPoolManager } from '../../generated/StabilityPoolManager/StabilityPoolManager';
-import { DebtTokenMeta, Token } from '../../generated/schema';
+import { DebtTokenMeta, StabilityDepositAPY, StabilityDepositChunk, Token } from '../../generated/schema';
 
 export const stableDebtToken = EventAddress.fromString('0x6c3f90f043a72fa612cbac8115ee7e52bde6e490');
 export const govToken = EventAddress.fromString('0x9f8f72aa9304c8b593d555f12ef6589cc3a579a2');
@@ -57,5 +57,80 @@ export function handleUpdateStabilityDepositAPY(
   lostDeposit: BigInt,
   collGain: StabilityOffsetAddedGainsStruct[],
 ): void {
-  // # "StabilityDepositAPY" + token
+  let stabilityDepositAPYEntity = StabilityDepositAPY.load(`StabilityDepositAPY-${tokenAddress.toHexString()}`);
+
+  // Calculate Profit from gained colls and lost debts
+  const tokenContract = DebtToken.bind(tokenAddress);
+  const tokenPrice = tokenContract.getPrice();
+  const loss = lostDeposit.times(tokenPrice);
+
+  let allGains = BigInt.fromI32(0);
+
+  for (let i = 0; i < collGain.length; i++) {
+    const { tokenAddress, amount } = collGain[i];
+    const tokenContract = DebtToken.bind(tokenAddress);
+    const tokenPrice = tokenContract.getPrice();
+
+    allGains.plus(tokenPrice.times(amount));
+  }
+
+  const profit = allGains.minus(loss);
+
+  // If there is no chunk at all create a new one and a new APY
+  if (stabilityDepositAPYEntity === null) {
+    // create new chunk
+    const firstStabilityDepositChunk = new StabilityDepositChunk(
+      `StabilityDepositChunk-${tokenAddress.toHexString()}-0`,
+    );
+    firstStabilityDepositChunk.timestamp = event.block.timestamp;
+    firstStabilityDepositChunk.profit = profit;
+    firstStabilityDepositChunk.volume = lostDeposit;
+    firstStabilityDepositChunk.save();
+
+    // create new APY
+    stabilityDepositAPYEntity = new StabilityDepositAPY(`StabilityDepositAPY-${tokenAddress.toHexString()}`);
+    stabilityDepositAPYEntity.index = 0;
+    firstStabilityDepositChunk.profit = profit;
+    firstStabilityDepositChunk.volume = lostDeposit;
+  } else {
+    const lastIndex = stabilityDepositAPYEntity.index;
+    const latestChunk = StabilityDepositChunk.load(`StabilityDepositChunk-${tokenAddress.toHexString()}-${lastIndex}`)!;
+
+    // check if latest chunk is outdated after 60min
+    const sixtyMin = BigInt.fromI32(60 * 60);
+    const isOutdated = latestChunk.timestamp.gt(event.block.timestamp.plus(sixtyMin));
+
+    if (isOutdated) {
+      // create new chunk
+      const newStabilityDepositChunk = new StabilityDepositChunk(
+        `StabilityDepositChunk-${tokenAddress.toHexString()}-${lastIndex + 1}`,
+      );
+      newStabilityDepositChunk.timestamp = event.block.timestamp;
+      newStabilityDepositChunk.profit = profit;
+      newStabilityDepositChunk.volume = lostDeposit;
+      newStabilityDepositChunk.save();
+
+      // only remove last chunk from APY if it is older that 30d
+      if (lastIndex > 30 * 24) {
+        // remove last chunk from APY but add latest profit and volume too
+        stabilityDepositAPYEntity.profit = stabilityDepositAPYEntity.profit.minus(latestChunk.profit).plus(profit);
+        stabilityDepositAPYEntity.volume = stabilityDepositAPYEntity.volume.minus(latestChunk.volume).plus(lostDeposit);
+      } else {
+        // in the first 30d just add profit + volume
+        stabilityDepositAPYEntity.profit = stabilityDepositAPYEntity.profit.plus(profit);
+        stabilityDepositAPYEntity.volume = stabilityDepositAPYEntity.volume.plus(lostDeposit);
+      }
+      stabilityDepositAPYEntity.index = lastIndex + 1;
+    } else {
+      // just update profit + volume
+      latestChunk.profit = latestChunk.profit.plus(profit);
+      latestChunk.volume = latestChunk.volume.plus(lostDeposit);
+      latestChunk.save();
+
+      stabilityDepositAPYEntity.profit = stabilityDepositAPYEntity.profit.plus(profit);
+      stabilityDepositAPYEntity.volume = stabilityDepositAPYEntity.volume.plus(lostDeposit);
+    }
+  }
+
+  stabilityDepositAPYEntity.save();
 }
