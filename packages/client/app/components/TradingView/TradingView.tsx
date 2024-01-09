@@ -20,8 +20,8 @@ import {
   GetTradingViewLatestCandleQueryVariables,
 } from '../../generated/gql-types';
 import { GET_TRADING_VIEW_CANDLES, GET_TRADING_VIEW_LATEST_CANDLE } from '../../queries';
-import TradingViewHeader from './TradingViewHeader';
 import { bigIntStringToFloat } from '../../utils/math';
+import TradingViewHeader from './TradingViewHeader';
 
 // const devMode = process.env.NEXT_PUBLIC_API_MOCKING === 'enabled';
 const devMode = false;
@@ -54,7 +54,14 @@ function TradingViewComponent() {
       const {
         tokenCandleSingleton: { close, high, low, open, timestamp, volume },
       } = data;
-      updateLatestCandleCallback.current({ time: timestamp, open: bigIntStringToFloat(open), high: bigIntStringToFloat(high), low: bigIntStringToFloat(low), close: bigIntStringToFloat(close), volume: bigIntStringToFloat(volume) });
+      updateLatestCandleCallback.current({
+        time: timestamp,
+        open: bigIntStringToFloat(open),
+        high: bigIntStringToFloat(high),
+        low: bigIntStringToFloat(low),
+        close: bigIntStringToFloat(close),
+        volume: bigIntStringToFloat(volume),
+      });
     }
   }, [data]);
 

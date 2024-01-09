@@ -1,4 +1,5 @@
 import { faker } from '@faker-js/faker';
+import { ethers } from 'ethers';
 import { graphql } from 'msw';
 import { FAVORITE_ASSETS_LOCALSTORAGE_KEY } from '../app/components/Features/Assets/Assets';
 import { Contracts } from '../app/context/EthersProvider';
@@ -42,8 +43,6 @@ import {
   GET_TRADING_VIEW_LATEST_CANDLE,
   GET_TROVEMANAGER,
 } from '../app/queries';
-import { ethers } from 'ethers';
-import { floatToBigInt } from '../app/utils/math';
 
 const getFavoritedAssetsFromLS = () => {
   return typeof window !== 'undefined'
@@ -566,7 +565,14 @@ export const handlers = [
         let volume = Math.random() * 1000; // Random volume
 
         // Add the bar to the array
-        bars.push({ timestamp, open: ethers.parseEther(open.toString()).toString(), high: ethers.parseEther(open.toString()).toString(), low: ethers.parseEther(low.toString()).toString(), close: ethers.parseEther(close.toString()).toString(), volume: ethers.parseEther(volume.toString()).toString() });
+        bars.push({
+          timestamp,
+          open: ethers.parseEther(open.toString()).toString(),
+          high: ethers.parseEther(open.toString()).toString(),
+          low: ethers.parseEther(low.toString()).toString(),
+          close: ethers.parseEther(close.toString()).toString(),
+          volume: ethers.parseEther(volume.toString()).toString(),
+        });
 
         // Increment time by the resolution interval
         // @ts-ignore

@@ -1,4 +1,4 @@
-import { ethers } from "ethers";
+import { ethers } from 'ethers';
 
 export const stdFormatter = new Intl.NumberFormat('en-US', {
   minimumFractionDigits: 2,
@@ -39,18 +39,18 @@ export function floatToBigInt(floatNumber: number, precision: number = 18) {
   // const bigIntNumber = BigInt(Math.round(floatNumber * factor));
   // return bigIntNumber;
 
-   // Convert the float to a string to handle precision
-   const floatString = floatNumber.toString();
+  // Convert the float to a string to handle precision
+  const floatString = floatNumber.toString();
 
-   // Use ethers.js utility to parse the float string into a BigInt
-   // This will account for the decimal places and convert accordingly
-   const bigIntValue = ethers.parseUnits(floatString, precision);
- 
-   return bigIntValue;
+  // Use ethers.js utility to parse the float string into a BigInt
+  // This will account for the decimal places and convert accordingly
+  const bigIntValue = ethers.parseUnits(floatString, precision);
+
+  return bigIntValue;
 }
 
 export function bigIntStringToFloat(bigIntValue: string, decimals = 18) {
-  const bigint = BigInt(bigIntValue)
+  const bigint = BigInt(bigIntValue);
 
   // Use ethers.js utility to format the BigInt value into a string
   // This takes into account the decimal places
