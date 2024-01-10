@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "yarn codegen && next build",
+    "build": "yarn codegen:types && next build",
     "start": "next start",
     "lint": "next lint",
     "prettier:check": "prettier --check **/*.{js,jsx,mjs,ts,tsx,json,css,md}",
