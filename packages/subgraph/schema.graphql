@@ -4,6 +4,7 @@ type SystemInfo @entity {
   id: String!
   timestamp: BigInt!
   stableCoin: Bytes!
+  storagePool: Bytes!
 }
 
 # TODO: wasa mapper for swap pools PairCreated event
@@ -87,10 +88,24 @@ type CollateralTokenMeta @entity(immutable: true) {
   timestamp: BigInt!
 
   # global
-  # TODO: wasa Link to event when ReservePool is implemented
   totalValueLockedUSD: BigInt!
-  # TODO: 30d average => also needs an aggregator
-  totalValueLockedUSD30dAverage: BigInt!
+  totalValueLockedUSD30dAverage: TotalValueLockedAverage!
+}
+
+# aggregator for 30d average, each chunk is 60min
+type TotalValueLockedAverage @entity {
+  # "TotalValueLockedAverage" + token
+  id: String!
+  index: Int!
+  value: BigInt!
+}
+
+# A chunk is added once every 60min are over and is deducted at the end of 30d
+type TotalValueLockedChunk @entity {
+  # "TotalValueLockedChunk" + token + index
+  id: String!
+  timestamp: BigInt!
+  value: BigInt!
 }
 
 # type UserCollateralTokenMeta @entity {

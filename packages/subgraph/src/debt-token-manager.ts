@@ -5,13 +5,13 @@ import {
   OwnershipTransferred as OwnershipTransferredEvent,
 } from '../generated/DebtTokenManager/DebtTokenManager';
 import { handleCreateDebtTokenMeta } from './entities/debt-token-meta-entity';
-import { handleUpdateSystemInfo } from './entities/system-info-entity';
+import { handleUpdateSystemInfo_stableCoin } from './entities/system-info-entity';
 import { handleCreateToken } from './entities/token-entity';
 
 export function handleDebtTokenAdded(event: DebtTokenAddedEvent): void {
   const debtTokenManagerContract = DebtTokenManager.bind(event.address);
   const stableCoin = debtTokenManagerContract.getStableCoin();
-  handleUpdateSystemInfo(event, stableCoin);
+  handleUpdateSystemInfo_stableCoin(event, stableCoin);
 
   handleCreateToken(event, event.params._debtTokenAddress, false);
   handleCreateDebtTokenMeta(event, event.params._debtTokenAddress);

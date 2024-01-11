@@ -36,6 +36,6 @@ export function handleTroveSnapshotsUpdated(event: TroveSnapshotsUpdatedEvent): 
 export function handleCollChanged(event: TroveCollChangedEvent): void {
   for (let i = 0; i < event.params._collTokenAddresses.length; i++) {
     // TODO: Loop over troves from the troveManager to get totalValueLockedUSD for any single collToken
-    handleCreateCollateralTokenMeta(event, event.params._collTokenAddresses[i], event.address);
+    handleCreateCollateralTokenMeta(event, event.params._collTokenAddresses[i]);
   }
 }
