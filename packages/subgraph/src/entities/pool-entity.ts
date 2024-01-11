@@ -3,9 +3,9 @@ import { SwapPair } from '../../generated/SwapPair/SwapPair';
 import { Pool, PoolLiquidity, PoolVolume30d, PoolVolumeChunk } from '../../generated/schema';
 
 // 15 minutes
-const chunkSize = 15 * 60 * 1000;
-const thirtyDays = BigInt.fromI32(30 * 24 * 60 * 60 * 1000);
-const totalChunks = 30 * 24 * 4;
+const chunkSize = 60;
+const thirtyDays = BigInt.fromI32(30 * 24 * 60 * 60);
+const totalChunks = 30 * 24;
 
 export function handleCreatePool(event: ethereum.Event, token0: Address, token1: Address): void {
   const poolEntity = new Pool(`Pool-${token0.toHexString()}-${token1.toHexString()}`);
@@ -31,14 +31,16 @@ export function handleCreatePool(event: ethereum.Event, token0: Address, token1:
 
   //   Aggregator for recent Volume
   const poolVolume = new PoolVolume30d(event.transaction.hash.concatI32(event.logIndex.toI32()));
-  poolVolume.index = 0;
+  poolVolume.lastIndex = 0;
+  poolVolume.leadingIndex = 0;
   poolVolume.value = BigInt.fromI32(0);
   poolVolume.feeUSD = BigInt.fromI32(0);
   poolVolume.save();
   poolEntity.volume30dUSD = poolVolume.id;
 
   const poolVolume30dAgo = new PoolVolume30d(event.transaction.hash.concatI32(event.logIndex.toI32()));
-  poolVolume30dAgo.index = 0;
+  poolVolume30dAgo.lastIndex = 0;
+  poolVolume30dAgo.leadingIndex = 0;
   poolVolume30dAgo.value = BigInt.fromI32(0);
   poolVolume30dAgo.feeUSD = BigInt.fromI32(0);
   poolVolume30dAgo.save();
@@ -56,31 +58,59 @@ export function handleUpdatePoolVolume(event: ethereum.Event, token0: Address, t
 
   //   load last VolumeChunk and check if its outdated
   const recentVolume = PoolVolume30d.load(poolEntity.volume30dUSD)!;
-  const lastIndex = recentVolume.index;
 
-  const lastVolumeChunk = PoolVolumeChunk.load(
-    `PoolVolumeChunk-${token0.toHexString()}-${token1.toHexString()}-${lastIndex}`,
+  const leadingVolumeChunk = PoolVolumeChunk.load(
+    `PoolVolumeChunk-${token0.toHexString()}-${token1.toHexString()}-${recentVolume.leadingIndex}`,
   )!;
-  const isOutdated = lastVolumeChunk.timestamp.plus(thirtyDays).lt(BigInt.fromI32(Date.now()));
+  const leadingChunkIsOutdated = leadingVolumeChunk.timestamp.plus(BigInt.fromI32(chunkSize)).lt(event.block.timestamp);
 
-  if (isOutdated) {
-    // create new chunk
+  // create a new chunk
+  if (leadingChunkIsOutdated) {
     const newVolumeChunk = new PoolVolumeChunk(
-      `PoolVolumeChunk-${token0.toHexString()}-${token1.toHexString()}-${lastIndex}`,
+      `PoolVolumeChunk-${token0.toHexString()}-${token1.toHexString()}-${recentVolume.leadingIndex + 1}`,
     )!;
-    newVolumeChunk.timestamp = event.block.timestamp;
+    // increase timestamp by exactly chunksize
+    newVolumeChunk.timestamp = leadingVolumeChunk.timestamp.plus(BigInt.fromI32(chunkSize));
     newVolumeChunk.value = value;
-
     newVolumeChunk.save();
 
-    // remove old chunk and add new chunk
-    recentVolume.index = lastIndex + 1;
-    recentVolume.value = recentVolume.value.minus(lastVolumeChunk.value).plus(value);
+    recentVolume.leadingIndex += 1;
   } else {
-    lastVolumeChunk.value = lastVolumeChunk.value.plus(value);
-    lastVolumeChunk.save();
+    // just add it to the leading chunk
+    leadingVolumeChunk.value = leadingVolumeChunk.value.plus(value);
+    leadingVolumeChunk.save();
+  }
 
-    recentVolume.value = recentVolume.value.minus(lastVolumeChunk.value).plus(value);
+  // add new volume
+  recentVolume.value = recentVolume.value.plus(value);
+
+  const lastVolumeChunk = PoolVolumeChunk.load(
+    `PoolVolumeChunk-${token0.toHexString()}-${token1.toHexString()}-${recentVolume.lastIndex}`,
+  )!;
+  const lastChunkIsOutdated = lastVolumeChunk.timestamp.plus(thirtyDays).lt(event.block.timestamp);
+  if (lastChunkIsOutdated) {
+    recentVolume.value = recentVolume.value.minus(lastVolumeChunk.value);
+    recentVolume.lastIndex += 1;
+
+    const volume30DaysAgo = PoolVolume30d.load(poolEntity.volume30dUSD30dAgo)!;
+
+    // add new chunk that is just older than 30 days
+    volume30DaysAgo.leadingIndex += 1;
+    volume30DaysAgo.value = volume30DaysAgo.value.plus(lastVolumeChunk.value);
+
+    // remove chunk that is older than 60 days
+    const lastVolumeChunk30DaysAgo = PoolVolumeChunk.load(
+      `PoolVolumeChunk-${token0.toHexString()}-${token1.toHexString()}-${volume30DaysAgo.lastIndex}`,
+    )!;
+    const lastChunkIsOutdated = lastVolumeChunk30DaysAgo.timestamp
+      .plus(thirtyDays.times(BigInt.fromI32(2)))
+      .lt(event.block.timestamp);
+    if (lastChunkIsOutdated) {
+      volume30DaysAgo.value = volume30DaysAgo.value.minus(lastVolumeChunk30DaysAgo.value);
+      volume30DaysAgo.lastIndex += 1;
+    }
+
+    volume30DaysAgo.save();
   }
 
   recentVolume.save();

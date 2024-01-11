@@ -198,7 +198,8 @@ type Pool @entity {
 # Aggregator, pushed old events out and lets new in, recalculating the acc value each time
 type PoolVolume30d @entity {
   id: Bytes!
-  index: Int!
+  leadingIndex: Int!
+  lastIndex: Int!
   value: BigInt!
   # die fee in USD bitte ebenfalls im laufenden durchschnitt mitberechen, diese wird dann notwenidg um die APY zu ermitteln
   feeUSD: BigInt!
