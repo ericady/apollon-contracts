@@ -13,7 +13,7 @@ export const govToken = EventAddress.fromString('0x9f8f72aa9304c8b593d555f12ef65
 export function handleCreateDebtTokenMeta(
   event: ethereum.Event,
   tokenAddress: Address,
-  govReserveCap: BigInt | undefined = undefined,
+  govReserveCap: BigInt | null = null,
 ): void {
   const debtTokenMeta = new DebtTokenMeta(event.transaction.hash.concatI32(event.logIndex.toI32()));
 
@@ -67,7 +67,8 @@ export function handleUpdateStabilityDepositAPY(
   let allGains = BigInt.fromI32(0);
 
   for (let i = 0; i < collGain.length; i++) {
-    const { tokenAddress, amount } = collGain[i];
+    const tokenAddress = collGain[i].tokenAddress;
+    const amount = collGain[i].amount;
     const tokenContract = DebtToken.bind(tokenAddress);
     const tokenPrice = tokenContract.getPrice();
 

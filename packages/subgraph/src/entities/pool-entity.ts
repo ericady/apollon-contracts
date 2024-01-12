@@ -53,7 +53,7 @@ export function handleCreatePool(event: ethereum.Event, token0: Address, token1:
   poolVolumeChunk.save();
 }
 
-export function handleUpdatePoolVolume(event: ethereum.Event, token0: Address, token1: Address, value: BigInt) {
+export function handleUpdatePoolVolume(event: ethereum.Event, token0: Address, token1: Address, value: BigInt): void {
   const poolEntity = Pool.load(`Pool-${token0.toHexString()}-${token1.toHexString()}`)!;
 
   //   load last VolumeChunk and check if its outdated
@@ -116,7 +116,7 @@ export function handleUpdatePoolVolume(event: ethereum.Event, token0: Address, t
   recentVolume.save();
 }
 
-export function handleUpdatePoolTotalSupply(event: ethereum.Event, token0: Address, token1: Address) {
+export function handleUpdatePoolTotalSupply(event: ethereum.Event, token0: Address, token1: Address): void {
   const poolEntity = Pool.load(`Pool-${token0.toHexString()}-${token1.toHexString()}`)!;
 
   const swapPairContract = SwapPair.bind(event.address);

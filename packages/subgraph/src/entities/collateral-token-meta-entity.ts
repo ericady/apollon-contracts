@@ -14,7 +14,7 @@ export function handleCreateCollateralTokenMeta(event: ethereum.Event, tokenAddr
   collateralTokenMeta.timestamp = event.block.timestamp;
 
   const systemInfo = SystemInfo.load(`SystemInfo`)!;
-  const storagePoolContract = StoragePool.bind(systemInfo.storagePool);
+  const storagePoolContract = StoragePool.bind(Address.fromBytes(systemInfo.storagePool));
 
   collateralTokenMeta.totalValueLockedUSD = storagePoolContract.getTokenTotalAmount(tokenAddress, true);
 
