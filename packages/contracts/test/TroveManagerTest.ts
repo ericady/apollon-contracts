@@ -576,15 +576,15 @@ describe('TroveManager', () => {
         // console.log('Alice ICR: ', (await troveManager.getCurrentICR(alice))[0] / BigInt(1e16));
 
         const priceBefore = await priceFeed.getPrice(BTC);
-        console.log('🔥 ~ file: TroveManagerTest.ts:700 ~ it ~ priceBefore:', priceBefore);
+        console.log('🔥 ~ it ~ priceBefore:', priceBefore);
 
         const tcrBefore = await getTCR(contracts);
-        console.log('🔥 ~ file: TroveManagerTest.ts:702 ~ it ~ tcrBefore:', tcrBefore / BigInt(1e16));
+        console.log('🔥 ~ it ~ tcrBefore:', tcrBefore);
 
         //decrease price
         await priceFeed.setTokenPrice(BTC, parseUnits('10000'));
         const price = await priceFeed.getPrice(BTC);
-        console.log('🔥 ~ file: TroveManagerTest.ts:676 ~ it ~ price:', price);
+        console.log('🔥 ~ it ~ price:', price);
         const TCR_0 = await getTCR(contracts);
         console.log('🔥 ~ it ~ TCR_0:', TCR_0);
 
@@ -609,12 +609,12 @@ describe('TroveManager', () => {
 
         //get entire system coll & debt
         const entireSystemColl_Before = await storagePool.getEntireSystemColl();
-        console.log('🔥 ~ file: TroveManagerTest.ts:679 ~ it ~ entireSystemColl_Before:', entireSystemColl_Before);
+        console.log('🔥 ~ it ~ entireSystemColl_Before:', entireSystemColl_Before);
         const entireSystemDebt_Before = await storagePool.getEntireSystemDebt();
-        console.log('🔥 ~ file: TroveManagerTest.ts:681 ~ it ~ entireSystemDebt_Before:', entireSystemDebt_Before);
+        console.log('🔥 ~ it ~ entireSystemDebt_Before:', entireSystemDebt_Before);
 
         const expectedTCR_0 = (entireSystemColl_Before * parseUnits('1')) / entireSystemDebt_Before;
-        console.log('🔥 ~ file: TroveManagerTest.ts:682 ~ it ~ expectedTCR_0:', expectedTCR_0 / BigInt(1e16));
+        console.log('🔥 ~ it ~ expectedTCR_0:', expectedTCR_0 / BigInt(1e16));
         expect(expectedTCR_0).to.be.equal(TCR_0);
 
         // Confirm system is not in Recovery Mode
@@ -721,7 +721,7 @@ describe('TroveManager', () => {
         console.log("dennis's ICR: ", dennisICRAfter / BigInt(1e16));
 
         const price = await priceFeed.getPrice(BTC);
-        console.log('🔥 ~ file: TroveManagerTest.ts:522 ~ it ~ price:', price);
+        console.log('🔥 ~ it ~ price:', price);
         const TCR_0 = await getTCR(contracts);
         console.log('🔥 ~ it ~ TCR_0:', TCR_0);
 
@@ -1181,11 +1181,11 @@ describe('TroveManager', () => {
 
       //get alice's pending rewards
       const aliceStatusBefore = await troveManager.getTroveStatus(alice);
-      console.log('🔥 ~ file: TroveManagerTest.ts:549 ~ it ~ aliceStatusBefore:', aliceStatusBefore);
+      console.log('🔥 ~ it ~ aliceStatusBefore:', aliceStatusBefore);
 
       //check alice's pending rewards
       const alicePendingReward_Before = await troveManager.getPendingReward(alice, BTC, true);
-      console.log('🔥 ~ file: TroveManagerTest.ts:566 ~ it ~ alicePendingReward_Before:', alicePendingReward_Before);
+      console.log('🔥 ~ it ~ alicePendingReward_Before:', alicePendingReward_Before);
 
       // Attempt to liquidate alice and dennis, which skips alice in the liquidation since it is immune
       const liquidate_alice = await liquidationOperations.liquidate(alice);
