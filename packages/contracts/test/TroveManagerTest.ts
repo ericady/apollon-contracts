@@ -345,9 +345,11 @@ describe('TroveManager', () => {
       });
 
       // todo
-      it.skip('liquidate(): Given the same price and no other trove changes, complete Pool offsets restore the TCR to its value prior to the defaulters opening troves', async () => {});
+      // it.skip('liquidate(): Given the same price and no other trove changes, complete Pool offsets restore the TCR to its value prior to the defaulters opening troves', async () => {}); DONE
       // it.skip('liquidate(): Pool offsets increase the TCR', async () => {}); DONE
       // it.skip('liquidate(): a pure redistribution reduces the TCR only as a result of compensation', async () => {}); WORKING
+      // todo
+      // it.skip("liquidates a SP depositor's trove with ICR < 110%, and the liquidation correctly impacts their SP deposit and ETH gain", async () => {}); DONE
 
       it("does not affect the SP deposit or coll gain when called on an SP depositor's address that has no trove", async () => {
         await whaleShrimpTroveInit(contracts, signers, false);
@@ -375,9 +377,6 @@ describe('TroveManager', () => {
         const spGainAfter = await stabilityPool.getDepositorCollGain(erin, BTC);
         assert.equal(spGainBefore, spGainAfter);
       });
-
-      // todo
-      it.skip("liquidates a SP depositor's trove with ICR < 110%, and the liquidation correctly impacts their SP deposit and ETH gain", async () => {});
 
       it("does not alter the liquidated user's token balance", async () => {
         await whaleShrimpTroveInit(contracts, signers, false);
@@ -1112,7 +1111,7 @@ describe('TroveManager', () => {
         from: alice,
         contracts,
         collToken: BTC,
-        collAmount: parseUnits('2', 9),
+        collAmount: parseUnits('1', 9),
         debts: [{ tokenAddress: STABLE, amount: parseUnits('8000') }],
       });
       await stabilityPoolManager
@@ -1126,7 +1125,7 @@ describe('TroveManager', () => {
         contracts,
         collToken: BTC,
         collAmount: parseUnits('2', 9),
-        debts: [{ tokenAddress: STABLE, amount: parseUnits('5500') }],
+        debts: [{ tokenAddress: STABLE, amount: parseUnits('10000') }],
       });
       const bobICR = (await troveManager.getCurrentICR(bob)).ICR;
       console.log("Bob's ICR: ", bobICR / BigInt(1e16));
@@ -1135,8 +1134,8 @@ describe('TroveManager', () => {
         from: carol,
         contracts,
         collToken: BTC,
-        collAmount: parseUnits('2', 9),
-        debts: [{ tokenAddress: STABLE, amount: parseUnits('18000') }],
+        collAmount: parseUnits('1', 9),
+        debts: [{ tokenAddress: STABLE, amount: parseUnits('14000') }],
       });
       const carolICR = (await troveManager.getCurrentICR(carol)).ICR;
       console.log("Carol's ICR: ", carolICR / BigInt(1e16));
@@ -1145,14 +1144,14 @@ describe('TroveManager', () => {
         from: dennis,
         contracts,
         collToken: BTC,
-        collAmount: parseUnits('2', 9),
-        debts: [{ tokenAddress: STABLE, amount: parseUnits('18500') }],
+        collAmount: parseUnits('1', 9),
+        debts: [{ tokenAddress: STABLE, amount: parseUnits('15000') }],
       });
       const dennisICR = (await troveManager.getCurrentICR(dennis)).ICR;
       console.log("dennis's ICR: ", dennisICR / BigInt(1e16));
 
       //decrease price
-      await priceFeed.setTokenPrice(BTC, parseUnits('10000'));
+      await priceFeed.setTokenPrice(BTC, parseUnits('15000'));
 
       // Confirm system is not in Recovery Mode
       const [isRecoveryModeBefore] = await storagePool.checkRecoveryMode();
@@ -1163,12 +1162,10 @@ describe('TroveManager', () => {
       const carol_Status = await troveManager.getTroveStatus(carol);
       assert.equal(carol_Status.toString(), TroveStatus.CLOSED_BY_LIQUIDATION_IN_NORMAL_MODE.toString());
 
-      await stabilityPoolManager.connect(carol).provideStability([{ tokenAddress: STABLE, amount: parseUnits('10') }]);
+      await stabilityPoolManager.connect(carol).provideStability([{ tokenAddress: STABLE, amount: parseUnits('100') }]);
 
       //drop price again
-      await priceFeed.setTokenPrice(BTC, parseUnits('8000'));
-
-      const aliceBtcRewardBefore = await troveManager.getPendingReward(alice, BTC, true);
+      await priceFeed.setTokenPrice(BTC, parseUnits('12000'));
 
       //check recovery mode
       const [isRecoveryModeAfter] = await storagePool.checkRecoveryMode();
@@ -1188,55 +1185,48 @@ describe('TroveManager', () => {
       console.log('🔥 ~ it ~ alicePendingReward_Before:', alicePendingReward_Before);
 
       // Attempt to liquidate alice and dennis, which skips alice in the liquidation since it is immune
-      const liquidate_alice = await liquidationOperations.liquidate(alice);
-      const liquidate_dennis = await liquidationOperations.liquidate(dennis);
+      await liquidationOperations.liquidate(alice);
+      await liquidationOperations.liquidate(dennis);
 
-      const liquidate_aliceReceipt = await liquidate_alice.wait();
-      const liquidate_dennisReceipt = await liquidate_dennis.wait();
+      const alice_Status = await troveManager.getTroveStatus(alice);
+      assert.equal(alice_Status.toString(), TroveStatus.ACTIVE.toString());
 
-      assert.isTrue(!!liquidate_aliceReceipt?.status);
-      assert.isTrue(!!liquidate_dennisReceipt?.status);
+      const dennis_Status = await troveManager.getTroveStatus(dennis);
+      assert.equal(dennis_Status.toString(), TroveStatus.CLOSED_BY_LIQUIDATION_IN_RECOVERY_MODE.toString());
 
-      const aliceStatusAfter = await troveManager.getTroveStatus(alice);
-      const dennisStatus = await troveManager.getTroveStatus(dennis);
-
-      // remaining troves bob & whale repay a little debt, applying their pending rewards
-      await borrowerOperations.connect(bob).repayDebt([{ tokenAddress: STABLE, amount: parseUnits('1') }]);
+      // remaining troves bob repay a little debt, applying their pending rewards
+      await borrowerOperations.connect(bob).repayDebt([{ tokenAddress: STABLE, amount: parseUnits('1000') }]);
 
       // Check alice is the only trove that has pending rewards
-      const alicePendingReward = await troveManager.getPendingReward(alice, BTC, true);
-      assert.isTrue(alicePendingReward > 0);
+      const alicePendingBTCReward = await troveManager.getPendingReward(alice, BTC, true);
+      assert.isTrue(alicePendingBTCReward > 0);
 
       const bobPendingReward = await troveManager.getPendingReward(bob, BTC, true);
       assert.isFalse(bobPendingReward > 0);
 
       // Check alice's pending coll and debt rewards are <= the coll and debt in the DefaultPool
-      const PendingColBTC_A = await troveManager.getPendingReward(alice, BTC, true);
       const PendingDebtSTABLE_A = await troveManager.getPendingReward(alice, STABLE, false);
 
-      const entireSystemColl = await storagePool.getEntireSystemColl();
+      const entireSystemCollUsd = await storagePool.getEntireSystemColl();
+      const entireSystemCollAmount = await priceFeed.getAmountFromUSDValue(BTC, entireSystemCollUsd);
       const entireSystemDebt = await storagePool.getEntireSystemDebt();
 
       expect(PendingDebtSTABLE_A).to.be.lte(entireSystemDebt);
-      expect(PendingColBTC_A).to.be.lte(entireSystemColl);
+      expect(alicePendingBTCReward).to.be.lte(entireSystemCollUsd);
 
       //Check only difference is dust
-      expect(PendingColBTC_A - entireSystemColl).to.be.lt(1000);
+      expect(alicePendingBTCReward - entireSystemCollAmount).to.be.lt(1000);
       expect(PendingDebtSTABLE_A - entireSystemDebt).to.be.lt(1000);
 
       // Confirm system is still in Recovery Mode
       const [isRecoveryModeAfter_Active] = await storagePool.checkRecoveryMode();
       assert.isTrue(isRecoveryModeAfter_Active);
 
-      // remaining troves bob repay a little debt, applying their pending rewards
-      await borrowerOperations.connect(bob).repayDebt([{ tokenAddress: STABLE, amount: parseUnits('1000') }]);
-
       //drop price again
       await priceFeed.setTokenPrice(BTC, parseUnits('5000'));
 
       //check trove length before liquidation
       const troveLengthBefore = await troveManager.getTroveOwnersCount();
-      console.log('🔥 ~ it ~ troveLengthBefore:', troveLengthBefore);
 
       // Try to liquidate alice again. Check it succeeds and closes alice's trove
       const liquidateAgain_alice = await liquidationOperations.liquidate(alice);
