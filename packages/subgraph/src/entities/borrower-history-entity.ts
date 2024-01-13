@@ -17,12 +17,16 @@ export function handleCreateBorrowerHistory(
   tokenAmountsGained: BigInt[],
 ): void {
   const borrowerHistoryEntity = new BorrowerHistory(event.transaction.hash.concatI32(event.logIndex.toI32()));
+  const systemInfo = SystemInfo.load(`SystemInfo`)!;
 
   borrowerHistoryEntity.pool = poolAddress;
   borrowerHistoryEntity.borrower = borrower;
   borrowerHistoryEntity.timestamp = event.block.timestamp;
 
   const operationValuesLost: Bytes[] = [];
+  // only used in CLAIMED_REWARDS
+  const allLostDepositsUSD = BigInt.fromI32(0);
+
   for (let i = 0; i < tokenAddressesLost.length; i++) {
     const tokenAddress = tokenAddressesLost[i];
     const operationValue = new TokenAmount(
@@ -34,13 +38,17 @@ export function handleCreateBorrowerHistory(
     operationValue.save();
 
     operationValuesLost.push(operationValue.id);
+
+    if (type === 'CLAIMED_REWARDS') {
+      const priceFeedContract = PriceFeed.bind(systemInfo.priceFeed as Address);
+      const tokenPrice = priceFeedContract.getPrice(tokenAddress);
+      allLostDepositsUSD.plus(tokenPrice.times(operationValue.amount));
+    }
   }
 
   const operationValuesGained: Bytes[] = [];
   // only used in CLAIMED_REWARDS
   const allRewardsUSD = BigInt.fromI32(0);
-
-  const systemInfo = SystemInfo.load(`SystemInfo`)!;
 
   for (let i = 0; i < tokenAddressesGained.length; i++) {
     const tokenAddress = tokenAddressesGained[i];
@@ -66,6 +74,7 @@ export function handleCreateBorrowerHistory(
 
   if (type === 'CLAIMED_REWARDS') {
     borrowerHistoryEntity.claimInUSD = allRewardsUSD;
+    borrowerHistoryEntity.lostDepositInUSD = allLostDepositsUSD;
   }
 
   borrowerHistoryEntity.save();

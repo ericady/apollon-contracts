@@ -237,6 +237,8 @@ type BorrowerHistory @entity(immutable: true) {
   values: [TokenAmount!]! @relation(name: "TokenAmountToBorrowerHistory")
   # worth of the claimed tokens in USD at the time of the event, only set on CLAIMED_REWARDS
   claimInUSD: BigInt
+  # worth of the lost debtToken in USD at the time of the event, only set on CLAIMED_REWARDS
+  lostDepositInUSD: BigInt
 }
 
 # CHARTS

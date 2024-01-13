@@ -20,7 +20,7 @@ export type BorrowerHistory = {
   __typename: 'BorrowerHistory';
   claimInUSD?: Maybe<Scalars['Float']['output']>;
   id: Scalars['ID']['output'];
-  resultInUSD: Scalars['Float']['output'];
+  lostDepositInUSD?: Maybe<Scalars['Float']['output']>;
   timestamp: Scalars['Int']['output'];
   type: BorrowerHistoryType;
   values: Array<TokenAmount>;
@@ -214,12 +214,12 @@ export type SystemInfo = {
 
 export type Token = {
   __typename: 'Token';
-  address: Scalars['String']['output'];
-  createdAt: Scalars['String']['output'];
-  id: Scalars['ID']['output'];
+  address: Scalars['Bytes']['output'];
+  createdAt: Scalars['BigInt']['output'];
+  id: Scalars['Bytes']['output'];
   isPoolToken: Scalars['Boolean']['output'];
-  priceUSD: Scalars['Float']['output'];
-  priceUSD24hAgo: Scalars['Float']['output'];
+  priceUSD: Scalars['BigInt']['output'];
+  priceUSD24hAgo: Scalars['BigInt']['output'];
   priceUSDOracle: Scalars['Float']['output'];
   symbol: Scalars['String']['output'];
 };
@@ -296,7 +296,7 @@ export type TroveManager = {
 export type GetAllPoolsQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type GetAllPoolsQuery = { __typename: 'Query', getPools: Array<{ __typename: 'Pool', id: string, swapFee: number, volume30dUSD: number, liquidity: Array<{ __typename: 'PoolLiquidity', totalAmount: number, token: { __typename: 'Token', id: string, address: string, symbol: string, priceUSD: number, priceUSD24hAgo: number } }> }> };
+export type GetAllPoolsQuery = { __typename: 'Query', getPools: Array<{ __typename: 'Pool', id: string, swapFee: number, volume30dUSD: number, liquidity: Array<{ __typename: 'PoolLiquidity', totalAmount: number, token: { __typename: 'Token', id: string, address: string, symbol: string, priceUSD: string, priceUSD24hAgo: string } }> }> };
 
 export type GetSelectedTokenQueryVariables = Exact<{
   address: Scalars['String']['input'];
@@ -308,14 +308,14 @@ export type GetSelectedTokenQuery = { __typename: 'Query', getToken: { __typenam
 export type GetDebtTokensQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type GetDebtTokensQuery = { __typename: 'Query', getDebtTokens: Array<{ __typename: 'DebtTokenMeta', totalSupplyUSD: number, totalReserve: number, totalReserve30dAverage: number, token: { __typename: 'Token', id: string, address: string, symbol: string, priceUSD: number, priceUSD24hAgo: number } }> };
+export type GetDebtTokensQuery = { __typename: 'Query', getDebtTokens: Array<{ __typename: 'DebtTokenMeta', totalSupplyUSD: number, totalReserve: number, totalReserve30dAverage: number, token: { __typename: 'Token', id: string, address: string, symbol: string, priceUSD: string, priceUSD24hAgo: string } }> };
 
 export type GetBorrowerDebtTokensQueryVariables = Exact<{
   borrower: Scalars['String']['input'];
 }>;
 
 
-export type GetBorrowerDebtTokensQuery = { __typename: 'Query', getDebtTokens: Array<{ __typename: 'DebtTokenMeta', troveMintedAmount: number, walletAmount: number, providedStability: number, compoundedDeposit: number, stabilityCompoundAmount: number, troveRepableDebtAmount: number, stabilityDepositAPY: number, totalDepositedStability: number, totalSupplyUSD: number, totalSupplyUSD30dAverage: number, token: { __typename: 'Token', id: string, address: string, symbol: string, priceUSD: number, isPoolToken: boolean } }> };
+export type GetBorrowerDebtTokensQuery = { __typename: 'Query', getDebtTokens: Array<{ __typename: 'DebtTokenMeta', troveMintedAmount: number, walletAmount: number, providedStability: number, compoundedDeposit: number, stabilityCompoundAmount: number, troveRepableDebtAmount: number, stabilityDepositAPY: number, totalDepositedStability: number, totalSupplyUSD: number, totalSupplyUSD30dAverage: number, token: { __typename: 'Token', id: string, address: string, symbol: string, priceUSD: string, isPoolToken: boolean } }> };
 
 export type GetBorrowerSwapEventsQueryVariables = Exact<{
   borrower: Scalars['String']['input'];
@@ -323,28 +323,28 @@ export type GetBorrowerSwapEventsQueryVariables = Exact<{
 }>;
 
 
-export type GetBorrowerSwapEventsQuery = { __typename: 'Query', getSwaps: { __typename: 'SwapEventPage', swaps: Array<{ __typename: 'SwapEvent', id: string, timestamp: number, direction: LongShortDirection, size: number, totalPriceInStable: number, swapFee: number, token: { __typename: 'Token', id: string, address: string, symbol: string, priceUSD: number } }>, pageInfo: { __typename: 'PageInfo', totalCount: number, hasNextPage: boolean, endCursor: string } } };
+export type GetBorrowerSwapEventsQuery = { __typename: 'Query', getSwaps: { __typename: 'SwapEventPage', swaps: Array<{ __typename: 'SwapEvent', id: string, timestamp: number, direction: LongShortDirection, size: number, totalPriceInStable: number, swapFee: number, token: { __typename: 'Token', id: string, address: string, symbol: string, priceUSD: string } }>, pageInfo: { __typename: 'PageInfo', totalCount: number, hasNextPage: boolean, endCursor: string } } };
 
 export type GetBorrowerLiquidityPoolsQueryVariables = Exact<{
   borrower?: InputMaybe<Scalars['String']['input']>;
 }>;
 
 
-export type GetBorrowerLiquidityPoolsQuery = { __typename: 'Query', getPools: Array<{ __typename: 'Pool', id: string, liquidityDepositAPY: number, volume30dUSD: number, volume30dUSD30dAgo: number, totalSupply: number, borrowerAmount: number, liquidity: Array<{ __typename: 'PoolLiquidity', id: string, totalAmount: number, token: { __typename: 'Token', id: string, address: string, symbol: string, priceUSD: number } }> }> };
+export type GetBorrowerLiquidityPoolsQuery = { __typename: 'Query', getPools: Array<{ __typename: 'Pool', id: string, liquidityDepositAPY: number, volume30dUSD: number, volume30dUSD30dAgo: number, totalSupply: number, borrowerAmount: number, liquidity: Array<{ __typename: 'PoolLiquidity', id: string, totalAmount: number, token: { __typename: 'Token', id: string, address: string, symbol: string, priceUSD: string } }> }> };
 
 export type GetCollateralTokensQueryVariables = Exact<{
   borrower: Scalars['String']['input'];
 }>;
 
 
-export type GetCollateralTokensQuery = { __typename: 'Query', getCollateralTokens: Array<{ __typename: 'CollateralTokenMeta', walletAmount: number, troveLockedAmount: number, stabilityGainedAmount: number, totalValueLockedUSD: number, totalValueLockedUSD30dAverage: number, token: { __typename: 'Token', id: string, address: string, symbol: string, priceUSD: number } }> };
+export type GetCollateralTokensQuery = { __typename: 'Query', getCollateralTokens: Array<{ __typename: 'CollateralTokenMeta', walletAmount: number, troveLockedAmount: number, stabilityGainedAmount: number, totalValueLockedUSD: number, totalValueLockedUSD30dAverage: number, token: { __typename: 'Token', id: string, address: string, symbol: string, priceUSD: string } }> };
 
 export type GetBorrowerStabilityHistoryQueryVariables = Exact<{
   borrower: Scalars['String']['input'];
 }>;
 
 
-export type GetBorrowerStabilityHistoryQuery = { __typename: 'Query', getBorrowerStabilityHistory: { __typename: 'PoolHistoryPage', history: Array<{ __typename: 'BorrowerHistory', id: string, timestamp: number, type: BorrowerHistoryType, claimInUSD?: number | null, values: Array<{ __typename: 'TokenAmount', amount: number, token: { __typename: 'Token', address: string, symbol: string } }> }>, pageInfo: { __typename: 'PageInfo', totalCount: number, hasNextPage: boolean, endCursor: string } } };
+export type GetBorrowerStabilityHistoryQuery = { __typename: 'Query', getBorrowerStabilityHistory: { __typename: 'PoolHistoryPage', history: Array<{ __typename: 'BorrowerHistory', id: string, timestamp: number, type: BorrowerHistoryType, claimInUSD?: number | null, lostDepositInUSD?: number | null, values: Array<{ __typename: 'TokenAmount', amount: number, token: { __typename: 'Token', address: string, symbol: string } }> }>, pageInfo: { __typename: 'PageInfo', totalCount: number, hasNextPage: boolean, endCursor: string } } };
 
 export type GetCollateralUsdHistoryQueryVariables = Exact<{ [key: string]: never; }>;
 

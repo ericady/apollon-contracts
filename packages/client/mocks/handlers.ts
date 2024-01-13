@@ -43,6 +43,7 @@ import {
   GET_TRADING_VIEW_LATEST_CANDLE,
   GET_TROVEMANAGER,
 } from '../app/queries';
+import { bigIntStringToFloat } from '../app/utils/math';
 
 const getFavoritedAssetsFromLS = () => {
   return typeof window !== 'undefined'
@@ -60,9 +61,9 @@ const JUSD: Token = {
   address: Contracts.ERC20.JUSD,
   symbol: 'JUSD',
   createdAt: faker.date.past().toISOString(),
-  priceUSD: parseFloat(faker.finance.amount(1, 5000, 2)),
-  priceUSD24hAgo: parseFloat(faker.finance.amount(1, 5000, 2)),
-  priceUSDOracle: parseFloat(faker.finance.amount(1, 5000, 2)),
+  priceUSD: ethers.parseEther(faker.finance.amount(1, 5000, 2)).toString(),
+  priceUSD24hAgo: ethers.parseEther(faker.finance.amount(1, 5000, 2)).toString(),
+  priceUSDOracle: bigIntStringToFloat(ethers.parseEther(faker.finance.amount(1, 5000, 2)).toString()),
   isPoolToken: faker.datatype.boolean(),
 };
 
@@ -74,9 +75,9 @@ export const tokens: Token[] = Array(10)
     address: index <= favoritedAssets.length - 1 ? favoritedAssets[index] : faker.string.uuid(),
     symbol: faker.finance.currencyCode(),
     createdAt: faker.date.past().toISOString(),
-    priceUSD: parseFloat(faker.finance.amount(1, 5000, 2)),
-    priceUSD24hAgo: parseFloat(faker.finance.amount(1, 5000, 2)),
-    priceUSDOracle: parseFloat(faker.finance.amount(1, 5000, 2)),
+    priceUSD: ethers.parseEther(faker.finance.amount(1, 5000, 2)).toString(),
+    priceUSD24hAgo: ethers.parseEther(faker.finance.amount(1, 5000, 2)).toString(),
+    priceUSDOracle: bigIntStringToFloat(ethers.parseEther(faker.finance.amount(1, 5000, 2)).toString()),
     isPoolToken: faker.datatype.boolean(),
   }));
 
@@ -88,9 +89,9 @@ const collateralTokens: Token[] = Object.entries(Contracts.ERC20)
     address,
     symbol,
     createdAt: faker.date.past().toISOString(),
-    priceUSD: parseFloat(faker.finance.amount(1, 5000, 2)),
-    priceUSD24hAgo: parseFloat(faker.finance.amount(1, 5000, 2)),
-    priceUSDOracle: parseFloat(faker.finance.amount(1, 5000, 2)),
+    priceUSD: ethers.parseEther(faker.finance.amount(1, 5000, 2)).toString(),
+    priceUSD24hAgo: ethers.parseEther(faker.finance.amount(1, 5000, 2)).toString(),
+    priceUSDOracle: bigIntStringToFloat(ethers.parseEther(faker.finance.amount(1, 5000, 2)).toString()),
     isPoolToken: faker.datatype.boolean(),
   }))
   .concat(JUSD);
@@ -227,7 +228,7 @@ const pastSwapEvents = Array(pastSwapEventsLength)
       __typename: 'SwapEvent',
       id: faker.string.uuid(),
       borrower: faker.string.uuid(),
-      totalPriceInStable: (size * token.priceUSD) / JUSD.priceUSD,
+      totalPriceInStable: (size * bigIntStringToFloat(token.priceUSD)) / bigIntStringToFloat(JUSD.priceUSD),
       timestamp,
       direction: faker.helpers.enumValue(LongShortDirection),
       size,
@@ -256,7 +257,7 @@ const generateTokenValues = (maxValue: number, tokens: Token[]) => {
   return tokens.map((token, index) => {
     const value = parseFloat(faker.finance.amount(0, leftValue, 2));
     // Last token gets all the left value
-    const amount = index === tokens.length - 1 ? leftValue : value / token.priceUSD;
+    const amount = index === tokens.length - 1 ? leftValue : value / bigIntStringToFloat(token.priceUSD);
     leftValue -= value;
 
     return {
@@ -273,7 +274,7 @@ const borrowerHistory: BorrowerHistory[] = Array(faker.number.int({ min: 5, max:
 
     const lostAmount = parseFloat(faker.finance.amount(1, 1000, 2));
     const gainedAmount = parseFloat(
-      faker.finance.amount(lostAmount, faker.number.int({ min: lostAmount, max: (lostAmount + 1) * 1.1 }), 2),
+      faker.finance.amount(lostAmount, faker.number.int({ min: lostAmount, max: lostAmount * 1.1 }), 2),
     );
 
     // negative amount and only on lost token for claimed rewards
@@ -301,7 +302,8 @@ const borrowerHistory: BorrowerHistory[] = Array(faker.number.int({ min: 5, max:
       timestamp: now - faker.number.int({ min: 0, max: 29 }) * oneDayInMs,
       type,
       values: [...lostToken, ...gainedToken],
-      claimInUSD: type === BorrowerHistoryType.ClaimedRewards ? lostAmount : null,
+      claimInUSD: type === BorrowerHistoryType.ClaimedRewards ? gainedAmount : null,
+      lostDepositInUSD: type === BorrowerHistoryType.ClaimedRewards ? lostAmount : null,
     };
   })
   .sort((a, b) => b.timestamp - a.timestamp);

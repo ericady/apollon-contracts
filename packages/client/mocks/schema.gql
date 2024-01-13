@@ -2,13 +2,13 @@ scalar BigInt
 scalar Bytes
 
 type Token {
-  id: ID!
-  address: String! # contract address, used as id
+  id: Bytes!
+  address: Bytes!
   symbol: String!
-  createdAt: String!
+  createdAt: BigInt!
   #
-  priceUSD: Float!
-  priceUSD24hAgo: Float!
+  priceUSD: BigInt!
+  priceUSD24hAgo: BigInt!
   priceUSDOracle: Float!
   #
   isPoolToken: Boolean!
@@ -152,7 +152,8 @@ type BorrowerHistory {
   values: [TokenAmount!]!
   # worth of the claimed tokens in USD at the time of the event, only set on CLAIMED_REWARDS
   claimInUSD: Float
-  resultInUSD: Float!
+  # worth of the lost debtToken in USD at the time of the event, only set on CLAIMED_REWARDS
+  lostDepositInUSD: Float
 }
 
 type PoolHistoryPage {

@@ -161,6 +161,7 @@ export const GET_BORROWER_STABILITY_HISTORY = gql`
           amount
         }
         claimInUSD
+        lostDepositInUSD
       }
       pageInfo {
         totalCount
