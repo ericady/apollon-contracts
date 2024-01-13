@@ -81,33 +81,29 @@ export function handleSwap(event: SwapEvent): void {
   const systemInfo = SystemInfo.load(`SystemInfo`)!;
   const stableCoin = systemInfo.stableCoin;
 
-  const debtToken =  token0 === stableCoin ? token1 : token0
+  const debtToken = token0 === stableCoin ? token1 : token0;
 
   if (token0 === stableCoin || token1 === stableCoin) {
-    const tokenPrice = handleUpdateTokenCandle_low_high(
-      event,
-      event.address,
-      token0 === stableCoin ? 1 : 0,
-      debtToken,
-    );
+    const tokenPrice = handleUpdateTokenCandle_low_high(event, event.address, token0 === stableCoin ? 1 : 0, debtToken);
     handleUpdateToken_priceUSD(event, debtToken, tokenPrice);
 
     // TODO: Maybe always update volume?
     const volume = token0 === stableCoin ? event.params.amount1In : event.params.amount0In;
-    handleUpdateTokenCandle_volume(
-      event,
-      event.address,
-      token0 === stableCoin ? 1 : 0,
-      debtToken,
-      volume,
-    );
+    handleUpdateTokenCandle_volume(event, event.address, token0 === stableCoin ? 1 : 0, debtToken, volume);
 
-    const direction = token0 === stableCoin ? event.params.amount0In.equals(BigInt.fromI32(0)) ? "LONG" : "SHORT" : event.params.amount1In.equals(BigInt.fromI32(0)) ? "LONG" : "SHORT"
+    const direction =
+      token0 === stableCoin
+        ? event.params.amount0In.equals(BigInt.fromI32(0))
+          ? 'LONG'
+          : 'SHORT'
+        : event.params.amount1In.equals(BigInt.fromI32(0))
+        ? 'LONG'
+        : 'SHORT';
     // Check if this is correct
-    const debtTokenSize = direction === "LONG" ? event.params.amount1In : event.params.amount0In;
-    const stableSize = direction === "LONG" ? event.params.amount0In : event.params.amount1In;
+    const debtTokenSize = direction === 'LONG' ? event.params.amount1In : event.params.amount0In;
+    const stableSize = direction === 'LONG' ? event.params.amount0In : event.params.amount1In;
 
-    handleCreateSwapEvent(event, event.address, debtToken, event.params.to, direction, debtTokenSize, stableSize)
+    handleCreateSwapEvent(event, event.address, debtToken, event.params.to, direction, debtTokenSize, stableSize);
   }
 }
 
