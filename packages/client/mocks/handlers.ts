@@ -301,7 +301,6 @@ const borrowerHistory: BorrowerHistory[] = Array(faker.number.int({ min: 5, max:
       timestamp: now - faker.number.int({ min: 0, max: 29 }) * oneDayInMs,
       type,
       values: [...lostToken, ...gainedToken],
-      resultInUSD: gainedAmount,
       claimInUSD: type === BorrowerHistoryType.ClaimedRewards ? lostAmount : null,
     };
   })

@@ -344,7 +344,7 @@ export type GetBorrowerStabilityHistoryQueryVariables = Exact<{
 }>;
 
 
-export type GetBorrowerStabilityHistoryQuery = { __typename: 'Query', getBorrowerStabilityHistory: { __typename: 'PoolHistoryPage', history: Array<{ __typename: 'BorrowerHistory', id: string, timestamp: number, type: BorrowerHistoryType, resultInUSD: number, claimInUSD?: number | null, values: Array<{ __typename: 'TokenAmount', amount: number, token: { __typename: 'Token', address: string, symbol: string } }> }>, pageInfo: { __typename: 'PageInfo', totalCount: number, hasNextPage: boolean, endCursor: string } } };
+export type GetBorrowerStabilityHistoryQuery = { __typename: 'Query', getBorrowerStabilityHistory: { __typename: 'PoolHistoryPage', history: Array<{ __typename: 'BorrowerHistory', id: string, timestamp: number, type: BorrowerHistoryType, claimInUSD?: number | null, values: Array<{ __typename: 'TokenAmount', amount: number, token: { __typename: 'Token', address: string, symbol: string } }> }>, pageInfo: { __typename: 'PageInfo', totalCount: number, hasNextPage: boolean, endCursor: string } } };
 
 export type GetCollateralUsdHistoryQueryVariables = Exact<{ [key: string]: never; }>;
 

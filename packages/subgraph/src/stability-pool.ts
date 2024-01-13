@@ -1,3 +1,4 @@
+import { Address, BigInt } from '@graphprotocol/graph-ts';
 import {
   DepositSnapshotUpdated as DepositSnapshotUpdatedEvent,
   EpochUpdated as EpochUpdatedEvent,
@@ -6,6 +7,7 @@ import {
   ScaleUpdated as ScaleUpdatedEvent,
   StabilityGainsWithdrawn as StabilityGainsWithdrawnEvent,
   StabilityOffset as StabilityOffsetEvent,
+  StabilityPool,
   StabilityProvided as StabilityProvidedEvent,
   StabilityWithdrawn as StabilityWithdrawnEvent,
 } from '../generated/StabilityPool/StabilityPool';
@@ -23,7 +25,28 @@ export function handleS_Updated(event: S_UpdatedEvent): void {}
 export function handleScaleUpdated(event: ScaleUpdatedEvent): void {}
 
 export function handleStabilityGainsWithdrawn(event: StabilityGainsWithdrawnEvent): void {
-  handleCreateBorrowerHistory(event, event.address);
+  const stabilityPoolContract = StabilityPool.bind(event.address);
+  const depositToken = stabilityPoolContract.depositToken();
+
+  const collGainAddresses: Address[] = [];
+  const collGainAmounts: BigInt[] = [];
+  for (let i = 0; i < event.params.gainsWithdrawn.length; i++) {
+    const address = event.params.gainsWithdrawn[i].tokenAddress;
+    collGainAddresses.push(address);
+    const amount = event.params.gainsWithdrawn[i].amount;
+    collGainAmounts.push(amount);
+  }
+
+  handleCreateBorrowerHistory(
+    event,
+    event.address,
+    event.params.user,
+    'CLAIMED_REWARDS',
+    [depositToken],
+    [event.params.depositLost],
+    collGainAddresses,
+    collGainAmounts,
+  );
 }
 
 export function handleStabilityOffset(event: StabilityOffsetEvent): void {
@@ -35,11 +58,37 @@ export function handleStabilityOffset(event: StabilityOffsetEvent): void {
 export function handleStabilityProvided(event: StabilityProvidedEvent): void {
   // totalDepositedStability changed
   handleCreateDebtTokenMeta(event, event.address);
-  handleCreateBorrowerHistory(event, event.address);
+
+  const stabilityPoolContract = StabilityPool.bind(event.address);
+  const depositToken = stabilityPoolContract.depositToken();
+
+  handleCreateBorrowerHistory(
+    event,
+    event.address,
+    event.params.user,
+    'DEPOSITED',
+    [],
+    [],
+    [depositToken],
+    [event.params.amount],
+  );
 }
 
 export function handleStabilityWithdrawn(event: StabilityWithdrawnEvent): void {
   // totalDepositedStability changed
   handleCreateDebtTokenMeta(event, event.address);
-  handleCreateBorrowerHistory(event, event.address);
+
+  const stabilityPoolContract = StabilityPool.bind(event.address);
+  const depositToken = stabilityPoolContract.depositToken();
+
+  handleCreateBorrowerHistory(
+    event,
+    event.address,
+    event.params.user,
+    'WITHDRAWN',
+    [depositToken],
+    [event.params.amount],
+    [],
+    [],
+  );
 }

@@ -26,3 +26,16 @@ export const handleUpdateSystemInfo_storagePool = (event: ethereum.Event, storag
 
   systemInfo.save();
 };
+
+export const handleUpdateSystemInfo_priceFeed = (event: ethereum.Event, priceFeed: Address): void => {
+  let systemInfo = SystemInfo.load(`SystemInfo`);
+
+  if (systemInfo === null) {
+    systemInfo = new SystemInfo(`SystemInfo`);
+  }
+
+  systemInfo.timestamp = event.block.timestamp;
+  systemInfo.priceFeed = priceFeed;
+
+  systemInfo.save();
+};

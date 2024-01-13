@@ -5,6 +5,7 @@ type SystemInfo @entity {
   timestamp: BigInt!
   stableCoin: Bytes!
   storagePool: Bytes!
+  priceFeed: Bytes!
 }
 
 # TODO: wasa mapper for swap pools PairCreated event
@@ -230,15 +231,12 @@ type BorrowerHistory @entity(immutable: true) {
   id: Bytes!
   pool: Bytes!
   borrower: Bytes!
-  timestamp: BigInt!
   # Group transactions together in accumulated view
-  block: Int!
+  timestamp: BigInt!
   type: BorrowerHistoryType!
   values: [TokenAmount!]! @relation(name: "TokenAmountToBorrowerHistory")
   # worth of the claimed tokens in USD at the time of the event, only set on CLAIMED_REWARDS
   claimInUSD: BigInt
-  # collGains - depositLoss
-  resultInUSD: BigInt
 }
 
 # CHARTS
