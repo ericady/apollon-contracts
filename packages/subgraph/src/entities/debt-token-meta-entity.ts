@@ -44,8 +44,7 @@ export function handleCreateDebtTokenMeta(
     }
   }
 
-  // TODO: Implement
-  debtTokenMeta.stabilityDepositAPY = 1;
+  debtTokenMeta.stabilityDepositAPY = `StabilityDepositAPY-${tokenAddress.toHexString()}`;
   debtTokenMeta.totalDepositedStability = debtTokenStabilityPoolContract.getTotalDeposit();
 
   debtTokenMeta.save();
