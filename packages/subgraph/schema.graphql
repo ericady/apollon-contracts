@@ -84,7 +84,7 @@ type StabilityDepositChunk @entity {
 
 type CollateralTokenMeta @entity(immutable: true) {
   id: Bytes!
-  token: Bytes!
+  token: Token! @relation(name: "TokenToCollateralTokenMeta")
   timestamp: BigInt!
 
   # global
@@ -142,7 +142,7 @@ type SwapEvent @entity(immutable: true) {
 type PoolLiquidity @entity {
   # unique Byte combination of tokenA + tokenB
   id: Bytes!
-  token: Bytes!
+  token: Token! @relation(name: "TokenToPoolLiquidity")
   # TODO: wasa Swap event swapPair.getReserves
   totalAmount: BigInt!
 }
@@ -216,7 +216,7 @@ type PoolVolumeChunk @entity {
 # TODO: wasa not sure about contract/event limitations of the BorrowerHistory, lets analyze this together first before implementation.
 type TokenAmount @entity(immutable: true) {
   id: Bytes!
-  token: Bytes!
+  token: Token! @relation(name: "TokenToTokenAmount")
   amount: BigInt!
 }
 
@@ -250,7 +250,7 @@ type BorrowerHistory @entity(immutable: true) {
 type TokenCandleSingleton @entity {
   # "TokenCandleSingleton" + token + candleSize
   id: String!
-  token: Bytes!
+  token: Token! @relation(name: "TokenToTokenCandle Singleton")
   # last candle + candleSize
   timestamp: BigInt!
   # last candle
