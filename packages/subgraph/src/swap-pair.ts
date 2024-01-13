@@ -1,3 +1,4 @@
+import { BigInt } from '@graphprotocol/graph-ts';
 import {
   Approval as ApprovalEvent,
   Burn as BurnEvent,
@@ -8,6 +9,7 @@ import {
   Transfer as TransferEvent,
 } from '../generated/SwapPair/SwapPair';
 import { SystemInfo } from '../generated/schema';
+import { handleCreateSwapEvent } from './entities/swap-event-entity';
 import { handleUpdateTokenCandle_low_high, handleUpdateTokenCandle_volume } from './entities/token-candle-entity';
 import { handleUpdateToken_priceUSD } from './entities/token-entity';
 
@@ -79,14 +81,16 @@ export function handleSwap(event: SwapEvent): void {
   const systemInfo = SystemInfo.load(`SystemInfo`)!;
   const stableCoin = systemInfo.stableCoin;
 
+  const debtToken =  token0 === stableCoin ? token1 : token0
+
   if (token0 === stableCoin || token1 === stableCoin) {
     const tokenPrice = handleUpdateTokenCandle_low_high(
       event,
       event.address,
       token0 === stableCoin ? 1 : 0,
-      token0 === stableCoin ? token1 : token0,
+      debtToken,
     );
-    handleUpdateToken_priceUSD(event, token0 === stableCoin ? token1 : token0, tokenPrice);
+    handleUpdateToken_priceUSD(event, debtToken, tokenPrice);
 
     // TODO: Maybe always update volume?
     const volume = token0 === stableCoin ? event.params.amount1In : event.params.amount0In;
@@ -94,9 +98,16 @@ export function handleSwap(event: SwapEvent): void {
       event,
       event.address,
       token0 === stableCoin ? 1 : 0,
-      token0 === stableCoin ? token1 : token0,
+      debtToken,
       volume,
     );
+
+    const direction = token0 === stableCoin ? event.params.amount0In.equals(BigInt.fromI32(0)) ? "LONG" : "SHORT" : event.params.amount1In.equals(BigInt.fromI32(0)) ? "LONG" : "SHORT"
+    // Check if this is correct
+    const debtTokenSize = direction === "LONG" ? event.params.amount1In : event.params.amount0In;
+    const stableSize = direction === "LONG" ? event.params.amount0In : event.params.amount1In;
+
+    handleCreateSwapEvent(event, event.address, debtToken, event.params.to, direction, debtTokenSize, stableSize)
   }
 }
 

@@ -127,11 +127,11 @@ enum LongShortDirection {
 }
 
 type SwapEvent @entity(immutable: true) {
-  id: ID!
-  borrower: String!
+  id: Bytes!
+  borrower: Bytes!
   timestamp: BigInt!
   #
-  token: Token!
+  token: Token! @relation(name: "TokenToSwapEvent")
   direction: LongShortDirection! # Indicates whether the swap is LONG or SHORT
   size: BigInt! # always positive, applied by direction. The size of the "non-stable" coin involved in the swap
   totalPriceInStable: BigInt! # The total price at the time of the swap, always in stable coin
