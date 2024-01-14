@@ -7,8 +7,12 @@ import {
   TotalValueLockedChunk,
 } from '../../generated/schema';
 
-export function handleCreateCollateralTokenMeta(event: ethereum.Event, tokenAddress: Address): void {
-  const collateralTokenMeta = new CollateralTokenMeta(event.transaction.hash.concatI32(event.logIndex.toI32()));
+export function handleCreateUpdateCollateralTokenMeta(event: ethereum.Event, tokenAddress: Address): void {
+  let collateralTokenMeta = CollateralTokenMeta.load(`CollateralTokenMeta-${tokenAddress.toHexString()}`);
+
+  if (collateralTokenMeta === null) {
+    collateralTokenMeta = new CollateralTokenMeta(`CollateralTokenMeta-${tokenAddress.toHexString()}`);
+  }
 
   collateralTokenMeta.token = tokenAddress;
   collateralTokenMeta.timestamp = event.block.timestamp;
@@ -19,7 +23,6 @@ export function handleCreateCollateralTokenMeta(event: ethereum.Event, tokenAddr
   collateralTokenMeta.totalValueLockedUSD = storagePoolContract.getTokenTotalAmount(tokenAddress, true);
 
   // Load Avergae or intialise it
-  // "TotalValueLockedAverage" + token
   let tvlAverage = TotalValueLockedAverage.load(`TotalValueLockedAverage-${tokenAddress.toHexString()}`);
 
   if (tvlAverage === null) {

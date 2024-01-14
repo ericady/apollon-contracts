@@ -72,6 +72,12 @@ export const GET_BORROWER_DEBT_TOKENS = gql`
     }
   }
 `;
+// TODO: Use real subgraph query:
+// query AAA {
+//   debtTokenMetas {
+//     timestamp
+//   }
+// }
 
 // TODO: Not yet used. Maybe remove it later.
 export const GET_BORROWER_SWAPS = gql`

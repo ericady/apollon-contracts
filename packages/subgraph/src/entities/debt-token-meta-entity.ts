@@ -10,12 +10,16 @@ import { DebtTokenMeta, StabilityDepositAPY, StabilityDepositChunk, Token } from
 export const stableDebtToken = EventAddress.fromString('0x6c3f90f043a72fa612cbac8115ee7e52bde6e490');
 export const govToken = EventAddress.fromString('0x9f8f72aa9304c8b593d555f12ef6589cc3a579a2');
 
-export function handleCreateDebtTokenMeta(
+export function handleCreateUpdateDebtTokenMeta(
   event: ethereum.Event,
   tokenAddress: Address,
   govReserveCap: BigInt | null = null,
 ): void {
-  const debtTokenMeta = new DebtTokenMeta(event.transaction.hash.concatI32(event.logIndex.toI32()));
+  let debtTokenMeta = DebtTokenMeta.load(`DebtTokenMeta-${tokenAddress.toHexString()}`);
+
+  if (debtTokenMeta === null) {
+    debtTokenMeta = new DebtTokenMeta(`DebtTokenMeta-${tokenAddress.toHexString()}`);
+  }
 
   const tokenContract = DebtToken.bind(tokenAddress);
   const debtTokenStabilityPoolManagerContract = StabilityPoolManager.bind(tokenContract.stabilityPoolManagerAddress());

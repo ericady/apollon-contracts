@@ -11,7 +11,7 @@ import {
   TroveIndexUpdated as TroveIndexUpdatedEvent,
   TroveSnapshotsUpdated as TroveSnapshotsUpdatedEvent,
 } from '../generated/TroveManager/TroveManager';
-import { handleCreateCollateralTokenMeta } from './entities/collateral-token-meta-entity';
+import { handleCreateUpdateCollateralTokenMeta } from './entities/collateral-token-meta-entity';
 
 export function handleBaseRateUpdated(event: BaseRateUpdatedEvent): void {}
 
@@ -36,6 +36,6 @@ export function handleTroveSnapshotsUpdated(event: TroveSnapshotsUpdatedEvent): 
 export function handleCollChanged(event: TroveCollChangedEvent): void {
   for (let i = 0; i < event.params._collTokenAddresses.length; i++) {
     // TODO: Loop over troves from the troveManager to get totalValueLockedUSD for any single collToken
-    handleCreateCollateralTokenMeta(event, event.params._collTokenAddresses[i]);
+    handleCreateUpdateCollateralTokenMeta(event, event.params._collTokenAddresses[i]);
   }
 }

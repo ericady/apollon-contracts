@@ -12,7 +12,7 @@ import {
   StabilityWithdrawn as StabilityWithdrawnEvent,
 } from '../generated/StabilityPool/StabilityPool';
 import { handleCreateBorrowerHistory } from './entities/borrower-history-entity';
-import { handleCreateDebtTokenMeta, handleUpdateStabilityDepositAPY } from './entities/debt-token-meta-entity';
+import { handleCreateUpdateDebtTokenMeta, handleUpdateStabilityDepositAPY } from './entities/debt-token-meta-entity';
 
 export function handleDepositSnapshotUpdated(event: DepositSnapshotUpdatedEvent): void {}
 
@@ -52,12 +52,12 @@ export function handleStabilityGainsWithdrawn(event: StabilityGainsWithdrawnEven
 export function handleStabilityOffset(event: StabilityOffsetEvent): void {
   handleUpdateStabilityDepositAPY(event, event.address, event.params.removedDeposit, event.params.addedGains);
   // stabilityDepositAPY changed
-  handleCreateDebtTokenMeta(event, event.address);
+  handleCreateUpdateDebtTokenMeta(event, event.address);
 }
 
 export function handleStabilityProvided(event: StabilityProvidedEvent): void {
   // totalDepositedStability changed
-  handleCreateDebtTokenMeta(event, event.address);
+  handleCreateUpdateDebtTokenMeta(event, event.address);
 
   const stabilityPoolContract = StabilityPool.bind(event.address);
   const depositToken = stabilityPoolContract.depositToken();
@@ -76,7 +76,7 @@ export function handleStabilityProvided(event: StabilityProvidedEvent): void {
 
 export function handleStabilityWithdrawn(event: StabilityWithdrawnEvent): void {
   // totalDepositedStability changed
-  handleCreateDebtTokenMeta(event, event.address);
+  handleCreateUpdateDebtTokenMeta(event, event.address);
 
   const stabilityPoolContract = StabilityPool.bind(event.address);
   const depositToken = stabilityPoolContract.depositToken();

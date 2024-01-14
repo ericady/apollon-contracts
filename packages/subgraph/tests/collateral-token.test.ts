@@ -1,5 +1,5 @@
 import { afterAll, assert, clearStore, describe, newMockEvent, test } from 'matchstick-as/assembly/index';
-import { handleCreateCollateralTokenMeta } from '../src/entities/collateral-token-meta-entity';
+import { handleCreateUpdateCollateralTokenMeta } from '../src/entities/collateral-token-meta-entity';
 import { MockCollateralToken1Address, MockTroveManagerAddress } from './debt-token-utils';
 
 describe('handleNewCollateralTokenMeta()', () => {
@@ -10,7 +10,7 @@ describe('handleNewCollateralTokenMeta()', () => {
   test('CollateralTokenMeta entity created and stored when a single collateral token has been changed', () => {
     const genericEvent = newMockEvent();
 
-    handleCreateCollateralTokenMeta(genericEvent, MockCollateralToken1Address, MockTroveManagerAddress);
+    handleCreateUpdateCollateralTokenMeta(genericEvent, MockCollateralToken1Address, MockTroveManagerAddress);
 
     // TODO: use event driven testing not entity function
     // handleCollateralUpdated(newCollateralUpdatedEvent);

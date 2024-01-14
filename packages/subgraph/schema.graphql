@@ -25,8 +25,9 @@ type Token @entity {
   isPoolToken: Boolean!
 }
 
-type DebtTokenMeta @entity(immutable: true) {
-  id: Bytes!
+type DebtTokenMeta @entity {
+  # "DebtTokenMeta" + token
+  id: String!
   token: Token! @relation(name: "TokenToDebtTokenMeta")
   timestamp: BigInt!
 
@@ -44,12 +45,11 @@ type DebtTokenMeta @entity(immutable: true) {
   # - deposited: `stableReserveCap` und `govReserveCap`
   # - event: `WithdrewReserves` und borrowerOps.increaseDebt, dort haben wir aber aktuell kein Event 😟
   totalReserve: BigInt!
-  # TODO: Fetch this from the client side
-  # totalReserve30dAverage: BigInt!
+  totalReserve30dAverage: BigInt!
   # event StoragePoolValueUpdated
   totalSupplyUSD: BigInt!
+  totalSupplyUSD30dAverage: BigInt!
   # event StoragePoolValueUpdated
-  # totalSupplyUSD30dAverage: BigInt!
 }
 
 # Aggregator, pushed old events out and lets new in, recalculating the acc value each time
@@ -83,8 +83,9 @@ type StabilityDepositChunk @entity {
 #   stabilityCompoundAmount: BigInt!
 # }
 
-type CollateralTokenMeta @entity(immutable: true) {
-  id: Bytes!
+type CollateralTokenMeta @entity {
+  # "CollateralTokenMeta" + token
+  id: String!
   token: Token! @relation(name: "TokenToCollateralTokenMeta")
   timestamp: BigInt!
 

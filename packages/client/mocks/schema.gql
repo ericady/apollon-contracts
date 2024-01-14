@@ -6,18 +6,18 @@ type Token {
   address: Bytes!
   symbol: String!
   createdAt: BigInt!
-  #
   priceUSD: BigInt!
+  isPoolToken: Boolean!
+  # handled by client
   priceUSD24hAgo: BigInt!
   priceUSDOracle: Float!
-  #
-  isPoolToken: Boolean!
 }
 
 type DebtTokenMeta {
-  id: ID!
+  id: Bytes!
   token: Token!
-  # borrower specific
+  timestamp: BigInt!
+  # handled by client
   walletAmount: Float!
   troveMintedAmount: Float!
   providedStability: Float!
@@ -27,12 +27,19 @@ type DebtTokenMeta {
 
   # global
   # TODO: No implementation yet
-  stabilityDepositAPY: Float!
-  totalDepositedStability: Float!
-  totalReserve: Float!
+  stabilityDepositAPY: StabilityDepositAPY!
+  totalDepositedStability: BigInt!
+  totalReserve: BigInt!
   totalReserve30dAverage: Float!
-  totalSupplyUSD: Float!
+  totalSupplyUSD: BigInt!
   totalSupplyUSD30dAverage: Float!
+}
+
+type StabilityDepositAPY {
+  id: String!
+  index: Int!
+  profit: BigInt!
+  volume: BigInt!
 }
 
 type CollateralTokenMeta {
