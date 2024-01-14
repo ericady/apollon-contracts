@@ -51,9 +51,9 @@ function StabilityPoolTable() {
   }
 
   const rewards =
-    collateralData?.getCollateralTokens.filter(({ stabilityGainedAmount }) => stabilityGainedAmount > 0) ?? [];
+    collateralData?.collateralTokenMetas.filter(({ stabilityGainedAmount }) => stabilityGainedAmount > 0) ?? [];
   const stabilityLost =
-    debtData?.getDebtTokens.filter(
+    debtData?.debtTokenMetas.filter(
       ({ compoundedDeposit, providedStability }) => compoundedDeposit > 0 || providedStability > 0,
     ) ?? [];
 

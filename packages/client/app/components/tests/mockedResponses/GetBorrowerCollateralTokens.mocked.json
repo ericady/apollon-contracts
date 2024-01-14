@@ -1,6 +1,6 @@
 {
   "data": {
-    "getCollateralTokens": [
+    "collateralTokenMetas": [
       {
         "__typename": "CollateralTokenMeta",
         "id": "5aa63141-fd6f-41c0-88b9-bdbb0e00fe3f",

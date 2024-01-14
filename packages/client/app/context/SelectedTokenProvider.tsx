@@ -23,7 +23,7 @@ export type SelectedToken = {
 };
 
 export const SelectedTokenContext = createContext<{
-  JUSDToken: GetCollateralTokensQuery['getCollateralTokens'][number]['token'] | undefined;
+  JUSDToken: GetCollateralTokensQuery['collateralTokenMetas'][number]['token'] | undefined;
   tokenRatio: number;
   selectedToken: SelectedToken | null;
   setSelectedToken: (asset: SelectedToken) => void;
@@ -48,7 +48,7 @@ export default function SelectedTokenProvider({ children }: { children: React.Re
       },
     },
   );
-  const JUSDToken = data?.getCollateralTokens.find(({ token }) => token.address === Contracts.ERC20.JUSD)?.token;
+  const JUSDToken = data?.collateralTokenMetas.find(({ token }) => token.address === Contracts.ERC20.JUSD)?.token;
   const tokenRatio =
     JUSDToken === undefined || selectedToken === null
       ? 0
@@ -70,7 +70,7 @@ export default function SelectedTokenProvider({ children }: { children: React.Re
 }
 
 export function useSelectedToken(): {
-  JUSDToken: GetCollateralTokensQuery['getCollateralTokens'][number]['token'] | undefined;
+  JUSDToken: GetCollateralTokensQuery['collateralTokenMetas'][number]['token'] | undefined;
   tokenRatio: number;
   selectedToken: SelectedToken | null;
   setSelectedToken: (asset: SelectedToken) => void;

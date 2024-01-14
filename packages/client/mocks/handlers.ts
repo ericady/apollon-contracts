@@ -11,9 +11,9 @@ import {
   LongShortDirection,
   Pool,
   Query,
+  QueryCollateralTokenMetasArgs,
+  QueryDebtTokenMetasArgs,
   QueryGetBorrowerStabilityHistoryArgs,
-  QueryGetCollateralTokensArgs,
-  QueryGetDebtTokensArgs,
   QueryGetPoolPriceHistoryArgs,
   QueryGetPoolsArgs,
   QueryGetSwapsArgs,
@@ -337,33 +337,33 @@ const totalBorrowerHistory = borrowerHistory.length;
 
 export const handlers = [
   // GetDebtTokens
-  graphql.query<{ getDebtTokens: Query['getDebtTokens'] }, QueryGetDebtTokensArgs>(
+  graphql.query<{ debtTokenMetas: Query['debtTokenMetas'] }, QueryDebtTokenMetasArgs>(
     GET_ALL_DEBT_TOKENS,
     (req, res, ctx) => {
-      return res(ctx.data({ getDebtTokens: debtTokenMeta }));
+      return res(ctx.data({ debtTokenMetas: debtTokenMeta }));
     },
   ),
   // GetAllPools
-  graphql.query<{ getPools: Query['getPools'] }, QueryGetDebtTokensArgs>(GET_ALL_POOLS, (req, res, ctx) => {
+  graphql.query<{ getPools: Query['getPools'] }, QueryDebtTokenMetasArgs>(GET_ALL_POOLS, (req, res, ctx) => {
     const result: Query['getPools'] = pools;
     return res(ctx.data({ getPools: result }));
   }),
   // // GetBorrowerRewards
-  // graphql.query<{ getPools: Query['getPools'] }, QueryGetDebtTokensArgs>(GET_BORROWER_REWARDS, (req, res, ctx) => {
+  // graphql.query<{ getPools: Query['getPools'] }, QueryDebtTokenMetasArgs>(GET_BORROWER_REWARDS, (req, res, ctx) => {
   //   const result: Query['getPools'] = pools;
   //   return res(ctx.data({ getPools: result }));
   // }),
 
   // GetBorrowerDebtTokens
-  graphql.query<{ getDebtTokens: Query['getDebtTokens'] }, QueryGetDebtTokensArgs>(
+  graphql.query<{ debtTokenMetas: Query['debtTokenMetas'] }, QueryDebtTokenMetasArgs>(
     GET_BORROWER_DEBT_TOKENS,
     (req, res, ctx) => {
       const { borrower } = req.variables;
 
       if (borrower) {
-        return res(ctx.data({ getDebtTokens: userDebtTokenMeta }));
+        return res(ctx.data({ debtTokenMetas: userDebtTokenMeta }));
       } else {
-        return res(ctx.data({ getDebtTokens: debtTokenMeta }));
+        return res(ctx.data({ debtTokenMetas: debtTokenMeta }));
       }
     },
   ),
@@ -378,15 +378,15 @@ export const handlers = [
   }),
 
   // GetCollateralTokens
-  graphql.query<{ getCollateralTokens: Query['getCollateralTokens'] }, QueryGetCollateralTokensArgs>(
+  graphql.query<{ collateralTokenMetas: Query['collateralTokenMetas'] }, QueryCollateralTokenMetasArgs>(
     GET_BORROWER_COLLATERAL_TOKENS,
     (req, res, ctx) => {
       const { borrower } = req.variables;
 
       if (borrower) {
-        return res(ctx.data({ getCollateralTokens: userCollateralTokenMeta }));
+        return res(ctx.data({ collateralTokenMetas: userCollateralTokenMeta }));
       } else {
-        return res(ctx.data({ getCollateralTokens: collateralTokenMeta }));
+        return res(ctx.data({ collateralTokenMetas: collateralTokenMeta }));
       }
     },
   ),

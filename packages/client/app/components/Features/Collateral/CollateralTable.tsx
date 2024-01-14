@@ -55,10 +55,10 @@ function CollateralTable() {
   );
 
   const borrowerCollateralTokens = useMemo(() => {
-    const colorPalette: string[] = data ? generateColorPalette(data.getCollateralTokens.length) : [];
+    const colorPalette: string[] = data ? generateColorPalette(data.collateralTokenMetas.length) : [];
 
     return (
-      data?.getCollateralTokens
+      data?.collateralTokenMetas
         .filter(({ troveLockedAmount, walletAmount }) => walletAmount! > 0 || troveLockedAmount! > 0)
         .map((token) => ({
           ...token,

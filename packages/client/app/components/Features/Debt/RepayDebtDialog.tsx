@@ -39,7 +39,7 @@ const RepayDebtDialog = () => {
 
   useEffect(() => {
     if (data && !formState.isDirty) {
-      const emptyValues = data!.getDebtTokens.reduce((acc, { token }) => ({ ...acc, [token.address]: '' }), {});
+      const emptyValues = data!.debtTokenMetas.reduce((acc, { token }) => ({ ...acc, [token.address]: '' }), {});
       reset(emptyValues);
     }
   }, [data, formState.isDirty, reset]);
@@ -68,7 +68,7 @@ const RepayDebtDialog = () => {
 
     setSteps([
       ...tokenAmounts.map(({ tokenAddress, amount }) => ({
-        title: `Approve ${data?.getDebtTokens.find(({ token: { address } }) => address === tokenAddress)?.token
+        title: `Approve ${data?.debtTokenMetas.find(({ token: { address } }) => address === tokenAddress)?.token
           .symbol} spending.`,
         transaction: {
           methodCall: async () => {
@@ -104,7 +104,7 @@ const RepayDebtDialog = () => {
           width: 'auto',
           padding: '0 50px',
         }}
-        disabled={!address || !data?.getDebtTokens.some(({ troveRepableDebtAmount }) => troveRepableDebtAmount > 0)}
+        disabled={!address || !data?.debtTokenMetas.some(({ troveRepableDebtAmount }) => troveRepableDebtAmount > 0)}
       >
         Repay
       </Button>
@@ -152,7 +152,7 @@ const RepayDebtDialog = () => {
               }}
             >
               <div style={{ overflowY: 'scroll', maxHeight: '60vh' }}>
-                {data?.getDebtTokens
+                {data?.debtTokenMetas
                   .filter(({ troveRepableDebtAmount }) => troveRepableDebtAmount > 0)
                   .map(({ token, walletAmount, troveRepableDebtAmount }, index) => (
                     <Box
@@ -163,7 +163,7 @@ const RepayDebtDialog = () => {
                         justifyContent: 'space-between',
                         padding: '20px',
                         height: '114px',
-                        borderBottom: index === data?.getDebtTokens.length - 1 ? 'none' : '1px solid',
+                        borderBottom: index === data?.debtTokenMetas.length - 1 ? 'none' : '1px solid',
                         borderColor: 'background.paper',
                       }}
                     >

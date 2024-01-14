@@ -1,6 +1,6 @@
 {
   "data": {
-    "getDebtTokens": [
+    "debtTokenMetas": [
       {
         "__typename": "DebtTokenMeta",
         "id": "f688d13f-bd3e-4904-b46e-ab3a2e12541d",

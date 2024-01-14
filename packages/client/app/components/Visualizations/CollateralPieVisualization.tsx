@@ -5,7 +5,7 @@ import { GetCollateralTokensQuery } from '../../generated/gql-types';
 import { roundCurrency } from '../../utils/math';
 
 type Props = {
-  borrowerCollateralTokens: (GetCollateralTokensQuery['getCollateralTokens'][number] & {
+  borrowerCollateralTokens: (GetCollateralTokensQuery['collateralTokenMetas'][number] & {
     chartColor?: string;
     troveValueUSD: number;
   })[];

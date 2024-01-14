@@ -28,7 +28,7 @@ function TreasuryTable() {
 
   if (!data) return <TreasuryTableLoader />;
 
-  const debtTokensInReserve = data.getDebtTokens
+  const debtTokensInReserve = data.debtTokenMetas
     .map((debtToken) => ({
       ...debtToken,
       totalReserve: bigIntStringToFloat(debtToken.totalReserve),

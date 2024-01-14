@@ -61,11 +61,11 @@ function LiquidityDepositWithdraw({ selectedPool }: Props) {
     skip: !address,
   });
 
-  const relevantDebtTokenA = data?.getDebtTokens.find(({ token }) => token.id === tokenA.token.id) ?? {
+  const relevantDebtTokenA = data?.debtTokenMetas.find(({ token }) => token.id === tokenA.token.id) ?? {
     walletAmount: 0,
     troveMintedAmount: 0,
   };
-  const relevantDebtTokenB = data?.getDebtTokens.find(({ token }) => token.id === tokenB.token.id) ?? {
+  const relevantDebtTokenB = data?.debtTokenMetas.find(({ token }) => token.id === tokenB.token.id) ?? {
     walletAmount: 0,
     troveMintedAmount: 0,
   };

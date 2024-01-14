@@ -47,7 +47,7 @@ export const IntegrationWrapper = ({ children, ...stateProps }: PropsWithChildre
   );
 };
 
-export const PreselectedTestToken = MockedPositionsWithoutBorrower.data.getDebtTokens[0].token;
+export const PreselectedTestToken = MockedPositionsWithoutBorrower.data.debtTokenMetas[0].token;
 
 /**
  * This component is used as a wrapper to mock library Providers and other Context state.

@@ -78,8 +78,8 @@ type Query {
   # without borrower address troveAmount and walletAmount are always undefined
   # every token is returned, even if it is not used by the borrower (troveAmount, walletAmount = 0)
   # the same token can be returned twice, if it is used as debt and collateral
-  getDebtTokens(borrower: String): [DebtTokenMeta!]!
-  getCollateralTokens(borrower: String): [CollateralTokenMeta!]!
+  debtTokenMetas(borrower: String): [DebtTokenMeta!]!
+  collateralTokenMetas(borrower: String): [CollateralTokenMeta!]!
   # TODO: Rename this for the subgraph query
   getToken(address: String!): Token!
 }

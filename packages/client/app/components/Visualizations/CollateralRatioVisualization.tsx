@@ -83,13 +83,13 @@ function CollateralRatioVisualization({
   );
 
   const debtValue =
-    debtData?.getDebtTokens.reduce(
+    debtData?.debtTokenMetas.reduce(
       (acc, { troveMintedAmount, token }) => acc + troveMintedAmount! * bigIntStringToFloat(token.priceUSD),
       0,
     ) ?? 0;
 
   const collateralValue =
-    collateralData?.getCollateralTokens.reduce(
+    collateralData?.collateralTokenMetas.reduce(
       (acc, { troveLockedAmount, token }) => acc + troveLockedAmount! * bigIntStringToFloat(token.priceUSD),
       0,
     ) ?? 0;

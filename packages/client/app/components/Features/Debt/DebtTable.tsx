@@ -48,10 +48,10 @@ function DebtTable() {
   });
 
   const borrowerDebtTokens = useMemo(() => {
-    const colorPalette: string[] = data ? generateColorPalette(data.getDebtTokens.length) : [];
+    const colorPalette: string[] = data ? generateColorPalette(data.debtTokenMetas.length) : [];
 
     return (
-      data?.getDebtTokens
+      data?.debtTokenMetas
         .filter(({ troveMintedAmount, walletAmount }) => walletAmount! > 0 || troveMintedAmount! > 0)
         .map((token) => ({
           ...token,

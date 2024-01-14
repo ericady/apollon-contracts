@@ -14,10 +14,10 @@ describe('StabilityUpdateDialog', () => {
         provideStability: jest.fn(),
       },
       debtTokenContracts: {
-        [MockedGetBorrowerDebtTokens.data.getDebtTokens[0].token.address]: {
+        [MockedGetBorrowerDebtTokens.data.debtTokenMetas[0].token.address]: {
           approve: jest.fn(),
         },
-        [MockedGetBorrowerDebtTokens.data.getDebtTokens[1].token.address]: {
+        [MockedGetBorrowerDebtTokens.data.debtTokenMetas[1].token.address]: {
           approve: jest.fn(),
         },
       },
@@ -80,10 +80,10 @@ describe('StabilityUpdateDialog', () => {
     await userEvent.click(submitButton);
 
     expect(
-      contractMock.debtTokenContracts[MockedGetBorrowerDebtTokens.data.getDebtTokens[0].token.address].approve,
+      contractMock.debtTokenContracts[MockedGetBorrowerDebtTokens.data.debtTokenMetas[0].token.address].approve,
     ).toHaveBeenNthCalledWith(1, '0x509ee0d083ddf8ac028f2a56731412edd63223s8', 10000000000000000000n);
     expect(
-      contractMock.debtTokenContracts[MockedGetBorrowerDebtTokens.data.getDebtTokens[1].token.address].approve,
+      contractMock.debtTokenContracts[MockedGetBorrowerDebtTokens.data.debtTokenMetas[1].token.address].approve,
     ).toHaveBeenNthCalledWith(1, '0x509ee0d083ddf8ac028f2a56731412edd63223s8', 20000000000000000000n);
     expect(contractMock.stabilityPoolManagerContract.provideStability).toHaveBeenNthCalledWith(1, [
       { amount: 10000000000000000000n, tokenAddress: '16fdb8e8-f202-4564-9af5-71b77ebc11a3' },

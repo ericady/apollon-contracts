@@ -41,14 +41,14 @@ const StabilityUpdateDialog = () => {
 
   useEffect(() => {
     if (data && !formState.isDirty) {
-      const emptyValues = data!.getDebtTokens.reduce((acc, { token }) => ({ ...acc, [token.address]: '' }), {});
+      const emptyValues = data!.debtTokenMetas.reduce((acc, { token }) => ({ ...acc, [token.address]: '' }), {});
       reset(emptyValues);
     }
   }, [data, formState.isDirty, reset]);
 
   const handleChange = (_: SyntheticEvent, newValue: 'DEPOSIT' | 'WITHDRAW') => {
     setTabValue(newValue);
-    const emptyValues = data!.getDebtTokens.reduce((acc, { token }) => ({ ...acc, [token.address]: '' }), {});
+    const emptyValues = data!.debtTokenMetas.reduce((acc, { token }) => ({ ...acc, [token.address]: '' }), {});
     reset(emptyValues);
   };
 
@@ -138,7 +138,7 @@ const StabilityUpdateDialog = () => {
               </Tabs>
 
               <div style={{ overflowY: 'scroll', maxHeight: '60vh' }}>
-                {data?.getDebtTokens
+                {data?.debtTokenMetas
                   .filter(
                     ({ walletAmount, compoundedDeposit }) =>
                       (tabValue === 'DEPOSIT' && walletAmount > 0) ||
@@ -153,7 +153,7 @@ const StabilityUpdateDialog = () => {
                         justifyContent: 'space-between',
                         padding: '20px',
                         height: '114px',
-                        borderBottom: index === data?.getDebtTokens.length - 1 ? 'none' : '1px solid',
+                        borderBottom: index === data?.debtTokenMetas.length - 1 ? 'none' : '1px solid',
                         borderColor: 'background.paper',
                       }}
                     >

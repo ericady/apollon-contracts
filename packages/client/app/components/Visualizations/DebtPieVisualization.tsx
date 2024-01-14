@@ -5,7 +5,7 @@ import { GetBorrowerDebtTokensQuery } from '../../generated/gql-types';
 import { roundCurrency } from '../../utils/math';
 
 type Props = {
-  borrowerDebtTokens: (GetBorrowerDebtTokensQuery['getDebtTokens'][number] & {
+  borrowerDebtTokens: (GetBorrowerDebtTokensQuery['debtTokenMetas'][number] & {
     chartColor?: string;
     troveMintedUSD: number;
   })[];

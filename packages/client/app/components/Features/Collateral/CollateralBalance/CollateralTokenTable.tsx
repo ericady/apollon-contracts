@@ -56,7 +56,7 @@ const CollateralTokenTable = () => {
               </TableRow>
             </TableHead>
             <TableBody>
-              {data.getCollateralTokens
+              {data.collateralTokenMetas
                 .map((collToken) => ({
                   ...collToken,
                   totalValueLockedUSD: bigIntStringToFloat(collToken.totalValueLockedUSD),

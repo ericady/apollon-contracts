@@ -30,7 +30,7 @@ export const GET_SELECTED_TOKEN = gql`
 
 export const GET_ALL_DEBT_TOKENS = gql`
   query GetDebtTokens {
-    getDebtTokens {
+    debtTokenMetas {
       # TODO: Implement sort in query or sort server side
       totalSupplyUSD
       totalReserve
@@ -52,7 +52,7 @@ export const GET_ALL_DEBT_TOKENS = gql`
 
 export const GET_BORROWER_DEBT_TOKENS = gql`
   query GetBorrowerDebtTokens($borrower: String!) {
-    getDebtTokens(borrower: $borrower) {
+    debtTokenMetas(borrower: $borrower) {
       troveMintedAmount
       walletAmount @client
       providedStability @client
@@ -81,12 +81,6 @@ export const GET_BORROWER_DEBT_TOKENS = gql`
     }
   }
 `;
-// TODO: Use real subgraph query:
-// query AAA {
-//   debtTokenMetas {
-//     timestamp
-//   }
-// }
 
 // TODO: Not yet used. Maybe remove it later.
 export const GET_BORROWER_SWAPS = gql`
@@ -144,7 +138,7 @@ export const GET_BORROWER_LIQUIDITY_POOLS = gql`
 
 export const GET_BORROWER_COLLATERAL_TOKENS = gql`
   query GetCollateralTokens($borrower: String!) {
-    getCollateralTokens(borrower: $borrower) {
+    collateralTokenMetas(borrower: $borrower) {
       token {
         id
         address
