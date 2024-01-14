@@ -152,7 +152,7 @@ function StabilityClaimedRewards({ history }: StabilityWidgetProps) {
         }}
       >
         <Typography variant="titleAlternate" color="primary.contrastText">
-          {formatUnixTimestamp(history.timestamp, false)}
+          {formatUnixTimestamp(history.timestamp.toString(), false)}
         </Typography>
 
         <Label variant="success" fixedWidth={false}>
@@ -223,7 +223,7 @@ function StabilityDeposit({ history }: StabilityWidgetProps) {
         }}
       >
         <Typography variant="titleAlternate" color="primary.contrastText">
-          {formatUnixTimestamp(history.timestamp, false)}
+          {formatUnixTimestamp(history.timestamp.toString(), false)}
         </Typography>
 
         <Label variant="none" fixedWidth={false}>
@@ -258,7 +258,7 @@ function StabilityWithdraw({ history }: StabilityWidgetProps) {
         }}
       >
         <Typography variant="titleAlternate" color="primary.contrastText">
-          {formatUnixTimestamp(history.timestamp, false)}
+          {formatUnixTimestamp(history.timestamp.toString(), false)}
         </Typography>
 
         <Label variant="info" fixedWidth={false}>

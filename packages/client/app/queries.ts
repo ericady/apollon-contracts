@@ -82,29 +82,21 @@ export const GET_BORROWER_DEBT_TOKENS = gql`
   }
 `;
 
-// TODO: Not yet used. Maybe remove it later.
 export const GET_BORROWER_SWAPS = gql`
-  query GetBorrowerSwapEvents($borrower: String!, $cursor: String) {
-    getSwaps(borrower: $borrower, cursor: $cursor) {
-      swaps {
+  query GetBorrowerSwapEvents($where: SwapEvent_filter!, $first: Int = 30, $skip: Int!) {
+    swapEvents(first: $first, orderBy: timestamp, orderDirection: desc, skip: $skip, where: $where) {
+      id
+      timestamp
+      token {
         id
-        timestamp
-        token {
-          id
-          address
-          symbol
-          priceUSD
-        }
-        direction
-        size
-        totalPriceInStable
-        swapFee
+        address
+        symbol
+        priceUSD
       }
-      pageInfo {
-        totalCount
-        hasNextPage
-        endCursor
-      }
+      direction
+      size
+      totalPriceInStable
+      swapFee
     }
   }
 `;

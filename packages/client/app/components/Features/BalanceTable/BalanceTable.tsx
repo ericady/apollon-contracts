@@ -34,8 +34,11 @@ const BalanceTable = () => {
     GET_BORROWER_SWAPS,
     {
       variables: {
-        borrower: address,
-        cursor: null,
+        where: {
+          borrower: address,
+        },
+        skip: 0,
+        first: 30,
       },
       // Guest mode. Avoid hitting the API with invalid parameters.
       skip: !address,
@@ -75,7 +78,7 @@ const BalanceTable = () => {
                 POSITIONS{'  '}
                 {openPositions && (
                   <Label variant="none" fixedWidth={false}>
-                    <span data-testid="apollon-positions-count">{openPositions.getSwaps.pageInfo.totalCount}</span>
+                    <span data-testid="apollon-positions-count">{openPositions.swapEvents.pageInfo.totalCount}</span>
                   </Label>
                 )}
               </span>
@@ -90,7 +93,11 @@ const BalanceTable = () => {
                 SWAPS{'  '}
                 {closedPositions && (
                   <Label variant="none" fixedWidth={false}>
-                    <span data-testid="apollon-history-count">{closedPositions.getSwaps.pageInfo.totalCount}</span>
+                    <span data-testid="apollon-history-count">
+                      {closedPositions.swapEvents.length < 30
+                        ? closedPositions.swapEvents.length
+                        : `${closedPositions.swapEvents.length}+`}
+                    </span>
                   </Label>
                 )}
               </span>

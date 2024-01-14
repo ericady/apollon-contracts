@@ -16,7 +16,7 @@ import {
   QueryGetBorrowerStabilityHistoryArgs,
   QueryGetPoolPriceHistoryArgs,
   QueryGetPoolsArgs,
-  QueryGetSwapsArgs,
+  QuerySwapEventsArgs,
   QueryTokenArgs,
   QueryTokenCandleSingletonArgs,
   QueryTokenCandlesArgs,
@@ -72,7 +72,7 @@ export const tokens: Token[] = Array(10)
   .map<Token>((_, index) => ({
     id: faker.string.uuid(),
     __typename: 'Token',
-    address: index <= favoritedAssets.length - 1 ? favoritedAssets[index] : faker.string.uuid(),
+    address: index <= favoritedAssets.length - 1 ? favoritedAssets[index] : faker.finance.ethereumAddress(),
     symbol: faker.finance.currencyCode(),
     // Unix timestamp in seconds like the API returns it.
     createdAt: (faker.date.past().getTime() / 1000).toString(),
@@ -245,22 +245,25 @@ const pastSwapEventsLength = faker.number.int({ min: 5, max: 90 });
 const pastSwapEvents = Array(pastSwapEventsLength)
   .fill(null)
   .map<SwapEvent>(() => {
-    const timestamp = faker.date.past({ years: 1 }).getTime();
-    const size = parseFloat(faker.finance.amount(1, 1000, 2));
+    const timestamp = (faker.date.past({ years: 1 }).getTime() / 1000).toString();
+    const size = floatToBigInt(faker.number.float({ min: 1, max: 1000, precision: 0.0001 })).toString();
     const token = faker.helpers.arrayElement(tokens);
+
     return {
       __typename: 'SwapEvent',
       id: faker.string.uuid(),
-      borrower: faker.string.uuid(),
-      totalPriceInStable: (size * bigIntStringToFloat(token.priceUSD)) / bigIntStringToFloat(JUSD.priceUSD),
       timestamp,
+      borrower: faker.finance.ethereumAddress(),
+      totalPriceInStable: floatToBigInt(
+        (bigIntStringToFloat(size) * bigIntStringToFloat(token.priceUSD)) / bigIntStringToFloat(JUSD.priceUSD),
+      ).toString(),
       direction: faker.helpers.enumValue(LongShortDirection),
       size,
-      swapFee: parseFloat(faker.finance.amount(1, 50, 2)),
+      swapFee: floatToBigInt(faker.number.float({ min: 1, max: 50, precision: 0.0001 }), 6).toString(),
       token,
     };
   })
-  .sort((a, b) => b.timestamp - a.timestamp);
+  .sort((a, b) => parseInt(b.timestamp) - parseInt(a.timestamp));
 
 // Define a helper function to generate pool price history data
 const generatePoolPriceHistory = (): number[][] => {
@@ -392,49 +395,14 @@ export const handlers = [
   ),
 
   // GetBorrowerSwapEvents
-  graphql.query<{ getSwaps: Query['getSwaps'] }, QueryGetSwapsArgs>(GET_BORROWER_SWAPS, (req, res, ctx) => {
-    const { borrower, cursor } = req.variables;
-    if (!borrower) {
-      throw new Error('Borrower address is required');
+  graphql.query<{ swapEvents: Query['swapEvents'] }, QuerySwapEventsArgs>(GET_BORROWER_SWAPS, (req, res, ctx) => {
+    const { first, skip, where } = req.variables;
+    if (!where?.borrower || !skip || !first) {
+      throw new Error('Required parameter not supplied');
     }
+    const positions = pastSwapEvents.slice(skip, skip + first);
 
-    if (cursor) {
-      // find the closed position with the id === cursor and return the next 30 entries from that position
-
-      const cursorPositionIndex = pastSwapEvents.findIndex(({ id }) => id === cursor);
-      const positions = pastSwapEvents.slice(cursorPositionIndex + 1, cursorPositionIndex + 31);
-      const hasNextPage = cursorPositionIndex + 31 < pastSwapEventsLength;
-      const endCursor = positions[positions.length - 1].id;
-
-      const result: Query['getSwaps'] = {
-        __typename: 'SwapEventPage',
-        swaps: positions,
-        pageInfo: {
-          __typename: 'PageInfo',
-          totalCount: pastSwapEventsLength,
-          hasNextPage,
-          endCursor,
-        },
-      };
-      return res(ctx.data({ getSwaps: result }));
-    } else {
-      // return the first 30 closed positions
-      const positions = pastSwapEvents.slice(0, 30);
-      const hasNextPage = pastSwapEventsLength > 30;
-      const endCursor = positions[positions.length - 1].id;
-
-      const result: Query['getSwaps'] = {
-        __typename: 'SwapEventPage',
-        swaps: positions,
-        pageInfo: {
-          __typename: 'PageInfo',
-          totalCount: pastSwapEventsLength,
-          hasNextPage,
-          endCursor,
-        },
-      };
-      return res(ctx.data({ getSwaps: result }));
-    }
+    return res(ctx.data({ swapEvents: positions }));
   }),
 
   // GetBorrowerLiquidityPools

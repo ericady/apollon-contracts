@@ -90,20 +90,23 @@ enum LongShortDirection {
 }
 
 type SwapEvent {
-  id: ID!
-  borrower: String!
-  timestamp: Int!
+  id: Bytes!
+  borrower: Bytes!
+  timestamp: BigInt!
   #
   token: Token!
   direction: LongShortDirection! # Indicates whether the swap is LONG or SHORT
-  size: Float! # always positive, applied by direction. The size of the "non-stable" coin involved in the swap
-  totalPriceInStable: Float! # The total price at the time of the swap, always in stable coin
-  swapFee: Float! # protocol fees, without gas. Long => jUSD / Short => DebtToken
+  size: BigInt! # always positive, applied by direction. The size of the "non-stable" coin involved in the swap
+  totalPriceInStable: BigInt! # The total price at the time of the swap, always in stable coin
+  swapFee: BigInt! # protocol fees, without gas. Long => jUSD / Short => DebtToken
 }
 
-type SwapEventPage {
-  swaps: [SwapEvent!]!
-  pageInfo: PageInfo!
+input SwapEvent_filter {
+  borrower: Bytes
+}
+
+enum SwapEvent_orderBy {
+  timestamp
 }
 
 # General meta info for pagination
@@ -114,9 +117,13 @@ type PageInfo {
 }
 
 type Query {
-  # returns 30 elements, cursor based pagination
-  # sorted by position.timestamp DESC
-  getSwaps(borrower: String!, cursor: String): SwapEventPage!
+  swapEvents(
+    first: Int = 100
+    orderBy: SwapEvent_orderBy
+    orderDirection: OrderDirection
+    skip: Int = 0
+    where: SwapEvent_filter
+  ): [SwapEvent!]!
 }
 
 type PoolLiquidity {

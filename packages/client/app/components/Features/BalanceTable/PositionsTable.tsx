@@ -40,7 +40,7 @@
 //   const handleScroll: TableContainerProps['onScroll'] = (event) => {
 //     const scrollableDiv = event.target as HTMLDivElement;
 //     if (scrollableDiv.scrollTop + scrollableDiv.clientHeight >= scrollableDiv.scrollHeight) {
-//       if (data?.getSwaps.pageInfo.hasNextPage) {
+//       if (data?.swapEvents.pageInfo.hasNextPage) {
 //         fetchMorePositions();
 //       }
 //     }
@@ -49,7 +49,7 @@
 //   const fetchMorePositions = () => {
 //     fetchMore({
 //       variables: {
-//         cursor: data?.getSwaps.pageInfo.endCursor,
+//         cursor: data?.swapEvents.pageInfo.endCursor,
 //       },
 //     });
 //   };
@@ -72,7 +72,7 @@
 //           </TableRow>
 //         </TableHead>
 //         <TableBody>
-//           {data?.getSwaps.positions.map(
+//           {data?.swapEvents.positions.map(
 //             ({ id, direction, swapFee, timestamp, size, token, totalPriceInStable }) => {
 //               const ratioStableCoinNow = token.priceUSD / JUSDToken!.priceUSD;
 //               const totalPriceInStableNow = ratioStableCoinNow * size;

@@ -58,17 +58,14 @@ export function CustomApolloProvider({ children }: PropsWithChildren<{}>) {
 
         Query: {
           fields: {
-            getSwaps: {
+            swapEvents: {
               // Don't cache separate results based on
               // any of this field's arguments.
-              keyArgs: ['isOpen'],
+              keyArgs: [],
               // Concatenate the incoming list items with
               // the existing list items.
-              merge(existing = { swaps: [] }, incoming) {
-                return {
-                  ...incoming,
-                  swaps: [...existing.swaps, ...incoming.swaps],
-                };
+              merge(existing = [], incoming) {
+                return [...existing.swaps, ...incoming.swaps];
               },
               read: (existing) => {
                 return existing;

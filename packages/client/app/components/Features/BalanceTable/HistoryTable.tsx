@@ -14,7 +14,7 @@ import {
 } from '../../../generated/gql-types';
 import { GET_BORROWER_SWAPS } from '../../../queries';
 import { formatUnixTimestamp } from '../../../utils/date';
-import { convertSwapFee, roundCurrency } from '../../../utils/math';
+import { bigIntStringToFloat, convertSwapFee, roundCurrency } from '../../../utils/math';
 import Label from '../../Label/Label';
 import HeaderCell from '../../Table/HeaderCell';
 import HistoryTableLoader from './HistoryTableLoader';
@@ -26,8 +26,11 @@ function HistoryTable() {
     GET_BORROWER_SWAPS,
     {
       variables: {
-        borrower: address,
-        cursor: null,
+        where: {
+          borrower: address,
+        },
+        skip: 0,
+        first: 30,
       },
     },
   );
@@ -35,7 +38,7 @@ function HistoryTable() {
   const handleScroll: TableContainerProps['onScroll'] = (event) => {
     const scrollableDiv = event.target as HTMLDivElement;
     if (scrollableDiv.scrollTop + scrollableDiv.clientHeight >= scrollableDiv.scrollHeight) {
-      if (data?.getSwaps.pageInfo.hasNextPage) {
+      if ((data?.swapEvents.length ?? 0) % 30 === 0) {
         fetchMorePositions();
       }
     }
@@ -44,7 +47,11 @@ function HistoryTable() {
   const fetchMorePositions = () => {
     fetchMore({
       variables: {
-        cursor: data?.getSwaps.pageInfo.endCursor,
+        where: {
+          borrower: address,
+        },
+        skip: data?.swapEvents.length ?? 0,
+        first: 30,
       },
     });
   };
@@ -66,7 +73,7 @@ function HistoryTable() {
         </TableHead>
 
         <TableBody>
-          {data.getSwaps.swaps.map(({ id, direction, swapFee, timestamp, size, token, totalPriceInStable }) => {
+          {data.swapEvents.map(({ id, direction, swapFee, timestamp, size, token, totalPriceInStable }) => {
             return (
               <TableRow hover key={id}>
                 <TableCell>{formatUnixTimestamp(timestamp)}</TableCell>
@@ -91,14 +98,22 @@ function HistoryTable() {
                   <Label variant="none">{token.symbol}</Label>
                 </TableCell>
 
-                <TableCell align="right">{roundCurrency(totalPriceInStable)} jUSD</TableCell>
+                <TableCell align="right">{roundCurrency(bigIntStringToFloat(totalPriceInStable))} jUSD</TableCell>
 
-                <TableCell align="right">{roundCurrency(totalPriceInStable / size)} jUSD</TableCell>
+                <TableCell align="right">
+                  {roundCurrency(bigIntStringToFloat(totalPriceInStable) / bigIntStringToFloat(size))} jUSD
+                </TableCell>
 
                 <TableCell align="right">
                   {direction === LongShortDirection.Long
-                    ? `${roundCurrency(convertSwapFee(swapFee) * totalPriceInStable, 5)} jUSD`
-                    : `${roundCurrency(convertSwapFee(swapFee) * size, 5)} ${token.symbol}`}
+                    ? `${roundCurrency(
+                        convertSwapFee(bigIntStringToFloat(swapFee, 6)) * bigIntStringToFloat(totalPriceInStable),
+                        5,
+                      )} jUSD`
+                    : `${roundCurrency(
+                        convertSwapFee(bigIntStringToFloat(swapFee, 6)) * bigIntStringToFloat(size),
+                        5,
+                      )} ${token.symbol}`}
                 </TableCell>
               </TableRow>
             );
