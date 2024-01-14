@@ -17,7 +17,7 @@ import {
   QueryGetPoolPriceHistoryArgs,
   QueryGetPoolsArgs,
   QueryGetSwapsArgs,
-  QueryGetTokenArgs,
+  QueryTokenArgs,
   QueryTokenCandleSingletonArgs,
   QueryTokenCandlesArgs,
   SwapEvent,
@@ -369,12 +369,12 @@ export const handlers = [
   ),
 
   // GetSelectedToken
-  graphql.query<{ getToken: Query['getToken'] }, QueryGetTokenArgs>(GET_SELECTED_TOKEN, (req, res, ctx) => {
+  graphql.query<{ token: Query['token'] }, QueryTokenArgs>(GET_SELECTED_TOKEN, (req, res, ctx) => {
     const { address } = req.variables;
 
-    const getToken = tokens.find((token) => token.address === address)!;
+    const token = tokens.find((token) => token.address === address)!;
 
-    return res(ctx.data({ getToken }));
+    return res(ctx.data({ token }));
   }),
 
   // GetCollateralTokens

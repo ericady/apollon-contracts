@@ -81,7 +81,7 @@ type Query {
   debtTokenMetas(borrower: String): [DebtTokenMeta!]!
   collateralTokenMetas(borrower: String): [CollateralTokenMeta!]!
   # TODO: Rename this for the subgraph query
-  getToken(address: String!): Token!
+  token(address: String!): Token!
 }
 
 enum LongShortDirection {

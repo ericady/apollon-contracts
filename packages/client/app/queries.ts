@@ -22,7 +22,7 @@ export const GET_ALL_POOLS = gql`
 
 export const GET_SELECTED_TOKEN = gql`
   query GetSelectedToken($address: String!) {
-    getToken(address: $address) {
+    token(address: $address) {
       priceUSDOracle @client
     }
   }

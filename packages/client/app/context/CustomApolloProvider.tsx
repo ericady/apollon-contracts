@@ -12,7 +12,7 @@ import { AddressLike, ethers } from 'ethers';
 import { PropsWithChildren } from 'react';
 import { DebtToken, StabilityPoolManager, StoragePool, SwapPair, TroveManager } from '../../generated/types';
 import {
-  QueryGetTokenArgs,
+  QueryTokenArgs,
   SystemInfo,
   TokenFragmentFragment,
   TroveManager as TroveManagerType,
@@ -144,7 +144,7 @@ const getProductionCacheConfig = ({
             if (
               isFieldOutdated(SchemaDataFreshnessManager.DebtToken[Contracts.DebtToken.DebtToken1], 'priceUSDOracle')
             ) {
-              const address = (args as QueryGetTokenArgs).address;
+              const address = (args as QueryTokenArgs).address;
               SchemaDataFreshnessManager.DebtToken[Contracts.DebtToken.DebtToken1].priceUSDOracle.fetch(
                 // FIXME: use address insteadof hardcoded contract
                 debtTokenContracts[Contracts.DebtToken.DebtToken1],

@@ -52,7 +52,7 @@ function TradingViewHeader() {
         <Typography variant="subtitle1" fontFamily="Space Grotesk Variable">
           Oracle
           <Box sx={{ color: 'text.primary', display: 'inline', ml: '8px' }}>
-            {data ? roundCurrency(data.getToken.priceUSDOracle) : ' -'}
+            {data ? roundCurrency(data.token.priceUSDOracle) : ' -'}
           </Box>{' '}
           $
         </Typography>
@@ -60,7 +60,7 @@ function TradingViewHeader() {
           Premium
           <Box sx={{ color: 'text.primary', display: 'inline', ml: '8px' }}>
             {data && selectedToken
-              ? displayPercentage(percentageChange(selectedToken.priceUSD, data.getToken.priceUSDOracle), 'positive')
+              ? displayPercentage(percentageChange(selectedToken.priceUSD, data.token.priceUSDOracle), 'positive')
               : ' -'}
           </Box>
         </Typography>

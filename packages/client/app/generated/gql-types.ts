@@ -127,8 +127,8 @@ export type Query = {
   getReserveUSDHistory: Array<Array<Scalars['Int']['output']>>;
   getSwaps: SwapEventPage;
   getSystemInfo: SystemInfo;
-  getToken: Token;
   getTroveManager: TroveManager;
+  token: Token;
   tokenCandleSingleton: TokenCandleSingleton;
   tokenCandles: Array<TokenCandle>;
 };
@@ -173,7 +173,7 @@ export type QueryGetSwapsArgs = {
 };
 
 
-export type QueryGetTokenArgs = {
+export type QueryTokenArgs = {
   address: Scalars['String']['input'];
 };
 
@@ -334,7 +334,7 @@ export type GetSelectedTokenQueryVariables = Exact<{
 }>;
 
 
-export type GetSelectedTokenQuery = { __typename: 'Query', getToken: { __typename: 'Token', priceUSDOracle: number } };
+export type GetSelectedTokenQuery = { __typename: 'Query', token: { __typename: 'Token', priceUSDOracle: number } };
 
 export type GetDebtTokensQueryVariables = Exact<{ [key: string]: never; }>;
 
