@@ -48,7 +48,7 @@ type DebtTokenMeta @entity {
   totalReserve30dAverage: TotalReserveAverage!
   # event StoragePoolValueUpdated
   totalSupplyUSD: BigInt!
-  totalSupplyUSD30dAverage: BigInt!
+  totalSupplyUSD30dAverage: TotalSupplyAverage!
   # event StoragePoolValueUpdated
 }
 
@@ -63,6 +63,22 @@ type TotalReserveAverage @entity {
 # A chunk is added once every 60min are over and is deducted at the end of 30d
 type TotalReserveAverageChunk @entity {
   # "TotalReserveAverageChunk" + token + index
+  id: String!
+  timestamp: BigInt!
+  value: BigInt!
+}
+
+# aggregator for 30d average, each chunk is 60min
+type TotalSupplyAverage @entity {
+  # "TotalSupplyAverage" + token
+  id: String!
+  index: Int!
+  value: BigInt!
+}
+
+# A chunk is added once every 60min are over and is deducted at the end of 30d
+type TotalSupplyAverageChunk @entity {
+  # "TotalSupplyAverageChunk" + token + index
   id: String!
   timestamp: BigInt!
   value: BigInt!

@@ -29,7 +29,7 @@ export const handleUpdateCollateralTokenMeta_totalValueLockedUSD30dAverage = (
   event: ethereum.Event,
   tokenAddress: Address,
   collateralTokenMeta: CollateralTokenMeta | null = null,
-) => {
+): void => {
   if (collateralTokenMeta === null) {
     collateralTokenMeta = CollateralTokenMeta.load(`CollateralTokenMeta-${tokenAddress.toHexString()}`)!;
   }

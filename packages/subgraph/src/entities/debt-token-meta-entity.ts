@@ -12,6 +12,8 @@ import {
   Token,
   TotalReserveAverage,
   TotalReserveAverageChunk,
+  TotalSupplyAverage,
+  TotalSupplyAverageChunk,
 } from '../../generated/schema';
 
 export const stableDebtToken = EventAddress.fromString('0x6c3f90f043a72fa612cbac8115ee7e52bde6e490');
@@ -60,6 +62,7 @@ export function handleCreateUpdateDebtTokenMeta(
   // Just link average but update them atomically.
   debtTokenMeta.stabilityDepositAPY = `StabilityDepositAPY-${tokenAddress.toHexString()}`;
   debtTokenMeta.totalReserve30dAverage = `TotalReserveAverage-${tokenAddress.toHexString()}`;
+  debtTokenMeta.totalSupplyUSD30dAverage = `TotalSupplyAverage-${tokenAddress.toHexString()}`;
 
   debtTokenMeta.save();
 }
@@ -153,7 +156,7 @@ export const handleUpdateDebtTokenMeta_totalReserve30dAverage = (
   event: ethereum.Event,
   tokenAddress: Address,
   totalReserve: BigInt,
-) => {
+): void => {
   // Load Avergae or intialise it
   let totalReserveAverage = TotalReserveAverage.load(`TotalReserveAverage-${tokenAddress.toHexString()}`);
 
@@ -162,7 +165,7 @@ export const handleUpdateDebtTokenMeta_totalReserve30dAverage = (
     totalReserveAverage.value = totalReserve;
     totalReserveAverage.index = 0;
 
-    // "TotalValueLockedChunk" + token + index
+    // "TotalReserveAverageChunk" + token + index
     const totalReserveAverageFirstChunk = new TotalReserveAverageChunk(
       `TotalReserveAverageChunk-${tokenAddress.toHexString()}-0`,
     );
@@ -217,4 +220,75 @@ export const handleUpdateDebtTokenMeta_totalReserve30dAverage = (
   }
 
   totalReserveAverage.save();
+};
+
+export const handleUpdateDebtTokenMeta_totalSupply30dAverage = (event: ethereum.Event, tokenAddress: Address): void => {
+  const debtTokenContract = DebtToken.bind(tokenAddress);
+  const totalSupply = debtTokenContract.totalSupply();
+  const tokenPrice = debtTokenContract.getPrice();
+  const totalSupplyUSD = totalSupply.times(tokenPrice);
+
+  // Load Avergae or intialise it
+  let totalSupplyAverage = TotalSupplyAverage.load(`TotalSupplyAverage-${tokenAddress.toHexString()}`);
+
+  if (totalSupplyAverage === null) {
+    totalSupplyAverage = new TotalSupplyAverage(`TotalSupplyAverage-${tokenAddress.toHexString()}`);
+    totalSupplyAverage.value = totalSupplyUSD;
+    totalSupplyAverage.index = 0;
+
+    // "TotalSupplyAverageChunk" + token + index
+    const totalSupplyAverageFirstChunk = new TotalSupplyAverageChunk(
+      `TotalSupplyAverageChunk-${tokenAddress.toHexString()}-0`,
+    );
+    totalSupplyAverageFirstChunk.timestamp = event.block.timestamp;
+    totalSupplyAverageFirstChunk.value = totalSupplyUSD;
+    totalSupplyAverageFirstChunk.save();
+  } else {
+    //  Add additional chunks the average has not been recalculated in the last 60 mins with last value (because there has been no update).
+    let lastChunk = TotalSupplyAverageChunk.load(
+      `TotalSupplyAverageChunk-${tokenAddress.toHexString()}-${totalSupplyAverage.index.toString()}`,
+    )!;
+    let moreThanOneChunkOutdated = lastChunk.timestamp.lt(event.block.timestamp.minus(BigInt.fromI32(2 * 60 * 60)));
+
+    while (moreThanOneChunkOutdated) {
+      totalSupplyAverage.index = totalSupplyAverage.index + 1;
+      const totalSupplyAverageNewChunk = new TotalSupplyAverageChunk(
+        `TotalSupplyAverageChunk-${tokenAddress.toHexString()}-${totalSupplyAverage.index.toString()}`,
+      );
+      totalSupplyAverageNewChunk.timestamp = lastChunk.timestamp.plus(BigInt.fromI32(60 * 60));
+      totalSupplyAverageNewChunk.value = lastChunk.value;
+      totalSupplyAverageNewChunk.save();
+
+      lastChunk = totalSupplyAverageNewChunk;
+      moreThanOneChunkOutdated = lastChunk.timestamp.lt(event.block.timestamp.minus(BigInt.fromI32(2 * 60 * 60)));
+    }
+
+    // Add the last chunk.
+    if (lastChunk.timestamp.lt(event.block.timestamp.minus(BigInt.fromI32(60 * 60)))) {
+      // Add a new chunk anyway
+      totalSupplyAverage.index = totalSupplyAverage.index + 1;
+
+      const totalSupplyAverageNewChunk = new TotalSupplyAverageChunk(
+        `TotalSupplyAverageChunk-${tokenAddress.toHexString()}-${totalSupplyAverage.index.toString()}`,
+      );
+      totalSupplyAverageNewChunk.timestamp = lastChunk.timestamp.plus(BigInt.fromI32(60 * 60));
+      totalSupplyAverageNewChunk.value = totalSupplyUSD;
+      totalSupplyAverageNewChunk.save();
+
+      // recalculate average based on if its the first 30 days or not
+      if (totalSupplyAverage.index < 24 * 30) {
+        totalSupplyAverage.value = totalSupplyAverage.value
+          .div(BigInt.fromI32(totalSupplyAverage.index - 1 / totalSupplyAverage.index))
+          .plus(totalSupplyAverageNewChunk.value.div(BigInt.fromI32(totalSupplyAverage.index)));
+      } else {
+        // Otherwise remove last chunk and add new chunk and recalculate average
+        const dividedByChunks = BigInt.fromI32(30 * 24);
+        totalSupplyAverage.value = totalSupplyAverage.value
+          .plus(totalSupplyAverageNewChunk.value.div(dividedByChunks))
+          .minus(lastChunk.value.div(dividedByChunks));
+      }
+    }
+  }
+
+  totalSupplyAverage.save();
 };
