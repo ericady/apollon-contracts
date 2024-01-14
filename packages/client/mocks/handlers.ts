@@ -105,11 +105,15 @@ const collateralTokenMeta: CollateralTokenMeta[] = collateralTokens.map<Collater
   return {
     __typename: 'CollateralTokenMeta',
     id: faker.string.uuid(),
+    timestamp: (now / 1000).toString(),
     token: collToken,
-    totalValueLockedUSD,
-    totalValueLockedUSD30dAverage: parseFloat(
-      faker.finance.amount(totalValueLockedUSD * 0.9, totalValueLockedUSD * 1.2, 2),
-    ),
+    totalValueLockedUSD: floatToBigInt(faker.number.float({ min: 10000, max: 50000, precision: 0.01 })).toString(),
+    totalValueLockedUSD30dAverage: {
+      __typename: 'TotalValueLockedAverage',
+      id: faker.string.uuid(),
+      index: 0,
+      value: floatToBigInt(faker.number.float({ min: 10000, max: 50000, precision: 0.01 })).toString(),
+    },
     walletAmount: 0,
     troveLockedAmount: 0,
     stabilityGainedAmount: 0,
@@ -149,28 +153,30 @@ const debtTokenMeta = tokens.map<DebtTokenMeta>((token, index) => {
     troveRepableDebtAmount: 0,
 
     totalDepositedStability: floatToBigInt(faker.number.float({ min: 1000, max: 5000, precision: 0.0001 })).toString(),
-    totalReserve: floatToBigInt(isGovOrStableDebtToken ? faker.number.float({ min: 1000, max: 5000, precision: 0.0001 }): 0).toString(),
+    totalReserve: floatToBigInt(
+      isGovOrStableDebtToken ? faker.number.float({ min: 1000, max: 5000, precision: 0.0001 }) : 0,
+    ).toString(),
     totalReserve30dAverage: isGovOrStableDebtToken
       ? {
-        __typename: "TotalReserveAverage",
-        id: faker.string.uuid(),
-        index: 0,
-        value: floatToBigInt(faker.number.float({ min: 1000, max: 5000, precision: 0.0001 })).toString()
-      }
+          __typename: 'TotalReserveAverage',
+          id: faker.string.uuid(),
+          index: 0,
+          value: floatToBigInt(faker.number.float({ min: 1000, max: 5000, precision: 0.0001 })).toString(),
+        }
       : null,
     totalSupplyUSD: floatToBigInt(faker.number.float({ min: 10000, max: 50000, precision: 0.0001 })).toString(),
     totalSupplyUSD30dAverage: {
-      __typename: "TotalSupplyAverage",
+      __typename: 'TotalSupplyAverage',
       id: faker.string.uuid(),
       index: 0,
-      value: floatToBigInt(faker.number.float({ min: 10000, max: 50000, precision: 0.0001 })).toString()
+      value: floatToBigInt(faker.number.float({ min: 10000, max: 50000, precision: 0.0001 })).toString(),
     },
     stabilityDepositAPY: {
-      __typename: "StabilityDepositAPY",
+      __typename: 'StabilityDepositAPY',
       id: faker.string.uuid(),
       index: 0,
       profit: floatToBigInt(faker.number.float({ min: 1, max: 100, precision: 0.0001 })).toString(),
-      volume:  floatToBigInt(faker.number.float({ min: 100, max: 200, precision: 0.0001 })).toString(),
+      volume: floatToBigInt(faker.number.float({ min: 100, max: 200, precision: 0.0001 })).toString(),
     },
   };
 });

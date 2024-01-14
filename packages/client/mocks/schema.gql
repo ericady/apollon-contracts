@@ -14,7 +14,7 @@ type Token {
 }
 
 type DebtTokenMeta {
-  id: Bytes!
+  id: String!
   token: Token!
   timestamp: BigInt!
   # handled by client
@@ -55,16 +55,23 @@ type StabilityDepositAPY {
 }
 
 type CollateralTokenMeta {
-  id: ID!
+  id: String!
   token: Token!
+  timestamp: BigInt!
   # borrower specific
   walletAmount: Float!
   troveLockedAmount: Float!
   stabilityGainedAmount: Float!
 
   # global
-  totalValueLockedUSD: Float!
-  totalValueLockedUSD30dAverage: Float!
+  totalValueLockedUSD: BigInt!
+  totalValueLockedUSD30dAverage: TotalValueLockedAverage!
+}
+
+type TotalValueLockedAverage {
+  id: String!
+  index: Int!
+  value: BigInt!
 }
 
 type Query {

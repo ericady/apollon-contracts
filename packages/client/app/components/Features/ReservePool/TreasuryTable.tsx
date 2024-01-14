@@ -10,7 +10,13 @@ import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import { GetDebtTokensQuery, GetDebtTokensQueryVariables } from '../../../generated/gql-types';
 import { GET_ALL_DEBT_TOKENS } from '../../../queries';
-import { bigIntStringToFloat, displayPercentage, percentageChange, roundCurrency, stdFormatter } from '../../../utils/math';
+import {
+  bigIntStringToFloat,
+  displayPercentage,
+  percentageChange,
+  roundCurrency,
+  stdFormatter,
+} from '../../../utils/math';
 import FeatureBox from '../../FeatureBox/FeatureBox';
 import DirectionIcon from '../../Icons/DirectionIcon';
 import Label from '../../Label/Label';
@@ -22,12 +28,19 @@ function TreasuryTable() {
 
   if (!data) return <TreasuryTableLoader />;
 
-  const debtTokensInReserve = data.getDebtTokens.map((debtToken) => ({...debtToken, totalReserve: bigIntStringToFloat(debtToken.totalReserve), totalSupplyUSD: bigIntStringToFloat(debtToken.totalSupplyUSD), 
-  totalReserve30dAverage: debtToken.totalReserve30dAverage ? {
-    ...debtToken.totalReserve30dAverage,
-    value: bigIntStringToFloat(debtToken.totalReserve30dAverage.value)
-  } : null
-  })).filter(({ totalReserve }) =>  totalReserve > 0);
+  const debtTokensInReserve = data.getDebtTokens
+    .map((debtToken) => ({
+      ...debtToken,
+      totalReserve: bigIntStringToFloat(debtToken.totalReserve),
+      totalSupplyUSD: bigIntStringToFloat(debtToken.totalSupplyUSD),
+      totalReserve30dAverage: debtToken.totalReserve30dAverage
+        ? {
+            ...debtToken.totalReserve30dAverage,
+            value: bigIntStringToFloat(debtToken.totalReserve30dAverage.value),
+          }
+        : null,
+    }))
+    .filter(({ totalReserve }) => totalReserve > 0);
 
   return (
     <FeatureBox title="Treasury" noPadding border="full" borderRadius>
@@ -61,7 +74,11 @@ function TreasuryTable() {
                   <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
                     <Typography
                       fontWeight={400}
-                      color={percentageChange(totalReserve, totalReserve30dAverage!.value) > 0 ? 'success.main' : 'error.main'}
+                      color={
+                        percentageChange(totalReserve, totalReserve30dAverage!.value) > 0
+                          ? 'success.main'
+                          : 'error.main'
+                      }
                     >
                       {displayPercentage(percentageChange(totalReserve, totalReserve30dAverage!.value), 'positive')}
                     </Typography>

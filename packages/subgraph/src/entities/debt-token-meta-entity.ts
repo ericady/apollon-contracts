@@ -61,8 +61,11 @@ export function handleCreateUpdateDebtTokenMeta(
 
   // Just link average but update them atomically.
   debtTokenMeta.stabilityDepositAPY = `StabilityDepositAPY-${tokenAddress.toHexString()}`;
-  debtTokenMeta.totalReserve30dAverage = `TotalReserveAverage-${tokenAddress.toHexString()}`;
   debtTokenMeta.totalSupplyUSD30dAverage = `TotalSupplyAverage-${tokenAddress.toHexString()}`;
+
+  if (tokenAddress === stableDebtToken || tokenAddress === govToken) {
+    debtTokenMeta.totalReserve30dAverage = `TotalReserveAverage-${tokenAddress.toHexString()}`;
+  }
 
   debtTokenMeta.save();
 }

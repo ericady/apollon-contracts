@@ -16,7 +16,6 @@ import {
   GetBorrowerDebtTokensQuery,
   GetBorrowerDebtTokensQueryVariables,
   GetBorrowerLiquidityPoolsQuery,
-  PoolLiquidity,
 } from '../../../generated/gql-types';
 import { GET_BORROWER_DEBT_TOKENS } from '../../../queries';
 import { bigIntStringToFloat, displayPercentage, floatToBigInt, roundCurrency, roundNumber } from '../../../utils/math';
@@ -40,8 +39,8 @@ type FieldValues = {
 function LiquidityDepositWithdraw({ selectedPool }: Props) {
   const { liquidity, borrowerAmount, totalSupply } = selectedPool;
   const [tokenA, tokenB] = liquidity.map((liquidity) => ({
-...liquidity,
-token: {...liquidity.token, priceUSD: bigIntStringToFloat(liquidity.token.priceUSD)},
+    ...liquidity,
+    token: { ...liquidity.token, priceUSD: bigIntStringToFloat(liquidity.token.priceUSD) },
   }));
 
   const {
@@ -231,8 +230,8 @@ token: {...liquidity.token, priceUSD: bigIntStringToFloat(liquidity.token.priceU
       const tokenAAmount = calculate150PercentTokenValue(
         currentDebtValueUSD,
         currentCollateralValueUSD,
-        {totalAmount: tokenA.totalAmount, priceUSD: tokenA.token.priceUSD},
-        {totalAmount: tokenB.totalAmount, priceUSD: tokenB.token.priceUSD},
+        { totalAmount: tokenA.totalAmount, priceUSD: tokenA.token.priceUSD },
+        { totalAmount: tokenB.totalAmount, priceUSD: tokenB.token.priceUSD },
         relevantDebtTokenA as DebtTokenMeta,
         relevantDebtTokenB as DebtTokenMeta,
       );
@@ -685,8 +684,8 @@ export default LiquidityDepositWithdraw;
 export const calculate150PercentTokenValue = (
   currentDebtValueUSD: number,
   currentCollateralValueUSD: number,
-  tokenA: { priceUSD: number, totalAmount: number },
-  tokenB: { priceUSD: number, totalAmount: number },
+  tokenA: { priceUSD: number; totalAmount: number },
+  tokenB: { priceUSD: number; totalAmount: number },
   relevantDebtTokenA: DebtTokenMeta,
   relevantDebtTokenB: DebtTokenMeta,
 ) => {

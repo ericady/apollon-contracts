@@ -156,7 +156,10 @@ export const GET_BORROWER_COLLATERAL_TOKENS = gql`
       stabilityGainedAmount
 
       totalValueLockedUSD
-      totalValueLockedUSD30dAverage
+      totalValueLockedUSD30dAverage {
+        id
+        value
+      }
     }
   }
 `;

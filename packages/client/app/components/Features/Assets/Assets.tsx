@@ -57,7 +57,9 @@ function Assets() {
           priceUSD24hAgo: bigIntStringToFloat(token.priceUSD24hAgo),
           swapFee,
           // calculate change over last 24h
-          change: (bigIntStringToFloat(token.priceUSD) - bigIntStringToFloat(token.priceUSD24hAgo)) / bigIntStringToFloat(token.priceUSD24hAgo),
+          change:
+            (bigIntStringToFloat(token.priceUSD) - bigIntStringToFloat(token.priceUSD24hAgo)) /
+            bigIntStringToFloat(token.priceUSD24hAgo),
           isFavorite: favoritedAssets.find((address) => token.address === address) !== undefined ? true : false,
           volume30dUSD,
           pool: {

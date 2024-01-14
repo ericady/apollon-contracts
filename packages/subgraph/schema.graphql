@@ -45,7 +45,7 @@ type DebtTokenMeta @entity {
   # - deposited: `stableReserveCap` und `govReserveCap`
   # - event: `WithdrewReserves` und borrowerOps.increaseDebt, dort haben wir aber aktuell kein Event 😟
   totalReserve: BigInt!
-  totalReserve30dAverage: TotalReserveAverage!
+  totalReserve30dAverage: TotalReserveAverage
   # event StoragePoolValueUpdated
   totalSupplyUSD: BigInt!
   totalSupplyUSD30dAverage: TotalSupplyAverage!

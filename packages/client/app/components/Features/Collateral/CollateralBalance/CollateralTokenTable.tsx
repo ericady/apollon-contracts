@@ -11,7 +11,13 @@ import TableRow from '@mui/material/TableRow';
 import { useEthers } from '../../../../context/EthersProvider';
 import { GetCollateralTokensQuery, GetCollateralTokensQueryVariables } from '../../../../generated/gql-types';
 import { GET_BORROWER_COLLATERAL_TOKENS } from '../../../../queries';
-import { displayPercentage, percentageChange, roundCurrency, stdFormatter } from '../../../../utils/math';
+import {
+  bigIntStringToFloat,
+  displayPercentage,
+  percentageChange,
+  roundCurrency,
+  stdFormatter,
+} from '../../../../utils/math';
 import FeatureBox from '../../../FeatureBox/FeatureBox';
 import DirectionIcon from '../../../Icons/DirectionIcon';
 import Label from '../../../Label/Label';
@@ -50,44 +56,50 @@ const CollateralTokenTable = () => {
               </TableRow>
             </TableHead>
             <TableBody>
-              {data.getCollateralTokens.map(
-                ({ token, totalValueLockedUSD, totalValueLockedUSD30dAverage, troveLockedAmount, walletAmount }) => (
-                  <TableRow hover key={token.address}>
-                    <TableCell align="right" sx={{ borderRight: '1px solid', borderColor: 'table.border' }}>
-                      {roundCurrency(walletAmount ?? 0, 5)}
-                    </TableCell>
-                    <TableCell align="right" sx={{ borderRight: '1px solid', borderColor: 'table.border' }}>
-                      {roundCurrency(troveLockedAmount ?? 0, 5)}
-                    </TableCell>
-                    <TableCell>
-                      <Label variant="none">{token.symbol}</Label>
-                    </TableCell>
-                    <TableCell align="right" sx={{ pr: 0 }}>
-                      {stdFormatter.format(totalValueLockedUSD)}
-                    </TableCell>
-                    <TableCell width={125}>
-                      <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-                        <Typography
-                          fontWeight={400}
-                          color={
-                            percentageChange(totalValueLockedUSD, totalValueLockedUSD30dAverage) > 0
-                              ? 'success.main'
-                              : 'error.main'
-                          }
-                        >
-                          {displayPercentage(
-                            percentageChange(totalValueLockedUSD, totalValueLockedUSD30dAverage),
-                            'positive',
-                          )}
-                        </Typography>
-                        <DirectionIcon
-                          showIncrease={percentageChange(totalValueLockedUSD, totalValueLockedUSD30dAverage) > 0}
-                        />
-                      </div>
-                    </TableCell>
-                  </TableRow>
-                ),
-              )}
+              {data.getCollateralTokens
+                .map((collToken) => ({
+                  ...collToken,
+                  totalValueLockedUSD: bigIntStringToFloat(collToken.totalValueLockedUSD),
+                  totalValueLockedUSD30dAverage: bigIntStringToFloat(collToken.totalValueLockedUSD30dAverage.value),
+                }))
+                .map(
+                  ({ token, totalValueLockedUSD, totalValueLockedUSD30dAverage, troveLockedAmount, walletAmount }) => (
+                    <TableRow hover key={token.address}>
+                      <TableCell align="right" sx={{ borderRight: '1px solid', borderColor: 'table.border' }}>
+                        {roundCurrency(walletAmount ?? 0, 5)}
+                      </TableCell>
+                      <TableCell align="right" sx={{ borderRight: '1px solid', borderColor: 'table.border' }}>
+                        {roundCurrency(troveLockedAmount ?? 0, 5)}
+                      </TableCell>
+                      <TableCell>
+                        <Label variant="none">{token.symbol}</Label>
+                      </TableCell>
+                      <TableCell align="right" sx={{ pr: 0 }}>
+                        {stdFormatter.format(totalValueLockedUSD)}
+                      </TableCell>
+                      <TableCell width={125}>
+                        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
+                          <Typography
+                            fontWeight={400}
+                            color={
+                              percentageChange(totalValueLockedUSD, totalValueLockedUSD30dAverage) > 0
+                                ? 'success.main'
+                                : 'error.main'
+                            }
+                          >
+                            {displayPercentage(
+                              percentageChange(totalValueLockedUSD, totalValueLockedUSD30dAverage),
+                              'positive',
+                            )}
+                          </Typography>
+                          <DirectionIcon
+                            showIncrease={percentageChange(totalValueLockedUSD, totalValueLockedUSD30dAverage) > 0}
+                          />
+                        </div>
+                      </TableCell>
+                    </TableRow>
+                  ),
+                )}
 
               <TableRow>
                 <TableCell
