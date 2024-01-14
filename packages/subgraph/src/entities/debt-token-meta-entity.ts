@@ -5,7 +5,14 @@ import { DebtToken } from '../../generated/DebtToken/DebtToken';
 import { ReservePool } from '../../generated/ReservePool/ReservePool';
 import { StabilityOffsetAddedGainsStruct, StabilityPool } from '../../generated/StabilityPool/StabilityPool';
 import { StabilityPoolManager } from '../../generated/StabilityPoolManager/StabilityPoolManager';
-import { DebtTokenMeta, StabilityDepositAPY, StabilityDepositChunk, Token } from '../../generated/schema';
+import {
+  DebtTokenMeta,
+  StabilityDepositAPY,
+  StabilityDepositChunk,
+  Token,
+  TotalReserveAverage,
+  TotalReserveAverageChunk,
+} from '../../generated/schema';
 
 export const stableDebtToken = EventAddress.fromString('0x6c3f90f043a72fa612cbac8115ee7e52bde6e490');
 export const govToken = EventAddress.fromString('0x9f8f72aa9304c8b593d555f12ef6589cc3a579a2');
@@ -48,13 +55,16 @@ export function handleCreateUpdateDebtTokenMeta(
     }
   }
 
-  debtTokenMeta.stabilityDepositAPY = `StabilityDepositAPY-${tokenAddress.toHexString()}`;
   debtTokenMeta.totalDepositedStability = debtTokenStabilityPoolContract.getTotalDeposit();
+
+  // Just link average but update them atomically.
+  debtTokenMeta.stabilityDepositAPY = `StabilityDepositAPY-${tokenAddress.toHexString()}`;
+  debtTokenMeta.totalReserve30dAverage = `TotalReserveAverage-${tokenAddress.toHexString()}`;
 
   debtTokenMeta.save();
 }
 
-export function handleUpdateStabilityDepositAPY(
+export function handleUpdateDebtTokenMeta_stabilityDepositAPY(
   event: ethereum.Event,
   tokenAddress: Address,
   lostDeposit: BigInt,
@@ -138,3 +148,73 @@ export function handleUpdateStabilityDepositAPY(
 
   stabilityDepositAPYEntity.save();
 }
+
+export const handleUpdateDebtTokenMeta_totalReserve30dAverage = (
+  event: ethereum.Event,
+  tokenAddress: Address,
+  totalReserve: BigInt,
+) => {
+  // Load Avergae or intialise it
+  let totalReserveAverage = TotalReserveAverage.load(`TotalReserveAverage-${tokenAddress.toHexString()}`);
+
+  if (totalReserveAverage === null) {
+    totalReserveAverage = new TotalReserveAverage(`TotalReserveAverage-${tokenAddress.toHexString()}`);
+    totalReserveAverage.value = totalReserve;
+    totalReserveAverage.index = 0;
+
+    // "TotalValueLockedChunk" + token + index
+    const totalReserveAverageFirstChunk = new TotalReserveAverageChunk(
+      `TotalReserveAverageChunk-${tokenAddress.toHexString()}-0`,
+    );
+    totalReserveAverageFirstChunk.timestamp = event.block.timestamp;
+    totalReserveAverageFirstChunk.value = totalReserve;
+    totalReserveAverageFirstChunk.save();
+  } else {
+    //  Add additional chunks the average has not been recalculated in the last 60 mins with last value (because there has been no update).
+    let lastChunk = TotalReserveAverageChunk.load(
+      `TotalReserveAverageChunk-${tokenAddress.toHexString()}-${totalReserveAverage.index.toString()}`,
+    )!;
+    let moreThanOneChunkOutdated = lastChunk.timestamp.lt(event.block.timestamp.minus(BigInt.fromI32(2 * 60 * 60)));
+
+    while (moreThanOneChunkOutdated) {
+      totalReserveAverage.index = totalReserveAverage.index + 1;
+      const totalReserveAverageNewChunk = new TotalReserveAverageChunk(
+        `TotalReserveAverageChunk-${tokenAddress.toHexString()}-${totalReserveAverage.index.toString()}`,
+      );
+      totalReserveAverageNewChunk.timestamp = lastChunk.timestamp.plus(BigInt.fromI32(60 * 60));
+      totalReserveAverageNewChunk.value = lastChunk.value;
+      totalReserveAverageNewChunk.save();
+
+      lastChunk = totalReserveAverageNewChunk;
+      moreThanOneChunkOutdated = lastChunk.timestamp.lt(event.block.timestamp.minus(BigInt.fromI32(2 * 60 * 60)));
+    }
+
+    // Add the last chunk.
+    if (lastChunk.timestamp.lt(event.block.timestamp.minus(BigInt.fromI32(60 * 60)))) {
+      // Add a new chunk anyway
+      totalReserveAverage.index = totalReserveAverage.index + 1;
+
+      const totalReserveAverageNewChunk = new TotalReserveAverageChunk(
+        `TotalReserveAverageChunk-${tokenAddress.toHexString()}-${totalReserveAverage.index.toString()}`,
+      );
+      totalReserveAverageNewChunk.timestamp = lastChunk.timestamp.plus(BigInt.fromI32(60 * 60));
+      totalReserveAverageNewChunk.value = totalReserve;
+      totalReserveAverageNewChunk.save();
+
+      // recalculate average based on if its the first 30 days or not
+      if (totalReserveAverage.index < 24 * 30) {
+        totalReserveAverage.value = totalReserveAverage.value
+          .div(BigInt.fromI32(totalReserveAverage.index - 1 / totalReserveAverage.index))
+          .plus(totalReserveAverageNewChunk.value.div(BigInt.fromI32(totalReserveAverage.index)));
+      } else {
+        // Otherwise remove last chunk and add new chunk and recalculate average
+        const dividedByChunks = BigInt.fromI32(30 * 24);
+        totalReserveAverage.value = totalReserveAverage.value
+          .plus(totalReserveAverageNewChunk.value.div(dividedByChunks))
+          .minus(lastChunk.value.div(dividedByChunks));
+      }
+    }
+  }
+
+  totalReserveAverage.save();
+};

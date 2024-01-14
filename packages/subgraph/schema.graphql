@@ -45,11 +45,27 @@ type DebtTokenMeta @entity {
   # - deposited: `stableReserveCap` und `govReserveCap`
   # - event: `WithdrewReserves` und borrowerOps.increaseDebt, dort haben wir aber aktuell kein Event 😟
   totalReserve: BigInt!
-  totalReserve30dAverage: BigInt!
+  totalReserve30dAverage: TotalReserveAverage!
   # event StoragePoolValueUpdated
   totalSupplyUSD: BigInt!
   totalSupplyUSD30dAverage: BigInt!
   # event StoragePoolValueUpdated
+}
+
+# aggregator for 30d average, each chunk is 60min
+type TotalReserveAverage @entity {
+  # "TotalReserveAverage" + token
+  id: String!
+  index: Int!
+  value: BigInt!
+}
+
+# A chunk is added once every 60min are over and is deducted at the end of 30d
+type TotalReserveAverageChunk @entity {
+  # "TotalReserveAverageChunk" + token + index
+  id: String!
+  timestamp: BigInt!
+  value: BigInt!
 }
 
 # Aggregator, pushed old events out and lets new in, recalculating the acc value each time

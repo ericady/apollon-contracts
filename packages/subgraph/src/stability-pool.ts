@@ -12,7 +12,10 @@ import {
   StabilityWithdrawn as StabilityWithdrawnEvent,
 } from '../generated/StabilityPool/StabilityPool';
 import { handleCreateBorrowerHistory } from './entities/borrower-history-entity';
-import { handleCreateUpdateDebtTokenMeta, handleUpdateStabilityDepositAPY } from './entities/debt-token-meta-entity';
+import {
+  handleCreateUpdateDebtTokenMeta,
+  handleUpdateDebtTokenMeta_stabilityDepositAPY,
+} from './entities/debt-token-meta-entity';
 
 export function handleDepositSnapshotUpdated(event: DepositSnapshotUpdatedEvent): void {}
 
@@ -50,7 +53,12 @@ export function handleStabilityGainsWithdrawn(event: StabilityGainsWithdrawnEven
 }
 
 export function handleStabilityOffset(event: StabilityOffsetEvent): void {
-  handleUpdateStabilityDepositAPY(event, event.address, event.params.removedDeposit, event.params.addedGains);
+  handleUpdateDebtTokenMeta_stabilityDepositAPY(
+    event,
+    event.address,
+    event.params.removedDeposit,
+    event.params.addedGains,
+  );
   // stabilityDepositAPY changed
   handleCreateUpdateDebtTokenMeta(event, event.address);
 }

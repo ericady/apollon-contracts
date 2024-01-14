@@ -22,6 +22,18 @@ export function handleCreateUpdateCollateralTokenMeta(event: ethereum.Event, tok
 
   collateralTokenMeta.totalValueLockedUSD = storagePoolContract.getTokenTotalAmount(tokenAddress, true);
 
+  handleUpdateCollateralTokenMeta_totalValueLockedUSD30dAverage(event, tokenAddress, collateralTokenMeta);
+}
+
+export const handleUpdateCollateralTokenMeta_totalValueLockedUSD30dAverage = (
+  event: ethereum.Event,
+  tokenAddress: Address,
+  collateralTokenMeta: CollateralTokenMeta | null = null,
+) => {
+  if (collateralTokenMeta === null) {
+    collateralTokenMeta = CollateralTokenMeta.load(`CollateralTokenMeta-${tokenAddress.toHexString()}`)!;
+  }
+
   // Load Avergae or intialise it
   let tvlAverage = TotalValueLockedAverage.load(`TotalValueLockedAverage-${tokenAddress.toHexString()}`);
 
@@ -83,7 +95,6 @@ export function handleCreateUpdateCollateralTokenMeta(event: ethereum.Event, tok
   }
 
   tvlAverage.save();
-
   collateralTokenMeta.totalValueLockedUSD30dAverage = tvlAverage.id;
   collateralTokenMeta.save();
-}
+};
