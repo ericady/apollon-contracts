@@ -23,7 +23,7 @@ import { Contracts, useEthers } from '../../../context/EthersProvider';
 import { useTransactionDialog } from '../../../context/TransactionDialogProvider';
 import { GetCollateralTokensQuery, GetCollateralTokensQueryVariables } from '../../../generated/gql-types';
 import { GET_BORROWER_COLLATERAL_TOKENS } from '../../../queries';
-import { displayPercentage, floatToBigInt, roundCurrency } from '../../../utils/math';
+import { bigIntStringToFloat, displayPercentage, floatToBigInt, roundCurrency } from '../../../utils/math';
 import NumberInput from '../../FormControls/NumberInput';
 import CrossIcon from '../../Icons/CrossIcon';
 import DiamondIcon from '../../Icons/DiamondIcon';
@@ -183,9 +183,8 @@ const CollateralUpdateDialog = ({ buttonVariant, buttonSx = {} }: Props) => {
     allTokenAmount.reduce((acc, curr, index) => {
       const address = [Contracts.ERC20.JUSD, Contracts.ERC20.DFI, Contracts.ERC20.ETH, Contracts.ERC20.USDT][index];
       const { token } = collateralToDeposit.find(({ token }) => token.address === address)!;
-      const { priceUSD } = token;
 
-      return acc + (isNaN(parseFloat(curr)) ? 0 : parseFloat(curr) * priceUSD);
+      return acc + (isNaN(parseFloat(curr)) ? 0 : parseFloat(curr) * bigIntStringToFloat(token.priceUSD));
     }, 0) * (tabValue === 'DEPOSIT' ? -1 : 1);
 
   return (

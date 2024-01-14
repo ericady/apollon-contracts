@@ -19,7 +19,7 @@ import {
   PoolLiquidity,
 } from '../../../generated/gql-types';
 import { GET_BORROWER_DEBT_TOKENS } from '../../../queries';
-import { displayPercentage, floatToBigInt, roundCurrency, roundNumber } from '../../../utils/math';
+import { bigIntStringToFloat, displayPercentage, floatToBigInt, roundCurrency, roundNumber } from '../../../utils/math';
 import FeatureBox from '../../FeatureBox/FeatureBox';
 import NumberInput from '../../FormControls/NumberInput';
 import ForwardIcon from '../../Icons/ForwardIcon';
@@ -39,7 +39,10 @@ type FieldValues = {
 
 function LiquidityDepositWithdraw({ selectedPool }: Props) {
   const { liquidity, borrowerAmount, totalSupply } = selectedPool;
-  const [tokenA, tokenB] = liquidity;
+  const [tokenA, tokenB] = liquidity.map((liquidity) => ({
+...liquidity,
+token: {...liquidity.token, priceUSD: bigIntStringToFloat(liquidity.token.priceUSD)},
+  }));
 
   const {
     address,
@@ -228,8 +231,8 @@ function LiquidityDepositWithdraw({ selectedPool }: Props) {
       const tokenAAmount = calculate150PercentTokenValue(
         currentDebtValueUSD,
         currentCollateralValueUSD,
-        tokenA as PoolLiquidity,
-        tokenB as PoolLiquidity,
+        {totalAmount: tokenA.totalAmount, priceUSD: tokenA.token.priceUSD},
+        {totalAmount: tokenB.totalAmount, priceUSD: tokenB.token.priceUSD},
         relevantDebtTokenA as DebtTokenMeta,
         relevantDebtTokenB as DebtTokenMeta,
       );
@@ -682,8 +685,8 @@ export default LiquidityDepositWithdraw;
 export const calculate150PercentTokenValue = (
   currentDebtValueUSD: number,
   currentCollateralValueUSD: number,
-  tokenA: PoolLiquidity,
-  tokenB: PoolLiquidity,
+  tokenA: { priceUSD: number, totalAmount: number },
+  tokenB: { priceUSD: number, totalAmount: number },
   relevantDebtTokenA: DebtTokenMeta,
   relevantDebtTokenB: DebtTokenMeta,
 ) => {
@@ -692,12 +695,12 @@ export const calculate150PercentTokenValue = (
   const diffUSD = targetDebtUSD - currentDebtValueUSD;
 
   const tokenBTotokenARatio = tokenA.totalAmount / tokenB.totalAmount;
-  const ratioWithPrice = (tokenBTotokenARatio * tokenB.token.priceUSD) / tokenA.token.priceUSD;
+  const ratioWithPrice = (tokenBTotokenARatio * tokenB.priceUSD) / tokenA.priceUSD;
 
   if (relevantDebtTokenA.walletAmount === 0 && relevantDebtTokenB.walletAmount === 0) {
     const diffTokenAUSD = diffUSD / (1 + ratioWithPrice);
 
-    const tokenAAmount = diffTokenAUSD / tokenA.token.priceUSD;
+    const tokenAAmount = diffTokenAUSD / tokenA.priceUSD;
 
     return tokenAAmount;
   }
@@ -706,16 +709,16 @@ export const calculate150PercentTokenValue = (
 
   if (diffWalletTokenA > 0) {
     // fill tokenB with amount for complete diff
-    if (diffUSD < diffWalletTokenA * tokenA.token.priceUSD) {
-      const tokenBAmount = diffUSD / tokenB.token.priceUSD;
+    if (diffUSD < diffWalletTokenA * tokenA.priceUSD) {
+      const tokenBAmount = diffUSD / tokenB.priceUSD;
       const tokenAAmount = (tokenBAmount * tokenB.totalAmount) / tokenA.totalAmount;
 
       return tokenAAmount;
     } else {
-      const restDebtToShare = diffUSD - diffWalletTokenA * tokenA.token.priceUSD;
+      const restDebtToShare = diffUSD - diffWalletTokenA * tokenA.priceUSD;
       const diffTokenAUSD = restDebtToShare / (1 + ratioWithPrice);
 
-      const tokenAAmount = diffTokenAUSD / tokenA.token.priceUSD;
+      const tokenAAmount = diffTokenAUSD / tokenA.priceUSD;
 
       return relevantDebtTokenA.walletAmount + tokenAAmount;
     }
@@ -724,16 +727,16 @@ export const calculate150PercentTokenValue = (
       relevantDebtTokenA.walletAmount - relevantDebtTokenB.walletAmount * ratioWithPrice,
     );
 
-    if (diffUSD < diffWalletTokenBasA * tokenA.token.priceUSD) {
+    if (diffUSD < diffWalletTokenBasA * tokenA.priceUSD) {
       // fill tokenA with amount for complete diff
-      const tokenAAmount = diffUSD / tokenA.token.priceUSD;
+      const tokenAAmount = diffUSD / tokenA.priceUSD;
 
       return tokenAAmount;
     } else {
-      const restDebtToShare = diffUSD - diffWalletTokenBasA * tokenA.token.priceUSD;
+      const restDebtToShare = diffUSD - diffWalletTokenBasA * tokenA.priceUSD;
       let diffTokenAUSD = restDebtToShare / (1 + ratioWithPrice);
 
-      const tokenAAmount = diffTokenAUSD / tokenA.token.priceUSD;
+      const tokenAAmount = diffTokenAUSD / tokenA.priceUSD;
 
       return relevantDebtTokenB.walletAmount * ratioWithPrice + tokenAAmount;
     }

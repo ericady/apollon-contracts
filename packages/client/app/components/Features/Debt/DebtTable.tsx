@@ -11,7 +11,7 @@ import { useMemo } from 'react';
 import { useEthers } from '../../../context/EthersProvider';
 import { GetBorrowerDebtTokensQuery, GetBorrowerDebtTokensQueryVariables } from '../../../generated/gql-types';
 import { GET_BORROWER_DEBT_TOKENS } from '../../../queries';
-import { roundCurrency, roundNumber } from '../../../utils/math';
+import { bigIntStringToFloat, roundCurrency, roundNumber } from '../../../utils/math';
 import Label from '../../Label/Label';
 import HeaderCell from '../../Table/HeaderCell';
 import DebtPieVisualization from '../../Visualizations/DebtPieVisualization';
@@ -56,7 +56,7 @@ function DebtTable() {
         .map((token) => ({
           ...token,
           chartColor: colorPalette.shift(),
-          troveMintedUSD: roundNumber(token.troveMintedAmount ?? 0 * token.token.priceUSD),
+          troveMintedUSD: roundNumber(token.troveMintedAmount ?? 0 * bigIntStringToFloat(token.token.priceUSD)),
         })) ?? []
     );
   }, [data]);

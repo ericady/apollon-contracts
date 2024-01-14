@@ -26,13 +26,25 @@ type DebtTokenMeta {
   troveRepableDebtAmount: Float!
 
   # global
-  # TODO: No implementation yet
   stabilityDepositAPY: StabilityDepositAPY!
   totalDepositedStability: BigInt!
   totalReserve: BigInt!
-  totalReserve30dAverage: Float!
+  # only defined for gov and stableDebtToken
+  totalReserve30dAverage: TotalReserveAverage
   totalSupplyUSD: BigInt!
-  totalSupplyUSD30dAverage: Float!
+  totalSupplyUSD30dAverage: TotalSupplyAverage!
+}
+
+type TotalReserveAverage {
+  id: String!
+  index: Int!
+  value: BigInt!
+}
+
+type TotalSupplyAverage {
+  id: String!
+  index: Int!
+  value: BigInt!
 }
 
 type StabilityDepositAPY {

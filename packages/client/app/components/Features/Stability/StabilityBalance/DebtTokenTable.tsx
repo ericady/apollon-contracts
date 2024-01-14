@@ -9,7 +9,7 @@ import TableRow from '@mui/material/TableRow';
 import { useEthers } from '../../../../context/EthersProvider';
 import { GetBorrowerDebtTokensQuery, GetBorrowerDebtTokensQueryVariables } from '../../../../generated/gql-types';
 import { GET_BORROWER_DEBT_TOKENS } from '../../../../queries';
-import { displayPercentage, percentageChange, roundCurrency, stdFormatter } from '../../../../utils/math';
+import { bigIntStringToFloat, displayPercentage, percentageChange, roundCurrency, stdFormatter } from '../../../../utils/math';
 import FeatureBox from '../../../FeatureBox/FeatureBox';
 import DirectionIcon from '../../../Icons/DirectionIcon';
 import Label from '../../../Label/Label';
@@ -61,7 +61,21 @@ function DebtTokenTable() {
             </TableRow>
           </TableHead>
           <TableBody>
-            {data.getDebtTokens.map(
+            {data.getDebtTokens.map((debtToken) => ({
+              ...debtToken,
+              totalSupplyUSD: bigIntStringToFloat(debtToken.totalSupplyUSD),
+              totalDepositedStability: bigIntStringToFloat(debtToken.totalDepositedStability),
+              totalSupplyUSD30dAverage: {
+                ...debtToken.totalSupplyUSD30dAverage,
+                value: bigIntStringToFloat(debtToken.totalSupplyUSD30dAverage.value),
+              
+              },
+              stabilityDepositAPY: {
+                ...debtToken.stabilityDepositAPY,
+                value: bigIntStringToFloat(debtToken.stabilityDepositAPY.profit) / bigIntStringToFloat(debtToken.stabilityDepositAPY.volume),
+              
+              }
+            })).map(
               (
                 {
                   stabilityDepositAPY,
@@ -113,13 +127,13 @@ function DebtTokenTable() {
                       <Typography
                         fontWeight={400}
                         color={
-                          percentageChange(totalSupplyUSD, totalSupplyUSD30dAverage) > 0 ? 'success.main' : 'error.main'
+                          percentageChange(totalSupplyUSD, totalSupplyUSD30dAverage.value) > 0 ? 'success.main' : 'error.main'
                         }
                       >
-                        {displayPercentage(percentageChange(totalSupplyUSD, totalSupplyUSD30dAverage), 'positive')}
+                        {displayPercentage(percentageChange(totalSupplyUSD, totalSupplyUSD30dAverage.value), 'positive')}
                       </Typography>
 
-                      <DirectionIcon showIncrease={percentageChange(totalSupplyUSD, totalSupplyUSD30dAverage) > 0} />
+                      <DirectionIcon showIncrease={percentageChange(totalSupplyUSD, totalSupplyUSD30dAverage.value) > 0} />
                     </div>
                   </TableCell>
                   <TableCell align="right" sx={{ borderBottom: index === data.getDebtTokens.length - 1 ? 'none' : '' }}>
@@ -131,7 +145,7 @@ function DebtTokenTable() {
                       borderBottom: index === data.getDebtTokens.length - 1 ? 'none' : '',
                     }}
                   >
-                    {displayPercentage(stabilityDepositAPY)}
+                    {displayPercentage(stabilityDepositAPY.value)}
                   </TableCell>
                 </TableRow>
               ),

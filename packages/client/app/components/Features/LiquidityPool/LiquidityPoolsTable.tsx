@@ -7,7 +7,7 @@ import { useEffect, useMemo } from 'react';
 import { useEthers } from '../../../context/EthersProvider';
 import { GetBorrowerLiquidityPoolsQuery, GetBorrowerLiquidityPoolsQueryVariables } from '../../../generated/gql-types';
 import { GET_BORROWER_LIQUIDITY_POOLS } from '../../../queries';
-import { displayPercentage, percentageChange, roundCurrency, stdFormatter } from '../../../utils/math';
+import { bigIntStringToFloat, displayPercentage, percentageChange, roundCurrency, stdFormatter } from '../../../utils/math';
 import FeatureBox from '../../FeatureBox/FeatureBox';
 import DirectionIcon from '../../Icons/DirectionIcon';
 import ExchangeIcon from '../../Icons/ExchangeIcon';
@@ -37,10 +37,10 @@ function LiquidityPoolsTable({ selectedPool, setSelectedPool }: Props) {
         { totalSupply: totalSupplyA, borrowerAmount: borrowerAmountA, liquidity: [liqA1, liqA2] },
         { totalSupply: totalSupplyB, borrowerAmount: borrowerAmountB, liquidity: [liqB1, liqB2] },
       ) =>
-        (borrowerAmountB / totalSupplyB) * liqA1.totalAmount * liqA1.token.priceUSD +
-        (borrowerAmountB / totalSupplyB) * liqA2.totalAmount * liqA2.token.priceUSD -
-        ((borrowerAmountA / totalSupplyA) * liqB1.totalAmount * liqB1.token.priceUSD +
-          (borrowerAmountA / totalSupplyA) * liqB2.totalAmount * liqB2.token.priceUSD),
+        (borrowerAmountB / totalSupplyB) * liqA1.totalAmount * bigIntStringToFloat (liqA1.token.priceUSD) +
+        (borrowerAmountB / totalSupplyB) * liqA2.totalAmount * bigIntStringToFloat(liqA2.token.priceUSD) -
+        ((borrowerAmountA / totalSupplyA) * liqB1.totalAmount * bigIntStringToFloat( liqB1.token.priceUSD) +
+          (borrowerAmountA / totalSupplyA) * liqB2.totalAmount * bigIntStringToFloat( liqB2.token.priceUSD)),
     );
   }, [borrowerPoolsData]);
 

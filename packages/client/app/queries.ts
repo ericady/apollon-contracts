@@ -28,14 +28,16 @@ export const GET_SELECTED_TOKEN = gql`
   }
 `;
 
-// TODO: Maybe unite this
 export const GET_ALL_DEBT_TOKENS = gql`
   query GetDebtTokens {
     getDebtTokens {
       # TODO: Implement sort in query or sort server side
       totalSupplyUSD
       totalReserve
-      totalReserve30dAverage
+      totalReserve30dAverage {
+        id
+        value
+      }
 
       token {
         id
@@ -58,10 +60,17 @@ export const GET_BORROWER_DEBT_TOKENS = gql`
       stabilityCompoundAmount
       troveRepableDebtAmount @client
 
-      stabilityDepositAPY
+      stabilityDepositAPY {
+        id
+        profit
+        volume
+      }
       totalDepositedStability
       totalSupplyUSD
-      totalSupplyUSD30dAverage
+      totalSupplyUSD30dAverage {
+        id
+        value
+      }
       token {
         id
         address

@@ -43,7 +43,7 @@ import {
   GET_TRADING_VIEW_LATEST_CANDLE,
   GET_TROVEMANAGER,
 } from '../app/queries';
-import { bigIntStringToFloat } from '../app/utils/math';
+import { bigIntStringToFloat, floatToBigInt } from '../app/utils/math';
 
 const getFavoritedAssetsFromLS = () => {
   return typeof window !== 'undefined'
@@ -60,10 +60,10 @@ const JUSD: Token = {
   __typename: 'Token',
   address: Contracts.ERC20.JUSD,
   symbol: 'JUSD',
-  createdAt: faker.date.past().toISOString(),
-  priceUSD: ethers.parseEther(faker.finance.amount(1, 5000, 2)).toString(),
-  priceUSD24hAgo: ethers.parseEther(faker.finance.amount(1, 5000, 2)).toString(),
-  priceUSDOracle: bigIntStringToFloat(ethers.parseEther(faker.finance.amount(1, 5000, 2)).toString()),
+  createdAt: (faker.date.past().getTime() / 1000).toString(),
+  priceUSD: floatToBigInt(faker.number.float({ min: 1, max: 5000, precision: 0.01 })).toString(),
+  priceUSD24hAgo: floatToBigInt(faker.number.float({ min: 1, max: 5000, precision: 0.01 })).toString(),
+  priceUSDOracle: faker.number.float({ min: 1, max: 5000, precision: 0.01 }),
   isPoolToken: faker.datatype.boolean(),
 };
 
@@ -74,10 +74,11 @@ export const tokens: Token[] = Array(10)
     __typename: 'Token',
     address: index <= favoritedAssets.length - 1 ? favoritedAssets[index] : faker.string.uuid(),
     symbol: faker.finance.currencyCode(),
-    createdAt: faker.date.past().toISOString(),
-    priceUSD: ethers.parseEther(faker.finance.amount(1, 5000, 2)).toString(),
-    priceUSD24hAgo: ethers.parseEther(faker.finance.amount(1, 5000, 2)).toString(),
-    priceUSDOracle: bigIntStringToFloat(ethers.parseEther(faker.finance.amount(1, 5000, 2)).toString()),
+    // Unix timestamp in seconds like the API returns it.
+    createdAt: (faker.date.past().getTime() / 1000).toString(),
+    priceUSD: floatToBigInt(faker.number.float({ min: 1, max: 5000, precision: 0.01 })).toString(),
+    priceUSD24hAgo: floatToBigInt(faker.number.float({ min: 1, max: 5000, precision: 0.01 })).toString(),
+    priceUSDOracle: faker.number.float({ min: 1, max: 5000, precision: 0.01 }),
     isPoolToken: faker.datatype.boolean(),
   }));
 
@@ -88,10 +89,10 @@ const collateralTokens: Token[] = Object.entries(Contracts.ERC20)
     __typename: 'Token',
     address,
     symbol,
-    createdAt: faker.date.past().toISOString(),
-    priceUSD: ethers.parseEther(faker.finance.amount(1, 5000, 2)).toString(),
-    priceUSD24hAgo: ethers.parseEther(faker.finance.amount(1, 5000, 2)).toString(),
-    priceUSDOracle: bigIntStringToFloat(ethers.parseEther(faker.finance.amount(1, 5000, 2)).toString()),
+    createdAt: (faker.date.past().getTime() / 1000).toString(),
+    priceUSD: floatToBigInt(faker.number.float({ min: 1, max: 5000, precision: 0.01 })).toString(),
+    priceUSD24hAgo: floatToBigInt(faker.number.float({ min: 1, max: 5000, precision: 0.01 })).toString(),
+    priceUSDOracle: faker.number.float({ min: 1, max: 5000, precision: 0.01 }),
     isPoolToken: faker.datatype.boolean(),
   }))
   .concat(JUSD);
@@ -138,6 +139,7 @@ const debtTokenMeta = tokens.map<DebtTokenMeta>((token, index) => {
   return {
     __typename: 'DebtTokenMeta',
     id: faker.string.uuid(),
+    timestamp: (now / 1000).toString(),
     token: token,
     walletAmount: 0,
     troveMintedAmount: 0,
@@ -146,14 +148,30 @@ const debtTokenMeta = tokens.map<DebtTokenMeta>((token, index) => {
     stabilityCompoundAmount: 0,
     troveRepableDebtAmount: 0,
 
-    totalDepositedStability: faker.number.float({ min: 1000, max: 5000, precision: 0.0001 }),
-    totalReserve: isGovOrStableDebtToken ? faker.number.float({ min: 1000, max: 5000, precision: 0.0001 }) : 0,
+    totalDepositedStability: floatToBigInt(faker.number.float({ min: 1000, max: 5000, precision: 0.0001 })).toString(),
+    totalReserve: floatToBigInt(isGovOrStableDebtToken ? faker.number.float({ min: 1000, max: 5000, precision: 0.0001 }): 0).toString(),
     totalReserve30dAverage: isGovOrStableDebtToken
-      ? faker.number.float({ min: 1000, max: 5000, precision: 0.0001 })
-      : 0,
-    totalSupplyUSD: parseFloat(faker.finance.amount(10000, 50000, 2)),
-    totalSupplyUSD30dAverage: parseFloat(faker.finance.amount(10000, 50000, 2)),
-    stabilityDepositAPY: faker.number.float({ min: 0, max: 10, precision: 0.0001 }) / 100,
+      ? {
+        __typename: "TotalReserveAverage",
+        id: faker.string.uuid(),
+        index: 0,
+        value: floatToBigInt(faker.number.float({ min: 1000, max: 5000, precision: 0.0001 })).toString()
+      }
+      : null,
+    totalSupplyUSD: floatToBigInt(faker.number.float({ min: 10000, max: 50000, precision: 0.0001 })).toString(),
+    totalSupplyUSD30dAverage: {
+      __typename: "TotalSupplyAverage",
+      id: faker.string.uuid(),
+      index: 0,
+      value: floatToBigInt(faker.number.float({ min: 10000, max: 50000, precision: 0.0001 })).toString()
+    },
+    stabilityDepositAPY: {
+      __typename: "StabilityDepositAPY",
+      id: faker.string.uuid(),
+      index: 0,
+      profit: floatToBigInt(faker.number.float({ min: 1, max: 100, precision: 0.0001 })).toString(),
+      volume:  floatToBigInt(faker.number.float({ min: 100, max: 200, precision: 0.0001 })).toString(),
+    },
   };
 });
 
@@ -316,30 +334,7 @@ export const handlers = [
   graphql.query<{ getDebtTokens: Query['getDebtTokens'] }, QueryGetDebtTokensArgs>(
     GET_ALL_DEBT_TOKENS,
     (req, res, ctx) => {
-      const result: Query['getDebtTokens'] = tokens.map((token) => {
-        const shouldHaveReserve = faker.datatype.boolean();
-
-        return {
-          __typename: 'DebtTokenMeta',
-          id: faker.string.uuid(),
-          token: token,
-          walletAmount: 0,
-          troveMintedAmount: 0,
-          providedStability: 0,
-          compoundedDeposit: 0,
-          stabilityCompoundAmount: 0,
-          troveRepableDebtAmount: 0,
-
-          totalDepositedStability: parseFloat(faker.finance.amount(1000, 5000, 2)),
-          totalReserve: shouldHaveReserve ? parseFloat(faker.finance.amount(1000, 5000, 2)) : 0,
-          totalReserve30dAverage: shouldHaveReserve ? parseFloat(faker.finance.amount(1000, 5000, 2)) : 0,
-          totalSupplyUSD: parseFloat(faker.finance.amount(10000, 50000, 2)),
-          totalSupplyUSD30dAverage: parseFloat(faker.finance.amount(10000, 50000, 2)),
-          stabilityDepositAPY: faker.number.float({ min: 0.01, max: 0.1, precision: 0.01 }),
-        };
-      });
-
-      return res(ctx.data({ getDebtTokens: result }));
+      return res(ctx.data({ getDebtTokens: debtTokenMeta }));
     },
   ),
   // GetAllPools

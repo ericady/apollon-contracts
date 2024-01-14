@@ -14,7 +14,7 @@ import { SelectedToken, useSelectedToken } from '../../../context/SelectedTokenP
 import { GetAllPoolsQuery, GetAllPoolsQueryVariables } from '../../../generated/gql-types';
 import { GET_ALL_POOLS } from '../../../queries';
 import { WIDGET_HEIGHTS } from '../../../utils/contants';
-import { displayPercentage, roundCurrency } from '../../../utils/math';
+import { bigIntStringToFloat, displayPercentage, roundCurrency } from '../../../utils/math';
 import FeatureBox from '../../FeatureBox/FeatureBox';
 import DirectionIcon from '../../Icons/DirectionIcon';
 import PinnedIcon from '../../Icons/PinnedIcon';
@@ -53,9 +53,11 @@ function Assets() {
 
         return {
           ...token,
+          priceUSD: bigIntStringToFloat(token.priceUSD),
+          priceUSD24hAgo: bigIntStringToFloat(token.priceUSD24hAgo),
           swapFee,
           // calculate change over last 24h
-          change: (token.priceUSD - token.priceUSD24hAgo) / token.priceUSD24hAgo,
+          change: (bigIntStringToFloat(token.priceUSD) - bigIntStringToFloat(token.priceUSD24hAgo)) / bigIntStringToFloat(token.priceUSD24hAgo),
           isFavorite: favoritedAssets.find((address) => token.address === address) !== undefined ? true : false,
           volume30dUSD,
           pool: {
@@ -155,7 +157,7 @@ function Assets() {
                     </TableCell>
                     <TableCell sx={{ p: 0.5 }} align="right">
                       <Typography fontWeight={400}>
-                        {JUSDToken ? roundCurrency(priceUSD / JUSDToken.priceUSD) : '-'}
+                        {JUSDToken ? roundCurrency(priceUSD / bigIntStringToFloat(JUSDToken.priceUSD)) : '-'}
                       </Typography>
                     </TableCell>
                     <TableCell sx={{ p: 0.5 }} align="right" width={60}>

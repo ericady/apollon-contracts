@@ -10,7 +10,7 @@ import {
   GetCollateralTokensQueryVariables,
 } from '../../generated/gql-types';
 import { GET_BORROWER_COLLATERAL_TOKENS, GET_BORROWER_DEBT_TOKENS } from '../../queries';
-import { displayPercentage } from '../../utils/math';
+import { bigIntStringToFloat, displayPercentage } from '../../utils/math';
 
 export const CRIT_RATIO = 1.1;
 
@@ -84,13 +84,13 @@ function CollateralRatioVisualization({
 
   const debtValue =
     debtData?.getDebtTokens.reduce(
-      (acc, { troveMintedAmount, token }) => acc + troveMintedAmount! * token.priceUSD,
+      (acc, { troveMintedAmount, token }) => acc + troveMintedAmount! * bigIntStringToFloat(token.priceUSD),
       0,
     ) ?? 0;
 
   const collateralValue =
     collateralData?.getCollateralTokens.reduce(
-      (acc, { troveLockedAmount, token }) => acc + troveLockedAmount! * token.priceUSD,
+      (acc, { troveLockedAmount, token }) => acc + troveLockedAmount! * bigIntStringToFloat(token.priceUSD),
       0,
     ) ?? 0;
 

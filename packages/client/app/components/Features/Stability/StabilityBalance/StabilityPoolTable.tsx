@@ -14,7 +14,7 @@ import {
   GetCollateralTokensQueryVariables,
 } from '../../../../generated/gql-types';
 import { GET_BORROWER_COLLATERAL_TOKENS, GET_BORROWER_DEBT_TOKENS } from '../../../../queries';
-import { displayPercentage, percentageChange, roundCurrency } from '../../../../utils/math';
+import { bigIntStringToFloat, displayPercentage, percentageChange, roundCurrency } from '../../../../utils/math';
 import FeatureBox from '../../../FeatureBox/FeatureBox';
 import Label from '../../../Label/Label';
 import DiagramPlaceholder from '../../../Loader/DiagramPlaceholder';
@@ -58,12 +58,12 @@ function StabilityPoolTable() {
     ) ?? [];
 
   const rewardsTotalInUSD = rewards.reduce(
-    (acc, { stabilityGainedAmount, token }) => acc + stabilityGainedAmount * token.priceUSD,
+    (acc, { stabilityGainedAmount, token }) => acc + stabilityGainedAmount * bigIntStringToFloat(token.priceUSD),
     0,
   );
   const lossTotalInUSD = stabilityLost.reduce(
     (acc, { compoundedDeposit, token, providedStability }) =>
-      acc + (providedStability - compoundedDeposit) * token.priceUSD,
+      acc + (providedStability - compoundedDeposit) * bigIntStringToFloat(token.priceUSD),
     0,
   );
 
