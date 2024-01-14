@@ -696,8 +696,8 @@ export default LiquidityDepositWithdraw;
 export const calculate150PercentTokenValue = (
   currentDebtValueUSD: number,
   currentCollateralValueUSD: number,
-  tokenA: { priceUSD: number; totalAmount: number },
-  tokenB: { priceUSD: number; totalAmount: number },
+  tokenA: { priceUSD: number, totalAmount: number },
+  tokenB: { priceUSD: number, totalAmount: number },
   relevantDebtTokenA: DebtTokenMeta,
   relevantDebtTokenB: DebtTokenMeta,
 ) => {
