@@ -527,9 +527,6 @@ describe('TroveManager', () => {
           collAmount: parseUnits('2', 9),
           debts: [{ tokenAddress: STABLE, amount: parseUnits('8000') }],
         });
-        const aliceICR = (await troveManager.getCurrentICR(alice)).ICR;
-        console.log("Alice's ICR: ", aliceICR / BigInt(1e16));
-
         await openTrove({
           from: bob,
           contracts,
@@ -537,9 +534,6 @@ describe('TroveManager', () => {
           collAmount: parseUnits('2', 9),
           debts: [{ tokenAddress: STABLE, amount: parseUnits('9500') }],
         });
-        const bobICR = (await troveManager.getCurrentICR(bob)).ICR;
-        console.log("Bob's ICR: ", bobICR / BigInt(1e16));
-
         await openTrove({
           from: carol,
           contracts,
@@ -547,9 +541,6 @@ describe('TroveManager', () => {
           collAmount: parseUnits('2', 9),
           debts: [{ tokenAddress: STABLE, amount: parseUnits('18000') }],
         });
-        const carolICR = (await troveManager.getCurrentICR(carol)).ICR;
-        console.log("Carol's ICR: ", carolICR / BigInt(1e16));
-
         await openTrove({
           from: dennis,
           contracts,
@@ -557,220 +548,117 @@ describe('TroveManager', () => {
           collAmount: parseUnits('2', 9),
           debts: [{ tokenAddress: STABLE, amount: parseUnits('18500') }],
         });
-        const dennisICR = (await troveManager.getCurrentICR(dennis)).ICR;
-        console.log("dennis's ICR: ", dennisICR / BigInt(1e16));
-
         await openTrove({
           from: whale,
           contracts,
           collToken: BTC,
-
           collAmount: parseUnits('3', 9),
           debts: [{ tokenAddress: STABLE, amount: parseUnits('10000') }],
         });
 
-        const whaleICR = (await troveManager.getCurrentICR(whale)).ICR;
-        console.log("Whale's ICR: ", whaleICR / BigInt(1e16));
-
-        // console.log('Alice ICR: ', (await troveManager.getCurrentICR(alice))[0] / BigInt(1e16));
-
-        const priceBefore = await priceFeed.getPrice(BTC);
-        console.log('🔥 ~ it ~ priceBefore:', priceBefore);
-
-        const tcrBefore = await getTCR(contracts);
-        console.log('🔥 ~ it ~ tcrBefore:', tcrBefore);
-
         //decrease price
         await priceFeed.setTokenPrice(BTC, parseUnits('10000'));
-        const price = await priceFeed.getPrice(BTC);
-        console.log('🔥 ~ it ~ price:', price);
+
+        //get entire system coll & debt
+        const entireSystemColl_Before = await storagePool.getEntireSystemColl();
+        const entireSystemDebt_Before = await storagePool.getEntireSystemDebt();
+
         const TCR_0 = await getTCR(contracts);
-        console.log('🔥 ~ it ~ TCR_0:', TCR_0);
-
-        const aliceICRAfter = (await troveManager.getCurrentICR(alice)).ICR;
-        console.log("Alice's ICR after price drop: ", aliceICRAfter / BigInt(1e16));
-
-        const bobICRAfter = (await troveManager.getCurrentICR(bob)).ICR;
-        console.log("Bob's ICR after price drop: ", bobICRAfter / BigInt(1e16));
-
-        const carolICRAfter = (await troveManager.getCurrentICR(carol)).ICR;
-        console.log("Carol's ICR after price drop: ", carolICRAfter / BigInt(1e16));
-
-        const dennisICRAfter = (await troveManager.getCurrentICR(dennis)).ICR;
-        console.log("dennis's ICR after price drop: ", dennisICRAfter / BigInt(1e16));
-
-        const whaleICRAfter = (await troveManager.getCurrentICR(whale)).ICR;
-        console.log("Whale's ICR after price drop: ", whaleICRAfter / BigInt(1e16));
+        const expectedTCR_0 = (entireSystemColl_Before * parseUnits('1')) / entireSystemDebt_Before;
+        expect(expectedTCR_0).to.be.equal(TCR_0);
 
         // Confirm system is not in Recovery Mode
         const [isRecoveryModeBefore] = await storagePool.checkRecoveryMode();
         assert.isFalse(isRecoveryModeBefore);
 
-        //get entire system coll & debt
-        const entireSystemColl_Before = await storagePool.getEntireSystemColl();
-        console.log('🔥 ~ it ~ entireSystemColl_Before:', entireSystemColl_Before);
-        const entireSystemDebt_Before = await storagePool.getEntireSystemDebt();
-        console.log('🔥 ~ it ~ entireSystemDebt_Before:', entireSystemDebt_Before);
-
-        const expectedTCR_0 = (entireSystemColl_Before * parseUnits('1')) / entireSystemDebt_Before;
-        console.log('🔥 ~ it ~ expectedTCR_0:', expectedTCR_0 / BigInt(1e16));
-        expect(expectedTCR_0).to.be.equal(TCR_0);
-
-        // Confirm system is not in Recovery Mode
-        const [isRecoveryModeAfter] = await storagePool.checkRecoveryMode();
-        assert.isFalse(isRecoveryModeAfter);
-
         // Check TCR does not decrease with each liquidation for carol
         const carolLiquidate = await liquidationOperations.liquidate(carol);
-        const [liquidatedDebt_1, liquidatedColl_1, gasComp_1] = await getEmittedLiquidationValues(
-          carolLiquidate,
-          contracts
-        );
-        const TCR_1 = await getTCR(contracts);
-        console.log('🔥 ~ it ~ TCR_1:', TCR_1);
+        assert.isFalse(await troveManager.isTroveActive(carol));
+        const [, , stableGasComp_1, collGasComp_1] = await getEmittedLiquidationValues(carolLiquidate, contracts);
+        const btcGasComp_1 = collGasComp_1.find((e: MockERC20[]) => e[0] === BTC.target)[1];
+        const btcGasComp_1_USD = await priceFeed.getUSDValue(BTC, btcGasComp_1);
 
         // Expect only change to TCR to be due to the issued gas compensation
-        const expectedTCR_1 = ((entireSystemColl_Before - gasComp_1) * price) / entireSystemDebt_Before;
-        // expect(expectedTCR_1).to.be.equal(TCR_1); // working on commented, getting error
+        const TCR_1 = await getTCR(contracts);
+        const expectedTCR_1 =
+          ((entireSystemColl_Before - btcGasComp_1_USD) * parseUnits('1')) /
+          (entireSystemDebt_Before - stableGasComp_1);
+        expect(expectedTCR_1).to.be.equal(TCR_1);
 
         // Check TCR does not decrease with each liquidation for dennis
         const denisLiquidate = await liquidationOperations.liquidate(dennis);
-        const [liquidatedDebt_2, liquidatedColl_2, gasComp_2] = await getEmittedLiquidationValues(
-          carolLiquidate,
-          contracts
-        );
-        const TCR_2 = await getTCR(contracts);
-        console.log('🔥 ~ it ~ TCR_2:', TCR_2);
+        const [, , stableGasComp_2, collGasComp_2] = await getEmittedLiquidationValues(denisLiquidate, contracts);
+        const btcGasComp_2 = collGasComp_2.find((e: MockERC20[]) => e[0] === BTC.target)[1];
+        const btcGasComp_2_USD = await priceFeed.getUSDValue(BTC, btcGasComp_2);
 
         // Expect only change to TCR to be due to the issued gas compensation
-        const expectedTCR_2 = ((entireSystemColl_Before - gasComp_2) * price) / entireSystemDebt_Before;
-        // expect(expectedTCR_2).to.be.equal(TCR_2); // working on commented, getting error
+        const TCR_2 = await getTCR(contracts);
+        const expectedTCR_2 =
+          ((entireSystemColl_Before - btcGasComp_1_USD - btcGasComp_2_USD) * parseUnits('1')) /
+          (entireSystemDebt_Before - stableGasComp_1 - stableGasComp_2);
+        expect(expectedTCR_2).to.be.equal(TCR_2);
       });
 
       it("does not liquidate a SP depositor's trove with ICR > 110%, and does not affect their SP deposit or collateral gain", async () => {
         await openTrove({
-          from: alice,
+          from: whale,
           contracts,
           collToken: BTC,
-          collAmount: parseUnits('2', 9),
-          debts: [{ tokenAddress: STABLE, amount: parseUnits('8000') }],
+          collAmount: parseUnits('3', 9),
+          debts: [{ tokenAddress: STABLE, amount: parseUnits('10000') }],
         });
-        const aliceICR = (await troveManager.getCurrentICR(alice)).ICR;
-        console.log("Alice's ICR: ", aliceICR / BigInt(1e16));
-
         await openTrove({
           from: bob,
           contracts,
           collToken: BTC,
           collAmount: parseUnits('2', 9),
-          debts: [{ tokenAddress: STABLE, amount: parseUnits('9500') }],
+          debts: [{ tokenAddress: STABLE, amount: parseUnits('10000') }],
         });
-        const bobICR = (await troveManager.getCurrentICR(bob)).ICR;
-        console.log("Bob's ICR: ", bobICR / BigInt(1e16));
-
         await openTrove({
           from: carol,
           contracts,
           collToken: BTC,
-          collAmount: parseUnits('2', 9),
-          debts: [{ tokenAddress: STABLE, amount: parseUnits('20000') }],
-        });
-        const carolICR = (await troveManager.getCurrentICR(carol)).ICR;
-        console.log("Carol's ICR: ", carolICR / BigInt(1e16));
-
-        await openTrove({
-          from: dennis,
-          contracts,
-          collToken: BTC,
-          collAmount: parseUnits('2', 9),
-          debts: [{ tokenAddress: STABLE, amount: parseUnits('16500') }],
-        });
-        const dennisICR = (await troveManager.getCurrentICR(dennis)).ICR;
-        console.log("dennis's ICR: ", dennisICR / BigInt(1e16));
-
-        await openTrove({
-          from: whale,
-          contracts,
-          collToken: BTC,
-
-          collAmount: parseUnits('3', 9),
+          collAmount: parseUnits('1', 9),
           debts: [{ tokenAddress: STABLE, amount: parseUnits('10000') }],
         });
-        const whaleICR = (await troveManager.getCurrentICR(whale)).ICR;
-        console.log("Whale's ICR: ", whaleICR / BigInt(1e16));
 
-        const dennisSPValue = parseUnits('16300');
-
-        const priceBefore = await priceFeed.getPrice(BTC);
-        console.log('🔥 ~ it ~ priceBefore:', priceBefore);
-
-        const tcrBefore = await getTCR(contracts);
-        console.log('🔥 ~ it ~ tcrBefore:', tcrBefore);
-
-        //alice provides stable to SP
-        await stabilityPoolManager.connect(dennis).provideStability([{ tokenAddress: STABLE, amount: dennisSPValue }]);
+        //bob provides stable to SP
+        const bobSPDeposit = parseUnits('10000');
+        await stabilityPoolManager.connect(bob).provideStability([{ tokenAddress: STABLE, amount: bobSPDeposit }]);
 
         // carol gets liquidated
         await priceFeed.setTokenPrice(BTC, parseUnits('10000'));
-
-        const carolICRAfter = (await troveManager.getCurrentICR(carol)).ICR;
-        console.log("Carol's ICR: ", carolICRAfter / BigInt(1e16));
-
-        const dennisICRAfter = (await troveManager.getCurrentICR(dennis)).ICR;
-        console.log("dennis's ICR: ", dennisICRAfter / BigInt(1e16));
-
-        const price = await priceFeed.getPrice(BTC);
-        console.log('🔥 ~ it ~ price:', price);
-        const TCR_0 = await getTCR(contracts);
-        console.log('🔥 ~ it ~ TCR_0:', TCR_0);
-
-        // check recovery mode
         const [isInRecoveryMode] = await storagePool.checkRecoveryMode();
         assert.isFalse(isInRecoveryMode);
-
         const liquidateCarol = await liquidationOperations.liquidate(carol);
-
-        const [liquidatedDebt, liquidatedColl, stableGasComp, collGasComp] = await getEmittedLiquidationValues(
-          liquidateCarol,
-          contracts
-        );
-
-        //get carol trove status
+        const [liquidatedDebt, liquidatedColl] = await getEmittedLiquidationValues(liquidateCarol, contracts);
         const liquidateCarolTroveStatus = await troveManager.getTroveStatus(carol);
         assert.equal(liquidateCarolTroveStatus.toString(), TroveStatus.CLOSED_BY_LIQUIDATION_IN_NORMAL_MODE.toString());
 
+        // price increases, dennis ICR > 110% again
         await priceFeed.setTokenPrice(BTC, parseUnits('17000'));
+        const getDennisCurrentICR = (await troveManager.getCurrentICR(bob)).ICR;
+        expect(getDennisCurrentICR).to.be.gt(parseUnits('110', 16));
 
-        const getDennisCurrentICR = await troveManager.getCurrentICR(dennis);
-        expect(getDennisCurrentICR[0]).to.be.gt(parseUnits('110', 16));
-
+        // Check Bob' SP deposit has absorbed Carol's debt, and he has received her liquidated ETH
         const stabilityPool = await getStabilityPool(contracts, STABLE);
+        const bobDeposit_Before = await stabilityPool.getCompoundedDebtDeposit(bob);
+        const bobGain_Before = await stabilityPool.getDepositorCollGain(bob, BTC);
+        assert.isAtMost(bobDeposit_Before - liquidatedDebt.find(e => e[0] === STABLE.target)[1], 1000);
+        assert.isAtMost(bobGain_Before - liquidatedColl.find(e => e[0] === BTC.target)[1], 1000);
 
-        const dennis_Deposit_Before = await stabilityPool.getCompoundedDebtDeposit(dennis);
-        const spGainBefore = await stabilityPool.getDepositorCollGain(dennis, BTC);
-
-        const depositDiff = dennisSPValue - liquidatedDebt[0][1];
-        expect(dennis_Deposit_Before - depositDiff).to.be.lte(dennisSPValue);
-
-        const collDiff = spGainBefore - liquidatedColl[0][1];
-        expect(collDiff).to.be.lte(dennisSPValue);
-
-        // check not in recovery mode
-        const [checkInRecoveryMode] = await storagePool.checkRecoveryMode();
-        assert.isFalse(checkInRecoveryMode);
-
-        // Attempt to liquidate dennis
-        await expect(liquidationOperations.liquidate(dennis)).to.be.revertedWithCustomError(
+        // Attempt to liquidate bob
+        await expect(liquidationOperations.liquidate(bob)).to.be.revertedWithCustomError(
           liquidationOperations,
           'NoLiquidatableTrove'
         );
+        assert.isTrue(await troveManager.isTroveActive(bob));
 
-        const dennis_Deposit_After = await stabilityPool.getCompoundedDebtDeposit(dennis);
-        const spGainAfter = await stabilityPool.getDepositorCollGain(dennis, BTC);
-
-        // Check dennis' SP deposit does not change after liquidation attempt
-        assert.equal(dennis_Deposit_Before, dennis_Deposit_After);
-        assert.equal(spGainBefore, spGainAfter);
+        // Check bob's SP deposit does not change after liquidation attempt
+        const bobDeposit_After = await stabilityPool.getCompoundedDebtDeposit(bob);
+        const bobGain_After = await stabilityPool.getDepositorCollGain(bob, BTC);
+        assert.equal(bobDeposit_Before, bobDeposit_After);
+        assert.equal(bobGain_Before, bobGain_After);
       });
 
       it("liquidates a SP depositor's trove with ICR < 110%, and the liquidation correctly impacts their SP deposit and collateral gain", async () => {

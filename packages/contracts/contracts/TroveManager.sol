@@ -148,7 +148,7 @@ contract TroveManager is LiquityBase, Ownable(msg.sender), CheckContract, ITrove
 
   // Return the nominal collateral ratio (ICR) of a given Trove, without the price. Takes a trove's pending coll and debt rewards from redistributions into account.
   function getNominalICR(address _borrower) external view override returns (uint) {
-    (uint currentCollInUSD, uint currentDebtInUSD) = _getCurrentTrovesFaceValues(_borrower);
+    (uint currentCollInUSD, uint currentDebtInUSD) = _getCurrentTrovesUSDValues(_borrower);
     uint NICR = LiquityMath._computeNominalCR(currentCollInUSD, currentDebtInUSD);
     return NICR;
   }
@@ -156,12 +156,12 @@ contract TroveManager is LiquityBase, Ownable(msg.sender), CheckContract, ITrove
   // Return the current collateral ratio (ICR) of a given Trove. Takes a trove's pending coll and debt rewards from redistributions into account.
   function getCurrentICR(address _borrower) external view override returns (uint ICR, uint currentDebtInUSD) {
     uint currentCollInUSD;
-    (currentCollInUSD, currentDebtInUSD) = _getCurrentTrovesFaceValues(_borrower);
+    (currentCollInUSD, currentDebtInUSD) = _getCurrentTrovesUSDValues(_borrower);
     ICR = LiquityMath._computeCR(currentCollInUSD, currentDebtInUSD);
     return (ICR, currentDebtInUSD);
   }
 
-  function _getCurrentTrovesFaceValues(
+  function _getCurrentTrovesUSDValues(
     address _borrower
   ) internal view returns (uint currentCollInUSD, uint currentDebtInUSD) {
     Trove storage _trove = Troves[_borrower];
@@ -673,7 +673,6 @@ contract TroveManager is LiquityBase, Ownable(msg.sender), CheckContract, ITrove
     delete trove.collTokens;
 
     _removeTroveOwner(_borrower, numOfOwners);
-
     emit TroveClosed(_borrower, closedStatus);
   }
 
