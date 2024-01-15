@@ -207,9 +207,10 @@ type PoolLiquidity @entity {
 # }
 
 type Pool @entity {
-  # TODO: wasa We need some distict logic to create the ID
   # `Pool-${token0.toHexString()}-${token1.toHexString()}`
   id: String!
+  # SwapPair contract address
+  address: Bytes!
 
   # Percent value applied when opening the first position for this pool. Can be negative and positive.
   # swapFee: BigInt!

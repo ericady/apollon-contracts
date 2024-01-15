@@ -23,7 +23,7 @@ export function handlePairCreated(event: PairCreatedEvent): void {
     );
   }
 
-  handleCreatePool(event, event.params.token0, event.params.token1);
+  handleCreatePool(event, event.params.token0, event.params.token1, event.params.pair);
 }
 
 export function handleSwapOperationsInitialized(event: SwapOperationsInitializedEvent): void {}

@@ -213,28 +213,33 @@ for (let i = 0; i < allTokens.length; i++) {
     pools.push({
       __typename: 'Pool',
       id: faker.string.uuid(),
-      swapFee: faker.number.float({ min: -0.05, max: 0.05, precision: 0.0001 }),
+      address: faker.finance.ethereumAddress(),
+      swapFee: floatToBigInt(faker.number.float({ min: -0.05, max: 0.05, precision: 0.0001 }), 6).toString(),
       liquidity: sortedPair.map((token) => ({
         id: faker.string.uuid(),
         __typename: 'PoolLiquidity',
         token,
-        totalAmount: parseFloat(faker.finance.amount(100000, 1000000, 2)),
+        totalAmount: floatToBigInt(faker.number.float({ min: 100000, max: 500000, precision: 0.0001 })).toString(),
       })),
-      // Taking a subset of tokens for demonstration
-      rewards: faker.datatype.boolean({ probability: 0.05 })
-        ? faker.helpers.arrayElements(tokens, { min: 0, max: 3 }).map((token) => ({
-            __typename: 'PoolReward',
-            id: faker.string.uuid(),
-            token,
-            amount: parseFloat(faker.finance.amount(1, 50, 2)),
-          }))
-        : [],
-      liquidityDepositAPY: faker.number.float({ min: 0, max: 0.5, precision: 0.0001 }),
-      volume30dUSD: parseFloat(faker.finance.amount(10000, 50000, 2)),
-      volume30dUSD30dAgo: parseFloat(faker.finance.amount(10000, 50000, 2)),
-
+      liquidityDepositAPY: floatToBigInt(faker.number.float({ min: 0.01, max: 0.3, precision: 0.0001 })).toString(),
+      volume30dUSD: {
+        __typename: 'PoolVolume30d',
+        id: faker.string.uuid(),
+        lastIndex: 0,
+        leadingIndex: 0,
+        value: floatToBigInt(faker.number.float({ min: 100000, max: 500000, precision: 0.0001 })).toString(),
+        feeUSD: floatToBigInt(faker.number.float({ min: 1000, max: 5000, precision: 0.0001 })).toString(),
+      },
+      volume30dUSD30dAgo: {
+        __typename: 'PoolVolume30d',
+        id: faker.string.uuid(),
+        lastIndex: 0,
+        leadingIndex: 0,
+        value: floatToBigInt(faker.number.float({ min: 100000, max: 500000, precision: 0.0001 })).toString(),
+        feeUSD: floatToBigInt(faker.number.float({ min: 1000, max: 5000, precision: 0.0001 })).toString(),
+      },
       borrowerAmount: 0,
-      totalSupply: faker.number.float({ min: 100000, max: 1000000, precision: 0.0001 }),
+      totalSupply: floatToBigInt(faker.number.float({ min: 100000, max: 500000, precision: 0.0001 })).toString(),
     });
   }
 }
@@ -259,7 +264,7 @@ const pastSwapEvents = Array(pastSwapEventsLength)
       ).toString(),
       direction: faker.helpers.enumValue(LongShortDirection),
       size,
-      swapFee: floatToBigInt(faker.number.float({ min: 1, max: 50, precision: 0.0001 }), 6).toString(),
+      swapFee: floatToBigInt(faker.number.float({ min: 0.01, max: 0.1, precision: 0.0001 }), 6).toString(),
       token,
     };
   })
@@ -426,7 +431,11 @@ export const handlers = [
         liquidity: pool.liquidity.map((liquidity) => ({
           ...liquidity,
         })),
-        borrowerAmount: faker.number.float({ min: 10, max: pool.totalSupply / 100, precision: 0.0001 }),
+        borrowerAmount: faker.number.float({
+          min: 10,
+          max: bigIntStringToFloat(pool.totalSupply) / 100,
+          precision: 0.0001,
+        }),
       };
     });
 

@@ -133,9 +133,9 @@ function LiquidityDepositWithdraw({ selectedPool }: Props) {
         },
       ]);
     } else {
-      const percentageFromPool = tokenAAmount / totalSupply;
-      const tokenAAmountForWithdraw = percentageFromPool * tokenA.totalAmount;
-      const tokenBAmountForWithdraw = percentageFromPool * tokenB.totalAmount;
+      const percentageFromPool = tokenAAmount / bigIntStringToFloat(totalSupply);
+      const tokenAAmountForWithdraw = percentageFromPool * bigIntStringToFloat(tokenA.totalAmount);
+      const tokenBAmountForWithdraw = percentageFromPool * bigIntStringToFloat(tokenB.totalAmount);
 
       setSteps([
         {
@@ -184,13 +184,19 @@ function LiquidityDepositWithdraw({ selectedPool }: Props) {
 
     if (tabValue === 'DEPOSIT') {
       if (fieldName === 'tokenAAmount') {
-        const pairValue = roundNumber((numericValue * tokenA.totalAmount) / tokenB.totalAmount, 5);
+        const pairValue = roundNumber(
+          (numericValue * bigIntStringToFloat(tokenA.totalAmount)) / bigIntStringToFloat(tokenB.totalAmount),
+          5,
+        );
         setValue('tokenBAmount', pairValue.toString(), {
           shouldValidate: true,
           shouldDirty: true,
         });
       } else {
-        const pairValue = roundNumber((numericValue * tokenB.totalAmount) / tokenA.totalAmount, 5);
+        const pairValue = roundNumber(
+          (numericValue * bigIntStringToFloat(tokenB.totalAmount)) / bigIntStringToFloat(tokenA.totalAmount),
+          5,
+        );
 
         setValue('tokenAAmount', pairValue.toString(), {
           shouldValidate: true,
@@ -230,8 +236,8 @@ function LiquidityDepositWithdraw({ selectedPool }: Props) {
       const tokenAAmount = calculate150PercentTokenValue(
         currentDebtValueUSD,
         currentCollateralValueUSD,
-        { totalAmount: tokenA.totalAmount, priceUSD: tokenA.token.priceUSD },
-        { totalAmount: tokenB.totalAmount, priceUSD: tokenB.token.priceUSD },
+        { totalAmount: bigIntStringToFloat(tokenA.totalAmount), priceUSD: tokenA.token.priceUSD },
+        { totalAmount: bigIntStringToFloat(tokenB.totalAmount), priceUSD: tokenB.token.priceUSD },
         relevantDebtTokenA as DebtTokenMeta,
         relevantDebtTokenB as DebtTokenMeta,
       );
@@ -248,9 +254,9 @@ function LiquidityDepositWithdraw({ selectedPool }: Props) {
   const tokenBAmount = watch('tokenBAmount');
 
   // Withdraw
-  const percentageFromPool = (tokenAAmount ? parseFloat(tokenAAmount) : 0) / totalSupply;
-  const tokenAAmountForWithdraw = percentageFromPool * tokenA.totalAmount;
-  const tokenBAmountForWithdraw = percentageFromPool * tokenB.totalAmount;
+  const percentageFromPool = (tokenAAmount ? parseFloat(tokenAAmount) : 0) / bigIntStringToFloat(totalSupply);
+  const tokenAAmountForWithdraw = percentageFromPool * bigIntStringToFloat(tokenA.totalAmount);
+  const tokenBAmountForWithdraw = percentageFromPool * bigIntStringToFloat(tokenB.totalAmount);
 
   const addedDebtUSD =
     tabValue === 'DEPOSIT'
@@ -297,7 +303,10 @@ function LiquidityDepositWithdraw({ selectedPool }: Props) {
                     sx={{ fontWeight: '400', marginTop: '10px' }}
                     data-testid="apollon-liquidity-pool-deposit-token-a-funds-label"
                   >
-                    {roundCurrency((borrowerAmount / totalSupply) * tokenA.totalAmount, 5)}
+                    {roundCurrency(
+                      (borrowerAmount / bigIntStringToFloat(totalSupply)) * bigIntStringToFloat(tokenA.totalAmount),
+                      5,
+                    )}
                   </Typography>
                   <Typography variant="label">Deposited</Typography>
                 </div>
@@ -396,7 +405,10 @@ function LiquidityDepositWithdraw({ selectedPool }: Props) {
                     sx={{ fontWeight: '400', marginTop: '10px' }}
                     data-testid="apollon-liquidity-pool-deposit-token-b-funds-label"
                   >
-                    {roundCurrency((borrowerAmount / totalSupply) * tokenB.totalAmount, 5)}
+                    {roundCurrency(
+                      (borrowerAmount / bigIntStringToFloat(totalSupply)) * bigIntStringToFloat(tokenB.totalAmount),
+                      5,
+                    )}
                   </Typography>
                   <Typography variant="label">Deposited</Typography>
                 </div>

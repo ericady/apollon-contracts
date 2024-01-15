@@ -7,10 +7,11 @@ const chunkSize = 60;
 const thirtyDays = BigInt.fromI32(30 * 24 * 60 * 60);
 const totalChunks = 30 * 24;
 
-export function handleCreatePool(event: ethereum.Event, token0: Address, token1: Address): void {
+export function handleCreatePool(event: ethereum.Event, token0: Address, token1: Address, swapPair: Address): void {
   const poolEntity = new Pool(`Pool-${token0.toHexString()}-${token1.toHexString()}`);
+  poolEntity.address = swapPair;
 
-  const swapPairContract = SwapPair.bind(event.address);
+  const swapPairContract = SwapPair.bind(swapPair);
   const reserves = swapPairContract.getReserves();
 
   const liquidity0 = new PoolLiquidity(token0.concat(token1));

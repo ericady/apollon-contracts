@@ -127,31 +127,34 @@ type Query {
 }
 
 type PoolLiquidity {
-  id: ID!
+  id: Bytes!
   token: Token!
-  totalAmount: Float!
-}
-
-type PoolReward {
-  id: ID!
-  token: Token!
-  amount: Float!
+  totalAmount: BigInt!
 }
 
 type Pool {
-  # TradingPair contract address
-  id: ID!
-  # Percent value applied when opening the first position for this pool. Can be negative and positive.
-  swapFee: Float!
+  # `Pool-${token0.toHexString()}-${token1.toHexString()}`
+  id: String!
+  # SwapPair contract address
+  address: Bytes!
   liquidity: [PoolLiquidity!]!
-  rewards: [PoolReward!]!
-  liquidityDepositAPY: Float!
-  volume30dUSD: Float!
-  volume30dUSD30dAgo: Float!
+  liquidityDepositAPY: BigInt!
+  volume30dUSD: PoolVolume30d!
+  volume30dUSD30dAgo: PoolVolume30d!
+  totalSupply: BigInt!
 
-  totalSupply: Float!
   # client side
   borrowerAmount: Float!
+  # Percent value applied when opening the first position for this pool. Can be negative and positive.
+  swapFee: BigInt!
+}
+
+type PoolVolume30d {
+  id: Bytes!
+  feeUSD: BigInt!
+  lastIndex: Int!
+  leadingIndex: Int!
+  value: BigInt!
 }
 
 type Query {

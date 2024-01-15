@@ -5,7 +5,9 @@ export const GET_ALL_POOLS = gql`
     getPools {
       id
       swapFee @client
-      volume30dUSD
+      volume30dUSD {
+        value
+      }
       liquidity {
         totalAmount
         token {
@@ -105,6 +107,7 @@ export const GET_BORROWER_LIQUIDITY_POOLS = gql`
   query GetBorrowerLiquidityPools($borrower: String) {
     getPools(borrower: $borrower) {
       id
+      address
       liquidity {
         id
         token {
@@ -116,8 +119,12 @@ export const GET_BORROWER_LIQUIDITY_POOLS = gql`
         totalAmount
       }
       liquidityDepositAPY
-      volume30dUSD
-      volume30dUSD30dAgo
+      volume30dUSD {
+        value
+      }
+      volume30dUSD30dAgo {
+        value
+      }
 
       totalSupply
       # client side

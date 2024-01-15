@@ -14,7 +14,7 @@ import { SelectedToken, useSelectedToken } from '../../../context/SelectedTokenP
 import { GetAllPoolsQuery, GetAllPoolsQueryVariables } from '../../../generated/gql-types';
 import { GET_ALL_POOLS } from '../../../queries';
 import { WIDGET_HEIGHTS } from '../../../utils/contants';
-import { bigIntStringToFloat, displayPercentage, roundCurrency } from '../../../utils/math';
+import { bigIntStringToFloat, convertSwapFee, displayPercentage, roundCurrency } from '../../../utils/math';
 import FeatureBox from '../../FeatureBox/FeatureBox';
 import DirectionIcon from '../../Icons/DirectionIcon';
 import PinnedIcon from '../../Icons/PinnedIcon';
@@ -55,19 +55,19 @@ function Assets() {
           ...token,
           priceUSD: bigIntStringToFloat(token.priceUSD),
           priceUSD24hAgo: bigIntStringToFloat(token.priceUSD24hAgo),
-          swapFee,
+          swapFee: convertSwapFee(bigIntStringToFloat(swapFee, 6)),
           // calculate change over last 24h
           change:
             (bigIntStringToFloat(token.priceUSD) - bigIntStringToFloat(token.priceUSD24hAgo)) /
             bigIntStringToFloat(token.priceUSD24hAgo),
           isFavorite: favoritedAssets.find((address) => token.address === address) !== undefined ? true : false,
-          volume30dUSD,
+          volume30dUSD: bigIntStringToFloat(volume30dUSD.value),
           pool: {
             id,
             liqudityPair:
               tokenA.token.address === Contracts.ERC20.JUSD
-                ? [tokenA.totalAmount, tokenB.totalAmount]
-                : [tokenB.totalAmount, tokenA.totalAmount],
+                ? [bigIntStringToFloat(tokenA.totalAmount), bigIntStringToFloat(tokenB.totalAmount)]
+                : [bigIntStringToFloat(tokenB.totalAmount), bigIntStringToFloat(tokenA.totalAmount)],
           },
         };
       })

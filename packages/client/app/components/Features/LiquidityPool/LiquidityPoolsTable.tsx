@@ -43,10 +43,18 @@ function LiquidityPoolsTable({ selectedPool, setSelectedPool }: Props) {
         { totalSupply: totalSupplyA, borrowerAmount: borrowerAmountA, liquidity: [liqA1, liqA2] },
         { totalSupply: totalSupplyB, borrowerAmount: borrowerAmountB, liquidity: [liqB1, liqB2] },
       ) =>
-        (borrowerAmountB / totalSupplyB) * liqA1.totalAmount * bigIntStringToFloat(liqA1.token.priceUSD) +
-        (borrowerAmountB / totalSupplyB) * liqA2.totalAmount * bigIntStringToFloat(liqA2.token.priceUSD) -
-        ((borrowerAmountA / totalSupplyA) * liqB1.totalAmount * bigIntStringToFloat(liqB1.token.priceUSD) +
-          (borrowerAmountA / totalSupplyA) * liqB2.totalAmount * bigIntStringToFloat(liqB2.token.priceUSD)),
+        (borrowerAmountB / bigIntStringToFloat(totalSupplyB)) *
+          bigIntStringToFloat(liqA1.totalAmount) *
+          bigIntStringToFloat(liqA1.token.priceUSD) +
+        (borrowerAmountB / bigIntStringToFloat(totalSupplyB)) *
+          bigIntStringToFloat(liqA2.totalAmount) *
+          bigIntStringToFloat(liqA2.token.priceUSD) -
+        ((borrowerAmountA / bigIntStringToFloat(totalSupplyA)) *
+          bigIntStringToFloat(liqB1.totalAmount) *
+          bigIntStringToFloat(liqB1.token.priceUSD) +
+          (borrowerAmountA / bigIntStringToFloat(totalSupplyA)) *
+            bigIntStringToFloat(liqB2.totalAmount) *
+            bigIntStringToFloat(liqB2.token.priceUSD)),
     );
   }, [borrowerPoolsData]);
 
@@ -96,7 +104,10 @@ function LiquidityPoolsTable({ selectedPool, setSelectedPool }: Props) {
                 totalSupply,
               } = pool;
               const [tokenA, tokenB] = liquidity;
-              const volumeChange = percentageChange(volume30dUSD, volume30dUSD30dAgo);
+              const volumeChange = percentageChange(
+                bigIntStringToFloat(volume30dUSD.value),
+                bigIntStringToFloat(volume30dUSD30dAgo.value),
+              );
 
               return (
                 <TableRow
@@ -119,7 +130,7 @@ function LiquidityPoolsTable({ selectedPool, setSelectedPool }: Props) {
                     }}
                   >
                     <Typography fontWeight={400}>
-                      {roundCurrency(tokenA.totalAmount, 5)}
+                      {roundCurrency(bigIntStringToFloat(tokenA.totalAmount), 5)}
                       <br />
                       <span
                         data-testid="apollon-liquidity-pool-table-row-borrower-amount-token-a"
@@ -128,7 +139,9 @@ function LiquidityPoolsTable({ selectedPool, setSelectedPool }: Props) {
                           fontSize: '11.7px',
                         }}
                       >
-                        {roundCurrency((borrowerAmount / totalSupply) * tokenA.totalAmount)}
+                        {roundCurrency(
+                          (borrowerAmount / bigIntStringToFloat(totalSupply)) * bigIntStringToFloat(tokenA.totalAmount),
+                        )}
                       </span>
                     </Typography>
                   </TableCell>
@@ -143,7 +156,7 @@ function LiquidityPoolsTable({ selectedPool, setSelectedPool }: Props) {
 
                   <TableCell sx={{ pr: 0, width: '50px', maxWidth: '200px' }}>
                     <Typography fontWeight={400}>
-                      {roundCurrency(tokenB.totalAmount, 5)}
+                      {roundCurrency(bigIntStringToFloat(tokenB.totalAmount), 5)}
                       <br />
                       <span
                         data-testid="apollon-liquidity-pool-table-row-borrower-amount-token-b"
@@ -152,7 +165,9 @@ function LiquidityPoolsTable({ selectedPool, setSelectedPool }: Props) {
                           fontSize: '11.7px',
                         }}
                       >
-                        {roundCurrency((borrowerAmount / totalSupply) * tokenB.totalAmount)}
+                        {roundCurrency(
+                          (borrowerAmount / bigIntStringToFloat(totalSupply)) * bigIntStringToFloat(tokenB.totalAmount),
+                        )}
                       </span>
                     </Typography>
                   </TableCell>
@@ -160,11 +175,11 @@ function LiquidityPoolsTable({ selectedPool, setSelectedPool }: Props) {
                   <TableCell>
                     <Label variant="none">{tokenB.token.symbol}</Label>
                   </TableCell>
-                  <TableCell align="right">{displayPercentage(liquidityDepositAPY)}</TableCell>
+                  <TableCell align="right">{displayPercentage(bigIntStringToFloat(liquidityDepositAPY))}</TableCell>
 
                   <TableCell align="right" sx={{ pr: 0, pl: 1, width: '50px', maxWidth: '200px' }}>
                     <Typography variant="caption" noWrap>
-                      {stdFormatter.format(volume30dUSD)} $
+                      {stdFormatter.format(bigIntStringToFloat(volume30dUSD.value))} $
                     </Typography>
                   </TableCell>
                   <TableCell align="right" width={125}>
