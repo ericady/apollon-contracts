@@ -492,20 +492,20 @@ export const handlers = [
       const { orderBy, orderDirection, where } = req.variables;
 
       const resolutionMultiplier = {
-        1: 60, // 1 minute in seconds
-        10: 10 * 60, // 5 minutes
-        60: 60 * 60, // 1 hour
-        360: 6 * 60 * 60, // 6 hour
-        1440: 24 * 60 * 60, // 1 day
-        10080: 7 * 24 * 60 * 60, // 1 day
+        1: 60 * 1000, // 1 minute in milliseconds
+        10: 10 * 60 * 1000, // 5 minutes
+        60: 60 * 60 * 1000, // 1 hour
+        360: 6 * 60 * 60 * 1000, // 6 hour
+        1440: 24 * 60 * 60 * 1000, // 1 day
+        10080: 7 * 24 * 60 * 60 * 1000, // 1 day
         // Add more resolutions as needed
       };
 
       let bars = [];
-      let timestamp = where!.timestamp_gte!; // Convert from seconds to milliseconds
+      let timestamp = where!.timestamp_gte! * 1000; // Convert from seconds to milliseconds
 
       // Generate bars up to 'periodParams.to' or 'periodParams.countBack' number of bars
-      while (timestamp < where!.timestamp_lte!) {
+      while (timestamp < where!.timestamp_lte! * 1000) {
         // Randomly generate OHLC values (modify logic as needed)
         let open = Math.random() * 100 + 100; // Random value between 100 and 200
         let close = Math.random() * 100 + 100;
@@ -515,7 +515,7 @@ export const handlers = [
 
         // Add the bar to the array
         bars.push({
-          timestamp: floatToBigInt(timestamp).toString(),
+          timestamp,
           open: ethers.parseEther(open.toString()).toString(),
           high: ethers.parseEther(high.toString()).toString(),
           low: ethers.parseEther(low.toString()).toString(),
@@ -557,7 +557,7 @@ export const handlers = [
       const randomCandle: TokenCandleSingleton = {
         id,
         __typename: 'TokenCandleSingleton',
-        timestamp: floatToBigInt(Date.now() / 1000).toString(),
+        timestamp: Date.now(),
         token: tokens[0].address,
         candleSize: 60,
         open: ethers.parseEther(open.toString()).toString(),

@@ -40,7 +40,7 @@ export function floatToBigInt(floatNumber: number, precision: number = 18) {
   // return bigIntNumber;
 
   // Convert the float to a string to handle precision
-  const floatString = floatNumber.toString();
+  const floatString = floatNumber.toFixed(precision);
 
   // Use ethers.js utility to parse the float string into a BigInt
   // This will account for the decimal places and convert accordingly

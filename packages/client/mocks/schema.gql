@@ -233,7 +233,7 @@ type TokenCandle {
   high: BigInt!
   low: BigInt!
   open: BigInt!
-  timestamp: BigInt!
+  timestamp: Int!
   token: Token!
   volume: BigInt!
 }
@@ -244,7 +244,7 @@ type TokenCandleSingleton {
   id: String!
   low: BigInt!
   open: BigInt!
-  timestamp: BigInt!
+  timestamp: Int!
   token: Bytes!
   volume: BigInt!
 }
