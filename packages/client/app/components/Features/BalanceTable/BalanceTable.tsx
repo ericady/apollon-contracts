@@ -30,7 +30,7 @@ const BalanceTable = () => {
   //     skip: !address,
   //   },
   // );
-  const { data: closedPositions } = useQuery<GetBorrowerSwapEventsQuery, GetBorrowerSwapEventsQueryVariables>(
+  const { data } = useQuery<GetBorrowerSwapEventsQuery, GetBorrowerSwapEventsQueryVariables>(
     GET_BORROWER_SWAPS,
     {
       variables: {
@@ -44,6 +44,8 @@ const BalanceTable = () => {
       skip: !address,
     },
   );
+
+  console.log('data: ', data);
 
   const handleChange = (_: SyntheticEvent, newValue: 'DEBT' | 'COLLATERAL' | 'HISTORY') => {
     setTabValue(newValue);
@@ -91,12 +93,12 @@ const BalanceTable = () => {
             label={
               <span>
                 SWAPS{'  '}
-                {closedPositions && (
+                {data && (
                   <Label variant="none" fixedWidth={false}>
                     <span data-testid="apollon-history-count">
-                      {closedPositions.swapEvents.length < 30
-                        ? closedPositions.swapEvents.length
-                        : `${closedPositions.swapEvents.length}+`}
+                      {data.swapEvents.length < 30
+                        ? data.swapEvents.length
+                        : `${data.swapEvents.length}+`}
                     </span>
                   </Label>
                 )}

@@ -65,7 +65,7 @@ export function CustomApolloProvider({ children }: PropsWithChildren<{}>) {
               // Concatenate the incoming list items with
               // the existing list items.
               merge(existing = [], incoming) {
-                return [...existing.swaps, ...incoming.swaps];
+                return [...existing, ...incoming];
               },
               read: (existing) => {
                 return existing;
@@ -78,11 +78,8 @@ export function CustomApolloProvider({ children }: PropsWithChildren<{}>) {
               keyArgs: [],
               // Concatenate the incoming list items with
               // the existing list items.
-              merge(existing = { history: [] }, incoming) {
-                return {
-                  ...incoming,
-                  history: [...existing.history, ...incoming.history],
-                };
+              merge(existing = [], incoming) {
+                return [...existing, ...incoming];
               },
               read: (existing) => {
                 return existing;

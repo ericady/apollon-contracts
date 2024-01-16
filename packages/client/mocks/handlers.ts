@@ -406,12 +406,14 @@ export const handlers = [
   // GetBorrowerSwapEvents
   graphql.query<{ swapEvents: Query['swapEvents'] }, QuerySwapEventsArgs>(GET_BORROWER_SWAPS, (req, res, ctx) => {
     const { first, skip, where } = req.variables;
-    if (!where?.borrower || !skip || !first) {
+    if (!where?.borrower || skip === null || skip === undefined || first === null || first === undefined) {
       throw new Error('Required parameter not supplied');
     }
-    const positions = pastSwapEvents.slice(skip, skip + first);
+    const swapEvents = pastSwapEvents.slice(skip, skip + first);
 
-    return res(ctx.data({ swapEvents: positions }));
+
+
+    return res(ctx.data({ swapEvents }));
   }),
 
   // GetBorrowerLiquidityPools
@@ -469,12 +471,12 @@ export const handlers = [
     (req, res, ctx) => {
       // For this mock, we ignore the actual poolId and just generate mock data
       const { first, skip, where } = req.variables;
-      if (!where?.borrower || !skip || !first) {
+      if (!where?.borrower || skip === null || skip === undefined || first === null || first === undefined) {
         throw new Error('Required parameter not supplied');
       }
-      const history = borrowerHistory.slice(skip, skip + first);
+      const borrowerHistories = borrowerHistory.slice(skip, skip + first);
 
-      return res(ctx.data({ borrowerHistories: history }));
+      return res(ctx.data({ borrowerHistories }));
     },
   ),
 

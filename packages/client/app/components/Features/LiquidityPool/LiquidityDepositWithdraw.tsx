@@ -209,13 +209,13 @@ function LiquidityDepositWithdraw({ selectedPool }: Props) {
 
   const fillMaxInputValue = (fieldName: keyof FieldValues) => {
     if (tabValue === 'DEPOSIT') {
-      if (fieldName === 'tokenAAmount' && relevantDebtTokenA.walletAmount) {
+      if (fieldName === 'tokenAAmount') {
         setValue(fieldName, relevantDebtTokenA.walletAmount.toString(), {
           shouldValidate: true,
           shouldDirty: true,
         });
         handleInput(fieldName, relevantDebtTokenA.walletAmount.toString());
-      } else if (fieldName === 'tokenBAmount' && relevantDebtTokenB.walletAmount) {
+      } else if (fieldName === 'tokenBAmount') {
         setValue(fieldName, relevantDebtTokenB.walletAmount.toString(), {
           shouldValidate: true,
           shouldDirty: true,
@@ -232,7 +232,7 @@ function LiquidityDepositWithdraw({ selectedPool }: Props) {
 
   const fill150PercentInputValue = () => {
     // Check if current collateral is less than 150% of current debt
-    if (currentDebtValueUSD && currentCollateralValueUSD && currentCollateralValueUSD / currentDebtValueUSD > 1.5) {
+    if (currentDebtValueUSD && currentCollateralValueUSD) {
       const tokenAAmount = calculate150PercentTokenValue(
         currentDebtValueUSD,
         currentCollateralValueUSD,
@@ -348,6 +348,7 @@ function LiquidityDepositWithdraw({ selectedPool }: Props) {
                     </div>
 
                     <Button
+                    disabled={relevantDebtTokenA.walletAmount === 0}
                       variant="undercover"
                       sx={{ textDecoration: 'underline', p: 0, mt: 0.25, height: 25 }}
                       onClick={() => fillMaxInputValue('tokenAAmount')}
@@ -378,6 +379,7 @@ function LiquidityDepositWithdraw({ selectedPool }: Props) {
                     </div>
 
                     <Button
+                    disabled={!currentCollateralValueUSD || !currentDebtValueUSD || (currentCollateralValueUSD / currentDebtValueUSD < 1.5)}
                       variant="undercover"
                       sx={{ textDecoration: 'underline', p: 0, mt: 0.25, height: 25 }}
                       onClick={() => fill150PercentInputValue()}
@@ -450,6 +452,7 @@ function LiquidityDepositWithdraw({ selectedPool }: Props) {
                     </div>
 
                     <Button
+                    disabled={relevantDebtTokenB.walletAmount === 0}
                       variant="undercover"
                       sx={{ textDecoration: 'underline', p: 0, mt: 0.25, height: 25 }}
                       onClick={() => fillMaxInputValue('tokenBAmount')}
@@ -480,6 +483,7 @@ function LiquidityDepositWithdraw({ selectedPool }: Props) {
                     </div>
 
                     <Button
+                      disabled={!currentCollateralValueUSD || !currentDebtValueUSD || (currentCollateralValueUSD / currentDebtValueUSD < 1.5)}
                       variant="undercover"
                       sx={{ textDecoration: 'underline', p: 0, mt: 0.25, height: 25 }}
                       onClick={() => fill150PercentInputValue()}
