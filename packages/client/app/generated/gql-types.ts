@@ -18,10 +18,12 @@ export type Scalars = {
 
 export type BorrowerHistory = {
   __typename: 'BorrowerHistory';
-  claimInUSD?: Maybe<Scalars['Float']['output']>;
-  id: Scalars['ID']['output'];
-  lostDepositInUSD?: Maybe<Scalars['Float']['output']>;
-  timestamp: Scalars['Int']['output'];
+  borrower: Scalars['Bytes']['output'];
+  claimInUSD?: Maybe<Scalars['BigInt']['output']>;
+  id: Scalars['Bytes']['output'];
+  lostDepositInUSD?: Maybe<Scalars['BigInt']['output']>;
+  pool: Scalars['Bytes']['output'];
+  timestamp: Scalars['BigInt']['output'];
   type: BorrowerHistoryType;
   values: Array<TokenAmount>;
 };
@@ -121,14 +123,12 @@ export type Query = {
   debtTokenMetas: Array<DebtTokenMeta>;
   getBorrowerPoolHistory: PoolHistoryPage;
   getBorrowerStabilityHistory: PoolHistoryPage;
-  getCollateralRatioHistory: Array<Array<Scalars['Int']['output']>>;
   getCollateralUSDHistory: Array<Array<Scalars['Int']['output']>>;
   getDebtUSDHistory: Array<Array<Scalars['Int']['output']>>;
-  getPoolPriceHistory: Array<Array<Scalars['Int']['output']>>;
-  pools: Array<Pool>;
   getReserveUSDHistory: Array<Array<Scalars['Int']['output']>>;
   getSystemInfo: SystemInfo;
   getTroveManager: TroveManager;
+  pools: Array<Pool>;
   swapEvents: Array<SwapEvent>;
   token: Token;
   tokenCandleSingleton: TokenCandleSingleton;
@@ -159,12 +159,7 @@ export type QueryGetBorrowerStabilityHistoryArgs = {
 };
 
 
-export type QueryGetPoolPriceHistoryArgs = {
-  poolId: Scalars['String']['input'];
-};
-
-
-export type QueryGetPoolsArgs = {
+export type QueryPoolsArgs = {
   borrower?: InputMaybe<Scalars['String']['input']>;
 };
 
@@ -243,7 +238,8 @@ export type Token = {
 
 export type TokenAmount = {
   __typename: 'TokenAmount';
-  amount: Scalars['Float']['output'];
+  amount: Scalars['BigInt']['output'];
+  id: Scalars['Bytes']['output'];
   token: Token;
 };
 
@@ -383,7 +379,7 @@ export type GetBorrowerStabilityHistoryQueryVariables = Exact<{
 }>;
 
 
-export type GetBorrowerStabilityHistoryQuery = { __typename: 'Query', getBorrowerStabilityHistory: { __typename: 'PoolHistoryPage', history: Array<{ __typename: 'BorrowerHistory', id: string, timestamp: number, type: BorrowerHistoryType, claimInUSD?: number | null, lostDepositInUSD?: number | null, values: Array<{ __typename: 'TokenAmount', amount: number, token: { __typename: 'Token', address: string, symbol: string } }> }>, pageInfo: { __typename: 'PageInfo', totalCount: number, hasNextPage: boolean, endCursor: string } } };
+export type GetBorrowerStabilityHistoryQuery = { __typename: 'Query', getBorrowerStabilityHistory: { __typename: 'PoolHistoryPage', history: Array<{ __typename: 'BorrowerHistory', id: string, timestamp: string, type: BorrowerHistoryType, claimInUSD?: string | null, lostDepositInUSD?: string | null, values: Array<{ __typename: 'TokenAmount', amount: string, token: { __typename: 'Token', address: string, symbol: string } }> }>, pageInfo: { __typename: 'PageInfo', totalCount: number, hasNextPage: boolean, endCursor: string } } };
 
 export type GetCollateralUsdHistoryQueryVariables = Exact<{ [key: string]: never; }>;
 

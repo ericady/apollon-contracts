@@ -13,7 +13,7 @@ import {
 } from '../../../generated/gql-types';
 import { GET_BORROWER_STABILITY_HISTORY } from '../../../queries';
 import { formatUnixTimestamp } from '../../../utils/date';
-import { roundCurrency } from '../../../utils/math';
+import { bigIntStringToFloat, roundCurrency } from '../../../utils/math';
 import CrossIcon from '../../Icons/CrossIcon';
 import DiamondIcon from '../../Icons/DiamondIcon';
 import Label from '../../Label/Label';
@@ -138,8 +138,8 @@ type StabilityWidgetProps = {
 };
 
 function StabilityClaimedRewards({ history }: StabilityWidgetProps) {
-  const lostTokens = history.values.filter((reward) => reward.amount < 0);
-  const gainedTokens = history.values.filter((reward) => reward.amount > 0);
+  const lostTokens = history.values.filter((reward) => bigIntStringToFloat(reward.amount) < 0);
+  const gainedTokens = history.values.filter((reward) => bigIntStringToFloat(reward.amount) > 0);
 
   return (
     <>
@@ -165,7 +165,7 @@ function StabilityClaimedRewards({ history }: StabilityWidgetProps) {
           {lostTokens.map(({ token, amount }) => (
             <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }} key={token.address}>
               <Typography fontWeight={400} noWrap>
-                {roundCurrency(amount, 5)}
+                {roundCurrency(bigIntStringToFloat(amount), 5)}
               </Typography>
               <Label variant="none">{token.symbol}</Label>
             </div>
@@ -189,7 +189,9 @@ function StabilityClaimedRewards({ history }: StabilityWidgetProps) {
               fontWeight={400}
               sx={{ gap: '5px', justifyContent: 'end' }}
             >
-              + {roundCurrency(history.claimInUSD! - history.lostDepositInUSD!)} $
+              +{' '}
+              {roundCurrency(bigIntStringToFloat(history.claimInUSD!) - bigIntStringToFloat(history.lostDepositInUSD!))}{' '}
+              $
               <ExpandLessSharpIcon sx={{ color: 'info.main' }} />
             </Typography>
           </Box>
@@ -201,7 +203,7 @@ function StabilityClaimedRewards({ history }: StabilityWidgetProps) {
               style={{ display: 'flex', alignItems: 'center', gap: '10px', justifyContent: 'end' }}
               key={token.address}
             >
-              <Typography fontWeight={400}>{roundCurrency(amount, 5)}</Typography>
+              <Typography fontWeight={400}>{roundCurrency(bigIntStringToFloat(amount), 5)}</Typography>
               <Label variant="none">{token.symbol}</Label>
             </div>
           ))}
@@ -237,7 +239,7 @@ function StabilityDeposit({ history }: StabilityWidgetProps) {
             style={{ display: 'flex', alignItems: 'center', gap: '10px', width: '100%', justifyContent: 'end' }}
             key={token.address}
           >
-            <Typography fontWeight={400}>{roundCurrency(amount, 5)}</Typography>
+            <Typography fontWeight={400}>{roundCurrency(bigIntStringToFloat(amount), 5)}</Typography>
             <Label variant="none">{token.symbol}</Label>
           </div>
         ))}
@@ -272,7 +274,7 @@ function StabilityWithdraw({ history }: StabilityWidgetProps) {
             style={{ display: 'flex', alignItems: 'center', gap: '10px', width: '100%', justifyContent: 'end' }}
             key={token.address}
           >
-            <Typography fontWeight={400}>{roundCurrency(amount, 5)}</Typography>
+            <Typography fontWeight={400}>{roundCurrency(bigIntStringToFloat(amount), 5)}</Typography>
             <Label variant="none">{token.symbol}</Label>
           </div>
         ))}

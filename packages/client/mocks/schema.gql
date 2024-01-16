@@ -169,8 +169,9 @@ type Query {
 }
 
 type TokenAmount {
+  id: Bytes!
   token: Token!
-  amount: Float!
+  amount: BigInt!
 }
 
 enum BorrowerHistoryType {
@@ -180,14 +181,16 @@ enum BorrowerHistoryType {
 }
 
 type BorrowerHistory {
-  id: ID!
-  timestamp: Int!
+  id: Bytes!
+  borrower: Bytes!
+  pool: Bytes!
+  timestamp: BigInt!
   type: BorrowerHistoryType!
   values: [TokenAmount!]!
   # worth of the claimed tokens in USD at the time of the event, only set on CLAIMED_REWARDS
-  claimInUSD: Float
+  claimInUSD: BigInt
   # worth of the lost debtToken in USD at the time of the event, only set on CLAIMED_REWARDS
-  lostDepositInUSD: Float
+  lostDepositInUSD: BigInt
 }
 
 type PoolHistoryPage {

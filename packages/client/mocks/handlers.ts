@@ -14,8 +14,7 @@ import {
   QueryCollateralTokenMetasArgs,
   QueryDebtTokenMetasArgs,
   QueryGetBorrowerStabilityHistoryArgs,
-  QueryGetPoolPriceHistoryArgs,
-  QueryGetPoolsArgs,
+  QueryPoolsArgs,
   QuerySwapEventsArgs,
   QueryTokenArgs,
   QueryTokenCandleSingletonArgs,
@@ -313,10 +312,11 @@ const borrowerHistory: BorrowerHistory[] = Array(faker.number.int({ min: 5, max:
     const lostToken =
       type === BorrowerHistoryType.ClaimedRewards
         ? generateTokenValues(lostAmount, faker.helpers.arrayElements(tokens, { min: 1, max: 5 })).map<TokenAmount>(
-            (token) => ({
+            ({ amount, token }) => ({
               __typename: 'TokenAmount',
-              ...token,
-              amount: token.amount * -1,
+              id: faker.string.uuid(),
+              amount: floatToBigInt(amount * -1).toString(),
+              token,
             }),
           )
         : [];
@@ -324,21 +324,25 @@ const borrowerHistory: BorrowerHistory[] = Array(faker.number.int({ min: 5, max:
     const gainedToken = generateTokenValues(
       gainedAmount,
       faker.helpers.arrayElements(tokens, { min: 1, max: 5 }),
-    ).map<TokenAmount>((token) => ({
+    ).map<TokenAmount>(({ amount, token }) => ({
       __typename: 'TokenAmount',
-      ...token,
+      id: faker.string.uuid(),
+      amount: floatToBigInt(amount).toString(),
+      token,
     }));
     return {
       __typename: 'BorrowerHistory',
       id: faker.string.uuid(),
-      timestamp: now - faker.number.int({ min: 0, max: 29 }) * oneDayInMs,
+      borrower: faker.finance.ethereumAddress(),
+      pool: faker.finance.ethereumAddress(),
+      timestamp: floatToBigInt(now - faker.number.int({ min: 0, max: 29 }) * oneDayInMs).toString(),
       type,
       values: [...lostToken, ...gainedToken],
-      claimInUSD: type === BorrowerHistoryType.ClaimedRewards ? gainedAmount : null,
-      lostDepositInUSD: type === BorrowerHistoryType.ClaimedRewards ? lostAmount : null,
+      claimInUSD: type === BorrowerHistoryType.ClaimedRewards ? floatToBigInt(gainedAmount).toString() : null,
+      lostDepositInUSD: type === BorrowerHistoryType.ClaimedRewards ? floatToBigInt(lostAmount).toString() : null,
     };
   })
-  .sort((a, b) => b.timestamp - a.timestamp);
+  .sort((a, b) => bigIntStringToFloat(b.timestamp) - bigIntStringToFloat(a.timestamp));
 const totalBorrowerHistory = borrowerHistory.length;
 
 // --------------- HANDLER ----------------
@@ -411,7 +415,7 @@ export const handlers = [
   }),
 
   // GetBorrowerLiquidityPools
-  graphql.query<{ pools: Query['pools'] }, QueryGetPoolsArgs>(GET_BORROWER_LIQUIDITY_POOLS, (req, res, ctx) => {
+  graphql.query<{ pools: Query['pools'] }, QueryPoolsArgs>(GET_BORROWER_LIQUIDITY_POOLS, (req, res, ctx) => {
     const { borrower } = req.variables;
     if (!borrower) {
       const result: Query['pools'] = liquidityPools;
