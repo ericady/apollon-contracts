@@ -72,7 +72,7 @@ export function CustomApolloProvider({ children }: PropsWithChildren<{}>) {
               },
             },
 
-            getBorrowerStabilityHistory: {
+            borrowerHistories: {
               // Don't cache separate results based on
               // any of this field's arguments.
               keyArgs: [],

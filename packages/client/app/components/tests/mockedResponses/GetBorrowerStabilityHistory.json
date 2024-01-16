@@ -1,6 +1,6 @@
 {
   "data": {
-    "getBorrowerStabilityHistory": {
+    "borrowerHistories": {
       "history": [
         {
           "id": "7e4812e9-f3b4-4211-bc1a-bc16414eac7e",

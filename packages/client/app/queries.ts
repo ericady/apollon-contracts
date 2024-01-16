@@ -159,27 +159,20 @@ export const GET_BORROWER_COLLATERAL_TOKENS = gql`
 `;
 
 export const GET_BORROWER_STABILITY_HISTORY = gql`
-  query GetBorrowerStabilityHistory($borrower: String!) {
-    getBorrowerStabilityHistory(borrower: $borrower) {
-      history {
-        id
-        timestamp
-        type
-        values {
-          token {
-            address
-            symbol
-          }
-          amount
+  query GetBorrowerStabilityHistory($where: BorrowerHistory_filter!, $first: Int = 30, $skip: Int!) {
+    borrowerHistories(first: $first, orderBy: timestamp, orderDirection: desc, skip: $skip, where: $where) {
+      id
+      timestamp
+      type
+      values {
+        token {
+          address
+          symbol
         }
-        claimInUSD
-        lostDepositInUSD
+        amount
       }
-      pageInfo {
-        totalCount
-        hasNextPage
-        endCursor
-      }
+      claimInUSD
+      lostDepositInUSD
     }
   }
 `;

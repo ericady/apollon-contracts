@@ -11,9 +11,9 @@ import {
   LongShortDirection,
   Pool,
   Query,
+  QueryBorrowerHistoriesArgs,
   QueryCollateralTokenMetasArgs,
   QueryDebtTokenMetasArgs,
-  QueryGetBorrowerStabilityHistoryArgs,
   QueryPoolsArgs,
   QuerySwapEventsArgs,
   QueryTokenArgs,
@@ -464,53 +464,19 @@ export const handlers = [
     return res(ctx.data({ getDebtUSDHistory: result }));
   }),
   // GetBorrowerStabilityHistory
-  graphql.query<
-    { getBorrowerStabilityHistory: Query['getBorrowerStabilityHistory'] },
-    QueryGetBorrowerStabilityHistoryArgs
-  >(GET_BORROWER_STABILITY_HISTORY, (req, res, ctx) => {
-    // For this mock, we ignore the actual poolId and just generate mock data
-    const { borrower, cursor } = req.variables;
-    if (!borrower) {
-      throw new Error('Borrower address is required');
-    }
+  graphql.query<{ borrowerHistories: Query['borrowerHistories'] }, QueryBorrowerHistoriesArgs>(
+    GET_BORROWER_STABILITY_HISTORY,
+    (req, res, ctx) => {
+      // For this mock, we ignore the actual poolId and just generate mock data
+      const { first, skip, where } = req.variables;
+      if (!where?.borrower || !skip || !first) {
+        throw new Error('Required parameter not supplied');
+      }
+      const history = borrowerHistory.slice(skip, skip + first);
 
-    if (cursor) {
-      // find the open position with the id === cursor and return the next 30 entries from that position
-      const cursorPositionIndex = borrowerHistory.findIndex(({ id }) => id === cursor);
-      const history = borrowerHistory.slice(cursorPositionIndex + 1, cursorPositionIndex + 31);
-      const hasNextPage = cursorPositionIndex + 31 < totalBorrowerHistory;
-      const endCursor = history[history.length - 1].id;
-
-      const result: Query['getBorrowerStabilityHistory'] = {
-        __typename: 'PoolHistoryPage',
-        history,
-        pageInfo: {
-          __typename: 'PageInfo',
-          totalCount: totalBorrowerHistory,
-          hasNextPage,
-          endCursor,
-        },
-      };
-      return res(ctx.data({ getBorrowerStabilityHistory: result }));
-    } else {
-      // return the first 30 open positions
-      const history = borrowerHistory.slice(0, 30);
-      const hasNextPage = totalBorrowerHistory > 30;
-      const endCursor = history[history.length - 1].id;
-
-      const result: Query['getBorrowerStabilityHistory'] = {
-        __typename: 'PoolHistoryPage',
-        history,
-        pageInfo: {
-          __typename: 'PageInfo',
-          totalCount: totalBorrowerHistory,
-          hasNextPage,
-          endCursor,
-        },
-      };
-      return res(ctx.data({ getBorrowerStabilityHistory: result }));
-    }
-  }),
+      return res(ctx.data({ borrowerHistories: history }));
+    },
+  ),
 
   // GetReserveUSDHistory
   graphql.query<{ getReserveUSDHistory: Query['getReserveUSDHistory'] }>(GET_RESERVE_USD_HISTORY, (req, res, ctx) => {

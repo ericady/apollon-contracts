@@ -109,13 +109,6 @@ enum SwapEvent_orderBy {
   timestamp
 }
 
-# General meta info for pagination
-type PageInfo {
-  totalCount: Int!
-  hasNextPage: Boolean!
-  endCursor: String!
-}
-
 type Query {
   swapEvents(
     first: Int = 100
@@ -193,14 +186,22 @@ type BorrowerHistory {
   lostDepositInUSD: BigInt
 }
 
-type PoolHistoryPage {
-  history: [BorrowerHistory!]!
-  pageInfo: PageInfo!
+enum BorrowerHistory_orderBy {
+  timestamp
+}
+
+input BorrowerHistory_filter {
+  borrower: Bytes
 }
 
 type Query {
-  getBorrowerPoolHistory(poolId: String!, borrower: String!, cursor: String): PoolHistoryPage!
-  getBorrowerStabilityHistory(borrower: String!, cursor: String): PoolHistoryPage!
+  borrowerHistories(
+    first: Int = 100
+    orderBy: BorrowerHistory_orderBy
+    orderDirection: OrderDirection
+    skip: Int = 0
+    where: BorrowerHistory_filter
+  ): [BorrowerHistory!]!
 }
 
 # ---------------- Client side contract calls ----------------

@@ -27,14 +27,18 @@ const StabilityHistoryDialog = () => {
     GET_BORROWER_STABILITY_HISTORY,
     {
       variables: {
-        borrower: address,
+        first: 30,
+        skip: 0,
+        where: {
+          borrower: address,
+        },
       },
       skip: !address,
     },
   );
 
   const getComponentForBorrowerHistoryType = (
-    history: GetBorrowerStabilityHistoryQuery['getBorrowerStabilityHistory']['history'][number],
+    history: GetBorrowerStabilityHistoryQuery['borrowerHistories'][number],
   ) => {
     switch (history.type) {
       case BorrowerHistoryType.ClaimedRewards:
@@ -54,7 +58,7 @@ const StabilityHistoryDialog = () => {
   const handleScroll: DialogContentProps['onScroll'] = (event) => {
     const scrollableDiv = event.target as HTMLDivElement;
     if (scrollableDiv.scrollTop + scrollableDiv.clientHeight >= scrollableDiv.scrollHeight) {
-      if (data?.getBorrowerStabilityHistory.pageInfo.hasNextPage) {
+      if ((data?.borrowerHistories.length ?? 0) % 30 === 0) {
         fetchMorePositions();
       }
     }
@@ -63,7 +67,11 @@ const StabilityHistoryDialog = () => {
   const fetchMorePositions = () => {
     fetchMore({
       variables: {
-        cursor: data?.getBorrowerStabilityHistory.pageInfo.endCursor,
+        where: {
+          borrower: address,
+        },
+        skip: data?.borrowerHistories.length ?? 0,
+        first: 30,
       },
     });
   };
@@ -112,12 +120,11 @@ const StabilityHistoryDialog = () => {
               borderColor: 'background.paper',
             }}
           >
-            {data.getBorrowerStabilityHistory.history.map((history, index) => (
+            {data.borrowerHistories.map((history, index) => (
               <Box
                 data-testid="apollon-stability-history-dialog-history"
                 sx={{
-                  borderBottom:
-                    index === data.getBorrowerStabilityHistory.pageInfo.totalCount - 1 ? 'none' : `1px solid`,
+                  borderBottom: index === data.borrowerHistories.length - 1 ? 'none' : `1px solid`,
                   borderBottomColor: 'table.border',
                   padding: '20px',
                 }}
@@ -134,7 +141,7 @@ const StabilityHistoryDialog = () => {
 };
 
 type StabilityWidgetProps = {
-  history: GetBorrowerStabilityHistoryQuery['getBorrowerStabilityHistory']['history'][number];
+  history: GetBorrowerStabilityHistoryQuery['borrowerHistories'][number];
 };
 
 function StabilityClaimedRewards({ history }: StabilityWidgetProps) {

@@ -34,6 +34,14 @@ export enum BorrowerHistoryType {
   Withdrawn = 'WITHDRAWN'
 }
 
+export type BorrowerHistory_Filter = {
+  borrower?: InputMaybe<Scalars['Bytes']['input']>;
+};
+
+export enum BorrowerHistory_OrderBy {
+  Timestamp = 'timestamp'
+}
+
 export type CollateralTokenMeta = {
   __typename: 'CollateralTokenMeta';
   id: Scalars['String']['output'];
@@ -75,13 +83,6 @@ export enum OrderDirection {
   Desc = 'desc'
 }
 
-export type PageInfo = {
-  __typename: 'PageInfo';
-  endCursor: Scalars['String']['output'];
-  hasNextPage: Scalars['Boolean']['output'];
-  totalCount: Scalars['Int']['output'];
-};
-
 export type Pool = {
   __typename: 'Pool';
   address: Scalars['Bytes']['output'];
@@ -93,12 +94,6 @@ export type Pool = {
   totalSupply: Scalars['BigInt']['output'];
   volume30dUSD: PoolVolume30d;
   volume30dUSD30dAgo: PoolVolume30d;
-};
-
-export type PoolHistoryPage = {
-  __typename: 'PoolHistoryPage';
-  history: Array<BorrowerHistory>;
-  pageInfo: PageInfo;
 };
 
 export type PoolLiquidity = {
@@ -119,10 +114,9 @@ export type PoolVolume30d = {
 
 export type Query = {
   __typename: 'Query';
+  borrowerHistories: Array<BorrowerHistory>;
   collateralTokenMetas: Array<CollateralTokenMeta>;
   debtTokenMetas: Array<DebtTokenMeta>;
-  getBorrowerPoolHistory: PoolHistoryPage;
-  getBorrowerStabilityHistory: PoolHistoryPage;
   getCollateralUSDHistory: Array<Array<Scalars['Int']['output']>>;
   getDebtUSDHistory: Array<Array<Scalars['Int']['output']>>;
   getReserveUSDHistory: Array<Array<Scalars['Int']['output']>>;
@@ -136,6 +130,15 @@ export type Query = {
 };
 
 
+export type QueryBorrowerHistoriesArgs = {
+  first?: InputMaybe<Scalars['Int']['input']>;
+  orderBy?: InputMaybe<BorrowerHistory_OrderBy>;
+  orderDirection?: InputMaybe<OrderDirection>;
+  skip?: InputMaybe<Scalars['Int']['input']>;
+  where?: InputMaybe<BorrowerHistory_Filter>;
+};
+
+
 export type QueryCollateralTokenMetasArgs = {
   borrower?: InputMaybe<Scalars['String']['input']>;
 };
@@ -143,19 +146,6 @@ export type QueryCollateralTokenMetasArgs = {
 
 export type QueryDebtTokenMetasArgs = {
   borrower?: InputMaybe<Scalars['String']['input']>;
-};
-
-
-export type QueryGetBorrowerPoolHistoryArgs = {
-  borrower: Scalars['String']['input'];
-  cursor?: InputMaybe<Scalars['String']['input']>;
-  poolId: Scalars['String']['input'];
-};
-
-
-export type QueryGetBorrowerStabilityHistoryArgs = {
-  borrower: Scalars['String']['input'];
-  cursor?: InputMaybe<Scalars['String']['input']>;
 };
 
 
@@ -375,11 +365,13 @@ export type GetCollateralTokensQueryVariables = Exact<{
 export type GetCollateralTokensQuery = { __typename: 'Query', collateralTokenMetas: Array<{ __typename: 'CollateralTokenMeta', walletAmount: number, troveLockedAmount: number, stabilityGainedAmount: number, totalValueLockedUSD: string, token: { __typename: 'Token', id: string, address: string, symbol: string, priceUSD: string }, totalValueLockedUSD30dAverage: { __typename: 'TotalValueLockedAverage', id: string, value: string } }> };
 
 export type GetBorrowerStabilityHistoryQueryVariables = Exact<{
-  borrower: Scalars['String']['input'];
+  where: BorrowerHistory_Filter;
+  first?: InputMaybe<Scalars['Int']['input']>;
+  skip: Scalars['Int']['input'];
 }>;
 
 
-export type GetBorrowerStabilityHistoryQuery = { __typename: 'Query', getBorrowerStabilityHistory: { __typename: 'PoolHistoryPage', history: Array<{ __typename: 'BorrowerHistory', id: string, timestamp: string, type: BorrowerHistoryType, claimInUSD?: string | null, lostDepositInUSD?: string | null, values: Array<{ __typename: 'TokenAmount', amount: string, token: { __typename: 'Token', address: string, symbol: string } }> }>, pageInfo: { __typename: 'PageInfo', totalCount: number, hasNextPage: boolean, endCursor: string } } };
+export type GetBorrowerStabilityHistoryQuery = { __typename: 'Query', borrowerHistories: Array<{ __typename: 'BorrowerHistory', id: string, timestamp: string, type: BorrowerHistoryType, claimInUSD?: string | null, lostDepositInUSD?: string | null, values: Array<{ __typename: 'TokenAmount', amount: string, token: { __typename: 'Token', address: string, symbol: string } }> }> };
 
 export type GetCollateralUsdHistoryQueryVariables = Exact<{ [key: string]: never; }>;
 
