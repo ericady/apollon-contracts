@@ -40,7 +40,7 @@ function Assets() {
 
   const tokens = useMemo<SelectedToken[]>(() => {
     const jUSDPools =
-      data?.getPools.filter(({ liquidity }) => {
+      data?.pools.filter(({ liquidity }) => {
         const [tokenA, tokenB] = liquidity;
         return tokenA.token.address === Contracts.ERC20.JUSD || tokenB.token.address === Contracts.ERC20.JUSD;
       }) ?? [];

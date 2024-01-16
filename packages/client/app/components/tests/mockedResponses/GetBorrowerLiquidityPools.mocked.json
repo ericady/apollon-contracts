@@ -1,6 +1,6 @@
 {
   "data": {
-    "getPools": [
+    "pools": [
       {
         "__typename": "Pool",
         "id": "9141ac09-f968-4afb-9e1d-43beff3a5d39",

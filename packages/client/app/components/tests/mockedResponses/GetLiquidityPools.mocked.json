@@ -1,6 +1,6 @@
 {
   "data": {
-    "getPools": [
+    "pools": [
       {
         "id": "b00d03e6-15fd-46a5-a184-030c43ff80b8",
         "swapFee": 0.0472,

@@ -352,14 +352,14 @@ export const handlers = [
     },
   ),
   // GetAllPools
-  graphql.query<{ getPools: Query['getPools'] }, QueryDebtTokenMetasArgs>(GET_ALL_POOLS, (req, res, ctx) => {
-    const result: Query['getPools'] = pools;
-    return res(ctx.data({ getPools: result }));
+  graphql.query<{ pools: Query['pools'] }, QueryDebtTokenMetasArgs>(GET_ALL_POOLS, (req, res, ctx) => {
+    const result: Query['pools'] = pools;
+    return res(ctx.data({ pools: result }));
   }),
   // // GetBorrowerRewards
-  // graphql.query<{ getPools: Query['getPools'] }, QueryDebtTokenMetasArgs>(GET_BORROWER_REWARDS, (req, res, ctx) => {
-  //   const result: Query['getPools'] = pools;
-  //   return res(ctx.data({ getPools: result }));
+  // graphql.query<{ pools: Query['pools'] }, QueryDebtTokenMetasArgs>(GET_BORROWER_REWARDS, (req, res, ctx) => {
+  //   const result: Query['pools'] = pools;
+  //   return res(ctx.data({ pools: result }));
   // }),
 
   // GetBorrowerDebtTokens
@@ -411,12 +411,12 @@ export const handlers = [
   }),
 
   // GetBorrowerLiquidityPools
-  graphql.query<{ getPools: Query['getPools'] }, QueryGetPoolsArgs>(GET_BORROWER_LIQUIDITY_POOLS, (req, res, ctx) => {
+  graphql.query<{ pools: Query['pools'] }, QueryGetPoolsArgs>(GET_BORROWER_LIQUIDITY_POOLS, (req, res, ctx) => {
     const { borrower } = req.variables;
     if (!borrower) {
-      const result: Query['getPools'] = liquidityPools;
+      const result: Query['pools'] = liquidityPools;
 
-      return res(ctx.data({ getPools: result }));
+      return res(ctx.data({ pools: result }));
     }
 
     const borrowerLiquidityPools = faker.helpers.arrayElements(liquidityPools, { min: 1, max: 5 });
@@ -425,7 +425,7 @@ export const handlers = [
       (pool) => !borrowerLiquidityPools.find(({ id }) => id === pool.id),
     );
 
-    const liqudityPoolsWithBorrower: Query['getPools'] = borrowerLiquidityPools.map<Pool>((pool) => {
+    const liqudityPoolsWithBorrower: Query['pools'] = borrowerLiquidityPools.map<Pool>((pool) => {
       return {
         ...pool,
         liquidity: pool.liquidity.map((liquidity) => ({
@@ -439,7 +439,7 @@ export const handlers = [
       };
     });
 
-    return res(ctx.data({ getPools: liqudityPoolsWithoutBorrower.concat(liqudityPoolsWithBorrower) }));
+    return res(ctx.data({ pools: liqudityPoolsWithoutBorrower.concat(liqudityPoolsWithBorrower) }));
   }),
 
   // CHART DATA MOCK
@@ -602,19 +602,6 @@ export const handlers = [
           tokenCandleSingleton: randomCandle,
         }),
       );
-    },
-  ),
-
-  // TODO: Are they needed??
-
-  // GetPoolPriceHistory
-  graphql.query<{ getPoolPriceHistory: Query['getPoolPriceHistory'] }, QueryGetPoolPriceHistoryArgs>(
-    'GetPoolPriceHistory',
-    (req, res, ctx) => {
-      // For this mock, we ignore the actual poolId and just generate mock data
-      const result = generatePoolPriceHistory();
-
-      return res(ctx.data({ getPoolPriceHistory: result }));
     },
   ),
 

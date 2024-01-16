@@ -6,7 +6,7 @@ import LiquidityDepositWithdraw from './LiquidityDepositWithdraw';
 import LiquidityPoolsTable from './LiquidityPoolsTable';
 
 const LiquidityPool = () => {
-  const [selectedPool, setSelectedPool] = useState<GetBorrowerLiquidityPoolsQuery['getPools'][number] | null>(null);
+  const [selectedPool, setSelectedPool] = useState<GetBorrowerLiquidityPoolsQuery['pools'][number] | null>(null);
 
   return (
     <>

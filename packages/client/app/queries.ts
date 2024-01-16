@@ -2,7 +2,7 @@ import { gql } from '@apollo/client';
 
 export const GET_ALL_POOLS = gql`
   query GetAllPools {
-    getPools {
+    pools {
       id
       swapFee @client
       volume30dUSD {
@@ -106,7 +106,7 @@ export const GET_BORROWER_SWAPS = gql`
 
 export const GET_BORROWER_LIQUIDITY_POOLS = gql`
   query GetBorrowerLiquidityPools($borrower: String) {
-    getPools(borrower: $borrower) {
+    pools(borrower: $borrower) {
       id
       address
       liquidity {

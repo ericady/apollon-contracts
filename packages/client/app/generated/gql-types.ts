@@ -125,7 +125,7 @@ export type Query = {
   getCollateralUSDHistory: Array<Array<Scalars['Int']['output']>>;
   getDebtUSDHistory: Array<Array<Scalars['Int']['output']>>;
   getPoolPriceHistory: Array<Array<Scalars['Int']['output']>>;
-  getPools: Array<Pool>;
+  pools: Array<Pool>;
   getReserveUSDHistory: Array<Array<Scalars['Int']['output']>>;
   getSystemInfo: SystemInfo;
   getTroveManager: TroveManager;
@@ -334,7 +334,7 @@ export type TroveManager = {
 export type GetAllPoolsQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type GetAllPoolsQuery = { __typename: 'Query', getPools: Array<{ __typename: 'Pool', id: string, swapFee: string, volume30dUSD: { __typename: 'PoolVolume30d', value: string }, liquidity: Array<{ __typename: 'PoolLiquidity', totalAmount: string, token: { __typename: 'Token', id: string, address: string, symbol: string, priceUSD: string, priceUSD24hAgo: string } }> }> };
+export type GetAllPoolsQuery = { __typename: 'Query', pools: Array<{ __typename: 'Pool', id: string, swapFee: string, volume30dUSD: { __typename: 'PoolVolume30d', value: string }, liquidity: Array<{ __typename: 'PoolLiquidity', totalAmount: string, token: { __typename: 'Token', id: string, address: string, symbol: string, priceUSD: string, priceUSD24hAgo: string } }> }> };
 
 export type GetSelectedTokenQueryVariables = Exact<{
   address: Scalars['String']['input'];
@@ -369,7 +369,7 @@ export type GetBorrowerLiquidityPoolsQueryVariables = Exact<{
 }>;
 
 
-export type GetBorrowerLiquidityPoolsQuery = { __typename: 'Query', getPools: Array<{ __typename: 'Pool', id: string, address: string, liquidityDepositAPY: string, totalSupply: string, borrowerAmount: number, liquidity: Array<{ __typename: 'PoolLiquidity', id: string, totalAmount: string, token: { __typename: 'Token', id: string, address: string, symbol: string, priceUSD: string } }>, volume30dUSD: { __typename: 'PoolVolume30d', value: string }, volume30dUSD30dAgo: { __typename: 'PoolVolume30d', value: string } }> };
+export type GetBorrowerLiquidityPoolsQuery = { __typename: 'Query', pools: Array<{ __typename: 'Pool', id: string, address: string, liquidityDepositAPY: string, totalSupply: string, borrowerAmount: number, liquidity: Array<{ __typename: 'PoolLiquidity', id: string, totalAmount: string, token: { __typename: 'Token', id: string, address: string, symbol: string, priceUSD: string } }>, volume30dUSD: { __typename: 'PoolVolume30d', value: string }, volume30dUSD30dAgo: { __typename: 'PoolVolume30d', value: string } }> };
 
 export type GetCollateralTokensQueryVariables = Exact<{
   borrower: Scalars['String']['input'];

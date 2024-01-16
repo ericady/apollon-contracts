@@ -22,8 +22,8 @@ import HeaderCell from '../../Table/HeaderCell';
 import LiquidityPoolsTableLoader from './LiquidityPoolsTableLoader';
 
 type Props = {
-  selectedPool: GetBorrowerLiquidityPoolsQuery['getPools'][number] | null;
-  setSelectedPool: (pool: GetBorrowerLiquidityPoolsQuery['getPools'][number] | null) => void;
+  selectedPool: GetBorrowerLiquidityPoolsQuery['pools'][number] | null;
+  setSelectedPool: (pool: GetBorrowerLiquidityPoolsQuery['pools'][number] | null) => void;
 };
 
 function LiquidityPoolsTable({ selectedPool, setSelectedPool }: Props) {
@@ -35,8 +35,8 @@ function LiquidityPoolsTable({ selectedPool, setSelectedPool }: Props) {
   >(GET_BORROWER_LIQUIDITY_POOLS, { variables: { borrower: address } });
 
   // sort for highest borrower investment
-  const allPoolsSorted: GetBorrowerLiquidityPoolsQuery['getPools'] = useMemo(() => {
-    const poolsCopy = [...(borrowerPoolsData?.getPools ?? [])];
+  const allPoolsSorted: GetBorrowerLiquidityPoolsQuery['pools'] = useMemo(() => {
+    const poolsCopy = [...(borrowerPoolsData?.pools ?? [])];
 
     return poolsCopy.sort(
       (

@@ -9,7 +9,7 @@ import LiquidityDepositWithdraw, { calculate150PercentTokenValue } from './Liqui
 
 describe('LiquidityPool', () => {
   it('Deposit: should call function of mocked contract', async () => {
-    const mockedPool = MockedGetBorrowerLiquidityPools.data.getPools[0];
+    const mockedPool = MockedGetBorrowerLiquidityPools.data.pools[0];
 
     const contractMock = {
       swapOperationsContract: {
@@ -81,7 +81,7 @@ describe('LiquidityPool', () => {
   });
 
   it('Withdraw: should call function of mocked contract', async () => {
-    const mockedPool = MockedGetBorrowerLiquidityPools.data.getPools[0];
+    const mockedPool = MockedGetBorrowerLiquidityPools.data.pools[0];
 
     const contractMock = {
       swapOperationsContract: {
@@ -133,8 +133,8 @@ describe('LiquidityPool', () => {
 
   // TODO: Write some more unit tests for edge cases
   it('calculate token amount when walletAmount is 0', () => {
-    const tokenA = MockedGetBorrowerLiquidityPools.data.getPools[0].liquidity[0] as PoolLiquidity;
-    const tokenB = MockedGetBorrowerLiquidityPools.data.getPools[0].liquidity[1] as PoolLiquidity;
+    const tokenA = MockedGetBorrowerLiquidityPools.data.pools[0].liquidity[0] as PoolLiquidity;
+    const tokenB = MockedGetBorrowerLiquidityPools.data.pools[0].liquidity[1] as PoolLiquidity;
     const result = calculate150PercentTokenValue(
       1000,
       6000,

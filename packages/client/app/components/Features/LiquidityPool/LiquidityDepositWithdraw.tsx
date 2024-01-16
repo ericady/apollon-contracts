@@ -28,7 +28,7 @@ import CollateralRatioVisualization from '../../Visualizations/CollateralRatioVi
 const SLIPPAGE = 0.02;
 
 type Props = {
-  selectedPool: GetBorrowerLiquidityPoolsQuery['getPools'][number];
+  selectedPool: GetBorrowerLiquidityPoolsQuery['pools'][number];
 };
 
 type FieldValues = {
