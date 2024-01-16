@@ -176,7 +176,7 @@ const Swap = () => {
       handleSwapValueChange('JUSD', jUSDAmount);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selectedToken])
+  }, [selectedToken]);
 
   return (
     <FeatureBox

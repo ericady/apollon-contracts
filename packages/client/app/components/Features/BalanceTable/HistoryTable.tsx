@@ -110,10 +110,9 @@ function HistoryTable() {
                         bigIntStringToFloat(swapFee, 6) * bigIntStringToFloat(totalPriceInStable),
                         5,
                       )} jUSD`
-                    : `${roundCurrency(
-                        bigIntStringToFloat(swapFee, 6) * bigIntStringToFloat(size),
-                        5,
-                      )} ${token.symbol}`}
+                    : `${roundCurrency(bigIntStringToFloat(swapFee, 6) * bigIntStringToFloat(size), 5)} ${
+                        token.symbol
+                      }`}
                 </TableCell>
               </TableRow>
             );

@@ -215,14 +215,17 @@ function TradingViewComponent() {
       });
     }
 
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [client, isDarkMode, selectedToken]);
+
+  // cleanup
+  useEffect(() => {
     return () => {
       if (currentChart.current) {
         currentChart.current.remove();
-        currentChart.current = undefined;
       }
     };
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [client, isDarkMode, selectedToken]);
+  }, []);
 
   return (
     <>
