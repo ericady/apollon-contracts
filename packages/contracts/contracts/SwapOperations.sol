@@ -44,7 +44,8 @@ contract SwapOperations is ISwapOperations, Ownable(msg.sender), CheckContract, 
       _debtTokenManager
     );
 
-    renounceOwnership();
+    // Disabled to create pairs later
+    // renounceOwnership();
   }
 
   modifier ensure(uint deadline) {

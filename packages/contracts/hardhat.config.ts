@@ -2,6 +2,7 @@ import '@nomicfoundation/hardhat-ethers';
 import '@nomicfoundation/hardhat-verify';
 import '@nomicfoundation/hardhat-toolbox';
 import '@nomicfoundation/hardhat-network-helpers';
+import 'hardhat-deploy';
 import 'hardhat-abi-exporter';
 import 'hardhat-gas-reporter';
 import 'hardhat-contract-sizer';
@@ -14,8 +15,6 @@ subtask(TASK_COMPILE_SOLIDITY_GET_SOURCE_PATHS).setAction(async (_, __, runSuper
   const paths = await runSuper();
   return paths.filter((p: any) => !p.includes('_hardhatIgnore'));
 });
-
-import accountsList from './hardhatAccountsList2k';
 
 import fs from 'fs';
 const getSecret = (secretKey: string, defaultValue = '') => {
@@ -44,8 +43,8 @@ const config: HardhatUserConfig = {
     tests: './test',
     cache: './cache',
     artifacts: './artifacts',
-    // deploy: './scripts/deployment/deploy',
-    // deployments: './deployments',
+    deploy: './scripts/deploy',
+    deployments: './deployments',
   },
   solidity: {
     compilers: [
@@ -62,10 +61,9 @@ const config: HardhatUserConfig = {
   networks: {
     localhost: {
       chainId: 31337,
-      url:"http://0.0.0.0:8545"
+      url: 'http://0.0.0.0:8545',
     },
     hardhat: {
-      accounts: accountsList,
       gas: 10000000, // tx gas limit
       blockGasLimit: 15000000,
       gasPrice: 20000000000,
@@ -88,6 +86,11 @@ const config: HardhatUserConfig = {
       accounts: [
         getSecret('RINKEBY_DEPLOYER_PRIVATEKEY', '0x60ddfe7f579ab6867cbe7a2dc03853dc141d7a4ab6dbefc0dae2d2b1bd4e487f'),
       ],
+    },
+  },
+  namedAccounts: {
+    deployer: {
+      default: 0,
     },
   },
   etherscan: { apiKey: getSecret('ETHERSCAN_API_KEY') },
