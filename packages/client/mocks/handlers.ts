@@ -52,7 +52,7 @@ const getFavoritedAssetsFromLS = () => {
 
 const favoritedAssets: string[] = getFavoritedAssetsFromLS();
 const now = Date.now();
-const oneDayInMs = 24 * 60 * 60 * 1000;
+const oneDayInSeconds = 24 * 60 * 60;
 
 const JUSD: Token = {
   id: faker.string.uuid(),
@@ -104,7 +104,7 @@ const collateralTokenMeta: CollateralTokenMeta[] = collateralTokens.map<Collater
   return {
     __typename: 'CollateralTokenMeta',
     id: faker.string.uuid(),
-    timestamp: (now / 1000).toString(),
+    timestamp: now / 1000,
     token: collToken,
     totalValueLockedUSD: floatToBigInt(faker.number.float({ min: 10000, max: 50000, precision: 0.01 })).toString(),
     totalValueLockedUSD30dAverage: {
@@ -142,7 +142,7 @@ const debtTokenMeta = tokens.map<DebtTokenMeta>((token, index) => {
   return {
     __typename: 'DebtTokenMeta',
     id: faker.string.uuid(),
-    timestamp: (now / 1000).toString(),
+    timestamp: now / 1000,
     token: token,
     walletAmount: 0,
     troveMintedAmount: 0,
@@ -249,7 +249,7 @@ const pastSwapEventsLength = faker.number.int({ min: 5, max: 90 });
 const pastSwapEvents = Array(pastSwapEventsLength)
   .fill(null)
   .map<SwapEvent>(() => {
-    const timestamp = (faker.date.past({ years: 1 }).getTime() / 1000).toString();
+    const timestamp = faker.date.past({ years: 1 }).getTime();
     const size = floatToBigInt(faker.number.float({ min: 1, max: 1000, precision: 0.0001 })).toString();
     const token = faker.helpers.arrayElement(tokens);
 
@@ -267,7 +267,7 @@ const pastSwapEvents = Array(pastSwapEventsLength)
       token,
     };
   })
-  .sort((a, b) => parseInt(b.timestamp) - parseInt(a.timestamp));
+  .sort((a, b) => b.timestamp - a.timestamp);
 
 // Define a helper function to generate pool price history data
 const generatePoolPriceHistory = (): number[][] => {
@@ -275,7 +275,7 @@ const generatePoolPriceHistory = (): number[][] => {
     .fill(null)
     .map((_, i) => {
       // Generate a timestamp for each day in the past month
-      const timestamp = now - i * oneDayInMs;
+      const timestamp = now - i * oneDayInSeconds;
       const price = parseFloat(faker.finance.amount(1, 5000, 2));
       return [timestamp, price];
     })
@@ -335,15 +335,14 @@ const borrowerHistory: BorrowerHistory[] = Array(faker.number.int({ min: 5, max:
       id: faker.string.uuid(),
       borrower: faker.finance.ethereumAddress(),
       pool: faker.finance.ethereumAddress(),
-      timestamp: floatToBigInt(now - faker.number.int({ min: 0, max: 29 }) * oneDayInMs).toString(),
+      timestamp: now - faker.number.int({ min: 0, max: 29 }) * oneDayInSeconds,
       type,
       values: [...lostToken, ...gainedToken],
       claimInUSD: type === BorrowerHistoryType.ClaimedRewards ? floatToBigInt(gainedAmount).toString() : null,
       lostDepositInUSD: type === BorrowerHistoryType.ClaimedRewards ? floatToBigInt(lostAmount).toString() : null,
     };
   })
-  .sort((a, b) => bigIntStringToFloat(b.timestamp) - bigIntStringToFloat(a.timestamp));
-const totalBorrowerHistory = borrowerHistory.length;
+  .sort((a, b) => b.timestamp - a.timestamp);
 
 // --------------- HANDLER ----------------
 
@@ -410,8 +409,6 @@ export const handlers = [
       throw new Error('Required parameter not supplied');
     }
     const swapEvents = pastSwapEvents.slice(skip, skip + first);
-
-
 
     return res(ctx.data({ swapEvents }));
   }),

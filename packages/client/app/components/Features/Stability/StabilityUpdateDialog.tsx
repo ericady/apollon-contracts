@@ -161,7 +161,7 @@ const StabilityUpdateDialog = () => {
                         <div style={{ marginTop: 6 }}>
                           <Label variant="success">{token.symbol}</Label>
                           <Typography sx={{ fontWeight: '400', marginTop: '10px' }}>
-                            {roundCurrency(compoundedDeposit, 5)}
+                            {roundCurrency(compoundedDeposit, 5, 5)}
                           </Typography>
                           <Typography variant="label" paragraph>
                             remaining deposit
@@ -204,7 +204,7 @@ const StabilityUpdateDialog = () => {
                                   data-testid="apollon-stability-update-dialog-deposit-funds-label"
                                   color="info.main"
                                 >
-                                  {roundCurrency(walletAmount, 5)}
+                                  {roundCurrency(walletAmount, 5, 5)}
                                 </Typography>
                                 <Typography variant="label" paragraph>
                                   Wallet
@@ -218,7 +218,7 @@ const StabilityUpdateDialog = () => {
                                   data-testid="apollon-stability-update-dialog-withdraw-funds-label"
                                   color="info.main"
                                 >
-                                  {roundCurrency(compoundedDeposit, 5)}
+                                  {roundCurrency(compoundedDeposit, 5, 5)}
                                 </Typography>
                                 <Typography variant="label" paragraph>
                                   remaining deposit

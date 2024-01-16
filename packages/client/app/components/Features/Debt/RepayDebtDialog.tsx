@@ -170,7 +170,7 @@ const RepayDebtDialog = () => {
                       <div style={{ marginTop: 6 }}>
                         <Label variant="success">{token.symbol}</Label>
                         <Typography sx={{ fontWeight: '400', marginTop: '10px' }}>
-                          {roundCurrency(troveRepableDebtAmount, 5)}
+                          {roundCurrency(troveRepableDebtAmount, 5, 5)}
                         </Typography>
                         <Typography variant="label" paragraph>
                           repayable debt
@@ -202,7 +202,7 @@ const RepayDebtDialog = () => {
                               data-testid="apollon-repay-debt-dialog-deposit-funds-label"
                               color="info.main"
                             >
-                              {roundCurrency(walletAmount, 5)}
+                              {roundCurrency(walletAmount, 5, 5)}
                             </Typography>
                             <Typography variant="label" paragraph>
                               Wallet

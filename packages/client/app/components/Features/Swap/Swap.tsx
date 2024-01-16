@@ -284,7 +284,7 @@ const Swap = () => {
               >
                 Price per unit:
                 {selectedToken ? (
-                  <span>{roundCurrency(tokenRatio * (1 - selectedToken.swapFee), 4)} jUSD</span>
+                  <span>{roundCurrency(tokenRatio * (1 - selectedToken.swapFee), 5, 5)} jUSD</span>
                 ) : (
                   <Skeleton width="120px" />
                 )}

@@ -254,7 +254,7 @@ const Farm = () => {
                 >
                   Price per unit:
                   {selectedToken && data ? (
-                    <span>{roundCurrency(tokenRatio * (1 + selectedToken.swapFee + borrowingFee!), 4)} jUSD</span>
+                    <span>{roundCurrency(tokenRatio * (1 + selectedToken.swapFee + borrowingFee!), 5, 5)} jUSD</span>
                   ) : (
                     <Skeleton width="120px" />
                   )}

@@ -23,7 +23,7 @@ export type BorrowerHistory = {
   id: Scalars['Bytes']['output'];
   lostDepositInUSD?: Maybe<Scalars['BigInt']['output']>;
   pool: Scalars['Bytes']['output'];
-  timestamp: Scalars['BigInt']['output'];
+  timestamp: Scalars['Int']['output'];
   type: BorrowerHistoryType;
   values: Array<TokenAmount>;
 };
@@ -46,7 +46,7 @@ export type CollateralTokenMeta = {
   __typename: 'CollateralTokenMeta';
   id: Scalars['String']['output'];
   stabilityGainedAmount: Scalars['Float']['output'];
-  timestamp: Scalars['BigInt']['output'];
+  timestamp: Scalars['Int']['output'];
   token: Token;
   totalValueLockedUSD: Scalars['BigInt']['output'];
   totalValueLockedUSD30dAverage: TotalValueLockedAverage;
@@ -61,7 +61,7 @@ export type DebtTokenMeta = {
   providedStability: Scalars['Float']['output'];
   stabilityCompoundAmount: Scalars['Float']['output'];
   stabilityDepositAPY: StabilityDepositApy;
-  timestamp: Scalars['BigInt']['output'];
+  timestamp: Scalars['Int']['output'];
   token: Token;
   totalDepositedStability: Scalars['BigInt']['output'];
   totalReserve: Scalars['BigInt']['output'];
@@ -194,7 +194,7 @@ export type SwapEvent = {
   id: Scalars['Bytes']['output'];
   size: Scalars['BigInt']['output'];
   swapFee: Scalars['BigInt']['output'];
-  timestamp: Scalars['BigInt']['output'];
+  timestamp: Scalars['Int']['output'];
   token: Token;
   totalPriceInStable: Scalars['BigInt']['output'];
 };
@@ -348,7 +348,7 @@ export type GetBorrowerSwapEventsQueryVariables = Exact<{
 }>;
 
 
-export type GetBorrowerSwapEventsQuery = { __typename: 'Query', swapEvents: Array<{ __typename: 'SwapEvent', id: string, timestamp: string, direction: LongShortDirection, size: string, totalPriceInStable: string, swapFee: string, token: { __typename: 'Token', id: string, address: string, symbol: string, priceUSD: string } }> };
+export type GetBorrowerSwapEventsQuery = { __typename: 'Query', swapEvents: Array<{ __typename: 'SwapEvent', id: string, timestamp: number, direction: LongShortDirection, size: string, totalPriceInStable: string, swapFee: string, token: { __typename: 'Token', id: string, address: string, symbol: string, priceUSD: string } }> };
 
 export type GetBorrowerLiquidityPoolsQueryVariables = Exact<{
   borrower?: InputMaybe<Scalars['String']['input']>;
@@ -371,7 +371,7 @@ export type GetBorrowerStabilityHistoryQueryVariables = Exact<{
 }>;
 
 
-export type GetBorrowerStabilityHistoryQuery = { __typename: 'Query', borrowerHistories: Array<{ __typename: 'BorrowerHistory', id: string, timestamp: string, type: BorrowerHistoryType, claimInUSD?: string | null, lostDepositInUSD?: string | null, values: Array<{ __typename: 'TokenAmount', amount: string, token: { __typename: 'Token', address: string, symbol: string } }> }> };
+export type GetBorrowerStabilityHistoryQuery = { __typename: 'Query', borrowerHistories: Array<{ __typename: 'BorrowerHistory', id: string, timestamp: number, type: BorrowerHistoryType, claimInUSD?: string | null, lostDepositInUSD?: string | null, values: Array<{ __typename: 'TokenAmount', amount: string, token: { __typename: 'Token', address: string, symbol: string } }> }> };
 
 export type GetCollateralUsdHistoryQueryVariables = Exact<{ [key: string]: never; }>;
 

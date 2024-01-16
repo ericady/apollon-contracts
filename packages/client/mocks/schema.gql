@@ -16,7 +16,7 @@ type Token {
 type DebtTokenMeta {
   id: String!
   token: Token!
-  timestamp: BigInt!
+  timestamp: Int!
   # handled by client
   walletAmount: Float!
   troveMintedAmount: Float!
@@ -57,7 +57,7 @@ type StabilityDepositAPY {
 type CollateralTokenMeta {
   id: String!
   token: Token!
-  timestamp: BigInt!
+  timestamp: Int!
   # borrower specific
   walletAmount: Float!
   troveLockedAmount: Float!
@@ -92,7 +92,7 @@ enum LongShortDirection {
 type SwapEvent {
   id: Bytes!
   borrower: Bytes!
-  timestamp: BigInt!
+  timestamp: Int!
   #
   token: Token!
   direction: LongShortDirection! # Indicates whether the swap is LONG or SHORT
@@ -177,7 +177,7 @@ type BorrowerHistory {
   id: Bytes!
   borrower: Bytes!
   pool: Bytes!
-  timestamp: BigInt!
+  timestamp: Int!
   type: BorrowerHistoryType!
   values: [TokenAmount!]!
   # worth of the claimed tokens in USD at the time of the event, only set on CLAIMED_REWARDS

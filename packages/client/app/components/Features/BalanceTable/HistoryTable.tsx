@@ -93,23 +93,24 @@ function HistoryTable() {
 
                 <TableCell align="right">
                   <Typography color="primary.contrastText" fontWeight={400}>
-                    {size}
+                    {roundCurrency(bigIntStringToFloat(size), 5, 5)}
                   </Typography>
                 </TableCell>
                 <TableCell sx={{ pl: 0 }} width={50}>
                   <Label variant="none">{token.symbol}</Label>
                 </TableCell>
 
-                <TableCell align="right">{roundCurrency(bigIntStringToFloat(totalPriceInStable))} jUSD</TableCell>
+                <TableCell align="right">{roundCurrency(bigIntStringToFloat(totalPriceInStable), 5, 5)} jUSD</TableCell>
 
                 <TableCell align="right">
-                  {roundCurrency(bigIntStringToFloat(totalPriceInStable) / bigIntStringToFloat(size))} jUSD
+                  {roundCurrency(bigIntStringToFloat(totalPriceInStable) / bigIntStringToFloat(size), 5, 5)} jUSD
                 </TableCell>
 
                 <TableCell align="right">
                   {direction === LongShortDirection.Long
                     ? `${roundCurrency(
                         bigIntStringToFloat(swapFee, 6) * bigIntStringToFloat(totalPriceInStable),
+                        5,
                         5,
                       )} jUSD`
                     : `${roundCurrency(bigIntStringToFloat(swapFee, 6) * bigIntStringToFloat(size), 5)} ${

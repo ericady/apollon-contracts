@@ -159,7 +159,7 @@ function StabilityClaimedRewards({ history }: StabilityWidgetProps) {
         }}
       >
         <Typography variant="titleAlternate" color="primary.contrastText">
-          {formatUnixTimestamp(history.timestamp.toString(), false)}
+          {formatUnixTimestamp(history.timestamp, false)}
         </Typography>
 
         <Label variant="success" fixedWidth={false}>
@@ -172,7 +172,7 @@ function StabilityClaimedRewards({ history }: StabilityWidgetProps) {
           {lostTokens.map(({ token, amount }) => (
             <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }} key={token.address}>
               <Typography fontWeight={400} noWrap>
-                {roundCurrency(bigIntStringToFloat(amount), 5)}
+                {roundCurrency(bigIntStringToFloat(amount), 5, 5)}
               </Typography>
               <Label variant="none">{token.symbol}</Label>
             </div>
@@ -210,7 +210,7 @@ function StabilityClaimedRewards({ history }: StabilityWidgetProps) {
               style={{ display: 'flex', alignItems: 'center', gap: '10px', justifyContent: 'end' }}
               key={token.address}
             >
-              <Typography fontWeight={400}>{roundCurrency(bigIntStringToFloat(amount), 5)}</Typography>
+              <Typography fontWeight={400}>{roundCurrency(bigIntStringToFloat(amount), 5, 5)}</Typography>
               <Label variant="none">{token.symbol}</Label>
             </div>
           ))}
@@ -232,7 +232,7 @@ function StabilityDeposit({ history }: StabilityWidgetProps) {
         }}
       >
         <Typography variant="titleAlternate" color="primary.contrastText">
-          {formatUnixTimestamp(history.timestamp.toString(), false)}
+          {formatUnixTimestamp(history.timestamp, false)}
         </Typography>
 
         <Label variant="none" fixedWidth={false}>
@@ -246,7 +246,7 @@ function StabilityDeposit({ history }: StabilityWidgetProps) {
             style={{ display: 'flex', alignItems: 'center', gap: '10px', width: '100%', justifyContent: 'end' }}
             key={token.address}
           >
-            <Typography fontWeight={400}>{roundCurrency(bigIntStringToFloat(amount), 5)}</Typography>
+            <Typography fontWeight={400}>{roundCurrency(bigIntStringToFloat(amount), 5, 5)}</Typography>
             <Label variant="none">{token.symbol}</Label>
           </div>
         ))}
@@ -267,7 +267,7 @@ function StabilityWithdraw({ history }: StabilityWidgetProps) {
         }}
       >
         <Typography variant="titleAlternate" color="primary.contrastText">
-          {formatUnixTimestamp(history.timestamp.toString(), false)}
+          {formatUnixTimestamp(history.timestamp, false)}
         </Typography>
 
         <Label variant="info" fixedWidth={false}>
@@ -281,7 +281,7 @@ function StabilityWithdraw({ history }: StabilityWidgetProps) {
             style={{ display: 'flex', alignItems: 'center', gap: '10px', width: '100%', justifyContent: 'end' }}
             key={token.address}
           >
-            <Typography fontWeight={400}>{roundCurrency(bigIntStringToFloat(amount), 5)}</Typography>
+            <Typography fontWeight={400}>{roundCurrency(bigIntStringToFloat(amount), 5, 5)}</Typography>
             <Label variant="none">{token.symbol}</Label>
           </div>
         ))}

@@ -41,7 +41,7 @@ const createRenderCustomizedLabel = (isDarkMode: boolean) => (svgPropsAndData: a
         textAnchor={x > cx ? 'start' : 'end'}
         dominantBaseline="central"
       >
-        {roundCurrency(troveMintedUSD, 4)}
+        {roundCurrency(troveMintedUSD, 5, 5)}
       </text>
     </g>
   );

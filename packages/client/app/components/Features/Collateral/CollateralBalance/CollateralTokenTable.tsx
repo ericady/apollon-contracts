@@ -66,10 +66,10 @@ const CollateralTokenTable = () => {
                   ({ token, totalValueLockedUSD, totalValueLockedUSD30dAverage, troveLockedAmount, walletAmount }) => (
                     <TableRow hover key={token.address}>
                       <TableCell align="right" sx={{ borderRight: '1px solid', borderColor: 'table.border' }}>
-                        {roundCurrency(walletAmount ?? 0, 5)}
+                        {roundCurrency(walletAmount ?? 0, 5, 5)}
                       </TableCell>
                       <TableCell align="right" sx={{ borderRight: '1px solid', borderColor: 'table.border' }}>
-                        {roundCurrency(troveLockedAmount ?? 0, 5)}
+                        {roundCurrency(troveLockedAmount ?? 0, 5, 5)}
                       </TableCell>
                       <TableCell>
                         <Label variant="none">{token.symbol}</Label>

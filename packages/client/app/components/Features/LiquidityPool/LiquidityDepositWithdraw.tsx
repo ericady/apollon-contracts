@@ -306,6 +306,7 @@ function LiquidityDepositWithdraw({ selectedPool }: Props) {
                     {roundCurrency(
                       (borrowerAmount / bigIntStringToFloat(totalSupply)) * bigIntStringToFloat(tokenA.totalAmount),
                       5,
+                      5,
                     )}
                   </Typography>
                   <Typography variant="label">Deposited</Typography>
@@ -339,6 +340,7 @@ function LiquidityDepositWithdraw({ selectedPool }: Props) {
                                 ? parseFloat(tokenAAmount)
                                 : relevantDebtTokenA.walletAmount,
                               5,
+                              5,
                             )
                           : 0}
                       </Typography>
@@ -348,7 +350,7 @@ function LiquidityDepositWithdraw({ selectedPool }: Props) {
                     </div>
 
                     <Button
-                    disabled={relevantDebtTokenA.walletAmount === 0}
+                      disabled={relevantDebtTokenA.walletAmount === 0}
                       variant="undercover"
                       sx={{ textDecoration: 'underline', p: 0, mt: 0.25, height: 25 }}
                       onClick={() => fillMaxInputValue('tokenAAmount')}
@@ -370,6 +372,7 @@ function LiquidityDepositWithdraw({ selectedPool }: Props) {
                                 ? parseFloat(tokenAAmount) - relevantDebtTokenA.walletAmount
                                 : 0,
                               5,
+                              5,
                             )
                           : 0}
                       </Typography>
@@ -379,7 +382,11 @@ function LiquidityDepositWithdraw({ selectedPool }: Props) {
                     </div>
 
                     <Button
-                    disabled={!currentCollateralValueUSD || !currentDebtValueUSD || (currentCollateralValueUSD / currentDebtValueUSD < 1.5)}
+                      disabled={
+                        !currentCollateralValueUSD ||
+                        !currentDebtValueUSD ||
+                        currentCollateralValueUSD / currentDebtValueUSD < 1.5
+                      }
                       variant="undercover"
                       sx={{ textDecoration: 'underline', p: 0, mt: 0.25, height: 25 }}
                       onClick={() => fill150PercentInputValue()}
@@ -409,6 +416,7 @@ function LiquidityDepositWithdraw({ selectedPool }: Props) {
                   >
                     {roundCurrency(
                       (borrowerAmount / bigIntStringToFloat(totalSupply)) * bigIntStringToFloat(tokenB.totalAmount),
+                      5,
                       5,
                     )}
                   </Typography>
@@ -443,6 +451,7 @@ function LiquidityDepositWithdraw({ selectedPool }: Props) {
                                 ? parseFloat(tokenBAmount)
                                 : relevantDebtTokenB.walletAmount,
                               5,
+                              5,
                             )
                           : 0}
                       </Typography>
@@ -452,7 +461,7 @@ function LiquidityDepositWithdraw({ selectedPool }: Props) {
                     </div>
 
                     <Button
-                    disabled={relevantDebtTokenB.walletAmount === 0}
+                      disabled={relevantDebtTokenB.walletAmount === 0}
                       variant="undercover"
                       sx={{ textDecoration: 'underline', p: 0, mt: 0.25, height: 25 }}
                       onClick={() => fillMaxInputValue('tokenBAmount')}
@@ -474,6 +483,7 @@ function LiquidityDepositWithdraw({ selectedPool }: Props) {
                                 ? parseFloat(tokenBAmount) - relevantDebtTokenB.walletAmount
                                 : 0,
                               5,
+                              5,
                             )
                           : 0}
                       </Typography>
@@ -483,7 +493,11 @@ function LiquidityDepositWithdraw({ selectedPool }: Props) {
                     </div>
 
                     <Button
-                      disabled={!currentCollateralValueUSD || !currentDebtValueUSD || (currentCollateralValueUSD / currentDebtValueUSD < 1.5)}
+                      disabled={
+                        !currentCollateralValueUSD ||
+                        !currentDebtValueUSD ||
+                        currentCollateralValueUSD / currentDebtValueUSD < 1.5
+                      }
                       variant="undercover"
                       sx={{ textDecoration: 'underline', p: 0, mt: 0.25, height: 25 }}
                       onClick={() => fill150PercentInputValue()}
@@ -535,7 +549,7 @@ function LiquidityDepositWithdraw({ selectedPool }: Props) {
                         data-testid="apollon-liquidity-pool-withdraw-token-a-funds-label"
                         color="info.main"
                       >
-                        {roundCurrency(borrowerAmount, 5)}
+                        {roundCurrency(borrowerAmount, 5, 5)}
                       </Typography>
                       <br />
                       <Typography variant="label">Deposited</Typography>
@@ -569,7 +583,7 @@ function LiquidityDepositWithdraw({ selectedPool }: Props) {
                 >
                   <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                     <Typography component="span" style={{ marginRight: '8px' }}>
-                      {roundCurrency(tokenAAmountForWithdraw, 5)}
+                      {roundCurrency(tokenAAmountForWithdraw, 5, 5)}
                     </Typography>
 
                     <Typography variant="label">Payout</Typography>
@@ -578,8 +592,8 @@ function LiquidityDepositWithdraw({ selectedPool }: Props) {
                   <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                     <Typography component="span" style={{ marginRight: '8px' }}>
                       {tokenAAmountForWithdraw > relevantDebtTokenA.troveMintedAmount
-                        ? roundCurrency(relevantDebtTokenA.troveMintedAmount, 5)
-                        : roundCurrency(tokenAAmountForWithdraw, 5)}
+                        ? roundCurrency(relevantDebtTokenA.troveMintedAmount, 5, 5)
+                        : roundCurrency(tokenAAmountForWithdraw, 5, 5)}
                     </Typography>
 
                     <Typography variant="label">Debt payed of</Typography>
@@ -605,7 +619,7 @@ function LiquidityDepositWithdraw({ selectedPool }: Props) {
                 >
                   <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                     <Typography component="span" style={{ marginRight: '8px' }}>
-                      {roundCurrency(tokenBAmountForWithdraw, 5)}
+                      {roundCurrency(tokenBAmountForWithdraw, 5, 5)}
                     </Typography>
 
                     <Typography variant="label">Payout</Typography>
@@ -614,8 +628,8 @@ function LiquidityDepositWithdraw({ selectedPool }: Props) {
                   <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                     <Typography component="span" style={{ marginRight: '8px' }}>
                       {tokenBAmountForWithdraw > relevantDebtTokenB.troveMintedAmount
-                        ? roundCurrency(relevantDebtTokenB.troveMintedAmount, 5)
-                        : roundCurrency(tokenBAmountForWithdraw, 5)}
+                        ? roundCurrency(relevantDebtTokenB.troveMintedAmount, 5, 5)
+                        : roundCurrency(tokenBAmountForWithdraw, 5, 5)}
                     </Typography>
 
                     <Typography variant="label">Debt payed of</Typography>

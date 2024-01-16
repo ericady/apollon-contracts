@@ -30,20 +30,17 @@ const BalanceTable = () => {
   //     skip: !address,
   //   },
   // );
-  const { data } = useQuery<GetBorrowerSwapEventsQuery, GetBorrowerSwapEventsQueryVariables>(
-    GET_BORROWER_SWAPS,
-    {
-      variables: {
-        where: {
-          borrower: address,
-        },
-        skip: 0,
-        first: 30,
+  const { data } = useQuery<GetBorrowerSwapEventsQuery, GetBorrowerSwapEventsQueryVariables>(GET_BORROWER_SWAPS, {
+    variables: {
+      where: {
+        borrower: address,
       },
-      // Guest mode. Avoid hitting the API with invalid parameters.
-      skip: !address,
+      skip: 0,
+      first: 30,
     },
-  );
+    // Guest mode. Avoid hitting the API with invalid parameters.
+    skip: !address,
+  });
 
   console.log('data: ', data);
 
@@ -96,9 +93,7 @@ const BalanceTable = () => {
                 {data && (
                   <Label variant="none" fixedWidth={false}>
                     <span data-testid="apollon-history-count">
-                      {data.swapEvents.length < 30
-                        ? data.swapEvents.length
-                        : `${data.swapEvents.length}+`}
+                      {data.swapEvents.length < 30 ? data.swapEvents.length : `${data.swapEvents.length}+`}
                     </span>
                   </Label>
                 )}

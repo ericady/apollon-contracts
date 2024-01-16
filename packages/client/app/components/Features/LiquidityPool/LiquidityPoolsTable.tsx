@@ -130,7 +130,7 @@ function LiquidityPoolsTable({ selectedPool, setSelectedPool }: Props) {
                     }}
                   >
                     <Typography fontWeight={400}>
-                      {roundCurrency(bigIntStringToFloat(tokenA.totalAmount), 5)}
+                      {roundCurrency(bigIntStringToFloat(tokenA.totalAmount), 5, 5)}
                       <br />
                       <span
                         data-testid="apollon-liquidity-pool-table-row-borrower-amount-token-a"
@@ -156,7 +156,7 @@ function LiquidityPoolsTable({ selectedPool, setSelectedPool }: Props) {
 
                   <TableCell sx={{ pr: 0, width: '50px', maxWidth: '200px' }}>
                     <Typography fontWeight={400}>
-                      {roundCurrency(bigIntStringToFloat(tokenB.totalAmount), 5)}
+                      {roundCurrency(bigIntStringToFloat(tokenB.totalAmount), 5, 5)}
                       <br />
                       <span
                         data-testid="apollon-liquidity-pool-table-row-borrower-amount-token-b"

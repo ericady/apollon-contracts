@@ -68,7 +68,7 @@ function TreasuryTable() {
                   align="right"
                   sx={{ borderBottom: index === debtTokensInReserve.length - 1 ? 'none' : '', pr: 0 }}
                 >
-                  {roundCurrency(totalReserve - totalReserve30dAverage!.value, 5)}
+                  {roundCurrency(totalReserve - totalReserve30dAverage!.value, 5, 5)}
                 </TableCell>
                 <TableCell width={125} sx={{ borderBottom: index === debtTokensInReserve.length - 1 ? 'none' : '' }}>
                   <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>

@@ -101,7 +101,7 @@ function DebtTokenTable() {
                       align="right"
                       sx={{ borderBottom: index === data.debtTokenMetas.length - 1 ? 'none' : '' }}
                     >
-                      {roundCurrency(walletAmount, 5)}
+                      {roundCurrency(walletAmount, 5, 5)}
                     </TableCell>
                     <TableCell
                       align="right"
@@ -109,7 +109,7 @@ function DebtTokenTable() {
                         borderBottom: index === data.debtTokenMetas.length - 1 ? 'none' : '',
                       }}
                     >
-                      {roundCurrency(troveRepableDebtAmount, 5)}
+                      {roundCurrency(troveRepableDebtAmount, 5, 5)}
                     </TableCell>
                     <TableCell
                       align="right"

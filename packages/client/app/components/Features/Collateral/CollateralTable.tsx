@@ -137,11 +137,11 @@ function CollateralTable() {
                           />
                         </svg>
                         <Typography color="primary.contrastText" fontWeight={400}>
-                          {roundCurrency(troveLockedAmount!, 5)}
+                          {roundCurrency(troveLockedAmount!, 5, 5)}
                         </Typography>
                       </div>
                     </TableCell>
-                    <TableCell align="right">{roundCurrency(walletAmount!, 5)}</TableCell>
+                    <TableCell align="right">{roundCurrency(walletAmount!, 5, 5)}</TableCell>
                     <TableCell>
                       <Label variant="none">{token.symbol}</Label>
                     </TableCell>

@@ -266,7 +266,7 @@ const CollateralUpdateDialog = ({ buttonVariant, buttonSx = {} }: Props) => {
                         <div style={{ marginTop: 6 }}>
                           <Label variant="success">{symbol}</Label>
                           <Typography sx={{ fontWeight: '400', marginTop: '10px' }}>
-                            {roundCurrency(troveLockedAmount ?? 0, 5)}
+                            {roundCurrency(troveLockedAmount ?? 0, 5, 5)}
                           </Typography>
                           <Typography variant="label" paragraph>
                             Trove
@@ -309,7 +309,7 @@ const CollateralUpdateDialog = ({ buttonVariant, buttonSx = {} }: Props) => {
                                   data-testid="apollon-collateral-update-dialog-deposit-ether-funds-label"
                                   color="info.main"
                                 >
-                                  {roundCurrency(walletAmount ?? 0, 5)}
+                                  {roundCurrency(walletAmount ?? 0, 5, 5)}
                                 </Typography>
                                 <Typography variant="label" paragraph>
                                   Wallet
@@ -323,7 +323,7 @@ const CollateralUpdateDialog = ({ buttonVariant, buttonSx = {} }: Props) => {
                                   data-testid="apollon-collateral-update-dialog-withdraw-ether-funds-label"
                                   color="info.main"
                                 >
-                                  {roundCurrency(troveLockedAmount ?? 0, 5)}
+                                  {roundCurrency(troveLockedAmount ?? 0, 5, 5)}
                                 </Typography>
                                 <Typography variant="label" paragraph>
                                   Trove
