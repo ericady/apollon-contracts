@@ -23,7 +23,7 @@ import FeatureBox from '../../FeatureBox/FeatureBox';
 import NumberInput from '../../FormControls/NumberInput';
 import ForwardIcon from '../../Icons/ForwardIcon';
 import Label from '../../Label/Label';
-import CollateralRatioVisualization from '../../Visualizations/CollateralRatioVisualization';
+import CollateralRatioVisualization, { CRIT_RATIO } from '../../Visualizations/CollateralRatioVisualization';
 
 const SLIPPAGE = 0.02;
 
@@ -682,7 +682,11 @@ function LiquidityDepositWithdraw({ selectedPool }: Props) {
           </Box>
 
           <div style={{ width: '100%', padding: '20px' }}>
-            <Button type="submit" variant="outlined" disabled={!address}>
+            <Button
+              type="submit"
+              variant="outlined"
+              disabled={(newRatio && newRatio < CRIT_RATIO && tabValue === 'DEPOSIT') || !address}
+            >
               Update
             </Button>
             {formState.isSubmitted && !formState.isDirty && (

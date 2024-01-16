@@ -21,7 +21,7 @@ import FeatureBox from '../../FeatureBox/FeatureBox';
 import NumberInput from '../../FormControls/NumberInput';
 import ForwardIcon from '../../Icons/ForwardIcon';
 import Label from '../../Label/Label';
-import CollateralRatioVisualization from '../../Visualizations/CollateralRatioVisualization';
+import CollateralRatioVisualization, { CRIT_RATIO } from '../../Visualizations/CollateralRatioVisualization';
 
 type FieldValues = {
   farmShortValue: string;
@@ -327,7 +327,7 @@ const Farm = () => {
               <InfoButton
                 title="EXECUTE"
                 description="The final values will be calculated after the swap."
-                disabled={!address || !JUSDToken || !selectedToken}
+                disabled={!address || !JUSDToken || (newRatio && newRatio < CRIT_RATIO) || !selectedToken}
               />
             </div>
           </form>
