@@ -14,7 +14,7 @@ import {
 } from '../../../generated/gql-types';
 import { GET_BORROWER_SWAPS } from '../../../queries';
 import { formatUnixTimestamp } from '../../../utils/date';
-import { bigIntStringToFloat, convertSwapFee, roundCurrency } from '../../../utils/math';
+import { bigIntStringToFloat, roundCurrency } from '../../../utils/math';
 import Label from '../../Label/Label';
 import HeaderCell from '../../Table/HeaderCell';
 import HistoryTableLoader from './HistoryTableLoader';
@@ -107,11 +107,11 @@ function HistoryTable() {
                 <TableCell align="right">
                   {direction === LongShortDirection.Long
                     ? `${roundCurrency(
-                        convertSwapFee(bigIntStringToFloat(swapFee, 6)) * bigIntStringToFloat(totalPriceInStable),
+                        bigIntStringToFloat(swapFee, 6) * bigIntStringToFloat(totalPriceInStable),
                         5,
                       )} jUSD`
                     : `${roundCurrency(
-                        convertSwapFee(bigIntStringToFloat(swapFee, 6)) * bigIntStringToFloat(size),
+                        bigIntStringToFloat(swapFee, 6) * bigIntStringToFloat(size),
                         5,
                       )} ${token.symbol}`}
                 </TableCell>

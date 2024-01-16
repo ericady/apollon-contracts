@@ -50,7 +50,7 @@ function Assets() {
       .map<SelectedToken>(({ id, liquidity, swapFee, volume30dUSD }) => {
         const [tokenA, tokenB] = liquidity;
         const token = tokenA.token.address === Contracts.ERC20.JUSD ? tokenB.token : tokenA.token;
-
+console.log('bigIntStringToFloat(swapFee, 6): ', bigIntStringToFloat(swapFee, 6));
         return {
           ...token,
           priceUSD: bigIntStringToFloat(token.priceUSD),
@@ -159,11 +159,11 @@ function Assets() {
                     </TableCell>
                     <TableCell sx={{ p: 0.5 }} align="right">
                       <Typography fontWeight={400}>
-                        {JUSDToken ? roundCurrency(priceUSD / bigIntStringToFloat(JUSDToken.priceUSD)) : '-'}
+                      {JUSDToken ? roundCurrency(priceUSD / bigIntStringToFloat(JUSDToken.priceUSD)) : '-'}
                       </Typography>
                     </TableCell>
                     <TableCell sx={{ p: 0.5 }} align="right" width={60}>
-                      <Typography fontWeight={400} sx={{ color: swapFee > 0 ? 'success.main' : 'error.main' }}>
+                      <Typography fontWeight={400} sx={{ color: swapFee < 0 ? 'success.main' : 'error.main' }}>
                         {displayPercentage(swapFee, 'omit')}
                       </Typography>
                     </TableCell>

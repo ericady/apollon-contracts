@@ -4,7 +4,7 @@ import { Skeleton } from '@mui/material';
 import Button from '@mui/material/Button';
 import InputAdornment from '@mui/material/InputAdornment';
 import Typography from '@mui/material/Typography';
-import { ChangeEvent, useState } from 'react';
+import { ChangeEvent, useEffect, useState } from 'react';
 import { FormProvider, useController, useForm } from 'react-hook-form';
 import { Contracts, useEthers } from '../../../context/EthersProvider';
 import { useSelectedToken } from '../../../context/SelectedTokenProvider';
@@ -170,6 +170,13 @@ const Swap = () => {
     const priceImpact = ((newPriceAfterSwap - currentPrice) / currentPrice) * 100; // in percentage
     return Math.abs(priceImpact) > 1 ? 1 : Math.abs(priceImpact);
   };
+
+  useEffect(() => {
+    if (jUSDAmount) {
+      handleSwapValueChange('JUSD', jUSDAmount);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedToken])
 
   return (
     <FeatureBox

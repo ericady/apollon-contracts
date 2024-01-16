@@ -228,7 +228,7 @@ const Farm = () => {
                     tabValue === 'Long' ? (
                       <span data-testid="apollon-farm-position-size">
                         {!isNaN(watchFarmShortValue) && selectedToken && data
-                          ? `${roundCurrency(getExpectedPositionSize())} ${selectedToken.symbol}}`
+                          ? `${roundCurrency(getExpectedPositionSize())} ${selectedToken.symbol}`
                           : '-'}
                       </span>
                     ) : (

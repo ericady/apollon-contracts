@@ -61,8 +61,3 @@ export function bigIntStringToFloat(bigIntValue: string, decimals = 18) {
 
   return floatValue;
 }
-
-//  die currentSwapFee wird in dem event als 1e6 angegeben → 1000000 sind 100%, 3000 sind 0.3%
-export const convertSwapFee = (swapFee: number) => {
-  return swapFee / 1000000;
-};

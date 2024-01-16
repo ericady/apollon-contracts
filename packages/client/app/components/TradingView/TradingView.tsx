@@ -191,7 +191,7 @@ function TradingViewComponent() {
         symbol: devMode ? 'AAPL' : selectedToken.symbol,
         autosize: true,
 
-        debug: process.env.NODE_ENV === 'development',
+        debug: devMode,
         theme: isDarkMode ? 'dark' : 'light',
         // TODO: Maybe implement later for diffing
         disabled_features: ['header_symbol_search', 'header_compare'],
