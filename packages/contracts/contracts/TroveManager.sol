@@ -801,3 +801,4 @@ contract TroveManager is LiquityBase, Ownable(msg.sender), CheckContract, ITrove
     if (Troves[_borrower].status != Status.active) revert InvalidTrove();
   }
 }
+  
