@@ -73,27 +73,6 @@ describe('RedemptionOperations', () => {
   });
 
   describe('redeemCollateral()', () => {
-    // it('from one open Trove', async () => {
-    //   await whaleShrimpTroveInit(contracts, signers, false);
-
-    //   const bobStableBalanceBefore = await STABLE.balanceOf(bob);
-    //   const btcStableBalanceBefore = await storagePool.getValue(BTC, true, 0);
-
-    //   const toRedeem = parseUnits('50');
-    //   await redemptionOperations.connect(bob).redeemCollateral(toRedeem, parseUnits('0.01'), [defaulter_1]);
-
-    //   const bobStableBalanceAfter = await STABLE.balanceOf(bob);
-    //   expect(bobStableBalanceAfter).to.be.equal(bobStableBalanceBefore - toRedeem);
-
-    //   const collTokenBalance = await BTC.balanceOf(bob);
-    //   let expectedBTCPayout = toRedeem / (await priceFeed.getUSDValue(BTC, 1));
-    //   expectedBTCPayout -= await redemptionOperations.getRedemptionFeeWithDecay(expectedBTCPayout);
-    //   assert.equal(collTokenBalance, expectedBTCPayout);
-
-    //   const btcStableBalanceAfter = await storagePool.getValue(BTC, true, 0);
-    //   assert.equal(btcStableBalanceAfter, btcStableBalanceBefore - expectedBTCPayout);
-    // });
-
     it('from one open Trove', async () => {
       await whaleShrimpTroveInit(contracts, signers, false);
 

@@ -1324,5 +1324,4 @@ describe('LiquidationOperations', () => {
       assert.equal((await troveManager.getTroveOwnersCount()).toString(), '5');
     });
   });
-  it('//debt disttibuted to satablilty pool', async () => {});
 });
