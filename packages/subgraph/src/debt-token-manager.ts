@@ -7,6 +7,7 @@ import {
 import { handleCreateUpdateDebtTokenMeta } from './entities/debt-token-meta-entity';
 import { handleUpdateSystemInfo_stableCoin } from './entities/system-info-entity';
 import { handleCreateToken } from './entities/token-entity';
+import { log } from '@graphprotocol/graph-ts';
 
 export function handleDebtTokenAdded(event: DebtTokenAddedEvent): void {
   const debtTokenManagerContract = DebtTokenManager.bind(event.address);

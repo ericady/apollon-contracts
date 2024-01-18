@@ -1,5 +1,5 @@
 import { Address, BigInt, ethereum } from '@graphprotocol/graph-ts';
-import { DebtToken } from '../../generated/DebtToken/DebtToken';
+import { DebtToken } from '../../generated/DebtToken_STABLE/DebtToken';
 import { SwapPair } from '../../generated/SwapPair/SwapPair';
 import { SystemInfo, TokenCandle, TokenCandleSingleton } from '../../generated/schema';
 

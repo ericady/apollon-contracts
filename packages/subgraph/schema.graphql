@@ -6,6 +6,7 @@ type SystemInfo @entity {
   stableCoin: Bytes!
   storagePool: Bytes!
   priceFeed: Bytes!
+  reservePool: Bytes!
 }
 
 # TODO: wasa mapper for swap pools PairCreated event
@@ -44,7 +45,7 @@ type DebtTokenMeta @entity {
   # - token: es gibt nur zwei, kannst du hardcoden, oder von reservePool.`stableDebtToken` und reservePool.`govToken`
   # - deposited: `stableReserveCap` und `govReserveCap`
   # - event: `WithdrewReserves` und borrowerOps.increaseDebt, dort haben wir aber aktuell kein Event 😟
-  totalReserve: BigInt!
+  totalReserve: BigInt
   totalReserve30dAverage: TotalReserveAverage
   # event StoragePoolValueUpdated
   totalSupplyUSD: BigInt!

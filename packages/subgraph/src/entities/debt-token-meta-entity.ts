@@ -1,7 +1,6 @@
 import { Address, BigInt, ethereum } from '@graphprotocol/graph-ts';
 import { Address as EventAddress } from '@graphprotocol/graph-ts/common/numbers';
 import { BorrowerOperations } from '../../generated/BorrowerOperations/BorrowerOperations';
-import { DebtToken } from '../../generated/DebtToken/DebtToken';
 import { ReservePool } from '../../generated/ReservePool/ReservePool';
 import { StabilityOffsetAddedGainsStruct, StabilityPool } from '../../generated/StabilityPool/StabilityPool';
 import { StabilityPoolManager } from '../../generated/StabilityPoolManager/StabilityPoolManager';
@@ -15,6 +14,8 @@ import {
   TotalSupplyAverage,
   TotalSupplyAverageChunk,
 } from '../../generated/schema';
+import { log } from '@graphprotocol/graph-ts';
+import { DebtToken } from '../../generated/DebtToken_STABLE/DebtToken';
 
 export const stableDebtToken = EventAddress.fromString('0x6c3f90f043a72fa612cbac8115ee7e52bde6e490');
 export const govToken = EventAddress.fromString('0x9f8f72aa9304c8b593d555f12ef6589cc3a579a2');
@@ -31,7 +32,11 @@ export function handleCreateUpdateDebtTokenMeta(
   }
 
   const tokenContract = DebtToken.bind(tokenAddress);
-  const debtTokenStabilityPoolManagerContract = StabilityPoolManager.bind(tokenContract.stabilityPoolManagerAddress());
+  const stabilityManagerAddress = tokenContract.stabilityPoolManagerAddress();
+  // FIXME: I need to add them all to the network.json
+  // const stabilityManagerAddress = Address.fromString("0xDc64a140Aa3E981100a9becA4E685f962f0cF6C9");
+
+  const debtTokenStabilityPoolManagerContract = StabilityPoolManager.bind(stabilityManagerAddress);
   const debtTokenStabilityPoolContract = StabilityPool.bind(
     debtTokenStabilityPoolManagerContract.getStabilityPool(tokenAddress),
   );
@@ -51,7 +56,7 @@ export function handleCreateUpdateDebtTokenMeta(
     const reservePoolContract = ReservePool.bind(reservePoolAddress);
 
     if (tokenAddress === stableDebtToken) {
-      debtTokenMeta.totalReserve = tokenContract.balanceOf(event.address);
+      debtTokenMeta.totalReserve = tokenContract.balanceOf(reservePoolAddress);
     } else if (tokenAddress === govToken) {
       debtTokenMeta.totalReserve = govReserveCap ? govReserveCap : reservePoolContract.govReserveCap();
     }

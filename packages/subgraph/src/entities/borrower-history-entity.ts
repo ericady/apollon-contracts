@@ -40,7 +40,7 @@ export function handleCreateBorrowerHistory(
     operationValuesLost.push(operationValue.id);
 
     if (type === 'CLAIMED_REWARDS') {
-      const priceFeedContract = PriceFeed.bind(systemInfo.priceFeed as Address);
+      const priceFeedContract = PriceFeed.bind(Address.fromBytes(systemInfo.priceFeed));
       const tokenPrice = priceFeedContract.getPrice(tokenAddress);
       allLostDepositsUSD.plus(tokenPrice.times(operationValue.amount));
     }
@@ -63,7 +63,7 @@ export function handleCreateBorrowerHistory(
     operationValuesGained.push(operationValue.id);
 
     if (type === 'CLAIMED_REWARDS') {
-      const priceFeedContract = PriceFeed.bind(systemInfo.priceFeed as Address);
+      const priceFeedContract = PriceFeed.bind(Address.fromBytes(systemInfo.priceFeed));
       const tokenPrice = priceFeedContract.getPrice(tokenAddress);
       allRewardsUSD.plus(tokenPrice.times(operationValue.amount));
     }
