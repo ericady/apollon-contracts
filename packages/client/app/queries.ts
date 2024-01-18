@@ -3,19 +3,24 @@ import { gql } from '@apollo/client';
 export const GET_ALL_POOLS = gql`
   query GetAllPools {
     pools {
+      __typename
       id
       swapFee @client
       volume30dUSD {
+        id
         value
       }
       liquidity {
+        __typename
+        id
         totalAmount
         token {
+          __typename
           id
           address
           symbol
           priceUSD
-          priceUSD24hAgo
+          priceUSD24hAgo @client
         }
       }
     }
@@ -46,7 +51,7 @@ export const GET_ALL_DEBT_TOKENS = gql`
         address
         symbol
         priceUSD
-        priceUSD24hAgo
+        priceUSD24hAgo @client
       }
     }
   }
@@ -147,7 +152,7 @@ export const GET_BORROWER_COLLATERAL_TOKENS = gql`
       }
       walletAmount @client
       troveLockedAmount @client
-      stabilityGainedAmount
+      stabilityGainedAmount @client
 
       totalValueLockedUSD
       totalValueLockedUSD30dAverage {
@@ -241,7 +246,7 @@ export const TOKEN_FRAGMENT = gql`
 
 export const GET_TROVEMANAGER = gql`
   query GetTroveManager {
-    getTroveManager {
+    getTroveManager @client {
       id
       borrowingRate
     }
@@ -250,7 +255,7 @@ export const GET_TROVEMANAGER = gql`
 
 export const GET_SYSTEMINFO = gql`
   query GetSystemInfo {
-    getSystemInfo {
+    getSystemInfo @client {
       id
       recoveryModeActive
       totalCollateralRatio

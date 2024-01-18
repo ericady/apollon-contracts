@@ -42,8 +42,6 @@ const BalanceTable = () => {
     skip: !address,
   });
 
-  console.log('data: ', data);
-
   const handleChange = (_: SyntheticEvent, newValue: 'DEBT' | 'COLLATERAL' | 'HISTORY') => {
     setTabValue(newValue);
   };

@@ -43,10 +43,13 @@
       "address": "0xa82fF9aFd8f496c3d6ac40E2a0F282E47488CFc9"
     },
     "SwapPair": {
-      "address": "0xDa64863ED0bC07177f0B1e11bEbca60874c98d15"
+      "address": "0x687E100f79ceD7Cc8b2BD19Eb326a28885F5b371"
     },
     "ReservePool": {
       "address": "0x0165878A594ca255338adfa4d48449f69242Eb8F"
+    },
+    "SwapOperations": {
+      "address": "0x610178dA211FEF7D417bC0e6FeD39F05609AD788"
     }
   }
 }

@@ -52,6 +52,8 @@ export function handleCreatePool(event: ethereum.Event, token0: Address, token1:
   poolVolumeChunk.timestamp = event.block.timestamp;
   poolVolumeChunk.value = BigInt.fromI32(0);
   poolVolumeChunk.save();
+
+  poolEntity.save();
 }
 
 export function handleUpdatePoolVolume(event: ethereum.Event, token0: Address, token1: Address, value: BigInt): void {

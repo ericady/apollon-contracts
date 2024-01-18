@@ -20,6 +20,8 @@ import DirectionIcon from '../../Icons/DirectionIcon';
 import PinnedIcon from '../../Icons/PinnedIcon';
 import HeaderCell from '../../Table/HeaderCell';
 import AssetsLoader from './AssetsLoader';
+import { ethers } from 'ethers';
+import { getCheckSum } from '../../../utils/crypto';
 
 export const FAVORITE_ASSETS_LOCALSTORAGE_KEY = 'favoriteAssets';
 // FIXME: Hardcode address for stability once its there.
@@ -36,14 +38,28 @@ function Assets() {
   const { selectedToken, setSelectedToken, JUSDToken } = useSelectedToken();
 
   // TODO: Implement a filter for only JUSD to subgraph
-  const { data } = useQuery<GetAllPoolsQuery, GetAllPoolsQueryVariables>(GET_ALL_POOLS);
+  const { data, startPolling, refetch } = useQuery<GetAllPoolsQuery, GetAllPoolsQueryVariables>(GET_ALL_POOLS);
 
+  useEffect(() => {
+    setInterval(() => {
+      refetch();
+    }, 1000)
+  }, [])
+
+console.log('data: ', data);
   const tokens = useMemo<SelectedToken[]>(() => {
+    if (!data?.pools[0].swapFee) return []
+
+    console.log('data AFTER RESOLVE: ', data);
+
     const jUSDPools =
       data?.pools.filter(({ liquidity }) => {
         const [tokenA, tokenB] = liquidity;
-        return tokenA.token.address === Contracts.ERC20.JUSD || tokenB.token.address === Contracts.ERC20.JUSD;
+        return getCheckSum(tokenA.token.address) === getCheckSum(Contracts.ERC20.JUSD) || getCheckSum(tokenB.token.address) === getCheckSum(Contracts.ERC20.JUSD);
       }) ?? [];
+      
+      console.log('Contracts.ERC20.JUSD: ', Contracts.ERC20.JUSD);
+      console.log('jUSDPools: ', jUSDPools);
 
     // get token address from local storage and set isFavorite if it is present
     return jUSDPools

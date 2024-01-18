@@ -6,6 +6,7 @@ import {
 import { SystemInfo } from '../generated/schema';
 import { handleCreatePool } from './entities/pool-entity';
 import { handleCreateTokenCandleSingleton } from './entities/token-candle-entity';
+import { log } from '@graphprotocol/graph-ts';
 
 export function handleOwnershipTransferred(event: OwnershipTransferredEvent): void {}
 
@@ -22,6 +23,8 @@ export function handlePairCreated(event: PairCreatedEvent): void {
       event.params.token0 === stableCoin ? event.params.token1 : event.params.token0,
     );
   }
+
+  log.warning('PoolCreated: {}', [event.params.pair.toHexString()]);
 
   handleCreatePool(event, event.params.token0, event.params.token1, event.params.pair);
 }

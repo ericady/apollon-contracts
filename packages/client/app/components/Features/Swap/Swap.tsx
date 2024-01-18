@@ -173,7 +173,7 @@ const Swap = () => {
 
   useEffect(() => {
     if (jUSDAmount) {
-      handleSwapValueChange('JUSD', jUSDAmount);
+      handleSwapValueChange('JUSD', jUSDAmount.toString());
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedToken]);

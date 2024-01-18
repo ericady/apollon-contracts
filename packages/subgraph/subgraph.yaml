@@ -347,7 +347,7 @@ dataSources:
     name: SwapPair
     network: localhost
     source:
-      address: '0xDa64863ED0bC07177f0B1e11bEbca60874c98d15'
+      address: '0x687E100f79ceD7Cc8b2BD19Eb326a28885F5b371'
       abi: SwapPair
       startBlock: 0
     mapping:
