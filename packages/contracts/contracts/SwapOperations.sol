@@ -248,9 +248,9 @@ contract SwapOperations is ISwapOperations, Ownable(msg.sender), CheckContract, 
 
     // receive tokens from pair
     address pair = getPair[tokenA][tokenB];
+    ISwapPair(pair).transferFrom(msg.sender, pair, liquidity);
     (vars.amount0, vars.amount1, vars.burned0, vars.burned1) = ISwapPair(pair).burn(
       msg.sender,
-      liquidity,
       // check if there are some debts which has to be repaid first
       troveManager.getTroveRepayableDebt(msg.sender, vars.token0),
       troveManager.getTroveRepayableDebt(msg.sender, vars.token1)
@@ -267,6 +267,24 @@ contract SwapOperations is ISwapOperations, Ownable(msg.sender), CheckContract, 
     (amountA, amountB) = tokenA == vars.token0 ? (vars.amount0, vars.amount1) : (vars.amount1, vars.amount0);
     if (amountA < amountAMin) revert InsufficientAAmount();
     if (amountB < amountBMin) revert InsufficientBAmount();
+  }
+
+  function removeLiquidityWithPermit(
+    address tokenA,
+    address tokenB,
+    uint liquidity,
+    uint amountAMin,
+    uint amountBMin,
+    uint deadline,
+    bool approveMax,
+    uint8 v,
+    bytes32 r,
+    bytes32 s
+  ) external virtual override returns (uint amountA, uint amountB) {
+    address pair = getPair[tokenA][tokenB];
+    uint value = approveMax ? type(uint).max : liquidity;
+    ISwapPair(pair).permit(msg.sender, address(this), value, deadline, v, r, s);
+    (amountA, amountB) = removeLiquidity(tokenA, tokenB, liquidity, amountAMin, amountBMin, deadline);
   }
 
   // **** SWAP ****
