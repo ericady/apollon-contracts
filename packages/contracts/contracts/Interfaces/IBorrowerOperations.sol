@@ -16,7 +16,8 @@ interface IBorrowerOperations is IBBase {
     address _priceFeedAddress,
     address _debtTokenManagerAddress,
     address _collTokenManagerAddress,
-    address _swapOperationsAddress
+    address _swapOperationsAddress,
+    address _sortedTrovesAddress
   );
   event TroveCreated(address _borrower, uint arrayIndex);
   event SentBorrowingFeesToReserve(address indexed _borrower, uint amount);
@@ -43,17 +44,22 @@ interface IBorrowerOperations is IBBase {
 
   // --- Functions ---
 
-  function openTrove(TokenAmount[] memory _colls) external;
+  function openTrove(TokenAmount[] memory _colls, address _upperHint, address _lowerHint) external;
 
-  function addColl(TokenAmount[] memory _colls) external;
+  function addColl(TokenAmount[] memory _colls, address _upperHint, address _lowerHint) external;
 
-  function withdrawColl(TokenAmount[] memory _colls) external;
+  function withdrawColl(TokenAmount[] memory _colls, address _upperHint, address _lowerHint) external;
 
-  function increaseDebt(address _borrower, address _to, TokenAmount[] memory _debts, uint _maxFeePercentage) external;
+  function increaseDebt(address _borrower, address _to, TokenAmount[] memory _debts, MintMeta memory _meta) external;
 
-  function repayDebt(TokenAmount[] memory _debts) external;
+  function repayDebt(TokenAmount[] memory _debts, address _upperHint, address _lowerHint) external;
 
-  function repayDebtFromPoolBurn(address borrower, TokenAmount[] memory _debts) external;
+  function repayDebtFromPoolBurn(
+    address borrower,
+    TokenAmount[] memory _debts,
+    address _upperHint,
+    address _lowerHint
+  ) external;
 
   function closeTrove() external;
 

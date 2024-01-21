@@ -339,6 +339,12 @@
                 "internalType": "address",
                 "name": "_priceFeedAddress",
                 "type": "address"
+            },
+            {
+                "indexed": false,
+                "internalType": "address",
+                "name": "_sortedTrovesAddress",
+                "type": "address"
             }
         ],
         "name": "TroveManagerInitialized",
@@ -948,25 +954,6 @@
                 "internalType": "address",
                 "name": "_borrower",
                 "type": "address"
-            }
-        ],
-        "name": "getNominalICR",
-        "outputs": [
-            {
-                "internalType": "uint256",
-                "name": "",
-                "type": "uint256"
-            }
-        ],
-        "stateMutability": "view",
-        "type": "function"
-    },
-    {
-        "inputs": [
-            {
-                "internalType": "address",
-                "name": "_borrower",
-                "type": "address"
             },
             {
                 "internalType": "address",
@@ -1549,6 +1536,11 @@
                 "internalType": "address",
                 "name": "_priceFeedAddress",
                 "type": "address"
+            },
+            {
+                "internalType": "address",
+                "name": "_sortedTrovesAddress",
+                "type": "address"
             }
         ],
         "name": "setAddresses",
@@ -1572,6 +1564,19 @@
         "name": "setTroveStatus",
         "outputs": [],
         "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [],
+        "name": "sortedTroves",
+        "outputs": [
+            {
+                "internalType": "contract ISortedTroves",
+                "name": "",
+                "type": "address"
+            }
+        ],
+        "stateMutability": "view",
         "type": "function"
     },
     {

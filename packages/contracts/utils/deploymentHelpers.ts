@@ -11,6 +11,7 @@ import {
   MockStabilityPoolManager,
   StoragePool,
   ReservePool,
+  SortedTroves,
 } from '../typechain';
 import { parseUnits } from 'ethers';
 
@@ -19,6 +20,7 @@ export interface Contracts {
   redemptionOperations: RedemptionOperations;
   liquidationOperations: LiquidationOperations;
   troveManager: MockTroveManager;
+  sortedTroves: SortedTroves;
   stabilityPoolManager: MockStabilityPoolManager;
   storagePool: StoragePool;
   reservePool: ReservePool;
@@ -42,6 +44,9 @@ export const deployCore = async (): Promise<Contracts> => {
 
   const troveManagerFactory = await ethers.getContractFactory('MockTroveManager');
   const troveManager = await troveManagerFactory.deploy();
+
+  const sortedTrovesFactory = await ethers.getContractFactory('SortedTroves');
+  const sortedTroves = await sortedTrovesFactory.deploy();
 
   const stabilityPoolManagerFactory = await ethers.getContractFactory('MockStabilityPoolManager');
   const stabilityPoolManager = await stabilityPoolManagerFactory.deploy();
@@ -69,6 +74,7 @@ export const deployCore = async (): Promise<Contracts> => {
     redemptionOperations,
     liquidationOperations,
     troveManager,
+    sortedTroves,
     stabilityPoolManager,
     storagePool,
     reservePool,
@@ -88,8 +94,11 @@ export const connectCoreContracts = async (contracts: Contracts) => {
     contracts.redemptionOperations,
     contracts.liquidationOperations,
     contracts.storagePool,
-    contracts.priceFeed
+    contracts.priceFeed,
+    contracts.sortedTroves
   );
+
+  await contracts.sortedTroves.setAddresses(contracts.troveManager, contracts.borrowerOperations);
 
   await contracts.borrowerOperations.setAddresses(
     contracts.troveManager,
@@ -99,7 +108,8 @@ export const connectCoreContracts = async (contracts: Contracts) => {
     contracts.priceFeed,
     contracts.debtTokenManager,
     contracts.collTokenManager,
-    contracts.swapOperations
+    contracts.swapOperations,
+    contracts.sortedTroves
   );
 
   await contracts.redemptionOperations.setAddresses(
@@ -107,7 +117,8 @@ export const connectCoreContracts = async (contracts: Contracts) => {
     contracts.storagePool,
     contracts.priceFeed,
     contracts.debtTokenManager,
-    contracts.collTokenManager
+    contracts.collTokenManager,
+    contracts.sortedTroves
   );
 
   await contracts.liquidationOperations.setAddresses(

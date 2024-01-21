@@ -139,6 +139,12 @@
                 "internalType": "address",
                 "name": "_swapOperationsAddress",
                 "type": "address"
+            },
+            {
+                "indexed": false,
+                "internalType": "address",
+                "name": "_sortedTrovesAddress",
+                "type": "address"
             }
         ],
         "name": "BorrowerOperationsInitialized",
@@ -200,6 +206,16 @@
                 "internalType": "struct IBase.TokenAmount[]",
                 "name": "_colls",
                 "type": "tuple[]"
+            },
+            {
+                "internalType": "address",
+                "name": "_upperHint",
+                "type": "address"
+            },
+            {
+                "internalType": "address",
+                "name": "_lowerHint",
+                "type": "address"
             }
         ],
         "name": "addColl",
@@ -280,9 +296,26 @@
                 "type": "tuple[]"
             },
             {
-                "internalType": "uint256",
-                "name": "_maxFeePercentage",
-                "type": "uint256"
+                "components": [
+                    {
+                        "internalType": "address",
+                        "name": "upperHint",
+                        "type": "address"
+                    },
+                    {
+                        "internalType": "address",
+                        "name": "lowerHint",
+                        "type": "address"
+                    },
+                    {
+                        "internalType": "uint256",
+                        "name": "maxFeePercentage",
+                        "type": "uint256"
+                    }
+                ],
+                "internalType": "struct IBase.MintMeta",
+                "name": "_meta",
+                "type": "tuple"
             }
         ],
         "name": "increaseDebt",
@@ -308,6 +341,16 @@
                 "internalType": "struct IBase.TokenAmount[]",
                 "name": "_colls",
                 "type": "tuple[]"
+            },
+            {
+                "internalType": "address",
+                "name": "_upperHint",
+                "type": "address"
+            },
+            {
+                "internalType": "address",
+                "name": "_lowerHint",
+                "type": "address"
             }
         ],
         "name": "openTrove",
@@ -333,6 +376,16 @@
                 "internalType": "struct IBase.TokenAmount[]",
                 "name": "_debts",
                 "type": "tuple[]"
+            },
+            {
+                "internalType": "address",
+                "name": "_upperHint",
+                "type": "address"
+            },
+            {
+                "internalType": "address",
+                "name": "_lowerHint",
+                "type": "address"
             }
         ],
         "name": "repayDebt",
@@ -363,6 +416,16 @@
                 "internalType": "struct IBase.TokenAmount[]",
                 "name": "_debts",
                 "type": "tuple[]"
+            },
+            {
+                "internalType": "address",
+                "name": "_upperHint",
+                "type": "address"
+            },
+            {
+                "internalType": "address",
+                "name": "_lowerHint",
+                "type": "address"
             }
         ],
         "name": "repayDebtFromPoolBurn",
@@ -388,6 +451,16 @@
                 "internalType": "struct IBase.TokenAmount[]",
                 "name": "_colls",
                 "type": "tuple[]"
+            },
+            {
+                "internalType": "address",
+                "name": "_upperHint",
+                "type": "address"
+            },
+            {
+                "internalType": "address",
+                "name": "_lowerHint",
+                "type": "address"
             }
         ],
         "name": "withdrawColl",

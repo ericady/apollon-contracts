@@ -21,6 +21,11 @@
     },
     {
         "inputs": [],
+        "name": "InvalidRedemptionHint",
+        "type": "error"
+    },
+    {
+        "inputs": [],
         "name": "LessThanMCR",
         "type": "error"
     },
@@ -158,6 +163,12 @@
                 "indexed": false,
                 "internalType": "address",
                 "name": "_collTokenManager",
+                "type": "address"
+            },
+            {
+                "indexed": false,
+                "internalType": "address",
+                "name": "_sortedTrovesAddress",
                 "type": "address"
             }
         ],
@@ -464,9 +475,31 @@
                 "type": "uint256"
             },
             {
-                "internalType": "address[]",
-                "name": "_sourceTroves",
-                "type": "address[]"
+                "components": [
+                    {
+                        "internalType": "address",
+                        "name": "trove",
+                        "type": "address"
+                    },
+                    {
+                        "internalType": "address",
+                        "name": "upperHint",
+                        "type": "address"
+                    },
+                    {
+                        "internalType": "address",
+                        "name": "lowerHint",
+                        "type": "address"
+                    },
+                    {
+                        "internalType": "uint256",
+                        "name": "expectedCR",
+                        "type": "uint256"
+                    }
+                ],
+                "internalType": "struct IRedemptionOperations.RedeemIteration[]",
+                "name": "_iterations",
+                "type": "tuple[]"
             }
         ],
         "name": "redeemCollateral",
@@ -507,11 +540,29 @@
                 "internalType": "address",
                 "name": "_collTokenManagerAddress",
                 "type": "address"
+            },
+            {
+                "internalType": "address",
+                "name": "_sortedTrovesAddress",
+                "type": "address"
             }
         ],
         "name": "setAddresses",
         "outputs": [],
         "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [],
+        "name": "sortedTroves",
+        "outputs": [
+            {
+                "internalType": "contract ISortedTroves",
+                "name": "",
+                "type": "address"
+            }
+        ],
+        "stateMutability": "view",
         "type": "function"
     },
     {

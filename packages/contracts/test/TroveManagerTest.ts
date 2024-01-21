@@ -13,12 +13,7 @@ import {
 } from '../typechain';
 import { Contracts, deployCore, connectCoreContracts, deployAndLinkToken } from '../utils/deploymentHelpers';
 import { SignerWithAddress } from '@nomicfoundation/hardhat-ethers/signers';
-import {
-  openTrove,
-  whaleShrimpTroveInit,
-  getTCR,
-  TroveStatus,
-} from '../utils/testHelper';
+import { openTrove, whaleShrimpTroveInit, getTCR, TroveStatus } from '../utils/testHelper';
 import { assert, expect } from 'chai';
 import { parseUnits } from 'ethers';
 
@@ -97,6 +92,7 @@ describe('TroveManager', () => {
       const btcStableBalanceAfter = await storagePool.getValue(BTC, true, 0);
       assert.equal(btcStableBalanceAfter, btcStableBalanceBefore - expectedBTCPayout);
     });
+
     it('Should add collateral to the trove and update the stats', async function () {
       await whaleShrimpTroveInit(contracts, signers, false);
 
@@ -263,6 +259,7 @@ describe('TroveManager', () => {
       // Confirm Troves count
       expect(troveLengthBefore - troveLengthAfter).to.be.equal(1);
     });
+
     it('Pending reward not affected after collateral price change', async () => {
       await whaleShrimpTroveInit(contracts, signers);
 
@@ -289,6 +286,7 @@ describe('TroveManager', () => {
       const amountAfterPriceChange = await priceFeed.getAmountFromUSDValue(BTC, carolBtcRewardAfter);
       assert.equal(amountBeforePriceChange, amountAfterPriceChange);
     });
+
     it('Returns 0 if there is no pending reward', async () => {
       await whaleShrimpTroveInit(contracts, signers, false);
 

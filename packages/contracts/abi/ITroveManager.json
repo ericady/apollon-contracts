@@ -288,6 +288,12 @@
                 "internalType": "address",
                 "name": "_priceFeedAddress",
                 "type": "address"
+            },
+            {
+                "indexed": false,
+                "internalType": "address",
+                "name": "_sortedTrovesAddress",
+                "type": "address"
             }
         ],
         "name": "TroveManagerInitialized",
@@ -638,25 +644,6 @@
             }
         ],
         "stateMutability": "view",
-        "type": "function"
-    },
-    {
-        "inputs": [
-            {
-                "internalType": "address",
-                "name": "_borrower",
-                "type": "address"
-            }
-        ],
-        "name": "getNominalICR",
-        "outputs": [
-            {
-                "internalType": "uint256",
-                "name": "",
-                "type": "uint256"
-            }
-        ],
-        "stateMutability": "nonpayable",
         "type": "function"
     },
     {

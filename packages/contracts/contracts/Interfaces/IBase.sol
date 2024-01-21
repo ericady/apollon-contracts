@@ -11,6 +11,12 @@ interface IBase {
 
   error FeeExceedMaxPercentage();
 
+  struct MintMeta {
+    address upperHint;
+    address lowerHint;
+    uint maxFeePercentage;
+  }
+
   struct RAmount {
     address tokenAddress;
     bool isColl; // coll or debt token

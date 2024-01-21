@@ -175,7 +175,7 @@ contract SwapOperations is ISwapOperations, Ownable(msg.sender), CheckContract, 
     uint amountBDesired,
     uint amountAMin,
     uint amountBMin,
-    uint _maxMintFeePercentage,
+    MintMeta memory _mintMeta,
     uint deadline
   ) external virtual override ensure(deadline) returns (uint amountA, uint amountB, uint liquidity) {
     ProvidingVars memory vars;
@@ -214,7 +214,7 @@ contract SwapOperations is ISwapOperations, Ownable(msg.sender), CheckContract, 
       TokenAmount[] memory debtsToMint = new TokenAmount[](2);
       debtsToMint[0] = TokenAmount(tokenA, vars.fromMintA);
       debtsToMint[1] = TokenAmount(tokenB, vars.fromMintB);
-      borrowerOperations.increaseDebt(msg.sender, vars.pair, debtsToMint, _maxMintFeePercentage);
+      borrowerOperations.increaseDebt(msg.sender, vars.pair, debtsToMint, _mintMeta);
     }
 
     // transfer tokens sourced from senders balance
@@ -239,6 +239,8 @@ contract SwapOperations is ISwapOperations, Ownable(msg.sender), CheckContract, 
     uint liquidity,
     uint amountAMin,
     uint amountBMin,
+    address _upperHint,
+    address _lowerHint,
     uint deadline
   ) public virtual override ensure(deadline) returns (uint amountA, uint amountB) {
     RemovalVars memory vars;
@@ -259,7 +261,7 @@ contract SwapOperations is ISwapOperations, Ownable(msg.sender), CheckContract, 
       TokenAmount[] memory debtsToRepay = new TokenAmount[](2);
       debtsToRepay[0] = TokenAmount(vars.token0, vars.burned0);
       debtsToRepay[1] = TokenAmount(vars.token1, vars.burned1);
-      borrowerOperations.repayDebtFromPoolBurn(msg.sender, debtsToRepay);
+      borrowerOperations.repayDebtFromPoolBurn(msg.sender, debtsToRepay, _upperHint, _lowerHint);
     }
 
     (amountA, amountB) = tokenA == vars.token0 ? (vars.amount0, vars.amount1) : (vars.amount1, vars.amount0);
@@ -314,14 +316,14 @@ contract SwapOperations is ISwapOperations, Ownable(msg.sender), CheckContract, 
     uint debtOutMin,
     address debtTokenAddress,
     address to,
-    uint _maxMintFeePercentage,
+    MintMeta memory _mintMeta,
     uint deadline
   ) external override returns (uint[] memory amounts) {
     address[] memory path = new address[](2);
     path[0] = address(debtTokenManager.getStableCoin());
     path[1] = debtTokenAddress;
 
-    return _openPosition(stableToMintIn, debtOutMin, path, to, _maxMintFeePercentage);
+    return _openPosition(stableToMintIn, debtOutMin, path, to, _mintMeta);
   }
 
   function openShortPosition(
@@ -329,14 +331,14 @@ contract SwapOperations is ISwapOperations, Ownable(msg.sender), CheckContract, 
     uint stableOutMin,
     address debtTokenAddress,
     address to,
-    uint _maxMintFeePercentage,
+    MintMeta memory _mintMeta,
     uint deadline
   ) external override returns (uint[] memory amounts) {
     address[] memory path = new address[](2);
     path[0] = debtTokenAddress;
     path[1] = address(debtTokenManager.getStableCoin());
 
-    return _openPosition(debtToMintIn, stableOutMin, path, to, _maxMintFeePercentage);
+    return _openPosition(debtToMintIn, stableOutMin, path, to, _mintMeta);
   }
 
   function _openPosition(
@@ -344,7 +346,7 @@ contract SwapOperations is ISwapOperations, Ownable(msg.sender), CheckContract, 
     uint amountOutMin,
     address[] memory path,
     address to,
-    uint _maxMintFeePercentage
+    MintMeta memory _mintMeta
   ) internal returns (uint[] memory amounts) {
     address pair = getPair[path[0]][path[1]];
     if (pair == address(0)) revert PairDoesNotExist();
@@ -355,7 +357,7 @@ contract SwapOperations is ISwapOperations, Ownable(msg.sender), CheckContract, 
     // mint the debt token and transfer it to the pair
     TokenAmount[] memory debtsToMint = new TokenAmount[](1);
     debtsToMint[0] = TokenAmount(path[0], amounts[0]);
-    borrowerOperations.increaseDebt(msg.sender, pair, debtsToMint, _maxMintFeePercentage);
+    borrowerOperations.increaseDebt(msg.sender, pair, debtsToMint, _mintMeta);
 
     // execute the swap
     _swap(amounts, path, to);

@@ -259,19 +259,12 @@ contract StabilityPool is LiquityBase, CheckContract, IStabilityPool {
   }
 
   /*  withdrawFromSP():
-   * - Triggers a GOV issuance, based on time passed since the last issuance. The GOV issuance is shared between *all* depositors
    * - Sends all depositor's accumulated gains to depositor
    * - Decreases deposit and takes new snapshots.
    * - If _amount > userDeposit, the user withdraws all of their compounded deposit.
    */
   function withdrawFromSP(address user, uint depositToWithdrawal) external override {
     _requireCallerIsStabilityPoolManager();
-
-    // todo removed this check, because we do not know about potential under collateralized loans
-    // (sorted troves is not anymore sorted by runtime cr, its the cr on creation time)
-    // this check is not required for any security reasons
-    // but it prevented users from withdrawing their deposit out of the stability pool in case of an <100% CR trove (to avoid the loss)
-    //    if (debtToWithdrawal != 0) _requireNoUnderCollateralizedTroves();
 
     uint remainingDeposit = this.getCompoundedDebtDeposit(user);
     depositToWithdrawal = LiquityMath._min(depositToWithdrawal, remainingDeposit);

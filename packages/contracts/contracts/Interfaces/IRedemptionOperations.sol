@@ -17,6 +17,13 @@ interface IRedemptionOperations is IBBase {
     uint sendToRedeemer;
   }
 
+  struct RedeemIteration {
+    address trove;
+    address upperHint;
+    address lowerHint;
+    uint expectedCR;
+  }
+
   // --- Events ---
 
   event RedemptionOperationsInitialized(
@@ -24,7 +31,8 @@ interface IRedemptionOperations is IBBase {
     address _storgePool,
     address _priceFeed,
     address _debtTokenManager,
-    address _collTokenManager
+    address _collTokenManager,
+    address _sortedTrovesAddress
   );
   event SuccessfulRedemption(
     uint _attemptedStableAmount,
@@ -42,10 +50,15 @@ interface IRedemptionOperations is IBBase {
   error NoRedeems();
   error GreaterThanTCR();
   error TooHighRedeemFee();
+  error InvalidRedemptionHint();
 
   // --- Functions ---
 
-  function redeemCollateral(uint _stableCoinAmount, uint _maxFee, address[] memory _sourceTroves) external;
+  function redeemCollateral(
+    uint _stableCoinAmount,
+    uint _maxFeePercentage,
+    RedeemIteration[] memory _iterations
+  ) external;
 
   function getRedemptionRate() external view returns (uint);
 

@@ -350,9 +350,26 @@
                 "type": "uint256"
             },
             {
-                "internalType": "uint256",
-                "name": "_maxMintFeePercentage",
-                "type": "uint256"
+                "components": [
+                    {
+                        "internalType": "address",
+                        "name": "upperHint",
+                        "type": "address"
+                    },
+                    {
+                        "internalType": "address",
+                        "name": "lowerHint",
+                        "type": "address"
+                    },
+                    {
+                        "internalType": "uint256",
+                        "name": "maxFeePercentage",
+                        "type": "uint256"
+                    }
+                ],
+                "internalType": "struct IBase.MintMeta",
+                "name": "_mintMeta",
+                "type": "tuple"
             },
             {
                 "internalType": "uint256",
@@ -626,9 +643,26 @@
                 "type": "address"
             },
             {
-                "internalType": "uint256",
-                "name": "_maxMintFeePercentage",
-                "type": "uint256"
+                "components": [
+                    {
+                        "internalType": "address",
+                        "name": "upperHint",
+                        "type": "address"
+                    },
+                    {
+                        "internalType": "address",
+                        "name": "lowerHint",
+                        "type": "address"
+                    },
+                    {
+                        "internalType": "uint256",
+                        "name": "maxFeePercentage",
+                        "type": "uint256"
+                    }
+                ],
+                "internalType": "struct IBase.MintMeta",
+                "name": "_mintMeta",
+                "type": "tuple"
             },
             {
                 "internalType": "uint256",
@@ -670,9 +704,26 @@
                 "type": "address"
             },
             {
-                "internalType": "uint256",
-                "name": "_maxMintFeePercentage",
-                "type": "uint256"
+                "components": [
+                    {
+                        "internalType": "address",
+                        "name": "upperHint",
+                        "type": "address"
+                    },
+                    {
+                        "internalType": "address",
+                        "name": "lowerHint",
+                        "type": "address"
+                    },
+                    {
+                        "internalType": "uint256",
+                        "name": "maxFeePercentage",
+                        "type": "uint256"
+                    }
+                ],
+                "internalType": "struct IBase.MintMeta",
+                "name": "_mintMeta",
+                "type": "tuple"
             },
             {
                 "internalType": "uint256",
@@ -772,6 +823,16 @@
                 "internalType": "uint256",
                 "name": "amountBMin",
                 "type": "uint256"
+            },
+            {
+                "internalType": "address",
+                "name": "_upperHint",
+                "type": "address"
+            },
+            {
+                "internalType": "address",
+                "name": "_lowerHint",
+                "type": "address"
             },
             {
                 "internalType": "uint256",

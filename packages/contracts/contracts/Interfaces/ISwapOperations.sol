@@ -67,7 +67,7 @@ interface ISwapOperations is IBBase {
     uint amountBDesired,
     uint amountAMin,
     uint amountBMin,
-    uint _maxMintFeePercentage,
+    MintMeta memory _mintMeta,
     uint deadline
   ) external returns (uint amountA, uint amountB, uint liquidity);
 
@@ -78,6 +78,8 @@ interface ISwapOperations is IBBase {
     uint liquidity,
     uint amountAMin,
     uint amountBMin,
+    address _upperHint,
+    address _lowerHint,
     uint deadline
   ) external returns (uint amountA, uint amountB);
 
@@ -102,7 +104,7 @@ interface ISwapOperations is IBBase {
     uint debtOutMin,
     address debtTokenAddress,
     address to,
-    uint _maxMintFeePercentage,
+    MintMeta memory _mintMeta,
     uint deadline
   ) external returns (uint[] memory amounts);
 
@@ -111,7 +113,7 @@ interface ISwapOperations is IBBase {
     uint stableOutMin,
     address debtTokenAddress,
     address to,
-    uint _maxMintFeePercentage,
+    MintMeta memory _mintMeta,
     uint deadline
   ) external returns (uint[] memory amounts);
 }

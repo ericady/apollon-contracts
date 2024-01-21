@@ -11,6 +11,7 @@ import './Interfaces/IDebtToken.sol';
 import './Interfaces/IPriceFeed.sol';
 import './Interfaces/IStoragePool.sol';
 import './Interfaces/IBBase.sol';
+import './Interfaces/ISortedTroves.sol';
 
 contract TroveManager is LiquityBase, Ownable(msg.sender), CheckContract, ITroveManager {
   string public constant NAME = 'TroveManager';
@@ -22,6 +23,7 @@ contract TroveManager is LiquityBase, Ownable(msg.sender), CheckContract, ITrove
   address public liquidationOperationsAddress;
   IStoragePool public storagePool;
   IPriceFeed public priceFeed;
+  ISortedTroves public sortedTroves;
 
   // todo gov
   //    ILQTYToken public override lqtyToken;
@@ -92,26 +94,30 @@ contract TroveManager is LiquityBase, Ownable(msg.sender), CheckContract, ITrove
     address _redemptionOperationsAddress,
     address _liquidationOperationsAddress,
     address _storagePoolAddress,
-    address _priceFeedAddress
+    address _priceFeedAddress,
+    address _sortedTrovesAddress
   ) external onlyOwner {
     checkContract(_borrowerOperationsAddress);
     checkContract(_redemptionOperationsAddress);
     checkContract(_liquidationOperationsAddress);
     checkContract(_storagePoolAddress);
     checkContract(_priceFeedAddress);
+    checkContract(_sortedTrovesAddress);
 
     borrowerOperationsAddress = _borrowerOperationsAddress;
     redemptionOperationsAddress = _redemptionOperationsAddress;
     liquidationOperationsAddress = _liquidationOperationsAddress;
     storagePool = IStoragePool(_storagePoolAddress);
     priceFeed = IPriceFeed(_priceFeedAddress);
+    sortedTroves = ISortedTroves(_sortedTrovesAddress);
 
     emit TroveManagerInitialized(
       _borrowerOperationsAddress,
       _redemptionOperationsAddress,
       _liquidationOperationsAddress,
       _storagePoolAddress,
-      _priceFeedAddress
+      _priceFeedAddress,
+      _sortedTrovesAddress
     );
 
     renounceOwnership();
@@ -145,13 +151,6 @@ contract TroveManager is LiquityBase, Ownable(msg.sender), CheckContract, ITrove
    * collateral ratios
    *
    **/
-
-  // Return the nominal collateral ratio (ICR) of a given Trove, without the price. Takes a trove's pending coll and debt rewards from redistributions into account.
-  function getNominalICR(address _borrower) external view override returns (uint) {
-    (uint currentCollInUSD, uint currentDebtInUSD) = _getCurrentTrovesUSDValues(_borrower);
-    uint NICR = LiquityMath._computeNominalCR(currentCollInUSD, currentDebtInUSD);
-    return NICR;
-  }
 
   // Return the current collateral ratio (ICR) of a given Trove. Takes a trove's pending coll and debt rewards from redistributions into account.
   function getCurrentICR(address _borrower) external view override returns (uint ICR, uint currentDebtInUSD) {
@@ -673,6 +672,7 @@ contract TroveManager is LiquityBase, Ownable(msg.sender), CheckContract, ITrove
     delete trove.collTokens;
 
     _removeTroveOwner(_borrower, numOfOwners);
+    sortedTroves.remove(_borrower);
     emit TroveClosed(_borrower, closedStatus);
   }
 
@@ -801,4 +801,3 @@ contract TroveManager is LiquityBase, Ownable(msg.sender), CheckContract, ITrove
     if (Troves[_borrower].status != Status.active) revert InvalidTrove();
   }
 }
-  

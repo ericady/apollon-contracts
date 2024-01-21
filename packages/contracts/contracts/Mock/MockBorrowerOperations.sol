@@ -8,11 +8,11 @@ import '../BorrowerOperations.sol';
 for testing the parent's internal functions. */
 
 contract MockBorrowerOperations is BorrowerOperations {
-  function increaseDebts(TokenAmount[] memory _debts, uint _maxFeePercentage) external {
+  function increaseDebts(TokenAmount[] memory _debts, MintMeta memory _meta) external {
     // separate minting is allowed for better testing
     // _requireCallerIsSwapOperations();
 
-    _increaseDebt(msg.sender, msg.sender, _debts, _maxFeePercentage);
+    _increaseDebt(msg.sender, msg.sender, _debts, _meta);
   }
 
   // Payable fallback function

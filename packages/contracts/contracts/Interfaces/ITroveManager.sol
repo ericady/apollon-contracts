@@ -17,7 +17,8 @@ interface ITroveManager is IBBase {
     address _redemptionOperationsAddress,
     address _liquidationOperationsAddress,
     address _storagePoolAddress,
-    address _priceFeedAddress
+    address _priceFeedAddress,
+    address _sortedTrovesAddress
   );
 
   event TroveAppliedRewards(address _borrower, CAmount[] _appliedRewards);
@@ -53,8 +54,6 @@ interface ITroveManager is IBBase {
   function setTroveStatus(address _borrower, uint num) external;
 
   //
-
-  function getNominalICR(address _borrower) external returns (uint);
 
   function getCurrentICR(address _borrower) external view returns (uint ICR, uint currentDebtInUSD);
 
