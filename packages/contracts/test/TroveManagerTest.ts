@@ -8,12 +8,11 @@ import {
   StoragePool,
   LiquidationOperations,
   RedemptionOperations,
-  StabilityPool,
   BorrowerOperations,
 } from '../typechain';
 import { Contracts, deployCore, connectCoreContracts, deployAndLinkToken } from '../utils/deploymentHelpers';
 import { SignerWithAddress } from '@nomicfoundation/hardhat-ethers/signers';
-import { openTrove, whaleShrimpTroveInit, getTCR, TroveStatus } from '../utils/testHelper';
+import { openTrove, whaleShrimpTroveInit, getTCR, TroveStatus, addColl, repayDebt, redeem } from '../utils/testHelper';
 import { assert, expect } from 'chai';
 import { parseUnits } from 'ethers';
 
@@ -22,20 +21,16 @@ describe('TroveManager', () => {
   let alice: SignerWithAddress;
   let bob: SignerWithAddress;
   let whale: SignerWithAddress;
-  let erin: SignerWithAddress;
   let carol: SignerWithAddress;
   let dennis: SignerWithAddress;
 
   let defaulter_1: SignerWithAddress;
-  let defaulter_2: SignerWithAddress;
   let defaulter_3: SignerWithAddress;
 
   let storagePool: StoragePool;
 
   let STABLE: MockDebtToken;
-  let STOCK: MockDebtToken;
   let BTC: MockERC20;
-  let USDT: MockERC20;
 
   let priceFeed: MockPriceFeed;
   let troveManager: MockTroveManager;
@@ -48,7 +43,7 @@ describe('TroveManager', () => {
 
   before(async () => {
     signers = await ethers.getSigners();
-    [, defaulter_1, defaulter_2, defaulter_3, whale, alice, bob, carol, dennis, erin] = signers;
+    [, defaulter_1, , defaulter_3, whale, alice, bob, carol, dennis] = signers;
   });
 
   beforeEach(async () => {
@@ -65,9 +60,7 @@ describe('TroveManager', () => {
     borrowerOperations = contracts.borrowerOperations;
 
     STABLE = contracts.debtToken.STABLE;
-    STOCK = contracts.debtToken.STOCK;
     BTC = contracts.collToken.BTC;
-    USDT = contracts.collToken.USDT;
   });
 
   describe('redeemCollateral()', () => {
@@ -79,7 +72,7 @@ describe('TroveManager', () => {
 
       const toRedeem = parseUnits('50');
 
-      await redemptionOperations.connect(bob).redeemCollateral(toRedeem, parseUnits('0.01'), [defaulter_1]);
+      await redeem(bob, toRedeem, contracts);
       const bobStableBalanceAfter = await STABLE.balanceOf(bob);
 
       expect(bobStableBalanceAfter).to.be.equal(bobStableBalanceBefore - toRedeem);
@@ -114,7 +107,7 @@ describe('TroveManager', () => {
       const prevTotalCollateralStake = await troveManager.totalStakes(btcAddress);
       const prevTroveStake = await troveManager.getTroveStakes(bobAddress, btcAddress);
 
-      await expect(contracts.borrowerOperations.connect(bob).addColl([{ tokenAddress: BTC, amount: collAmountToAdd }]))
+      await expect(addColl(bob, contracts, [{ tokenAddress: BTC, amount: collAmountToAdd }]))
         .to.emit(storagePool, 'StoragePoolValueUpdated')
         .withArgs(btcAddress, true, '0', prevPoolValue + collAmountToAdd)
         .and.to.emit(BTC, 'Transfer')
@@ -218,7 +211,7 @@ describe('TroveManager', () => {
       assert.equal(dennis_Status.toString(), TroveStatus.CLOSED_BY_LIQUIDATION_IN_RECOVERY_MODE.toString());
 
       // remaining troves bob repay a little debt, applying their pending rewards
-      await borrowerOperations.connect(bob).repayDebt([{ tokenAddress: STABLE, amount: parseUnits('1000') }]);
+      await repayDebt(bob, contracts, [{ tokenAddress: STABLE, amount: parseUnits('1000') }]);
 
       // Check alice is the only trove that has pending rewards
       const alicePendingBTCReward = await troveManager.getPendingReward(alice, BTC, true);

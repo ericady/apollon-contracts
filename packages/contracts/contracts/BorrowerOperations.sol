@@ -779,14 +779,12 @@ contract BorrowerOperations is LiquityBase, Ownable(msg.sender), CheckContract, 
 
   // Returns the composite debt (drawn debt + gas compensation) of a trove, for the purpose of ICR calculation
   function _getCompositeDebt(DebtTokenAmount[] memory _debts) internal view returns (uint debtInUSD) {
-    for (uint i = 0; i < _debts.length; i++) {
+    for (uint i = 0; i < _debts.length; i++)
       debtInUSD += priceFeed.getUSDValue(address(_debts[i].debtToken), _debts[i].netDebt);
-    }
   }
 
   function _getCompositeColl(TokenAmount[] memory _colls) internal view returns (uint collInUSD) {
-    for (uint i = 0; i < _colls.length; i++) {
+    for (uint i = 0; i < _colls.length; i++)
       collInUSD += priceFeed.getUSDValue(_colls[i].tokenAddress, _colls[i].amount);
-    }
   }
 }

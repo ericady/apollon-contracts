@@ -15,7 +15,11 @@ interface ISortedTroves {
 
   // --- Events ---
 
-  event SortedTrovesInitialised(address _troveManagerAddress, address _borrowerOperationsAddress);
+  event SortedTrovesInitialised(
+    address _troveManagerAddress,
+    address _borrowerOperationsAddress,
+    address _redemptionOperationsAddress
+  );
   event NodeAdded(address _id, uint _CR);
   event NodeRemoved(address _id);
 

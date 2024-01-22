@@ -366,6 +366,91 @@
         "type": "function"
     },
     {
+        "inputs": [
+            {
+                "internalType": "address",
+                "name": "_borrower",
+                "type": "address"
+            },
+            {
+                "internalType": "uint256",
+                "name": "_redeemMaxAmount",
+                "type": "uint256"
+            },
+            {
+                "internalType": "bool",
+                "name": "_includePendingRewards",
+                "type": "bool"
+            }
+        ],
+        "name": "calculateTroveRedemption",
+        "outputs": [
+            {
+                "components": [
+                    {
+                        "components": [
+                            {
+                                "internalType": "address",
+                                "name": "tokenAddress",
+                                "type": "address"
+                            },
+                            {
+                                "internalType": "uint256",
+                                "name": "amount",
+                                "type": "uint256"
+                            }
+                        ],
+                        "internalType": "struct IBase.TokenAmount",
+                        "name": "stableCoinEntry",
+                        "type": "tuple"
+                    },
+                    {
+                        "internalType": "uint256",
+                        "name": "stableCoinLot",
+                        "type": "uint256"
+                    },
+                    {
+                        "components": [
+                            {
+                                "internalType": "address",
+                                "name": "tokenAddress",
+                                "type": "address"
+                            },
+                            {
+                                "internalType": "uint256",
+                                "name": "amount",
+                                "type": "uint256"
+                            }
+                        ],
+                        "internalType": "struct IBase.TokenAmount[]",
+                        "name": "collLots",
+                        "type": "tuple[]"
+                    },
+                    {
+                        "internalType": "uint256",
+                        "name": "troveCollInUSD",
+                        "type": "uint256"
+                    },
+                    {
+                        "internalType": "uint256",
+                        "name": "troveDebtInUSD",
+                        "type": "uint256"
+                    },
+                    {
+                        "internalType": "uint256",
+                        "name": "resultingCR",
+                        "type": "uint256"
+                    }
+                ],
+                "internalType": "struct IRedemptionOperations.SingleRedemptionVariables",
+                "name": "vars",
+                "type": "tuple"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
         "inputs": [],
         "name": "collTokenManager",
         "outputs": [
@@ -470,11 +555,6 @@
                 "type": "uint256"
             },
             {
-                "internalType": "uint256",
-                "name": "_maxFeePercentage",
-                "type": "uint256"
-            },
-            {
                 "components": [
                     {
                         "internalType": "address",
@@ -500,6 +580,11 @@
                 "internalType": "struct IRedemptionOperations.RedeemIteration[]",
                 "name": "_iterations",
                 "type": "tuple[]"
+            },
+            {
+                "internalType": "uint256",
+                "name": "_maxFeePercentage",
+                "type": "uint256"
             }
         ],
         "name": "redeemCollateral",

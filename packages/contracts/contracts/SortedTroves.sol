@@ -13,6 +13,7 @@ contract SortedTroves is Ownable(msg.sender), CheckContract, ISortedTroves {
 
   address public borrowerOperationsAddress;
   address public troveManagerAddress;
+  address public redemptionOperationsAddress;
 
   struct Node {
     bool exists;
@@ -30,14 +31,20 @@ contract SortedTroves is Ownable(msg.sender), CheckContract, ISortedTroves {
 
   // --- Contract setters ---
 
-  function setAddresses(address _troveManagerAddress, address _borrowerOperationsAddress) external onlyOwner {
+  function setAddresses(
+    address _troveManagerAddress,
+    address _borrowerOperationsAddress,
+    address _redemptionOperationsAddress
+  ) external onlyOwner {
     checkContract(_troveManagerAddress);
     checkContract(_borrowerOperationsAddress);
+    checkContract(_redemptionOperationsAddress);
 
     troveManagerAddress = _troveManagerAddress;
     borrowerOperationsAddress = _borrowerOperationsAddress;
+    redemptionOperationsAddress = _redemptionOperationsAddress;
 
-    emit SortedTrovesInitialised(_troveManagerAddress, _borrowerOperationsAddress);
+    emit SortedTrovesInitialised(_troveManagerAddress, _borrowerOperationsAddress, _redemptionOperationsAddress);
     renounceOwnership();
   }
 
@@ -49,7 +56,7 @@ contract SortedTroves is Ownable(msg.sender), CheckContract, ISortedTroves {
    * @param _nextId Id of next node for the insert position
    */
   function insert(address _id, uint _CR, address _prevId, address _nextId) external override {
-    _requireCallerIsBOorTroveM();
+    _requireCallerIsProtocol();
     _insert(_id, _CR, _prevId, _nextId);
   }
 
@@ -61,7 +68,7 @@ contract SortedTroves is Ownable(msg.sender), CheckContract, ISortedTroves {
    * @param _nextId Id of next node for the new insert position
    */
   function reInsert(address _id, uint _newCR, address _prevId, address _nextId) external override {
-    _requireCallerIsBOorTroveM();
+    _requireCallerIsProtocol();
     _remove(_id);
     _insert(_id, _newCR, _prevId, _nextId);
   }
@@ -108,7 +115,7 @@ contract SortedTroves is Ownable(msg.sender), CheckContract, ISortedTroves {
   }
 
   function remove(address _id) external override {
-    _requireCallerIsBOorTroveM();
+    _requireCallerIsProtocol();
     _remove(_id);
   }
 
@@ -258,8 +265,12 @@ contract SortedTroves is Ownable(msg.sender), CheckContract, ISortedTroves {
 
   // --- 'require' functions ---
 
-  function _requireCallerIsBOorTroveM() internal view {
-    if (msg.sender != borrowerOperationsAddress && msg.sender != troveManagerAddress) revert CallerNotBrOrTrContract();
+  function _requireCallerIsProtocol() internal view {
+    if (
+      msg.sender != borrowerOperationsAddress &&
+      msg.sender != troveManagerAddress &&
+      msg.sender != redemptionOperationsAddress
+    ) revert CallerNotBrOrTrContract();
   }
 
   // --- Getters ---

@@ -4,14 +4,12 @@ import {
   MockERC20,
   MockPriceFeed,
   MockTroveManager,
-  StabilityPoolManager,
   StoragePool,
-  LiquidationOperations,
   RedemptionOperations,
 } from '../typechain';
 import { Contracts, deployCore, connectCoreContracts, deployAndLinkToken } from '../utils/deploymentHelpers';
 import { SignerWithAddress } from '@nomicfoundation/hardhat-ethers/signers';
-import { assertRevert, getStabilityPool, openTrove, whaleShrimpTroveInit } from '../utils/testHelper';
+import { openTrove, whaleShrimpTroveInit } from '../utils/testHelper';
 import { assert, expect } from 'chai';
 import { formatUnits, parseUnits } from 'ethers';
 
@@ -20,37 +18,26 @@ describe('RedemptionOperations', () => {
   let owner: SignerWithAddress;
   let alice: SignerWithAddress;
   let bob: SignerWithAddress;
-  let carol: SignerWithAddress;
-  let whale: SignerWithAddress;
-  let dennis: SignerWithAddress;
-  let erin: SignerWithAddress;
-  let flyn: SignerWithAddress;
-
   let defaulter_1: SignerWithAddress;
-  let defaulter_2: SignerWithAddress;
-  let defaulter_3: SignerWithAddress;
 
   let storagePool: StoragePool;
 
   let STABLE: MockDebtToken;
-  let STOCK: MockDebtToken;
   let BTC: MockERC20;
-  let USDT: MockERC20;
 
   let priceFeed: MockPriceFeed;
   let troveManager: MockTroveManager;
-
-  let stabilityPoolManager: StabilityPoolManager;
   let redemptionOperations: RedemptionOperations;
-  let liquidationOperations: LiquidationOperations;
   let contracts: Contracts;
 
   let redemptionFee: bigint;
 
   before(async () => {
     signers = await ethers.getSigners();
-    [owner, defaulter_1, defaulter_2, defaulter_3, whale, alice, bob, carol, dennis, erin, flyn] = signers;
+    [owner, defaulter_1, , , , alice, bob] = signers;
   });
+
+  // todo add tests with multiple trove iterations, how does the different hints influence each other? (because the calculation could change after the previous iteration...)
 
   beforeEach(async () => {
     contracts = await deployCore();
@@ -60,14 +47,10 @@ describe('RedemptionOperations', () => {
     priceFeed = contracts.priceFeed;
     troveManager = contracts.troveManager;
     redemptionOperations = contracts.redemptionOperations;
-    liquidationOperations = contracts.liquidationOperations;
     storagePool = contracts.storagePool;
-    stabilityPoolManager = contracts.stabilityPoolManager;
 
     STABLE = contracts.debtToken.STABLE;
-    STOCK = contracts.debtToken.STOCK;
     BTC = contracts.collToken.BTC;
-    USDT = contracts.collToken.USDT;
 
     redemptionFee = await redemptionOperations.getRedemptionRate();
   });
@@ -98,15 +81,14 @@ describe('RedemptionOperations', () => {
       const COLLATERAL_AMOUNT = '10000';
       const REDEMPTION_AMOUNT = '500';
 
-      const { collateral: a_totalCollateral, debtInUSD: a_totalDebtInUsd } = await openTrove({
+      await openTrove({
         from: alice,
         contracts,
         collToken: BTC,
         collAmount: parseUnits('1', 9),
         debts: [{ tokenAddress: STABLE, amount: parseUnits(COLLATERAL_AMOUNT) }],
       });
-
-      const { collateral: b_totalCollateral, debtInUSD: b_totalDebtInUsd } = await openTrove({
+      await openTrove({
         from: bob,
         contracts,
         collToken: BTC,
@@ -115,45 +97,31 @@ describe('RedemptionOperations', () => {
       });
 
       await STABLE.unprotectedMint(bob, parseUnits(COLLATERAL_AMOUNT));
-
       await STABLE.connect(bob).approve(await redemptionOperations.getAddress(), parseUnits(COLLATERAL_AMOUNT));
-
       const bobBalanceBefore = await BTC.balanceOf(bob);
-
       const baseRate = await troveManager.getBaseRate();
-
       const REDEMPTION_FEE = await troveManager.REDEMPTION_FEE_FLOOR();
-
       const DECIMAL_PRECISION = 1e18;
 
       /* EXPERIMENTAL */
-
       const redemptionAmountInUSD = await priceFeed.getUSDValue(STABLE, REDEMPTION_AMOUNT);
-
       // _redeemCollateralFromTrove
       const COLL_TOKEN_AMOUNT = await priceFeed.getAmountFromUSDValue(
         BTC,
         parseUnits(redemptionAmountInUSD.toString(), 'ether')
       );
-
       // _calcRedemptionFee
       const redemptionFee = (BigInt(REDEMPTION_FEE + baseRate) * BigInt(COLL_TOKEN_AMOUNT)) / BigInt(DECIMAL_PRECISION);
-
       // 2 * 1e18 / REDEMPTION_AMOUNT
-
       const userAcceptanceFee = (redemptionFee * BigInt(DECIMAL_PRECISION)) / BigInt(COLL_TOKEN_AMOUNT);
-
       /* EXPERIMENTAL */
 
       const tx = await redemptionOperations
         .connect(bob)
         .redeemCollateral(parseUnits(REDEMPTION_AMOUNT), REDEMPTION_FEE, [alice]);
       const mined = await tx.wait();
-
       const bobBalanceAfter = await BTC.balanceOf(bob);
-
       const balanceDifference = bobBalanceAfter - bobBalanceBefore;
-
       console.log(
         'USD Value of the difference: ',
         formatUnits(await priceFeed.getUSDValue(BTC, balanceDifference), 'ether')

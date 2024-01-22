@@ -145,7 +145,11 @@ const connectContracts = async (
         { ...overrides, nonce }
       ),
 
-    nonce => sortedTroves.setAddresses(troveManager.address, borrowerOperations.address, { ...overrides, nonce }),
+    nonce =>
+      sortedTroves.setAddresses(troveManager.address, borrowerOperations.address, redemptionOperations.address, {
+        ...overrides,
+        nonce,
+      }),
 
     nonce =>
       borrowerOperations.setAddresses(

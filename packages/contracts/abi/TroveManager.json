@@ -956,6 +956,93 @@
                 "type": "address"
             },
             {
+                "components": [
+                    {
+                        "internalType": "address",
+                        "name": "tokenAddress",
+                        "type": "address"
+                    },
+                    {
+                        "internalType": "uint256",
+                        "name": "amount",
+                        "type": "uint256"
+                    }
+                ],
+                "internalType": "struct IBase.TokenAmount[]",
+                "name": "addedColl",
+                "type": "tuple[]"
+            },
+            {
+                "components": [
+                    {
+                        "internalType": "address",
+                        "name": "tokenAddress",
+                        "type": "address"
+                    },
+                    {
+                        "internalType": "uint256",
+                        "name": "amount",
+                        "type": "uint256"
+                    }
+                ],
+                "internalType": "struct IBase.TokenAmount[]",
+                "name": "removedColl",
+                "type": "tuple[]"
+            },
+            {
+                "components": [
+                    {
+                        "internalType": "address",
+                        "name": "tokenAddress",
+                        "type": "address"
+                    },
+                    {
+                        "internalType": "uint256",
+                        "name": "amount",
+                        "type": "uint256"
+                    }
+                ],
+                "internalType": "struct IBase.TokenAmount[]",
+                "name": "addedDebt",
+                "type": "tuple[]"
+            },
+            {
+                "components": [
+                    {
+                        "internalType": "address",
+                        "name": "tokenAddress",
+                        "type": "address"
+                    },
+                    {
+                        "internalType": "uint256",
+                        "name": "amount",
+                        "type": "uint256"
+                    }
+                ],
+                "internalType": "struct IBase.TokenAmount[]",
+                "name": "removedDebt",
+                "type": "tuple[]"
+            }
+        ],
+        "name": "getICRIncludingPatch",
+        "outputs": [
+            {
+                "internalType": "uint256",
+                "name": "ICR",
+                "type": "uint256"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "address",
+                "name": "_borrower",
+                "type": "address"
+            },
+            {
                 "internalType": "address",
                 "name": "_tokenAddress",
                 "type": "address"

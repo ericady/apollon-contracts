@@ -57,6 +57,14 @@ interface ITroveManager is IBBase {
 
   function getCurrentICR(address _borrower) external view returns (uint ICR, uint currentDebtInUSD);
 
+  function getICRIncludingPatch(
+    address _borrower,
+    TokenAmount[] memory addedColl,
+    TokenAmount[] memory removedColl,
+    TokenAmount[] memory addedDebt,
+    TokenAmount[] memory removedDebt
+  ) external view returns (uint ICR);
+
   //
 
   function updateStakeAndTotalStakes(address[] memory collTokenAddresses, address _borrower) external;

@@ -160,6 +160,37 @@ contract TroveManager is LiquityBase, Ownable(msg.sender), CheckContract, ITrove
     return (ICR, currentDebtInUSD);
   }
 
+  function getICRIncludingPatch(
+    address _borrower,
+    TokenAmount[] memory addedColl,
+    TokenAmount[] memory removedColl,
+    TokenAmount[] memory addedDebt,
+    TokenAmount[] memory removedDebt
+  ) external view override returns (uint ICR) {
+    Trove storage _trove = Troves[_borrower];
+    if (_trove.status != Status.active) return 0;
+
+    (uint currentCollInUSD, uint currentDebtInUSD) = _getCurrentTrovesUSDValues(_borrower);
+
+    currentCollInUSD += _getCompositeUSD(addedColl);
+    uint removedCollInUSD = _getCompositeUSD(removedColl);
+    if (currentCollInUSD < removedCollInUSD) currentCollInUSD = 0;
+    else currentCollInUSD -= _getCompositeUSD(removedColl);
+
+    currentDebtInUSD += _getCompositeUSD(addedDebt);
+    uint removedDebtInUSD = _getCompositeUSD(removedDebt);
+    if (currentDebtInUSD < removedDebtInUSD) currentDebtInUSD = 0;
+    else currentDebtInUSD -= _getCompositeUSD(removedDebt);
+
+    return LiquityMath._computeCR(currentCollInUSD, currentDebtInUSD);
+  }
+
+  function _getCompositeUSD(TokenAmount[] memory _amounts) internal view returns (uint inUSD) {
+    for (uint i = 0; i < _amounts.length; i++)
+      inUSD += priceFeed.getUSDValue(_amounts[i].tokenAddress, _amounts[i].amount);
+    return inUSD;
+  }
+
   function _getCurrentTrovesUSDValues(
     address _borrower
   ) internal view returns (uint currentCollInUSD, uint currentDebtInUSD) {

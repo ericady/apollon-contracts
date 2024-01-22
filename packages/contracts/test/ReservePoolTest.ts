@@ -3,62 +3,32 @@ import { ethers } from 'hardhat';
 import { Contracts, connectCoreContracts, deployAndLinkToken, deployCore } from '../utils/deploymentHelpers';
 import {
   LiquidationOperations,
-  MockBorrowerOperations,
   MockDebtToken,
   MockERC20,
   MockPriceFeed,
-  MockTroveManager,
   ReservePool,
   StabilityPoolManager,
-  StoragePool,
-  TroveManager,
 } from '../typechain';
 import { expect } from 'chai';
-import {
-  TimeValues,
-  MAX_BORROWING_FEE,
-  checkRecoveryMode,
-  fastForwardTime,
-  getLatestBlockTimestamp,
-  getStabilityPool,
-  getTCR,
-  getTroveEntireColl,
-  getTroveEntireDebt,
-  openTrove,
-} from '../utils/testHelper';
+import { openTrove } from '../utils/testHelper';
 import { parseUnits } from 'ethers';
 
 describe('Reserve Pool', () => {
-  let owner: SignerWithAddress;
   let alice: SignerWithAddress;
   let bob: SignerWithAddress;
   let carol: SignerWithAddress;
-  let whale: SignerWithAddress;
-  let dennis: SignerWithAddress;
-  let erin: SignerWithAddress;
-  let flyn: SignerWithAddress;
-
-  let defaulter_1: SignerWithAddress;
-  let defaulter_2: SignerWithAddress;
-  let defaulter_3: SignerWithAddress;
 
   let STABLE: MockDebtToken;
-  let STOCK: MockDebtToken;
   let BTC: MockERC20;
-  let USDT: MockERC20;
 
   let contracts: Contracts;
   let priceFeed: MockPriceFeed;
-  let troveManager: MockTroveManager;
-  let borrowerOperations: MockBorrowerOperations;
   let liquidationOperations: LiquidationOperations;
-  let storagePool: StoragePool;
   let reservePool: ReservePool;
   let stabilityPoolManager: StabilityPoolManager;
 
   before(async () => {
-    [owner, defaulter_1, defaulter_2, defaulter_3, whale, alice, bob, carol, dennis, erin, flyn] =
-      await ethers.getSigners();
+    [, , , , , alice, bob, carol] = await ethers.getSigners();
   });
 
   beforeEach(async () => {
@@ -67,17 +37,12 @@ describe('Reserve Pool', () => {
     await deployAndLinkToken(contracts);
 
     priceFeed = contracts.priceFeed;
-    troveManager = contracts.troveManager;
-    borrowerOperations = contracts.borrowerOperations;
     liquidationOperations = contracts.liquidationOperations;
-    storagePool = contracts.storagePool;
     reservePool = contracts.reservePool;
     stabilityPoolManager = contracts.stabilityPoolManager;
 
     STABLE = contracts.debtToken.STABLE;
-    STOCK = contracts.debtToken.STOCK;
     BTC = contracts.collToken.BTC;
-    USDT = contracts.collToken.USDT;
   });
 
   describe('reserveCap()', () => {

@@ -98,7 +98,11 @@ export const connectCoreContracts = async (contracts: Contracts) => {
     contracts.sortedTroves
   );
 
-  await contracts.sortedTroves.setAddresses(contracts.troveManager, contracts.borrowerOperations);
+  await contracts.sortedTroves.setAddresses(
+    contracts.troveManager,
+    contracts.borrowerOperations,
+    contracts.redemptionOperations
+  );
 
   await contracts.borrowerOperations.setAddresses(
     contracts.troveManager,

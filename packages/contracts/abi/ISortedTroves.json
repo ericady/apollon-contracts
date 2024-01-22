@@ -80,6 +80,12 @@
                 "internalType": "address",
                 "name": "_borrowerOperationsAddress",
                 "type": "address"
+            },
+            {
+                "indexed": false,
+                "internalType": "address",
+                "name": "_redemptionOperationsAddress",
+                "type": "address"
             }
         ],
         "name": "SortedTrovesInitialised",

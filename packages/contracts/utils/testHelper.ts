@@ -6,6 +6,7 @@ import { ethers } from 'hardhat';
 import { expect } from 'chai';
 import { AddressLike, ContractTransactionResponse } from 'ethers';
 import { parseUnits } from 'ethers';
+import { AddressZero } from '@ethersproject/constants';
 
 export const MAX_BORROWING_FEE = parseUnits('0.05');
 
@@ -24,20 +25,40 @@ export const openTrove = async ({
 }) => {
   await collToken.unprotectedMint(from, collAmount);
   await collToken.connect(from).approve(contracts.borrowerOperations, collAmount);
-  const openTx = await contracts.borrowerOperations
-    .connect(from)
-    .openTrove([{ tokenAddress: collToken, amount: collAmount }]);
+
+  const addedColl = [{ tokenAddress: collToken, amount: collAmount }];
+  const afterCreationCR = await contracts.troveManager.getICRIncludingPatch(from, addedColl, [], [], []);
+  const [upperHint, lowerHint] = await contracts.sortedTroves.findInsertPosition(
+    afterCreationCR,
+    AddressZero,
+    AddressZero
+  );
+  const openTx = await contracts.borrowerOperations.connect(from).openTrove(addedColl, upperHint, lowerHint);
 
   if (debts) await increaseDebt(from, contracts, debts);
-
-  const collateral = await contracts.troveManager.getTroveColl(from);
-  const debtInUSD = await getTroveEntireDebt(contracts, from);
-
   return {
     openTx,
-    collateral,
-    debtInUSD,
+    collateral: await contracts.troveManager.getTroveColl(from),
+    debtInUSD: await getTroveEntireDebt(contracts, from),
   };
+};
+
+export const addColl = async (from: SignerWithAddress, contracts: Contracts, colls: any[], approve = false) => {
+  if (approve)
+    for (const { tokenAddress, amount } of colls) {
+      await tokenAddress.unprotectedMint(from, amount);
+      await tokenAddress.connect(from).approve(contracts.borrowerOperations, amount);
+    }
+
+  const afterPathCR = await contracts.troveManager.getICRIncludingPatch(from, colls, [], [], []);
+  const [upperHint, lowerHint] = await contracts.sortedTroves.findInsertPosition(afterPathCR, AddressZero, AddressZero);
+  return contracts.borrowerOperations.connect(from).addColl(colls, upperHint, lowerHint);
+};
+
+export const withdrawalColl = async (from: SignerWithAddress, contracts: Contracts, colls: any[]) => {
+  const afterPathCR = await contracts.troveManager.getICRIncludingPatch(from, [], colls, [], []);
+  const [upperHint, lowerHint] = await contracts.sortedTroves.findInsertPosition(afterPathCR, AddressZero, AddressZero);
+  return contracts.borrowerOperations.connect(from).withdrawColl(colls, upperHint, lowerHint);
 };
 
 export const increaseDebt = async (
@@ -46,7 +67,54 @@ export const increaseDebt = async (
   debts: any[],
   maxFeePercentage = MAX_BORROWING_FEE
 ) => {
-  return { tx: await contracts.borrowerOperations.connect(from).increaseDebts(debts, maxFeePercentage) };
+  const afterPathCR = await contracts.troveManager.getICRIncludingPatch(from, [], [], debts, []);
+  const [upperHint, lowerHint] = await contracts.sortedTroves.findInsertPosition(afterPathCR, AddressZero, AddressZero);
+  return {
+    tx: await contracts.borrowerOperations
+      .connect(from)
+      .increaseDebts(debts, { upperHint, lowerHint, maxFeePercentage }),
+  };
+};
+
+export const repayDebt = async (from: SignerWithAddress, contracts: Contracts, debts: any[]) => {
+  const afterPathCR = await contracts.troveManager.getICRIncludingPatch(from, [], [], [], debts);
+  const [upperHint, lowerHint] = await contracts.sortedTroves.findInsertPosition(afterPathCR, AddressZero, AddressZero);
+  return {
+    tx: await contracts.borrowerOperations.connect(from).repayDebt(debts, upperHint, lowerHint),
+  };
+};
+
+export const redeem = async (
+  from: SignerWithAddress,
+  toRedeem: bigint,
+  contracts: Contracts,
+  maxFeePercentage = MAX_BORROWING_FEE
+) => {
+  const iterations = [];
+  let lastIteration;
+  let stableRemaining: bigint = toRedeem;
+  while (stableRemaining > 0n) {
+    const trove = lastIteration
+      ? await contracts.sortedTroves.getPrev(lastIteration.trove)
+      : await contracts.sortedTroves.getLast();
+
+    const simulatedRedemption = await contracts.redemptionOperations.calculateTroveRedemption(
+      trove,
+      stableRemaining,
+      true
+    );
+    stableRemaining -= simulatedRedemption.stableCoinLot;
+    const [upperHint, lowerHint] = await contracts.sortedTroves.findInsertPosition(
+      simulatedRedemption.resultingCR,
+      AddressZero,
+      AddressZero
+    );
+
+    lastIteration = { trove, upperHint, lowerHint, expectedCR: simulatedRedemption.resultingCR };
+    iterations.push(lastIteration);
+  }
+
+  return contracts.redemptionOperations.connect(from).redeemCollateral(toRedeem, iterations, maxFeePercentage);
 };
 
 export const getStabilityPool = async (contracts: Contracts, debt: MockDebtToken) => {

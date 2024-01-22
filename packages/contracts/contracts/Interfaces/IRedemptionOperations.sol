@@ -24,6 +24,17 @@ interface IRedemptionOperations is IBBase {
     uint expectedCR;
   }
 
+  struct SingleRedemptionVariables {
+    TokenAmount stableCoinEntry;
+    //
+    uint stableCoinLot;
+    TokenAmount[] collLots;
+    //
+    uint troveCollInUSD;
+    uint troveDebtInUSD;
+    uint resultingCR;
+  }
+
   // --- Events ---
 
   event RedemptionOperationsInitialized(
@@ -56,9 +67,15 @@ interface IRedemptionOperations is IBBase {
 
   function redeemCollateral(
     uint _stableCoinAmount,
-    uint _maxFeePercentage,
-    RedeemIteration[] memory _iterations
+    RedeemIteration[] memory _iterations,
+    uint _maxFeePercentage
   ) external;
+
+  function calculateTroveRedemption(
+    address _borrower,
+    uint _redeemMaxAmount,
+    bool _includePendingRewards
+  ) external returns (SingleRedemptionVariables memory vars);
 
   function getRedemptionRate() external view returns (uint);
 

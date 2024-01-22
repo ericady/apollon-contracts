@@ -20,6 +20,7 @@ import {
   getTCR,
   openTrove,
   whaleShrimpTroveInit,
+  repayDebt,
 } from '../utils/testHelper';
 import { assert, expect } from 'chai';
 import { formatUnits, parseUnits } from 'ethers';
@@ -33,7 +34,6 @@ describe('LiquidationOperations', () => {
   let whale: SignerWithAddress;
   let dennis: SignerWithAddress;
   let erin: SignerWithAddress;
-  let flyn: SignerWithAddress;
 
   let defaulter_1: SignerWithAddress;
   let defaulter_2: SignerWithAddress;
@@ -42,9 +42,7 @@ describe('LiquidationOperations', () => {
   let storagePool: StoragePool;
 
   let STABLE: MockDebtToken;
-  let STOCK: MockDebtToken;
   let BTC: MockERC20;
-  let USDT: MockERC20;
 
   let priceFeed: MockPriceFeed;
   let troveManager: MockTroveManager;
@@ -55,11 +53,9 @@ describe('LiquidationOperations', () => {
   let borrowerOperations: BorrowerOperations;
   let contracts: Contracts;
 
-  let redemptionFee: bigint;
-
   before(async () => {
     signers = await ethers.getSigners();
-    [owner, defaulter_1, defaulter_2, defaulter_3, whale, alice, bob, carol, dennis, erin, flyn] = signers;
+    [owner, defaulter_1, defaulter_2, defaulter_3, whale, alice, bob, carol, dennis, erin] = signers;
   });
 
   beforeEach(async () => {
@@ -76,11 +72,7 @@ describe('LiquidationOperations', () => {
     borrowerOperations = contracts.borrowerOperations;
 
     STABLE = contracts.debtToken.STABLE;
-    STOCK = contracts.debtToken.STOCK;
     BTC = contracts.collToken.BTC;
-    USDT = contracts.collToken.USDT;
-
-    redemptionFee = await redemptionOperations.getRedemptionRate();
   });
 
   describe('in Normal Mode', () => {
@@ -1178,7 +1170,7 @@ describe('LiquidationOperations', () => {
       assert.equal(dennis_Status.toString(), TroveStatus.CLOSED_BY_LIQUIDATION_IN_RECOVERY_MODE.toString());
 
       // remaining troves bob repay a little debt, applying their pending rewards
-      await borrowerOperations.connect(bob).repayDebt([{ tokenAddress: STABLE, amount: parseUnits('1000') }]);
+      await repayDebt(bob, contracts, [{ tokenAddress: STABLE, amount: parseUnits('1000') }]);
 
       // Check alice is the only trove that has pending rewards
       const alicePendingBTCReward = await troveManager.getPendingReward(alice, BTC, true);

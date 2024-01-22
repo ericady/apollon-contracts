@@ -28,35 +28,30 @@ import {
   getTroveStake,
   getEmittedLiquidationValues,
   getStableFeeFromStableBorrowingEvent,
+  addColl,
+  withdrawalColl,
+  increaseDebt,
+  repayDebt,
 } from '../utils/testHelper';
 import { parseUnits } from 'ethers';
 import { time } from '@nomicfoundation/hardhat-network-helpers';
 
 describe('BorrowerOperations', () => {
-  let owner: SignerWithAddress;
   let alice: SignerWithAddress;
   let bob: SignerWithAddress;
   let carol: SignerWithAddress;
   let whale: SignerWithAddress;
   let dennis: SignerWithAddress;
   let erin: SignerWithAddress;
-  let flyn: SignerWithAddress;
-
-  let defaulter_1: SignerWithAddress;
-  let defaulter_2: SignerWithAddress;
-  let defaulter_3: SignerWithAddress;
 
   let STABLE: MockDebtToken;
-  let STOCK: MockDebtToken;
   let BTC: MockERC20;
-  let USDT: MockERC20;
 
   let contracts: Contracts;
   let priceFeed: MockPriceFeed;
   let troveManager: MockTroveManager;
   let borrowerOperations: MockBorrowerOperations;
   let storagePool: StoragePool;
-  let stabilityPoolManager: StabilityPoolManager;
   let liquidationOperations: LiquidationOperations;
 
   const open = async (user: SignerWithAddress, collAmount: bigint, debtAmount: bigint) => {
@@ -70,8 +65,7 @@ describe('BorrowerOperations', () => {
   };
 
   before(async () => {
-    [owner, defaulter_1, defaulter_2, defaulter_3, whale, alice, bob, carol, dennis, erin, flyn] =
-      await ethers.getSigners();
+    [, , , , whale, alice, bob, carol, dennis, erin] = await ethers.getSigners();
   });
 
   beforeEach(async () => {
@@ -83,13 +77,10 @@ describe('BorrowerOperations', () => {
     troveManager = contracts.troveManager;
     borrowerOperations = contracts.borrowerOperations;
     storagePool = contracts.storagePool;
-    stabilityPoolManager = contracts.stabilityPoolManager;
     liquidationOperations = contracts.liquidationOperations;
 
     STABLE = contracts.debtToken.STABLE;
-    STOCK = contracts.debtToken.STOCK;
     BTC = contracts.collToken.BTC;
-    USDT = contracts.collToken.USDT;
   });
 
   // --- addColl() ---
@@ -108,6 +99,7 @@ describe('BorrowerOperations', () => {
 
       const poolStats = await storagePool.checkRecoveryMode();
       expect(poolStats.isInRecoveryMode).to.be.false;
+
       // At the moment alice's debt status,
       // Collateral:  0.05 BTC  ($50)
       // Debt:        1 STOCK ($350 = 150 + 200 gas lock)
@@ -115,17 +107,11 @@ describe('BorrowerOperations', () => {
       const aliceICR = await troveManager.getCurrentICR(alice);
       expect(aliceICR.ICR).lt(parseUnits('1.1')); // Less than 110%
 
-      const collTopUp = 1; // 1 wei top up
-      await BTC.unprotectedMint(alice, collTopUp);
-      await BTC.connect(alice).approve(borrowerOperations, collTopUp);
-      await expect(
-        borrowerOperations.connect(alice).addColl([
-          {
-            tokenAddress: BTC,
-            amount: collTopUp,
-          },
-        ])
-      ).to.be.revertedWithCustomError(borrowerOperations, 'ICR_lt_MCR');
+      // 1 wei top up
+      await expect(addColl(alice, contracts, [{ tokenAddress: BTC, amount: 1 }], true)).to.be.revertedWithCustomError(
+        borrowerOperations,
+        'ICR_lt_MCR'
+      );
     });
     it('Increases the activePool ETH and raw ether balance by correct amount', async () => {
       const aliceColl = parseUnits('0.05', 9);
@@ -139,14 +125,7 @@ describe('BorrowerOperations', () => {
 
       // Add 1 BTC
       const collTopUp = parseUnits('1', 9);
-      await BTC.unprotectedMint(alice, collTopUp);
-      await BTC.connect(alice).approve(borrowerOperations, collTopUp);
-      await borrowerOperations.connect(alice).addColl([
-        {
-          tokenAddress: BTC,
-          amount: collTopUp,
-        },
-      ]);
+      await addColl(alice, contracts, [{ tokenAddress: BTC, amount: collTopUp }], true);
 
       const pool_BTC_After = await storagePool.getValue(BTC, true, 0);
       const pool_RawBTC_After = await BTC.balanceOf(storagePool);
@@ -168,14 +147,7 @@ describe('BorrowerOperations', () => {
 
       // Alice adds second collateral
       const collTopUp = parseUnits('1', 9);
-      await BTC.unprotectedMint(alice, collTopUp);
-      await BTC.connect(alice).approve(borrowerOperations, collTopUp);
-      await borrowerOperations.connect(alice).addColl([
-        {
-          tokenAddress: BTC,
-          amount: collTopUp,
-        },
-      ]);
+      await addColl(alice, contracts, [{ tokenAddress: BTC, amount: collTopUp }], true);
 
       const alice_Trove_After = await troveManager.Troves(alice);
       const alice_DebtAndColl_After = await troveManager.getTroveColl(alice);
@@ -200,14 +172,7 @@ describe('BorrowerOperations', () => {
 
       // Alice tops up Trove collateral with 2 ether
       const collTopUp = parseUnits('1', 9);
-      await BTC.unprotectedMint(alice, collTopUp);
-      await BTC.connect(alice).approve(borrowerOperations, collTopUp);
-      await borrowerOperations.connect(alice).addColl([
-        {
-          tokenAddress: BTC,
-          amount: collTopUp,
-        },
-      ]);
+      await addColl(alice, contracts, [{ tokenAddress: BTC, amount: collTopUp }], true);
 
       // Check stake and total stakes get updated
       const alice_Stake_After = await troveManager.getTroveStakeValue(alice);
@@ -270,23 +235,9 @@ describe('BorrowerOperations', () => {
 
       // Alice and Bob top up their Troves
       const aliceTopup = parseUnits('5', 9);
-      await BTC.unprotectedMint(alice, aliceTopup);
-      await BTC.connect(alice).approve(borrowerOperations, aliceTopup);
-      await borrowerOperations.connect(alice).addColl([
-        {
-          tokenAddress: BTC,
-          amount: aliceTopup,
-        },
-      ]);
+      await addColl(alice, contracts, [{ tokenAddress: BTC, amount: aliceTopup }], true);
       const bobTopup = parseUnits('1', 9);
-      await BTC.unprotectedMint(bob, bobTopup);
-      await BTC.connect(bob).approve(borrowerOperations, bobTopup);
-      await borrowerOperations.connect(bob).addColl([
-        {
-          tokenAddress: BTC,
-          amount: bobTopup,
-        },
-      ]);
+      await addColl(bob, contracts, [{ tokenAddress: BTC, amount: bobTopup }], true);
 
       const alicePendingRewardBTCAfter = await troveManager.getPendingReward(alice, BTC, true);
       const alicePendingRewardStableAfter = await troveManager.getPendingReward(alice, STABLE, false);
@@ -333,12 +284,7 @@ describe('BorrowerOperations', () => {
 
       // Carol attempts to add collateral to her non-existent trove
       await expect(
-        borrowerOperations.connect(carol).addColl([
-          {
-            tokenAddress: BTC,
-            amount: parseUnits('1', 9),
-          },
-        ])
+        addColl(carol, contracts, [{ tokenAddress: BTC, amount: parseUnits('1', 9) }], true)
       ).to.be.revertedWithCustomError(borrowerOperations, 'TroveClosedOrNotExist');
 
       // Price drops
@@ -349,12 +295,7 @@ describe('BorrowerOperations', () => {
 
       // Bob attempts to add collateral to his closed trove
       await expect(
-        borrowerOperations.connect(bob).addColl([
-          {
-            tokenAddress: BTC,
-            amount: parseUnits('1', 9),
-          },
-        ])
+        addColl(bob, contracts, [{ tokenAddress: BTC, amount: parseUnits('1', 9) }], true)
       ).to.be.revertedWithCustomError(borrowerOperations, 'TroveClosedOrNotExist');
     });
     it('can add collateral in Recovery Mode', async () => {
@@ -370,14 +311,7 @@ describe('BorrowerOperations', () => {
       expect(await checkRecoveryMode(contracts)).to.be.true;
 
       const collTopUp = parseUnits('1', 9);
-      await BTC.unprotectedMint(alice, collTopUp);
-      await BTC.connect(alice).approve(borrowerOperations, collTopUp);
-      await borrowerOperations.connect(alice).addColl([
-        {
-          tokenAddress: BTC,
-          amount: collTopUp,
-        },
-      ]);
+      await addColl(alice, contracts, [{ tokenAddress: BTC, amount: collTopUp }], true);
 
       // Check Alice's collateral
       const aliceCollAfter = await troveManager.getTroveColl(alice);
@@ -403,11 +337,10 @@ describe('BorrowerOperations', () => {
       expect((await storagePool.checkRecoveryMode()).isInRecoveryMode).to.be.false;
       expect((await troveManager.getCurrentICR(alice)).ICR).to.be.lt(parseUnits('1.1')); // less than 110%
 
-      const collWithdrawal = 1; // 1 wei withdrawal
-
-      await expect(
-        borrowerOperations.connect(alice).withdrawColl([{ tokenAddress: BTC, amount: collWithdrawal }])
-      ).to.be.revertedWithCustomError(borrowerOperations, 'ICR_lt_MCR');
+      await expect(addColl(alice, contracts, [{ tokenAddress: BTC, amount: 1 }], true)).to.be.revertedWithCustomError(
+        borrowerOperations,
+        'ICR_lt_MCR'
+      );
     });
     it('reverts when calling address does not have active trove', async () => {
       const aliceColl = parseUnits('1.5', 9);
@@ -418,11 +351,11 @@ describe('BorrowerOperations', () => {
       await open(bob, bobColl, bobDebt);
 
       // Bob successfully withdraws some coll
-      await borrowerOperations.connect(bob).withdrawColl([{ tokenAddress: BTC, amount: parseUnits('0.1', 9) }]);
+      await withdrawalColl(bob, contracts, [{ tokenAddress: BTC, amount: parseUnits('0.1', 9) }]);
 
       // Carol with no active trove attempts to withdraw
       await expect(
-        borrowerOperations.connect(carol).withdrawColl([{ tokenAddress: BTC, amount: parseUnits('0.1', 9) }])
+        withdrawalColl(carol, contracts, [{ tokenAddress: BTC, amount: parseUnits('0.1', 9) }])
       ).to.be.revertedWithCustomError(borrowerOperations, 'TroveClosedOrNotExist');
     });
     it('reverts when system is in Recovery Mode', async () => {
@@ -436,7 +369,7 @@ describe('BorrowerOperations', () => {
       expect(await checkRecoveryMode(contracts)).to.be.false;
 
       // Withdrawal possible when recoveryMode == false
-      await borrowerOperations.connect(alice).withdrawColl([{ tokenAddress: BTC, amount: 1000 }]);
+      await withdrawalColl(alice, contracts, [{ tokenAddress: BTC, amount: 1000 }]);
 
       await priceFeed.setTokenPrice(BTC, parseUnits('1000'));
 
@@ -444,7 +377,7 @@ describe('BorrowerOperations', () => {
 
       //Check withdrawal impossible when recoveryMode == true
       await expect(
-        borrowerOperations.connect(alice).withdrawColl([{ tokenAddress: BTC, amount: 1000 }])
+        withdrawalColl(alice, contracts, [{ tokenAddress: BTC, amount: 1000 }])
       ).to.be.revertedWithCustomError(borrowerOperations, 'CollWithdrawPermittedInRM');
     });
     it("reverts when requested ETH withdrawal is > the trove's collateral", async () => {
@@ -460,12 +393,12 @@ describe('BorrowerOperations', () => {
 
       // Carol withdraws exactly all her collateral
       await expect(
-        borrowerOperations.connect(carol).withdrawColl([{ tokenAddress: BTC, amount: carolColl }])
+        withdrawalColl(carol, contracts, [{ tokenAddress: BTC, amount: carolColl }])
       ).to.be.revertedWithCustomError(borrowerOperations, 'ICR_lt_MCR');
 
       // Bob attempts to withdraw 1 wei more than his collateral
       await expect(
-        borrowerOperations.connect(bob).withdrawColl([{ tokenAddress: BTC, amount: bobColl + 1n }])
+        withdrawalColl(bob, contracts, [{ tokenAddress: BTC, amount: bobColl + 1n }])
       ).to.be.revertedWithCustomError(borrowerOperations, 'WithdrawAmount_gt_Coll');
     });
     it("reverts when withdrawal would bring the user's ICR < MCR", async () => {
@@ -476,7 +409,7 @@ describe('BorrowerOperations', () => {
 
       // Bob attempts to withdraws 1 wei, Which would leave him with < 110% ICR.
       await expect(
-        borrowerOperations.connect(bob).withdrawColl([{ tokenAddress: BTC, amount: parseUnits('0.1', 9) }])
+        withdrawalColl(bob, contracts, [{ tokenAddress: BTC, amount: parseUnits('0.1', 9) }])
       ).to.be.revertedWithCustomError(borrowerOperations, 'ICR_lt_MCR');
     });
     it('reverts if system is in Recovery Mode', async () => {
@@ -499,9 +432,10 @@ describe('BorrowerOperations', () => {
       await priceFeed.setTokenPrice(BTC, parseUnits('1000'));
 
       //Alice tries to withdraw collateral during Recovery Mode
-      await expect(
-        borrowerOperations.connect(alice).withdrawColl([{ tokenAddress: BTC, amount: 1 }])
-      ).to.be.revertedWithCustomError(borrowerOperations, 'CollWithdrawPermittedInRM');
+      await expect(withdrawalColl(alice, contracts, [{ tokenAddress: BTC, amount: 1 }])).to.be.revertedWithCustomError(
+        borrowerOperations,
+        'CollWithdrawPermittedInRM'
+      );
     });
     it('doesn’t allow a user to completely withdraw all collateral from their Trove (due to gas compensation)', async () => {
       const aliceColl = parseUnits('1.5', 9);
@@ -517,7 +451,7 @@ describe('BorrowerOperations', () => {
 
       // Alice attempts to withdraw all collateral
       await expect(
-        borrowerOperations.connect(alice).withdrawColl([{ tokenAddress: BTC, amount: aliceColl }])
+        withdrawalColl(alice, contracts, [{ tokenAddress: BTC, amount: aliceColl }])
       ).to.be.revertedWithCustomError(borrowerOperations, 'ICR_lt_MCR');
     });
     it('leaves the Trove active when the user withdraws less than all the collateral', async () => {
@@ -531,7 +465,7 @@ describe('BorrowerOperations', () => {
       expect(alice_Trove_Before.status).to.be.equal(1);
 
       // Withdraw some collateral
-      await borrowerOperations.connect(alice).withdrawColl([{ tokenAddress: BTC, amount: parseUnits('0.1', 9) }]);
+      await withdrawalColl(alice, contracts, [{ tokenAddress: BTC, amount: parseUnits('0.1', 9) }]);
 
       // Check Trove is still active
       const alice_Trove_After = await troveManager.Troves(alice);
@@ -544,7 +478,7 @@ describe('BorrowerOperations', () => {
 
       // Alice withdraws 1 ether
       const withdrawColl = parseUnits('0.1', 9);
-      await borrowerOperations.connect(alice).withdrawColl([{ tokenAddress: BTC, amount: withdrawColl }]);
+      await withdrawalColl(alice, contracts, [{ tokenAddress: BTC, amount: withdrawColl }]);
 
       // Check 1 ether remaining
       const troveAfter = await troveManager.getTroveColl(alice);
@@ -562,7 +496,7 @@ describe('BorrowerOperations', () => {
       const activePool_RawBTC_before = await BTC.balanceOf(storagePool);
 
       const withdrawColl = parseUnits('0.1', 9);
-      await borrowerOperations.connect(alice).withdrawColl([{ tokenAddress: BTC, amount: withdrawColl }]);
+      await withdrawalColl(alice, contracts, [{ tokenAddress: BTC, amount: withdrawColl }]);
 
       // check after
       const activePool_BTC_After = await storagePool.getValue(BTC, true, 0);
@@ -584,7 +518,7 @@ describe('BorrowerOperations', () => {
 
       // Alice withdraws 1 ether
       const withdrawColl = parseUnits('0.1', 9);
-      await borrowerOperations.connect(alice).withdrawColl([{ tokenAddress: BTC, amount: withdrawColl }]);
+      await withdrawalColl(alice, contracts, [{ tokenAddress: BTC, amount: withdrawColl }]);
 
       // Check stake and total stakes get updated
       const alice_Stake_After = await troveManager.getTroveStakes(alice, BTC);
@@ -600,7 +534,7 @@ describe('BorrowerOperations', () => {
 
       const alice_BTC_Bal_Before = await BTC.balanceOf(alice);
       const withdrawColl = parseUnits('0.1', 9);
-      await borrowerOperations.connect(alice).withdrawColl([{ tokenAddress: BTC, amount: withdrawColl }]);
+      await withdrawalColl(alice, contracts, [{ tokenAddress: BTC, amount: withdrawColl }]);
 
       const alice_BTC_Bal_After = await BTC.balanceOf(alice);
       expect(alice_BTC_Bal_After).to.be.equal(alice_BTC_Bal_Before + withdrawColl);
@@ -659,8 +593,8 @@ describe('BorrowerOperations', () => {
       const aliceCollWithdrawal = parseUnits('0.2', 9);
       const bobCollWithdrawal = parseUnits('0.1', 9);
 
-      await borrowerOperations.connect(alice).withdrawColl([{ tokenAddress: BTC, amount: aliceCollWithdrawal }]);
-      await borrowerOperations.connect(bob).withdrawColl([{ tokenAddress: BTC, amount: bobCollWithdrawal }]);
+      await withdrawalColl(alice, contracts, [{ tokenAddress: BTC, amount: aliceCollWithdrawal }]);
+      await withdrawalColl(bob, contracts, [{ tokenAddress: BTC, amount: bobCollWithdrawal }]);
 
       // Check that both alice and Bob have had pending rewards applied in addition to their top-ups.
       const aliceCollAfter = (await troveManager.getTroveColl(alice))[0].amount;
@@ -709,7 +643,7 @@ describe('BorrowerOperations', () => {
       const stableMint = 1; // withdraw 1 wei LUSD
 
       await expect(
-        borrowerOperations.connect(bob).increaseDebts([{ tokenAddress: STABLE, amount: stableMint }], MAX_BORROWING_FEE)
+        increaseDebt(bob, contracts, [{ tokenAddress: STABLE, amount: stableMint }])
       ).to.be.revertedWithCustomError(borrowerOperations, 'ICR_lt_MCR');
     });
     it('decays a non-zero base rate', async () => {
@@ -730,9 +664,7 @@ describe('BorrowerOperations', () => {
       await fastForwardTime(60 * 60 * 2);
 
       // D withdraws LUSD
-      await borrowerOperations
-        .connect(dennis)
-        .increaseDebts([{ tokenAddress: STABLE, amount: parseUnits('1') }], MAX_BORROWING_FEE);
+      await increaseDebt(dennis, contracts, [{ tokenAddress: STABLE, amount: parseUnits('1') }]);
 
       // Check baseRate has decreased
       const baseRate_2 = await troveManager.baseRate();
@@ -742,9 +674,7 @@ describe('BorrowerOperations', () => {
       await fastForwardTime(60 * 60);
 
       // E withdraws LUSD
-      await borrowerOperations
-        .connect(carol)
-        .increaseDebts([{ tokenAddress: STABLE, amount: parseUnits('1') }], MAX_BORROWING_FEE);
+      await increaseDebt(carol, contracts, [{ tokenAddress: STABLE, amount: parseUnits('1') }]);
 
       const baseRate_3 = await troveManager.baseRate();
       expect(baseRate_3).to.be.lt(baseRate_2);
@@ -753,29 +683,23 @@ describe('BorrowerOperations', () => {
       await open(alice, parseUnits('1', 9), parseUnits('10000'));
 
       await expect(
-        borrowerOperations
-          .connect(alice)
-          .increaseDebts([{ tokenAddress: STABLE, amount: parseUnits('1') }], parseUnits('2'))
+        increaseDebt(alice, contracts, [{ tokenAddress: STABLE, amount: parseUnits('1') }], parseUnits('2'))
       ).to.be.revertedWithCustomError(borrowerOperations, 'MaxFee_out_Range');
       await expect(
-        borrowerOperations
-          .connect(alice)
-          .increaseDebts([{ tokenAddress: STABLE, amount: parseUnits('1') }], parseUnits('1') + 1n)
+        increaseDebt(alice, contracts, [{ tokenAddress: STABLE, amount: parseUnits('1') }], parseUnits('1') + 1n)
       ).to.be.revertedWithCustomError(borrowerOperations, 'MaxFee_out_Range');
     });
     it('reverts if max fee < 0.5% in Normal mode', async () => {
       await open(alice, parseUnits('1', 9), parseUnits('10000'));
 
       await expect(
-        borrowerOperations.connect(alice).increaseDebts([{ tokenAddress: STABLE, amount: parseUnits('1') }], 0)
+        increaseDebt(alice, contracts, [{ tokenAddress: STABLE, amount: parseUnits('1') }], 0n)
       ).to.be.revertedWithCustomError(borrowerOperations, 'MaxFee_out_Range');
       await expect(
-        borrowerOperations.connect(alice).increaseDebts([{ tokenAddress: STABLE, amount: parseUnits('1') }], 1)
+        increaseDebt(alice, contracts, [{ tokenAddress: STABLE, amount: parseUnits('1') }], 1n)
       ).to.be.revertedWithCustomError(borrowerOperations, 'MaxFee_out_Range');
       await expect(
-        borrowerOperations
-          .connect(alice)
-          .increaseDebts([{ tokenAddress: STABLE, amount: parseUnits('1') }], parseUnits('0.005') - 1n)
+        increaseDebt(alice, contracts, [{ tokenAddress: STABLE, amount: parseUnits('1') }], parseUnits('0.005') - 1n)
       ).to.be.revertedWithCustomError(borrowerOperations, 'MaxFee_out_Range');
     });
     it('succeeds when fee is less than max fee percentage', async () => {
@@ -790,18 +714,14 @@ describe('BorrowerOperations', () => {
 
       // Attempt with maxFee > 5%
       await expect(
-        borrowerOperations
-          .connect(alice)
-          .increaseDebts([{ tokenAddress: STABLE, amount: parseUnits('1') }], MAX_BORROWING_FEE + 1n)
+        increaseDebt(alice, contracts, [{ tokenAddress: STABLE, amount: parseUnits('1') }], MAX_BORROWING_FEE + 1n)
       ).to.be.revertedWithCustomError(borrowerOperations, 'MaxFee_out_Range');
 
       baseRate = await troveManager.baseRate(); // expect 5% base rate
       expect(baseRate).to.be.equal(parseUnits('0.05'));
 
       // Attempt with maxFee = 5%
-      await borrowerOperations
-        .connect(alice)
-        .increaseDebts([{ tokenAddress: STABLE, amount: parseUnits('1') }], parseUnits('0.05'));
+      await increaseDebt(alice, contracts, [{ tokenAddress: STABLE, amount: parseUnits('1') }], parseUnits('0.05'));
 
       baseRate = await troveManager.baseRate(); // expect 5% base rate
       expect(baseRate).to.be.equal(parseUnits('0.05'));
@@ -819,9 +739,7 @@ describe('BorrowerOperations', () => {
       await fastForwardTime(7200);
 
       // D withdraws LUSD
-      await borrowerOperations
-        .connect(alice)
-        .increaseDebts([{ tokenAddress: STABLE, amount: parseUnits('37') }], MAX_BORROWING_FEE);
+      await increaseDebt(alice, contracts, [{ tokenAddress: STABLE, amount: parseUnits('37') }]);
 
       // Check baseRate is still 0
       const baseRate_2 = await troveManager.baseRate();
@@ -831,9 +749,7 @@ describe('BorrowerOperations', () => {
       await fastForwardTime(3600);
 
       // E opens trove
-      await borrowerOperations
-        .connect(bob)
-        .increaseDebts([{ tokenAddress: STABLE, amount: parseUnits('12') }], MAX_BORROWING_FEE);
+      await increaseDebt(bob, contracts, [{ tokenAddress: STABLE, amount: parseUnits('12') }]);
 
       const baseRate_3 = await troveManager.baseRate();
       expect(baseRate_3).to.be.equal(0n);
@@ -857,9 +773,7 @@ describe('BorrowerOperations', () => {
       await fastForwardTime(10);
 
       // Borrower C triggers a fee
-      await borrowerOperations
-        .connect(bob)
-        .increaseDebts([{ tokenAddress: STABLE, amount: parseUnits('1') }], MAX_BORROWING_FEE);
+      await increaseDebt(bob, contracts, [{ tokenAddress: STABLE, amount: parseUnits('1') }]);
 
       const lastFeeOpTime_2 = await troveManager.lastFeeOperationTime();
 
@@ -875,9 +789,7 @@ describe('BorrowerOperations', () => {
       expect(BigInt(timeNow) - lastFeeOpTime_1).to.be.gte(60n);
 
       // Borrower C triggers a fee
-      await borrowerOperations
-        .connect(bob)
-        .increaseDebts([{ tokenAddress: STABLE, amount: parseUnits('1') }], MAX_BORROWING_FEE);
+      await increaseDebt(bob, contracts, [{ tokenAddress: STABLE, amount: parseUnits('1') }]);
 
       const lastFeeOpTime_3 = await troveManager.lastFeeOperationTime();
 
@@ -902,17 +814,13 @@ describe('BorrowerOperations', () => {
       await fastForwardTime(30);
 
       // Borrower C triggers a fee, before decay interval has passed
-      await borrowerOperations
-        .connect(bob)
-        .increaseDebts([{ tokenAddress: STABLE, amount: parseUnits('1') }], MAX_BORROWING_FEE);
+      await increaseDebt(bob, contracts, [{ tokenAddress: STABLE, amount: parseUnits('1') }]);
 
       // 30 seconds pass
       await fastForwardTime(30);
 
       // Borrower C triggers another fee
-      await borrowerOperations
-        .connect(bob)
-        .increaseDebts([{ tokenAddress: STABLE, amount: parseUnits('1') }], MAX_BORROWING_FEE);
+      await increaseDebt(bob, contracts, [{ tokenAddress: STABLE, amount: parseUnits('1') }]);
 
       // Check base rate has decreased even though Borrower tried to stop it decaying
       const baseRate_2 = await troveManager.baseRate();
@@ -1247,15 +1155,11 @@ describe('BorrowerOperations', () => {
       await open(bob, parseUnits('2', 9), parseUnits('20000'));
 
       // Bob successfully withdraws LUSD
-      await borrowerOperations
-        .connect(bob)
-        .increaseDebts([{ tokenAddress: STABLE, amount: parseUnits('100') }], MAX_BORROWING_FEE);
+      await increaseDebt(bob, contracts, [{ tokenAddress: STABLE, amount: parseUnits('100') }]);
 
       // Carol with no active trove attempts to withdraw LUSD
       await expect(
-        borrowerOperations
-          .connect(carol)
-          .increaseDebts([{ tokenAddress: STABLE, amount: parseUnits('100') }], MAX_BORROWING_FEE)
+        increaseDebt(carol, contracts, [{ tokenAddress: STABLE, amount: parseUnits('100') }])
       ).to.be.revertedWithCustomError(borrowerOperations, 'TroveClosedOrNotExist');
     });
     it('reverts when requested withdrawal amount is zero LUSD', async () => {
@@ -1263,14 +1167,13 @@ describe('BorrowerOperations', () => {
       await open(bob, parseUnits('2', 9), parseUnits('20000'));
 
       // Bob successfully withdraws 1e-18 LUSD
-      await borrowerOperations
-        .connect(bob)
-        .increaseDebts([{ tokenAddress: STABLE, amount: parseUnits('100') }], MAX_BORROWING_FEE);
+      await increaseDebt(bob, contracts, [{ tokenAddress: STABLE, amount: parseUnits('100') }]);
 
       // Alice attempts to withdraw 0 LUSD
-      await expect(
-        borrowerOperations.connect(alice).increaseDebts([{ tokenAddress: STABLE, amount: 0 }], MAX_BORROWING_FEE)
-      ).to.be.revertedWithCustomError(borrowerOperations, 'ZeroDebtChange');
+      await expect(increaseDebt(alice, contracts, [{ tokenAddress: STABLE, amount: 0 }])).to.be.revertedWithCustomError(
+        borrowerOperations,
+        'ZeroDebtChange'
+      );
     });
     it('reverts when system is in Recovery Mode', async () => {
       await open(alice, parseUnits('1', 9), parseUnits('10000'));
@@ -1279,18 +1182,17 @@ describe('BorrowerOperations', () => {
       expect(await checkRecoveryMode(contracts)).to.be.false;
 
       // Withdrawal possible when recoveryMode == false
-      await borrowerOperations
-        .connect(alice)
-        .increaseDebts([{ tokenAddress: STABLE, amount: parseUnits('100') }], MAX_BORROWING_FEE);
+      await increaseDebt(alice, contracts, [{ tokenAddress: STABLE, amount: parseUnits('100') }]);
 
       await priceFeed.setTokenPrice(BTC, parseUnits('100'));
 
       expect(await checkRecoveryMode(contracts)).to.be.true;
 
       //Check LUSD withdrawal impossible when recoveryMode == true
-      await expect(
-        borrowerOperations.connect(alice).increaseDebts([{ tokenAddress: STABLE, amount: 1 }], MAX_BORROWING_FEE)
-      ).to.be.revertedWithCustomError(borrowerOperations, 'ICR_lt_CCR');
+      await expect(increaseDebt(alice, contracts, [{ tokenAddress: STABLE, amount: 1 }])).to.be.revertedWithCustomError(
+        borrowerOperations,
+        'ICR_lt_CCR'
+      );
     });
     it("reverts when withdrawal would bring the trove's ICR < MCR", async () => {
       await open(alice, parseUnits('1', 9), parseUnits('10000'));
@@ -1298,9 +1200,7 @@ describe('BorrowerOperations', () => {
 
       // Bob tries to withdraw LUSD that would bring his ICR < MCR
       await expect(
-        borrowerOperations
-          .connect(bob)
-          .increaseDebts([{ tokenAddress: STABLE, amount: parseUnits('20000') }], MAX_BORROWING_FEE)
+        increaseDebt(bob, contracts, [{ tokenAddress: STABLE, amount: parseUnits('20000') }])
       ).to.be.revertedWithCustomError(borrowerOperations, 'ICR_lt_MCR');
     });
     it('reverts when a withdrawal would cause the TCR of the system to fall below the CCR', async () => {
@@ -1314,9 +1214,7 @@ describe('BorrowerOperations', () => {
 
       // Bob attempts to withdraw 1 LUSD and system TCR would be lower than CCR of 150%.
       await expect(
-        borrowerOperations
-          .connect(bob)
-          .increaseDebts([{ tokenAddress: STABLE, amount: parseUnits('100') }], MAX_BORROWING_FEE)
+        increaseDebt(bob, contracts, [{ tokenAddress: STABLE, amount: parseUnits('100') }])
       ).to.be.revertedWithCustomError(borrowerOperations, 'TCR_lt_CCR');
     });
     it('reverts if system is in Recovery Mode', async () => {
@@ -1332,9 +1230,7 @@ describe('BorrowerOperations', () => {
       expect(await checkRecoveryMode(contracts)).to.be.true;
 
       await expect(
-        borrowerOperations
-          .connect(alice)
-          .increaseDebts([{ tokenAddress: STABLE, amount: parseUnits('200') }], MAX_BORROWING_FEE)
+        increaseDebt(alice, contracts, [{ tokenAddress: STABLE, amount: parseUnits('200') }])
       ).to.be.revertedWithCustomError(borrowerOperations, 'ICR_lt_CCR');
     });
     it("increases the Trove's LUSD debt by the correct amount", async () => {
@@ -1344,9 +1240,7 @@ describe('BorrowerOperations', () => {
       const aliceDebtBefore = await getTroveEntireDebt(contracts, alice);
       expect(aliceDebtBefore).to.be.gt(0n);
 
-      await borrowerOperations
-        .connect(alice)
-        .increaseDebts([{ tokenAddress: STABLE, amount: parseUnits('100') }], MAX_BORROWING_FEE);
+      await increaseDebt(alice, contracts, [{ tokenAddress: STABLE, amount: parseUnits('100') }]);
 
       // check after
       const aliceDebtAfter = await getTroveEntireDebt(contracts, alice);
@@ -1363,9 +1257,7 @@ describe('BorrowerOperations', () => {
       const storagePool_Debt_Before = await storagePool.getEntireSystemDebt();
       expect(storagePool_Debt_Before).to.be.eq(aliceDebtBefore);
 
-      await borrowerOperations
-        .connect(alice)
-        .increaseDebts([{ tokenAddress: STABLE, amount: parseUnits('100') }], MAX_BORROWING_FEE);
+      await increaseDebt(alice, contracts, [{ tokenAddress: STABLE, amount: parseUnits('100') }]);
 
       // check after
       const storagePool_Debt_After = await storagePool.getEntireSystemDebt();
@@ -1380,9 +1272,7 @@ describe('BorrowerOperations', () => {
       const alice_StableBalance_Before = await STABLE.balanceOf(alice);
       expect(alice_StableBalance_Before).to.be.equal(parseUnits('10000'));
 
-      await borrowerOperations
-        .connect(alice)
-        .increaseDebts([{ tokenAddress: STABLE, amount: parseUnits('100') }], MAX_BORROWING_FEE);
+      await increaseDebt(alice, contracts, [{ tokenAddress: STABLE, amount: parseUnits('100') }]);
 
       // check after
       const alice_StableBalance_After = await STABLE.balanceOf(alice);
@@ -1404,17 +1294,18 @@ describe('BorrowerOperations', () => {
       const { ICR } = await troveManager.getCurrentICR(alice);
       expect(ICR).to.be.lt(parseUnits('1.1')); // 110%
 
-      await expect(
-        borrowerOperations.connect(alice).repayDebt([{ tokenAddress: STABLE, amount: 1 }])
-      ).to.be.revertedWithCustomError(borrowerOperations, 'ICR_lt_MCR');
+      await expect(increaseDebt(alice, contracts, [{ tokenAddress: STABLE, amount: 1 }])).to.be.revertedWithCustomError(
+        borrowerOperations,
+        'ICR_lt_MCR'
+      );
     });
     it('Succeeds when it would leave trove with net debt >= minimum net debt', async () => {
       // Make the LUSD request 2 wei above min net debt to correct for floor division, and make net debt = min net debt + 1 wei
       await open(alice, parseUnits('1', 9), parseUnits('1'));
-      await borrowerOperations.connect(alice).repayDebt([{ tokenAddress: STABLE, amount: 1 }]);
+      await repayDebt(alice, contracts, [{ tokenAddress: STABLE, amount: 1 }]);
 
       await open(bob, parseUnits('1', 9), parseUnits('20'));
-      await borrowerOperations.connect(bob).repayDebt([{ tokenAddress: STABLE, amount: parseUnits('19') }]);
+      await repayDebt(bob, contracts, [{ tokenAddress: STABLE, amount: parseUnits('19') }]);
     });
     it.skip('reverts when it would leave trove with net debt < minimum net debt', async () => {
       //TODO: We don't have min net debt yet, check it out later
@@ -1439,18 +1330,18 @@ describe('BorrowerOperations', () => {
       await STABLE.connect(bob).transfer(alice, repayAmount);
 
       await expect(
-        borrowerOperations.connect(alice).repayDebt([{ tokenAddress: STABLE, amount: repayAmount }])
+        repayDebt(alice, contracts, [{ tokenAddress: STABLE, amount: repayAmount }])
       ).to.be.revertedWithCustomError(borrowerOperations, 'Repaid_gt_CurrentDebt');
     });
     it('reverts when calling address does not have active trove', async () => {
       await open(alice, parseUnits('1', 9), parseUnits('1000'));
       await open(bob, parseUnits('1', 9), parseUnits('1000'));
       // Bob successfully repays some LUSD
-      await borrowerOperations.connect(bob).repayDebt([{ tokenAddress: STABLE, amount: parseUnits('500') }]);
+      await repayDebt(bob, contracts, [{ tokenAddress: STABLE, amount: parseUnits('500') }]);
 
       // Carol with no active trove attempts to repayLUSD
       await expect(
-        borrowerOperations.connect(carol).repayDebt([{ tokenAddress: STABLE, amount: parseUnits('500') }])
+        repayDebt(carol, contracts, [{ tokenAddress: STABLE, amount: parseUnits('500') }])
       ).to.be.revertedWithCustomError(borrowerOperations, 'TroveClosedOrNotExist');
     });
     it('reverts when attempted repayment is > the debt of the trove', async () => {
@@ -1459,11 +1350,11 @@ describe('BorrowerOperations', () => {
       const aliceDebt = await getTroveEntireDebt(contracts, alice);
 
       // Bob successfully repays some LUSD
-      await borrowerOperations.connect(bob).repayDebt([{ tokenAddress: STABLE, amount: parseUnits('500') }]);
+      await repayDebt(bob, contracts, [{ tokenAddress: STABLE, amount: parseUnits('500') }]);
 
       // Alice attempts to repay more than her debt
       await expect(
-        borrowerOperations.connect(alice).repayDebt([{ tokenAddress: STABLE, amount: aliceDebt + 1n }])
+        repayDebt(alice, contracts, [{ tokenAddress: STABLE, amount: aliceDebt + 1n }])
       ).to.be.revertedWithPanic();
       // TODO: should not reverted with panic error, check later
       // ).to.be.revertedWithCustomError(borrowerOperations, 'Repaid_gt_CurrentDebt');
@@ -1477,10 +1368,9 @@ describe('BorrowerOperations', () => {
       expect(aliceDebtBefore).to.be.equal(aliceBorrowAmount + aliceBorrowAmount / 200n + parseUnits('200'));
 
       const repayAmount = parseUnits('500');
-      await borrowerOperations.connect(alice).repayDebt([{ tokenAddress: STABLE, amount: repayAmount }]);
+      await repayDebt(alice, contracts, [{ tokenAddress: STABLE, amount: repayAmount }]);
 
       const aliceDebtAfter = await getTroveEntireDebt(contracts, alice);
-
       expect(aliceDebtAfter).to.be.equal(aliceDebtBefore - repayAmount);
     });
 
@@ -1496,7 +1386,7 @@ describe('BorrowerOperations', () => {
       const activePool_LUSD_Before = await storagePool.getValue(STABLE, false, 0);
       expect(activePool_LUSD_Before).to.be.gt(aliceBorrowAmount * 2n);
 
-      await borrowerOperations.connect(alice).repayDebt([{ tokenAddress: STABLE, amount: aliceDebtBefore / 10n }]);
+      await repayDebt(alice, contracts, [{ tokenAddress: STABLE, amount: aliceDebtBefore / 10n }]);
 
       // check after
       const activePool_LUSD_After = await storagePool.getValue(STABLE, false, 0);
@@ -1515,7 +1405,7 @@ describe('BorrowerOperations', () => {
       const alice_StableBalance_Before = await STABLE.balanceOf(alice);
       expect(alice_StableBalance_Before).to.be.equal(borrowAmount);
 
-      await borrowerOperations.connect(alice).repayDebt([{ tokenAddress: STABLE, amount: aliceDebtBefore / 10n }]);
+      await repayDebt(alice, contracts, [{ tokenAddress: STABLE, amount: aliceDebtBefore / 10n }]);
 
       // check after
       const alice_StableBalance_After = await STABLE.balanceOf(alice);
@@ -1534,7 +1424,7 @@ describe('BorrowerOperations', () => {
       await priceFeed.setTokenPrice(BTC, parseUnits('5000'));
       expect(await checkRecoveryMode(contracts)).to.be.true;
 
-      await borrowerOperations.connect(alice).repayDebt([{ tokenAddress: STABLE, amount: aliceDebtBefore / 10n }]);
+      await repayDebt(alice, contracts, [{ tokenAddress: STABLE, amount: aliceDebtBefore / 10n }]);
 
       // Check Alice's debt: 110 (initial) - 50 (repaid)
       const aliceDebtAfter = await getTroveEntireDebt(contracts, alice);
@@ -1558,7 +1448,7 @@ describe('BorrowerOperations', () => {
 
       // Bob tries to repay 6 LUSD
       await expect(
-        borrowerOperations.connect(bob).repayDebt([{ tokenAddress: STABLE, amount: parseUnits('6') }])
+        repayDebt(bob, contracts, [{ tokenAddress: STABLE, amount: parseUnits('6') }])
       ).to.be.revertedWithCustomError(borrowerOperations, 'InsufficientDebtToRepay');
     });
   });
@@ -1948,9 +1838,7 @@ describe('BorrowerOperations', () => {
       expect(defaultPool_LUSDDebt_afterAliceCloses).to.be.equal(defaultPool_LUSDDebt - pendingDebtReward_A);
 
       // whale adjusts trove, pulling their rewards out of DefaultPool
-      await borrowerOperations
-        .connect(whale)
-        .increaseDebts([{ tokenAddress: STABLE, amount: parseUnits('1') }], MAX_BORROWING_FEE);
+      await increaseDebt(whale, contracts, [{ tokenAddress: STABLE, amount: parseUnits('1') }]);
 
       // Close Bob's trove. Expect DefaultPool coll and debt to drop to 0, since closing pulls his rewards out.
       await borrowerOperations.connect(bob).closeTrove();
@@ -2059,10 +1947,12 @@ describe('BorrowerOperations', () => {
 
     it('Opens a trove with net debt >= minimum net debt', async () => {
       // Add 1 wei to correct for rounding error in helper function
-      await BTC.unprotectedMint(alice, parseUnits('1', 9));
-      await BTC.connect(alice).approve(borrowerOperations, parseUnits('1', 9));
-      await borrowerOperations.connect(alice).openTrove([{ tokenAddress: BTC, amount: parseUnits('1', 9) }]);
-
+      await openTrove({
+        from: alice,
+        contracts,
+        collToken: BTC,
+        collAmount: parseUnits('1', 9),
+      });
       expect(await troveManager.getTroveStatus(alice)).to.be.equal(1);
     });
 

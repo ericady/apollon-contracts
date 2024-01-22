@@ -131,6 +131,12 @@
                 "internalType": "address",
                 "name": "_borrowerOperationsAddress",
                 "type": "address"
+            },
+            {
+                "indexed": false,
+                "internalType": "address",
+                "name": "_redemptionOperationsAddress",
+                "type": "address"
             }
         ],
         "name": "SortedTrovesInitialised",
@@ -398,6 +404,19 @@
         "type": "function"
     },
     {
+        "inputs": [],
+        "name": "redemptionOperationsAddress",
+        "outputs": [
+            {
+                "internalType": "address",
+                "name": "",
+                "type": "address"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
         "inputs": [
             {
                 "internalType": "address",
@@ -427,6 +446,11 @@
             {
                 "internalType": "address",
                 "name": "_borrowerOperationsAddress",
+                "type": "address"
+            },
+            {
+                "internalType": "address",
+                "name": "_redemptionOperationsAddress",
                 "type": "address"
             }
         ],
