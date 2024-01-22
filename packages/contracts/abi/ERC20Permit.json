@@ -1,26 +1,5 @@
 [
     {
-        "inputs": [
-            {
-                "internalType": "string",
-                "name": "name",
-                "type": "string"
-            },
-            {
-                "internalType": "string",
-                "name": "symbol",
-                "type": "string"
-            },
-            {
-                "internalType": "uint8",
-                "name": "decimals_",
-                "type": "uint8"
-            }
-        ],
-        "stateMutability": "nonpayable",
-        "type": "constructor"
-    },
-    {
         "inputs": [],
         "name": "ECDSAInvalidSignature",
         "type": "error"
@@ -535,24 +514,6 @@
                 "type": "bool"
             }
         ],
-        "stateMutability": "nonpayable",
-        "type": "function"
-    },
-    {
-        "inputs": [
-            {
-                "internalType": "address",
-                "name": "_account",
-                "type": "address"
-            },
-            {
-                "internalType": "uint256",
-                "name": "_amount",
-                "type": "uint256"
-            }
-        ],
-        "name": "unprotectedMint",
-        "outputs": [],
         "stateMutability": "nonpayable",
         "type": "function"
     }

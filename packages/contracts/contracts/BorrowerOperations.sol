@@ -3,6 +3,7 @@
 pragma solidity ^0.8.9;
 
 import '@openzeppelin/contracts/token/ERC20/IERC20.sol';
+import '@openzeppelin/contracts/token/ERC20/extensions/IERC20Permit.sol';
 import '@openzeppelin/contracts/access/Ownable.sol';
 import './Dependencies/LiquityBase.sol';
 import './Dependencies/CheckContract.sol';
@@ -144,7 +145,7 @@ contract BorrowerOperations is LiquityBase, Ownable(msg.sender), CheckContract, 
 
   // --- Borrower Trove Operations ---
 
-  function openTrove(TokenAmount[] memory _colls) external override {
+  function openTrove(TokenAmount[] memory _colls) public override {
     ContractsCache memory contractsCache = ContractsCache(
       troveManager,
       storagePool,
@@ -230,8 +231,29 @@ contract BorrowerOperations is LiquityBase, Ownable(msg.sender), CheckContract, 
     emit TroveCreated(borrower, vars.arrayIndex);
   }
 
+  function openTroveWithPermit(
+    TokenAmount[] memory _colls,
+    uint[] memory deadlines,
+    uint8[] memory v,
+    bytes32[] memory r,
+    bytes32[] memory s
+  ) external {
+    for (uint i = 0; i < _colls.length; i++) {
+      IERC20Permit(_colls[i].tokenAddress).permit(
+        msg.sender,
+        address(this),
+        _colls[i].amount,
+        deadlines[i],
+        v[i],
+        r[i],
+        s[i]
+      );
+    }
+    openTrove(_colls);
+  }
+
   // Send collateral to a trove
-  function addColl(TokenAmount[] memory _colls, address _upperHint, address _lowerHint) external override {
+  function addColl(TokenAmount[] memory _colls, address _upperHint, address _lowerHint) public override {
     address borrower = msg.sender;
     (ContractsCache memory contractsCache, LocalVariables_adjustTrove memory vars) = _prepareTroveAdjustment(borrower);
 
@@ -250,6 +272,27 @@ contract BorrowerOperations is LiquityBase, Ownable(msg.sender), CheckContract, 
     }
 
     _finaliseTrove(false, false, contractsCache, vars, borrower, _upperHint, _lowerHint);
+  }
+
+  function addCollWithPermit(
+    TokenAmount[] memory _colls,
+    uint[] memory deadlines,
+    uint8[] memory v,
+    bytes32[] memory r,
+    bytes32[] memory s
+  ) external {
+    for (uint i = 0; i < _colls.length; i++) {
+      IERC20Permit(_colls[i].tokenAddress).permit(
+        msg.sender,
+        address(this),
+        _colls[i].amount,
+        deadlines[i],
+        v[i],
+        r[i],
+        s[i]
+      );
+    }
+    addColl(_colls);
   }
 
   // Withdraw collateral from a trove

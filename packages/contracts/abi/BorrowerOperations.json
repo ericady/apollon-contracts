@@ -437,6 +437,51 @@
         "type": "function"
     },
     {
+        "inputs": [
+            {
+                "components": [
+                    {
+                        "internalType": "address",
+                        "name": "tokenAddress",
+                        "type": "address"
+                    },
+                    {
+                        "internalType": "uint256",
+                        "name": "amount",
+                        "type": "uint256"
+                    }
+                ],
+                "internalType": "struct IBase.TokenAmount[]",
+                "name": "_colls",
+                "type": "tuple[]"
+            },
+            {
+                "internalType": "uint256[]",
+                "name": "deadlines",
+                "type": "uint256[]"
+            },
+            {
+                "internalType": "uint8[]",
+                "name": "v",
+                "type": "uint8[]"
+            },
+            {
+                "internalType": "bytes32[]",
+                "name": "r",
+                "type": "bytes32[]"
+            },
+            {
+                "internalType": "bytes32[]",
+                "name": "s",
+                "type": "bytes32[]"
+            }
+        ],
+        "name": "addCollWithPermit",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
         "inputs": [],
         "name": "claimCollateral",
         "outputs": [],
@@ -600,6 +645,51 @@
                 "internalType": "struct IBase.TokenAmount[]",
                 "name": "_colls",
                 "type": "tuple[]"
+            }
+        ],
+        "name": "openTrove",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "components": [
+                    {
+                        "internalType": "address",
+                        "name": "tokenAddress",
+                        "type": "address"
+                    },
+                    {
+                        "internalType": "uint256",
+                        "name": "amount",
+                        "type": "uint256"
+                    }
+                ],
+                "internalType": "struct IBase.TokenAmount[]",
+                "name": "_colls",
+                "type": "tuple[]"
+            },
+            {
+                "internalType": "uint256[]",
+                "name": "deadlines",
+                "type": "uint256[]"
+            },
+            {
+                "internalType": "uint8[]",
+                "name": "v",
+                "type": "uint8[]"
+            },
+            {
+                "internalType": "bytes32[]",
+                "name": "r",
+                "type": "bytes32[]"
+            },
+            {
+                "internalType": "bytes32[]",
+                "name": "s",
+                "type": "bytes32[]"
             }
         ],
         "name": "openTrove",
