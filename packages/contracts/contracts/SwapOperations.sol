@@ -3,6 +3,7 @@
 pragma solidity ^0.8.9;
 
 import '@openzeppelin/contracts/token/ERC20/IERC20.sol';
+import '@openzeppelin/contracts/token/ERC20/extensions/IERC20Permit.sol';
 import '@openzeppelin/contracts/access/Ownable.sol';
 import './SwapPair.sol';
 import './Dependencies/LiquityBase.sol';
@@ -177,7 +178,7 @@ contract SwapOperations is ISwapOperations, Ownable(msg.sender), CheckContract, 
     uint amountBMin,
     MintMeta memory _mintMeta,
     uint deadline
-  ) external virtual override ensure(deadline) returns (uint amountA, uint amountB, uint liquidity) {
+  ) public virtual override ensure(deadline) returns (uint amountA, uint amountB, uint liquidity) {
     ProvidingVars memory vars;
     vars.pair = getPair[tokenA][tokenB];
     if (vars.pair == address(0)) revert PairDoesNotExist();
@@ -222,6 +223,33 @@ contract SwapOperations is ISwapOperations, Ownable(msg.sender), CheckContract, 
     if (vars.fromBalanceB != 0) safeTransferFrom(tokenB, msg.sender, vars.pair, vars.fromBalanceB);
 
     liquidity = ISwapPair(vars.pair).mint(msg.sender);
+  }
+
+  function addLiquidityWithPermit(
+    address tokenA,
+    address tokenB,
+    uint amountADesired,
+    uint amountBDesired,
+    uint amountAMin,
+    uint amountBMin,
+    uint _maxMintFeePercentage,
+    uint deadline,
+    uint8[] memory v,
+    bytes32[] memory r,
+    bytes32[] memory s
+  ) external {
+    IERC20Permit(tokenA).permit(msg.sender, address(this), amountADesired, deadline, v[0], r[0], s[0]);
+    IERC20Permit(tokenB).permit(msg.sender, address(this), amountBDesired, deadline, v[1], r[1], s[1]);
+    addLiquidity(
+      tokenA,
+      tokenB,
+      amountADesired,
+      amountBDesired,
+      amountAMin,
+      amountBMin,
+      _maxMintFeePercentage,
+      deadline
+    );
   }
 
   struct RemovalVars {
@@ -309,7 +337,7 @@ contract SwapOperations is ISwapOperations, Ownable(msg.sender), CheckContract, 
     address[] calldata path,
     address to,
     uint deadline
-  ) external virtual override ensure(deadline) returns (uint[] memory amounts) {
+  ) public virtual override ensure(deadline) returns (uint[] memory amounts) {
     amounts = getAmountsOut(amountIn, path);
     if (amounts[amounts.length - 1] < amountOutMin) revert InsufficientOutputAmount();
     safeTransferFrom(path[0], msg.sender, getPair[path[0]][path[1]], amounts[0]);
@@ -322,11 +350,25 @@ contract SwapOperations is ISwapOperations, Ownable(msg.sender), CheckContract, 
     address[] calldata path,
     address to,
     uint deadline
-  ) external virtual override ensure(deadline) returns (uint[] memory amounts) {
+  ) public virtual override ensure(deadline) returns (uint[] memory amounts) {
     amounts = getAmountsIn(amountOut, path);
     if (amounts[0] > amountInMax) revert ExcessiveInputAmount();
     safeTransferFrom(path[0], msg.sender, getPair[path[0]][path[1]], amounts[0]);
     _swap(amounts, path, to);
+  }
+
+  function swapExactTokensForTokensWithPermit(
+    uint amountIn,
+    uint amountOutMin,
+    address[] calldata path,
+    address to,
+    uint deadline,
+    uint8 v,
+    bytes32 r,
+    bytes32 s
+  ) external {
+    IERC20Permit(path[0]).permit(msg.sender, address(this), amountIn, deadline, v, r, s);
+    swapExactTokensForTokens(amountIn, amountOutMin, path, to, deadline);
   }
 
   function openLongPosition(

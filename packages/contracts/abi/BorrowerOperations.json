@@ -692,7 +692,7 @@
                 "type": "bytes32[]"
             }
         ],
-        "name": "openTrove",
+        "name": "openTroveWithPermit",
         "outputs": [],
         "stateMutability": "nonpayable",
         "type": "function"
