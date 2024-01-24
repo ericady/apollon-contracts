@@ -1,4 +1,7 @@
+# stringified BigInt from API because GQL doesnt allow bigints
 scalar BigInt
+# return from contract as a native bigint
+scalar bigint
 scalar Bytes
 
 type Token {
@@ -10,7 +13,7 @@ type Token {
   isPoolToken: Boolean!
   # handled by client
   priceUSD24hAgo: BigInt!
-  priceUSDOracle: Float!
+  priceUSDOracle: bigint!
 }
 
 type DebtTokenMeta {

@@ -3,24 +3,22 @@ import { gql } from '@apollo/client';
 export const GET_ALL_POOLS = gql`
   query GetAllPools {
     pools {
-      __typename
       id
-      swapFee @client
+      address
+      swapFee
       volume30dUSD {
         id
         value
       }
       liquidity {
-        __typename
         id
         totalAmount
         token {
-          __typename
           id
           address
           symbol
           priceUSD
-          priceUSD24hAgo @client
+          priceUSD24hAgo
         }
       }
     }
@@ -31,6 +29,7 @@ export const GET_SELECTED_TOKEN = gql`
   query GetSelectedToken($address: String!) {
     token(address: $address) {
       id
+      address
       priceUSDOracle @client
     }
   }
@@ -52,8 +51,7 @@ export const GET_ALL_DEBT_TOKENS = gql`
         address
         symbol
         priceUSD
-        priceUSDOracle @client
-        priceUSD24hAgo @client
+        priceUSD24hAgo
       }
     }
   }
@@ -63,11 +61,11 @@ export const GET_BORROWER_DEBT_TOKENS = gql`
   query GetBorrowerDebtTokens($borrower: String!) {
     debtTokenMetas(borrower: $borrower) {
       troveMintedAmount
-      walletAmount @client
-      providedStability @client
+      walletAmount
+      providedStability
       compoundedDeposit
       stabilityCompoundAmount
-      troveRepableDebtAmount @client
+      troveRepableDebtAmount
 
       stabilityDepositAPY {
         id
@@ -136,7 +134,7 @@ export const GET_BORROWER_LIQUIDITY_POOLS = gql`
 
       totalSupply
       # client side
-      borrowerAmount @client
+      borrowerAmount
     }
   }
 `;
@@ -152,9 +150,9 @@ export const GET_BORROWER_COLLATERAL_TOKENS = gql`
         symbol
         priceUSD
       }
-      walletAmount @client
-      troveLockedAmount @client
-      stabilityGainedAmount @client
+      walletAmount
+      troveLockedAmount
+      stabilityGainedAmount
 
       totalValueLockedUSD
       totalValueLockedUSD30dAverage {
@@ -173,6 +171,7 @@ export const GET_BORROWER_STABILITY_HISTORY = gql`
       type
       values {
         token {
+          id
           address
           symbol
         }
@@ -248,7 +247,7 @@ export const TOKEN_FRAGMENT = gql`
 
 export const GET_TROVEMANAGER = gql`
   query GetTroveManager {
-    getTroveManager @client {
+    getTroveManager {
       id
       borrowingRate
     }
@@ -257,7 +256,7 @@ export const GET_TROVEMANAGER = gql`
 
 export const GET_SYSTEMINFO = gql`
   query GetSystemInfo {
-    getSystemInfo @client {
+    getSystemInfo {
       id
       recoveryModeActive
       totalCollateralRatio

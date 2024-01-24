@@ -11,3 +11,4 @@ generates:
       scalars:
         BigInt: string
         Bytes: string
+        bigint: bigint

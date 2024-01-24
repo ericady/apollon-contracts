@@ -10,16 +10,13 @@ import {
 } from '@apollo/client';
 import { AddressLike, ethers } from 'ethers';
 import { PropsWithChildren } from 'react';
-import { DebtToken, StabilityPoolManager, StoragePool, SwapPair, TroveManager } from '../../generated/types';
-import {
-  QueryTokenArgs,
-  SystemInfo,
-  TokenFragmentFragment,
-  TroveManager as TroveManagerType,
-} from '../generated/gql-types';
+import { DebtToken, ERC20, StabilityPoolManager, StoragePool, SwapPair, TroveManager } from '../../generated/types';
+import { SystemInfo, TokenFragmentFragment, TroveManager as TroveManagerType } from '../generated/gql-types';
 import { TOKEN_FRAGMENT } from '../queries';
-import { floatToBigInt } from '../utils/math';
-import { Contracts, useEthers } from './EthersProvider';
+import { dangerouslyConvertBigNumberToNumber, floatToBigInt } from '../utils/math';
+import { Contracts, isCollateralTokenAddress, isDebtTokenAddress, useEthers } from './EthersProvider';
+
+const defaultFieldValue = BigInt(0);
 
 export function CustomApolloProvider({ children }: PropsWithChildren<{}>) {
   const {
@@ -30,6 +27,7 @@ export function CustomApolloProvider({ children }: PropsWithChildren<{}>) {
       swapPairContracts,
       stabilityPoolManagerContract,
       storagePoolContract,
+      collateralTokenContracts,
     },
     address: borrower,
   } = useEthers();
@@ -41,6 +39,7 @@ export function CustomApolloProvider({ children }: PropsWithChildren<{}>) {
           provider,
           borrower,
           debtTokenContracts,
+          collateralTokenContracts,
           troveManagerContract,
           stabilityPoolManagerContract,
           swapPairContracts,
@@ -123,6 +122,7 @@ const getProductionCacheConfig = ({
   provider,
   borrower,
   debtTokenContracts,
+  collateralTokenContracts,
   troveManagerContract,
   stabilityPoolManagerContract,
   swapPairContracts,
@@ -131,6 +131,7 @@ const getProductionCacheConfig = ({
   provider: ReturnType<typeof useEthers>['provider'];
   borrower: AddressLike;
   debtTokenContracts: ReturnType<typeof useEthers>['contracts']['debtTokenContracts'];
+  collateralTokenContracts: ReturnType<typeof useEthers>['contracts']['collateralTokenContracts'];
   troveManagerContract: ReturnType<typeof useEthers>['contracts']['troveManagerContract'];
   stabilityPoolManagerContract: ReturnType<typeof useEthers>['contracts']['stabilityPoolManagerContract'];
   swapPairContracts: ReturnType<typeof useEthers>['contracts']['swapPairContracts'];
@@ -147,16 +148,23 @@ const getProductionCacheConfig = ({
         },
 
         priceUSDOracle: {
-          read(_, { args }) {
-            if (isFieldOutdated(SchemaDataFreshnessManager.DebtToken[Contracts.DebtToken.STABLE], 'priceUSDOracle')) {
-              const address = (args as QueryTokenArgs).address;
-              SchemaDataFreshnessManager.DebtToken[Contracts.DebtToken.STABLE].priceUSDOracle.fetch(
-                // FIXME: use address insteadof hardcoded contract
-                debtTokenContracts[Contracts.DebtToken.STABLE],
-              );
+          read(_, { readField }) {
+            const address = readField('address') as Readonly<string>;
+            if (address) {
+              if (
+                isDebtTokenAddress(address) &&
+                isFieldOutdated(SchemaDataFreshnessManager.DebtToken[address], 'priceUSDOracle')
+              ) {
+                SchemaDataFreshnessManager.DebtToken[address].priceUSDOracle.fetch(debtTokenContracts[address]);
+                return SchemaDataFreshnessManager.DebtToken[address].priceUSDOracle.value();
+              } else if (
+                isCollateralTokenAddress(address) &&
+                isFieldOutdated(SchemaDataFreshnessManager.ERC20[address], 'priceUSDOracle')
+              ) {
+                SchemaDataFreshnessManager.ERC20[address].priceUSDOracle.fetch(collateralTokenContracts[address]);
+                return SchemaDataFreshnessManager.ERC20[address].priceUSDOracle.value();
+              }
             }
-
-            return SchemaDataFreshnessManager.DebtToken[Contracts.DebtToken.STABLE].priceUSDOracle.value();
           },
         },
       },
@@ -175,16 +183,15 @@ const getProductionCacheConfig = ({
 
             if (
               tokenData?.address &&
-              isFieldOutdated(SchemaDataFreshnessManager.DebtToken[Contracts.DebtToken.STABLE], 'walletAmount')
+              isDebtTokenAddress(tokenData.address) &&
+              isFieldOutdated(SchemaDataFreshnessManager.DebtToken[tokenData.address], 'walletAmount')
             ) {
-              // Make smart contract call using the address
-              SchemaDataFreshnessManager.DebtToken[Contracts.DebtToken.STABLE].walletAmount.fetch(
+              SchemaDataFreshnessManager.DebtToken[tokenData.address].walletAmount.fetch(
                 debtTokenContracts[Contracts.DebtToken.STABLE],
                 borrower,
               );
+              return SchemaDataFreshnessManager.DebtToken[tokenData.address].walletAmount.value();
             }
-
-            return SchemaDataFreshnessManager.DebtToken[Contracts.DebtToken.STABLE].walletAmount.value();
           },
         },
 
@@ -199,15 +206,15 @@ const getProductionCacheConfig = ({
 
             if (
               tokenData?.address &&
-              isFieldOutdated(SchemaDataFreshnessManager.DebtToken[Contracts.DebtToken.STABLE], 'troveMintedAmount')
+              isDebtTokenAddress(tokenData.address) &&
+              isFieldOutdated(SchemaDataFreshnessManager.DebtToken[tokenData.address], 'troveMintedAmount')
             ) {
-              SchemaDataFreshnessManager.DebtToken[Contracts.DebtToken.STABLE].troveMintedAmount.fetch({
+              SchemaDataFreshnessManager.DebtToken[tokenData.address].troveMintedAmount.fetch({
                 troveManagerContract: troveManagerContract,
                 borrower,
               });
+              return SchemaDataFreshnessManager.DebtToken[tokenData.address].troveMintedAmount.value();
             }
-
-            return SchemaDataFreshnessManager.DebtToken[Contracts.DebtToken.STABLE].troveMintedAmount.value();
           },
         },
 
@@ -222,18 +229,15 @@ const getProductionCacheConfig = ({
 
             if (
               tokenData?.address &&
-              isFieldOutdated(
-                SchemaDataFreshnessManager.DebtToken[Contracts.DebtToken.STABLE],
-                'troveRepableDebtAmount',
-              )
+              isDebtTokenAddress(tokenData.address) &&
+              isFieldOutdated(SchemaDataFreshnessManager.DebtToken[tokenData.address], 'troveRepableDebtAmount')
             ) {
-              SchemaDataFreshnessManager.DebtToken[Contracts.DebtToken.STABLE].troveRepableDebtAmount.fetch(
+              SchemaDataFreshnessManager.DebtToken[tokenData.address].troveRepableDebtAmount.fetch(
                 troveManagerContract,
                 borrower,
               );
+              return SchemaDataFreshnessManager.DebtToken[tokenData.address].troveRepableDebtAmount.value();
             }
-
-            return SchemaDataFreshnessManager.DebtToken[Contracts.DebtToken.STABLE].troveRepableDebtAmount.value();
           },
         },
 
@@ -248,15 +252,15 @@ const getProductionCacheConfig = ({
 
             if (
               tokenData?.address &&
-              isFieldOutdated(SchemaDataFreshnessManager.DebtToken[Contracts.DebtToken.STABLE], 'providedStability')
+              isDebtTokenAddress(tokenData.address) &&
+              isFieldOutdated(SchemaDataFreshnessManager.DebtToken[tokenData.address], 'providedStability')
             ) {
-              SchemaDataFreshnessManager.DebtToken[Contracts.DebtToken.STABLE].providedStability.fetch({
+              SchemaDataFreshnessManager.DebtToken[tokenData.address].providedStability.fetch({
                 stabilityPoolManagerContract,
                 depositor: borrower,
               });
+              return SchemaDataFreshnessManager.DebtToken[tokenData.address].providedStability.value();
             }
-
-            return SchemaDataFreshnessManager.DebtToken[Contracts.DebtToken.STABLE].providedStability.value();
           },
         },
 
@@ -271,147 +275,145 @@ const getProductionCacheConfig = ({
 
             if (
               tokenData?.address &&
-              isFieldOutdated(SchemaDataFreshnessManager.DebtToken[Contracts.DebtToken.STABLE], 'compoundedDeposit')
+              isDebtTokenAddress(tokenData.address) &&
+              isFieldOutdated(SchemaDataFreshnessManager.DebtToken[tokenData.address], 'compoundedDeposit')
             ) {
-              SchemaDataFreshnessManager.DebtToken[Contracts.DebtToken.STABLE].compoundedDeposit.fetch({
+              SchemaDataFreshnessManager.DebtToken[tokenData.address].compoundedDeposit.fetch({
                 stabilityPoolManagerContract,
                 depositor: borrower,
               });
+              return SchemaDataFreshnessManager.DebtToken[tokenData.address].compoundedDeposit.value();
             }
-
-            return SchemaDataFreshnessManager.DebtToken[Contracts.DebtToken.STABLE].compoundedDeposit.value();
           },
         },
       },
     },
 
-    CollateralTokenMeta: {
-      fields: {
-        walletAmount: {
-          read(_, { readField, cache }) {
-            const token = readField('token') as Readonly<Reference>;
+    // CollateralTokenMeta: {
+    //   fields: {
+    //     walletAmount: {
+    //       read(_, { readField, cache }) {
+    //         const token = readField('token') as Readonly<Reference>;
 
-            const tokenData = cache.readFragment<TokenFragmentFragment>({
-              id: token.__ref,
-              fragment: TOKEN_FRAGMENT,
-            });
+    //         const tokenData = cache.readFragment<TokenFragmentFragment>({
+    //           id: token.__ref,
+    //           fragment: TOKEN_FRAGMENT,
+    //         });
 
-            // FIXME: Change for dynamic address later
+    //         // FIXME: Change for dynamic address later
 
-            if (
-              tokenData?.address &&
-              isFieldOutdated(SchemaDataFreshnessManager.ERC20[Contracts.ERC20.ETH], 'walletAmount')
-            ) {
-              SchemaDataFreshnessManager.ERC20[Contracts.ERC20.ETH].walletAmount.fetch(provider, tokenData.address);
-            }
+    //         if (
+    //           tokenData?.address &&
+    //           isFieldOutdated(SchemaDataFreshnessManager.ERC20[Contracts.ERC20.ETH], 'walletAmount')
+    //         ) {
+    //           SchemaDataFreshnessManager.ERC20[Contracts.ERC20.ETH].walletAmount.fetch(provider, tokenData.address);
+    //         }
 
-            return SchemaDataFreshnessManager.ERC20[Contracts.ERC20.ETH].walletAmount.value();
-          },
-        },
+    //         return SchemaDataFreshnessManager.ERC20[Contracts.ERC20.ETH].walletAmount.value();
+    //       },
+    //     },
 
-        troveLockedAmount: {
-          read(_, { readField, cache }) {
-            const token = readField('token') as Readonly<Reference>;
+    //     troveLockedAmount: {
+    //       read(_, { readField, cache }) {
+    //         const token = readField('token') as Readonly<Reference>;
 
-            const tokenData = cache.readFragment<TokenFragmentFragment>({
-              id: token.__ref,
-              fragment: TOKEN_FRAGMENT,
-            });
+    //         const tokenData = cache.readFragment<TokenFragmentFragment>({
+    //           id: token.__ref,
+    //           fragment: TOKEN_FRAGMENT,
+    //         });
 
-            // FIXME: Change for dynamic address later
+    //         // FIXME: Change for dynamic address later
 
-            if (
-              tokenData?.address &&
-              isFieldOutdated(SchemaDataFreshnessManager.ERC20[Contracts.ERC20.ETH], 'walletAmount')
-            ) {
-              SchemaDataFreshnessManager.ERC20[Contracts.ERC20.ETH].troveLockedAmount.fetch({
-                troveManagerContract: troveManagerContract,
-                borrower,
-              });
-            }
+    //         if (
+    //           tokenData?.address &&
+    //           isFieldOutdated(SchemaDataFreshnessManager.ERC20[Contracts.ERC20.ETH], 'walletAmount')
+    //         ) {
+    //           SchemaDataFreshnessManager.ERC20[Contracts.ERC20.ETH].troveLockedAmount.fetch({
+    //             troveManagerContract: troveManagerContract,
+    //             borrower,
+    //           });
+    //         }
 
-            return SchemaDataFreshnessManager.ERC20[Contracts.ERC20.ETH].troveLockedAmount.value();
-          },
-        },
+    //         return SchemaDataFreshnessManager.ERC20[Contracts.ERC20.ETH].troveLockedAmount.value();
+    //       },
+    //     },
 
-        stabilityGainedAmount: {
-          read(_, { readField, cache }) {
-            const token = readField('token') as Readonly<Reference>;
+    //     stabilityGainedAmount: {
+    //       read(_, { readField, cache }) {
+    //         const token = readField('token') as Readonly<Reference>;
 
-            const tokenData = cache.readFragment<TokenFragmentFragment>({
-              id: token.__ref,
-              fragment: TOKEN_FRAGMENT,
-            });
+    //         const tokenData = cache.readFragment<TokenFragmentFragment>({
+    //           id: token.__ref,
+    //           fragment: TOKEN_FRAGMENT,
+    //         });
 
-            // FIXME: Change for dynamic address later
+    //         // FIXME: Change for dynamic address later
 
-            if (
-              tokenData?.address &&
-              isFieldOutdated(SchemaDataFreshnessManager.ERC20[Contracts.ERC20.ETH], 'stabilityGainedAmount')
-            ) {
-              SchemaDataFreshnessManager.ERC20[Contracts.ERC20.ETH].stabilityGainedAmount.fetch({
-                stabilityPoolManagerContract,
-                depositor: borrower,
-              });
-            }
+    //         if (
+    //           tokenData?.address &&
+    //           isFieldOutdated(SchemaDataFreshnessManager.ERC20[Contracts.ERC20.ETH], 'stabilityGainedAmount')
+    //         ) {
+    //           SchemaDataFreshnessManager.ERC20[Contracts.ERC20.ETH].stabilityGainedAmount.fetch({
+    //             stabilityPoolManagerContract,
+    //             depositor: borrower,
+    //           });
+    //         }
 
-            return SchemaDataFreshnessManager.ERC20[Contracts.ERC20.ETH].stabilityGainedAmount.value();
-          },
-        },
-      },
-    },
+    //         return SchemaDataFreshnessManager.ERC20[Contracts.ERC20.ETH].stabilityGainedAmount.value();
+    //       },
+    //     },
+    //   },
+    // },
 
-    Pool: {
-      fields: {
-        swapFee: {
-          read(_, { readField }) {
-            console.log('EXISTING: ', _);
-            const poolAddress = readField('address') as Readonly<string>;
-            console.log('poolAddress: ', poolAddress);
+    // Pool: {
+    //   fields: {
+    //     swapFee: {
+    //       read(_, { readField }) {
+    //         const poolAddress = readField('address') as Readonly<string>;
 
-            // FIXME: Change for dynamic address later
-            if (
-              poolAddress &&
-              isFieldOutdated(
-                SchemaDataFreshnessManager.SwapPairs['0x687E100f79ceD7Cc8b2BD19Eb326a28885F5b371'],
-                'swapFee',
-              )
-            ) {
-              SchemaDataFreshnessManager.SwapPairs['0x687E100f79ceD7Cc8b2BD19Eb326a28885F5b371'].swapFee.fetch(
-                swapPairContracts,
-              );
-            }
+    //         // FIXME: Change for dynamic address later
+    //         if (
+    //           poolAddress &&
+    //           isFieldOutdated(
+    //             SchemaDataFreshnessManager.SwapPairs['0x687E100f79ceD7Cc8b2BD19Eb326a28885F5b371'],
+    //             'swapFee',
+    //           )
+    //         ) {
+    //           SchemaDataFreshnessManager.SwapPairs['0x687E100f79ceD7Cc8b2BD19Eb326a28885F5b371'].swapFee.fetch(
+    //             swapPairContracts,
+    //           );
+    //         }
 
-            return SchemaDataFreshnessManager.SwapPairs['0x687E100f79ceD7Cc8b2BD19Eb326a28885F5b371'].swapFee.value();
-          },
-        },
+    //         return SchemaDataFreshnessManager.SwapPairs['0x687E100f79ceD7Cc8b2BD19Eb326a28885F5b371'].swapFee.value();
+    //       },
+    //     },
 
-        borrowerAmount: {
-          read(_, { readField }) {
-            const poolAddress = readField('address') as Readonly<string>;
+    //     borrowerAmount: {
+    //       read(_, { readField }) {
+    //         const poolAddress = readField('address') as Readonly<string>;
 
-            // FIXME: Change for dynamic address later
-            if (
-              poolAddress &&
-              borrower &&
-              isFieldOutdated(
-                SchemaDataFreshnessManager.SwapPairs['0x687E100f79ceD7Cc8b2BD19Eb326a28885F5b371'],
-                'borrowerAmount',
-              )
-            ) {
-              SchemaDataFreshnessManager.SwapPairs['0x687E100f79ceD7Cc8b2BD19Eb326a28885F5b371'].borrowerAmount.fetch(
-                swapPairContracts,
-                borrower,
-              );
-            }
+    //         // FIXME: Change for dynamic address later
+    //         if (
+    //           poolAddress &&
+    //           borrower &&
+    //           isFieldOutdated(
+    //             SchemaDataFreshnessManager.SwapPairs['0x687E100f79ceD7Cc8b2BD19Eb326a28885F5b371'],
+    //             'borrowerAmount',
+    //           )
+    //         ) {
+    //           SchemaDataFreshnessManager.SwapPairs['0x687E100f79ceD7Cc8b2BD19Eb326a28885F5b371'].borrowerAmount.fetch(
+    //             swapPairContracts,
+    //             borrower,
+    //           );
+    //         }
 
-            return SchemaDataFreshnessManager.SwapPairs[
-              '0x687E100f79ceD7Cc8b2BD19Eb326a28885F5b371'
-            ].borrowerAmount.value();
-          },
-        },
-      },
-    },
+    //         return SchemaDataFreshnessManager.SwapPairs[
+    //           '0x687E100f79ceD7Cc8b2BD19Eb326a28885F5b371'
+    //         ].borrowerAmount.value();
+    //       },
+    //     },
+    //   },
+    // },
   },
 
   Query: {
@@ -432,15 +434,17 @@ const getProductionCacheConfig = ({
 
       getSystemInfo: {
         read: () => {
-          if (isFieldOutdated(ContractDataFreshnessManager.StoragePool as any, 'getDepositorDeposits')) {
+          if (isFieldOutdated(SchemaDataFreshnessManager.StoragePool as any, 'totalCollateralRatio')) {
             SchemaDataFreshnessManager.StoragePool.totalCollateralRatio.fetch({ storagePoolContract });
+          } else if (isFieldOutdated(SchemaDataFreshnessManager.StoragePool as any, 'recoveryModeActive')) {
+            SchemaDataFreshnessManager.StoragePool.recoveryModeActive.fetch({ storagePoolContract });
           }
 
           return {
             __typename: 'SystemInfo',
             id: 'SystemInfo',
             totalCollateralRatio: SchemaDataFreshnessManager.StoragePool.totalCollateralRatio.value(),
-            recoveryModeActive: false,
+            recoveryModeActive: SchemaDataFreshnessManager.StoragePool.recoveryModeActive.value() as unknown as boolean,
           } as SystemInfo;
         },
       },
@@ -461,10 +465,10 @@ type ContractData<T> = Record<
 // Type that mirros the Contracts object with literal access to the contract addresses
 type ContractDataFreshnessManager<T> = {
   [P in keyof T]: T[P] extends Record<string, string>
-    ? { [Address in T[P][keyof T[P]]]: ContractData<number> }
+    ? { [Address in T[P][keyof T[P]]]: ContractData<bigint> }
     : T[P] extends Record<string, object>
     ? ContractData<T[P]['value']>
-    : ContractData<number>;
+    : ContractData<bigint>;
 };
 
 type ResolvedType<T> = T extends Promise<infer R> ? R : T;
@@ -608,16 +612,109 @@ export const ContractDataFreshnessManager: {
  */
 export const SchemaDataFreshnessManager: ContractDataFreshnessManager<typeof Contracts> = {
   ERC20: {
+    [Contracts.ERC20.JUSD]: {
+      priceUSDOracle: {
+        fetch: async (collTokenContract: ERC20) => {
+          SchemaDataFreshnessManager.ERC20[Contracts.ERC20.JUSD].priceUSDOracle.lastFetched = Date.now();
+
+          // FIXME: Implement Coll Oracle Prices
+          SchemaDataFreshnessManager.ERC20[Contracts.ERC20.JUSD].priceUSDOracle.value(1 as any);
+        },
+        value: makeVar(0 as any),
+        lastFetched: 0,
+        timeout: 1000 * 5,
+      },
+
+      walletAmount: {
+        fetch: async (provider: ethers.JsonRpcProvider, address: AddressLike) => {
+          SchemaDataFreshnessManager.ERC20[Contracts.ERC20.JUSD].walletAmount.lastFetched = Date.now();
+          const balanceWei = await provider.getBalance(address);
+          const balanceEther = ethers.formatEther(balanceWei);
+
+          SchemaDataFreshnessManager.ERC20[Contracts.ERC20.JUSD].walletAmount.value(BigInt(balanceEther));
+        },
+        value: makeVar(defaultFieldValue),
+        lastFetched: 0,
+        timeout: 1000 * 5,
+      },
+    },
+
+    [Contracts.ERC20.DFI]: {
+      priceUSDOracle: {
+        fetch: async (collTokenContract: ERC20) => {
+          SchemaDataFreshnessManager.ERC20[Contracts.ERC20.DFI].priceUSDOracle.lastFetched = Date.now();
+
+          // FIXME: Implement Coll Oracle Prices
+          SchemaDataFreshnessManager.ERC20[Contracts.ERC20.DFI].priceUSDOracle.value(1 as any);
+        },
+        value: makeVar(0 as any),
+        lastFetched: 0,
+        timeout: 1000 * 5,
+      },
+
+      walletAmount: {
+        fetch: async (provider: ethers.JsonRpcProvider, address: AddressLike) => {
+          SchemaDataFreshnessManager.ERC20[Contracts.ERC20.DFI].walletAmount.lastFetched = Date.now();
+          const balanceWei = await provider.getBalance(address);
+          const balanceEther = ethers.formatEther(balanceWei);
+
+          SchemaDataFreshnessManager.ERC20[Contracts.ERC20.DFI].walletAmount.value(BigInt(balanceEther));
+        },
+        value: makeVar(defaultFieldValue),
+        lastFetched: 0,
+        timeout: 1000 * 5,
+      },
+    },
+
+    [Contracts.ERC20.USDT]: {
+      priceUSDOracle: {
+        fetch: async (collTokenContract: ERC20) => {
+          SchemaDataFreshnessManager.ERC20[Contracts.ERC20.USDT].priceUSDOracle.lastFetched = Date.now();
+
+          // FIXME: Implement Coll Oracle Prices
+          SchemaDataFreshnessManager.ERC20[Contracts.ERC20.USDT].priceUSDOracle.value(1 as any);
+        },
+        value: makeVar(0 as any),
+        lastFetched: 0,
+        timeout: 1000 * 5,
+      },
+
+      walletAmount: {
+        fetch: async (provider: ethers.JsonRpcProvider, address: AddressLike) => {
+          SchemaDataFreshnessManager.ERC20[Contracts.ERC20.USDT].walletAmount.lastFetched = Date.now();
+          const balanceWei = await provider.getBalance(address);
+          const balanceEther = ethers.formatEther(balanceWei);
+
+          SchemaDataFreshnessManager.ERC20[Contracts.ERC20.USDT].walletAmount.value(BigInt(balanceEther));
+        },
+        value: makeVar(defaultFieldValue),
+        lastFetched: 0,
+        timeout: 1000 * 5,
+      },
+    },
+
     [Contracts.ERC20.ETH]: {
+      priceUSDOracle: {
+        fetch: async (collTokenContract: ERC20) => {
+          SchemaDataFreshnessManager.ERC20[Contracts.ERC20.ETH].priceUSDOracle.lastFetched = Date.now();
+
+          // FIXME: Implement Coll Oracle Prices
+          SchemaDataFreshnessManager.ERC20[Contracts.ERC20.ETH].priceUSDOracle.value(1 as any);
+        },
+        value: makeVar(0 as any),
+        lastFetched: 0,
+        timeout: 1000 * 5,
+      },
+
       walletAmount: {
         fetch: async (provider: ethers.JsonRpcProvider, address: AddressLike) => {
           SchemaDataFreshnessManager.ERC20[Contracts.ERC20.ETH].walletAmount.lastFetched = Date.now();
           const balanceWei = await provider.getBalance(address);
           const balanceEther = ethers.formatEther(balanceWei);
 
-          SchemaDataFreshnessManager.ERC20[Contracts.ERC20.ETH].walletAmount.value(parseInt(balanceEther));
+          SchemaDataFreshnessManager.ERC20[Contracts.ERC20.ETH].walletAmount.value(BigInt(balanceEther));
         },
-        value: makeVar(0),
+        value: makeVar(defaultFieldValue),
         lastFetched: 0,
         timeout: 1000 * 5,
       },
@@ -640,7 +737,7 @@ export const SchemaDataFreshnessManager: ContractDataFreshnessManager<typeof Con
             SchemaDataFreshnessManager.ERC20[Contracts.ERC20.ETH].troveLockedAmount.value(ethers.toNumber(tokenAmount));
           }
         },
-        value: makeVar(0),
+        value: makeVar(defaultFieldValue),
         lastFetched: 0,
         timeout: 1000 * 5,
       },
@@ -665,27 +762,22 @@ export const SchemaDataFreshnessManager: ContractDataFreshnessManager<typeof Con
             );
           }
         },
-        value: makeVar(0),
+        value: makeVar(defaultFieldValue),
         lastFetched: 0,
         timeout: 1000 * 5,
       },
     },
-    [Contracts.ERC20.JUSD]: {},
-    [Contracts.ERC20.DFI]: {},
-    [Contracts.ERC20.USDT]: {},
   },
   DebtToken: {
     [Contracts.DebtToken.STABLE]: {
       priceUSDOracle: {
         fetch: async (debtTokenContract: DebtToken) => {
-          SchemaDataFreshnessManager.DebtToken[Contracts.DebtToken.STABLE]!.priceUSDOracle.lastFetched = Date.now();
+          SchemaDataFreshnessManager.DebtToken[Contracts.DebtToken.STABLE].priceUSDOracle.lastFetched = Date.now();
           const oraclePrice = await debtTokenContract.getPrice();
 
-          SchemaDataFreshnessManager.DebtToken[Contracts.DebtToken.STABLE]!.priceUSDOracle.value(
-            ethers.toNumber(oraclePrice),
-          );
+          SchemaDataFreshnessManager.DebtToken[Contracts.DebtToken.STABLE].priceUSDOracle.value(oraclePrice);
         },
-        value: makeVar(0),
+        value: makeVar(defaultFieldValue),
         lastFetched: 0,
         timeout: 1000 * 5,
       },
@@ -694,11 +786,10 @@ export const SchemaDataFreshnessManager: ContractDataFreshnessManager<typeof Con
         fetch: async (debtTokenContract: DebtToken, borrower: AddressLike) => {
           SchemaDataFreshnessManager.DebtToken[Contracts.DebtToken.STABLE].walletAmount.lastFetched = Date.now();
           const borrowerBalance = await debtTokenContract.balanceOf(borrower);
-          SchemaDataFreshnessManager.DebtToken[Contracts.DebtToken.STABLE].walletAmount.value(
-            ethers.toNumber(borrowerBalance),
-          );
+
+          SchemaDataFreshnessManager.DebtToken[Contracts.DebtToken.STABLE].walletAmount.value(borrowerBalance);
         },
-        value: makeVar(0),
+        value: makeVar(defaultFieldValue),
         lastFetched: 0,
         timeout: 1000 * 5,
       },
@@ -718,12 +809,10 @@ export const SchemaDataFreshnessManager: ContractDataFreshnessManager<typeof Con
             ({ tokenAddress }) => tokenAddress === Contracts.DebtToken.STABLE,
           )?.amount;
           if (tokenAmount) {
-            SchemaDataFreshnessManager.DebtToken[Contracts.DebtToken.STABLE].troveMintedAmount.value(
-              ethers.toNumber(tokenAmount),
-            );
+            SchemaDataFreshnessManager.DebtToken[Contracts.DebtToken.STABLE].troveMintedAmount.value(tokenAmount);
           }
         },
-        value: makeVar(0),
+        value: makeVar(defaultFieldValue),
         lastFetched: 0,
         timeout: 1000 * 5,
       },
@@ -745,11 +834,11 @@ export const SchemaDataFreshnessManager: ContractDataFreshnessManager<typeof Con
           )?.amount;
           if (repayableDebt) {
             SchemaDataFreshnessManager.DebtToken[Contracts.DebtToken.STABLE].troveRepableDebtAmount.value(
-              ethers.toNumber(repayableDebt),
+              repayableDebt,
             );
           }
         },
-        value: makeVar(0),
+        value: makeVar(defaultFieldValue),
         lastFetched: 0,
         timeout: 1000 * 5,
       },
@@ -769,12 +858,10 @@ export const SchemaDataFreshnessManager: ContractDataFreshnessManager<typeof Con
             ({ tokenAddress }) => tokenAddress === Contracts.DebtToken.STABLE,
           )?.amount;
           if (tokenAmount) {
-            SchemaDataFreshnessManager.DebtToken[Contracts.DebtToken.STABLE].providedStability.value(
-              ethers.toNumber(tokenAmount),
-            );
+            SchemaDataFreshnessManager.DebtToken[Contracts.DebtToken.STABLE].providedStability.value(tokenAmount);
           }
         },
-        value: makeVar(0),
+        value: makeVar(defaultFieldValue),
         lastFetched: 0,
         timeout: 1000 * 5,
       },
@@ -793,18 +880,142 @@ export const SchemaDataFreshnessManager: ContractDataFreshnessManager<typeof Con
           const compoundedDeposit =
             ContractDataFreshnessManager.StabilityPoolManager.getDepositorCompoundedDeposits.value.find(
               ({ tokenAddress }) => tokenAddress === Contracts.DebtToken.STABLE,
-            )?.amount!;
+            )?.amount;
 
-          SchemaDataFreshnessManager.DebtToken[Contracts.DebtToken.STABLE].compoundedDeposit.value(
-            ethers.toNumber(compoundedDeposit),
-          );
+          if (compoundedDeposit) {
+            SchemaDataFreshnessManager.DebtToken[Contracts.DebtToken.STABLE].compoundedDeposit.value(compoundedDeposit);
+          }
         },
-        value: makeVar(0),
+        value: makeVar(defaultFieldValue),
         lastFetched: 0,
         timeout: 1000 * 5,
       },
     },
-    [Contracts.DebtToken.STOCK_1]: {},
+
+    [Contracts.DebtToken.STOCK_1]: {
+      priceUSDOracle: {
+        fetch: async (debtTokenContract: DebtToken) => {
+          SchemaDataFreshnessManager.DebtToken[Contracts.DebtToken.STOCK_1].priceUSDOracle.lastFetched = Date.now();
+          const oraclePrice = await debtTokenContract.getPrice();
+
+          SchemaDataFreshnessManager.DebtToken[Contracts.DebtToken.STOCK_1].priceUSDOracle.value(oraclePrice);
+        },
+        value: makeVar(defaultFieldValue),
+        lastFetched: 0,
+        timeout: 1000 * 5,
+      },
+
+      walletAmount: {
+        fetch: async (debtTokenContract: DebtToken, borrower: AddressLike) => {
+          SchemaDataFreshnessManager.DebtToken[Contracts.DebtToken.STOCK_1].walletAmount.lastFetched = Date.now();
+          const borrowerBalance = await debtTokenContract.balanceOf(borrower);
+
+          SchemaDataFreshnessManager.DebtToken[Contracts.DebtToken.STOCK_1].walletAmount.value(borrowerBalance);
+        },
+        value: makeVar(defaultFieldValue),
+        lastFetched: 0,
+        timeout: 1000 * 5,
+      },
+
+      troveMintedAmount: {
+        fetch: async (fetchSource?: { troveManagerContract: TroveManager; borrower: AddressLike }) => {
+          if (fetchSource) {
+            await ContractDataFreshnessManager.TroveManager.getTroveDebt.fetch(
+              fetchSource.troveManagerContract,
+              fetchSource.borrower,
+            );
+          }
+
+          SchemaDataFreshnessManager.DebtToken[Contracts.DebtToken.STOCK_1].troveMintedAmount.lastFetched = Date.now();
+
+          const tokenAmount = ContractDataFreshnessManager.TroveManager.getTroveDebt.value.find(
+            ({ tokenAddress }) => tokenAddress === Contracts.DebtToken.STOCK_1,
+          )?.amount;
+          if (tokenAmount) {
+            SchemaDataFreshnessManager.DebtToken[Contracts.DebtToken.STOCK_1].troveMintedAmount.value(tokenAmount);
+          }
+        },
+        value: makeVar(defaultFieldValue),
+        lastFetched: 0,
+        timeout: 1000 * 5,
+      },
+
+      troveRepableDebtAmount: {
+        fetch: async (fetchSource?: { troveManagerContract: TroveManager; borrower: AddressLike }) => {
+          if (fetchSource) {
+            await ContractDataFreshnessManager.TroveManager.getTroveRepayableDebts.fetch(
+              fetchSource.troveManagerContract,
+              fetchSource.borrower,
+            );
+          }
+
+          SchemaDataFreshnessManager.DebtToken[Contracts.DebtToken.STOCK_1].troveRepableDebtAmount.lastFetched =
+            Date.now();
+
+          const repayableDebt = ContractDataFreshnessManager.TroveManager.getTroveRepayableDebts.value.find(
+            ({ tokenAddress }) => tokenAddress === Contracts.DebtToken.STOCK_1,
+          )?.amount;
+          if (repayableDebt) {
+            SchemaDataFreshnessManager.DebtToken[Contracts.DebtToken.STOCK_1].troveRepableDebtAmount.value(
+              repayableDebt,
+            );
+          }
+        },
+        value: makeVar(defaultFieldValue),
+        lastFetched: 0,
+        timeout: 1000 * 5,
+      },
+
+      providedStability: {
+        fetch: async (fetchSource?: { stabilityPoolManagerContract: StabilityPoolManager; depositor: AddressLike }) => {
+          if (fetchSource) {
+            await ContractDataFreshnessManager.StabilityPoolManager.getDepositorDeposits.fetch(
+              fetchSource.stabilityPoolManagerContract,
+              fetchSource.depositor,
+            );
+          }
+
+          SchemaDataFreshnessManager.DebtToken[Contracts.DebtToken.STOCK_1].providedStability.lastFetched = Date.now();
+
+          const tokenAmount = ContractDataFreshnessManager.StabilityPoolManager.getDepositorDeposits.value.find(
+            ({ tokenAddress }) => tokenAddress === Contracts.DebtToken.STOCK_1,
+          )?.amount;
+          if (tokenAmount) {
+            SchemaDataFreshnessManager.DebtToken[Contracts.DebtToken.STOCK_1].providedStability.value(tokenAmount);
+          }
+        },
+        value: makeVar(defaultFieldValue),
+        lastFetched: 0,
+        timeout: 1000 * 5,
+      },
+
+      compoundedDeposit: {
+        fetch: async (fetchSource?: { stabilityPoolManagerContract: StabilityPoolManager; depositor: AddressLike }) => {
+          if (fetchSource) {
+            await ContractDataFreshnessManager.StabilityPoolManager.getDepositorCompoundedDeposits.fetch(
+              fetchSource.stabilityPoolManagerContract,
+              fetchSource.depositor,
+            );
+          }
+
+          SchemaDataFreshnessManager.DebtToken[Contracts.DebtToken.STOCK_1].compoundedDeposit.lastFetched = Date.now();
+
+          const compoundedDeposit =
+            ContractDataFreshnessManager.StabilityPoolManager.getDepositorCompoundedDeposits.value.find(
+              ({ tokenAddress }) => tokenAddress === Contracts.DebtToken.STOCK_1,
+            )?.amount;
+
+          if (compoundedDeposit) {
+            SchemaDataFreshnessManager.DebtToken[Contracts.DebtToken.STOCK_1].compoundedDeposit.value(
+              compoundedDeposit,
+            );
+          }
+        },
+        value: makeVar(defaultFieldValue),
+        lastFetched: 0,
+        timeout: 1000 * 5,
+      },
+    },
   },
   TroveManager: {
     borrowingRate: {
@@ -814,7 +1025,7 @@ export const SchemaDataFreshnessManager: ContractDataFreshnessManager<typeof Con
 
         SchemaDataFreshnessManager.TroveManager.borrowingRate.value(ethers.toNumber(borrowingRate));
       },
-      value: makeVar(0),
+      value: makeVar(defaultFieldValue),
       lastFetched: 0,
       timeout: 1000 * 5,
     },
@@ -836,7 +1047,7 @@ export const SchemaDataFreshnessManager: ContractDataFreshnessManager<typeof Con
             ethers.toNumber(amount),
           );
         },
-        value: makeVar(0),
+        value: makeVar(defaultFieldValue),
         lastFetched: 0,
         timeout: 1000 * 5,
       },
@@ -854,7 +1065,7 @@ export const SchemaDataFreshnessManager: ContractDataFreshnessManager<typeof Con
             Math.random(),
           );
         },
-        value: makeVar(0),
+        value: makeVar(defaultFieldValue),
         lastFetched: 0,
         timeout: 1000 * 5,
       },
@@ -870,10 +1081,9 @@ export const SchemaDataFreshnessManager: ContractDataFreshnessManager<typeof Con
 
         SchemaDataFreshnessManager.StoragePool.totalCollateralRatio.lastFetched = Date.now();
         const { TCR } = ContractDataFreshnessManager.StoragePool.checkRecoveryMode.value;
-
-        SchemaDataFreshnessManager.StoragePool.totalCollateralRatio.value(ethers.toNumber(TCR));
+        SchemaDataFreshnessManager.StoragePool.totalCollateralRatio.value(dangerouslyConvertBigNumberToNumber(TCR));
       },
-      value: makeVar(0),
+      value: makeVar(defaultFieldValue),
       lastFetched: 0,
       timeout: 1000 * 5,
     },
@@ -899,5 +1109,7 @@ export const SchemaDataFreshnessManager: ContractDataFreshnessManager<typeof Con
 
 // FIXME: I am too stupid to make this typesafe for now. I must pass the exact Contract Data literally.
 function isFieldOutdated(contract: ContractData<any>, field: string) {
+  console.log('contract: ', contract);
+  console.log('field: ', field);
   return contract[field].lastFetched < Date.now() - contract[field].timeout;
 }

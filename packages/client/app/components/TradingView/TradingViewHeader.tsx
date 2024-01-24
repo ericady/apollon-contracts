@@ -15,6 +15,8 @@ function TradingViewHeader() {
     skip: !selectedToken,
   });
 
+  console.log('data: ', data);
+
   return (
     <div
       style={{
@@ -45,7 +47,7 @@ function TradingViewHeader() {
         <Typography variant="subtitle1" fontFamily="Space Grotesk Variable">
           Pool
           <Box sx={{ color: 'text.primary', display: 'inline', ml: '8px' }}>
-            {selectedToken ? selectedToken.priceUSD : ' -'}
+            {selectedToken ? roundCurrency(selectedToken.priceUSD) : ' -'}
           </Box>{' '}
           $
         </Typography>

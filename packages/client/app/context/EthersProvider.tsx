@@ -38,6 +38,21 @@ declare global {
   }
 }
 
+export const isDebtTokenAddress = (
+  address: string,
+): address is '0x7a2088a1bFc9d81c55368AE168C2C02570cB814F' | '0x67d269191c92Caf3cD7723F116c85e6E9bf55933' => {
+  return Object.values(Contracts.DebtToken).includes(address as any);
+};
+export const isCollateralTokenAddress = (
+  address: string,
+): address is
+  | '0x59b670e9fA9D0A427751Af201D676719a970857b'
+  | '0xc6e7DF5E7b4f2A278906862b61205850344D4e7d'
+  | '0x9E545E3C0baAB3E08CdfD552C960A1050f373042'
+  | '0xa82fF9aFd8f496c3d6ac40E2a0F282E47488CFc9' => {
+  return Object.values(Contracts.ERC20).includes(address as any);
+};
+
 // TODO: These are the demo/production contracts. Replace them with the real ones.
 export const Contracts = {
   DebtToken: {

@@ -302,9 +302,7 @@ const borrowerHistory: BorrowerHistory[] = Array(faker.number.int({ min: 5, max:
     const type = faker.helpers.enumValue(BorrowerHistoryType);
 
     const lostAmount = parseFloat(faker.finance.amount(1, 1000, 2));
-    const gainedAmount = parseFloat(
-      faker.finance.amount(lostAmount, faker.number.int({ min: lostAmount, max: lostAmount * 1.1 }), 2),
-    );
+    const gainedAmount = faker.number.float({ min: lostAmount, max: lostAmount * 1.1, precision: 0.0001 });
 
     // negative amount and only on lost token for claimed rewards
     const lostToken =

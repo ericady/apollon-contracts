@@ -61,3 +61,21 @@ export function bigIntStringToFloat(bigIntValue: string, decimals = 18) {
 
   return floatValue;
 }
+
+export function dangerouslyConvertBigNumberToNumber(bigNumber: bigint, precisionDigits = 18) {
+  // Define the scaling factor based on the desired precision
+  const scalingFactor = ethers.parseUnits('1', precisionDigits);
+
+  // Scale down the BigNumber by the precision factor
+  const scaledValue = bigNumber / scalingFactor;
+
+  // Check if the scaled value is within JavaScript's safe integer range
+  if (scaledValue < ethers.parseUnits(Number.MAX_SAFE_INTEGER.toString(), precisionDigits)) {
+    // Convert to a JavaScript number
+    return bigIntStringToFloat(scaledValue.toString(), precisionDigits);
+  } else {
+    // Log an error or handle the case where the value is still too large
+    console.error("Resulting number exceeds JavaScript's safe integer range.");
+    return 0;
+  }
+}
