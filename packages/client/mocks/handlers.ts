@@ -99,8 +99,6 @@ const collateralTokens: Token[] = Object.entries(Contracts.ERC20)
 collateralTokens.shift();
 
 const collateralTokenMeta: CollateralTokenMeta[] = collateralTokens.map<CollateralTokenMeta>((collToken) => {
-  const totalValueLockedUSD = parseFloat(faker.finance.amount(10000, 50000, 2));
-
   return {
     __typename: 'CollateralTokenMeta',
     id: faker.string.uuid(),
@@ -383,7 +381,11 @@ export const handlers = [
   graphql.query<{ token: Query['token'] }, QueryTokenArgs>(GET_SELECTED_TOKEN, (req, res, ctx) => {
     const { address } = req.variables;
 
-    const token = tokens.find((token) => token.address === address)!;
+    console.log('req.variables: ', req.variables);
+
+    const token = tokens.concat(collateralTokens).find((token) => token.address === address)!;
+
+    console.log('token: ', token);
 
     return res(ctx.data({ token }));
   }),

@@ -30,6 +30,7 @@ export const GET_ALL_POOLS = gql`
 export const GET_SELECTED_TOKEN = gql`
   query GetSelectedToken($address: String!) {
     token(address: $address) {
+      id
       priceUSDOracle @client
     }
   }
@@ -51,6 +52,7 @@ export const GET_ALL_DEBT_TOKENS = gql`
         address
         symbol
         priceUSD
+        priceUSDOracle @client
         priceUSD24hAgo @client
       }
     }

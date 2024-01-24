@@ -9,7 +9,7 @@ import {
   makeVar,
 } from '@apollo/client';
 import { AddressLike, ethers } from 'ethers';
-import { PropsWithChildren, useEffect } from 'react';
+import { PropsWithChildren } from 'react';
 import { DebtToken, StabilityPoolManager, StoragePool, SwapPair, TroveManager } from '../../generated/types';
 import {
   QueryTokenArgs,
@@ -54,10 +54,12 @@ export function CustomApolloProvider({ children }: PropsWithChildren<{}>) {
     connectToDevTools: true,
     cache: new InMemoryCache({
       typePolicies: {
-        ...cacheConfig,
+        ...cacheConfig.fields,
 
         Query: {
           fields: {
+            ...cacheConfig.Query.fields,
+
             swapEvents: {
               // Don't cache separate results based on
               // any of this field's arguments.
@@ -92,27 +94,27 @@ export function CustomApolloProvider({ children }: PropsWithChildren<{}>) {
   });
 
   // TODO: Implement periodic Updates
-  useEffect(() => {
-    if (process.env.NEXT_PUBLIC_CONTRACT_MOCKING !== 'enabled') {
+  // useEffect(() => {
+  //   if (process.env.NEXT_PUBLIC_CONTRACT_MOCKING !== 'enabled') {
+  //     const priceUSDIntervall = setInterval(() => {
+  //       if (
+  //         isFieldOutdated(SchemaDataFreshnessManager.SwapPairs['0x687E100f79ceD7Cc8b2BD19Eb326a28885F5b371'], 'swapFee')
+  //       ) {
+  //         console.log('isFieldOutdated');
+  //         SchemaDataFreshnessManager.SwapPairs['0x687E100f79ceD7Cc8b2BD19Eb326a28885F5b371'].swapFee.fetch(
+  //           swapPairContracts['STOCK_1'],
+  //         );
+  //       }
 
-      SchemaDataFreshnessManager.SwapPairs['0x687E100f79ceD7Cc8b2BD19Eb326a28885F5b371']
-      const priceUSDIntervall = setInterval(() => {
-        console.log("priceUSDIntervall")
-        if (isFieldOutdated(SchemaDataFreshnessManager.SwapPairs['0x687E100f79ceD7Cc8b2BD19Eb326a28885F5b371'], 'swapFee')) {
-          console.log("isFieldOutdated")
-          SchemaDataFreshnessManager.SwapPairs['0x687E100f79ceD7Cc8b2BD19Eb326a28885F5b371'].swapFee.fetch(
-            swapPairContracts["STOCK_1"],
-          );
-        }
-        // This can be any interval you want but it guarantees data freshness if its not already fresh.
-      }, 1000 * 5);
+  //       // This can be any interval you want but it guarantees data freshness if its not already fresh.
+  //     }, 1000 * 5);
 
-      return () => {
-        clearInterval(priceUSDIntervall);
-      };
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  //     return () => {
+  //       clearInterval(priceUSDIntervall);
+  //     };
+  //   }
+  //   // eslint-disable-next-line react-hooks/exhaustive-deps
+  // }, []);
 
   return <ApolloProvider client={client}>{children}</ApolloProvider>;
 }
@@ -141,14 +143,12 @@ const getProductionCacheConfig = ({
           read() {
             // FIXME: Do this is a separate query later
             return 100;
-          }
+          },
         },
 
         priceUSDOracle: {
           read(_, { args }) {
-            if (
-              isFieldOutdated(SchemaDataFreshnessManager.DebtToken[Contracts.DebtToken.STABLE], 'priceUSDOracle')
-            ) {
+            if (isFieldOutdated(SchemaDataFreshnessManager.DebtToken[Contracts.DebtToken.STABLE], 'priceUSDOracle')) {
               const address = (args as QueryTokenArgs).address;
               SchemaDataFreshnessManager.DebtToken[Contracts.DebtToken.STABLE].priceUSDOracle.fetch(
                 // FIXME: use address insteadof hardcoded contract
@@ -712,8 +712,7 @@ export const SchemaDataFreshnessManager: ContractDataFreshnessManager<typeof Con
             );
           }
 
-          SchemaDataFreshnessManager.DebtToken[Contracts.DebtToken.STABLE].troveMintedAmount.lastFetched =
-            Date.now();
+          SchemaDataFreshnessManager.DebtToken[Contracts.DebtToken.STABLE].troveMintedAmount.lastFetched = Date.now();
 
           const tokenAmount = ContractDataFreshnessManager.TroveManager.getTroveDebt.value.find(
             ({ tokenAddress }) => tokenAddress === Contracts.DebtToken.STABLE,
@@ -764,8 +763,7 @@ export const SchemaDataFreshnessManager: ContractDataFreshnessManager<typeof Con
             );
           }
 
-          SchemaDataFreshnessManager.DebtToken[Contracts.DebtToken.STABLE].providedStability.lastFetched =
-            Date.now();
+          SchemaDataFreshnessManager.DebtToken[Contracts.DebtToken.STABLE].providedStability.lastFetched = Date.now();
 
           const tokenAmount = ContractDataFreshnessManager.StabilityPoolManager.getDepositorDeposits.value.find(
             ({ tokenAddress }) => tokenAddress === Contracts.DebtToken.STABLE,
@@ -790,8 +788,7 @@ export const SchemaDataFreshnessManager: ContractDataFreshnessManager<typeof Con
             );
           }
 
-          SchemaDataFreshnessManager.DebtToken[Contracts.DebtToken.STABLE].compoundedDeposit.lastFetched =
-            Date.now();
+          SchemaDataFreshnessManager.DebtToken[Contracts.DebtToken.STABLE].compoundedDeposit.lastFetched = Date.now();
 
           const compoundedDeposit =
             ContractDataFreshnessManager.StabilityPoolManager.getDepositorCompoundedDeposits.value.find(
@@ -845,10 +842,10 @@ export const SchemaDataFreshnessManager: ContractDataFreshnessManager<typeof Con
       },
       swapFee: {
         fetch: async (swapPairContract: SwapPair) => {
-          console.log("ACTUALLY FETCHING")
+          console.log('ACTUALLY FETCHING');
           SchemaDataFreshnessManager.SwapPairs['0x687E100f79ceD7Cc8b2BD19Eb326a28885F5b371'].swapFee.lastFetched =
             Date.now();
-            console.log('swapPairContract.getSwapFee: ', swapPairContract.getSwapFee);
+          console.log('swapPairContract.getSwapFee: ', swapPairContract.getSwapFee);
           const swapFee = await swapPairContract.getSwapFee();
           console.log('swapFee: ', swapFee);
           const swapFeeInPercent = parseFloat(ethers.formatUnits(swapFee, 6));
