@@ -1,6 +1,7 @@
 'use client';
 
 import { useQuery } from '@apollo/client';
+import { ethers } from 'ethers';
 import { createContext, useContext, useState } from 'react';
 import { GetCollateralTokensQuery, GetCollateralTokensQueryVariables } from '../generated/gql-types';
 import { GET_BORROWER_COLLATERAL_TOKENS } from '../queries';
@@ -8,17 +9,17 @@ import { bigIntStringToFloat } from '../utils/math';
 import { Contracts, useEthers } from './EthersProvider';
 
 export type SelectedToken = {
-  swapFee: number;
-  change: number;
+  swapFee: bigint;
+  change: bigint;
   isFavorite: boolean;
   address: string;
   symbol: string;
-  priceUSD: number;
+  priceUSD: bigint;
   priceUSD24hAgo: number;
-  volume30dUSD: number;
+  volume30dUSD: bigint;
   pool: {
     id: string;
-    liqudityPair: number[];
+    liqudityPair: bigint[];
   };
 };
 
@@ -52,7 +53,7 @@ export default function SelectedTokenProvider({ children }: { children: React.Re
   const tokenRatio =
     JUSDToken === undefined || selectedToken === null
       ? 0
-      : selectedToken!.priceUSD / bigIntStringToFloat(JUSDToken!.priceUSD);
+      : bigIntStringToFloat((selectedToken!.priceUSD / ethers.parseEther(JUSDToken!.priceUSD)).toString());
 
   return (
     <SelectedTokenContext.Provider

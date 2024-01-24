@@ -13,8 +13,8 @@ import { PropsWithChildren } from 'react';
 import { DebtToken, ERC20, StabilityPoolManager, StoragePool, SwapPair, TroveManager } from '../../generated/types';
 import { SystemInfo, TokenFragmentFragment, TroveManager as TroveManagerType } from '../generated/gql-types';
 import { TOKEN_FRAGMENT } from '../queries';
-import { dangerouslyConvertBigNumberToNumber, floatToBigInt } from '../utils/math';
-import { Contracts, isCollateralTokenAddress, isDebtTokenAddress, useEthers } from './EthersProvider';
+import { floatToBigInt } from '../utils/math';
+import { Contracts, isCollateralTokenAddress, isDebtTokenAddress, isPoolAddress, useEthers } from './EthersProvider';
 
 const defaultFieldValue = BigInt(0);
 
@@ -362,55 +362,42 @@ const getProductionCacheConfig = ({
       },
     },
 
-    // Pool: {
-    //   fields: {
-    //     swapFee: {
-    //       read(_, { readField }) {
-    //         const poolAddress = readField('address') as Readonly<string>;
+    Pool: {
+      fields: {
+        swapFee: {
+          read(_, { readField }) {
+            const poolAddress = readField('address') as Readonly<string>;
 
-    //         // FIXME: Change for dynamic address later
-    //         if (
-    //           poolAddress &&
-    //           isFieldOutdated(
-    //             SchemaDataFreshnessManager.SwapPairs['0x687E100f79ceD7Cc8b2BD19Eb326a28885F5b371'],
-    //             'swapFee',
-    //           )
-    //         ) {
-    //           SchemaDataFreshnessManager.SwapPairs['0x687E100f79ceD7Cc8b2BD19Eb326a28885F5b371'].swapFee.fetch(
-    //             swapPairContracts,
-    //           );
-    //         }
+            if (
+              poolAddress &&
+              isPoolAddress(poolAddress) &&
+              isFieldOutdated(SchemaDataFreshnessManager.SwapPairs[poolAddress], 'swapFee')
+            ) {
+              SchemaDataFreshnessManager.SwapPairs[poolAddress].swapFee.fetch(swapPairContracts);
 
-    //         return SchemaDataFreshnessManager.SwapPairs['0x687E100f79ceD7Cc8b2BD19Eb326a28885F5b371'].swapFee.value();
-    //       },
-    //     },
+              return SchemaDataFreshnessManager.SwapPairs[poolAddress].swapFee.value();
+            }
+          },
+        },
 
-    //     borrowerAmount: {
-    //       read(_, { readField }) {
-    //         const poolAddress = readField('address') as Readonly<string>;
+        borrowerAmount: {
+          read(_, { readField }) {
+            const poolAddress = readField('address') as Readonly<string>;
 
-    //         // FIXME: Change for dynamic address later
-    //         if (
-    //           poolAddress &&
-    //           borrower &&
-    //           isFieldOutdated(
-    //             SchemaDataFreshnessManager.SwapPairs['0x687E100f79ceD7Cc8b2BD19Eb326a28885F5b371'],
-    //             'borrowerAmount',
-    //           )
-    //         ) {
-    //           SchemaDataFreshnessManager.SwapPairs['0x687E100f79ceD7Cc8b2BD19Eb326a28885F5b371'].borrowerAmount.fetch(
-    //             swapPairContracts,
-    //             borrower,
-    //           );
-    //         }
+            if (
+              poolAddress &&
+              isPoolAddress(poolAddress) &&
+              borrower &&
+              isFieldOutdated(SchemaDataFreshnessManager.SwapPairs[poolAddress], 'borrowerAmount')
+            ) {
+              SchemaDataFreshnessManager.SwapPairs[poolAddress].borrowerAmount.fetch(swapPairContracts, borrower);
 
-    //         return SchemaDataFreshnessManager.SwapPairs[
-    //           '0x687E100f79ceD7Cc8b2BD19Eb326a28885F5b371'
-    //         ].borrowerAmount.value();
-    //       },
-    //     },
-    //   },
-    // },
+              return SchemaDataFreshnessManager.SwapPairs[poolAddress].borrowerAmount.value();
+            }
+          },
+        },
+      },
+    },
   },
 
   Query: {
@@ -1157,7 +1144,7 @@ export const SchemaDataFreshnessManager: ContractDataFreshnessManager<typeof Con
         SchemaDataFreshnessManager.TroveManager.borrowingRate.lastFetched = Date.now();
         const borrowingRate = await troveManagerContract.getBorrowingRate();
 
-        SchemaDataFreshnessManager.TroveManager.borrowingRate.value(ethers.toNumber(borrowingRate));
+        SchemaDataFreshnessManager.TroveManager.borrowingRate.value(borrowingRate);
       },
       value: makeVar(defaultFieldValue),
       lastFetched: 0,
@@ -1178,7 +1165,7 @@ export const SchemaDataFreshnessManager: ContractDataFreshnessManager<typeof Con
           const amount = userPoolBalance / (floatToBigInt(totalReserve) * floatToBigInt(totalAmount));
 
           SchemaDataFreshnessManager.SwapPairs['0x687E100f79ceD7Cc8b2BD19Eb326a28885F5b371'].borrowerAmount.value(
-            ethers.toNumber(amount),
+            amount,
           );
         },
         value: makeVar(defaultFieldValue),
@@ -1187,17 +1174,11 @@ export const SchemaDataFreshnessManager: ContractDataFreshnessManager<typeof Con
       },
       swapFee: {
         fetch: async (swapPairContract: SwapPair) => {
-          console.log('ACTUALLY FETCHING');
           SchemaDataFreshnessManager.SwapPairs['0x687E100f79ceD7Cc8b2BD19Eb326a28885F5b371'].swapFee.lastFetched =
             Date.now();
-          console.log('swapPairContract.getSwapFee: ', swapPairContract.getSwapFee);
           const swapFee = await swapPairContract.getSwapFee();
-          console.log('swapFee: ', swapFee);
-          const swapFeeInPercent = parseFloat(ethers.formatUnits(swapFee, 6));
 
-          SchemaDataFreshnessManager.SwapPairs['0x687E100f79ceD7Cc8b2BD19Eb326a28885F5b371'].swapFee.value(
-            Math.random(),
-          );
+          SchemaDataFreshnessManager.SwapPairs['0x687E100f79ceD7Cc8b2BD19Eb326a28885F5b371'].swapFee.value(swapFee);
         },
         value: makeVar(defaultFieldValue),
         lastFetched: 0,
@@ -1205,7 +1186,9 @@ export const SchemaDataFreshnessManager: ContractDataFreshnessManager<typeof Con
       },
     },
   },
+
   BorrowerOperations: {},
+
   StoragePool: {
     totalCollateralRatio: {
       fetch: async (fetchSource?: { storagePoolContract: StoragePool }) => {
@@ -1215,7 +1198,7 @@ export const SchemaDataFreshnessManager: ContractDataFreshnessManager<typeof Con
 
         SchemaDataFreshnessManager.StoragePool.totalCollateralRatio.lastFetched = Date.now();
         const { TCR } = ContractDataFreshnessManager.StoragePool.checkRecoveryMode.value;
-        SchemaDataFreshnessManager.StoragePool.totalCollateralRatio.value(dangerouslyConvertBigNumberToNumber(TCR));
+        SchemaDataFreshnessManager.StoragePool.totalCollateralRatio.value(TCR);
       },
       value: makeVar(defaultFieldValue),
       lastFetched: 0,
@@ -1243,7 +1226,5 @@ export const SchemaDataFreshnessManager: ContractDataFreshnessManager<typeof Con
 
 // FIXME: I am too stupid to make this typesafe for now. I must pass the exact Contract Data literally.
 function isFieldOutdated(contract: ContractData<any>, field: string) {
-  console.log('contract: ', contract);
-  console.log('field: ', field);
   return contract[field].lastFetched < Date.now() - contract[field].timeout;
 }

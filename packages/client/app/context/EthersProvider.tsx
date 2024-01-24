@@ -52,6 +52,9 @@ export const isCollateralTokenAddress = (
   | '0xa82fF9aFd8f496c3d6ac40E2a0F282E47488CFc9' => {
   return Object.values(Contracts.ERC20).includes(address as any);
 };
+export const isPoolAddress = (address: string): address is '0x687E100f79ceD7Cc8b2BD19Eb326a28885F5b371' => {
+  return Object.values(Contracts.SwapPairs).includes(address as any);
+};
 
 // TODO: These are the demo/production contracts. Replace them with the real ones.
 export const Contracts = {

@@ -21,12 +21,12 @@ type DebtTokenMeta {
   token: Token!
   timestamp: Int!
   # handled by client
-  walletAmount: Float!
-  troveMintedAmount: Float!
-  providedStability: Float!
-  compoundedDeposit: Float!
-  stabilityCompoundAmount: Float!
-  troveRepableDebtAmount: Float!
+  walletAmount: bigint!
+  troveMintedAmount: bigint!
+  providedStability: bigint!
+  compoundedDeposit: bigint!
+  stabilityCompoundAmount: bigint!
+  troveRepableDebtAmount: bigint!
 
   # global
   stabilityDepositAPY: StabilityDepositAPY!
@@ -62,9 +62,9 @@ type CollateralTokenMeta {
   token: Token!
   timestamp: Int!
   # borrower specific
-  walletAmount: Float!
-  troveLockedAmount: Float!
-  stabilityGainedAmount: Float!
+  walletAmount: bigint!
+  troveLockedAmount: bigint!
+  stabilityGainedAmount: bigint!
 
   # global
   totalValueLockedUSD: BigInt!
@@ -140,7 +140,7 @@ type Pool {
   totalSupply: BigInt!
 
   # client side
-  borrowerAmount: Float!
+  borrowerAmount: bigint!
   # Percent value applied when opening the first position for this pool. Can be negative and positive.
   swapFee: BigInt!
 }
@@ -211,13 +211,13 @@ type Query {
 
 type TroveManager {
   id: ID!
-  borrowingRate: Float!
+  borrowingRate: bigint!
 }
 
 type SystemInfo {
   id: ID!
   recoveryModeActive: Boolean!
-  totalCollateralRatio: Float!
+  totalCollateralRatio: bigint!
 }
 
 type Query {
