@@ -56,8 +56,6 @@ function HistoryTable() {
     });
   };
 
-  console.log('data: ', data);
-
   if (!data) return <HistoryTableLoader />;
 
   return (

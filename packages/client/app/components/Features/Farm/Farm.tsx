@@ -15,7 +15,7 @@ import { useTransactionDialog } from '../../../context/TransactionDialogProvider
 import { GetTroveManagerQuery, GetTroveManagerQueryVariables } from '../../../generated/gql-types';
 import { GET_TROVEMANAGER } from '../../../queries';
 import { WIDGET_HEIGHTS } from '../../../utils/contants';
-import { displayPercentage, floatToBigInt, roundCurrency } from '../../../utils/math';
+import { dangerouslyConvertBigIntToNumber, displayPercentage, floatToBigInt, roundCurrency } from '../../../utils/math';
 import InfoButton from '../../Buttons/InfoButton';
 import FeatureBox from '../../FeatureBox/FeatureBox';
 import NumberInput from '../../FormControls/NumberInput';
@@ -114,15 +114,23 @@ const Farm = () => {
 
   const watchFarmShortValue = parseInt(watch('farmShortValue'));
 
-  const addedDebtUSD = !isNaN(watchFarmShortValue) && selectedToken ? watchFarmShortValue * selectedToken!.priceUSD : 0;
+  const addedDebtUSD =
+    !isNaN(watchFarmShortValue) && selectedToken
+      ? dangerouslyConvertBigIntToNumber(BigInt(watchFarmShortValue) * selectedToken.priceUSD)
+      : 0;
   const borrowingFee = data?.getTroveManager.borrowingRate;
 
   const getExpectedPositionSize = () => {
     // Position size, rename in “Expected position size”, rechnung: vom input die borrowing fee abziehen (steht unten), dann über den pool dex Preis die andere Seite ermitteln und davon dann noch einmal die aktuelle swap fee abziehen
     const expectedPositionSize =
       tabValue === 'Long'
-        ? ((watchFarmShortValue * (1 - borrowingFee!)) / tokenRatio) * (1 - selectedToken!.swapFee)
-        : watchFarmShortValue * (1 - borrowingFee!) * tokenRatio * (1 - selectedToken!.swapFee);
+        ? ((watchFarmShortValue * dangerouslyConvertBigIntToNumber(floatToBigInt(1, 6) - borrowingFee!, 6)) /
+            tokenRatio) *
+          dangerouslyConvertBigIntToNumber(floatToBigInt(1, 6) - selectedToken!.swapFee, 6)
+        : watchFarmShortValue *
+          dangerouslyConvertBigIntToNumber(floatToBigInt(1, 6) - borrowingFee!, 6) *
+          tokenRatio *
+          dangerouslyConvertBigIntToNumber(floatToBigInt(1, 6) - selectedToken!.swapFee, 6);
 
     return expectedPositionSize;
   };
@@ -135,20 +143,22 @@ const Farm = () => {
 
     const currentPrice = liqudityPair[0] / liqudityPair[1];
 
-    let newPriceAfterSwap;
+    let newPriceAfterSwap: bigint;
     if (tabValue === 'Long') {
       // Calculate new amount of the other token after swap
-      const newY = (liqudityPair[1] * liqudityPair[0]) / (liqudityPair[0] + watchFarmShortValue);
-      newPriceAfterSwap = watchFarmShortValue / (liqudityPair[1] - newY);
+      const newY = (liqudityPair[1] * liqudityPair[0]) / (liqudityPair[0] + BigInt(watchFarmShortValue));
+      newPriceAfterSwap = BigInt(watchFarmShortValue) / (liqudityPair[1] - newY);
     } else {
       // Calculate new amount of jUSD after swap
-      const newX = (liqudityPair[0] * liqudityPair[1]) / (liqudityPair[1] + watchFarmShortValue);
-      newPriceAfterSwap = (liqudityPair[0] - newX) / watchFarmShortValue;
+      const newX = (liqudityPair[0] * liqudityPair[1]) / (liqudityPair[1] + BigInt(watchFarmShortValue));
+      newPriceAfterSwap = (liqudityPair[0] - newX) / BigInt(watchFarmShortValue);
     }
 
     // Calculate price impact
-    const priceImpact = ((newPriceAfterSwap - currentPrice) / currentPrice) * 100; // in percentage
-    return Math.abs(priceImpact) > 1 ? 1 : Math.abs(priceImpact);
+    const priceImpact = ((newPriceAfterSwap - currentPrice) / currentPrice) * BigInt(100); // in percentage
+    return Math.abs(dangerouslyConvertBigIntToNumber(priceImpact)) > 1
+      ? 1
+      : Math.abs(dangerouslyConvertBigIntToNumber(priceImpact));
   };
 
   return (
@@ -254,7 +264,17 @@ const Farm = () => {
                 >
                   Price per unit:
                   {selectedToken && data ? (
-                    <span>{roundCurrency(tokenRatio * (1 + selectedToken.swapFee + borrowingFee!), 5, 5)} jUSD</span>
+                    <span>
+                      {roundCurrency(
+                        dangerouslyConvertBigIntToNumber(
+                          BigInt(tokenRatio) * (floatToBigInt(1, 6) + selectedToken.swapFee + borrowingFee!),
+                          6,
+                        ),
+                        5,
+                        5,
+                      )}{' '}
+                      jUSD
+                    </span>
                   ) : (
                     <Skeleton width="120px" />
                   )}
@@ -271,7 +291,10 @@ const Farm = () => {
                 >
                   Protocol swap fee:
                   {selectedToken ? (
-                    <span data-testid="apollon-farm-protocol-fee"> {displayPercentage(selectedToken.swapFee)}</span>
+                    <span data-testid="apollon-farm-protocol-fee">
+                      {' '}
+                      {displayPercentage(dangerouslyConvertBigIntToNumber(selectedToken.swapFee))}
+                    </span>
                   ) : (
                     <div style={{ display: 'flex', alignItems: 'center', gap: 5, width: 120 }}>
                       <Skeleton width="55px" />
@@ -292,7 +315,9 @@ const Farm = () => {
                 >
                   Borrowing fee:
                   {data ? (
-                    <span data-testid="apollon-farm-borrowing-fee">{displayPercentage(borrowingFee!)}</span>
+                    <span data-testid="apollon-farm-borrowing-fee">
+                      {displayPercentage(dangerouslyConvertBigIntToNumber(borrowingFee!))}
+                    </span>
                   ) : (
                     <div style={{ display: 'flex', alignItems: 'center', gap: 5, width: 120 }}>
                       <Skeleton width="55px" />

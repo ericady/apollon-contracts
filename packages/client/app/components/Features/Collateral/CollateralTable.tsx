@@ -11,7 +11,7 @@ import { useCallback, useMemo, useState } from 'react';
 import { useEthers } from '../../../context/EthersProvider';
 import { GetCollateralTokensQuery, GetCollateralTokensQueryVariables } from '../../../generated/gql-types';
 import { GET_BORROWER_COLLATERAL_TOKENS } from '../../../queries';
-import { bigIntStringToFloat, displayPercentage, roundCurrency, roundNumber } from '../../../utils/math';
+import { dangerouslyConvertBigIntToNumber, displayPercentage, roundCurrency, roundNumber } from '../../../utils/math';
 import DiamondIcon from '../../Icons/DiamondIcon';
 import Label from '../../Label/Label';
 import HeaderCell from '../../Table/HeaderCell';
@@ -63,7 +63,9 @@ function CollateralTable() {
         .map((token) => ({
           ...token,
           chartColor: colorPalette.shift(),
-          troveValueUSD: roundNumber(token.troveLockedAmount ?? 0 * bigIntStringToFloat(token.token.priceUSD)),
+          troveValueUSD: token.troveLockedAmount
+            ? roundNumber(dangerouslyConvertBigIntToNumber(token.troveLockedAmount * BigInt(token.token.priceUSD)))
+            : 0,
         })) ?? []
     );
   }, [data]);
@@ -137,11 +139,13 @@ function CollateralTable() {
                           />
                         </svg>
                         <Typography color="primary.contrastText" fontWeight={400}>
-                          {roundCurrency(troveLockedAmount!, 5, 5)}
+                          {roundCurrency(dangerouslyConvertBigIntToNumber(troveLockedAmount!), 5, 5)}
                         </Typography>
                       </div>
                     </TableCell>
-                    <TableCell align="right">{roundCurrency(walletAmount!, 5, 5)}</TableCell>
+                    <TableCell align="right">
+                      {roundCurrency(dangerouslyConvertBigIntToNumber(walletAmount!), 5, 5)}
+                    </TableCell>
                     <TableCell>
                       <Label variant="none">{token.symbol}</Label>
                     </TableCell>

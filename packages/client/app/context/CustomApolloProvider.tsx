@@ -602,9 +602,9 @@ export const SchemaDataFreshnessManager: ContractDataFreshnessManager<typeof Con
           SchemaDataFreshnessManager.ERC20[Contracts.ERC20.JUSD].priceUSDOracle.lastFetched = Date.now();
 
           // FIXME: Implement Coll Oracle Prices
-          SchemaDataFreshnessManager.ERC20[Contracts.ERC20.JUSD].priceUSDOracle.value(1 as any);
+          SchemaDataFreshnessManager.ERC20[Contracts.ERC20.JUSD].priceUSDOracle.value(defaultFieldValue);
         },
-        value: makeVar(0 as any),
+        value: makeVar(defaultFieldValue),
         lastFetched: 0,
         timeout: 1000 * 5,
       },
@@ -613,9 +613,8 @@ export const SchemaDataFreshnessManager: ContractDataFreshnessManager<typeof Con
         fetch: async (provider: ethers.JsonRpcProvider, address: AddressLike) => {
           SchemaDataFreshnessManager.ERC20[Contracts.ERC20.JUSD].walletAmount.lastFetched = Date.now();
           const balanceWei = await provider.getBalance(address);
-          const balanceEther = ethers.formatEther(balanceWei);
 
-          SchemaDataFreshnessManager.ERC20[Contracts.ERC20.JUSD].walletAmount.value(BigInt(balanceEther));
+          SchemaDataFreshnessManager.ERC20[Contracts.ERC20.JUSD].walletAmount.value(balanceWei);
         },
         value: makeVar(defaultFieldValue),
         lastFetched: 0,
@@ -675,9 +674,9 @@ export const SchemaDataFreshnessManager: ContractDataFreshnessManager<typeof Con
           SchemaDataFreshnessManager.ERC20[Contracts.ERC20.DFI].priceUSDOracle.lastFetched = Date.now();
 
           // FIXME: Implement Coll Oracle Prices
-          SchemaDataFreshnessManager.ERC20[Contracts.ERC20.DFI].priceUSDOracle.value(1 as any);
+          SchemaDataFreshnessManager.ERC20[Contracts.ERC20.DFI].priceUSDOracle.value(defaultFieldValue);
         },
-        value: makeVar(0 as any),
+        value: makeVar(defaultFieldValue),
         lastFetched: 0,
         timeout: 1000 * 5,
       },
@@ -686,9 +685,8 @@ export const SchemaDataFreshnessManager: ContractDataFreshnessManager<typeof Con
         fetch: async (provider: ethers.JsonRpcProvider, address: AddressLike) => {
           SchemaDataFreshnessManager.ERC20[Contracts.ERC20.DFI].walletAmount.lastFetched = Date.now();
           const balanceWei = await provider.getBalance(address);
-          const balanceEther = ethers.formatEther(balanceWei);
 
-          SchemaDataFreshnessManager.ERC20[Contracts.ERC20.DFI].walletAmount.value(BigInt(balanceEther));
+          SchemaDataFreshnessManager.ERC20[Contracts.ERC20.DFI].walletAmount.value(balanceWei);
         },
         value: makeVar(defaultFieldValue),
         lastFetched: 0,
@@ -748,9 +746,9 @@ export const SchemaDataFreshnessManager: ContractDataFreshnessManager<typeof Con
           SchemaDataFreshnessManager.ERC20[Contracts.ERC20.USDT].priceUSDOracle.lastFetched = Date.now();
 
           // FIXME: Implement Coll Oracle Prices
-          SchemaDataFreshnessManager.ERC20[Contracts.ERC20.USDT].priceUSDOracle.value(1 as any);
+          SchemaDataFreshnessManager.ERC20[Contracts.ERC20.USDT].priceUSDOracle.value(defaultFieldValue);
         },
-        value: makeVar(0 as any),
+        value: makeVar(defaultFieldValue),
         lastFetched: 0,
         timeout: 1000 * 5,
       },
@@ -759,9 +757,8 @@ export const SchemaDataFreshnessManager: ContractDataFreshnessManager<typeof Con
         fetch: async (provider: ethers.JsonRpcProvider, address: AddressLike) => {
           SchemaDataFreshnessManager.ERC20[Contracts.ERC20.USDT].walletAmount.lastFetched = Date.now();
           const balanceWei = await provider.getBalance(address);
-          const balanceEther = ethers.formatEther(balanceWei);
 
-          SchemaDataFreshnessManager.ERC20[Contracts.ERC20.USDT].walletAmount.value(BigInt(balanceEther));
+          SchemaDataFreshnessManager.ERC20[Contracts.ERC20.USDT].walletAmount.value(balanceWei);
         },
         value: makeVar(defaultFieldValue),
         lastFetched: 0,
@@ -821,9 +818,9 @@ export const SchemaDataFreshnessManager: ContractDataFreshnessManager<typeof Con
           SchemaDataFreshnessManager.ERC20[Contracts.ERC20.ETH].priceUSDOracle.lastFetched = Date.now();
 
           // FIXME: Implement Coll Oracle Prices
-          SchemaDataFreshnessManager.ERC20[Contracts.ERC20.ETH].priceUSDOracle.value(1 as any);
+          SchemaDataFreshnessManager.ERC20[Contracts.ERC20.ETH].priceUSDOracle.value(defaultFieldValue);
         },
-        value: makeVar(0 as any),
+        value: makeVar(defaultFieldValue),
         lastFetched: 0,
         timeout: 1000 * 5,
       },
@@ -832,9 +829,8 @@ export const SchemaDataFreshnessManager: ContractDataFreshnessManager<typeof Con
         fetch: async (provider: ethers.JsonRpcProvider, address: AddressLike) => {
           SchemaDataFreshnessManager.ERC20[Contracts.ERC20.ETH].walletAmount.lastFetched = Date.now();
           const balanceWei = await provider.getBalance(address);
-          const balanceEther = ethers.formatEther(balanceWei);
 
-          SchemaDataFreshnessManager.ERC20[Contracts.ERC20.ETH].walletAmount.value(BigInt(balanceEther));
+          SchemaDataFreshnessManager.ERC20[Contracts.ERC20.ETH].walletAmount.value(balanceWei);
         },
         value: makeVar(defaultFieldValue),
         lastFetched: 0,

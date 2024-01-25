@@ -11,7 +11,7 @@ import { useMemo } from 'react';
 import { useEthers } from '../../../context/EthersProvider';
 import { GetBorrowerDebtTokensQuery, GetBorrowerDebtTokensQueryVariables } from '../../../generated/gql-types';
 import { GET_BORROWER_DEBT_TOKENS } from '../../../queries';
-import { bigIntStringToFloat, roundCurrency, roundNumber } from '../../../utils/math';
+import { dangerouslyConvertBigIntToNumber, roundCurrency, roundNumber } from '../../../utils/math';
 import Label from '../../Label/Label';
 import HeaderCell from '../../Table/HeaderCell';
 import DebtPieVisualization from '../../Visualizations/DebtPieVisualization';
@@ -56,7 +56,9 @@ function DebtTable() {
         .map((token) => ({
           ...token,
           chartColor: colorPalette.shift(),
-          troveMintedUSD: roundNumber(token.troveMintedAmount ?? 0 * bigIntStringToFloat(token.token.priceUSD)),
+          troveMintedUSD: token.troveMintedAmount
+            ? roundNumber(dangerouslyConvertBigIntToNumber(token.troveMintedAmount * BigInt(token.token.priceUSD)))
+            : 0,
         })) ?? []
     );
   }, [data]);
@@ -110,11 +112,13 @@ function DebtTable() {
                           />
                         </svg>
                         <Typography color="primary.contrastText" fontWeight={400}>
-                          {roundCurrency(troveMintedAmount!, 5, 5)}
+                          {roundCurrency(dangerouslyConvertBigIntToNumber(troveMintedAmount!), 5, 5)}
                         </Typography>
                       </div>
                     </TableCell>
-                    <TableCell align="right">{roundCurrency(walletAmount!, 5, 5)}</TableCell>
+                    <TableCell align="right">
+                      {roundCurrency(dangerouslyConvertBigIntToNumber(walletAmount!), 5, 5)}
+                    </TableCell>
                     <TableCell>
                       <Label variant="none">{token.symbol}</Label>
                     </TableCell>
