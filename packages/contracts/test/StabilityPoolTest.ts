@@ -19,6 +19,7 @@ import {
   TimeValues,
   getEmittedLiquidationValues,
   increaseDebt,
+  TroveStatus,
 } from '../utils/testHelper';
 import { parseUnits } from 'ethers';
 import apollonTesting from '../ignition/modules/apollonTesting';
@@ -658,6 +659,26 @@ describe('StabilityPool', () => {
           'ZeroAmount()'
         );
       });
+
+      it('updates totalDebtDeposits by correct amount', async () => {
+        await whaleShrimpTroveInit(contracts, signers, false);
+
+        const totalDeposit_Before = await stabilityPoolManager.getTotalDeposit(STABLE);
+
+        const provideToSP = parseUnits('1000');
+
+        await stabilityPoolManager.connect(alice).provideStability([{ tokenAddress: STABLE, amount: provideToSP }]);
+
+        const totalDeposit_After = await stabilityPoolManager.getTotalDeposit(STABLE);
+
+        assert.equal(totalDeposit_After, totalDeposit_Before + provideToSP);
+
+        await stabilityPoolManager.connect(alice).withdrawStability([{ tokenAddress: STABLE, amount: provideToSP }]);
+
+        const totalDeposit_After_Withdraw = await stabilityPoolManager.getTotalDeposit(STABLE);
+
+        assert.equal(totalDeposit_After_Withdraw, totalDeposit_Before);
+      });
     });
 
     describe('withdrawFromSP()', () => {
@@ -695,6 +716,26 @@ describe('StabilityPool', () => {
       //     stabilityPoolManager.connect(alice).withdrawStability([{ tokenAddress: STABLE, amount: parseUnits('500') }])
       //   );
       // });
+
+      // function is incomplete, it does not revert anything if user has no active deposit
+      it('reverts when user has no active deposit', async () => {
+        await whaleShrimpTroveInit(contracts, signers, false);
+
+        const provideToSP = parseUnits('1000');
+
+        await stabilityPoolManager.connect(alice).provideStability([{ tokenAddress: STABLE, amount: provideToSP }]);
+
+        const alice_initialDeposit = await stabilityPoolManager.getDepositorDeposit(alice, STABLE);
+        console.warn('☢️ ~ it ~ alice_initialDeposit:', alice_initialDeposit);
+
+        const bob_initialDeposit = await stabilityPoolManager.getDepositorDeposit(bob, STABLE);
+        console.warn('☢️ ~ it ~ bob_initialDeposit:', bob_initialDeposit);
+
+        const bobWith = await stabilityPoolManager
+          .connect(bob)
+          .withdrawStability([{ tokenAddress: STABLE, amount: provideToSP }]);
+        console.warn('☢️ ~ it ~ bobWith:', bobWith);
+      });
 
       it('partial retrieval - retrieves correct stable amount and the entire btc Gain, and updates deposit', async () => {
         // --- SETUP ---
@@ -1155,9 +1196,12 @@ describe('StabilityPool', () => {
         const stableInSPBefore = await stabilityPool.getTotalDeposit();
 
         // Bob attempts to withdraws 1 wei more than his compounded deposit from the Stability Pool
-        await stabilityPoolManager
-          .connect(bob)
-          .withdrawStability([{ tokenAddress: STABLE, amount: bob_Deposit_Before + BigInt(1) }]);
+        await stabilityPoolManager.connect(bob).withdrawStability([
+          {
+            tokenAddress: STABLE,
+            amount: bob_Deposit_Before + BigInt(1),
+          },
+        ]);
 
         // Check Bob's LUSD balance has risen by only the value of his compounded deposit
         const bob_expectedLUSDBalance = bob_Stable_Balance_Before + bob_Deposit_Before;
@@ -1300,6 +1344,26 @@ describe('StabilityPool', () => {
     });
 
     describe('withdrawGains():', () => {
+      // function is incomplete, it does not revert anything if user has no active deposit
+      it('reverts when user has no active deposit', async () => {
+        await whaleShrimpTroveInit(contracts, signers, false);
+
+        const provideToSP = parseUnits('1000');
+
+        await stabilityPoolManager.connect(alice).provideStability([{ tokenAddress: STABLE, amount: provideToSP }]);
+
+        const alice_initialDeposit = await stabilityPoolManager.getDepositorDeposit(alice, STABLE);
+        console.warn('☢️ ~ it ~ alice_initialDeposit:', alice_initialDeposit);
+
+        const bob_initialDeposit = await stabilityPoolManager.getDepositorDeposit(bob, STABLE);
+        console.warn('☢️ ~ it ~ bob_initialDeposit:', bob_initialDeposit);
+
+        const bobWith = await stabilityPoolManager
+          .connect(bob)
+          .provideStability([{ tokenAddress: STABLE, amount: provideToSP }]);
+        console.warn('☢️ ~ it ~ bobWith:', bobWith);
+      });
+
       it("Applies stable loss to user's deposit, and redirects coll reward to user's wallet", async () => {
         await whaleShrimpTroveInit(contracts, signers);
 
@@ -1406,6 +1470,33 @@ describe('StabilityPool', () => {
         // no btc left in pool, all claimed
         const btcInPool = (await stabilityPool.getTotalGainedColl()).find(d => d.tokenAddress === BTC.target)?.amount;
         expect(btcInPool).to.be.lt(10000);
+      });
+
+      it('reverts if user has no trove', async () => {
+        await whaleShrimpTroveInit(contracts, signers, false);
+
+        const provideToSP = parseUnits('1000');
+
+        await STABLE.connect(alice).transfer(defaulter_3, provideToSP);
+
+        await stabilityPoolManager
+          .connect(defaulter_3)
+          .provideStability([{ tokenAddress: STABLE, amount: provideToSP }]);
+
+        // drop price
+        await priceFeed.setTokenPrice(BTC, parseUnits('5000'));
+
+        await liquidationOperations.liquidate(defaulter_1);
+        expect((await troveManager.getTroveStatus(defaulter_1)).toString()).to.be.equal(
+          TroveStatus.CLOSED_BY_LIQUIDATION_IN_NORMAL_MODE.toString()
+        );
+
+        // price hikes
+        await priceFeed.setTokenPrice(BTC, parseUnits('21000'));
+
+        expect(await stabilityPoolManager.connect(defaulter_3).withdrawGains()).to.be.equal(
+          TroveStatus.NON_EXISTENT.toString()
+        );
       });
     });
   });
