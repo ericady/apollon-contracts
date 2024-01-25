@@ -15,7 +15,12 @@ import { GetAllPoolsQuery, GetAllPoolsQueryVariables } from '../../../generated/
 import { GET_ALL_POOLS } from '../../../queries';
 import { WIDGET_HEIGHTS } from '../../../utils/contants';
 import { getCheckSum } from '../../../utils/crypto';
-import { bigIntStringToFloat, displayPercentage, roundCurrency } from '../../../utils/math';
+import {
+  bigIntStringToFloat,
+  dangerouslyConvertBigIntToNumber,
+  displayPercentage,
+  roundCurrency,
+} from '../../../utils/math';
 import FeatureBox from '../../FeatureBox/FeatureBox';
 import DirectionIcon from '../../Icons/DirectionIcon';
 import PinnedIcon from '../../Icons/PinnedIcon';
@@ -58,21 +63,21 @@ function Assets() {
         const token = tokenA.token.address === Contracts.ERC20.JUSD ? tokenB.token : tokenA.token;
         return {
           ...token,
-          priceUSD: bigIntStringToFloat(token.priceUSD),
-          priceUSD24hAgo: bigIntStringToFloat(token.priceUSD24hAgo),
-          swapFee: bigIntStringToFloat(swapFee, 6),
+          priceUSD: BigInt(token.priceUSD),
+          priceUSD24hAgo: BigInt(token.priceUSD24hAgo),
+          swapFee: BigInt(swapFee),
           // calculate change over last 24h
           change:
             (bigIntStringToFloat(token.priceUSD) - bigIntStringToFloat(token.priceUSD24hAgo)) /
             bigIntStringToFloat(token.priceUSD24hAgo),
           isFavorite: favoritedAssets.find((address) => token.address === address) !== undefined ? true : false,
-          volume30dUSD: bigIntStringToFloat(volume30dUSD.value),
+          volume30dUSD: BigInt(volume30dUSD.value),
           pool: {
             id,
             liqudityPair:
               tokenA.token.address === Contracts.ERC20.JUSD
-                ? [bigIntStringToFloat(tokenA.totalAmount), bigIntStringToFloat(tokenB.totalAmount)]
-                : [bigIntStringToFloat(tokenB.totalAmount), bigIntStringToFloat(tokenA.totalAmount)],
+                ? [BigInt(tokenA.totalAmount), BigInt(tokenB.totalAmount)]
+                : [BigInt(tokenB.totalAmount), BigInt(tokenA.totalAmount)],
           },
         };
       })
@@ -164,12 +169,14 @@ function Assets() {
                     </TableCell>
                     <TableCell sx={{ p: 0.5 }} align="right">
                       <Typography fontWeight={400}>
-                        {JUSDToken ? roundCurrency(priceUSD / bigIntStringToFloat(JUSDToken.priceUSD)) : '-'}
+                        {JUSDToken
+                          ? roundCurrency(dangerouslyConvertBigIntToNumber(priceUSD / BigInt(JUSDToken.priceUSD)))
+                          : '-'}
                       </Typography>
                     </TableCell>
                     <TableCell sx={{ p: 0.5 }} align="right" width={60}>
                       <Typography fontWeight={400} sx={{ color: swapFee < 0 ? 'success.main' : 'error.main' }}>
-                        {displayPercentage(swapFee, 'omit')}
+                        {displayPercentage(dangerouslyConvertBigIntToNumber(swapFee, 6), 'omit')}
                       </Typography>
                     </TableCell>
                     <TableCell sx={{ p: 0.5 }} align="right" width={80}>

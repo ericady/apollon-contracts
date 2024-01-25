@@ -62,7 +62,7 @@ export function bigIntStringToFloat(bigIntValue: string, decimals = 18) {
   return floatValue;
 }
 
-export function dangerouslyConvertBigNumberToNumber(bigNumber: bigint, precisionDigits = 18) {
+export function dangerouslyConvertBigIntToNumber(bigNumber: bigint, precisionDigits = 18) {
   // Define the scaling factor based on the desired precision
   const scalingFactor = ethers.parseUnits('1', precisionDigits);
 

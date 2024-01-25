@@ -10,7 +10,14 @@ import { Contracts, useEthers } from '../../../context/EthersProvider';
 import { useSelectedToken } from '../../../context/SelectedTokenProvider';
 import { useTransactionDialog } from '../../../context/TransactionDialogProvider';
 import { WIDGET_HEIGHTS } from '../../../utils/contants';
-import { displayPercentage, floatToBigInt, roundCurrency, roundNumber } from '../../../utils/math';
+import {
+  bigIntStringToFloat,
+  dangerouslyConvertBigIntToNumber,
+  displayPercentage,
+  floatToBigInt,
+  roundCurrency,
+  roundNumber,
+} from '../../../utils/math';
 import InfoButton from '../../Buttons/InfoButton';
 import FeatureBox from '../../FeatureBox/FeatureBox';
 import NumberInput from '../../FormControls/NumberInput';
@@ -53,7 +60,13 @@ const Swap = () => {
 
     if (variant === 'JUSD') {
       if (!isNaN(numericValue)) {
-        setValue('tokenAmount', roundNumber((numericValue / tokenRatio) * (1 - selectedToken!.swapFee)).toString());
+        setValue(
+          'tokenAmount',
+          roundNumber(
+            (numericValue / tokenRatio) *
+              dangerouslyConvertBigIntToNumber(floatToBigInt(1, 6) - selectedToken!.swapFee, 6),
+          ).toString(),
+        );
         setTradingDirection('jUSDSpent');
       } else {
         setValue('tokenAmount', '');
@@ -62,7 +75,14 @@ const Swap = () => {
       setValue('jUSDAmount', value);
     } else {
       if (!isNaN(numericValue)) {
-        setValue('jUSDAmount', roundNumber(numericValue * tokenRatio * (1 - selectedToken!.swapFee)).toString());
+        setValue(
+          'jUSDAmount',
+          roundNumber(
+            numericValue *
+              tokenRatio *
+              dangerouslyConvertBigIntToNumber(floatToBigInt(1, 6) - selectedToken!.swapFee, 6),
+          ).toString(),
+        );
         setTradingDirection('jUSDAquired');
       } else {
         setValue('jUSDAmount', '');
@@ -158,17 +178,19 @@ const Swap = () => {
     let newPriceAfterSwap;
     if (tradingDirection === 'jUSDSpent') {
       // Calculate new amount of the other token after swap
-      const newY = (liqudityPair[1] * liqudityPair[0]) / (liqudityPair[0] + jUSDAmount);
-      newPriceAfterSwap = jUSDAmount / (liqudityPair[1] - newY);
+      const newY = (liqudityPair[1] * liqudityPair[0]) / (liqudityPair[0] + BigInt(jUSDAmount));
+      newPriceAfterSwap = BigInt(jUSDAmount) / (liqudityPair[1] - newY);
     } else {
       // Calculate new amount of jUSD after swap
-      const newX = (liqudityPair[0] * liqudityPair[1]) / (liqudityPair[1] + tokenAmount);
-      newPriceAfterSwap = (liqudityPair[0] - newX) / tokenAmount;
+      const newX = (liqudityPair[0] * liqudityPair[1]) / (liqudityPair[1] + BigInt(tokenAmount));
+      newPriceAfterSwap = (liqudityPair[0] - newX) / BigInt(tokenAmount);
     }
 
     // Calculate price impact
-    const priceImpact = ((newPriceAfterSwap - currentPrice) / currentPrice) * 100; // in percentage
-    return Math.abs(priceImpact) > 1 ? 1 : Math.abs(priceImpact);
+    const priceImpact = ((newPriceAfterSwap - currentPrice) / currentPrice) * BigInt(100); // in percentage
+    return Math.abs(bigIntStringToFloat(priceImpact.toString())) > 1
+      ? 1
+      : Math.abs(bigIntStringToFloat(priceImpact.toString()));
   };
 
   useEffect(() => {
@@ -284,7 +306,14 @@ const Swap = () => {
               >
                 Price per unit:
                 {selectedToken ? (
-                  <span>{roundCurrency(tokenRatio * (1 - selectedToken.swapFee), 5, 5)} jUSD</span>
+                  <span>
+                    {roundCurrency(
+                      tokenRatio * dangerouslyConvertBigIntToNumber(floatToBigInt(1, 6) - selectedToken.swapFee, 6),
+                      5,
+                      5,
+                    )}{' '}
+                    jUSD
+                  </span>
                 ) : (
                   <Skeleton width="120px" />
                 )}
@@ -301,7 +330,9 @@ const Swap = () => {
               >
                 Swap fee:
                 {selectedToken ? (
-                  <span data-testid="apollon-swap-protocol-fee">{displayPercentage(selectedToken.swapFee)}</span>
+                  <span data-testid="apollon-swap-protocol-fee">
+                    {displayPercentage(dangerouslyConvertBigIntToNumber(selectedToken.swapFee, 6))}
+                  </span>
                 ) : (
                   <div style={{ display: 'flex', alignItems: 'center', gap: 5, width: 120 }}>
                     <Skeleton width="55px" />

@@ -3,12 +3,7 @@ import { Box, Typography } from '@mui/material';
 import { useSelectedToken } from '../../context/SelectedTokenProvider';
 import { GetSelectedTokenQuery, GetSelectedTokenQueryVariables } from '../../generated/gql-types';
 import { GET_SELECTED_TOKEN } from '../../queries';
-import {
-  dangerouslyConvertBigNumberToNumber,
-  displayPercentage,
-  percentageChange,
-  roundCurrency,
-} from '../../utils/math';
+import { dangerouslyConvertBigIntToNumber, displayPercentage, percentageChange, roundCurrency } from '../../utils/math';
 
 function TradingViewHeader() {
   const { selectedToken } = useSelectedToken();
@@ -19,8 +14,6 @@ function TradingViewHeader() {
     },
     skip: !selectedToken,
   });
-
-  console.log('data: ', data);
 
   return (
     <div
@@ -45,21 +38,21 @@ function TradingViewHeader() {
         <Typography variant="subtitle1" fontFamily="Space Grotesk Variable">
           24h Volume
           <Box sx={{ color: 'text.primary', display: 'inline', ml: '8px' }}>
-            {selectedToken ? roundCurrency(dangerouslyConvertBigNumberToNumber(selectedToken.volume30dUSD)) : '-'}
+            {selectedToken ? roundCurrency(dangerouslyConvertBigIntToNumber(selectedToken.volume30dUSD)) : '-'}
           </Box>{' '}
           $
         </Typography>
         <Typography variant="subtitle1" fontFamily="Space Grotesk Variable">
           Pool
           <Box sx={{ color: 'text.primary', display: 'inline', ml: '8px' }}>
-            {selectedToken ? roundCurrency(dangerouslyConvertBigNumberToNumber(selectedToken.priceUSD)) : ' -'}
+            {selectedToken ? roundCurrency(dangerouslyConvertBigIntToNumber(selectedToken.priceUSD)) : ' -'}
           </Box>{' '}
           $
         </Typography>
         <Typography variant="subtitle1" fontFamily="Space Grotesk Variable">
           Oracle
           <Box sx={{ color: 'text.primary', display: 'inline', ml: '8px' }}>
-            {data ? roundCurrency(dangerouslyConvertBigNumberToNumber(data.token.priceUSDOracle)) : ' -'}
+            {data ? roundCurrency(dangerouslyConvertBigIntToNumber(data.token.priceUSDOracle)) : ' -'}
           </Box>{' '}
           $
         </Typography>
@@ -69,8 +62,8 @@ function TradingViewHeader() {
             {data && selectedToken
               ? displayPercentage(
                   percentageChange(
-                    dangerouslyConvertBigNumberToNumber(selectedToken.priceUSD),
-                    dangerouslyConvertBigNumberToNumber(data.token.priceUSDOracle),
+                    dangerouslyConvertBigIntToNumber(selectedToken.priceUSD),
+                    dangerouslyConvertBigIntToNumber(data.token.priceUSDOracle),
                   ),
                   'positive',
                 )
@@ -80,7 +73,7 @@ function TradingViewHeader() {
         <Typography variant="subtitle1" fontFamily="Space Grotesk Variable">
           Swap Fee
           <Box sx={{ color: 'text.primary', display: 'inline', ml: '8px' }}>
-            {selectedToken ? displayPercentage(dangerouslyConvertBigNumberToNumber(selectedToken.swapFee, 6)) : ' -'}
+            {selectedToken ? displayPercentage(dangerouslyConvertBigIntToNumber(selectedToken.swapFee, 6)) : ' -'}
           </Box>
         </Typography>
       </div>

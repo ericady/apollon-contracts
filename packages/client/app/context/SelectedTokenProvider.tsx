@@ -10,12 +10,12 @@ import { Contracts, useEthers } from './EthersProvider';
 
 export type SelectedToken = {
   swapFee: bigint;
-  change: bigint;
+  change: number;
   isFavorite: boolean;
   address: string;
   symbol: string;
   priceUSD: bigint;
-  priceUSD24hAgo: number;
+  priceUSD24hAgo: bigint;
   volume30dUSD: bigint;
   pool: {
     id: string;
