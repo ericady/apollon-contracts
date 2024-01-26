@@ -9,6 +9,8 @@ import {
   StabilityPoolManager,
   StoragePool,
   TroveManager,
+  SwapPair,
+  SwapOperations
 } from '../typechain';
 import { expect, assert } from 'chai';
 import {
@@ -20,8 +22,11 @@ import {
   TimeValues,
   getEmittedLiquidationValues,
   increaseDebt,
+  MAX_BORROWING_FEE,
+  getLatestBlockTimestamp
 } from '../utils/testHelper';
 import { parseUnits } from 'ethers';
+import { MockERC20Interface } from '../typechain/contracts/Mock/MockERC20';
 
 describe('SwapOperations', () => {
   let signers: SignerWithAddress[];
@@ -49,6 +54,74 @@ describe('SwapOperations', () => {
   let borrowerOperations: MockBorrowerOperations;
   let storagePool: StoragePool;
   let stabilityPoolManager: StabilityPoolManager;
+  let swapOperations: SwapOperations;
+
+  const open = async (user: SignerWithAddress, collAmount: bigint, debtAmount: bigint) => {
+    return await openTrove({
+      from: user,
+      contracts,
+      collToken: BTC,
+      collAmount: collAmount,
+      debts: [{ tokenAddress: STABLE, amount: debtAmount }],
+    });
+  };
+
+  const increase = async (user: SignerWithAddress, debts: any[], maxFeePercentage = MAX_BORROWING_FEE) => {
+    return increaseDebt(
+      user,
+      contracts,
+      debts,
+      maxFeePercentage
+    );
+  };
+
+  const deadline = async () : Promise<number> => {    
+    return (await getLatestBlockTimestamp()) + 100;
+  }
+
+  const add = async (user: SignerWithAddress, tokenA: MockERC20, tokenB: MockERC20, amountA: bigint, amountB: bigint, create: boolean = false) : Promise<SwapPair> => {
+    //create pair
+    if (create)
+    {
+      await swapOperations.connect(owner).createPair(
+        tokenA,
+        tokenB
+      );
+    }
+
+    //get pair    
+    const pairAddress = await swapOperations.getPair(
+      tokenA,
+      tokenB
+    );
+    const pair: SwapPair = await ethers.getContractAt('SwapPair', pairAddress);   
+
+    //add liquidty to another pair
+    await tokenA.unprotectedMint(user, amountA);
+    await tokenB.unprotectedMint(user, amountB);
+    await tokenA.connect(user).approve(swapOperations, amountA);
+    await tokenB.connect(user).approve(swapOperations, amountB);
+    await swapOperations.connect(user).addLiquidity(
+      tokenA,
+      tokenB,
+      amountA,
+      amountB,
+      0,
+      0,
+      0,
+      await deadline()
+    );
+
+    return pair;
+  };
+
+  const tokenAmount = (token: MockDebtToken, amount: bigint) =>
+  {
+    return {
+      tokenAddress: token.getAddress(),
+      amount
+    };
+  };
 
   before(async () => {
     signers = await ethers.getSigners();
@@ -65,6 +138,7 @@ describe('SwapOperations', () => {
     borrowerOperations = contracts.borrowerOperations;
     storagePool = contracts.storagePool;
     stabilityPoolManager = contracts.stabilityPoolManager;
+    swapOperations = contracts.swapOperations;
 
     STABLE = contracts.debtToken.STABLE;
     STOCK = contracts.debtToken.STOCK;
@@ -72,16 +146,72 @@ describe('SwapOperations', () => {
     USDT = contracts.collToken.USDT;
   });
 
-  it.skip('should not be possible to mint directly from the borrowerOps', async () => {
-    // todo
+  it('should not be possible to mint directly from the borrowerOps', async () => {
+    //increase debt
+    await expect(
+      borrowerOperations.connect(alice)
+        .increaseDebt(
+          alice.getAddress(),
+          alice.getAddress(),
+          [tokenAmount(STABLE, parseUnits('100'))],
+          MAX_BORROWING_FEE
+        )
+    ).to.be.revertedWithCustomError(borrowerOperations, 'NotFromSwapOps');
   });
 
-  it.skip('SwapPair mint/burn should be only callable from the SwapOps', async () => {
-    // todo
+  it('SwapPair mint/burn should be only callable from the SwapOps', async () => {
+    const amount = parseUnits('1000');
+
+    //open trove
+    await open(alice, parseUnits('1', 9), parseUnits('150'));
+
+    //create pair & add liquidity
+    const pair = await add(
+      alice,
+      STABLE,
+      STOCK,
+      amount,
+      amount,
+      true
+    );
+    
+    //mint
+    await expect(
+      pair.connect(alice).mint(alice)
+    ).to.be.revertedWithCustomError(pair, 'NotFromSwapOperations');
+
+    //burn
+    const balance = await pair.balanceOf(alice);
+    await expect(      
+      pair.connect(alice).burn(alice, balance, 0, 0)
+    ).to.be.revertedWithCustomError(pair, 'NotFromSwapOperations');
   });
 
-  it.skip('liquidity token should not be transferable', async () => {
-    // todo
+  it('liquidity token should not be transferable', async () => {
+    const amount = parseUnits('1000');
+
+    //open trove
+    await open(alice, parseUnits('1', 9), parseUnits('150'));
+
+    //create pair & add liquidity
+    const pair = await add(
+      alice,
+      STABLE,
+      STOCK,
+      amount,
+      amount,
+      true
+    );
+
+    //check if transfer function doesn't exist
+    expect(
+      (pair as any).transfer
+    ).to.be.eql(undefined, 'Transfer function defined');
+
+    //check if transferFrom function doesn't exist
+    expect(
+      (pair as any).transferFrom
+    ).to.be.eql(undefined, 'TransferFrom function defined');
   });
 
   describe('remove liquidity', () => {
@@ -130,25 +260,100 @@ describe('SwapOperations', () => {
     });
   });
 
-  describe('positions', () => {
-    it.skip('open long without trove, should fail', async () => {
-      // todo
-    });
+  describe.only('positions', () => {
+    describe('long', () => {
+      it('open without trove, should fail', async () => {
+        const amount = parseUnits('1000');
 
-    it.skip('open long with unknown debt token', async () => {
-      // todo
-    });
+        //open trove (bob)
+        await open(bob, parseUnits('1', 9), parseUnits('150'));
 
-    it.skip('open long with no enough collateral, should fail', async () => {
-      // todo
-    });
+        //create pair & add liquidity (bob)
+        await add(
+          bob,
+          STABLE,
+          STOCK,
+          amount,
+          amount,
+          true
+        );
 
-    it.skip('open long', async () => {
-      // todo
-    });
+        //open long (alice)
+        await expect(
+            swapOperations.connect(alice).openLongPosition(
+            parseUnits('100'),
+            0,
+            STOCK,
+            alice,
+            await swapOperations.MAX_BORROWING_FEE(),
+            await deadline()
+          )
+        ).to.be.revertedWithCustomError(borrowerOperations, 'TroveClosedOrNotExist');
+      });
 
-    it.skip('same for shorts', async () => {
-      // todo
+      it.skip('open with unknown debt token', async () => {
+        // todo
+      });
+
+      it('open with no enough collateral, should fail', async () => {
+        const amount = parseUnits('1000');
+
+        //open troves
+        await open(alice, parseUnits('1', 9), parseUnits('150'));
+        await open(bob, parseUnits('1'), parseUnits('150'));
+
+        //create pair & add liquidity
+        await add(
+          alice,
+          STABLE,
+          STOCK,
+          amount,
+          amount,
+          true
+        );
+
+        //open long
+        await expect(
+            swapOperations.connect(alice).openLongPosition(
+            parseUnits('1000000'),
+            0,
+            STOCK,
+            alice,
+            await swapOperations.MAX_BORROWING_FEE(),
+            await deadline()
+          )
+        ).to.be.revertedWithCustomError(borrowerOperations, 'ICR_lt_MCR');
+      });
+
+      it.only('open', async () => {
+        const amount = parseUnits('1000');
+
+        //open troves
+        await open(alice, parseUnits('1', 9), parseUnits('150'));
+        await open(bob, parseUnits('1'), parseUnits('150'));
+
+        //create pair & add liquidity
+        await add(
+          alice,
+          STABLE,
+          STOCK,
+          amount,
+          amount,
+          true
+        );
+
+        //open long (check balance before and after)
+        expect(await STOCK.balanceOf(alice)).to.eq(0);
+        await swapOperations.connect(alice).openLongPosition(
+          parseUnits('1'),
+          0,
+          STOCK,
+          alice,
+          await swapOperations.MAX_BORROWING_FEE(),
+          await deadline()
+        );
+        expect(await STOCK.balanceOf(alice)).to.greaterThan(0);
+      });
     });
   });
 });
