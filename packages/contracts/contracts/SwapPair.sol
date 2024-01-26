@@ -201,7 +201,7 @@ contract SwapPair is ISwapPair, SwapERC20, LiquityBase {
       // scope for reserve{0,1}Adjusted, avoids stack too deep errors
       uint balance0Adjusted = balance0 * SWAP_FEE_PRECISION - (amount0In * currentSwapFee);
       uint balance1Adjusted = balance1 * SWAP_FEE_PRECISION - (amount1In * currentSwapFee);
-      if (balance0Adjusted * balance1Adjusted < reserve0 * reserve1 * (SWAP_FEE_PRECISION ** 2)) revert K();
+      if (balance0Adjusted * balance1Adjusted < uint(reserve0) * uint(reserve1) * (uint(SWAP_FEE_PRECISION) ** 2)) revert K();
     }
 
     _update(balance0, balance1, reserve0, reserve1);
