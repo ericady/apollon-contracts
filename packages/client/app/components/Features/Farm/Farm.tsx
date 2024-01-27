@@ -266,10 +266,11 @@ const Farm = () => {
                   {selectedToken && data ? (
                     <span>
                       {roundCurrency(
-                        dangerouslyConvertBigIntToNumber(
-                          BigInt(tokenRatio) * (floatToBigInt(1, 6) + selectedToken.swapFee + borrowingFee!),
-                          6,
-                        ),
+                        tokenRatio *
+                          dangerouslyConvertBigIntToNumber(
+                            floatToBigInt(1, 5) + selectedToken.swapFee + borrowingFee!,
+                            6,
+                          ),
                         5,
                         5,
                       )}{' '}

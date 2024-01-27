@@ -140,13 +140,6 @@ const getProductionCacheConfig = ({
   fields: {
     Token: {
       fields: {
-        priceUSD24hAgo: {
-          read() {
-            // FIXME: Do this is a separate query later
-            return 100;
-          },
-        },
-
         priceUSDOracle: {
           read(_, { readField }) {
             const address = readField('address') as Readonly<string>;
@@ -366,6 +359,8 @@ const getProductionCacheConfig = ({
       fields: {
         swapFee: {
           read(_, { readField }) {
+            return BigInt(5000);
+
             const poolAddress = readField('address') as Readonly<string>;
 
             if (

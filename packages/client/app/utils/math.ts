@@ -62,7 +62,11 @@ export function bigIntStringToFloat(bigIntValue: string, decimals = 18) {
   return floatValue;
 }
 
-export function dangerouslyConvertBigIntToNumber(bigNumber: bigint, precisionDigits = 18): number {
+export function dangerouslyConvertBigIntToNumber(
+  bigNumber: bigint,
+  precisionDigits = 18,
+  shirftDigits?: number,
+): number {
   // Define the scaling factor based on the desired precision
   const scalingFactor = ethers.parseUnits('1', precisionDigits);
 
@@ -72,10 +76,20 @@ export function dangerouslyConvertBigIntToNumber(bigNumber: bigint, precisionDig
   // Check if the scaled value is within JavaScript's safe integer range
   if (scaledValue < ethers.parseUnits(Number.MAX_SAFE_INTEGER.toString(), precisionDigits)) {
     // Convert to a JavaScript number
-    return bigIntStringToFloat(scaledValue.toString(), precisionDigits);
+    return shirftDigits
+      ? bigIntStringToFloat(scaledValue.toString(), precisionDigits) / Math.pow(10, shirftDigits)
+      : bigIntStringToFloat(scaledValue.toString(), precisionDigits);
   } else {
     // Log an error or handle the case where the value is still too large
     console.warn("Resulting number exceeds JavaScript's safe integer range.");
     return 0;
   }
+}
+
+export function divBigIntsToFloat(number: bigint, divideBy: bigint, toPrecission: number): number {
+  const scalingFactor = ethers.parseUnits('1', toPrecission);
+
+  const result = (number * scalingFactor) / divideBy;
+
+  return bigIntStringToFloat(result.toString(), toPrecission);
 }

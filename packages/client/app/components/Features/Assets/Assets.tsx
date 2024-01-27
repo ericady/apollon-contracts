@@ -19,6 +19,7 @@ import {
   bigIntStringToFloat,
   dangerouslyConvertBigIntToNumber,
   displayPercentage,
+  divBigIntsToFloat,
   roundCurrency,
 } from '../../../utils/math';
 import FeatureBox from '../../FeatureBox/FeatureBox';
@@ -42,9 +43,10 @@ function Assets() {
   const { selectedToken, setSelectedToken, JUSDToken } = useSelectedToken();
 
   // TODO: Implement a filter for only JUSD to subgraph
-  const { data, startPolling, refetch } = useQuery<GetAllPoolsQuery, GetAllPoolsQueryVariables>(GET_ALL_POOLS);
+  const { data } = useQuery<GetAllPoolsQuery, GetAllPoolsQueryVariables>(GET_ALL_POOLS);
 
   const tokens = useMemo<SelectedToken[]>(() => {
+    // FIXME: Implement real await for queried data
     if (!data?.pools[0].swapFee) return [];
 
     const jUSDPools =
@@ -169,14 +171,12 @@ function Assets() {
                     </TableCell>
                     <TableCell sx={{ p: 0.5 }} align="right">
                       <Typography fontWeight={400}>
-                        {JUSDToken
-                          ? roundCurrency(dangerouslyConvertBigIntToNumber(priceUSD / BigInt(JUSDToken.priceUSD)))
-                          : '-'}
+                        {JUSDToken ? roundCurrency(divBigIntsToFloat(priceUSD, BigInt(JUSDToken.priceUSD), 5)) : '-'}
                       </Typography>
                     </TableCell>
                     <TableCell sx={{ p: 0.5 }} align="right" width={60}>
                       <Typography fontWeight={400} sx={{ color: swapFee < 0 ? 'success.main' : 'error.main' }}>
-                        {displayPercentage(dangerouslyConvertBigIntToNumber(swapFee, 6), 'omit')}
+                        {displayPercentage(dangerouslyConvertBigIntToNumber(swapFee, 0, 5), 'omit')}
                       </Typography>
                     </TableCell>
                     <TableCell sx={{ p: 0.5 }} align="right" width={80}>
@@ -189,7 +189,7 @@ function Assets() {
                           color: change < 0 ? 'error.main' : 'success.main',
                         }}
                       >
-                        {roundCurrency(change)} <DirectionIcon showIncrease={change > 0} fontSize="small" />
+                        {displayPercentage(change, 'omit')} <DirectionIcon showIncrease={change > 0} fontSize="small" />
                       </Box>
                     </TableCell>
                     <TableCell sx={{ p: 0.5, pr: 2, minWidth: '30px' }} align="right" width={50}>

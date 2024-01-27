@@ -62,7 +62,7 @@ const JUSD: Token = {
   createdAt: (faker.date.past().getTime() / 1000).toString(),
   priceUSD: floatToBigInt(faker.number.float({ min: 1, max: 5000, precision: 0.01 })).toString(),
   priceUSD24hAgo: floatToBigInt(faker.number.float({ min: 1, max: 5000, precision: 0.01 })).toString(),
-  priceUSDOracle: faker.number.float({ min: 1, max: 5000, precision: 0.01 }),
+  // priceUSDOracle: faker.number.float({ min: 1, max: 5000, precision: 0.01 }),
   isPoolToken: faker.datatype.boolean(),
 };
 
@@ -77,7 +77,7 @@ export const tokens: Token[] = Array(10)
     createdAt: (faker.date.past().getTime() / 1000).toString(),
     priceUSD: floatToBigInt(faker.number.float({ min: 1, max: 5000, precision: 0.01 })).toString(),
     priceUSD24hAgo: floatToBigInt(faker.number.float({ min: 1, max: 5000, precision: 0.01 })).toString(),
-    priceUSDOracle: faker.number.float({ min: 1, max: 5000, precision: 0.01 }),
+    // priceUSDOracle: faker.number.float({ min: 1, max: 5000, precision: 0.01 }),
     isPoolToken: faker.datatype.boolean(),
   }));
 
@@ -91,7 +91,7 @@ const collateralTokens: Token[] = Object.entries(Contracts.ERC20)
     createdAt: (faker.date.past().getTime() / 1000).toString(),
     priceUSD: floatToBigInt(faker.number.float({ min: 1, max: 5000, precision: 0.01 })).toString(),
     priceUSD24hAgo: floatToBigInt(faker.number.float({ min: 1, max: 5000, precision: 0.01 })).toString(),
-    priceUSDOracle: faker.number.float({ min: 1, max: 5000, precision: 0.01 }),
+    // priceUSDOracle: faker.number.float({ min: 1, max: 5000, precision: 0.01 }),
     isPoolToken: faker.datatype.boolean(),
   }))
   .concat(JUSD);
@@ -216,7 +216,7 @@ for (let i = 0; i < allTokens.length; i++) {
         id: faker.string.uuid(),
         __typename: 'PoolLiquidity',
         token,
-        totalAmount: floatToBigInt(faker.number.float({ min: 100000, max: 500000, precision: 0.0001 })).toString(),
+        totalAmount: floatToBigInt(faker.number.float({ min: 100000, max: 500000, precision: 0.0001 }), 0).toString(),
       })),
       liquidityDepositAPY: floatToBigInt(faker.number.float({ min: 0.01, max: 0.3, precision: 0.0001 })).toString(),
       volume30dUSD: {
@@ -379,11 +379,7 @@ export const handlers = [
   graphql.query<{ token: Query['token'] }, QueryTokenArgs>(GET_SELECTED_TOKEN, (req, res, ctx) => {
     const { address } = req.variables;
 
-    console.log('req.variables: ', req.variables);
-
-    const token = tokens.concat(collateralTokens).find((token) => token.address === address)!;
-
-    console.log('token: ', token);
+    const token = allTokens.find((token) => token.address === address)!;
 
     return res(ctx.data({ token }));
   }),

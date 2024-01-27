@@ -11,7 +11,6 @@ import { useSelectedToken } from '../../../context/SelectedTokenProvider';
 import { useTransactionDialog } from '../../../context/TransactionDialogProvider';
 import { WIDGET_HEIGHTS } from '../../../utils/contants';
 import {
-  bigIntStringToFloat,
   dangerouslyConvertBigIntToNumber,
   displayPercentage,
   floatToBigInt,
@@ -64,7 +63,7 @@ const Swap = () => {
           'tokenAmount',
           roundNumber(
             (numericValue / tokenRatio) *
-              dangerouslyConvertBigIntToNumber(floatToBigInt(1, 6) - selectedToken!.swapFee, 6),
+              dangerouslyConvertBigIntToNumber(floatToBigInt(1, 5) - selectedToken!.swapFee, 0, 5),
           ).toString(),
         );
         setTradingDirection('jUSDSpent');
@@ -80,7 +79,7 @@ const Swap = () => {
           roundNumber(
             numericValue *
               tokenRatio *
-              dangerouslyConvertBigIntToNumber(floatToBigInt(1, 6) - selectedToken!.swapFee, 6),
+              dangerouslyConvertBigIntToNumber(floatToBigInt(1, 6) - selectedToken!.swapFee, 0, 5),
           ).toString(),
         );
         setTradingDirection('jUSDAquired');
@@ -172,25 +171,24 @@ const Swap = () => {
     const {
       pool: { liqudityPair },
     } = selectedToken!;
+    const liq0 = dangerouslyConvertBigIntToNumber(liqudityPair[0], 0);
+    const liq1 = dangerouslyConvertBigIntToNumber(liqudityPair[1], 0);
+    const currentPrice = liq0 / liq1;
 
-    const currentPrice = liqudityPair[0] / liqudityPair[1];
-
-    let newPriceAfterSwap;
+    let newPriceAfterSwap: number;
     if (tradingDirection === 'jUSDSpent') {
       // Calculate new amount of the other token after swap
-      const newY = (liqudityPair[1] * liqudityPair[0]) / (liqudityPair[0] + BigInt(jUSDAmount));
-      newPriceAfterSwap = BigInt(jUSDAmount) / (liqudityPair[1] - newY);
+      const newY = (liq1 * liq0) / (liq0 + jUSDAmount);
+      newPriceAfterSwap = jUSDAmount / (liq1 - newY);
     } else {
       // Calculate new amount of jUSD after swap
-      const newX = (liqudityPair[0] * liqudityPair[1]) / (liqudityPair[1] + BigInt(tokenAmount));
-      newPriceAfterSwap = (liqudityPair[0] - newX) / BigInt(tokenAmount);
+      const newX = (liq0 * liq1) / (liq1 + tokenAmount);
+      newPriceAfterSwap = (liq0 - newX) / tokenAmount;
     }
 
     // Calculate price impact
-    const priceImpact = ((newPriceAfterSwap - currentPrice) / currentPrice) * BigInt(100); // in percentage
-    return Math.abs(bigIntStringToFloat(priceImpact.toString())) > 1
-      ? 1
-      : Math.abs(bigIntStringToFloat(priceImpact.toString()));
+    const priceImpact = ((newPriceAfterSwap - currentPrice) / currentPrice) * 100; // in percentage
+    return Math.abs(priceImpact) > 1 ? 1 : Math.abs(priceImpact);
   };
 
   useEffect(() => {
@@ -308,7 +306,7 @@ const Swap = () => {
                 {selectedToken ? (
                   <span>
                     {roundCurrency(
-                      tokenRatio * dangerouslyConvertBigIntToNumber(floatToBigInt(1, 6) - selectedToken.swapFee, 6),
+                      tokenRatio * dangerouslyConvertBigIntToNumber(floatToBigInt(1, 5) - selectedToken.swapFee, 0, 5),
                       5,
                       5,
                     )}{' '}
@@ -331,7 +329,7 @@ const Swap = () => {
                 Swap fee:
                 {selectedToken ? (
                   <span data-testid="apollon-swap-protocol-fee">
-                    {displayPercentage(dangerouslyConvertBigIntToNumber(selectedToken.swapFee, 6))}
+                    {displayPercentage(dangerouslyConvertBigIntToNumber(selectedToken.swapFee, 0, 5))}
                   </span>
                 ) : (
                   <div style={{ display: 'flex', alignItems: 'center', gap: 5, width: 120 }}>

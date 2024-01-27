@@ -5,7 +5,7 @@ export const GET_ALL_POOLS = gql`
     pools {
       id
       address
-      swapFee
+      swapFee @client
       volume30dUSD {
         id
         value
@@ -60,12 +60,12 @@ export const GET_ALL_DEBT_TOKENS = gql`
 export const GET_BORROWER_DEBT_TOKENS = gql`
   query GetBorrowerDebtTokens($borrower: String!) {
     debtTokenMetas(borrower: $borrower) {
-      troveMintedAmount
-      walletAmount
-      providedStability
-      compoundedDeposit
+      troveMintedAmount @client
+      walletAmount @client
+      providedStability @client
+      compoundedDeposit @client
       stabilityCompoundAmount
-      troveRepableDebtAmount
+      troveRepableDebtAmount @client
 
       stabilityDepositAPY {
         id
@@ -133,8 +133,7 @@ export const GET_BORROWER_LIQUIDITY_POOLS = gql`
       }
 
       totalSupply
-      # client side
-      borrowerAmount
+      borrowerAmount @client
     }
   }
 `;
@@ -150,9 +149,9 @@ export const GET_BORROWER_COLLATERAL_TOKENS = gql`
         symbol
         priceUSD
       }
-      walletAmount
-      troveLockedAmount
-      stabilityGainedAmount
+      walletAmount @client
+      troveLockedAmount @client
+      stabilityGainedAmount @client
 
       totalValueLockedUSD
       totalValueLockedUSD30dAverage {
@@ -247,7 +246,7 @@ export const TOKEN_FRAGMENT = gql`
 
 export const GET_TROVEMANAGER = gql`
   query GetTroveManager {
-    getTroveManager {
+    getTroveManager @client {
       id
       borrowingRate
     }
@@ -256,7 +255,7 @@ export const GET_TROVEMANAGER = gql`
 
 export const GET_SYSTEMINFO = gql`
   query GetSystemInfo {
-    getSystemInfo {
+    getSystemInfo @client {
       id
       recoveryModeActive
       totalCollateralRatio

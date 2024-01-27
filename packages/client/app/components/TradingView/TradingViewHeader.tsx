@@ -15,8 +15,6 @@ function TradingViewHeader() {
     skip: !selectedToken,
   });
 
-  console.log('data.token.priceUSDOracle: ', data?.token.priceUSDOracle, typeof data?.token.priceUSDOracle);
-
   return (
     <div
       style={{
