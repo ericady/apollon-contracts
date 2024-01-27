@@ -171,6 +171,12 @@
         "internalType": "address",
         "name": "_swapOperationsAddress",
         "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "address",
+        "name": "_sortedTrovesAddress",
+        "type": "address"
       }
     ],
     "name": "BorrowerOperationsInitialized",
@@ -326,7 +332,7 @@
   },
   {
     "inputs": [],
-    "name": "RESERVE_FEE",
+    "name": "STABLE_COIN_GAS_COMPENSATION",
     "outputs": [
       {
         "internalType": "uint256",
@@ -339,12 +345,25 @@
   },
   {
     "inputs": [],
-    "name": "STABLE_COIN_GAS_COMPENSATION",
+    "name": "SWAP_BASE_FEE",
     "outputs": [
       {
-        "internalType": "uint256",
+        "internalType": "uint32",
         "name": "",
-        "type": "uint256"
+        "type": "uint32"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "SWAP_FEE_PRECISION",
+    "outputs": [
+      {
+        "internalType": "uint32",
+        "name": "",
+        "type": "uint32"
       }
     ],
     "stateMutability": "view",
@@ -381,6 +400,16 @@
         "internalType": "struct IBase.TokenAmount[]",
         "name": "_colls",
         "type": "tuple[]"
+      },
+      {
+        "internalType": "address",
+        "name": "_upperHint",
+        "type": "address"
+      },
+      {
+        "internalType": "address",
+        "name": "_lowerHint",
+        "type": "address"
       }
     ],
     "name": "addColl",
@@ -487,9 +516,26 @@
         "type": "tuple[]"
       },
       {
-        "internalType": "uint256",
-        "name": "_maxFeePercentage",
-        "type": "uint256"
+        "components": [
+          {
+            "internalType": "address",
+            "name": "upperHint",
+            "type": "address"
+          },
+          {
+            "internalType": "address",
+            "name": "lowerHint",
+            "type": "address"
+          },
+          {
+            "internalType": "uint256",
+            "name": "maxFeePercentage",
+            "type": "uint256"
+          }
+        ],
+        "internalType": "struct IBase.MintMeta",
+        "name": "_meta",
+        "type": "tuple"
       }
     ],
     "name": "increaseDebt",
@@ -573,6 +619,16 @@
         "internalType": "struct IBase.TokenAmount[]",
         "name": "_debts",
         "type": "tuple[]"
+      },
+      {
+        "internalType": "address",
+        "name": "_upperHint",
+        "type": "address"
+      },
+      {
+        "internalType": "address",
+        "name": "_lowerHint",
+        "type": "address"
       }
     ],
     "name": "repayDebt",
@@ -603,6 +659,16 @@
         "internalType": "struct IBase.TokenAmount[]",
         "name": "_debts",
         "type": "tuple[]"
+      },
+      {
+        "internalType": "address",
+        "name": "_upperHint",
+        "type": "address"
+      },
+      {
+        "internalType": "address",
+        "name": "_lowerHint",
+        "type": "address"
       }
     ],
     "name": "repayDebtFromPoolBurn",
@@ -662,13 +728,31 @@
       },
       {
         "internalType": "address",
-        "name": "_swapOperations",
+        "name": "_swapOperationsAddress",
+        "type": "address"
+      },
+      {
+        "internalType": "address",
+        "name": "_sortedTrovesAddress",
         "type": "address"
       }
     ],
     "name": "setAddresses",
     "outputs": [],
     "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "sortedTroves",
+    "outputs": [
+      {
+        "internalType": "contract ISortedTroves",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
     "type": "function"
   },
   {
@@ -728,6 +812,16 @@
         "internalType": "struct IBase.TokenAmount[]",
         "name": "_colls",
         "type": "tuple[]"
+      },
+      {
+        "internalType": "address",
+        "name": "_upperHint",
+        "type": "address"
+      },
+      {
+        "internalType": "address",
+        "name": "_lowerHint",
+        "type": "address"
       }
     ],
     "name": "withdrawColl",

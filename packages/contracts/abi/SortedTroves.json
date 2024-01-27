@@ -200,11 +200,6 @@
                 "internalType": "address",
                 "name": "tail",
                 "type": "address"
-            },
-            {
-                "internalType": "uint256",
-                "name": "size",
-                "type": "uint256"
             }
         ],
         "stateMutability": "view",
@@ -235,6 +230,25 @@
                 "name": "",
                 "type": "address"
             },
+            {
+                "internalType": "address",
+                "name": "",
+                "type": "address"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "uint256",
+                "name": "_index",
+                "type": "uint256"
+            }
+        ],
+        "name": "getByIndex",
+        "outputs": [
             {
                 "internalType": "address",
                 "name": "",
@@ -311,6 +325,25 @@
     {
         "inputs": [],
         "name": "getSize",
+        "outputs": [
+            {
+                "internalType": "uint256",
+                "name": "",
+                "type": "uint256"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "address",
+                "name": "_id",
+                "type": "address"
+            }
+        ],
+        "name": "getUsedCR",
         "outputs": [
             {
                 "internalType": "uint256",

@@ -8,6 +8,8 @@ import './Interfaces/ISortedTroves.sol';
 import './Interfaces/ITroveManager.sol';
 import './Interfaces/IBorrowerOperations.sol';
 
+import 'hardhat/console.sol';
+
 contract SortedTroves is Ownable(msg.sender), CheckContract, ISortedTroves {
   string public constant NAME = 'SortedTroves';
 
@@ -16,6 +18,7 @@ contract SortedTroves is Ownable(msg.sender), CheckContract, ISortedTroves {
   address public redemptionOperationsAddress;
 
   struct Node {
+    uint listIndex;
     bool exists;
     uint usedCR; // nodes CR when it was last used (inserted or reinserted into the list)
     address nextId; // Id of next node (smaller CR) in the list
@@ -24,8 +27,8 @@ contract SortedTroves is Ownable(msg.sender), CheckContract, ISortedTroves {
   struct Data {
     address head; // Head of the list. Also the node in the list with the largest CR
     address tail; // Tail of the list. Also the node in the list with the smallest CR
-    uint256 size; // Current size of the list
     mapping(address => Node) nodes; // Track the corresponding ids for each node in the list
+    address[] list; // List of ids in the list
   }
   Data public data;
 
@@ -99,7 +102,9 @@ contract SortedTroves is Ownable(msg.sender), CheckContract, ISortedTroves {
 
     data.nodes[_id].exists = true;
     data.nodes[_id].usedCR = _CR;
-    data.size += 1;
+    data.nodes[_id].listIndex = data.list.length;
+    data.list.push(_id);
+
     emit NodeAdded(_id, _CR);
   }
 
@@ -114,9 +119,9 @@ contract SortedTroves is Ownable(msg.sender), CheckContract, ISortedTroves {
    */
   function _remove(address _id) internal {
     // List must contain the node
-    if (!contains(_id)) revert ListDoesNotContainNode();
+    if (!contains(_id)) return;
 
-    if (data.size > 1) {
+    if (data.list.length > 1) {
       // List contains more than a single node
       if (_id == data.head) {
         // The removed node is the head
@@ -144,8 +149,10 @@ contract SortedTroves is Ownable(msg.sender), CheckContract, ISortedTroves {
       data.tail = address(0);
     }
 
+    data.list[data.nodes[_id].listIndex] = data.list[data.list.length - 1];
+    data.list.pop();
     delete data.nodes[_id];
-    data.size -= 1;
+
     emit NodeRemoved(_id);
   }
 
@@ -275,14 +282,14 @@ contract SortedTroves is Ownable(msg.sender), CheckContract, ISortedTroves {
    * @dev Checks if the list is empty
    */
   function isEmpty() public view override returns (bool) {
-    return data.size == 0;
+    return data.list.length == 0;
   }
 
   /*
    * @dev Returns the current size of the list
    */
   function getSize() external view override returns (uint256) {
-    return data.size;
+    return data.list.length;
   }
 
   /*
@@ -313,5 +320,13 @@ contract SortedTroves is Ownable(msg.sender), CheckContract, ISortedTroves {
    */
   function getPrev(address _id) external view override returns (address) {
     return data.nodes[_id].prevId;
+  }
+
+  function getByIndex(uint _index) external view override returns (address) {
+    return data.list[_index];
+  }
+
+  function getUsedCR(address _id) external view override returns (uint) {
+    return data.nodes[_id].usedCR;
   }
 }

@@ -25,6 +25,7 @@ import stabilityPoolManagerAbi from '../abi/StabilityPoolManager.json';
 import swapOperationsAbi from '../abi/SwapOperations.json';
 import reservePoolAbi from '../abi/ReservePool.json';
 import sortedTrovesAbi from '../abi/SortedTroves.json';
+import hintHelpersAbi from '../abi/HintHelpers.json';
 
 import {
   BorrowerOperations,
@@ -42,6 +43,7 @@ import {
   SwapOperations,
   ReservePool,
   SortedTroves,
+  HintHelpers,
 } from '../types';
 
 import { EthersProvider, EthersSigner } from './types';
@@ -168,6 +170,7 @@ export interface _LiquityContracts {
   swapOperations: SwapOperations;
   reservePool: ReservePool;
   sortedTroves: SortedTroves;
+  hintHelpers: HintHelpers;
 
   // todo
   // communityIssuance: CommunityIssuance;
@@ -207,6 +210,7 @@ const getAbi = (priceFeedIsTestnet: boolean, uniTokenIsMock: boolean): LiquityCo
   swapOperations: swapOperationsAbi,
   reservePool: reservePoolAbi,
   sortedTroves: sortedTrovesAbi,
+  hintHelpers: hintHelpersAbi,
 
   // todo
   // communityIssuance: communityIssuanceAbi,

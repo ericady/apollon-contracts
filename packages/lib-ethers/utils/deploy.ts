@@ -65,6 +65,7 @@ const deployContracts = async (
         ...overrides,
       }),
       sortedTroves: await deployContract(deployer, getContractFactory, 'SortedTroves', { ...overrides }),
+      hintHelpers: await deployContract(deployer, getContractFactory, 'HintHelpers', { ...overrides }),
       priceFeed: await deployContract(
         deployer,
         getContractFactory,
@@ -125,6 +126,7 @@ const connectContracts = async (
     priceFeed,
     swapOperations,
     reservePool,
+    hintHelpers,
   }: _LiquityContracts,
   deployer: Signer,
   overrides?: Overrides
@@ -150,6 +152,8 @@ const connectContracts = async (
         ...overrides,
         nonce,
       }),
+
+    nonce => hintHelpers.setAddresses(sortedTroves.address, troveManager.address, { ...overrides, nonce }),
 
     nonce =>
       borrowerOperations.setAddresses(

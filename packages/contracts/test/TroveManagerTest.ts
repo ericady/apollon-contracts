@@ -66,12 +66,14 @@ describe('TroveManager', () => {
   describe('redeemCollateral()', () => {
     it('from one open Trove', async () => {
       await whaleShrimpTroveInit(contracts, signers, false);
+      console.log('after setup');
 
       const bobStableBalanceBefore = await STABLE.balanceOf(bob);
       const btcStableBalanceBefore = await storagePool.getValue(BTC, true, 0);
 
       const toRedeem = parseUnits('50');
 
+      console.log('redeeming....');
       await redeem(bob, toRedeem, contracts);
       const bobStableBalanceAfter = await STABLE.balanceOf(bob);
 

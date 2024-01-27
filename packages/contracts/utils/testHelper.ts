@@ -46,13 +46,13 @@ export const addColl = async (from: SignerWithAddress, contracts: Contracts, col
     }
 
   const afterPathCR = await contracts.troveManager.getICRIncludingPatch(from, colls, [], [], []);
-  const [upperHint, lowerHint] = await contracts.sortedTroves.findInsertPosition(afterPathCR, AddressZero, AddressZero);
+  const [upperHint, lowerHint] = await getHints(contracts, afterPathCR);
   return contracts.borrowerOperations.connect(from).addColl(colls, upperHint, lowerHint);
 };
 
 export const withdrawalColl = async (from: SignerWithAddress, contracts: Contracts, colls: any[]) => {
   const afterPathCR = await contracts.troveManager.getICRIncludingPatch(from, [], colls, [], []);
-  const [upperHint, lowerHint] = await contracts.sortedTroves.findInsertPosition(afterPathCR, AddressZero, AddressZero);
+  const [upperHint, lowerHint] = await getHints(contracts, afterPathCR);
   return contracts.borrowerOperations.connect(from).withdrawColl(colls, upperHint, lowerHint);
 };
 
@@ -63,7 +63,7 @@ export const increaseDebt = async (
   maxFeePercentage = MAX_BORROWING_FEE
 ) => {
   const afterPathCR = await contracts.troveManager.getICRIncludingPatch(from, [], [], debts, []);
-  const [upperHint, lowerHint] = await contracts.sortedTroves.findInsertPosition(afterPathCR, AddressZero, AddressZero);
+  const [upperHint, lowerHint] = await getHints(contracts, afterPathCR);
   return {
     tx: await contracts.borrowerOperations
       .connect(from)
@@ -73,7 +73,7 @@ export const increaseDebt = async (
 
 export const repayDebt = async (from: SignerWithAddress, contracts: Contracts, debts: any[]) => {
   const afterPathCR = await contracts.troveManager.getICRIncludingPatch(from, [], [], [], debts);
-  const [upperHint, lowerHint] = await contracts.sortedTroves.findInsertPosition(afterPathCR, AddressZero, AddressZero);
+  const [upperHint, lowerHint] = await getHints(contracts, afterPathCR);
   return {
     tx: await contracts.borrowerOperations.connect(from).repayDebt(debts, upperHint, lowerHint),
   };
@@ -89,9 +89,16 @@ export const redeem = async (
   let lastIteration;
   let stableRemaining: bigint = toRedeem;
   while (stableRemaining > 0n) {
-    const trove = lastIteration
+    let trove = lastIteration
       ? await contracts.sortedTroves.getPrev(lastIteration.trove)
       : await contracts.sortedTroves.getLast();
+
+    if (trove === AddressZero) {
+      // no troves left in the list, now we need to pick troves randomly
+      // todo
+      // todo pick a random trove should be added via test case...
+      console.log('empty list');
+    }
 
     const simulatedRedemption = await contracts.redemptionOperations.calculateTroveRedemption(
       trove,
@@ -99,18 +106,31 @@ export const redeem = async (
       true
     );
     stableRemaining -= simulatedRedemption.stableCoinLot;
-    const [upperHint, lowerHint] = await contracts.sortedTroves.findInsertPosition(
-      simulatedRedemption.resultingCR,
-      AddressZero,
-      AddressZero
-    );
+    const expectedCR = simulatedRedemption.resultingCR;
 
-    lastIteration = { trove, upperHint, lowerHint, expectedCR: simulatedRedemption.resultingCR };
+    const [upperHint, lowerHint] = await getHints(contracts, expectedCR);
+    lastIteration = { trove, upperHint, lowerHint, expectedCR };
     iterations.push(lastIteration);
   }
 
   return contracts.redemptionOperations.connect(from).redeemCollateral(toRedeem, iterations, maxFeePercentage);
 };
+
+async function getHints(contracts: Contracts, cr: bigint) {
+  let hint;
+  const amountStableTroves = await contracts.sortedTroves.getSize();
+  if (amountStableTroves === 0n) hint = AddressZero;
+  else {
+    const [_hint] = await contracts.hintHelpers.getApproxHint(
+      cr,
+      Math.round(Math.min(4000, 15 * Math.sqrt(Number(amountStableTroves)))),
+      Math.round(Math.random() * 100000000000)
+    );
+    hint = _hint;
+  }
+
+  return contracts.sortedTroves.findInsertPosition(cr, hint, hint);
+}
 
 export const getStabilityPool = async (contracts: Contracts, debt: MockDebtToken) => {
   const poolAddress = await contracts.stabilityPoolManager.getStabilityPool(debt);

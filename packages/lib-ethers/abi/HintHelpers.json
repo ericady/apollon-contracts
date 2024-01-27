@@ -1,6 +1,11 @@
 [
   {
     "inputs": [],
+    "name": "FeeExceedMaxPercentage",
+    "type": "error"
+  },
+  {
+    "inputs": [],
     "name": "NotContract",
     "type": "error"
   },
@@ -37,24 +42,17 @@
       {
         "indexed": false,
         "internalType": "address",
-        "name": "_debtTokenAddress",
+        "name": "_sortedTrovesAddress",
         "type": "address"
-      }
-    ],
-    "name": "DebtTokenAdded",
-    "type": "event"
-  },
-  {
-    "anonymous": false,
-    "inputs": [
+      },
       {
         "indexed": false,
         "internalType": "address",
-        "name": "_stabilityPoolManagerAddress",
+        "name": "_troveManagerAddress",
         "type": "address"
       }
     ],
-    "name": "DebtTokenManagerInitialized",
+    "name": "HintHelpersInitialized",
     "type": "event"
   },
   {
@@ -78,6 +76,58 @@
   },
   {
     "inputs": [],
+    "name": "BORROWING_FEE_FLOOR",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "CCR",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "MAX_BORROWING_FEE",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "MCR",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
     "name": "NAME",
     "outputs": [
       {
@@ -90,89 +140,13 @@
     "type": "function"
   },
   {
-    "inputs": [
-      {
-        "internalType": "address",
-        "name": "_debtTokenAddress",
-        "type": "address"
-      }
-    ],
-    "name": "addDebtToken",
-    "outputs": [],
-    "stateMutability": "nonpayable",
-    "type": "function"
-  },
-  {
-    "inputs": [
+    "inputs": [],
+    "name": "PERCENT_DIVISOR",
+    "outputs": [
       {
         "internalType": "uint256",
         "name": "",
         "type": "uint256"
-      }
-    ],
-    "name": "debtTokenAddresses",
-    "outputs": [
-      {
-        "internalType": "address",
-        "name": "",
-        "type": "address"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "address",
-        "name": "",
-        "type": "address"
-      }
-    ],
-    "name": "debtTokens",
-    "outputs": [
-      {
-        "internalType": "contract IDebtToken",
-        "name": "",
-        "type": "address"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      }
-    ],
-    "name": "debtTokensArray",
-    "outputs": [
-      {
-        "internalType": "contract IDebtToken",
-        "name": "",
-        "type": "address"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [
-      {
-        "internalType": "address",
-        "name": "_address",
-        "type": "address"
-      }
-    ],
-    "name": "getDebtToken",
-    "outputs": [
-      {
-        "internalType": "contract IDebtToken",
-        "name": "debtToken",
-        "type": "address"
       }
     ],
     "stateMutability": "view",
@@ -180,12 +154,12 @@
   },
   {
     "inputs": [],
-    "name": "getDebtTokenAddresses",
+    "name": "REDEMPTION_FEE_FLOOR",
     "outputs": [
       {
-        "internalType": "address[]",
+        "internalType": "uint256",
         "name": "",
-        "type": "address[]"
+        "type": "uint256"
       }
     ],
     "stateMutability": "view",
@@ -193,12 +167,51 @@
   },
   {
     "inputs": [],
-    "name": "getStableCoin",
+    "name": "STABLE_COIN_GAS_COMPENSATION",
     "outputs": [
       {
-        "internalType": "contract IDebtToken",
+        "internalType": "uint256",
         "name": "",
-        "type": "address"
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "SWAP_BASE_FEE",
+    "outputs": [
+      {
+        "internalType": "uint32",
+        "name": "",
+        "type": "uint32"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "SWAP_FEE_PRECISION",
+    "outputs": [
+      {
+        "internalType": "uint32",
+        "name": "",
+        "type": "uint32"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "_100pct",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
       }
     ],
     "stateMutability": "view",
@@ -207,17 +220,37 @@
   {
     "inputs": [
       {
-        "internalType": "address",
-        "name": "_address",
-        "type": "address"
+        "internalType": "uint256",
+        "name": "_CR",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "_numTrials",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "_inputRandomSeed",
+        "type": "uint256"
       }
     ],
-    "name": "isDebtToken",
+    "name": "getApproxHint",
     "outputs": [
       {
-        "internalType": "bool",
-        "name": "",
-        "type": "bool"
+        "internalType": "address",
+        "name": "hintAddress",
+        "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "diff",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint256",
+        "name": "latestRandomSeed",
+        "type": "uint256"
       }
     ],
     "stateMutability": "view",
@@ -247,7 +280,12 @@
     "inputs": [
       {
         "internalType": "address",
-        "name": "_stabilityPoolManagerAddress",
+        "name": "_sortedTrovesAddress",
+        "type": "address"
+      },
+      {
+        "internalType": "address",
+        "name": "_troveManagerAddress",
         "type": "address"
       }
     ],
@@ -258,23 +296,10 @@
   },
   {
     "inputs": [],
-    "name": "stabilityPoolManager",
+    "name": "sortedTroves",
     "outputs": [
       {
-        "internalType": "contract IStabilityPoolManager",
-        "name": "",
-        "type": "address"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [],
-    "name": "stableCoin",
-    "outputs": [
-      {
-        "internalType": "contract IDebtToken",
+        "internalType": "contract ISortedTroves",
         "name": "",
         "type": "address"
       }
@@ -293,6 +318,19 @@
     "name": "transferOwnership",
     "outputs": [],
     "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "troveManager",
+    "outputs": [
+      {
+        "internalType": "contract ITroveManager",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
     "type": "function"
   }
 ]

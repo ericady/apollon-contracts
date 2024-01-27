@@ -21,6 +21,8 @@ import SwapPair from '../../contracts/artifacts/contracts/SwapPair.sol/SwapPair.
 import SwapOperations from '../../contracts/artifacts/contracts/SwapOperations.sol/SwapOperations.json';
 import ReservePool from '../../contracts/artifacts/contracts/ReservePool.sol/ReservePool.json';
 import LiquidationOperations from '../../contracts/artifacts/contracts/LiquidationOperations.sol/LiquidationOperations.json';
+import SortedTroves from '../../contracts/artifacts/contracts/SortedTroves.sol/SortedTroves.json';
+import HintHelpers from '../../contracts/artifacts/contracts/HintHelpers.sol/HintHelpers.json';
 
 // todo
 // import CommunityIssuance from '../../contracts/artifacts/contracts/LQTY/CommunityIssuance.sol/CommunityIssuance.json';
@@ -164,6 +166,8 @@ const contractArtifacts = [
   SwapOperations,
   ReservePool,
   LiquidationOperations,
+  SortedTroves,
+  HintHelpers,
 ];
 
 const contracts = contractArtifacts.map(({ contractName, abi }) => ({

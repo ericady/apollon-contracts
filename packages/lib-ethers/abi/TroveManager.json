@@ -339,6 +339,12 @@
         "internalType": "address",
         "name": "_priceFeedAddress",
         "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "address",
+        "name": "_sortedTrovesAddress",
+        "type": "address"
       }
     ],
     "name": "TroveManagerInitialized",
@@ -506,7 +512,7 @@
   },
   {
     "inputs": [],
-    "name": "RESERVE_FEE",
+    "name": "STABLE_COIN_GAS_COMPENSATION",
     "outputs": [
       {
         "internalType": "uint256",
@@ -519,12 +525,25 @@
   },
   {
     "inputs": [],
-    "name": "STABLE_COIN_GAS_COMPENSATION",
+    "name": "SWAP_BASE_FEE",
     "outputs": [
       {
-        "internalType": "uint256",
+        "internalType": "uint32",
         "name": "",
-        "type": "uint256"
+        "type": "uint32"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "SWAP_FEE_PRECISION",
+    "outputs": [
+      {
+        "internalType": "uint32",
+        "name": "",
+        "type": "uint32"
       }
     ],
     "stateMutability": "view",
@@ -935,13 +954,81 @@
         "internalType": "address",
         "name": "_borrower",
         "type": "address"
+      },
+      {
+        "components": [
+          {
+            "internalType": "address",
+            "name": "tokenAddress",
+            "type": "address"
+          },
+          {
+            "internalType": "uint256",
+            "name": "amount",
+            "type": "uint256"
+          }
+        ],
+        "internalType": "struct IBase.TokenAmount[]",
+        "name": "addedColl",
+        "type": "tuple[]"
+      },
+      {
+        "components": [
+          {
+            "internalType": "address",
+            "name": "tokenAddress",
+            "type": "address"
+          },
+          {
+            "internalType": "uint256",
+            "name": "amount",
+            "type": "uint256"
+          }
+        ],
+        "internalType": "struct IBase.TokenAmount[]",
+        "name": "removedColl",
+        "type": "tuple[]"
+      },
+      {
+        "components": [
+          {
+            "internalType": "address",
+            "name": "tokenAddress",
+            "type": "address"
+          },
+          {
+            "internalType": "uint256",
+            "name": "amount",
+            "type": "uint256"
+          }
+        ],
+        "internalType": "struct IBase.TokenAmount[]",
+        "name": "addedDebt",
+        "type": "tuple[]"
+      },
+      {
+        "components": [
+          {
+            "internalType": "address",
+            "name": "tokenAddress",
+            "type": "address"
+          },
+          {
+            "internalType": "uint256",
+            "name": "amount",
+            "type": "uint256"
+          }
+        ],
+        "internalType": "struct IBase.TokenAmount[]",
+        "name": "removedDebt",
+        "type": "tuple[]"
       }
     ],
-    "name": "getNominalICR",
+    "name": "getICRIncludingPatch",
     "outputs": [
       {
         "internalType": "uint256",
-        "name": "",
+        "name": "ICR",
         "type": "uint256"
       }
     ],
@@ -1084,6 +1171,37 @@
         "type": "address"
       }
     ],
+    "name": "getTroveRepayableDebts",
+    "outputs": [
+      {
+        "components": [
+          {
+            "internalType": "address",
+            "name": "tokenAddress",
+            "type": "address"
+          },
+          {
+            "internalType": "uint256",
+            "name": "amount",
+            "type": "uint256"
+          }
+        ],
+        "internalType": "struct IBase.TokenAmount[]",
+        "name": "debts",
+        "type": "tuple[]"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "_borrower",
+        "type": "address"
+      }
+    ],
     "name": "getTroveStakeValue",
     "outputs": [
       {
@@ -1157,6 +1275,37 @@
         "internalType": "uint256",
         "name": "amount",
         "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "_borrower",
+        "type": "address"
+      }
+    ],
+    "name": "getTroveWithdrawableColls",
+    "outputs": [
+      {
+        "components": [
+          {
+            "internalType": "address",
+            "name": "tokenAddress",
+            "type": "address"
+          },
+          {
+            "internalType": "uint256",
+            "name": "amount",
+            "type": "uint256"
+          }
+        ],
+        "internalType": "struct IBase.TokenAmount[]",
+        "name": "colls",
+        "type": "tuple[]"
       }
     ],
     "stateMutability": "view",
@@ -1474,6 +1623,11 @@
         "internalType": "address",
         "name": "_priceFeedAddress",
         "type": "address"
+      },
+      {
+        "internalType": "address",
+        "name": "_sortedTrovesAddress",
+        "type": "address"
       }
     ],
     "name": "setAddresses",
@@ -1497,6 +1651,19 @@
     "name": "setTroveStatus",
     "outputs": [],
     "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "sortedTroves",
+    "outputs": [
+      {
+        "internalType": "contract ISortedTroves",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
     "type": "function"
   },
   {

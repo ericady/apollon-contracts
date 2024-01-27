@@ -43,6 +43,10 @@ interface ISortedTroves {
 
   function getPrev(address _id) external view returns (address);
 
+  function getByIndex(uint _index) external view returns (address);
+
+  function getUsedCR(address _id) external view returns (uint);
+
   function validInsertPosition(uint256 _CR, address _prevId, address _nextId) external view returns (bool);
 
   function findInsertPosition(uint256 _CR, address _prevId, address _nextId) external view returns (address, address);

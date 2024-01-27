@@ -188,6 +188,136 @@
     "type": "event"
   },
   {
+    "inputs": [],
+    "name": "BORROWING_FEE_FLOOR",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "CCR",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "MAX_BORROWING_FEE",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "MCR",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "PERCENT_DIVISOR",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "REDEMPTION_FEE_FLOOR",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "STABLE_COIN_GAS_COMPENSATION",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "SWAP_BASE_FEE",
+    "outputs": [
+      {
+        "internalType": "uint32",
+        "name": "",
+        "type": "uint32"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "SWAP_FEE_PRECISION",
+    "outputs": [
+      {
+        "internalType": "uint32",
+        "name": "",
+        "type": "uint32"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "_100pct",
+    "outputs": [
+      {
+        "internalType": "uint256",
+        "name": "",
+        "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
     "inputs": [
       {
         "internalType": "address",
@@ -220,9 +350,26 @@
         "type": "uint256"
       },
       {
-        "internalType": "uint256",
-        "name": "_maxMintFeePercentage",
-        "type": "uint256"
+        "components": [
+          {
+            "internalType": "address",
+            "name": "upperHint",
+            "type": "address"
+          },
+          {
+            "internalType": "address",
+            "name": "lowerHint",
+            "type": "address"
+          },
+          {
+            "internalType": "uint256",
+            "name": "maxFeePercentage",
+            "type": "uint256"
+          }
+        ],
+        "internalType": "struct IBase.MintMeta",
+        "name": "_mintMeta",
+        "type": "tuple"
       },
       {
         "internalType": "uint256",
@@ -334,19 +481,6 @@
     "type": "function"
   },
   {
-    "inputs": [],
-    "name": "feeTo",
-    "outputs": [
-      {
-        "internalType": "address",
-        "name": "",
-        "type": "address"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
     "inputs": [
       {
         "internalType": "uint256",
@@ -362,6 +496,11 @@
         "internalType": "uint256",
         "name": "reserveOut",
         "type": "uint256"
+      },
+      {
+        "internalType": "uint32",
+        "name": "swapFee",
+        "type": "uint32"
       }
     ],
     "name": "getAmountIn",
@@ -391,6 +530,11 @@
         "internalType": "uint256",
         "name": "reserveOut",
         "type": "uint256"
+      },
+      {
+        "internalType": "uint32",
+        "name": "swapFee",
+        "type": "uint32"
       }
     ],
     "name": "getAmountOut",
@@ -453,19 +597,6 @@
     "type": "function"
   },
   {
-    "inputs": [],
-    "name": "getFeeTo",
-    "outputs": [
-      {
-        "internalType": "address",
-        "name": "",
-        "type": "address"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
     "inputs": [
       {
         "internalType": "address",
@@ -512,9 +643,26 @@
         "type": "address"
       },
       {
-        "internalType": "uint256",
-        "name": "_maxMintFeePercentage",
-        "type": "uint256"
+        "components": [
+          {
+            "internalType": "address",
+            "name": "upperHint",
+            "type": "address"
+          },
+          {
+            "internalType": "address",
+            "name": "lowerHint",
+            "type": "address"
+          },
+          {
+            "internalType": "uint256",
+            "name": "maxFeePercentage",
+            "type": "uint256"
+          }
+        ],
+        "internalType": "struct IBase.MintMeta",
+        "name": "_mintMeta",
+        "type": "tuple"
       },
       {
         "internalType": "uint256",
@@ -556,9 +704,26 @@
         "type": "address"
       },
       {
-        "internalType": "uint256",
-        "name": "_maxMintFeePercentage",
-        "type": "uint256"
+        "components": [
+          {
+            "internalType": "address",
+            "name": "upperHint",
+            "type": "address"
+          },
+          {
+            "internalType": "address",
+            "name": "lowerHint",
+            "type": "address"
+          },
+          {
+            "internalType": "uint256",
+            "name": "maxFeePercentage",
+            "type": "uint256"
+          }
+        ],
+        "internalType": "struct IBase.MintMeta",
+        "name": "_mintMeta",
+        "type": "tuple"
       },
       {
         "internalType": "uint256",
@@ -592,10 +757,10 @@
   },
   {
     "inputs": [],
-    "name": "priceFeed",
+    "name": "priceFeedAddress",
     "outputs": [
       {
-        "internalType": "contract IPriceFeed",
+        "internalType": "address",
         "name": "",
         "type": "address"
       }
@@ -658,6 +823,16 @@
         "internalType": "uint256",
         "name": "amountBMin",
         "type": "uint256"
+      },
+      {
+        "internalType": "address",
+        "name": "_upperHint",
+        "type": "address"
+      },
+      {
+        "internalType": "address",
+        "name": "_lowerHint",
+        "type": "address"
       },
       {
         "internalType": "uint256",

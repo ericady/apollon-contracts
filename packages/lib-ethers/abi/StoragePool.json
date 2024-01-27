@@ -227,7 +227,7 @@
   },
   {
     "inputs": [],
-    "name": "RESERVE_FEE",
+    "name": "STABLE_COIN_GAS_COMPENSATION",
     "outputs": [
       {
         "internalType": "uint256",
@@ -240,12 +240,25 @@
   },
   {
     "inputs": [],
-    "name": "STABLE_COIN_GAS_COMPENSATION",
+    "name": "SWAP_BASE_FEE",
     "outputs": [
       {
-        "internalType": "uint256",
+        "internalType": "uint32",
         "name": "",
-        "type": "uint256"
+        "type": "uint32"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "SWAP_FEE_PRECISION",
+    "outputs": [
+      {
+        "internalType": "uint32",
+        "name": "",
+        "type": "uint32"
       }
     ],
     "stateMutability": "view",

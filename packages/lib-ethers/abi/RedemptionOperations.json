@@ -21,6 +21,11 @@
   },
   {
     "inputs": [],
+    "name": "InvalidRedemptionHint",
+    "type": "error"
+  },
+  {
+    "inputs": [],
     "name": "LessThanMCR",
     "type": "error"
   },
@@ -158,6 +163,12 @@
         "indexed": false,
         "internalType": "address",
         "name": "_collTokenManager",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "address",
+        "name": "_sortedTrovesAddress",
         "type": "address"
       }
     ],
@@ -304,19 +315,6 @@
   },
   {
     "inputs": [],
-    "name": "RESERVE_FEE",
-    "outputs": [
-      {
-        "internalType": "uint256",
-        "name": "",
-        "type": "uint256"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [],
     "name": "STABLE_COIN_GAS_COMPENSATION",
     "outputs": [
       {
@@ -330,12 +328,123 @@
   },
   {
     "inputs": [],
+    "name": "SWAP_BASE_FEE",
+    "outputs": [
+      {
+        "internalType": "uint32",
+        "name": "",
+        "type": "uint32"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "SWAP_FEE_PRECISION",
+    "outputs": [
+      {
+        "internalType": "uint32",
+        "name": "",
+        "type": "uint32"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
     "name": "_100pct",
     "outputs": [
       {
         "internalType": "uint256",
         "name": "",
         "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "_borrower",
+        "type": "address"
+      },
+      {
+        "internalType": "uint256",
+        "name": "_redeemMaxAmount",
+        "type": "uint256"
+      },
+      {
+        "internalType": "bool",
+        "name": "_includePendingRewards",
+        "type": "bool"
+      }
+    ],
+    "name": "calculateTroveRedemption",
+    "outputs": [
+      {
+        "components": [
+          {
+            "components": [
+              {
+                "internalType": "address",
+                "name": "tokenAddress",
+                "type": "address"
+              },
+              {
+                "internalType": "uint256",
+                "name": "amount",
+                "type": "uint256"
+              }
+            ],
+            "internalType": "struct IBase.TokenAmount",
+            "name": "stableCoinEntry",
+            "type": "tuple"
+          },
+          {
+            "internalType": "uint256",
+            "name": "stableCoinLot",
+            "type": "uint256"
+          },
+          {
+            "components": [
+              {
+                "internalType": "address",
+                "name": "tokenAddress",
+                "type": "address"
+              },
+              {
+                "internalType": "uint256",
+                "name": "amount",
+                "type": "uint256"
+              }
+            ],
+            "internalType": "struct IBase.TokenAmount[]",
+            "name": "collLots",
+            "type": "tuple[]"
+          },
+          {
+            "internalType": "uint256",
+            "name": "troveCollInUSD",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "troveDebtInUSD",
+            "type": "uint256"
+          },
+          {
+            "internalType": "uint256",
+            "name": "resultingCR",
+            "type": "uint256"
+          }
+        ],
+        "internalType": "struct IRedemptionOperations.SingleRedemptionVariables",
+        "name": "vars",
+        "type": "tuple"
       }
     ],
     "stateMutability": "view",
@@ -446,14 +555,36 @@
         "type": "uint256"
       },
       {
+        "components": [
+          {
+            "internalType": "address",
+            "name": "trove",
+            "type": "address"
+          },
+          {
+            "internalType": "address",
+            "name": "upperHint",
+            "type": "address"
+          },
+          {
+            "internalType": "address",
+            "name": "lowerHint",
+            "type": "address"
+          },
+          {
+            "internalType": "uint256",
+            "name": "expectedCR",
+            "type": "uint256"
+          }
+        ],
+        "internalType": "struct IRedemptionOperations.RedeemIteration[]",
+        "name": "_iterations",
+        "type": "tuple[]"
+      },
+      {
         "internalType": "uint256",
         "name": "_maxFeePercentage",
         "type": "uint256"
-      },
-      {
-        "internalType": "address[]",
-        "name": "_sourceTroves",
-        "type": "address[]"
       }
     ],
     "name": "redeemCollateral",
@@ -494,11 +625,29 @@
         "internalType": "address",
         "name": "_collTokenManagerAddress",
         "type": "address"
+      },
+      {
+        "internalType": "address",
+        "name": "_sortedTrovesAddress",
+        "type": "address"
       }
     ],
     "name": "setAddresses",
     "outputs": [],
     "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "sortedTroves",
+    "outputs": [
+      {
+        "internalType": "contract ISortedTroves",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
     "type": "function"
   },
   {

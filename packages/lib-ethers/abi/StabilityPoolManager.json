@@ -260,6 +260,37 @@
         "internalType": "address",
         "name": "_depositor",
         "type": "address"
+      }
+    ],
+    "name": "getDepositorCompoundedDeposits",
+    "outputs": [
+      {
+        "components": [
+          {
+            "internalType": "address",
+            "name": "tokenAddress",
+            "type": "address"
+          },
+          {
+            "internalType": "uint256",
+            "name": "amount",
+            "type": "uint256"
+          }
+        ],
+        "internalType": "struct IBase.TokenAmount[]",
+        "name": "deposits",
+        "type": "tuple[]"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "internalType": "address",
+        "name": "_depositor",
+        "type": "address"
       },
       {
         "internalType": "address",

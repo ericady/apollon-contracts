@@ -12,6 +12,7 @@ import {
   StoragePool,
   ReservePool,
   SortedTroves,
+  HintHelpers,
 } from '../typechain';
 import { parseUnits } from 'ethers';
 
@@ -21,6 +22,7 @@ export interface Contracts {
   liquidationOperations: LiquidationOperations;
   troveManager: MockTroveManager;
   sortedTroves: SortedTroves;
+  hintHelpers: HintHelpers;
   stabilityPoolManager: MockStabilityPoolManager;
   storagePool: StoragePool;
   reservePool: ReservePool;
@@ -47,6 +49,9 @@ export const deployCore = async (): Promise<Contracts> => {
 
   const sortedTrovesFactory = await ethers.getContractFactory('SortedTroves');
   const sortedTroves = await sortedTrovesFactory.deploy();
+
+  const hintHelpersFactory = await ethers.getContractFactory('HintHelpers');
+  const hintHelpers = await hintHelpersFactory.deploy();
 
   const stabilityPoolManagerFactory = await ethers.getContractFactory('MockStabilityPoolManager');
   const stabilityPoolManager = await stabilityPoolManagerFactory.deploy();
@@ -75,6 +80,7 @@ export const deployCore = async (): Promise<Contracts> => {
     liquidationOperations,
     troveManager,
     sortedTroves,
+    hintHelpers,
     stabilityPoolManager,
     storagePool,
     reservePool,
@@ -103,6 +109,8 @@ export const connectCoreContracts = async (contracts: Contracts) => {
     contracts.borrowerOperations,
     contracts.redemptionOperations
   );
+
+  await contracts.hintHelpers.setAddresses(contracts.sortedTroves, contracts.troveManager);
 
   await contracts.borrowerOperations.setAddresses(
     contracts.troveManager,

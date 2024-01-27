@@ -17,8 +17,6 @@ import './Interfaces/IRedemptionOperations.sol';
 import './Interfaces/ITroveManager.sol';
 import './Interfaces/ISortedTroves.sol';
 
-import 'hardhat/console.sol';
-
 contract RedemptionOperations is LiquityBase, Ownable(msg.sender), CheckContract, IRedemptionOperations {
   string public constant NAME = 'RedemptionOperations';
 
@@ -218,8 +216,9 @@ contract RedemptionOperations is LiquityBase, Ownable(msg.sender), CheckContract
 
     // stable coin debt should always exists because of the gas comp
     TokenAmount[] memory troveDebt = _includePendingRewards
-      ? troveManager.getTroveRepayableDebts(_borrower)
-      : troveManager.getTroveDebt(_borrower);
+      ? troveManager.getTroveRepayableDebts(_borrower) // with pending rewards
+      : troveManager.getTroveDebt(_borrower); // without pending rewards
+    if (troveDebt.length == 0) revert InvalidRedemptionHint();
     for (uint i = 0; i < troveDebt.length; i++) {
       TokenAmount memory debtEntry = troveDebt[i];
 
