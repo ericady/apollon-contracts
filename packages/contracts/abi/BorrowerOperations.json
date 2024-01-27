@@ -561,16 +561,6 @@
                 "internalType": "struct IBase.TokenAmount[]",
                 "name": "_colls",
                 "type": "tuple[]"
-            },
-            {
-                "internalType": "address",
-                "name": "_upperHint",
-                "type": "address"
-            },
-            {
-                "internalType": "address",
-                "name": "_lowerHint",
-                "type": "address"
             }
         ],
         "name": "openTrove",

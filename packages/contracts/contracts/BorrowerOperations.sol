@@ -143,7 +143,7 @@ contract BorrowerOperations is LiquityBase, Ownable(msg.sender), CheckContract, 
 
   // --- Borrower Trove Operations ---
 
-  function openTrove(TokenAmount[] memory _colls, address _upperHint, address _lowerHint) external override {
+  function openTrove(TokenAmount[] memory _colls) external override {
     ContractsCache memory contractsCache = ContractsCache(
       troveManager,
       storagePool,
@@ -202,8 +202,8 @@ contract BorrowerOperations is LiquityBase, Ownable(msg.sender), CheckContract, 
     contractsCache.troveManager.updateTroveRewardSnapshots(borrower);
     contractsCache.troveManager.updateStakeAndTotalStakes(vars.collTokenAddresses, borrower);
 
+    // just adding the trove to the general list, but not the sorted one, cause no redeemable stable debt yet
     vars.arrayIndex = contractsCache.troveManager.addTroveOwnerToArray(borrower);
-    sortedTroves.insert(borrower, vars.ICR, _upperHint, _lowerHint);
 
     // Move the coll to the active pool
     for (uint i = 0; i < vars.colls.length; i++) {
@@ -511,7 +511,13 @@ contract BorrowerOperations is LiquityBase, Ownable(msg.sender), CheckContract, 
     contractsCache.troveManager.updateStakeAndTotalStakes(vars.collTokenAddresses, _borrower);
 
     // update the troves list position
-    sortedTroves.reInsert(_borrower, vars.newICR, _upperHint, _lowerHint);
+    sortedTroves.update(
+      _borrower,
+      vars.newICR,
+      vars.stableCoinEntry.netDebt - STABLE_COIN_GAS_COMPENSATION,
+      _upperHint,
+      _lowerHint
+    );
   }
 
   function _getNewTCRFromTroveChange(

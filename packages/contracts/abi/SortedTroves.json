@@ -322,34 +322,6 @@
         "type": "function"
     },
     {
-        "inputs": [
-            {
-                "internalType": "address",
-                "name": "_id",
-                "type": "address"
-            },
-            {
-                "internalType": "uint256",
-                "name": "_CR",
-                "type": "uint256"
-            },
-            {
-                "internalType": "address",
-                "name": "_prevId",
-                "type": "address"
-            },
-            {
-                "internalType": "address",
-                "name": "_nextId",
-                "type": "address"
-            }
-        ],
-        "name": "insert",
-        "outputs": [],
-        "stateMutability": "nonpayable",
-        "type": "function"
-    },
-    {
         "inputs": [],
         "name": "isEmpty",
         "outputs": [
@@ -373,34 +345,6 @@
             }
         ],
         "stateMutability": "view",
-        "type": "function"
-    },
-    {
-        "inputs": [
-            {
-                "internalType": "address",
-                "name": "_id",
-                "type": "address"
-            },
-            {
-                "internalType": "uint256",
-                "name": "_newCR",
-                "type": "uint256"
-            },
-            {
-                "internalType": "address",
-                "name": "_prevId",
-                "type": "address"
-            },
-            {
-                "internalType": "address",
-                "name": "_nextId",
-                "type": "address"
-            }
-        ],
-        "name": "reInsert",
-        "outputs": [],
-        "stateMutability": "nonpayable",
         "type": "function"
     },
     {
@@ -483,6 +427,39 @@
             }
         ],
         "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "address",
+                "name": "_id",
+                "type": "address"
+            },
+            {
+                "internalType": "uint256",
+                "name": "_CR",
+                "type": "uint256"
+            },
+            {
+                "internalType": "uint256",
+                "name": "_redeemableDebt",
+                "type": "uint256"
+            },
+            {
+                "internalType": "address",
+                "name": "_prevId",
+                "type": "address"
+            },
+            {
+                "internalType": "address",
+                "name": "_nextId",
+                "type": "address"
+            }
+        ],
+        "name": "update",
+        "outputs": [],
+        "stateMutability": "nonpayable",
         "type": "function"
     },
     {

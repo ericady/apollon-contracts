@@ -49,31 +49,20 @@ contract SortedTroves is Ownable(msg.sender), CheckContract, ISortedTroves {
   }
 
   /*
-   * @dev Add a node to the list
-   * @param _id Node's id
-   * @param _cr Node's CR
-   * @param _prevId Id of previous node for the insert position
-   * @param _nextId Id of next node for the insert position
-   */
-  function insert(address _id, uint _CR, address _prevId, address _nextId) external override {
-    _requireCallerIsProtocol();
-    _insert(_id, _CR, _prevId, _nextId);
-  }
-
-  /*
    * @dev Re-insert the node at a new position, based on its new CR
    * @param _id Node's id
    * @param _newCR Node's new CR
+   * @param _redeemableDebt Amount of stablecoin minted by the node
    * @param _prevId Id of previous node for the new insert position
    * @param _nextId Id of next node for the new insert position
    */
-  function reInsert(address _id, uint _newCR, address _prevId, address _nextId) external override {
+  function update(address _id, uint _CR, uint _redeemableDebt, address _prevId, address _nextId) external override {
     _requireCallerIsProtocol();
     _remove(_id);
-    _insert(_id, _newCR, _prevId, _nextId);
-  }
 
-  function _insert(address _id, uint _CR, address _prevId, address _nextId) internal {
+    // only included troves which minted some stable into the list
+    if (_redeemableDebt == 0) return;
+
     if (contains(_id)) revert ListAlreadyContainsNode();
     if (_id == address(0)) revert IdCantBeZero();
     if (_CR == 0) revert CRNotPositive();

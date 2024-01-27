@@ -26,14 +26,9 @@ export const openTrove = async ({
   await collToken.unprotectedMint(from, collAmount);
   await collToken.connect(from).approve(contracts.borrowerOperations, collAmount);
 
-  const addedColl = [{ tokenAddress: collToken, amount: collAmount }];
-  const afterCreationCR = await contracts.troveManager.getICRIncludingPatch(from, addedColl, [], [], []);
-  const [upperHint, lowerHint] = await contracts.sortedTroves.findInsertPosition(
-    afterCreationCR,
-    AddressZero,
-    AddressZero
-  );
-  const openTx = await contracts.borrowerOperations.connect(from).openTrove(addedColl, upperHint, lowerHint);
+  const openTx = await contracts.borrowerOperations
+    .connect(from)
+    .openTrove([{ tokenAddress: collToken, amount: collAmount }]);
 
   if (debts) await increaseDebt(from, contracts, debts);
   return {

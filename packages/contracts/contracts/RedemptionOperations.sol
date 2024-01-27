@@ -115,17 +115,27 @@ contract RedemptionOperations is LiquityBase, Ownable(msg.sender), CheckContract
         false
       );
 
-      // Partial redemption was cancelled (out-of-date hint, or new net debt < minimum), therefore we could not redeem from the last Trove
+      // resulting CR differs from the expected CR, we bail in that case, because all following iterations will consume too much gas by searching for a updated hints
       if (troveRedemption.resultingCR != iteration.expectedCR) break;
 
-      // updating the troves stable debt and coll
+      // updating the troves stable debt
       DebtTokenAmount[] memory debtDecrease = new DebtTokenAmount[](1);
       debtDecrease[0] = DebtTokenAmount(debtTokenManager.getStableCoin(), troveRedemption.stableCoinLot, 0);
       troveManager.decreaseTroveDebt(iteration.trove, debtDecrease);
+
+      // updating the troves stable coll
       troveManager.increaseTroveColl(iteration.trove, troveRedemption.collLots);
       troveManager.updateStakeAndTotalStakes(vars.collTokenAddresses, iteration.trove);
 
-      sortedTroves.reInsert(iteration.trove, troveRedemption.resultingCR, iteration.upperHint, iteration.lowerHint);
+      // update the troves position in the sorted list
+      // in case the trove was fully redeemed, it will be removed from the list
+      sortedTroves.update(
+        iteration.trove,
+        troveRedemption.resultingCR,
+        troveRedemption.stableCoinEntry.amount - troveRedemption.stableCoinLot - STABLE_COIN_GAS_COMPENSATION, // amount which is still redeemable from that trove (after the current one...)
+        iteration.upperHint,
+        iteration.lowerHint
+      );
       emit RedeemedFromTrove(iteration.trove, troveRedemption.stableCoinLot, troveRedemption.collLots);
 
       // sum up redeemed stable and drawn collateral
@@ -185,6 +195,10 @@ contract RedemptionOperations is LiquityBase, Ownable(msg.sender), CheckContract
   }
 
   function _isValidRedemptionHint(address _redemptionHint) internal view returns (bool) {
+    // is case the sorted troves list is empty, all troves which minted stable are either redeemed or liquidated
+    // the remaining stable is now in "pending rewards" of non listed troves
+    if (sortedTroves.isEmpty()) return true;
+
     (uint hintCR, ) = troveManager.getCurrentICR(_redemptionHint);
     if (
       _redemptionHint == address(0) || !sortedTroves.contains(_redemptionHint) || hintCR < MCR // should be liquidated, not redeemed from
@@ -233,10 +247,6 @@ contract RedemptionOperations is LiquityBase, Ownable(msg.sender), CheckContract
       newCollInUSD -= collToRedeemInUSD;
     }
 
-    /*
-     * If the provided hint is out of date, we bail since trying to reinsert without a good hint will almost
-     * certainly result in running out of gas.
-     */
     vars.resultingCR = LiquityMath._computeCR(newCollInUSD, vars.troveDebtInUSD - vars.stableCoinLot);
     return vars;
   }

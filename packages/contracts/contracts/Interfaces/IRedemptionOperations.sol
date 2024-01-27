@@ -27,8 +27,8 @@ interface IRedemptionOperations is IBBase {
   struct SingleRedemptionVariables {
     TokenAmount stableCoinEntry;
     //
-    uint stableCoinLot;
-    TokenAmount[] collLots;
+    uint stableCoinLot; // redeemer pays for the debts of the trove owner
+    TokenAmount[] collLots; // will be removed from the troves coll and paid to the redeemer
     //
     uint troveCollInUSD;
     uint troveDebtInUSD;
