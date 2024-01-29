@@ -475,7 +475,23 @@
             }
         ],
         "name": "addLiquidityWithPermit",
-        "outputs": [],
+        "outputs": [
+            {
+                "internalType": "uint256",
+                "name": "amountA",
+                "type": "uint256"
+            },
+            {
+                "internalType": "uint256",
+                "name": "amountB",
+                "type": "uint256"
+            },
+            {
+                "internalType": "uint256",
+                "name": "liquidity",
+                "type": "uint256"
+            }
+        ],
         "stateMutability": "nonpayable",
         "type": "function"
     },
@@ -1124,7 +1140,13 @@
             }
         ],
         "name": "swapExactTokensForTokensWithPermit",
-        "outputs": [],
+        "outputs": [
+            {
+                "internalType": "uint256[]",
+                "name": "amounts",
+                "type": "uint256[]"
+            }
+        ],
         "stateMutability": "nonpayable",
         "type": "function"
     },

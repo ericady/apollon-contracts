@@ -14,7 +14,6 @@ import './Dependencies/CheckContract.sol';
 import './Interfaces/ITroveManager.sol';
 
 contract SwapOperations is ISwapOperations, Ownable(msg.sender), CheckContract, LiquityBase {
-
   // --- Custom Errors ---
 
   error PairRequiresStable();
@@ -69,9 +68,8 @@ contract SwapOperations is ISwapOperations, Ownable(msg.sender), CheckContract, 
 
   function createPair(address tokenA, address tokenB) external onlyOwner returns (address pair) {
     if (tokenA == tokenB) revert IdenticalAddresses();
-    if (tokenA != address(debtTokenManager.getStableCoin()) && 
-      tokenB != address(debtTokenManager.getStableCoin())
-    ) revert PairRequiresStable();
+    if (tokenA != address(debtTokenManager.getStableCoin()) && tokenB != address(debtTokenManager.getStableCoin()))
+      revert PairRequiresStable();
 
     (address token0, address token1) = sortTokens(tokenA, tokenB);
     if (token0 == address(0)) revert ZeroAddress();
@@ -237,19 +235,20 @@ contract SwapOperations is ISwapOperations, Ownable(msg.sender), CheckContract, 
     uint8[] memory v,
     bytes32[] memory r,
     bytes32[] memory s
-  ) external {
+  ) external returns (uint amountA, uint amountB, uint liquidity) {
     IERC20Permit(tokenA).permit(msg.sender, address(this), amountADesired, deadline, v[0], r[0], s[0]);
     IERC20Permit(tokenB).permit(msg.sender, address(this), amountBDesired, deadline, v[1], r[1], s[1]);
-    addLiquidity(
-      tokenA,
-      tokenB,
-      amountADesired,
-      amountBDesired,
-      amountAMin,
-      amountBMin,
-      _maxMintFeePercentage,
-      deadline
-    );
+    return
+      addLiquidity(
+        tokenA,
+        tokenB,
+        amountADesired,
+        amountBDesired,
+        amountAMin,
+        amountBMin,
+        _maxMintFeePercentage,
+        deadline
+      );
   }
 
   struct RemovalVars {
@@ -366,9 +365,9 @@ contract SwapOperations is ISwapOperations, Ownable(msg.sender), CheckContract, 
     uint8 v,
     bytes32 r,
     bytes32 s
-  ) external {
+  ) external returns (uint[] memory amounts) {
     IERC20Permit(path[0]).permit(msg.sender, address(this), amountIn, deadline, v, r, s);
-    swapExactTokensForTokens(amountIn, amountOutMin, path, to, deadline);
+    return swapExactTokensForTokens(amountIn, amountOutMin, path, to, deadline);
   }
 
   function openLongPosition(

@@ -71,6 +71,20 @@ interface ISwapOperations is IBBase {
     uint deadline
   ) external returns (uint amountA, uint amountB, uint liquidity);
 
+  function addLiquidityWithPermit(
+    address tokenA,
+    address tokenB,
+    uint amountADesired,
+    uint amountBDesired,
+    uint amountAMin,
+    uint amountBMin,
+    uint _maxMintFeePercentage,
+    uint deadline,
+    uint8[] memory v,
+    bytes32[] memory r,
+    bytes32[] memory s
+  ) external returns (uint amountA, uint amountB, uint liquidity);
+
   // automatically repays any related open loans from the borrower (msg.sender)
   function removeLiquidity(
     address tokenA,
@@ -110,6 +124,17 @@ interface ISwapOperations is IBBase {
     address[] calldata path,
     address to,
     uint deadline
+  ) external returns (uint[] memory amounts);
+
+  function swapExactTokensForTokensWithPermit(
+    uint amountIn,
+    uint amountOutMin,
+    address[] calldata path,
+    address to,
+    uint deadline,
+    uint8 v,
+    bytes32 r,
+    bytes32 s
   ) external returns (uint[] memory amounts);
 
   function openLongPosition(
