@@ -297,11 +297,23 @@ export const getStableFeeFromStableBorrowingEvent = async (
   const receipt = await tx?.wait();
   for (const log of receipt?.logs ?? []) {
     const logData = contracts.borrowerOperations.interface.parseLog(log as any);
-    // TODO: replace LUSDBorrowingFeePaid event
-    if (logData?.name !== 'LUSDBorrowingFeePaid') continue;
-    return logData.args[1];
+    if (logData?.name === 'PaidBorrowingFee') return logData.args[1];
   }
   return 0n;
+};
+
+export const getRedemptionMeta = async (tx: ContractTransactionResponse | null, contracts: Contracts) => {
+  const receipt = await tx?.wait();
+
+  const meta = {
+    redemptions: [],
+  };
+  for (const log of receipt?.logs ?? []) {
+    const logData = contracts.redemptionOperations.interface.parseLog(log as any);
+    if (logData?.name === 'SuccessfulRedemption') meta.totals = logData.args;
+    else if (logData?.name === 'RedeemedFromTrove') meta.redemptions.push(logData.args);
+  }
+  return meta;
 };
 
 export const TimeValues = {

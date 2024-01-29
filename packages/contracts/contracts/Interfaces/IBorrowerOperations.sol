@@ -20,7 +20,7 @@ interface IBorrowerOperations is IBBase {
     address _sortedTrovesAddress
   );
   event TroveCreated(address _borrower, uint arrayIndex);
-  event SentBorrowingFeesToReserve(address indexed _borrower, uint amount);
+  event PaidBorrowingFee(address indexed _borrower, uint amount);
 
   // --- Custom Errors ---
 

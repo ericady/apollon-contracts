@@ -104,7 +104,7 @@ contract RedemptionOperations is LiquityBase, Ownable(msg.sender), CheckContract
 
     for (uint i = 0; i < _iterations.length; i++) {
       RedeemIteration memory iteration = _iterations[i];
-      if (!_isValidRedemptionHint(iteration.trove)) revert InvalidRedemptionHint();
+      checkValidRedemptionHint(iteration.trove);
 
       troveManager.applyPendingRewards(iteration.trove);
       SingleRedemptionVariables memory troveRedemption = calculateTroveRedemption(
@@ -122,7 +122,7 @@ contract RedemptionOperations is LiquityBase, Ownable(msg.sender), CheckContract
       troveManager.decreaseTroveDebt(iteration.trove, debtDecrease);
 
       // updating the troves stable coll
-      troveManager.increaseTroveColl(iteration.trove, troveRedemption.collLots);
+      troveManager.decreaseTroveColl(iteration.trove, troveRedemption.collLots);
       troveManager.updateStakeAndTotalStakes(vars.collTokenAddresses, iteration.trove);
 
       // update the troves position in the sorted list
@@ -183,28 +183,32 @@ contract RedemptionOperations is LiquityBase, Ownable(msg.sender), CheckContract
         PoolType.Active,
         collEntry.sendToRedeemer
       );
-
-      // todo jelly handover
-      // // Send the fee to the gov token staking contract
-      // contractsCache.activePool.sendETH(address(contractsCache.lqtyStaking), vars.ETHFee);
+      storagePool.withdrawalValue(
+        GOV_STAKING_ADDRESS,
+        vars.collTokenAddresses[i],
+        true,
+        PoolType.Active,
+        collEntry.redemptionFee
+      );
     }
 
     emit SuccessfulRedemption(_stableCoinAmount, vars.totalRedeemedStable, vars.totalCollDrawn);
   }
 
-  function _isValidRedemptionHint(address _redemptionHint) internal view returns (bool) {
+  function checkValidRedemptionHint(address _redemptionHint) internal view {
+    if (!troveManager.isTroveActive(_redemptionHint)) revert HintUnknown();
+
     // is case the sorted troves list is empty, all troves which minted stable are either redeemed or liquidated
     // the remaining stable is now in "pending rewards" of non listed troves
-    if (sortedTroves.isEmpty()) return true;
+    if (sortedTroves.isEmpty()) return;
 
     (uint hintCR, ) = troveManager.getCurrentICR(_redemptionHint);
-    if (
-      _redemptionHint == address(0) || !sortedTroves.contains(_redemptionHint) || hintCR < MCR // should be liquidated, not redeemed from
-    ) return false;
+    if (hintCR < MCR) revert HintBelowMCR(); // should be liquidated, not redeemed from
+    if (!sortedTroves.contains(_redemptionHint)) revert InvalidRedemptionHint();
 
     address nextTrove = sortedTroves.getNext(_redemptionHint);
     (uint nextTroveCR, ) = troveManager.getCurrentICR(nextTrove);
-    return nextTrove == address(0) || nextTroveCR < MCR;
+    if (nextTrove != address(0) && nextTroveCR > MCR) revert InvalidHintLowerCRExists();
   }
 
   function calculateTroveRedemption(

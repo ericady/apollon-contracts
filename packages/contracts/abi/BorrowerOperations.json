@@ -217,7 +217,7 @@
                 "type": "uint256"
             }
         ],
-        "name": "SentBorrowingFeesToReserve",
+        "name": "PaidBorrowingFee",
         "type": "event"
     },
     {
@@ -260,6 +260,19 @@
                 "internalType": "uint256",
                 "name": "",
                 "type": "uint256"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [],
+        "name": "GOV_STAKING_ADDRESS",
+        "outputs": [
+            {
+                "internalType": "address",
+                "name": "",
+                "type": "address"
             }
         ],
         "stateMutability": "view",

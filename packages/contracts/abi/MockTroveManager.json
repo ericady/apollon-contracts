@@ -1,27 +1,12 @@
 [
     {
         "inputs": [],
-        "name": "ExceedDebtBalance",
-        "type": "error"
-    },
-    {
-        "inputs": [],
         "name": "FeeExceedMaxPercentage",
         "type": "error"
     },
     {
         "inputs": [],
-        "name": "InvalidMaxFeePercent",
-        "type": "error"
-    },
-    {
-        "inputs": [],
         "name": "InvalidTrove",
-        "type": "error"
-    },
-    {
-        "inputs": [],
-        "name": "LessThanMCR",
         "type": "error"
     },
     {
@@ -64,11 +49,6 @@
     {
         "inputs": [],
         "name": "ZeroAddress",
-        "type": "error"
-    },
-    {
-        "inputs": [],
-        "name": "ZeroAmount",
         "type": "error"
     },
     {
@@ -427,6 +407,19 @@
                 "internalType": "uint256",
                 "name": "",
                 "type": "uint256"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [],
+        "name": "GOV_STAKING_ADDRESS",
+        "outputs": [
+            {
+                "internalType": "address",
+                "name": "",
+                "type": "address"
             }
         ],
         "stateMutability": "view",

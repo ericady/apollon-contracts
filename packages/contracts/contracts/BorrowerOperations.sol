@@ -614,12 +614,9 @@ contract BorrowerOperations is LiquityBase, Ownable(msg.sender), CheckContract, 
       govStakingPayout -= reserveTransfer;
 
       _debtToken.mint(address(reservePool), reserveTransfer);
-      emit SentBorrowingFeesToReserve(_tokenRecipient, reserveTransfer);
     }
-
-    if (govStakingPayout > 0) {
-      // todo transfer to gov staking contract
-    }
+    if (govStakingPayout > 0) _debtToken.mint(GOV_STAKING_ADDRESS, govStakingPayout);
+    emit PaidBorrowingFee(_tokenRecipient, _borrowingFee);
   }
 
   function _poolRepayDebt(

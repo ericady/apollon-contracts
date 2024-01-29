@@ -10,7 +10,7 @@ import {
   StoragePool,
   TroveManager,
   SwapPair,
-  SwapOperations
+  SwapOperations,
 } from '../typechain';
 import { expect, assert } from 'chai';
 import {
@@ -23,7 +23,7 @@ import {
   getEmittedLiquidationValues,
   increaseDebt,
   MAX_BORROWING_FEE,
-  getLatestBlockTimestamp
+  getLatestBlockTimestamp,
 } from '../utils/testHelper';
 import { parseUnits } from 'ethers';
 import { MockERC20Interface } from '../typechain/contracts/Mock/MockERC20';
@@ -67,59 +67,44 @@ describe('SwapOperations', () => {
   };
 
   const increase = async (user: SignerWithAddress, debts: any[], maxFeePercentage = MAX_BORROWING_FEE) => {
-    return increaseDebt(
-      user,
-      contracts,
-      debts,
-      maxFeePercentage
-    );
+    return increaseDebt(user, contracts, debts, maxFeePercentage);
   };
 
-  const deadline = async () : Promise<number> => {    
+  const deadline = async (): Promise<number> => {
     return (await getLatestBlockTimestamp()) + 100;
-  }
+  };
 
-  const add = async (user: SignerWithAddress, tokenA: MockERC20, tokenB: MockERC20, amountA: bigint, amountB: bigint, create: boolean = false) : Promise<SwapPair> => {
+  const add = async (
+    user: SignerWithAddress,
+    tokenA: MockERC20,
+    tokenB: MockERC20,
+    amountA: bigint,
+    amountB: bigint,
+    create: boolean = false
+  ): Promise<SwapPair> => {
     //create pair
-    if (create)
-    {
-      await swapOperations.connect(owner).createPair(
-        tokenA,
-        tokenB
-      );
+    if (create) {
+      await swapOperations.connect(owner).createPair(tokenA, tokenB);
     }
 
-    //get pair    
-    const pairAddress = await swapOperations.getPair(
-      tokenA,
-      tokenB
-    );
-    const pair: SwapPair = await ethers.getContractAt('SwapPair', pairAddress);   
+    //get pair
+    const pairAddress = await swapOperations.getPair(tokenA, tokenB);
+    const pair: SwapPair = await ethers.getContractAt('SwapPair', pairAddress);
 
     //add liquidty to another pair
     await tokenA.unprotectedMint(user, amountA);
     await tokenB.unprotectedMint(user, amountB);
     await tokenA.connect(user).approve(swapOperations, amountA);
     await tokenB.connect(user).approve(swapOperations, amountB);
-    await swapOperations.connect(user).addLiquidity(
-      tokenA,
-      tokenB,
-      amountA,
-      amountB,
-      0,
-      0,
-      0,
-      await deadline()
-    );
+    await swapOperations.connect(user).addLiquidity(tokenA, tokenB, amountA, amountB, 0, 0, 0, await deadline());
 
     return pair;
   };
 
-  const tokenAmount = (token: MockDebtToken, amount: bigint) =>
-  {
+  const tokenAmount = (token: MockDebtToken, amount: bigint) => {
     return {
       tokenAddress: token.getAddress(),
-      amount
+      amount,
     };
   };
 
@@ -149,7 +134,8 @@ describe('SwapOperations', () => {
   it('should not be possible to mint directly from the borrowerOps', async () => {
     //increase debt
     await expect(
-      borrowerOperations.connect(alice)
+      borrowerOperations
+        .connect(alice)
         .increaseDebt(
           alice.getAddress(),
           alice.getAddress(),
@@ -166,25 +152,17 @@ describe('SwapOperations', () => {
     await open(alice, parseUnits('1', 9), parseUnits('150'));
 
     //create pair & add liquidity
-    const pair = await add(
-      alice,
-      STABLE,
-      STOCK,
-      amount,
-      amount,
-      true
-    );
-    
+    const pair = await add(alice, STABLE, STOCK, amount, amount, true);
+
     //mint
-    await expect(
-      pair.connect(alice).mint(alice)
-    ).to.be.revertedWithCustomError(pair, 'NotFromSwapOperations');
+    await expect(pair.connect(alice).mint(alice)).to.be.revertedWithCustomError(pair, 'NotFromSwapOperations');
 
     //burn
     const balance = await pair.balanceOf(alice);
-    await expect(      
-      pair.connect(alice).burn(alice, balance, 0, 0)
-    ).to.be.revertedWithCustomError(pair, 'NotFromSwapOperations');
+    await expect(pair.connect(alice).burn(alice, balance, 0, 0)).to.be.revertedWithCustomError(
+      pair,
+      'NotFromSwapOperations'
+    );
   });
 
   it('liquidity token should not be transferable', async () => {
@@ -194,24 +172,13 @@ describe('SwapOperations', () => {
     await open(alice, parseUnits('1', 9), parseUnits('150'));
 
     //create pair & add liquidity
-    const pair = await add(
-      alice,
-      STABLE,
-      STOCK,
-      amount,
-      amount,
-      true
-    );
+    const pair = await add(alice, STABLE, STOCK, amount, amount, true);
 
     //check if transfer function doesn't exist
-    expect(
-      (pair as any).transfer
-    ).to.be.eql(undefined, 'Transfer function defined');
+    expect((pair as any).transfer).to.be.eql(undefined, 'Transfer function defined');
 
     //check if transferFrom function doesn't exist
-    expect(
-      (pair as any).transferFrom
-    ).to.be.eql(undefined, 'TransferFrom function defined');
+    expect((pair as any).transferFrom).to.be.eql(undefined, 'TransferFrom function defined');
   });
 
   describe('remove liquidity', () => {
@@ -260,7 +227,7 @@ describe('SwapOperations', () => {
     });
   });
 
-  describe.only('positions', () => {
+  describe('positions', () => {
     describe('long', () => {
       it('open without trove, should fail', async () => {
         const amount = parseUnits('1000');
@@ -269,25 +236,20 @@ describe('SwapOperations', () => {
         await open(bob, parseUnits('1', 9), parseUnits('150'));
 
         //create pair & add liquidity (bob)
-        await add(
-          bob,
-          STABLE,
-          STOCK,
-          amount,
-          amount,
-          true
-        );
+        await add(bob, STABLE, STOCK, amount, amount, true);
 
         //open long (alice)
         await expect(
-            swapOperations.connect(alice).openLongPosition(
-            parseUnits('100'),
-            0,
-            STOCK,
-            alice,
-            await swapOperations.MAX_BORROWING_FEE(),
-            await deadline()
-          )
+          swapOperations
+            .connect(alice)
+            .openLongPosition(
+              parseUnits('100'),
+              0,
+              STOCK,
+              alice,
+              await swapOperations.MAX_BORROWING_FEE(),
+              await deadline()
+            )
         ).to.be.revertedWithCustomError(borrowerOperations, 'TroveClosedOrNotExist');
       });
 
@@ -303,29 +265,24 @@ describe('SwapOperations', () => {
         await open(bob, parseUnits('1'), parseUnits('150'));
 
         //create pair & add liquidity
-        await add(
-          alice,
-          STABLE,
-          STOCK,
-          amount,
-          amount,
-          true
-        );
+        await add(alice, STABLE, STOCK, amount, amount, true);
 
         //open long
         await expect(
-            swapOperations.connect(alice).openLongPosition(
-            parseUnits('1000000'),
-            0,
-            STOCK,
-            alice,
-            await swapOperations.MAX_BORROWING_FEE(),
-            await deadline()
-          )
+          swapOperations
+            .connect(alice)
+            .openLongPosition(
+              parseUnits('1000000'),
+              0,
+              STOCK,
+              alice,
+              await swapOperations.MAX_BORROWING_FEE(),
+              await deadline()
+            )
         ).to.be.revertedWithCustomError(borrowerOperations, 'ICR_lt_MCR');
       });
 
-      it.only('open', async () => {
+      it('open', async () => {
         const amount = parseUnits('1000');
 
         //open troves
@@ -333,25 +290,20 @@ describe('SwapOperations', () => {
         await open(bob, parseUnits('1'), parseUnits('150'));
 
         //create pair & add liquidity
-        await add(
-          alice,
-          STABLE,
-          STOCK,
-          amount,
-          amount,
-          true
-        );
+        await add(alice, STABLE, STOCK, amount, amount, true);
 
         //open long (check balance before and after)
         expect(await STOCK.balanceOf(alice)).to.eq(0);
-        await swapOperations.connect(alice).openLongPosition(
-          parseUnits('1'),
-          0,
-          STOCK,
-          alice,
-          await swapOperations.MAX_BORROWING_FEE(),
-          await deadline()
-        );
+        await swapOperations
+          .connect(alice)
+          .openLongPosition(
+            parseUnits('1'),
+            0,
+            STOCK,
+            alice,
+            await swapOperations.MAX_BORROWING_FEE(),
+            await deadline()
+          );
         expect(await STOCK.balanceOf(alice)).to.greaterThan(0);
       });
     });

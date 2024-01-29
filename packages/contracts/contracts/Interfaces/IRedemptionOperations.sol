@@ -45,12 +45,12 @@ interface IRedemptionOperations is IBBase {
     address _collTokenManager,
     address _sortedTrovesAddress
   );
+  event RedeemedFromTrove(address _borrower, uint stableAmount, TokenAmount[] _drawnCollAmounts);
   event SuccessfulRedemption(
     uint _attemptedStableAmount,
     uint _actualStableAmount,
     RedemptionCollAmount[] _collPayouts
   );
-  event RedeemedFromTrove(address _borrower, uint stableAmount, TokenAmount[] _drawnCollAmounts);
 
   // --- Errors ---
 
@@ -62,6 +62,9 @@ interface IRedemptionOperations is IBBase {
   error GreaterThanTCR();
   error TooHighRedeemFee();
   error InvalidRedemptionHint();
+  error HintUnknown();
+  error HintBelowMCR();
+  error InvalidHintLowerCRExists();
 
   // --- Functions ---
 

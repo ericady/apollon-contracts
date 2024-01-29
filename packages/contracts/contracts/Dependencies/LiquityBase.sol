@@ -22,6 +22,9 @@ contract LiquityBase is IBase {
   uint public constant BORROWING_FEE_FLOOR = 0.005e18; // 0.5%
   uint public constant REDEMPTION_FEE_FLOOR = 0.005e18; // 0.5%
 
+  // todo update
+  address public constant GOV_STAKING_ADDRESS = address(0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266);
+
   // Return the coll amount of to be drawn from a trove's collateral and sent as gas compensation.
   function _getCollGasCompensation(uint _collAmount) internal pure returns (uint) {
     return _collAmount / PERCENT_DIVISOR;

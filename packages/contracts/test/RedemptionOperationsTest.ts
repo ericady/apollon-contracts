@@ -9,16 +9,22 @@ import {
 } from '../typechain';
 import { Contracts, deployCore, connectCoreContracts, deployAndLinkToken } from '../utils/deploymentHelpers';
 import { SignerWithAddress } from '@nomicfoundation/hardhat-ethers/signers';
-import { openTrove, whaleShrimpTroveInit } from '../utils/testHelper';
+import { getRedemptionMeta, MAX_BORROWING_FEE, openTrove, redeem, whaleShrimpTroveInit } from '../utils/testHelper';
 import { assert, expect } from 'chai';
-import { formatUnits, parseUnits } from 'ethers';
+import { parseUnits, ZeroAddress } from 'ethers';
+
+// todo continue tests from "redeemCollateral(): ends the redemption sequence when max iterations have been reached"
+// todo sortedTroves test
 
 describe('RedemptionOperations', () => {
   let signers: SignerWithAddress[];
   let owner: SignerWithAddress;
+  let carol: SignerWithAddress;
   let alice: SignerWithAddress;
   let bob: SignerWithAddress;
   let defaulter_1: SignerWithAddress;
+  let defaulter_2: SignerWithAddress;
+  let erin: SignerWithAddress;
 
   let storagePool: StoragePool;
 
@@ -30,14 +36,10 @@ describe('RedemptionOperations', () => {
   let redemptionOperations: RedemptionOperations;
   let contracts: Contracts;
 
-  let redemptionFee: bigint;
-
   before(async () => {
     signers = await ethers.getSigners();
-    [owner, defaulter_1, , , , alice, bob] = signers;
+    [owner, defaulter_1, defaulter_2, , , alice, bob, carol, , erin] = signers;
   });
-
-  // todo add tests with multiple trove iterations, how does the different hints influence each other? (because the calculation could change after the previous iteration...)
 
   beforeEach(async () => {
     contracts = await deployCore();
@@ -51,109 +53,160 @@ describe('RedemptionOperations', () => {
 
     STABLE = contracts.debtToken.STABLE;
     BTC = contracts.collToken.BTC;
-
-    redemptionFee = await redemptionOperations.getRedemptionRate();
   });
 
   describe('redeemCollateral()', () => {
-    it('from one open Trove', async () => {
-      await whaleShrimpTroveInit(contracts, signers, false);
+    describe('working exmaples', () => {
+      let bobStableBalanceBefore: bigint,
+        btcStableBalanceBefore: bigint,
+        defaulterTroveStableDebtBefore: bigint,
+        defaulterTroveBTCBefore: bigint,
+        defaulter2TroveStableDebtBefore: bigint,
+        defaulter2TroveBTCBefore: bigint,
+        toRedeem: bigint,
+        redemptionMeta: any;
 
-      const bobStableBalanceBefore = await STABLE.balanceOf(bob);
-      const btcStableBalanceBefore = await storagePool.getValue(BTC, true, 0);
+      beforeEach(async () => {
+        await whaleShrimpTroveInit(contracts, signers, false);
 
-      const toRedeem = parseUnits('50');
-      await redemptionOperations.connect(bob).redeemCollateral(toRedeem, parseUnits('0.01'), [defaulter_1]);
+        bobStableBalanceBefore = await STABLE.balanceOf(bob);
+        btcStableBalanceBefore = await storagePool.getValue(BTC, true, 0);
 
-      const bobStableBalanceAfter = await STABLE.balanceOf(bob);
-      expect(bobStableBalanceAfter).to.be.equal(bobStableBalanceBefore - toRedeem);
+        defaulterTroveStableDebtBefore = await troveManager.getTroveRepayableDebt(defaulter_1, STABLE);
+        defaulterTroveBTCBefore = await troveManager.getTroveWithdrawableColl(defaulter_1, BTC);
 
-      const collTokenBalance = await BTC.balanceOf(bob);
-      let expectedBTCPayout = toRedeem / (await priceFeed.getUSDValue(BTC, 1));
-      expectedBTCPayout -= await redemptionOperations.getRedemptionFeeWithDecay(expectedBTCPayout);
-      assert.equal(collTokenBalance, expectedBTCPayout);
-
-      const btcStableBalanceAfter = await storagePool.getValue(BTC, true, 0);
-      assert.equal(btcStableBalanceAfter, btcStableBalanceBefore - expectedBTCPayout);
-    });
-
-    it('Should not touch Troves with ICR < 110%', async function () {
-      const COLLATERAL_AMOUNT = '10000';
-      const REDEMPTION_AMOUNT = '500';
-
-      await openTrove({
-        from: alice,
-        contracts,
-        collToken: BTC,
-        collAmount: parseUnits('1', 9),
-        debts: [{ tokenAddress: STABLE, amount: parseUnits(COLLATERAL_AMOUNT) }],
-      });
-      await openTrove({
-        from: bob,
-        contracts,
-        collToken: BTC,
-        collAmount: parseUnits('1.5', 9),
-        debts: [{ tokenAddress: STABLE, amount: parseUnits(COLLATERAL_AMOUNT) }],
+        defaulter2TroveStableDebtBefore = await troveManager.getTroveRepayableDebt(defaulter_2, STABLE);
+        defaulter2TroveBTCBefore = await troveManager.getTroveWithdrawableColl(defaulter_2, BTC);
       });
 
-      await STABLE.unprotectedMint(bob, parseUnits(COLLATERAL_AMOUNT));
-      await STABLE.connect(bob).approve(await redemptionOperations.getAddress(), parseUnits(COLLATERAL_AMOUNT));
-      const bobBalanceBefore = await BTC.balanceOf(bob);
-      const baseRate = await troveManager.getBaseRate();
-      const REDEMPTION_FEE = await troveManager.REDEMPTION_FEE_FLOOR();
-      const DECIMAL_PRECISION = 1e18;
+      it('one partial', async () => {
+        toRedeem = parseUnits('50');
+      });
 
-      /* EXPERIMENTAL */
-      const redemptionAmountInUSD = await priceFeed.getUSDValue(STABLE, REDEMPTION_AMOUNT);
-      // _redeemCollateralFromTrove
-      const COLL_TOKEN_AMOUNT = await priceFeed.getAmountFromUSDValue(
-        BTC,
-        parseUnits(redemptionAmountInUSD.toString(), 'ether')
-      );
-      // _calcRedemptionFee
-      const redemptionFee = (BigInt(REDEMPTION_FEE + baseRate) * BigInt(COLL_TOKEN_AMOUNT)) / BigInt(DECIMAL_PRECISION);
-      // 2 * 1e18 / REDEMPTION_AMOUNT
-      const userAcceptanceFee = (redemptionFee * BigInt(DECIMAL_PRECISION)) / BigInt(COLL_TOKEN_AMOUNT);
-      /* EXPERIMENTAL */
+      it('one fully', async () => {
+        toRedeem = parseUnits('100.5');
+      });
 
-      const tx = await redemptionOperations
-        .connect(bob)
-        .redeemCollateral(parseUnits(REDEMPTION_AMOUNT), REDEMPTION_FEE, [alice]);
-      const mined = await tx.wait();
-      const bobBalanceAfter = await BTC.balanceOf(bob);
-      const balanceDifference = bobBalanceAfter - bobBalanceBefore;
-      console.log(
-        'USD Value of the difference: ',
-        formatUnits(await priceFeed.getUSDValue(BTC, balanceDifference), 'ether')
-      );
+      it('first fully, second partial', async () => {
+        toRedeem = parseUnits('150');
+      });
+
+      it('two fully', async () => {
+        toRedeem = parseUnits('201');
+      });
+
+      afterEach(async () => {
+        redemptionMeta = await getRedemptionMeta(await redeem(bob, toRedeem, contracts), contracts);
+
+        const bobStableBalanceAfter = await STABLE.balanceOf(bob);
+        expect(bobStableBalanceAfter).to.be.equal(bobStableBalanceBefore - toRedeem);
+
+        const [, btcDrawn, , btcPayout] = redemptionMeta.totals[2].find((f: any) => f[0] === BTC.target);
+        assert.equal(await BTC.balanceOf(bob), btcPayout);
+        assert.isAtMost(
+          (toRedeem * parseUnits('1', 9)) / (await priceFeed.getUSDValue(BTC, parseUnits('1', 9))) - btcDrawn,
+          10n
+        );
+
+        // checking totals
+        const btcStorageBalanceAfter = await storagePool.getValue(BTC, true, 0);
+        assert.equal(btcStorageBalanceAfter, btcStableBalanceBefore - btcDrawn);
+
+        // checking defaulter 1
+        const [, stableDrawn, collDrawn] = redemptionMeta.redemptions.find((f: any) => f[0] === defaulter_1.address);
+        const defaulterTroveStableDebtAfter = await troveManager.getTroveRepayableDebt(defaulter_1, STABLE);
+        expect(defaulterTroveStableDebtAfter).to.be.equal(defaulterTroveStableDebtBefore - stableDrawn);
+
+        const defaulterTroveBTCAfter = await troveManager.getTroveWithdrawableColl(defaulter_1, BTC);
+        expect(defaulterTroveBTCAfter).to.be.equal(
+          defaulterTroveBTCBefore - collDrawn.find((f: any) => f[0] === BTC.target)[1]
+        );
+
+        // checking defaulter 2
+        if (redemptionMeta.redemptions.length === 2) {
+          const [, stableDrawn2, collDrawn2] = redemptionMeta.redemptions.find(
+            (f: any) => f[0] === defaulter_2.address
+          );
+          const defaulter2TroveStableDebtAfter = await troveManager.getTroveRepayableDebt(defaulter_2, STABLE);
+          expect(defaulter2TroveStableDebtAfter).to.be.equal(defaulter2TroveStableDebtBefore - stableDrawn2);
+
+          const defaulter2TroveBTCAfter = await troveManager.getTroveWithdrawableColl(defaulter_2, BTC);
+          expect(defaulter2TroveBTCAfter).to.be.equal(
+            defaulter2TroveBTCBefore - collDrawn2.find((f: any) => f[0] === BTC.target)[1]
+          );
+        }
+      });
     });
 
     it('Should revert if stable coin amount is zero', async function () {
-      const stableCoinAmount = parseUnits('10');
-      const maxFeePercentage = parseUnits('0.05');
-      await expect(
-        redemptionOperations.connect(owner).redeemCollateral(0, maxFeePercentage, [alice])
-      ).to.be.revertedWithCustomError(redemptionOperations, 'ZeroAmount');
+      await expect(redeem(alice, 0n, contracts)).to.be.revertedWithCustomError(redemptionOperations, 'ZeroAmount');
     });
 
     it('Should revert if max fee percentage is less than REDEMPTION_FEE_FLOOR', async function () {
-      const lowMaxFeePercentage = parseUnits('0.01');
-      const stableCoinAmount = parseUnits('1');
-      const sourceTroves = [alice];
-
       await expect(
-        redemptionOperations.connect(owner).redeemCollateral(stableCoinAmount, lowMaxFeePercentage, sourceTroves)
+        contracts.redemptionOperations.connect(alice).redeemCollateral(parseUnits('1'), [], 0.004e18)
       ).to.be.revertedWithCustomError(redemptionOperations, 'InvalidMaxFeePercent');
     });
 
     it('Should revert if stable coin amount exceeds debt balance', async function () {
-      const maxFeePercentage = parseUnits('0.05');
-      const highStableCoinAmount = parseUnits('1000');
-      const sourceTroves = [alice];
+      await expect(
+        contracts.redemptionOperations.connect(alice).redeemCollateral(parseUnits('10000'), [], MAX_BORROWING_FEE)
+      ).to.be.revertedWithCustomError(redemptionOperations, 'ExceedDebtBalance');
+    });
+
+    it('Should fail with invalid hint, non-existent trove', async function () {
+      await whaleShrimpTroveInit(contracts, signers, false);
 
       await expect(
-        redemptionOperations.connect(owner).redeemCollateral(highStableCoinAmount, maxFeePercentage, sourceTroves)
-      ).to.be.revertedWithCustomError(redemptionOperations, 'ExceedDebtBalance');
+        contracts.redemptionOperations
+          .connect(bob)
+          .redeemCollateral(
+            parseUnits('50'),
+            [{ trove: ZeroAddress, lowerHint: ZeroAddress, upperHint: ZeroAddress, expectedCR: 0n }],
+            MAX_BORROWING_FEE
+          )
+      ).to.be.revertedWithCustomError(redemptionOperations, 'HintUnknown');
+    });
+
+    it('Should fail with invalid hint, trove with stable', async function () {
+      await whaleShrimpTroveInit(contracts, signers, false);
+
+      await openTrove({
+        from: erin,
+        contracts,
+        collToken: BTC,
+        collAmount: parseUnits('1', 9),
+      });
+      await expect(
+        contracts.redemptionOperations
+          .connect(bob)
+          .redeemCollateral(
+            parseUnits('50'),
+            [{ trove: erin, lowerHint: ZeroAddress, upperHint: ZeroAddress, expectedCR: parseUnits('1') }],
+            MAX_BORROWING_FEE
+          )
+      ).to.be.revertedWithCustomError(redemptionOperations, 'InvalidRedemptionHint');
+    });
+
+    it('Should fail with invalid hint, trove with higher CR', async function () {
+      await whaleShrimpTroveInit(contracts, signers, false);
+
+      const toRedeem = parseUnits('50');
+      const simulatedRedemption = await contracts.redemptionOperations.calculateTroveRedemption(alice, toRedeem, true);
+      await expect(
+        contracts.redemptionOperations.connect(bob).redeemCollateral(
+          toRedeem,
+          [
+            {
+              trove: alice,
+              lowerHint: ZeroAddress,
+              upperHint: ZeroAddress,
+              expectedCR: simulatedRedemption.resultingCR,
+            },
+          ],
+          MAX_BORROWING_FEE
+        )
+      ).to.be.revertedWithCustomError(redemptionOperations, 'InvalidHintLowerCRExists');
     });
   });
 });

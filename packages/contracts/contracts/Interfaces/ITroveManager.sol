@@ -37,11 +37,7 @@ interface ITroveManager is IBBase {
 
   error NotFromBorrowerOrRedemptionOps();
   error InvalidTrove();
-  error ExceedDebtBalance();
   error OnlyOneTrove();
-  error ZeroAmount();
-  error LessThanMCR();
-  error InvalidMaxFeePercent();
 
   // --- Functions ---
 

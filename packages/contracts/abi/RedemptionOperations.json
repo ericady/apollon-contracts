@@ -16,6 +16,21 @@
     },
     {
         "inputs": [],
+        "name": "HintBelowMCR",
+        "type": "error"
+    },
+    {
+        "inputs": [],
+        "name": "HintUnknown",
+        "type": "error"
+    },
+    {
+        "inputs": [],
+        "name": "InvalidHintLowerCRExists",
+        "type": "error"
+    },
+    {
+        "inputs": [],
         "name": "InvalidMaxFeePercent",
         "type": "error"
     },
@@ -243,6 +258,19 @@
                 "internalType": "uint256",
                 "name": "",
                 "type": "uint256"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [],
+        "name": "GOV_STAKING_ADDRESS",
+        "outputs": [
+            {
+                "internalType": "address",
+                "name": "",
+                "type": "address"
             }
         ],
         "stateMutability": "view",

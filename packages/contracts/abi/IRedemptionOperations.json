@@ -16,6 +16,21 @@
     },
     {
         "inputs": [],
+        "name": "HintBelowMCR",
+        "type": "error"
+    },
+    {
+        "inputs": [],
+        "name": "HintUnknown",
+        "type": "error"
+    },
+    {
+        "inputs": [],
+        "name": "InvalidHintLowerCRExists",
+        "type": "error"
+    },
+    {
+        "inputs": [],
         "name": "InvalidMaxFeePercent",
         "type": "error"
     },

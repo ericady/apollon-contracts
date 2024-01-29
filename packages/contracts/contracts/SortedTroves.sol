@@ -142,17 +142,22 @@ contract SortedTroves is Ownable(msg.sender), CheckContract, ISortedTroves {
         // Set prev pointer of next node to the previous node
         data.nodes[data.nodes[_id].nextId].prevId = data.nodes[_id].prevId;
       }
+
+      uint toRemoveIndex = data.nodes[_id].listIndex;
+      if (toRemoveIndex < data.list.length) {
+        data.list[toRemoveIndex] = data.list[data.list.length - 1];
+        data.nodes[data.list[toRemoveIndex]].listIndex = toRemoveIndex;
+      }
+      data.list.pop();
     } else {
       // List contains a single node
       // Set the head and tail to null
       data.head = address(0);
       data.tail = address(0);
+      data.list.pop();
     }
 
-    data.list[data.nodes[_id].listIndex] = data.list[data.list.length - 1];
-    data.list.pop();
     delete data.nodes[_id];
-
     emit NodeRemoved(_id);
   }
 
