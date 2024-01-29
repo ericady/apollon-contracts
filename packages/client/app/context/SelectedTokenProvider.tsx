@@ -1,10 +1,10 @@
 'use client';
 
 import { useQuery } from '@apollo/client';
+import { ethers } from 'ethers';
 import { createContext, useContext, useState } from 'react';
 import { GetCollateralTokensQuery, GetCollateralTokensQueryVariables } from '../generated/gql-types';
 import { GET_BORROWER_COLLATERAL_TOKENS } from '../queries';
-import { divBigIntsToFloat } from '../utils/math';
 import { Contracts, useEthers } from './EthersProvider';
 
 export type SelectedToken = {
@@ -24,12 +24,12 @@ export type SelectedToken = {
 
 export const SelectedTokenContext = createContext<{
   JUSDToken: GetCollateralTokensQuery['collateralTokenMetas'][number]['token'] | undefined;
-  tokenRatio: number;
+  tokenRatio: bigint;
   selectedToken: SelectedToken | null;
   setSelectedToken: (asset: SelectedToken) => void;
 }>({
   JUSDToken: undefined,
-  tokenRatio: 0,
+  tokenRatio: BigInt(0),
   selectedToken: null,
   setSelectedToken: () => {},
 });
@@ -48,11 +48,12 @@ export default function SelectedTokenProvider({ children }: { children: React.Re
       },
     },
   );
+
   const JUSDToken = data?.collateralTokenMetas.find(({ token }) => token.address === Contracts.ERC20.JUSD)?.token;
   const tokenRatio =
     JUSDToken === undefined || selectedToken === null
-      ? 0
-      : divBigIntsToFloat(selectedToken!.priceUSD, BigInt(JUSDToken!.priceUSD), 5);
+      ? ethers.parseEther('1')
+      : (selectedToken!.priceUSD * ethers.parseEther('1')) / BigInt(JUSDToken!.priceUSD);
 
   return (
     <SelectedTokenContext.Provider
@@ -71,7 +72,7 @@ export default function SelectedTokenProvider({ children }: { children: React.Re
 
 export function useSelectedToken(): {
   JUSDToken: GetCollateralTokensQuery['collateralTokenMetas'][number]['token'] | undefined;
-  tokenRatio: number;
+  tokenRatio: bigint;
   selectedToken: SelectedToken | null;
   setSelectedToken: (asset: SelectedToken) => void;
 } {

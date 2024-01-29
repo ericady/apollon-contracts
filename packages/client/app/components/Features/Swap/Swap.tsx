@@ -4,6 +4,7 @@ import { Skeleton } from '@mui/material';
 import Button from '@mui/material/Button';
 import InputAdornment from '@mui/material/InputAdornment';
 import Typography from '@mui/material/Typography';
+import { ethers } from 'ethers';
 import { ChangeEvent, useEffect, useState } from 'react';
 import { FormProvider, useController, useForm } from 'react-hook-form';
 import { Contracts, useEthers } from '../../../context/EthersProvider';
@@ -55,15 +56,20 @@ const Swap = () => {
   const { field: tokenAmountField } = useController({ name: 'tokenAmount', control });
 
   const handleSwapValueChange = (variant: 'JUSD' | 'Token', value: string) => {
-    const numericValue = parseFloat(value);
+    const numericValue = ethers.parseEther(value);
+    const isDefined = !isNaN(parseFloat(value));
 
     if (variant === 'JUSD') {
-      if (!isNaN(numericValue)) {
+      if (isDefined) {
         setValue(
           'tokenAmount',
           roundNumber(
-            (numericValue / tokenRatio) *
-              dangerouslyConvertBigIntToNumber(floatToBigInt(1, 5) - selectedToken!.swapFee, 0, 5),
+            dangerouslyConvertBigIntToNumber(
+              (numericValue * (floatToBigInt(1, 6) - selectedToken!.swapFee) * ethers.parseUnits('1', 18)) / tokenRatio,
+              18,
+              6,
+            ),
+            5,
           ).toString(),
         );
         setTradingDirection('jUSDSpent');
@@ -73,13 +79,16 @@ const Swap = () => {
 
       setValue('jUSDAmount', value);
     } else {
-      if (!isNaN(numericValue)) {
+      if (isDefined) {
         setValue(
           'jUSDAmount',
           roundNumber(
-            numericValue *
-              tokenRatio *
-              dangerouslyConvertBigIntToNumber(floatToBigInt(1, 6) - selectedToken!.swapFee, 0, 5),
+            dangerouslyConvertBigIntToNumber(
+              numericValue * tokenRatio * (floatToBigInt(1, 6) - selectedToken!.swapFee),
+              36,
+              6,
+            ),
+            5,
           ).toString(),
         );
         setTradingDirection('jUSDAquired');
@@ -306,7 +315,11 @@ const Swap = () => {
                 {selectedToken ? (
                   <span>
                     {roundCurrency(
-                      tokenRatio * dangerouslyConvertBigIntToNumber(floatToBigInt(1, 5) - selectedToken.swapFee, 0, 5),
+                      dangerouslyConvertBigIntToNumber(
+                        tokenRatio * (floatToBigInt(1, 6) - selectedToken.swapFee),
+                        18,
+                        6,
+                      ),
                       5,
                       5,
                     )}{' '}
@@ -329,7 +342,7 @@ const Swap = () => {
                 Swap fee:
                 {selectedToken ? (
                   <span data-testid="apollon-swap-protocol-fee">
-                    {displayPercentage(dangerouslyConvertBigIntToNumber(selectedToken.swapFee, 0, 5))}
+                    {displayPercentage(dangerouslyConvertBigIntToNumber(selectedToken.swapFee, 0, 6))}
                   </span>
                 ) : (
                   <div style={{ display: 'flex', alignItems: 'center', gap: 5, width: 120 }}>

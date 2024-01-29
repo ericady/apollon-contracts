@@ -73,12 +73,14 @@ export function dangerouslyConvertBigIntToNumber(
   // Scale down the BigNumber by the precision factor
   const scaledValue = bigNumber / scalingFactor;
 
+  console.log('scaledValue: ', scaledValue);
+
   // Check if the scaled value is within JavaScript's safe integer range
-  if (scaledValue < ethers.parseUnits(Number.MAX_SAFE_INTEGER.toString(), precisionDigits)) {
+  if (scaledValue < ethers.parseUnits(Number.MAX_SAFE_INTEGER.toString(), 0)) {
     // Convert to a JavaScript number
     return shirftDigits
-      ? bigIntStringToFloat(scaledValue.toString(), precisionDigits) / Math.pow(10, shirftDigits)
-      : bigIntStringToFloat(scaledValue.toString(), precisionDigits);
+      ? bigIntStringToFloat(scaledValue.toString(), 0) / Math.pow(10, shirftDigits)
+      : bigIntStringToFloat(scaledValue.toString(), 0);
   } else {
     // Log an error or handle the case where the value is still too large
     console.warn("Resulting number exceeds JavaScript's safe integer range.");

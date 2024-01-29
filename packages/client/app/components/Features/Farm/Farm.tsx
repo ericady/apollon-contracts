@@ -7,6 +7,7 @@ import InputAdornment from '@mui/material/InputAdornment';
 import Tab from '@mui/material/Tab';
 import Tabs from '@mui/material/Tabs';
 import Typography from '@mui/material/Typography';
+import { ethers } from 'ethers';
 import { useCallback, useState } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
 import { useEthers } from '../../../context/EthersProvider';
@@ -15,7 +16,13 @@ import { useTransactionDialog } from '../../../context/TransactionDialogProvider
 import { GetTroveManagerQuery, GetTroveManagerQueryVariables } from '../../../generated/gql-types';
 import { GET_TROVEMANAGER } from '../../../queries';
 import { WIDGET_HEIGHTS } from '../../../utils/contants';
-import { dangerouslyConvertBigIntToNumber, displayPercentage, floatToBigInt, roundCurrency } from '../../../utils/math';
+import {
+  bigIntStringToFloat,
+  dangerouslyConvertBigIntToNumber,
+  displayPercentage,
+  floatToBigInt,
+  roundCurrency,
+} from '../../../utils/math';
 import InfoButton from '../../Buttons/InfoButton';
 import FeatureBox from '../../FeatureBox/FeatureBox';
 import NumberInput from '../../FormControls/NumberInput';
@@ -79,7 +86,8 @@ const Farm = () => {
             methodCall: async () => {
               return swapOperationsContract.openLongPosition(
                 floatToBigInt(farmShortValue),
-                floatToBigInt(getExpectedPositionSize() * (1 - maxSlippage)),
+                (getExpectedPositionSize() * ethers.parseEther((1 - maxSlippage).toString())) /
+                  ethers.parseUnits('1', 18),
                 selectedToken!.address,
                 address,
                 _maxMintFeePercentage,
@@ -98,7 +106,8 @@ const Farm = () => {
             methodCall: async () => {
               return swapOperationsContract.openShortPosition(
                 floatToBigInt(farmShortValue),
-                floatToBigInt(getExpectedPositionSize() * (1 - maxSlippage)),
+                (getExpectedPositionSize() * ethers.parseEther((1 - maxSlippage).toString())) /
+                  ethers.parseUnits('1', 18),
                 selectedToken!.address,
                 address,
                 _maxMintFeePercentage,
@@ -116,49 +125,59 @@ const Farm = () => {
 
   const addedDebtUSD =
     !isNaN(watchFarmShortValue) && selectedToken
-      ? dangerouslyConvertBigIntToNumber(BigInt(watchFarmShortValue) * selectedToken.priceUSD)
+      ? watchFarmShortValue * bigIntStringToFloat(selectedToken.priceUSD.toString())
       : 0;
   const borrowingFee = data?.getTroveManager.borrowingRate;
 
+  /**
+   * Must be exact due to contract call
+   */
   const getExpectedPositionSize = () => {
+    const valueAsBigint = ethers.parseEther(watchFarmShortValue.toString());
+
     // Position size, rename in “Expected position size”, rechnung: vom input die borrowing fee abziehen (steht unten), dann über den pool dex Preis die andere Seite ermitteln und davon dann noch einmal die aktuelle swap fee abziehen
     const expectedPositionSize =
       tabValue === 'Long'
-        ? ((watchFarmShortValue * dangerouslyConvertBigIntToNumber(floatToBigInt(1, 6) - borrowingFee!, 6)) /
-            tokenRatio) *
-          dangerouslyConvertBigIntToNumber(floatToBigInt(1, 6) - selectedToken!.swapFee, 6)
-        : watchFarmShortValue *
-          dangerouslyConvertBigIntToNumber(floatToBigInt(1, 6) - borrowingFee!, 6) *
-          tokenRatio *
-          dangerouslyConvertBigIntToNumber(floatToBigInt(1, 6) - selectedToken!.swapFee, 6);
+        ? (valueAsBigint * (floatToBigInt(1, 18) - borrowingFee!) * (floatToBigInt(1, 6) - selectedToken!.swapFee)) /
+          tokenRatio /
+          ethers.parseUnits('1', 6)
+        : (valueAsBigint *
+            (floatToBigInt(1, 18) - borrowingFee!) *
+            tokenRatio *
+            (floatToBigInt(1, 6) - selectedToken!.swapFee)) /
+          ethers.parseUnits('1', 18 + 18 + 6);
 
     return expectedPositionSize;
   };
 
-  // TODO: Not adjusted for swap fee
+  /**
+   * Not exact
+   * TODO: Not adjusted for swap fee
+   */
   const getPriceImpact = () => {
     const {
       pool: { liqudityPair },
     } = selectedToken!;
 
-    const currentPrice = liqudityPair[0] / liqudityPair[1];
+    const liq0 = dangerouslyConvertBigIntToNumber(liqudityPair[0], 0);
+    const liq1 = dangerouslyConvertBigIntToNumber(liqudityPair[1], 0);
 
-    let newPriceAfterSwap: bigint;
+    const currentPrice = liq0 / liq1;
+
+    let newPriceAfterSwap: number;
     if (tabValue === 'Long') {
       // Calculate new amount of the other token after swap
-      const newY = (liqudityPair[1] * liqudityPair[0]) / (liqudityPair[0] + BigInt(watchFarmShortValue));
-      newPriceAfterSwap = BigInt(watchFarmShortValue) / (liqudityPair[1] - newY);
+      const newY = (liq1 * liq0) / (liq0 + watchFarmShortValue);
+      newPriceAfterSwap = watchFarmShortValue / (liq1 - newY);
     } else {
       // Calculate new amount of jUSD after swap
-      const newX = (liqudityPair[0] * liqudityPair[1]) / (liqudityPair[1] + BigInt(watchFarmShortValue));
-      newPriceAfterSwap = (liqudityPair[0] - newX) / BigInt(watchFarmShortValue);
+      const newX = (liq0 * liq1) / (liq1 + watchFarmShortValue);
+      newPriceAfterSwap = (liq0 - newX) / watchFarmShortValue;
     }
 
     // Calculate price impact
-    const priceImpact = ((newPriceAfterSwap - currentPrice) / currentPrice) * BigInt(100); // in percentage
-    return Math.abs(dangerouslyConvertBigIntToNumber(priceImpact)) > 1
-      ? 1
-      : Math.abs(dangerouslyConvertBigIntToNumber(priceImpact));
+    const priceImpact = ((newPriceAfterSwap - currentPrice) / currentPrice) * 100; // in percentage
+    return Math.abs(priceImpact) > 1 ? 1 : Math.abs(priceImpact);
   };
 
   return (
@@ -238,13 +257,17 @@ const Farm = () => {
                     tabValue === 'Long' ? (
                       <span data-testid="apollon-farm-position-size">
                         {!isNaN(watchFarmShortValue) && selectedToken && data
-                          ? `${roundCurrency(getExpectedPositionSize())} ${selectedToken.symbol}`
+                          ? `${roundCurrency(
+                              dangerouslyConvertBigIntToNumber(getExpectedPositionSize(), 9, 9),
+                              5,
+                              5,
+                            )} ${selectedToken.symbol}`
                           : '-'}
                       </span>
                     ) : (
                       <span data-testid="apollon-farm-position-size">
                         {!isNaN(watchFarmShortValue) && selectedToken && data
-                          ? `${roundCurrency(getExpectedPositionSize())} jUSD`
+                          ? `${roundCurrency(dangerouslyConvertBigIntToNumber(getExpectedPositionSize()), 5, 5)} jUSD`
                           : '-'}
                       </span>
                     )
@@ -266,11 +289,14 @@ const Farm = () => {
                   {selectedToken && data ? (
                     <span>
                       {roundCurrency(
-                        tokenRatio *
-                          dangerouslyConvertBigIntToNumber(
-                            floatToBigInt(1, 5) + selectedToken.swapFee + borrowingFee!,
-                            6,
-                          ),
+                        dangerouslyConvertBigIntToNumber(
+                          tokenRatio *
+                            (ethers.parseEther('1') +
+                              selectedToken.swapFee * ethers.parseUnits('1', 12) +
+                              borrowingFee!),
+                          30,
+                          6,
+                        ),
                         5,
                         5,
                       )}{' '}
@@ -294,7 +320,7 @@ const Farm = () => {
                   {selectedToken ? (
                     <span data-testid="apollon-farm-protocol-fee">
                       {' '}
-                      {displayPercentage(dangerouslyConvertBigIntToNumber(selectedToken.swapFee))}
+                      {displayPercentage(dangerouslyConvertBigIntToNumber(selectedToken.swapFee, 0, 6))}
                     </span>
                   ) : (
                     <div style={{ display: 'flex', alignItems: 'center', gap: 5, width: 120 }}>
@@ -317,7 +343,7 @@ const Farm = () => {
                   Borrowing fee:
                   {data ? (
                     <span data-testid="apollon-farm-borrowing-fee">
-                      {displayPercentage(dangerouslyConvertBigIntToNumber(borrowingFee!))}
+                      {displayPercentage(dangerouslyConvertBigIntToNumber(borrowingFee!, 0, 17))}
                     </span>
                   ) : (
                     <div style={{ display: 'flex', alignItems: 'center', gap: 5, width: 120 }}>

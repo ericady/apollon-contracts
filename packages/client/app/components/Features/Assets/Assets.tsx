@@ -176,7 +176,7 @@ function Assets() {
                     </TableCell>
                     <TableCell sx={{ p: 0.5 }} align="right" width={60}>
                       <Typography fontWeight={400} sx={{ color: swapFee < 0 ? 'success.main' : 'error.main' }}>
-                        {displayPercentage(dangerouslyConvertBigIntToNumber(swapFee, 0, 5), 'omit')}
+                        {displayPercentage(dangerouslyConvertBigIntToNumber(swapFee, 0, 6), 'omit')}
                       </Typography>
                     </TableCell>
                     <TableCell sx={{ p: 0.5 }} align="right" width={80}>

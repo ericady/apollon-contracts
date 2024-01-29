@@ -359,7 +359,7 @@ const getProductionCacheConfig = ({
       fields: {
         swapFee: {
           read(_, { readField }) {
-            return BigInt(5000);
+            return BigInt(50000);
 
             const poolAddress = readField('address') as Readonly<string>;
 
