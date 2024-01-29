@@ -233,7 +233,7 @@ contract BorrowerOperations is LiquityBase, Ownable(msg.sender), CheckContract, 
 
   function openTroveWithPermit(
     TokenAmount[] memory _colls,
-    uint[] memory deadlines,
+    uint deadline,
     uint8[] memory v,
     bytes32[] memory r,
     bytes32[] memory s
@@ -243,7 +243,7 @@ contract BorrowerOperations is LiquityBase, Ownable(msg.sender), CheckContract, 
         msg.sender,
         address(this),
         _colls[i].amount,
-        deadlines[i],
+        deadline,
         v[i],
         r[i],
         s[i]
@@ -276,7 +276,7 @@ contract BorrowerOperations is LiquityBase, Ownable(msg.sender), CheckContract, 
 
   function addCollWithPermit(
     TokenAmount[] memory _colls,
-    uint[] memory deadlines,
+    uint deadline,
     uint8[] memory v,
     bytes32[] memory r,
     bytes32[] memory s
@@ -286,7 +286,7 @@ contract BorrowerOperations is LiquityBase, Ownable(msg.sender), CheckContract, 
         msg.sender,
         address(this),
         _colls[i].amount,
-        deadlines[i],
+        deadline,
         v[i],
         r[i],
         s[i]

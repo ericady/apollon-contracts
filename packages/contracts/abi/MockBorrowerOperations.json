@@ -456,9 +456,9 @@
                 "type": "tuple[]"
             },
             {
-                "internalType": "uint256[]",
-                "name": "deadlines",
-                "type": "uint256[]"
+                "internalType": "uint256",
+                "name": "deadline",
+                "type": "uint256"
             },
             {
                 "internalType": "uint8[]",
@@ -719,9 +719,9 @@
                 "type": "tuple[]"
             },
             {
-                "internalType": "uint256[]",
-                "name": "deadlines",
-                "type": "uint256[]"
+                "internalType": "uint256",
+                "name": "deadline",
+                "type": "uint256"
             },
             {
                 "internalType": "uint8[]",

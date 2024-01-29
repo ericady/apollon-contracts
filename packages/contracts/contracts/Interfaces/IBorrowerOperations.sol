@@ -49,7 +49,7 @@ interface IBorrowerOperations is IBBase {
 
   function openTroveWithPermit(
     TokenAmount[] memory _colls,
-    uint[] memory deadlines,
+    uint deadline,
     uint8[] memory v,
     bytes32[] memory r,
     bytes32[] memory s
@@ -59,7 +59,7 @@ interface IBorrowerOperations is IBBase {
 
   function addCollWithPermit(
     TokenAmount[] memory _colls,
-    uint[] memory deadlines,
+    uint deadline,
     uint8[] memory v,
     bytes32[] memory r,
     bytes32[] memory s
