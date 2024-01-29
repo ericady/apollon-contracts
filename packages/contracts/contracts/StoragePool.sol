@@ -143,7 +143,7 @@ contract StoragePool is LiquityBase, Ownable(msg.sender), CheckContract, IStorag
     emit StoragePoolValueUpdated(_tokenAddress, _isColl, _toType, entry.poolTypes[_toType]);
   }
 
-  function getEntireSystemColl() external view returns (uint entireSystemColl) {
+  function getEntireSystemColl() public view returns (uint entireSystemColl) {
     IPriceFeed priceFeedCached = priceFeed;
     for (uint i = 0; i < collTokenAddresses.length; i++)
       entireSystemColl += priceFeedCached.getUSDValue(
@@ -154,7 +154,7 @@ contract StoragePool is LiquityBase, Ownable(msg.sender), CheckContract, IStorag
     return entireSystemColl;
   }
 
-  function getEntireSystemDebt() external view returns (uint entireSystemDebt) {
+  function getEntireSystemDebt() public view returns (uint entireSystemDebt) {
     IPriceFeed priceFeedCached = priceFeed;
     for (uint i = 0; i < debtTokenAddresses.length; i++)
       entireSystemDebt += priceFeedCached.getUSDValue(
@@ -174,8 +174,8 @@ contract StoragePool is LiquityBase, Ownable(msg.sender), CheckContract, IStorag
     view
     returns (bool isInRecoveryMode, uint TCR, uint entireSystemColl, uint entireSystemDebt)
   {
-    entireSystemColl = this.getEntireSystemColl();
-    entireSystemDebt = this.getEntireSystemDebt();
+    entireSystemColl = getEntireSystemColl();
+    entireSystemDebt = getEntireSystemDebt();
     TCR = LiquityMath._computeCR(entireSystemColl, entireSystemDebt);
     isInRecoveryMode = TCR < CCR;
   }

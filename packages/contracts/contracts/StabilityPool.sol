@@ -242,7 +242,7 @@ contract StabilityPool is LiquityBase, CheckContract, IStabilityPool {
     _requireCallerIsStabilityPoolManager();
     _requireNonZeroAmount(_amount);
 
-    uint remainingDeposit = this.getCompoundedDebtDeposit(depositor);
+    uint remainingDeposit = getCompoundedDebtDeposit(depositor);
     _payoutCollGains(depositor, remainingDeposit);
 
     totalDeposits += _amount;
@@ -266,7 +266,7 @@ contract StabilityPool is LiquityBase, CheckContract, IStabilityPool {
   function withdrawFromSP(address user, uint depositToWithdrawal) external override {
     _requireCallerIsStabilityPoolManager();
 
-    uint remainingDeposit = this.getCompoundedDebtDeposit(user);
+    uint remainingDeposit = getCompoundedDebtDeposit(user);
     depositToWithdrawal = LiquityMath._min(depositToWithdrawal, remainingDeposit);
     if (depositToWithdrawal == 0) return;
 
@@ -297,7 +297,7 @@ contract StabilityPool is LiquityBase, CheckContract, IStabilityPool {
     _requireCallerIsStabilityPoolManager();
 
     // coll gain payout
-    uint remainingDeposit = this.getCompoundedDebtDeposit(user);
+    uint remainingDeposit = getCompoundedDebtDeposit(user);
     _payoutCollGains(user, remainingDeposit);
 
     // update deposit snapshots
@@ -545,7 +545,7 @@ contract StabilityPool is LiquityBase, CheckContract, IStabilityPool {
     TokenAmount[] memory collGains = new TokenAmount[](usedCollTokens.length);
     for (uint i = 0; i < usedCollTokens.length; i++) {
       address collTokenAddress = usedCollTokens[i];
-      uint collGain = this.getDepositorCollGain(_depositor, collTokenAddress);
+      uint collGain = getDepositorCollGain(_depositor, collTokenAddress);
       if (collGain == 0) continue;
 
       totalGainedColl[collTokenAddress] -= collGain;
@@ -563,7 +563,7 @@ contract StabilityPool is LiquityBase, CheckContract, IStabilityPool {
    * where S(0) and P(0) are the depositor's snapshots of the sum S and product P, respectively.
    * d0 is the last recorded deposit value.
    */
-  function getDepositorCollGain(address _depositor, address _collToken) external view override returns (uint collGain) {
+  function getDepositorCollGain(address _depositor, address _collToken) public view override returns (uint collGain) {
     uint initialDeposit = deposits[_depositor];
     if (initialDeposit == 0) return 0;
 
@@ -602,7 +602,7 @@ contract StabilityPool is LiquityBase, CheckContract, IStabilityPool {
    * Return the user's compounded deposit. Given by the formula:  d = d0 * P/P(0)
    * where P(0) is the depositor's snapshot of the product P, taken when they last updated their deposit.
    */
-  function getCompoundedDebtDeposit(address _depositor) external view override returns (uint) {
+  function getCompoundedDebtDeposit(address _depositor) public view override returns (uint) {
     uint initialDeposit = deposits[_depositor];
     if (initialDeposit == 0) return 0;
 

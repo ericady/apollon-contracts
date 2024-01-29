@@ -604,7 +604,7 @@ contract TroveManager is LiquityBase, Ownable(msg.sender), CheckContract, ITrove
     return (amounts, troveCollInUSD, troveDebtInUSD, troveDebtInUSDWithoutGasCompensation);
   }
 
-  function getTroveDebt(address _borrower) external view override returns (TokenAmount[] memory) {
+  function getTroveDebt(address _borrower) public view override returns (TokenAmount[] memory) {
     Trove storage trove = Troves[_borrower];
     if (trove.status != Status.active) return new TokenAmount[](0);
 
@@ -626,14 +626,14 @@ contract TroveManager is LiquityBase, Ownable(msg.sender), CheckContract, ITrove
   }
 
   function getTroveRepayableDebts(address _borrower) external view override returns (TokenAmount[] memory debts) {
-    debts = this.getTroveDebt(_borrower);
+    debts = getTroveDebt(_borrower);
     for (uint i = 0; i < debts.length; i++)
       debts[i].amount += getPendingReward(_borrower, debts[i].tokenAddress, false);
 
     return debts;
   }
 
-  function getTroveColl(address _borrower) external view override returns (TokenAmount[] memory colls) {
+  function getTroveColl(address _borrower) public view override returns (TokenAmount[] memory colls) {
     Trove storage trove = Troves[_borrower];
     if (trove.status != Status.active) return new TokenAmount[](0);
 
@@ -655,7 +655,7 @@ contract TroveManager is LiquityBase, Ownable(msg.sender), CheckContract, ITrove
   }
 
   function getTroveWithdrawableColls(address _borrower) external view override returns (TokenAmount[] memory colls) {
-    colls = this.getTroveColl(_borrower);
+    colls = getTroveColl(_borrower);
     for (uint i = 0; i < colls.length; i++) colls[i].amount += getPendingReward(_borrower, colls[i].tokenAddress, true);
 
     return colls;
@@ -744,7 +744,7 @@ contract TroveManager is LiquityBase, Ownable(msg.sender), CheckContract, ITrove
   }
 
   function getBorrowingRateWithDecay() public view override returns (uint) {
-    return _calcBorrowingRate(this.calcDecayedBaseRate());
+    return _calcBorrowingRate(calcDecayedBaseRate());
   }
 
   function _calcBorrowingRate(uint _baseRate) internal pure returns (uint) {
@@ -767,7 +767,7 @@ contract TroveManager is LiquityBase, Ownable(msg.sender), CheckContract, ITrove
   function decayBaseRateFromBorrowing() external override {
     _requireCallerIsBorrowerOpsOrRedemptionOpsOrLiquidationOps();
 
-    uint decayedBaseRate = this.calcDecayedBaseRate();
+    uint decayedBaseRate = calcDecayedBaseRate();
     assert(decayedBaseRate <= DECIMAL_PRECISION); // The baseRate can decay to 0
 
     baseRate = decayedBaseRate;
@@ -785,7 +785,7 @@ contract TroveManager is LiquityBase, Ownable(msg.sender), CheckContract, ITrove
   function updateBaseRateFromRedemption(uint _totalRedeemedStable, uint _totalStableCoinSupply) external override {
     _requireCallerIsBorrowerOpsOrRedemptionOpsOrLiquidationOps();
 
-    uint decayedBaseRate = this.calcDecayedBaseRate();
+    uint decayedBaseRate = calcDecayedBaseRate();
     uint redeemedStableFraction = (_totalRedeemedStable * DECIMAL_PRECISION) / _totalStableCoinSupply;
 
     // cap baseRate at a maximum of 100%
@@ -809,7 +809,7 @@ contract TroveManager is LiquityBase, Ownable(msg.sender), CheckContract, ITrove
     }
   }
 
-  function calcDecayedBaseRate() external view override returns (uint) {
+  function calcDecayedBaseRate() public view override returns (uint) {
     uint minutesPassed = _minutesPassedSinceLastFeeOp();
     uint decayFactor = LiquityMath._decPow(MINUTE_DECAY_FACTOR, minutesPassed);
 

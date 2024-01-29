@@ -107,7 +107,7 @@ contract RedemptionOperations is LiquityBase, Ownable(msg.sender), CheckContract
       if (!_isValidRedemptionHint(iteration.trove)) revert InvalidRedemptionHint();
 
       troveManager.applyPendingRewards(iteration.trove);
-      SingleRedemptionVariables memory troveRedemption = this.calculateTroveRedemption(
+      SingleRedemptionVariables memory troveRedemption = calculateTroveRedemption(
         iteration.trove,
         _stableCoinAmount - vars.totalRedeemedStable,
         false
@@ -211,7 +211,7 @@ contract RedemptionOperations is LiquityBase, Ownable(msg.sender), CheckContract
     address _borrower,
     uint _redeemMaxAmount,
     bool _includePendingRewards
-  ) external view override returns (SingleRedemptionVariables memory vars) {
+  ) public view override returns (SingleRedemptionVariables memory vars) {
     address stableCoinAddress = address(debtTokenManager.getStableCoin());
 
     // stable coin debt should always exists because of the gas comp

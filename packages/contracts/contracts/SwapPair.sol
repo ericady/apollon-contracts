@@ -153,7 +153,7 @@ contract SwapPair is ISwapPair, SwapERC20, LiquityBase {
   }
 
   // fee is returned in 1e6 (SWAP_FEE_PRECISION)
-  function getSwapFee() external view override returns (uint32 swapFee) {
+  function getSwapFee() public view override returns (uint32 swapFee) {
     // find stable coin
     address stableCoin = address(debtTokenManager.getStableCoin());
     address nonStableCoin = token0 == stableCoin ? token1 : token0;
@@ -196,12 +196,13 @@ contract SwapPair is ISwapPair, SwapERC20, LiquityBase {
     uint amount1In = balance1 > reserve1 - amount1Out ? balance1 - (reserve1 - amount1Out) : 0;
     if (amount0In == 0 && amount1In == 0) revert InsufficientInputAmount();
 
-    uint32 currentSwapFee = this.getSwapFee();
+    uint32 currentSwapFee = getSwapFee();
     {
       // scope for reserve{0,1}Adjusted, avoids stack too deep errors
       uint balance0Adjusted = balance0 * SWAP_FEE_PRECISION - (amount0In * currentSwapFee);
       uint balance1Adjusted = balance1 * SWAP_FEE_PRECISION - (amount1In * currentSwapFee);
-      if (balance0Adjusted * balance1Adjusted < uint(reserve0) * uint(reserve1) * (uint(SWAP_FEE_PRECISION) ** 2)) revert K();
+      if (balance0Adjusted * balance1Adjusted < uint(reserve0) * uint(reserve1) * (uint(SWAP_FEE_PRECISION) ** 2))
+        revert K();
     }
 
     _update(balance0, balance1, reserve0, reserve1);
