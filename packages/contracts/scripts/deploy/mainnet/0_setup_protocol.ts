@@ -8,7 +8,7 @@ const deployProtocol: DeployFunction = async (hre: HardhatRuntimeEnvironment) =>
   const { deployer } = await getNamedAccounts();
 
   // Deploy Core
-  const borrowerOperationsDeployment = await deploy('MockBorrowerOperations', {
+  const borrowerOperationsDeployment = await deploy('BorrowerOperations', {
     from: deployer,
     args: [],
     log: true,
@@ -26,13 +26,13 @@ const deployProtocol: DeployFunction = async (hre: HardhatRuntimeEnvironment) =>
     log: true,
   });
 
-  const troveManagerDeployment = await deploy('MockTroveManager', {
+  const troveManagerDeployment = await deploy('TroveManager', {
     from: deployer,
     args: [],
     log: true,
   });
 
-  const stabilityPoolManagerDeployment = await deploy('MockStabilityPoolManager', {
+  const stabilityPoolManagerDeployment = await deploy('StabilityPoolManager', {
     from: deployer,
     args: [],
     log: true,
@@ -62,7 +62,7 @@ const deployProtocol: DeployFunction = async (hre: HardhatRuntimeEnvironment) =>
     log: true,
   });
 
-  const priceFeedDeployment = await deploy('MockPriceFeed', {
+  const priceFeedDeployment = await deploy('PriceFeed', {
     from: deployer,
     args: [],
     log: true,
@@ -75,7 +75,7 @@ const deployProtocol: DeployFunction = async (hre: HardhatRuntimeEnvironment) =>
   });
 
   // Connect core contracts
-  const troveManager = await ethers.getContractAt('MockTroveManager', troveManagerDeployment.address);
+  const troveManager = await ethers.getContractAt('TroveManager', troveManagerDeployment.address);
   await troveManager.setAddresses(
     borrowerOperationsDeployment.address,
     redemptionOperationsDeployment.address,
@@ -84,7 +84,7 @@ const deployProtocol: DeployFunction = async (hre: HardhatRuntimeEnvironment) =>
     priceFeedDeployment.address
   );
 
-  const borrowerOperations = await ethers.getContractAt('MockBorrowerOperations', borrowerOperationsDeployment.address);
+  const borrowerOperations = await ethers.getContractAt('BorrowerOperations', borrowerOperationsDeployment.address);
   await borrowerOperations.setAddresses(
     troveManagerDeployment.address,
     storagePoolDeployment.address,
@@ -138,7 +138,7 @@ const deployProtocol: DeployFunction = async (hre: HardhatRuntimeEnvironment) =>
   await collTokenManager.setAddresses(priceFeedDeployment.address);
 
   const stabilityPoolManager = await ethers.getContractAt(
-    'MockStabilityPoolManager',
+    'StabilityPoolManager',
     stabilityPoolManagerDeployment.address
   );
   await stabilityPoolManager.setAddresses(
@@ -158,12 +158,12 @@ const deployProtocol: DeployFunction = async (hre: HardhatRuntimeEnvironment) =>
   );
 
   // Link contracts
-  const BTCDeployment = await deploy('MockERC20', {
+  const BTCDeployment = await deploy('ERC20', {
     from: deployer,
     args: ['Bitcoin', 'BTC', 9],
     log: true,
   });
-  const USDTDeployment = await deploy('MockERC20', {
+  const USDTDeployment = await deploy('ERC20', {
     from: deployer,
     args: ['USDT', 'USDT', 18],
     log: true,
@@ -171,11 +171,9 @@ const deployProtocol: DeployFunction = async (hre: HardhatRuntimeEnvironment) =>
   await collTokenManager.addCollToken(BTCDeployment.address);
   await collTokenManager.addCollToken(USDTDeployment.address);
 
-  const priceFeed = await ethers.getContractAt('MockPriceFeed', priceFeedDeployment.address);
-  await priceFeed.setTokenPrice(BTCDeployment.address, parseUnits('21000'));
-  await priceFeed.setTokenPrice(USDTDeployment.address, parseUnits('1'));
+  const priceFeed = await ethers.getContractAt('PriceFeed', priceFeedDeployment.address);
 
-  const STABLE = await deploy('MockDebtToken', {
+  const STABLE = await deploy('DebtToken', {
     from: deployer,
     args: [
       troveManagerDeployment.address,
@@ -191,9 +189,8 @@ const deployProtocol: DeployFunction = async (hre: HardhatRuntimeEnvironment) =>
     log: true,
   });
   await debtTokenManager.addDebtToken(STABLE.address);
-  await priceFeed.setTokenPrice(STABLE.address, parseUnits('1'));
 
-  const STOCK = await deploy('MockDebtToken', {
+  const STOCK = await deploy('DebtToken', {
     from: deployer,
     args: [
       troveManagerDeployment.address,
@@ -209,7 +206,6 @@ const deployProtocol: DeployFunction = async (hre: HardhatRuntimeEnvironment) =>
     log: true,
   });
   await debtTokenManager.addDebtToken(STOCK.address);
-  await priceFeed.setTokenPrice(STOCK.address, parseUnits('150'));
 
   const reservePool = await ethers.getContractAt('ReservePool', reservePoolDeployment.address);
   await reservePool.setAddresses(
@@ -222,5 +218,5 @@ const deployProtocol: DeployFunction = async (hre: HardhatRuntimeEnvironment) =>
   );
 };
 
-deployProtocol.tags = ['DeployProtocol'];
+deployProtocol.tags = ['DeployProtocolLocal', 'Local'];
 export default deployProtocol;

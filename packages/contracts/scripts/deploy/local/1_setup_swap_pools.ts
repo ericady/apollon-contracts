@@ -44,5 +44,5 @@ const deploySwapPools: DeployFunction = async (hre: HardhatRuntimeEnvironment) =
   await swapOps.addLiquidity(BTC.target, USDT.target, parseUnits('500', 9), parseUnits('500'), 0, 0, 0, deadline);
 };
 
-deploySwapPools.tags = ['DeploySwapPools'];
+deploySwapPools.tags = ['DeploySwapPoolsLocal', 'Local'];
 export default deploySwapPools;
