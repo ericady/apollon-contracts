@@ -10,9 +10,7 @@ import {
 let silent = true;
 
 export const log = (...args: unknown[]): void => {
-  if (!silent) {
-    console.log(...args);
-  }
+  if (!silent) console.log(...args);
 };
 
 export const setSilent = (s: boolean): void => {
@@ -91,15 +89,6 @@ const deployContracts = async (
       debtTokenManager: await deployContract(deployer, getContractFactory, 'DebtTokenManager', {
         ...overrides,
       }),
-      // communityIssuance: await deployContract(deployer, getContractFactory, 'CommunityIssuance', {
-      //   ...overrides,
-      // }),
-      // hintHelpers: await deployContract(deployer, getContractFactory, 'HintHelpers', { ...overrides }),
-      // lockupContractFactory: await deployContract(deployer, getContractFactory, 'LockupContractFactory', {
-      //   ...overrides,
-      // }),
-      // lqtyStaking: await deployContract(deployer, getContractFactory, 'LQTYStaking', { ...overrides }),
-      // unipool: await deployContract(deployer, getContractFactory, 'Unipool', { ...overrides }),
     },
     startBlock,
   ];
@@ -223,37 +212,6 @@ const connectContracts = async (
         debtTokenManager.address,
         { ...overrides, nonce }
       ),
-
-    // todo
-    // nonce =>
-    //   hintHelpers.setAddresses(sortedTroves.address, troveManager.address, {
-    //     ...overrides,
-    //     nonce,
-    //   }),
-    // nonce =>
-    //   lqtyStaking.setAddresses(
-    //     lqtyToken.address,
-    //     lusdToken.address,
-    //     troveManager.address,
-    //     borrowerOperations.address,
-    //     activePool.address,
-    //     { ...overrides, nonce }
-    //   ),
-    // nonce =>
-    //   lockupContractFactory.setLQTYTokenAddress(lqtyToken.address, {
-    //     ...overrides,
-    //     nonce,
-    //   }),
-    // nonce =>
-    //   communityIssuance.setAddresses(lqtyToken.address, stabilityPool.address, {
-    //     ...overrides,
-    //     nonce,
-    //   }),
-    // nonce =>
-    //   unipool.setParams(lqtyToken.address, uniToken.address, 2 * 30 * 24 * 60 * 60, {
-    //     ...overrides,
-    //     nonce,
-    //   }),
   ];
 
   const txs = await Promise.all(connections.map((connect, i) => connect(txCount + i)));
@@ -316,12 +274,6 @@ const deployAndConnectDebtTokens = async (
   );
 };
 
-// const deployMockUniToken = (
-//   deployer: Signer,
-//   getContractFactory: (name: string, signer: Signer) => Promise<ContractFactory>,
-//   overrides?: Overrides
-// ) => deployContract(deployer, getContractFactory, 'MockERC20', 'Mock Uniswap V2', 'UNI-V2', 18, { ...overrides });
-
 export const deployAndSetupContracts = async (
   deployer: Signer,
   getContractFactory: (name: string, signer: Signer) => Promise<ContractFactory>,
@@ -352,13 +304,7 @@ export const deployAndSetupContracts = async (
     ...(await deployContracts(deployer, getContractFactory, _priceFeedIsTestnet, overrides).then(
       async ([addresses, startBlock]) => ({
         startBlock,
-        addresses: {
-          ...addresses,
-          // todo
-          // uniToken: await (wethAddress
-          //   ? createUniswapV2Pair(deployer, wethAddress, addresses.lusdToken, overrides)
-          //   : deployMockUniToken(deployer, getContractFactory, overrides)),
-        },
+        addresses,
       })
     )),
   };
@@ -374,12 +320,5 @@ export const deployAndSetupContracts = async (
   return {
     ...deployment,
     bootstrapPeriod: (await contracts.troveManager.BOOTSTRAP_PERIOD()).toNumber(),
-
-    // todo
-    // deploymentDate: (await contracts.troveManager.getDeploymentStartTime()).toNumber() * 1000,
-    // totalStabilityPoolLQTYReward: `${Decimal.fromBigNumberString(
-    //   (await contracts.communityIssuance.LQTYSupplyCap()).toHexString()
-    // )}`,
-    // liquidityMiningLQTYRewardRate: `${Decimal.fromBigNumberString((await contracts.unipool.rewardRate()).toHexString())}`,
   };
 };
