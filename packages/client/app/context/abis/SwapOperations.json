@@ -98,6 +98,11 @@
     },
     {
         "inputs": [],
+        "name": "PairRequiresStable",
+        "type": "error"
+    },
+    {
+        "inputs": [],
         "name": "TransferFromFailed",
         "type": "error"
     },
@@ -208,6 +213,19 @@
                 "internalType": "uint256",
                 "name": "",
                 "type": "uint256"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [],
+        "name": "GOV_STAKING_ADDRESS",
+        "outputs": [
+            {
+                "internalType": "address",
+                "name": "",
+                "type": "address"
             }
         ],
         "stateMutability": "view",
@@ -350,9 +368,26 @@
                 "type": "uint256"
             },
             {
-                "internalType": "uint256",
-                "name": "_maxMintFeePercentage",
-                "type": "uint256"
+                "components": [
+                    {
+                        "internalType": "address",
+                        "name": "upperHint",
+                        "type": "address"
+                    },
+                    {
+                        "internalType": "address",
+                        "name": "lowerHint",
+                        "type": "address"
+                    },
+                    {
+                        "internalType": "uint256",
+                        "name": "maxFeePercentage",
+                        "type": "uint256"
+                    }
+                ],
+                "internalType": "struct IBase.MintMeta",
+                "name": "_mintMeta",
+                "type": "tuple"
             },
             {
                 "internalType": "uint256",
@@ -626,9 +661,26 @@
                 "type": "address"
             },
             {
-                "internalType": "uint256",
-                "name": "_maxMintFeePercentage",
-                "type": "uint256"
+                "components": [
+                    {
+                        "internalType": "address",
+                        "name": "upperHint",
+                        "type": "address"
+                    },
+                    {
+                        "internalType": "address",
+                        "name": "lowerHint",
+                        "type": "address"
+                    },
+                    {
+                        "internalType": "uint256",
+                        "name": "maxFeePercentage",
+                        "type": "uint256"
+                    }
+                ],
+                "internalType": "struct IBase.MintMeta",
+                "name": "_mintMeta",
+                "type": "tuple"
             },
             {
                 "internalType": "uint256",
@@ -670,9 +722,26 @@
                 "type": "address"
             },
             {
-                "internalType": "uint256",
-                "name": "_maxMintFeePercentage",
-                "type": "uint256"
+                "components": [
+                    {
+                        "internalType": "address",
+                        "name": "upperHint",
+                        "type": "address"
+                    },
+                    {
+                        "internalType": "address",
+                        "name": "lowerHint",
+                        "type": "address"
+                    },
+                    {
+                        "internalType": "uint256",
+                        "name": "maxFeePercentage",
+                        "type": "uint256"
+                    }
+                ],
+                "internalType": "struct IBase.MintMeta",
+                "name": "_mintMeta",
+                "type": "tuple"
             },
             {
                 "internalType": "uint256",
@@ -772,6 +841,16 @@
                 "internalType": "uint256",
                 "name": "amountBMin",
                 "type": "uint256"
+            },
+            {
+                "internalType": "address",
+                "name": "_upperHint",
+                "type": "address"
+            },
+            {
+                "internalType": "address",
+                "name": "_lowerHint",
+                "type": "address"
             },
             {
                 "internalType": "uint256",

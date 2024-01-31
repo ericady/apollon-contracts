@@ -294,7 +294,7 @@ const getProductionCacheConfig = ({
       fields: {
         walletAmount: {
           read(_, { readField, cache }) {
-            return BigInt(10000000000000000000);
+            return BigInt(100000000000000000000);
 
             const token = readField('token') as Readonly<Reference>;
 
@@ -317,7 +317,7 @@ const getProductionCacheConfig = ({
 
         troveLockedAmount: {
           read(_, { readField, cache }) {
-            return BigInt(10000000000000000000);
+            return BigInt(100000000000000000000);
 
             const token = readField('token') as Readonly<Reference>;
 
@@ -343,7 +343,7 @@ const getProductionCacheConfig = ({
 
         stabilityGainedAmount: {
           read(_, { readField, cache }) {
-            return BigInt(10000000000000000000);
+            return BigInt(100000000000000000000);
 
             const token = readField('token') as Readonly<Reference>;
 

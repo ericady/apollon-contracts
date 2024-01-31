@@ -13,7 +13,9 @@ function TCRChip() {
   return (
     <Tooltip title="Protocol enters the recovery mode if the TCR falls below 150%, which disables any new token minting and collateral withdrawal.">
       <Chip
-        label={`TCR ${displayPercentage(dangerouslyConvertBigIntToNumber(data.getSystemInfo.totalCollateralRatio))}`}
+        label={`TCR ${displayPercentage(
+          dangerouslyConvertBigIntToNumber(data.getSystemInfo.totalCollateralRatio, 9, 9),
+        )}`}
         color={data.getSystemInfo.recoveryModeActive ? 'warning' : 'default'}
       />
     </Tooltip>

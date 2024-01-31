@@ -194,7 +194,7 @@ for (let i = 0; i < allTokens.length; i++) {
         id: faker.string.uuid(),
         __typename: 'PoolLiquidity',
         token: token as Token,
-        totalAmount: floatToBigInt(faker.number.float({ min: 100000, max: 500000, precision: 0.0001 }), 0).toString(),
+        totalAmount: floatToBigInt(faker.number.float({ min: 100000, max: 500000, precision: 0.0001 })).toString(),
       })),
       liquidityDepositAPY: floatToBigInt(faker.number.float({ min: 0.01, max: 0.3, precision: 0.0001 })).toString(),
       volume30dUSD: {

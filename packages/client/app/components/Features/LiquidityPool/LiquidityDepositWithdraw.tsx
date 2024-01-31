@@ -18,7 +18,14 @@ import {
   GetBorrowerLiquidityPoolsQuery,
 } from '../../../generated/gql-types';
 import { GET_BORROWER_DEBT_TOKENS } from '../../../queries';
-import { bigIntStringToFloat, displayPercentage, floatToBigInt, roundCurrency, roundNumber } from '../../../utils/math';
+import {
+  bigIntStringToFloat,
+  dangerouslyConvertBigIntToNumber,
+  displayPercentage,
+  floatToBigInt,
+  roundCurrency,
+  roundNumber,
+} from '../../../utils/math';
 import FeatureBox from '../../FeatureBox/FeatureBox';
 import NumberInput from '../../FormControls/NumberInput';
 import ForwardIcon from '../../Icons/ForwardIcon';
@@ -62,13 +69,16 @@ function LiquidityDepositWithdraw({ selectedPool }: Props) {
   });
 
   const relevantDebtTokenA = data?.debtTokenMetas.find(({ token }) => token.id === tokenA.token.id) ?? {
-    walletAmount: 0,
-    troveMintedAmount: 0,
+    walletAmount: BigInt(0),
+    troveMintedAmount: BigInt(0),
   };
   const relevantDebtTokenB = data?.debtTokenMetas.find(({ token }) => token.id === tokenB.token.id) ?? {
-    walletAmount: 0,
-    troveMintedAmount: 0,
+    walletAmount: BigInt(0),
+    troveMintedAmount: BigInt(0),
   };
+
+  console.log('relevantDebtTokenA.walletAmount: ', relevantDebtTokenA);
+  console.log('relevantDebtTokenB.walletAmount: ', relevantDebtTokenB);
 
   const handleChange = (_: SyntheticEvent, newValue: 'DEPOSIT' | 'WITHDRAW') => {
     setTabValue(newValue);
@@ -124,7 +134,8 @@ function LiquidityDepositWithdraw({ selectedPool }: Props) {
                 floatToBigInt(tokenBAmount),
                 floatToBigInt(tokenAAmount * (1 - SLIPPAGE)),
                 floatToBigInt(tokenBAmount * (1 - SLIPPAGE)),
-                _maxMintFeePercentage,
+                // FIXME: What is MintMeta?
+                _maxMintFeePercentage as any,
                 deadline,
               );
             },
@@ -142,7 +153,9 @@ function LiquidityDepositWithdraw({ selectedPool }: Props) {
           title: `Remove Liquidity from the ${tokenA.token.symbol}-${tokenB.token.symbol} pool.`,
           transaction: {
             methodCall: async () => {
+              // FIXME: Adjust for new params
               return swapOperationsContract.removeLiquidity(
+                // @ts-ignore
                 tokenA.token.address,
                 tokenB.token.address,
                 floatToBigInt(tokenAAmount),
@@ -210,20 +223,20 @@ function LiquidityDepositWithdraw({ selectedPool }: Props) {
   const fillMaxInputValue = (fieldName: keyof FieldValues) => {
     if (tabValue === 'DEPOSIT') {
       if (fieldName === 'tokenAAmount') {
-        setValue(fieldName, relevantDebtTokenA.walletAmount.toString(), {
+        setValue(fieldName, dangerouslyConvertBigIntToNumber(relevantDebtTokenA.walletAmount, 9, 9).toString(), {
           shouldValidate: true,
           shouldDirty: true,
         });
-        handleInput(fieldName, relevantDebtTokenA.walletAmount.toString());
+        handleInput(fieldName, dangerouslyConvertBigIntToNumber(relevantDebtTokenA.walletAmount, 9, 9).toString());
       } else if (fieldName === 'tokenBAmount') {
-        setValue(fieldName, relevantDebtTokenB.walletAmount.toString(), {
+        setValue(fieldName, dangerouslyConvertBigIntToNumber(relevantDebtTokenB.walletAmount, 9, 9).toString(), {
           shouldValidate: true,
           shouldDirty: true,
         });
-        handleInput(fieldName, relevantDebtTokenB.walletAmount.toString());
+        handleInput(fieldName, dangerouslyConvertBigIntToNumber(relevantDebtTokenB.walletAmount, 9, 9).toString());
       }
     } else {
-      setValue(fieldName, borrowerAmount.toString(), {
+      setValue(fieldName, dangerouslyConvertBigIntToNumber(borrowerAmount, 9, 9).toString(), {
         shouldValidate: true,
         shouldDirty: true,
       });
@@ -261,17 +274,25 @@ function LiquidityDepositWithdraw({ selectedPool }: Props) {
   const addedDebtUSD =
     tabValue === 'DEPOSIT'
       ? (tokenAAmount
-          ? Math.max((parseFloat(tokenAAmount) - relevantDebtTokenA.walletAmount) * tokenA.token.priceUSD, 0)
+          ? Math.max(
+              (parseFloat(tokenAAmount) - dangerouslyConvertBigIntToNumber(relevantDebtTokenA.walletAmount, 9, 9)) *
+                tokenA.token.priceUSD,
+              0,
+            )
           : 0) +
         (tokenBAmount
-          ? Math.max((parseFloat(tokenBAmount) - relevantDebtTokenB.walletAmount) * tokenB.token.priceUSD, 0)
+          ? Math.max(
+              (parseFloat(tokenBAmount) - dangerouslyConvertBigIntToNumber(relevantDebtTokenB.walletAmount, 9, 9)) *
+                tokenB.token.priceUSD,
+              0,
+            )
           : 0)
       : ((relevantDebtTokenA.troveMintedAmount > tokenAAmountForWithdraw
           ? tokenAAmountForWithdraw * tokenA.token.priceUSD
-          : relevantDebtTokenA.troveMintedAmount * tokenA.token.priceUSD) +
+          : dangerouslyConvertBigIntToNumber(relevantDebtTokenA.troveMintedAmount, 9, 9) * tokenA.token.priceUSD) +
           (relevantDebtTokenB.troveMintedAmount > tokenBAmountForWithdraw
             ? tokenBAmountForWithdraw * tokenB.token.priceUSD
-            : relevantDebtTokenB.troveMintedAmount * tokenB.token.priceUSD)) *
+            : dangerouslyConvertBigIntToNumber(relevantDebtTokenB.troveMintedAmount, 9, 9) * tokenB.token.priceUSD)) *
         -1;
 
   return (
@@ -284,6 +305,7 @@ function LiquidityDepositWithdraw({ selectedPool }: Props) {
         <form onSubmit={handleSubmit(onSubmit)}>
           {/* DEPOSIT */}
 
+          {/* Some weird ts bug */}
           {tabValue === 'DEPOSIT' && (
             <>
               <Box
@@ -304,7 +326,11 @@ function LiquidityDepositWithdraw({ selectedPool }: Props) {
                     data-testid="apollon-liquidity-pool-deposit-token-a-funds-label"
                   >
                     {roundCurrency(
-                      (borrowerAmount / bigIntStringToFloat(totalSupply)) * bigIntStringToFloat(tokenA.totalAmount),
+                      dangerouslyConvertBigIntToNumber(
+                        (borrowerAmount * BigInt(tokenA.totalAmount)) / BigInt(totalSupply),
+                        12,
+                        6,
+                      ),
                       5,
                       5,
                     )}
@@ -336,9 +362,10 @@ function LiquidityDepositWithdraw({ selectedPool }: Props) {
                       >
                         {tokenAAmount
                           ? roundCurrency(
-                              parseFloat(tokenAAmount) < relevantDebtTokenA.walletAmount
+                              parseFloat(tokenAAmount) <
+                                dangerouslyConvertBigIntToNumber(relevantDebtTokenA.walletAmount, 9, 9)
                                 ? parseFloat(tokenAAmount)
-                                : relevantDebtTokenA.walletAmount,
+                                : dangerouslyConvertBigIntToNumber(relevantDebtTokenA.walletAmount, 12, 6),
                               5,
                               5,
                             )
@@ -350,7 +377,7 @@ function LiquidityDepositWithdraw({ selectedPool }: Props) {
                     </div>
 
                     <Button
-                      disabled={relevantDebtTokenA.walletAmount === 0}
+                      disabled={relevantDebtTokenA.walletAmount <= 0}
                       variant="undercover"
                       sx={{ textDecoration: 'underline', p: 0, mt: 0.25, height: 25 }}
                       onClick={() => fillMaxInputValue('tokenAAmount')}
@@ -368,8 +395,10 @@ function LiquidityDepositWithdraw({ selectedPool }: Props) {
                       >
                         {tokenAAmount
                           ? roundCurrency(
-                              parseFloat(tokenAAmount) > relevantDebtTokenA.walletAmount
-                                ? parseFloat(tokenAAmount) - relevantDebtTokenA.walletAmount
+                              parseFloat(tokenAAmount) >
+                                dangerouslyConvertBigIntToNumber(relevantDebtTokenA.walletAmount, 9, 9)
+                                ? parseFloat(tokenAAmount) -
+                                    dangerouslyConvertBigIntToNumber(relevantDebtTokenA.walletAmount, 12, 6)
                                 : 0,
                               5,
                               5,
@@ -415,7 +444,11 @@ function LiquidityDepositWithdraw({ selectedPool }: Props) {
                     data-testid="apollon-liquidity-pool-deposit-token-b-funds-label"
                   >
                     {roundCurrency(
-                      (borrowerAmount / bigIntStringToFloat(totalSupply)) * bigIntStringToFloat(tokenB.totalAmount),
+                      dangerouslyConvertBigIntToNumber(
+                        (borrowerAmount * BigInt(tokenB.totalAmount)) / BigInt(totalSupply),
+                        12,
+                        6,
+                      ),
                       5,
                       5,
                     )}
@@ -447,9 +480,10 @@ function LiquidityDepositWithdraw({ selectedPool }: Props) {
                       >
                         {tokenBAmount
                           ? roundCurrency(
-                              parseFloat(tokenBAmount) < relevantDebtTokenB.walletAmount
+                              parseFloat(tokenBAmount) <
+                                dangerouslyConvertBigIntToNumber(relevantDebtTokenB.walletAmount, 9, 9)
                                 ? parseFloat(tokenBAmount)
-                                : relevantDebtTokenB.walletAmount,
+                                : dangerouslyConvertBigIntToNumber(relevantDebtTokenB.walletAmount, 12, 6),
                               5,
                               5,
                             )
@@ -461,7 +495,7 @@ function LiquidityDepositWithdraw({ selectedPool }: Props) {
                     </div>
 
                     <Button
-                      disabled={relevantDebtTokenB.walletAmount === 0}
+                      disabled={relevantDebtTokenB.walletAmount <= 0}
                       variant="undercover"
                       sx={{ textDecoration: 'underline', p: 0, mt: 0.25, height: 25 }}
                       onClick={() => fillMaxInputValue('tokenBAmount')}
@@ -479,8 +513,10 @@ function LiquidityDepositWithdraw({ selectedPool }: Props) {
                       >
                         {tokenBAmount
                           ? roundCurrency(
-                              parseFloat(tokenBAmount) > relevantDebtTokenB.walletAmount
-                                ? parseFloat(tokenBAmount) - relevantDebtTokenB.walletAmount
+                              parseFloat(tokenBAmount) >
+                                dangerouslyConvertBigIntToNumber(relevantDebtTokenB.walletAmount, 9, 9)
+                                ? parseFloat(tokenBAmount) -
+                                    dangerouslyConvertBigIntToNumber(relevantDebtTokenB.walletAmount, 12, 9)
                                 : 0,
                               5,
                               5,
@@ -537,7 +573,7 @@ function LiquidityDepositWithdraw({ selectedPool }: Props) {
                     rules={{
                       min: { value: 0, message: 'You can only invest positive amounts.' },
                       max: {
-                        value: borrowerAmount,
+                        value: dangerouslyConvertBigIntToNumber(borrowerAmount, 9, 9),
                         message: 'This amount is greater than your deposited amount.',
                       },
                     }}
@@ -549,7 +585,7 @@ function LiquidityDepositWithdraw({ selectedPool }: Props) {
                         data-testid="apollon-liquidity-pool-withdraw-token-a-funds-label"
                         color="info.main"
                       >
-                        {roundCurrency(borrowerAmount, 5, 5)}
+                        {roundCurrency(dangerouslyConvertBigIntToNumber(borrowerAmount, 12, 6), 5, 5)}
                       </Typography>
                       <br />
                       <Typography variant="label">Deposited</Typography>
@@ -592,7 +628,11 @@ function LiquidityDepositWithdraw({ selectedPool }: Props) {
                   <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                     <Typography component="span" style={{ marginRight: '8px' }}>
                       {tokenAAmountForWithdraw > relevantDebtTokenA.troveMintedAmount
-                        ? roundCurrency(relevantDebtTokenA.troveMintedAmount, 5, 5)
+                        ? roundCurrency(
+                            dangerouslyConvertBigIntToNumber(relevantDebtTokenA.troveMintedAmount, 12, 6),
+                            5,
+                            5,
+                          )
                         : roundCurrency(tokenAAmountForWithdraw, 5, 5)}
                     </Typography>
 
@@ -628,7 +668,11 @@ function LiquidityDepositWithdraw({ selectedPool }: Props) {
                   <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                     <Typography component="span" style={{ marginRight: '8px' }}>
                       {tokenBAmountForWithdraw > relevantDebtTokenB.troveMintedAmount
-                        ? roundCurrency(relevantDebtTokenB.troveMintedAmount, 5, 5)
+                        ? roundCurrency(
+                            dangerouslyConvertBigIntToNumber(relevantDebtTokenB.troveMintedAmount, 12, 6),
+                            5,
+                            5,
+                          )
                         : roundCurrency(tokenBAmountForWithdraw, 5, 5)}
                     </Typography>
 
@@ -730,7 +774,7 @@ export const calculate150PercentTokenValue = (
   const tokenBTotokenARatio = tokenA.totalAmount / tokenB.totalAmount;
   const ratioWithPrice = (tokenBTotokenARatio * tokenB.priceUSD) / tokenA.priceUSD;
 
-  if (relevantDebtTokenA.walletAmount === 0 && relevantDebtTokenB.walletAmount === 0) {
+  if (relevantDebtTokenA.walletAmount === BigInt(0) && relevantDebtTokenB.walletAmount === BigInt(0)) {
     const diffTokenAUSD = diffUSD / (1 + ratioWithPrice);
 
     const tokenAAmount = diffTokenAUSD / tokenA.priceUSD;
@@ -738,7 +782,9 @@ export const calculate150PercentTokenValue = (
     return tokenAAmount;
   }
 
-  const diffWalletTokenA = relevantDebtTokenA.walletAmount - relevantDebtTokenB.walletAmount * ratioWithPrice;
+  const diffWalletTokenA =
+    dangerouslyConvertBigIntToNumber(relevantDebtTokenA.walletAmount, 9, 9) -
+    dangerouslyConvertBigIntToNumber(relevantDebtTokenB.walletAmount, 9, 9) * ratioWithPrice;
 
   if (diffWalletTokenA > 0) {
     // fill tokenB with amount for complete diff
@@ -753,11 +799,12 @@ export const calculate150PercentTokenValue = (
 
       const tokenAAmount = diffTokenAUSD / tokenA.priceUSD;
 
-      return relevantDebtTokenA.walletAmount + tokenAAmount;
+      return dangerouslyConvertBigIntToNumber(relevantDebtTokenA.walletAmount, 9, 9) + tokenAAmount;
     }
   } else {
     const diffWalletTokenBasA = Math.abs(
-      relevantDebtTokenA.walletAmount - relevantDebtTokenB.walletAmount * ratioWithPrice,
+      dangerouslyConvertBigIntToNumber(relevantDebtTokenA.walletAmount, 9, 9) -
+        dangerouslyConvertBigIntToNumber(relevantDebtTokenB.walletAmount, 9, 9) * ratioWithPrice,
     );
 
     if (diffUSD < diffWalletTokenBasA * tokenA.priceUSD) {
@@ -771,7 +818,7 @@ export const calculate150PercentTokenValue = (
 
       const tokenAAmount = diffTokenAUSD / tokenA.priceUSD;
 
-      return relevantDebtTokenB.walletAmount * ratioWithPrice + tokenAAmount;
+      return dangerouslyConvertBigIntToNumber(relevantDebtTokenB.walletAmount, 9, 9) * ratioWithPrice + tokenAAmount;
     }
   }
 };

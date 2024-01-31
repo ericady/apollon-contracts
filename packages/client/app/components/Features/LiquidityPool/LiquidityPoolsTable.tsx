@@ -9,6 +9,7 @@ import { GetBorrowerLiquidityPoolsQuery, GetBorrowerLiquidityPoolsQueryVariables
 import { GET_BORROWER_LIQUIDITY_POOLS } from '../../../queries';
 import {
   bigIntStringToFloat,
+  dangerouslyConvertBigIntToNumber,
   displayPercentage,
   percentageChange,
   roundCurrency,
@@ -43,16 +44,16 @@ function LiquidityPoolsTable({ selectedPool, setSelectedPool }: Props) {
         { totalSupply: totalSupplyA, borrowerAmount: borrowerAmountA, liquidity: [liqA1, liqA2] },
         { totalSupply: totalSupplyB, borrowerAmount: borrowerAmountB, liquidity: [liqB1, liqB2] },
       ) =>
-        (borrowerAmountB / bigIntStringToFloat(totalSupplyB)) *
+        (dangerouslyConvertBigIntToNumber(borrowerAmountB) / bigIntStringToFloat(totalSupplyB)) *
           bigIntStringToFloat(liqA1.totalAmount) *
           bigIntStringToFloat(liqA1.token.priceUSD) +
-        (borrowerAmountB / bigIntStringToFloat(totalSupplyB)) *
+        (dangerouslyConvertBigIntToNumber(borrowerAmountB) / bigIntStringToFloat(totalSupplyB)) *
           bigIntStringToFloat(liqA2.totalAmount) *
           bigIntStringToFloat(liqA2.token.priceUSD) -
-        ((borrowerAmountA / bigIntStringToFloat(totalSupplyA)) *
+        ((dangerouslyConvertBigIntToNumber(borrowerAmountA) / bigIntStringToFloat(totalSupplyA)) *
           bigIntStringToFloat(liqB1.totalAmount) *
           bigIntStringToFloat(liqB1.token.priceUSD) +
-          (borrowerAmountA / bigIntStringToFloat(totalSupplyA)) *
+          (dangerouslyConvertBigIntToNumber(borrowerAmountA) / bigIntStringToFloat(totalSupplyA)) *
             bigIntStringToFloat(liqB2.totalAmount) *
             bigIntStringToFloat(liqB2.token.priceUSD)),
     );
@@ -140,7 +141,13 @@ function LiquidityPoolsTable({ selectedPool, setSelectedPool }: Props) {
                         }}
                       >
                         {roundCurrency(
-                          (borrowerAmount / bigIntStringToFloat(totalSupply)) * bigIntStringToFloat(tokenA.totalAmount),
+                          dangerouslyConvertBigIntToNumber(
+                            (borrowerAmount * BigInt(tokenA.totalAmount)) / BigInt(totalSupply),
+                            12,
+                            6,
+                          ),
+                          5,
+                          5,
                         )}
                       </span>
                     </Typography>
@@ -166,7 +173,13 @@ function LiquidityPoolsTable({ selectedPool, setSelectedPool }: Props) {
                         }}
                       >
                         {roundCurrency(
-                          (borrowerAmount / bigIntStringToFloat(totalSupply)) * bigIntStringToFloat(tokenB.totalAmount),
+                          dangerouslyConvertBigIntToNumber(
+                            (borrowerAmount * BigInt(tokenB.totalAmount)) / BigInt(totalSupply),
+                            12,
+                            6,
+                          ),
+                          5,
+                          5,
                         )}
                       </span>
                     </Typography>

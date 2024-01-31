@@ -332,14 +332,14 @@ export type GetSelectedTokenQuery = { __typename: 'Query', token: { __typename: 
 export type GetDebtTokensQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type GetDebtTokensQuery = { __typename: 'Query', debtTokenMetas: Array<{ __typename: 'DebtTokenMeta', totalSupplyUSD: string, totalReserve: string, totalReserve30dAverage?: { __typename: 'TotalReserveAverage', id: string, value: string } | null, token: { __typename: 'Token', id: string, address: string, symbol: string, priceUSD: string, priceUSD24hAgo: string } }> };
+export type GetDebtTokensQuery = { __typename: 'Query', debtTokenMetas: Array<{ __typename: 'DebtTokenMeta', id: string, totalSupplyUSD: string, totalReserve: string, totalReserve30dAverage?: { __typename: 'TotalReserveAverage', id: string, value: string } | null, token: { __typename: 'Token', id: string, address: string, symbol: string, priceUSD: string, priceUSD24hAgo: string } }> };
 
 export type GetBorrowerDebtTokensQueryVariables = Exact<{
   borrower: Scalars['String']['input'];
 }>;
 
 
-export type GetBorrowerDebtTokensQuery = { __typename: 'Query', debtTokenMetas: Array<{ __typename: 'DebtTokenMeta', troveMintedAmount: bigint, walletAmount: bigint, providedStability: bigint, compoundedDeposit: bigint, troveRepableDebtAmount: bigint, totalDepositedStability: string, totalSupplyUSD: string, stabilityDepositAPY: { __typename: 'StabilityDepositAPY', id: string, profit: string, volume: string }, totalSupplyUSD30dAverage: { __typename: 'TotalSupplyAverage', id: string, value: string }, token: { __typename: 'Token', id: string, address: string, symbol: string, priceUSD: string, isPoolToken: boolean } }> };
+export type GetBorrowerDebtTokensQuery = { __typename: 'Query', debtTokenMetas: Array<{ __typename: 'DebtTokenMeta', id: string, troveMintedAmount: bigint, walletAmount: bigint, providedStability: bigint, compoundedDeposit: bigint, troveRepableDebtAmount: bigint, totalDepositedStability: string, totalSupplyUSD: string, stabilityDepositAPY: { __typename: 'StabilityDepositAPY', id: string, profit: string, volume: string }, totalSupplyUSD30dAverage: { __typename: 'TotalSupplyAverage', id: string, value: string }, token: { __typename: 'Token', id: string, address: string, symbol: string, priceUSD: string, isPoolToken: boolean } }> };
 
 export type GetBorrowerSwapEventsQueryVariables = Exact<{
   where: SwapEvent_Filter;
@@ -362,7 +362,7 @@ export type GetCollateralTokensQueryVariables = Exact<{
 }>;
 
 
-export type GetCollateralTokensQuery = { __typename: 'Query', collateralTokenMetas: Array<{ __typename: 'CollateralTokenMeta', walletAmount: bigint, troveLockedAmount: bigint, stabilityGainedAmount: bigint, totalValueLockedUSD: string, token: { __typename: 'Token', id: string, address: string, symbol: string, priceUSD: string }, totalValueLockedUSD30dAverage: { __typename: 'TotalValueLockedAverage', id: string, value: string } }> };
+export type GetCollateralTokensQuery = { __typename: 'Query', collateralTokenMetas: Array<{ __typename: 'CollateralTokenMeta', id: string, walletAmount: bigint, troveLockedAmount: bigint, stabilityGainedAmount: bigint, totalValueLockedUSD: string, token: { __typename: 'Token', id: string, address: string, symbol: string, priceUSD: string }, totalValueLockedUSD30dAverage: { __typename: 'TotalValueLockedAverage', id: string, value: string } }> };
 
 export type GetBorrowerStabilityHistoryQueryVariables = Exact<{
   where: BorrowerHistory_Filter;
