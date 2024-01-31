@@ -298,7 +298,7 @@ contract SwapOperations is ISwapOperations, Ownable(msg.sender), CheckContract, 
       (uint amount0Out, uint amount1Out) = input == token0 ? (uint(0), amountOut) : (amountOut, uint(0));
 
       address to = i < path.length - 2 ? getPair[output][path[i + 2]] : _to;
-      ISwapPair(getPair[input][output]).swap(amount0Out, amount1Out, to, new bytes(0));
+      ISwapPair(getPair[input][output]).swap(amount0Out, amount1Out, to);
     }
   }
 

@@ -12,7 +12,7 @@ import '../Interfaces/IBase.sol';
 contract LiquityBase is IBase {
   uint internal constant DECIMAL_PRECISION = 1e18;
   uint32 public constant SWAP_FEE_PRECISION = 1e6;
-  uint32 public constant SWAP_BASE_FEE = 3e3; // 0.3%
+  uint32 public constant SWAP_BASE_FEE = 0.003e6; // 0.3%
   uint public constant _100pct = 1e18; // 1e18 == 100%
   uint public constant MCR = 1.1e18; // 110%, Minimum collateral ratio for individual troves
   uint public constant CCR = 1.5e18; // 150%, Critical system collateral ratio. If the system's total collateral ratio (TCR) falls below the CCR, Recovery Mode is triggered.
@@ -24,6 +24,7 @@ contract LiquityBase is IBase {
 
   // todo update
   address public constant GOV_STAKING_ADDRESS = address(0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266);
+  uint32 public constant GOV_SWAP_FEE = 0.5e6; // 50% of the dynamic swap fee
 
   // Return the coll amount of to be drawn from a trove's collateral and sent as gas compensation.
   function _getCollGasCompensation(uint _collAmount) internal pure returns (uint) {

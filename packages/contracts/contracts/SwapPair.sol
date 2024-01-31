@@ -172,22 +172,21 @@ contract SwapPair is ISwapPair, SwapERC20, LiquityBase {
   }
 
   // this low-level function should be called from a contract which performs important safety checks
-  function swap(uint amount0Out, uint amount1Out, address to, bytes calldata data) external lock {
+  function swap(uint amount0Out, uint amount1Out, address to) external lock {
     _requireCallerIsOperations();
     if (amount0Out == 0 && amount1Out == 0) revert InsufficientOutputAmount();
     if (amount0Out > reserve0 || amount1Out > reserve1) revert InsufficientLiquidity();
 
     uint balance0;
     uint balance1;
+    address _token0 = token0;
+    address _token1 = token1;
     {
       // scope for _token{0,1}, avoids stack too deep errors
-      address _token0 = token0;
-      address _token1 = token1;
       if (to == _token0 || to == _token1) revert InvalidTo();
 
       if (amount0Out > 0) _safeTransfer(_token0, to, amount0Out); // optimistically transfer tokens
       if (amount1Out > 0) _safeTransfer(_token1, to, amount1Out); // optimistically transfer tokens
-      if (data.length > 0) ISwapCallee(to).swapCall(msg.sender, amount0Out, amount1Out, data);
       balance0 = IERC20(_token0).balanceOf(address(this));
       balance1 = IERC20(_token1).balanceOf(address(this));
     }
@@ -203,6 +202,18 @@ contract SwapPair is ISwapPair, SwapERC20, LiquityBase {
       uint balance1Adjusted = balance1 * SWAP_FEE_PRECISION - (amount1In * currentSwapFee);
       if (balance0Adjusted * balance1Adjusted < uint(reserve0) * uint(reserve1) * (uint(SWAP_FEE_PRECISION) ** 2))
         revert K();
+    }
+
+    // gov swap fee payment
+    if (amount0In > 0) {
+      uint amount0GovFee = (amount0In * currentSwapFee * GOV_SWAP_FEE) / (uint(SWAP_FEE_PRECISION) ** 2);
+      _safeTransfer(_token0, GOV_STAKING_ADDRESS, amount0GovFee);
+      balance0 -= amount0GovFee;
+    }
+    if (amount1In > 0) {
+      uint amount1GovFee = (amount1In * currentSwapFee * GOV_SWAP_FEE) / (uint(SWAP_FEE_PRECISION) ** 2);
+      _safeTransfer(_token1, GOV_STAKING_ADDRESS, amount1GovFee);
+      balance1 -= amount1GovFee;
     }
 
     _update(balance0, balance1, reserve0, reserve1);

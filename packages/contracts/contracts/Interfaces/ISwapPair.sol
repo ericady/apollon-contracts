@@ -58,7 +58,7 @@ interface ISwapPair is ISwapERC20 {
     uint debt1
   ) external returns (uint amount0, uint amount1, uint burned0, uint burned1);
 
-  function swap(uint amount0Out, uint amount1Out, address to, bytes calldata data) external;
+  function swap(uint amount0Out, uint amount1Out, address to) external;
 
   function skim(address to) external;
 
