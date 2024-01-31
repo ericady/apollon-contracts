@@ -14,6 +14,7 @@ import { DebtToken, ERC20, StabilityPoolManager, StoragePool, SwapPair, TroveMan
 import { SystemInfo, TokenFragmentFragment, TroveManager as TroveManagerType } from '../generated/gql-types';
 import { TOKEN_FRAGMENT } from '../queries';
 import { floatToBigInt } from '../utils/math';
+import { CustomApolloProvider_DevMode } from './CustomApolloProvider_dev';
 import { Contracts, isCollateralTokenAddress, isDebtTokenAddress, isPoolAddress, useEthers } from './EthersProvider';
 
 const defaultFieldValue = BigInt(0);
@@ -31,6 +32,10 @@ export function CustomApolloProvider({ children }: PropsWithChildren<{}>) {
     },
     address: borrower,
   } = useEthers();
+
+  if (process.env.NEXT_PUBLIC_CONTRACT_DATA_MOCKING) {
+    return <CustomApolloProvider_DevMode>{children}</CustomApolloProvider_DevMode>;
+  }
 
   const cacheConfig =
     process.env.NEXT_PUBLIC_CONTRACT_MOCKING === 'enabled'
@@ -142,8 +147,6 @@ const getProductionCacheConfig = ({
       fields: {
         priceUSDOracle: {
           read(_, { readField }) {
-            return BigInt(10000000000000000000);
-
             const address = readField('address') as Readonly<string>;
             if (address) {
               if (
@@ -169,7 +172,6 @@ const getProductionCacheConfig = ({
       fields: {
         walletAmount: {
           read(_, { readField, cache }) {
-            return BigInt(10000000000000000000);
             const token = readField('token') as Readonly<Reference>;
 
             const tokenData = cache.readFragment<TokenFragmentFragment>({
@@ -193,7 +195,6 @@ const getProductionCacheConfig = ({
 
         troveMintedAmount: {
           read(_, { readField, cache }) {
-            return BigInt(10000000000000000000);
             const token = readField('token') as Readonly<Reference>;
 
             const tokenData = cache.readFragment<TokenFragmentFragment>({
@@ -217,8 +218,6 @@ const getProductionCacheConfig = ({
 
         troveRepableDebtAmount: {
           read(_, { readField, cache }) {
-            return BigInt(10000000000000000000);
-
             const token = readField('token') as Readonly<Reference>;
 
             const tokenData = cache.readFragment<TokenFragmentFragment>({
@@ -242,7 +241,6 @@ const getProductionCacheConfig = ({
 
         providedStability: {
           read(_, { readField, cache }) {
-            return BigInt(10000000000000000000);
             const token = readField('token') as Readonly<Reference>;
 
             const tokenData = cache.readFragment<TokenFragmentFragment>({
@@ -266,7 +264,6 @@ const getProductionCacheConfig = ({
 
         compoundedDeposit: {
           read(_, { readField, cache }) {
-            return BigInt(7000000000000000000);
             const token = readField('token') as Readonly<Reference>;
 
             const tokenData = cache.readFragment<TokenFragmentFragment>({
@@ -294,8 +291,6 @@ const getProductionCacheConfig = ({
       fields: {
         walletAmount: {
           read(_, { readField, cache }) {
-            return BigInt(100000000000000000000);
-
             const token = readField('token') as Readonly<Reference>;
 
             const tokenData = cache.readFragment<TokenFragmentFragment>({
@@ -317,8 +312,6 @@ const getProductionCacheConfig = ({
 
         troveLockedAmount: {
           read(_, { readField, cache }) {
-            return BigInt(100000000000000000000);
-
             const token = readField('token') as Readonly<Reference>;
 
             const tokenData = cache.readFragment<TokenFragmentFragment>({
@@ -343,8 +336,6 @@ const getProductionCacheConfig = ({
 
         stabilityGainedAmount: {
           read(_, { readField, cache }) {
-            return BigInt(100000000000000000000);
-
             const token = readField('token') as Readonly<Reference>;
 
             const tokenData = cache.readFragment<TokenFragmentFragment>({
@@ -373,8 +364,6 @@ const getProductionCacheConfig = ({
       fields: {
         swapFee: {
           read(_, { readField }) {
-            return BigInt(50000);
-
             const poolAddress = readField('address') as Readonly<string>;
 
             if (
@@ -391,8 +380,6 @@ const getProductionCacheConfig = ({
 
         borrowerAmount: {
           read(_, { readField }) {
-            return BigInt(10000000000000000000);
-
             const poolAddress = readField('address') as Readonly<string>;
 
             if (
@@ -438,8 +425,7 @@ const getProductionCacheConfig = ({
           return {
             __typename: 'SystemInfo',
             id: 'SystemInfo',
-            totalCollateralRatio: BigInt(1000000000000000000),
-            // totalCollateralRatio: SchemaDataFreshnessManager.StoragePool.totalCollateralRatio.value(),
+            totalCollateralRatio: SchemaDataFreshnessManager.StoragePool.totalCollateralRatio.value(),
             recoveryModeActive: SchemaDataFreshnessManager.StoragePool.recoveryModeActive.value() as unknown as boolean,
           } as SystemInfo;
         },

@@ -77,9 +77,6 @@ function LiquidityDepositWithdraw({ selectedPool }: Props) {
     troveMintedAmount: BigInt(0),
   };
 
-  console.log('relevantDebtTokenA.walletAmount: ', relevantDebtTokenA);
-  console.log('relevantDebtTokenB.walletAmount: ', relevantDebtTokenB);
-
   const handleChange = (_: SyntheticEvent, newValue: 'DEPOSIT' | 'WITHDRAW') => {
     setTabValue(newValue);
     reset();
@@ -305,7 +302,6 @@ function LiquidityDepositWithdraw({ selectedPool }: Props) {
         <form onSubmit={handleSubmit(onSubmit)}>
           {/* DEPOSIT */}
 
-          {/* Some weird ts bug */}
           {tabValue === 'DEPOSIT' && (
             <>
               <Box
@@ -548,7 +544,7 @@ function LiquidityDepositWithdraw({ selectedPool }: Props) {
 
           {/* WITHDRAW */}
 
-          {tabValue === 'WITHDRAW' && borrowerAmount && (
+          {tabValue === 'WITHDRAW' && borrowerAmount > 0 && (
             <Box style={{ display: 'flex', flexDirection: 'column' }}>
               <Box
                 sx={{

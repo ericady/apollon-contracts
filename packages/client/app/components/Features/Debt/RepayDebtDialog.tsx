@@ -83,6 +83,7 @@ const RepayDebtDialog = () => {
         title: 'Repay all debt.',
         transaction: {
           methodCall: () => {
+            // @ts-ignore TODO: fix this parameters
             return borrowerOperationsContract.repayDebt(tokenAmounts);
           },
           // wait for all approvals

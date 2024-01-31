@@ -164,6 +164,7 @@ const CollateralUpdateDialog = ({ buttonVariant, buttonSx = {} }: Props) => {
               if (hasNoOpenTrove) {
                 return borrowerOperationsContract.openTrove(tokenAmounts);
               } else {
+                // @ts-ignore TODO: fix this parameters
                 return borrowerOperationsContract.addColl(tokenAmounts);
               }
             },
@@ -177,6 +178,7 @@ const CollateralUpdateDialog = ({ buttonVariant, buttonSx = {} }: Props) => {
         {
           title: 'Withdraw Collateral',
           transaction: {
+            // @ts-ignore TODO: fix this parameters
             methodCall: () => borrowerOperationsContract.withdrawColl(tokenAmounts),
             waitForResponseOf: [],
           },

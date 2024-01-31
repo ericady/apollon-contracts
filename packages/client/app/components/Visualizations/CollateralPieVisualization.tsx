@@ -11,8 +11,8 @@ type Props = {
   })[];
 };
 
-// eslint-disable-next-line react/display-name
-const createRenderCustomizedLabel =
+const CreateRenderCustomizedLabel =
+  // eslint-disable-next-line react/display-name
   (isDarkMode: boolean) => (svgPropsAndData: any & { troveValueUSD: number; token: Token; chartColor: string }) => {
     // has all the spread data and some props from the library
     const { x, y, cx, troveValueUSD, chartColor, token } = svgPropsAndData;
@@ -71,7 +71,7 @@ function CollateralPieVisualization({ borrowerCollateralTokens }: Props) {
       </div>
     );
 
-  const renderCustomizedLabel = createRenderCustomizedLabel(isDarkMode);
+  const renderCustomizedLabel = CreateRenderCustomizedLabel(isDarkMode);
 
   return (
     <PieChart width={430} height={280} margin={{ top: 0, right: 0, bottom: 0, left: 0 }}>

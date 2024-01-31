@@ -85,6 +85,7 @@ const Farm = () => {
           transaction: {
             methodCall: async () => {
               return swapOperationsContract.openLongPosition(
+                // @ts-ignore TODO: fix this parameters
                 floatToBigInt(farmShortValue),
                 (getExpectedPositionSize() * ethers.parseEther((1 - maxSlippage).toString())) /
                   ethers.parseUnits('1', 18),
@@ -105,6 +106,7 @@ const Farm = () => {
           transaction: {
             methodCall: async () => {
               return swapOperationsContract.openShortPosition(
+                // @ts-ignore TODO: fix this parameters
                 floatToBigInt(farmShortValue),
                 (getExpectedPositionSize() * ethers.parseEther((1 - maxSlippage).toString())) /
                   ethers.parseUnits('1', 18),
