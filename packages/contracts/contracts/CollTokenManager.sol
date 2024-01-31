@@ -31,7 +31,7 @@ contract CollTokenManager is Ownable(msg.sender), CheckContract, ICollTokenManag
 
   // --- Setters ---
 
-  // todo oracle id missing
+  // todo oracle id/linking missing
   function addCollToken(address _tokenAddress) external override onlyOwner {
     for (uint i = 0; i < collTokenAddresses.length; i++)
       if (collTokenAddresses[i] == _tokenAddress) revert TokenAlreadyAdded();

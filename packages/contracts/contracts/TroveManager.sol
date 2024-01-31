@@ -25,10 +25,6 @@ contract TroveManager is LiquityBase, Ownable(msg.sender), CheckContract, ITrove
   IPriceFeed public priceFeed;
   ISortedTroves public sortedTroves;
 
-  // todo gov
-  //    ILQTYToken public override lqtyToken;
-  //    ILQTYStaking public override lqtyStaking;
-
   // --- Data structures ---
 
   /*

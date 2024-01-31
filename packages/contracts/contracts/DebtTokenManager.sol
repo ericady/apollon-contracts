@@ -52,7 +52,7 @@ contract DebtTokenManager is Ownable(msg.sender), CheckContract, IDebtTokenManag
 
   // --- Setters ---
 
-  // todo price oracle id missing...
+  // todo price oracle id/linking missing...
   function addDebtToken(address _debtTokenAddress) external override onlyOwner {
     checkContract(_debtTokenAddress);
 

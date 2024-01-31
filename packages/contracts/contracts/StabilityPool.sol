@@ -152,7 +152,6 @@ contract StabilityPool is LiquityBase, CheckContract, IStabilityPool {
   struct Snapshots {
     mapping(address => uint) sums; // [coll token address] -> snapshot of S(um)
     uint P;
-    // uint G; todo gov
     uint128 scale;
     uint128 epoch;
   }
@@ -183,18 +182,6 @@ contract StabilityPool is LiquityBase, CheckContract, IStabilityPool {
   address[] public usedCollTokens;
   mapping(address => uint) public totalGainedColl; // [token address] -> total gained collateral
   mapping(uint128 => mapping(uint128 => mapping(address => uint))) public epochToScaleToCollTokenToSum; // [epoch][scale][collTokenAddress] => sum
-
-  /*
-   * Similarly, the sum 'G' is used to calculate GOV gains. During it's lifetime, each deposit d_t earns a GOV gain of
-   *  ( d_t * [G - G_t] )/P_t, where G_t is the depositor's snapshot of G taken at time t when  the deposit was made.
-   *
-   *  GOV reward events occur are triggered by depositor operations (new deposit, topup, withdrawal), and liquidations.
-   *  In each case, the GOV reward is issued (i.e. G is updated), before other state changes are made.
-   */
-  //    mapping (uint128 => mapping(uint128 => uint)) public epochToScaleToG; todo gov
-
-  // Error tracker for the error correction in the LQTY issuance calculation
-  //    uint public lastLQTYError; todo gov
 
   mapping(address => uint) public lastErrorOffset; // [tokenAddress] value, Error trackers for the error correction in the offset calculation
 
@@ -251,10 +238,6 @@ contract StabilityPool is LiquityBase, CheckContract, IStabilityPool {
     uint newDeposit = remainingDeposit + _amount;
     _updateDepositAndSnapshots(depositor, newDeposit);
 
-    // todo gov token...
-    // ICommunityIssuance communityIssuanceCached = communityIssuance;
-    // _triggerLQTYIssuance(communityIssuanceCached);
-
     emit StabilityProvided(depositor, _amount);
   }
 
@@ -280,10 +263,6 @@ contract StabilityPool is LiquityBase, CheckContract, IStabilityPool {
     uint newDeposit = remainingDeposit - depositToWithdrawal;
     _updateDepositAndSnapshots(user, newDeposit);
 
-    // todo gov token...
-    // ICommunityIssuance communityIssuanceCached = communityIssuance;
-    // _triggerLQTYIssuance(communityIssuanceCached);
-
     emit StabilityWithdrawn(user, depositToWithdrawal);
   }
 
@@ -302,10 +281,6 @@ contract StabilityPool is LiquityBase, CheckContract, IStabilityPool {
 
     // update deposit snapshots
     _updateDepositAndSnapshots(user, remainingDeposit);
-
-    // todo gov token...
-    // ICommunityIssuance communityIssuanceCached = communityIssuance;
-    // _triggerLQTYIssuance(communityIssuanceCached);
   }
 
   //    // --- GOV issuance functions ---
@@ -419,9 +394,6 @@ contract StabilityPool is LiquityBase, CheckContract, IStabilityPool {
       }
       if (!found) usedCollTokens.push(collEntry.tokenAddress);
     }
-
-    // todo gov...
-    // _triggerLQTYIssuance(communityIssuance);
 
     (TokenAmount[] memory collGainPerUnitStaked, uint depositLossPerUnitStaked) = _computeRewardsPerUnitStaked(
       _collToAdd,
@@ -669,9 +641,6 @@ contract StabilityPool is LiquityBase, CheckContract, IStabilityPool {
         currentScaleCached
       ][usedCollTokens[i]];
     }
-
-    // uint currentG = epochToScaleToG[currentEpochCached][currentScaleCached];
-    // depositSnapshots[_depositor].G = currentG; todo gov
 
     emit DepositSnapshotUpdated(_depositor);
   }

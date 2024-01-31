@@ -63,7 +63,6 @@ contract ReservePool is LiquityBase, Ownable(msg.sender), CheckContract, IReserv
     return capTarget - stableBalance;
   }
 
-  // todo...
   function isGovReserveCapReached() external view returns (bool) {
     return govToken.balanceOf(address(this)) >= govReserveCap;
   }

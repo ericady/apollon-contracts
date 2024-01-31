@@ -766,7 +766,6 @@ contract BorrowerOperations is LiquityBase, Ownable(msg.sender), CheckContract, 
   }
 
   function _requireAtLeastMinNetDebt(uint _netDebt, uint _repayment) internal pure {
-    // TODO: It should be netDebt - repayment > minDebt, but no min debt defined yet, check later
     if (_netDebt < _repayment) revert Repaid_gt_CurrentDebt();
   }
 
