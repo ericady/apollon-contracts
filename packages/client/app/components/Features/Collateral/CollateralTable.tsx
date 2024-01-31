@@ -56,7 +56,6 @@ function CollateralTable() {
 
   const borrowerCollateralTokens = useMemo(() => {
     const colorPalette: string[] = data ? generateColorPalette(data.collateralTokenMetas.length) : [];
-
     return (
       data?.collateralTokenMetas
         .filter(({ troveLockedAmount, walletAmount }) => walletAmount! > 0 || troveLockedAmount! > 0)
@@ -64,7 +63,9 @@ function CollateralTable() {
           ...token,
           chartColor: colorPalette.shift(),
           troveValueUSD: token.troveLockedAmount
-            ? roundNumber(dangerouslyConvertBigIntToNumber(token.troveLockedAmount * BigInt(token.token.priceUSD)))
+            ? roundNumber(
+                dangerouslyConvertBigIntToNumber(token.troveLockedAmount * BigInt(token.token.priceUSD), 30, 6),
+              )
             : 0,
         })) ?? []
     );

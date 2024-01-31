@@ -38,6 +38,7 @@ export const GET_SELECTED_TOKEN = gql`
 export const GET_ALL_DEBT_TOKENS = gql`
   query GetDebtTokens {
     debtTokenMetas {
+      id
       # TODO: Implement sort in query or sort server side
       totalSupplyUSD
       totalReserve
@@ -60,11 +61,11 @@ export const GET_ALL_DEBT_TOKENS = gql`
 export const GET_BORROWER_DEBT_TOKENS = gql`
   query GetBorrowerDebtTokens($borrower: String!) {
     debtTokenMetas(borrower: $borrower) {
+      id
       troveMintedAmount @client
       walletAmount @client
       providedStability @client
       compoundedDeposit @client
-      stabilityCompoundAmount
       troveRepableDebtAmount @client
 
       stabilityDepositAPY {
@@ -143,6 +144,7 @@ export const GET_BORROWER_LIQUIDITY_POOLS = gql`
 export const GET_BORROWER_COLLATERAL_TOKENS = gql`
   query GetCollateralTokens($borrower: String!) {
     collateralTokenMetas(borrower: $borrower) {
+      id
       token {
         id
         address

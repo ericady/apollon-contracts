@@ -10,7 +10,7 @@ import {
   GetCollateralTokensQueryVariables,
 } from '../../generated/gql-types';
 import { GET_BORROWER_COLLATERAL_TOKENS, GET_BORROWER_DEBT_TOKENS } from '../../queries';
-import { bigIntStringToFloat, displayPercentage } from '../../utils/math';
+import { bigIntStringToFloat, dangerouslyConvertBigIntToNumber, displayPercentage } from '../../utils/math';
 
 export const CRIT_RATIO = 1.1;
 
@@ -83,16 +83,22 @@ function CollateralRatioVisualization({
   );
 
   const debtValue =
-    debtData?.debtTokenMetas.reduce(
-      (acc, { troveMintedAmount, token }) => acc + troveMintedAmount! * bigIntStringToFloat(token.priceUSD),
-      0,
-    ) ?? 0;
+    debtData?.debtTokenMetas
+      .filter(({ troveMintedAmount }) => troveMintedAmount > 0)
+      .reduce(
+        (acc, { troveMintedAmount, token }) =>
+          acc + dangerouslyConvertBigIntToNumber(troveMintedAmount!, 9, 9) * bigIntStringToFloat(token.priceUSD),
+        0,
+      ) ?? 0;
 
   const collateralValue =
-    collateralData?.collateralTokenMetas.reduce(
-      (acc, { troveLockedAmount, token }) => acc + troveLockedAmount! * bigIntStringToFloat(token.priceUSD),
-      0,
-    ) ?? 0;
+    collateralData?.collateralTokenMetas
+      .filter(({ troveLockedAmount }) => troveLockedAmount > 0)
+      .reduce(
+        (acc, { troveLockedAmount, token }) =>
+          acc + dangerouslyConvertBigIntToNumber(troveLockedAmount!, 9, 9) * bigIntStringToFloat(token.priceUSD),
+        0,
+      ) ?? 0;
 
   const getRatios = useCallback(() => {
     const oldRatio = collateralValue / debtValue;

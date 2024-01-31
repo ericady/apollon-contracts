@@ -1,7 +1,7 @@
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 import { Typography, useTheme } from '@mui/material';
 import { Cell, Pie, PieChart } from 'recharts';
-import { GetCollateralTokensQuery } from '../../generated/gql-types';
+import { GetCollateralTokensQuery, Token } from '../../generated/gql-types';
 import { roundCurrency } from '../../utils/math';
 
 type Props = {
@@ -12,40 +12,41 @@ type Props = {
 };
 
 // eslint-disable-next-line react/display-name
-const createRenderCustomizedLabel = (isDarkMode: boolean) => (svgPropsAndData: any) => {
-  // has all the spread data and some props from the library
-  const { x, y, cx, troveLockedAmount, chartColor, token } = svgPropsAndData;
-  const isRight = x > cx;
+const createRenderCustomizedLabel =
+  (isDarkMode: boolean) => (svgPropsAndData: any & { troveValueUSD: number; token: Token; chartColor: string }) => {
+    // has all the spread data and some props from the library
+    const { x, y, cx, troveValueUSD, chartColor, token } = svgPropsAndData;
+    const isRight = x > cx;
 
-  return (
-    <g id="group1">
-      <svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" x={isRight ? x + 15 : x - 60} y={y - 15}>
-        <path
+    return (
+      <g id="group1">
+        <svg xmlns="http://www.w3.org/2000/svg" width="11" height="11" x={isRight ? x + 15 : x - 60} y={y - 15}>
+          <path
+            fill={chartColor}
+            d="M4 0a6.449 6.449 0 0 0 4 4 6.449 6.449 0 0 0-4 4 6.449 6.449 0 0 0-4-4 6.449 6.449 0 0 0 4-4Z"
+          />
+        </svg>
+        <text
+          fill={isDarkMode ? '#504D59' : '#939393'}
+          x={isRight ? x + 28 : x - 10}
+          y={y - 10}
+          textAnchor={x > cx ? 'start' : 'end'}
+          dominantBaseline="central"
+        >
+          {token.symbol}
+        </text>
+        <text
           fill={chartColor}
-          d="M4 0a6.449 6.449 0 0 0 4 4 6.449 6.449 0 0 0-4 4 6.449 6.449 0 0 0-4-4 6.449 6.449 0 0 0 4-4Z"
-        />
-      </svg>
-      <text
-        fill={isDarkMode ? '#504D59' : '#939393'}
-        x={isRight ? x + 28 : x - 10}
-        y={y - 10}
-        textAnchor={x > cx ? 'start' : 'end'}
-        dominantBaseline="central"
-      >
-        {token.symbol}
-      </text>
-      <text
-        fill={chartColor}
-        x={isRight ? x + 15 : x - 10}
-        y={y + 10}
-        textAnchor={x > cx ? 'start' : 'end'}
-        dominantBaseline="central"
-      >
-        {roundCurrency(troveLockedAmount, 5, 5)}
-      </text>
-    </g>
-  );
-};
+          x={isRight ? x + 15 : x - 10}
+          y={y + 10}
+          textAnchor={x > cx ? 'start' : 'end'}
+          dominantBaseline="central"
+        >
+          {roundCurrency(troveValueUSD, 5, 5)}
+        </text>
+      </g>
+    );
+  };
 
 function CollateralPieVisualization({ borrowerCollateralTokens }: Props) {
   const theme = useTheme();

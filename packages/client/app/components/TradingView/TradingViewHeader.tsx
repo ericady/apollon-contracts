@@ -52,14 +52,16 @@ function TradingViewHeader() {
         <Typography variant="subtitle1" fontFamily="Space Grotesk Variable">
           Oracle
           <Box sx={{ color: 'text.primary', display: 'inline', ml: '8px' }}>
-            {data ? roundCurrency(dangerouslyConvertBigIntToNumber(data.token.priceUSDOracle, 9, 9)) : ' -'}
+            {data?.token.priceUSDOracle !== undefined
+              ? roundCurrency(dangerouslyConvertBigIntToNumber(data.token.priceUSDOracle, 9, 9))
+              : ' -'}
           </Box>{' '}
           $
         </Typography>
         <Typography variant="subtitle1" fontFamily="Space Grotesk Variable">
           Premium
           <Box sx={{ color: 'text.primary', display: 'inline', ml: '8px' }}>
-            {data && selectedToken
+            {data?.token.priceUSDOracle !== undefined && selectedToken
               ? displayPercentage(
                   percentageChange(
                     dangerouslyConvertBigIntToNumber(selectedToken.priceUSD, 9, 9),

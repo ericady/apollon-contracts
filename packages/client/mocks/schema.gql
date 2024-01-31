@@ -25,7 +25,6 @@ type DebtTokenMeta {
   troveMintedAmount: bigint!
   providedStability: bigint!
   compoundedDeposit: bigint!
-  stabilityCompoundAmount: bigint!
   troveRepableDebtAmount: bigint!
 
   # global

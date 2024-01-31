@@ -11,7 +11,7 @@ import { Contracts, useEthers } from '../../../context/EthersProvider';
 import { useTransactionDialog } from '../../../context/TransactionDialogProvider';
 import { GetBorrowerDebtTokensQuery, GetBorrowerDebtTokensQueryVariables } from '../../../generated/gql-types';
 import { GET_BORROWER_DEBT_TOKENS } from '../../../queries';
-import { floatToBigInt, roundCurrency } from '../../../utils/math';
+import { dangerouslyConvertBigIntToNumber, floatToBigInt, roundCurrency } from '../../../utils/math';
 import NumberInput from '../../FormControls/NumberInput';
 import CrossIcon from '../../Icons/CrossIcon';
 import DiamondIcon from '../../Icons/DiamondIcon';
@@ -170,7 +170,7 @@ const RepayDebtDialog = () => {
                       <div style={{ marginTop: 6 }}>
                         <Label variant="success">{token.symbol}</Label>
                         <Typography sx={{ fontWeight: '400', marginTop: '10px' }}>
-                          {roundCurrency(troveRepableDebtAmount, 5, 5)}
+                          {roundCurrency(dangerouslyConvertBigIntToNumber(troveRepableDebtAmount, 12, 6), 5, 5)}
                         </Typography>
                         <Typography variant="label" paragraph>
                           repayable debt
@@ -186,7 +186,10 @@ const RepayDebtDialog = () => {
                           rules={{
                             min: { value: 0, message: 'Amount needs to be positive.' },
                             max: {
-                              value: walletAmount > troveRepableDebtAmount ? troveRepableDebtAmount : walletAmount,
+                              value:
+                                walletAmount > troveRepableDebtAmount
+                                  ? dangerouslyConvertBigIntToNumber(troveRepableDebtAmount, 12, 6)
+                                  : dangerouslyConvertBigIntToNumber(walletAmount, 12, 6),
                               message:
                                 walletAmount > troveRepableDebtAmount
                                   ? 'The specified amount is bigger than your debt.'
@@ -202,7 +205,7 @@ const RepayDebtDialog = () => {
                               data-testid="apollon-repay-debt-dialog-deposit-funds-label"
                               color="info.main"
                             >
-                              {roundCurrency(walletAmount, 5, 5)}
+                              {roundCurrency(dangerouslyConvertBigIntToNumber(walletAmount, 12, 6), 5, 5)}
                             </Typography>
                             <Typography variant="label" paragraph>
                               Wallet
@@ -212,7 +215,13 @@ const RepayDebtDialog = () => {
                           <Button
                             variant="undercover"
                             sx={{ textDecoration: 'underline', p: 0, mt: 0.25, height: 25 }}
-                            onClick={() => fillMaxInputValue(token.address, walletAmount, troveRepableDebtAmount)}
+                            onClick={() =>
+                              fillMaxInputValue(
+                                token.address,
+                                dangerouslyConvertBigIntToNumber(walletAmount, 12, 6),
+                                dangerouslyConvertBigIntToNumber(troveRepableDebtAmount, 12, 6),
+                              )
+                            }
                           >
                             max
                           </Button>

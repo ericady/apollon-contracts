@@ -57,7 +57,9 @@ function DebtTable() {
           ...token,
           chartColor: colorPalette.shift(),
           troveMintedUSD: token.troveMintedAmount
-            ? roundNumber(dangerouslyConvertBigIntToNumber(token.troveMintedAmount * BigInt(token.token.priceUSD)))
+            ? roundNumber(
+                dangerouslyConvertBigIntToNumber(token.troveMintedAmount * BigInt(token.token.priceUSD), 30, 6),
+              )
             : 0,
         })) ?? []
     );
@@ -112,12 +114,12 @@ function DebtTable() {
                           />
                         </svg>
                         <Typography color="primary.contrastText" fontWeight={400}>
-                          {roundCurrency(dangerouslyConvertBigIntToNumber(troveMintedAmount!), 5, 5)}
+                          {roundCurrency(dangerouslyConvertBigIntToNumber(troveMintedAmount!, 12, 6), 5, 5)}
                         </Typography>
                       </div>
                     </TableCell>
                     <TableCell align="right">
-                      {roundCurrency(dangerouslyConvertBigIntToNumber(walletAmount!), 5, 5)}
+                      {roundCurrency(dangerouslyConvertBigIntToNumber(walletAmount!, 12, 6), 5, 5)}
                     </TableCell>
                     <TableCell>
                       <Label variant="none">{token.symbol}</Label>

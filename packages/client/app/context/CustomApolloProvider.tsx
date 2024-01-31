@@ -142,6 +142,8 @@ const getProductionCacheConfig = ({
       fields: {
         priceUSDOracle: {
           read(_, { readField }) {
+            return BigInt(10000000000000000000);
+
             const address = readField('address') as Readonly<string>;
             if (address) {
               if (
@@ -167,6 +169,7 @@ const getProductionCacheConfig = ({
       fields: {
         walletAmount: {
           read(_, { readField, cache }) {
+            return BigInt(10000000000000000000);
             const token = readField('token') as Readonly<Reference>;
 
             const tokenData = cache.readFragment<TokenFragmentFragment>({
@@ -190,6 +193,7 @@ const getProductionCacheConfig = ({
 
         troveMintedAmount: {
           read(_, { readField, cache }) {
+            return BigInt(10000000000000000000);
             const token = readField('token') as Readonly<Reference>;
 
             const tokenData = cache.readFragment<TokenFragmentFragment>({
@@ -213,6 +217,8 @@ const getProductionCacheConfig = ({
 
         troveRepableDebtAmount: {
           read(_, { readField, cache }) {
+            return BigInt(10000000000000000000);
+
             const token = readField('token') as Readonly<Reference>;
 
             const tokenData = cache.readFragment<TokenFragmentFragment>({
@@ -236,6 +242,7 @@ const getProductionCacheConfig = ({
 
         providedStability: {
           read(_, { readField, cache }) {
+            return BigInt(10000000000000000000);
             const token = readField('token') as Readonly<Reference>;
 
             const tokenData = cache.readFragment<TokenFragmentFragment>({
@@ -259,6 +266,7 @@ const getProductionCacheConfig = ({
 
         compoundedDeposit: {
           read(_, { readField, cache }) {
+            return BigInt(10000000000000000000);
             const token = readField('token') as Readonly<Reference>;
 
             const tokenData = cache.readFragment<TokenFragmentFragment>({
@@ -286,6 +294,8 @@ const getProductionCacheConfig = ({
       fields: {
         walletAmount: {
           read(_, { readField, cache }) {
+            return BigInt(10000000000000000000);
+
             const token = readField('token') as Readonly<Reference>;
 
             const tokenData = cache.readFragment<TokenFragmentFragment>({
@@ -307,6 +317,8 @@ const getProductionCacheConfig = ({
 
         troveLockedAmount: {
           read(_, { readField, cache }) {
+            return BigInt(10000000000000000000);
+
             const token = readField('token') as Readonly<Reference>;
 
             const tokenData = cache.readFragment<TokenFragmentFragment>({
@@ -331,6 +343,8 @@ const getProductionCacheConfig = ({
 
         stabilityGainedAmount: {
           read(_, { readField, cache }) {
+            return BigInt(10000000000000000000);
+
             const token = readField('token') as Readonly<Reference>;
 
             const tokenData = cache.readFragment<TokenFragmentFragment>({
@@ -377,6 +391,8 @@ const getProductionCacheConfig = ({
 
         borrowerAmount: {
           read(_, { readField }) {
+            return BigInt(10000000000000000000);
+
             const poolAddress = readField('address') as Readonly<string>;
 
             if (

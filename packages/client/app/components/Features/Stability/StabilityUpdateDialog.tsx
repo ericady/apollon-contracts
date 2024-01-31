@@ -52,11 +52,11 @@ const StabilityUpdateDialog = () => {
     reset(emptyValues);
   };
 
-  const fillMaxInputValue = (tokenAddress: string, walletAmount: number, stabilityCompoundAmount: number) => {
+  const fillMaxInputValue = (tokenAddress: string, walletAmount: number, compoundedDeposit: number) => {
     if (tabValue === 'DEPOSIT') {
       setValue(tokenAddress, walletAmount.toString(), { shouldValidate: true, shouldDirty: true });
     } else {
-      setValue(tokenAddress, stabilityCompoundAmount.toString(), { shouldValidate: true, shouldDirty: true });
+      setValue(tokenAddress, compoundedDeposit.toString(), { shouldValidate: true, shouldDirty: true });
     }
   };
 

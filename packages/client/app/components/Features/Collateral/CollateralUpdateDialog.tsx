@@ -23,7 +23,13 @@ import { Contracts, useEthers } from '../../../context/EthersProvider';
 import { useTransactionDialog } from '../../../context/TransactionDialogProvider';
 import { GetCollateralTokensQuery, GetCollateralTokensQueryVariables } from '../../../generated/gql-types';
 import { GET_BORROWER_COLLATERAL_TOKENS } from '../../../queries';
-import { bigIntStringToFloat, displayPercentage, floatToBigInt, roundCurrency } from '../../../utils/math';
+import {
+  bigIntStringToFloat,
+  dangerouslyConvertBigIntToNumber,
+  displayPercentage,
+  floatToBigInt,
+  roundCurrency,
+} from '../../../utils/math';
 import NumberInput from '../../FormControls/NumberInput';
 import CrossIcon from '../../Icons/CrossIcon';
 import DiamondIcon from '../../Icons/DiamondIcon';
@@ -108,15 +114,19 @@ const CollateralUpdateDialog = ({ buttonVariant, buttonSx = {} }: Props) => {
 
   const fillMaxInputValue = (fieldName: keyof FieldValues, index: number) => {
     if (tabValue === 'DEPOSIT') {
-      setValue(fieldName, collateralToDeposit[index].walletAmount!.toString(), {
+      setValue(fieldName, dangerouslyConvertBigIntToNumber(collateralToDeposit[index].walletAmount, 9, 9).toString(), {
         shouldValidate: true,
         shouldDirty: true,
       });
     } else {
-      setValue(fieldName, collateralToDeposit[index].troveLockedAmount!.toString(), {
-        shouldValidate: true,
-        shouldDirty: true,
-      });
+      setValue(
+        fieldName,
+        dangerouslyConvertBigIntToNumber(collateralToDeposit[index].troveLockedAmount, 9, 9).toString(),
+        {
+          shouldValidate: true,
+          shouldDirty: true,
+        },
+      );
     }
   };
 
@@ -266,7 +276,7 @@ const CollateralUpdateDialog = ({ buttonVariant, buttonSx = {} }: Props) => {
                         <div style={{ marginTop: 6 }}>
                           <Label variant="success">{symbol}</Label>
                           <Typography sx={{ fontWeight: '400', marginTop: '10px' }}>
-                            {roundCurrency(troveLockedAmount ?? 0, 5, 5)}
+                            {roundCurrency(dangerouslyConvertBigIntToNumber(troveLockedAmount, 12, 6), 5, 5)}
                           </Typography>
                           <Typography variant="label" paragraph>
                             Trove
@@ -290,11 +300,11 @@ const CollateralUpdateDialog = ({ buttonVariant, buttonSx = {} }: Props) => {
                             max:
                               tabValue === 'DEPOSIT'
                                 ? {
-                                    value: walletAmount ?? 0,
+                                    value: dangerouslyConvertBigIntToNumber(walletAmount, 12, 6),
                                     message: 'Your wallet does not contain the specified amount.',
                                   }
                                 : {
-                                    value: troveLockedAmount ?? 0,
+                                    value: dangerouslyConvertBigIntToNumber(troveLockedAmount, 12, 6),
                                     message: 'Your trove does not contain the specified amount.',
                                   },
                           }}
@@ -309,7 +319,7 @@ const CollateralUpdateDialog = ({ buttonVariant, buttonSx = {} }: Props) => {
                                   data-testid="apollon-collateral-update-dialog-deposit-ether-funds-label"
                                   color="info.main"
                                 >
-                                  {roundCurrency(walletAmount ?? 0, 5, 5)}
+                                  {roundCurrency(dangerouslyConvertBigIntToNumber(walletAmount, 12, 6), 5, 5)}
                                 </Typography>
                                 <Typography variant="label" paragraph>
                                   Wallet
@@ -323,7 +333,7 @@ const CollateralUpdateDialog = ({ buttonVariant, buttonSx = {} }: Props) => {
                                   data-testid="apollon-collateral-update-dialog-withdraw-ether-funds-label"
                                   color="info.main"
                                 >
-                                  {roundCurrency(troveLockedAmount ?? 0, 5, 5)}
+                                  {roundCurrency(dangerouslyConvertBigIntToNumber(troveLockedAmount, 12, 6), 5, 5)}
                                 </Typography>
                                 <Typography variant="label" paragraph>
                                   Trove

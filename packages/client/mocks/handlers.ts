@@ -20,10 +20,12 @@ import {
   QueryTokenCandleSingletonArgs,
   QueryTokenCandlesArgs,
   SwapEvent,
+  SystemInfo,
   Token,
   TokenAmount,
   TokenCandle,
   TokenCandleSingleton,
+  TroveManager,
 } from '../app/generated/gql-types';
 import {
   GET_ALL_DEBT_TOKENS,
@@ -54,7 +56,7 @@ const favoritedAssets: string[] = getFavoritedAssetsFromLS();
 const now = Date.now();
 const oneDayInSeconds = 24 * 60 * 60;
 
-const JUSD: Token = {
+const JUSD: Omit<Token, 'priceUSDOracle'> = {
   id: faker.string.uuid(),
   __typename: 'Token',
   address: Contracts.ERC20.JUSD,
@@ -62,13 +64,12 @@ const JUSD: Token = {
   createdAt: (faker.date.past().getTime() / 1000).toString(),
   priceUSD: floatToBigInt(faker.number.float({ min: 1, max: 5000, precision: 0.01 })).toString(),
   priceUSD24hAgo: floatToBigInt(faker.number.float({ min: 1, max: 5000, precision: 0.01 })).toString(),
-  // priceUSDOracle: faker.number.float({ min: 1, max: 5000, precision: 0.01 }),
   isPoolToken: faker.datatype.boolean(),
 };
 
-export const tokens: Token[] = Array(10)
+export const tokens: Omit<Token, 'priceUSDOracle'>[] = Array(10)
   .fill(null)
-  .map<Token>((_, index) => ({
+  .map<Omit<Token, 'priceUSDOracle'>>((_, index) => ({
     id: faker.string.uuid(),
     __typename: 'Token',
     address: index <= favoritedAssets.length - 1 ? favoritedAssets[index] : faker.finance.ethereumAddress(),
@@ -77,13 +78,12 @@ export const tokens: Token[] = Array(10)
     createdAt: (faker.date.past().getTime() / 1000).toString(),
     priceUSD: floatToBigInt(faker.number.float({ min: 1, max: 5000, precision: 0.01 })).toString(),
     priceUSD24hAgo: floatToBigInt(faker.number.float({ min: 1, max: 5000, precision: 0.01 })).toString(),
-    // priceUSDOracle: faker.number.float({ min: 1, max: 5000, precision: 0.01 }),
     isPoolToken: faker.datatype.boolean(),
   }));
 
 // 5 hard tokens always with JUSD
-const collateralTokens: Token[] = Object.entries(Contracts.ERC20)
-  .map<Token>(([symbol, address]) => ({
+const collateralTokens: Omit<Token, 'priceUSDOracle'>[] = Object.entries(Contracts.ERC20)
+  .map<Omit<Token, 'priceUSDOracle'>>(([symbol, address]) => ({
     id: faker.string.uuid(),
     __typename: 'Token',
     address,
@@ -91,42 +91,33 @@ const collateralTokens: Token[] = Object.entries(Contracts.ERC20)
     createdAt: (faker.date.past().getTime() / 1000).toString(),
     priceUSD: floatToBigInt(faker.number.float({ min: 1, max: 5000, precision: 0.01 })).toString(),
     priceUSD24hAgo: floatToBigInt(faker.number.float({ min: 1, max: 5000, precision: 0.01 })).toString(),
-    // priceUSDOracle: faker.number.float({ min: 1, max: 5000, precision: 0.01 }),
     isPoolToken: faker.datatype.boolean(),
   }))
   .concat(JUSD);
 
 collateralTokens.shift();
 
-const collateralTokenMeta: CollateralTokenMeta[] = collateralTokens.map<CollateralTokenMeta>((collToken) => {
-  return {
-    __typename: 'CollateralTokenMeta',
-    id: faker.string.uuid(),
-    timestamp: now / 1000,
-    token: collToken,
-    totalValueLockedUSD: floatToBigInt(faker.number.float({ min: 10000, max: 50000, precision: 0.01 })).toString(),
-    totalValueLockedUSD30dAverage: {
-      __typename: 'TotalValueLockedAverage',
-      id: faker.string.uuid(),
-      index: 0,
-      value: floatToBigInt(faker.number.float({ min: 10000, max: 50000, precision: 0.01 })).toString(),
+const collateralTokenMeta: Omit<CollateralTokenMeta, 'walletAmount' | 'troveLockedAmount' | 'stabilityGainedAmount'>[] =
+  collateralTokens.map<Omit<CollateralTokenMeta, 'walletAmount' | 'troveLockedAmount' | 'stabilityGainedAmount'>>(
+    (collToken) => {
+      return {
+        __typename: 'CollateralTokenMeta',
+        id: faker.string.uuid(),
+        timestamp: now / 1000,
+        token: collToken as Token,
+        totalValueLockedUSD: floatToBigInt(faker.number.float({ min: 10000, max: 50000, precision: 0.01 })).toString(),
+        totalValueLockedUSD30dAverage: {
+          __typename: 'TotalValueLockedAverage',
+          id: faker.string.uuid(),
+          index: 0,
+          value: floatToBigInt(faker.number.float({ min: 10000, max: 50000, precision: 0.01 })).toString(),
+        },
+      };
     },
-    walletAmount: 0,
-    troveLockedAmount: 0,
-    stabilityGainedAmount: 0,
-  };
-});
+  );
 
-const userColl = faker.helpers
-  .arrayElements(collateralTokenMeta, { min: 0, max: collateralTokenMeta.length })
-  .map((collTokenMeta) => {
-    return {
-      ...collTokenMeta,
-      walletAmount: faker.number.float({ min: 500, max: 1000, precision: 0.0001 }),
-      troveLockedAmount: faker.number.float({ min: 50000, max: 100000, precision: 0.0001 }),
-      stabilityGainedAmount: faker.number.float({ min: 100, max: 500, precision: 0.0001 }),
-    };
-  });
+const userColl: Omit<CollateralTokenMeta, 'walletAmount' | 'troveLockedAmount' | 'stabilityGainedAmount'>[] =
+  faker.helpers.arrayElements(collateralTokenMeta, { min: 0, max: collateralTokenMeta.length });
 
 // Merge userCollateralTokenMeta and collateralTokenMeta but remove duplicates
 const userCollateralTokenMeta = [
@@ -134,20 +125,19 @@ const userCollateralTokenMeta = [
   ...collateralTokenMeta.filter((token) => !userColl.find(({ id }) => id === token.id)),
 ];
 
-const debtTokenMeta = tokens.map<DebtTokenMeta>((token, index) => {
+const debtTokenMeta = tokens.map<
+  Omit<
+    DebtTokenMeta,
+    'troveMintedAmount' | 'compoundedDeposit' | 'walletAmount' | 'providedStability' | 'troveRepableDebtAmount'
+  >
+>((token, index) => {
   const isGovOrStableDebtToken = index === tokens.length - 1 || index === tokens.length - 2;
 
   return {
     __typename: 'DebtTokenMeta',
     id: faker.string.uuid(),
     timestamp: now / 1000,
-    token: token,
-    walletAmount: 0,
-    troveMintedAmount: 0,
-    providedStability: 0,
-    compoundedDeposit: 0,
-    stabilityCompoundAmount: 0,
-    troveRepableDebtAmount: 0,
+    token: token as Token,
 
     totalDepositedStability: floatToBigInt(faker.number.float({ min: 1000, max: 5000, precision: 0.0001 })).toString(),
     totalReserve: floatToBigInt(
@@ -178,19 +168,7 @@ const debtTokenMeta = tokens.map<DebtTokenMeta>((token, index) => {
   };
 });
 
-const userDebt = faker.helpers
-  .arrayElements(debtTokenMeta, { min: 0, max: debtTokenMeta.length })
-  .map((debtTokenMeta) => {
-    return {
-      ...debtTokenMeta,
-      walletAmount: faker.number.float({ min: 100, max: 500, precision: 0.0001 }),
-      troveMintedAmount: faker.number.float({ min: 1000, max: 5000, precision: 0.0001 }),
-      providedStability: faker.number.float({ min: 100, max: 500, precision: 0.0001 }),
-      compoundedDeposit: faker.number.float({ min: 0, max: 100, precision: 0.0001 }),
-      stabilityCompoundAmount: faker.number.float({ min: 100, max: 500, precision: 0.0001 }),
-      troveRepableDebtAmount: faker.number.float({ min: 100, max: 500, precision: 0.0001 }),
-    };
-  });
+const userDebt = faker.helpers.arrayElements(debtTokenMeta, { min: 0, max: debtTokenMeta.length });
 
 // Merge userCollateralTokenMeta and collateralTokenMeta but remove duplicates
 const userDebtTokenMeta = [
@@ -199,7 +177,8 @@ const userDebtTokenMeta = [
 ];
 
 // Generate pools once for each pair of tokens
-export const pools: Pool[] = [];
+
+export const pools: Omit<Pool, 'borrowerAmount' | 'swapFee'>[] = [];
 
 const allTokens = tokens.concat(collateralTokens);
 
@@ -211,11 +190,10 @@ for (let i = 0; i < allTokens.length; i++) {
       __typename: 'Pool',
       id: faker.string.uuid(),
       address: faker.finance.ethereumAddress(),
-      swapFee: floatToBigInt(faker.number.float({ min: -0.05, max: 0.05, precision: 0.0001 }), 6).toString(),
       liquidity: sortedPair.map((token) => ({
         id: faker.string.uuid(),
         __typename: 'PoolLiquidity',
-        token,
+        token: token as Token,
         totalAmount: floatToBigInt(faker.number.float({ min: 100000, max: 500000, precision: 0.0001 }), 0).toString(),
       })),
       liquidityDepositAPY: floatToBigInt(faker.number.float({ min: 0.01, max: 0.3, precision: 0.0001 })).toString(),
@@ -235,7 +213,6 @@ for (let i = 0; i < allTokens.length; i++) {
         value: floatToBigInt(faker.number.float({ min: 100000, max: 500000, precision: 0.0001 })).toString(),
         feeUSD: floatToBigInt(faker.number.float({ min: 1000, max: 5000, precision: 0.0001 })).toString(),
       },
-      borrowerAmount: 0,
       totalSupply: floatToBigInt(faker.number.float({ min: 100000, max: 500000, precision: 0.0001 })).toString(),
     });
   }
@@ -262,7 +239,7 @@ const pastSwapEvents = Array(pastSwapEventsLength)
       direction: faker.helpers.enumValue(LongShortDirection),
       size,
       swapFee: floatToBigInt(faker.number.float({ min: 0.01, max: 0.1, precision: 0.0001 }), 6).toString(),
-      token,
+      token: token as Token,
     };
   })
   .sort((a, b) => b.timestamp - a.timestamp);
@@ -307,19 +284,20 @@ const borrowerHistory: BorrowerHistory[] = Array(faker.number.int({ min: 5, max:
     // negative amount and only on lost token for claimed rewards
     const lostToken =
       type === BorrowerHistoryType.ClaimedRewards
-        ? generateTokenValues(lostAmount, faker.helpers.arrayElements(tokens, { min: 1, max: 5 })).map<TokenAmount>(
-            ({ amount, token }) => ({
-              __typename: 'TokenAmount',
-              id: faker.string.uuid(),
-              amount: floatToBigInt(amount * -1).toString(),
-              token,
-            }),
-          )
+        ? generateTokenValues(
+            lostAmount,
+            faker.helpers.arrayElements(tokens as Token[], { min: 1, max: 5 }),
+          ).map<TokenAmount>(({ amount, token }) => ({
+            __typename: 'TokenAmount',
+            id: faker.string.uuid(),
+            amount: floatToBigInt(amount * -1).toString(),
+            token,
+          }))
         : [];
     // positive amount and always bigger than any potential lost amount
     const gainedToken = generateTokenValues(
       gainedAmount,
-      faker.helpers.arrayElements(tokens, { min: 1, max: 5 }),
+      faker.helpers.arrayElements(tokens as Token[], { min: 1, max: 5 }),
     ).map<TokenAmount>(({ amount, token }) => ({
       __typename: 'TokenAmount',
       id: faker.string.uuid(),
@@ -347,12 +325,12 @@ export const handlers = [
   graphql.query<{ debtTokenMetas: Query['debtTokenMetas'] }, QueryDebtTokenMetasArgs>(
     GET_ALL_DEBT_TOKENS,
     (req, res, ctx) => {
-      return res(ctx.data({ debtTokenMetas: debtTokenMeta }));
+      return res(ctx.data({ debtTokenMetas: debtTokenMeta as DebtTokenMeta[] }));
     },
   ),
   // GetAllPools
   graphql.query<{ pools: Query['pools'] }, QueryDebtTokenMetasArgs>(GET_ALL_POOLS, (req, res, ctx) => {
-    const result: Query['pools'] = pools;
+    const result: Query['pools'] = pools as Pool[];
     return res(ctx.data({ pools: result }));
   }),
   // // GetBorrowerRewards
@@ -368,9 +346,9 @@ export const handlers = [
       const { borrower } = req.variables;
 
       if (borrower) {
-        return res(ctx.data({ debtTokenMetas: userDebtTokenMeta }));
+        return res(ctx.data({ debtTokenMetas: userDebtTokenMeta as DebtTokenMeta[] }));
       } else {
-        return res(ctx.data({ debtTokenMetas: debtTokenMeta }));
+        return res(ctx.data({ debtTokenMetas: debtTokenMeta as DebtTokenMeta[] }));
       }
     },
   ),
@@ -381,7 +359,7 @@ export const handlers = [
 
     const token = allTokens.find((token) => token.address === address)!;
 
-    return res(ctx.data({ token }));
+    return res(ctx.data({ token: token as Token }));
   }),
 
   // GetCollateralTokens
@@ -391,9 +369,9 @@ export const handlers = [
       const { borrower } = req.variables;
 
       if (borrower) {
-        return res(ctx.data({ collateralTokenMetas: userCollateralTokenMeta }));
+        return res(ctx.data({ collateralTokenMetas: userCollateralTokenMeta as CollateralTokenMeta[] }));
       } else {
-        return res(ctx.data({ collateralTokenMetas: collateralTokenMeta }));
+        return res(ctx.data({ collateralTokenMetas: collateralTokenMeta as CollateralTokenMeta[] }));
       }
     },
   ),
@@ -413,7 +391,7 @@ export const handlers = [
   graphql.query<{ pools: Query['pools'] }, QueryPoolsArgs>(GET_BORROWER_LIQUIDITY_POOLS, (req, res, ctx) => {
     const { borrower } = req.variables;
     if (!borrower) {
-      const result: Query['pools'] = liquidityPools;
+      const result: Query['pools'] = liquidityPools as Pool[];
 
       return res(ctx.data({ pools: result }));
     }
@@ -424,21 +402,18 @@ export const handlers = [
       (pool) => !borrowerLiquidityPools.find(({ id }) => id === pool.id),
     );
 
-    const liqudityPoolsWithBorrower: Query['pools'] = borrowerLiquidityPools.map<Pool>((pool) => {
+    const liqudityPoolsWithBorrower: Query['pools'] = borrowerLiquidityPools.map<
+      Omit<Pool, 'borrowerAmount' | 'swapFee'>
+    >((pool) => {
       return {
         ...pool,
         liquidity: pool.liquidity.map((liquidity) => ({
           ...liquidity,
         })),
-        borrowerAmount: faker.number.float({
-          min: 10,
-          max: bigIntStringToFloat(pool.totalSupply) / 100,
-          precision: 0.0001,
-        }),
       };
-    });
+    }) as Pool[];
 
-    return res(ctx.data({ pools: liqudityPoolsWithoutBorrower.concat(liqudityPoolsWithBorrower) }));
+    return res(ctx.data({ pools: liqudityPoolsWithoutBorrower.concat(liqudityPoolsWithBorrower) as Pool[] }));
   }),
 
   // CHART DATA MOCK
@@ -529,7 +504,7 @@ export const handlers = [
             ...bar,
             __typename: 'TokenCandle',
             candleSize: where!.candleSize!,
-            token: tokens[0],
+            token: tokens[0] as Token,
             id: faker.string.uuid(),
           })),
         }),
@@ -579,8 +554,7 @@ export const handlers = [
         getTroveManager: {
           __typename: 'TroveManager',
           id: faker.string.uuid(),
-          borrowingRate: faker.number.float({ min: 0, max: 0.5, precision: 0.0001 }),
-        },
+        } as TroveManager,
       }),
     );
   }),
@@ -595,8 +569,7 @@ export const handlers = [
           __typename: 'SystemInfo',
           id: faker.string.uuid(),
           recoveryModeActive: totalCollateralRatio < 1.5,
-          totalCollateralRatio,
-        },
+        } as SystemInfo,
       }),
     );
   }),
