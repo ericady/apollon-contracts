@@ -40,6 +40,7 @@ import {
   GET_RESERVE_USD_HISTORY,
   GET_SELECTED_TOKEN,
   GET_SYSTEMINFO,
+  GET_TOKEN_PRICES_24h_AGO,
   GET_TRADING_VIEW_CANDLES,
   GET_TRADING_VIEW_LATEST_CANDLE,
   GET_TROVEMANAGER,
@@ -63,7 +64,6 @@ const JUSD: Omit<Token, 'priceUSDOracle'> = {
   symbol: 'JUSD',
   createdAt: (faker.date.past().getTime() / 1000).toString(),
   priceUSD: floatToBigInt(faker.number.float({ min: 1, max: 5000, precision: 0.01 })).toString(),
-  priceUSD24hAgo: floatToBigInt(faker.number.float({ min: 1, max: 5000, precision: 0.01 })).toString(),
   isPoolToken: faker.datatype.boolean(),
 };
 
@@ -77,7 +77,6 @@ export const tokens: Omit<Token, 'priceUSDOracle'>[] = Array(10)
     // Unix timestamp in seconds like the API returns it.
     createdAt: (faker.date.past().getTime() / 1000).toString(),
     priceUSD: floatToBigInt(faker.number.float({ min: 1, max: 5000, precision: 0.01 })).toString(),
-    priceUSD24hAgo: floatToBigInt(faker.number.float({ min: 1, max: 5000, precision: 0.01 })).toString(),
     isPoolToken: faker.datatype.boolean(),
   }));
 
@@ -90,7 +89,6 @@ const collateralTokens: Omit<Token, 'priceUSDOracle'>[] = Object.entries(Contrac
     symbol,
     createdAt: (faker.date.past().getTime() / 1000).toString(),
     priceUSD: floatToBigInt(faker.number.float({ min: 1, max: 5000, precision: 0.01 })).toString(),
-    priceUSD24hAgo: floatToBigInt(faker.number.float({ min: 1, max: 5000, precision: 0.01 })).toString(),
     isPoolToken: faker.datatype.boolean(),
   }))
   .concat(JUSD);
@@ -540,6 +538,41 @@ export const handlers = [
       return res(
         ctx.data({
           tokenCandleSingleton: randomCandle,
+        }),
+      );
+    },
+  ),
+
+  // GetPastTokenPrices
+  graphql.query<{ tokenCandles: Query['tokenCandles'] }, QueryTokenCandlesArgs>(
+    GET_TOKEN_PRICES_24h_AGO,
+    (req, res, ctx) => {
+      const tokenPrices24hAgo = tokens.concat(collateralTokens).map((token) => {
+        let open = Math.random() * 100 + 100; // Random value between 100 and 200
+        let close = Math.random() * 100 + 100;
+        let high = Math.max(open, close) + Math.random() * 10;
+        let low = Math.min(open, close) - Math.random() * 10;
+        let volume = Math.random() * 1000; // Random volume
+
+        const randomCandle: TokenCandle = {
+          id: faker.string.uuid(),
+          __typename: 'TokenCandle',
+          timestamp: Date.now(),
+          token: token as Token,
+          candleSize: 60,
+          open: ethers.parseEther(open.toString()).toString(),
+          close: ethers.parseEther(close.toString()).toString(),
+          high: ethers.parseEther(high.toString()).toString(),
+          low: ethers.parseEther(low.toString()).toString(),
+          volume: ethers.parseEther(volume.toString()).toString(),
+        };
+
+        return randomCandle;
+      });
+
+      return res(
+        ctx.data({
+          tokenCandles: tokenPrices24hAgo,
         }),
       );
     },

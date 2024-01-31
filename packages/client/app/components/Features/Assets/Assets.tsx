@@ -11,8 +11,13 @@ import TableRow from '@mui/material/TableRow';
 import { useEffect, useMemo, useState } from 'react';
 import { Contracts } from '../../../context/EthersProvider';
 import { SelectedToken, useSelectedToken } from '../../../context/SelectedTokenProvider';
-import { GetAllPoolsQuery, GetAllPoolsQueryVariables } from '../../../generated/gql-types';
-import { GET_ALL_POOLS } from '../../../queries';
+import {
+  GetAllPoolsQuery,
+  GetAllPoolsQueryVariables,
+  GetPastTokenPricesQuery,
+  GetPastTokenPricesQueryVariables,
+} from '../../../generated/gql-types';
+import { GET_ALL_POOLS, GET_TOKEN_PRICES_24h_AGO } from '../../../queries';
 import { WIDGET_HEIGHTS } from '../../../utils/contants';
 import { getCheckSum } from '../../../utils/crypto';
 import {
@@ -44,11 +49,14 @@ function Assets() {
 
   // TODO: Implement a filter for only JUSD to subgraph
   const { data } = useQuery<GetAllPoolsQuery, GetAllPoolsQueryVariables>(GET_ALL_POOLS);
+  const { data: pastTokenPrices } = useQuery<GetPastTokenPricesQuery, GetPastTokenPricesQueryVariables>(
+    GET_TOKEN_PRICES_24h_AGO,
+  );
+
+  console.log('data: ', data);
+  console.log('pastTokenPrices: ', pastTokenPrices);
 
   const tokens = useMemo<SelectedToken[]>(() => {
-    // FIXME: Implement real await for queried data
-    if (!data?.pools[0].swapFee) return [];
-
     const jUSDPools =
       data?.pools.filter(({ liquidity }) => {
         const [tokenA, tokenB] = liquidity;
@@ -63,15 +71,21 @@ function Assets() {
       .map<SelectedToken>(({ id, liquidity, swapFee, volume30dUSD }) => {
         const [tokenA, tokenB] = liquidity;
         const token = tokenA.token.address === Contracts.ERC20.JUSD ? tokenB.token : tokenA.token;
+
+        const pastToken = pastTokenPrices?.tokenCandles.find(
+          ({ token: pastToken }) => token.address === pastToken.address,
+        );
+        const pastPrice = pastToken?.close ? BigInt(pastToken?.close) : BigInt(0);
+
         return {
           ...token,
           priceUSD: BigInt(token.priceUSD),
-          priceUSD24hAgo: BigInt(token.priceUSD24hAgo),
+          priceUSD24hAgo: pastPrice,
           swapFee: BigInt(swapFee),
           // calculate change over last 24h
           change:
-            (bigIntStringToFloat(token.priceUSD) - bigIntStringToFloat(token.priceUSD24hAgo)) /
-            bigIntStringToFloat(token.priceUSD24hAgo),
+            (bigIntStringToFloat(token.priceUSD) - dangerouslyConvertBigIntToNumber(pastPrice, 9, 9)) /
+            dangerouslyConvertBigIntToNumber(pastPrice, 9, 9),
           isFavorite: favoritedAssets.find((address) => token.address === address) !== undefined ? true : false,
           volume30dUSD: BigInt(volume30dUSD.value),
           pool: {

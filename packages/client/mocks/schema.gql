@@ -12,7 +12,6 @@ type Token {
   priceUSD: BigInt!
   isPoolToken: Boolean!
   # handled by client
-  priceUSD24hAgo: BigInt!
   priceUSDOracle: bigint!
 }
 
@@ -288,6 +287,12 @@ enum OrderDirection {
 }
 
 type Query {
-  tokenCandles(orderBy: TokenCandle_orderBy, orderDirection: OrderDirection, where: TokenCandle_filter): [TokenCandle!]!
+  tokenCandles(
+    orderBy: TokenCandle_orderBy
+    orderDirection: OrderDirection
+    where: TokenCandle_filter
+    first: Int = 100
+    skip: Int = 0
+  ): [TokenCandle!]!
   tokenCandleSingleton(id: ID!): TokenCandleSingleton!
 }

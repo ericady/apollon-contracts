@@ -18,7 +18,6 @@ export const GET_ALL_POOLS = gql`
           address
           symbol
           priceUSD
-          priceUSD24hAgo
         }
       }
     }
@@ -52,7 +51,6 @@ export const GET_ALL_DEBT_TOKENS = gql`
         address
         symbol
         priceUSD
-        priceUSD24hAgo
       }
     }
   }
@@ -229,6 +227,24 @@ export const GET_TRADING_VIEW_LATEST_CANDLE = gql`
       open
       high
       low
+      close
+      volume
+    }
+  }
+`;
+
+// USE CANDLE TO GET PAST PRICE
+// Get hourly candles but skip the last day
+export const GET_TOKEN_PRICES_24h_AGO = gql`
+  query GetPastTokenPrices {
+    tokenCandles(where: { candleSize: 60 }, skip: 24, first: 1) {
+      id
+      token {
+        id
+        address
+      }
+      timestamp
+      # The price 24h ago
       close
       volume
     }

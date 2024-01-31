@@ -33,23 +33,22 @@ export function CustomApolloProvider({ children }: PropsWithChildren<{}>) {
     address: borrower,
   } = useEthers();
 
-  if (process.env.NEXT_PUBLIC_CONTRACT_DATA_MOCKING) {
+  console.log('process.env.NEXT_PUBLIC_CONTRACT_MOCKING: ', process.env.NEXT_PUBLIC_CONTRACT_MOCKING);
+
+  if (process.env.NEXT_PUBLIC_CONTRACT_MOCKING === 'enabled') {
     return <CustomApolloProvider_DevMode>{children}</CustomApolloProvider_DevMode>;
   }
 
-  const cacheConfig =
-    process.env.NEXT_PUBLIC_CONTRACT_MOCKING === 'enabled'
-      ? { fields: {}, Query: {} }
-      : getProductionCacheConfig({
-          provider,
-          borrower,
-          debtTokenContracts,
-          collateralTokenContracts,
-          troveManagerContract,
-          stabilityPoolManagerContract,
-          swapPairContracts,
-          storagePoolContract,
-        });
+  const cacheConfig = getProductionCacheConfig({
+    provider,
+    borrower,
+    debtTokenContracts,
+    collateralTokenContracts,
+    troveManagerContract,
+    stabilityPoolManagerContract,
+    swapPairContracts,
+    storagePoolContract,
+  });
 
   const client = new ApolloClient({
     // TODO: replace with our deployed graphql endpoint

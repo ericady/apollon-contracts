@@ -67,7 +67,7 @@ function SetupState({
 
   useEffect(() => {
     if (shouldPreselectTokens && !selectedToken) {
-      const { address, priceUSD, priceUSD24hAgo, symbol } = PreselectedTestToken;
+      const { address, symbol } = PreselectedTestToken;
       setSelectedToken({
         address,
         change: 0.01,

@@ -174,8 +174,10 @@ export type QueryTokenCandleSingletonArgs = {
 
 
 export type QueryTokenCandlesArgs = {
+  first?: InputMaybe<Scalars['Int']['input']>;
   orderBy?: InputMaybe<TokenCandle_OrderBy>;
   orderDirection?: InputMaybe<OrderDirection>;
+  skip?: InputMaybe<Scalars['Int']['input']>;
   where?: InputMaybe<TokenCandle_Filter>;
 };
 
@@ -221,7 +223,6 @@ export type Token = {
   id: Scalars['Bytes']['output'];
   isPoolToken: Scalars['Boolean']['output'];
   priceUSD: Scalars['BigInt']['output'];
-  priceUSD24hAgo: Scalars['BigInt']['output'];
   priceUSDOracle: Scalars['bigint']['output'];
   symbol: Scalars['String']['output'];
 };
@@ -320,7 +321,7 @@ export type TroveManager = {
 export type GetAllPoolsQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type GetAllPoolsQuery = { __typename: 'Query', pools: Array<{ __typename: 'Pool', id: string, address: string, swapFee: string, volume30dUSD: { __typename: 'PoolVolume30d', id: string, value: string }, liquidity: Array<{ __typename: 'PoolLiquidity', id: string, totalAmount: string, token: { __typename: 'Token', id: string, address: string, symbol: string, priceUSD: string, priceUSD24hAgo: string } }> }> };
+export type GetAllPoolsQuery = { __typename: 'Query', pools: Array<{ __typename: 'Pool', id: string, address: string, swapFee: string, volume30dUSD: { __typename: 'PoolVolume30d', id: string, value: string }, liquidity: Array<{ __typename: 'PoolLiquidity', id: string, totalAmount: string, token: { __typename: 'Token', id: string, address: string, symbol: string, priceUSD: string } }> }> };
 
 export type GetSelectedTokenQueryVariables = Exact<{
   address: Scalars['String']['input'];
@@ -332,7 +333,7 @@ export type GetSelectedTokenQuery = { __typename: 'Query', token: { __typename: 
 export type GetDebtTokensQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type GetDebtTokensQuery = { __typename: 'Query', debtTokenMetas: Array<{ __typename: 'DebtTokenMeta', id: string, totalSupplyUSD: string, totalReserve: string, totalReserve30dAverage?: { __typename: 'TotalReserveAverage', id: string, value: string } | null, token: { __typename: 'Token', id: string, address: string, symbol: string, priceUSD: string, priceUSD24hAgo: string } }> };
+export type GetDebtTokensQuery = { __typename: 'Query', debtTokenMetas: Array<{ __typename: 'DebtTokenMeta', id: string, totalSupplyUSD: string, totalReserve: string, totalReserve30dAverage?: { __typename: 'TotalReserveAverage', id: string, value: string } | null, token: { __typename: 'Token', id: string, address: string, symbol: string, priceUSD: string } }> };
 
 export type GetBorrowerDebtTokensQueryVariables = Exact<{
   borrower: Scalars['String']['input'];
@@ -401,6 +402,11 @@ export type GetTradingViewLatestCandleQueryVariables = Exact<{
 
 
 export type GetTradingViewLatestCandleQuery = { __typename: 'Query', tokenCandleSingleton: { __typename: 'TokenCandleSingleton', id: string, timestamp: number, open: string, high: string, low: string, close: string, volume: string } };
+
+export type GetPastTokenPricesQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type GetPastTokenPricesQuery = { __typename: 'Query', tokenCandles: Array<{ __typename: 'TokenCandle', id: string, timestamp: number, close: string, volume: string, token: { __typename: 'Token', id: string, address: string } }> };
 
 export type TokenFragmentFragment = { __typename: 'Token', id: string, address: string };
 

@@ -2,7 +2,7 @@
 
 import { Button } from '@mui/material';
 import { Contract, Eip1193Provider, JsonRpcSigner } from 'ethers';
-import { BrowserProvider, JsonRpcProvider, Network } from 'ethers/providers';
+import { BrowserProvider, JsonRpcProvider } from 'ethers/providers';
 import Link from 'next/link';
 import { useSnackbar } from 'notistack';
 import { createContext, useContext, useEffect, useState } from 'react';
@@ -119,12 +119,13 @@ export const EthersContext = createContext<{
   connectWallet: () => {},
 });
 
-// Connetion to local ganache.
+// Connetion to local node
+// TODO: Implement testnet once deployed
 const provider =
   process.env.NEXT_PUBLIC_CONTRACT_MOCKING === 'enabled' &&
   typeof window !== 'undefined' &&
   typeof window.ethereum !== 'undefined'
-    ? new BrowserProvider(window.ethereum, new Network('goerli', 5))
+    ? new JsonRpcProvider('http://0.0.0.0:8545', { name: 'localhost', chainId: 31337 })
     : new JsonRpcProvider('http://0.0.0.0:8545', { name: 'localhost', chainId: 31337 });
 
 // TODO: Implement network change: https://docs.ethers.org/v5/concepts/best-practices/
