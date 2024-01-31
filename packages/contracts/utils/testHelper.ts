@@ -138,7 +138,7 @@ export const getStabilityPool = async (contracts: Contracts, debt: MockDebtToken
 };
 
 /**
- * asserts that an transaction fails and is reverted. Part of the error message can be asserted.
+ * asserts that a transaction fails and is reverted. Part of the error message can be asserted.
  *
  * @param txPromise transaction that should be reverted
  * @param message part of the revert message that should be included. Usually the custom error of the contract.
