@@ -14,7 +14,13 @@ import {
   GetCollateralTokensQueryVariables,
 } from '../../../../generated/gql-types';
 import { GET_BORROWER_COLLATERAL_TOKENS, GET_BORROWER_DEBT_TOKENS } from '../../../../queries';
-import { bigIntStringToFloat, displayPercentage, percentageChange, roundCurrency } from '../../../../utils/math';
+import {
+  bigIntStringToFloat,
+  dangerouslyConvertBigIntToNumber,
+  displayPercentage,
+  percentageChange,
+  roundCurrency,
+} from '../../../../utils/math';
 import FeatureBox from '../../../FeatureBox/FeatureBox';
 import Label from '../../../Label/Label';
 import DiagramPlaceholder from '../../../Loader/DiagramPlaceholder';
@@ -58,12 +64,15 @@ function StabilityPoolTable() {
     ) ?? [];
 
   const rewardsTotalInUSD = rewards.reduce(
-    (acc, { stabilityGainedAmount, token }) => acc + stabilityGainedAmount * bigIntStringToFloat(token.priceUSD),
+    (acc, { stabilityGainedAmount, token }) =>
+      acc + dangerouslyConvertBigIntToNumber(stabilityGainedAmount, 9, 9) * bigIntStringToFloat(token.priceUSD),
     0,
   );
   const lossTotalInUSD = stabilityLost.reduce(
     (acc, { compoundedDeposit, token, providedStability }) =>
-      acc + (providedStability - compoundedDeposit) * bigIntStringToFloat(token.priceUSD),
+      acc +
+      dangerouslyConvertBigIntToNumber(providedStability - compoundedDeposit, 9, 9) *
+        bigIntStringToFloat(token.priceUSD),
     0,
   );
 
@@ -102,7 +111,9 @@ function StabilityPoolTable() {
                       return (
                         <TableRow hover key={index}>
                           <TableCell sx={noBorder ? { borderBottom: 'none', pr: 0 } : { pr: 0 }} align="right">
-                            {!isNaN(providedStability) ? roundCurrency(providedStability, 5, 5) : null}
+                            {providedStability <= 0
+                              ? roundCurrency(dangerouslyConvertBigIntToNumber(providedStability, 12, 6), 5, 5)
+                              : null}
                           </TableCell>
 
                           <TableCell
@@ -113,10 +124,14 @@ function StabilityPoolTable() {
                             {lostToken && <Label variant="error">{lostToken.symbol}</Label>}
                           </TableCell>
                           <TableCell align="right" sx={noBorder ? { borderBottom: 'none', pl: 0 } : { pl: 0 }}>
-                            {!isNaN(compoundedDeposit) ? roundCurrency(compoundedDeposit, 5, 5) : null}
+                            {compoundedDeposit <= 0
+                              ? roundCurrency(dangerouslyConvertBigIntToNumber(compoundedDeposit, 12, 6), 5, 5)
+                              : null}
                           </TableCell>
                           <TableCell sx={noBorder ? { borderBottom: 'none', pr: 0 } : { pr: 0 }} align="right">
-                            {!isNaN(stabilityGainedAmount) ? roundCurrency(stabilityGainedAmount, 5, 5) : null}
+                            {stabilityGainedAmount <= 0
+                              ? roundCurrency(dangerouslyConvertBigIntToNumber(stabilityGainedAmount, 12, 6), 5, 5)
+                              : null}
                           </TableCell>
                           <TableCell
                             width={50}

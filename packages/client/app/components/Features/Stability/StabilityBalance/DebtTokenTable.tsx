@@ -11,6 +11,7 @@ import { GetBorrowerDebtTokensQuery, GetBorrowerDebtTokensQueryVariables } from 
 import { GET_BORROWER_DEBT_TOKENS } from '../../../../queries';
 import {
   bigIntStringToFloat,
+  dangerouslyConvertBigIntToNumber,
   displayPercentage,
   percentageChange,
   roundCurrency,
@@ -82,6 +83,8 @@ function DebtTokenTable() {
                     bigIntStringToFloat(debtToken.stabilityDepositAPY.profit) /
                     bigIntStringToFloat(debtToken.stabilityDepositAPY.volume),
                 },
+                walletAmount: dangerouslyConvertBigIntToNumber(debtToken.walletAmount, 12, 6),
+                troveRepableDebtAmount: dangerouslyConvertBigIntToNumber(debtToken.troveRepableDebtAmount, 12, 6),
               }))
               .map(
                 (

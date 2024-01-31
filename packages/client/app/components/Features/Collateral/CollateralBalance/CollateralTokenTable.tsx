@@ -13,6 +13,7 @@ import { GetCollateralTokensQuery, GetCollateralTokensQueryVariables } from '../
 import { GET_BORROWER_COLLATERAL_TOKENS } from '../../../../queries';
 import {
   bigIntStringToFloat,
+  dangerouslyConvertBigIntToNumber,
   displayPercentage,
   percentageChange,
   roundCurrency,
@@ -66,10 +67,10 @@ const CollateralTokenTable = () => {
                   ({ token, totalValueLockedUSD, totalValueLockedUSD30dAverage, troveLockedAmount, walletAmount }) => (
                     <TableRow hover key={token.address}>
                       <TableCell align="right" sx={{ borderRight: '1px solid', borderColor: 'table.border' }}>
-                        {roundCurrency(walletAmount ?? 0, 5, 5)}
+                        {roundCurrency(dangerouslyConvertBigIntToNumber(walletAmount, 12, 6), 5, 5)}
                       </TableCell>
                       <TableCell align="right" sx={{ borderRight: '1px solid', borderColor: 'table.border' }}>
-                        {roundCurrency(troveLockedAmount ?? 0, 5, 5)}
+                        {roundCurrency(dangerouslyConvertBigIntToNumber(troveLockedAmount, 12, 6), 5, 5)}
                       </TableCell>
                       <TableCell>
                         <Label variant="none">{token.symbol}</Label>

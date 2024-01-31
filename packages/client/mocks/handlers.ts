@@ -53,7 +53,7 @@ const getFavoritedAssetsFromLS = () => {
 };
 
 const favoritedAssets: string[] = getFavoritedAssetsFromLS();
-const now = Date.now();
+const now = Math.round(Date.now() / 1000);
 const oneDayInSeconds = 24 * 60 * 60;
 
 const JUSD: Omit<Token, 'priceUSDOracle'> = {
@@ -103,7 +103,7 @@ const collateralTokenMeta: Omit<CollateralTokenMeta, 'walletAmount' | 'troveLock
       return {
         __typename: 'CollateralTokenMeta',
         id: faker.string.uuid(),
-        timestamp: now / 1000,
+        timestamp: now,
         token: collToken as Token,
         totalValueLockedUSD: floatToBigInt(faker.number.float({ min: 10000, max: 50000, precision: 0.01 })).toString(),
         totalValueLockedUSD30dAverage: {
@@ -136,7 +136,7 @@ const debtTokenMeta = tokens.map<
   return {
     __typename: 'DebtTokenMeta',
     id: faker.string.uuid(),
-    timestamp: now / 1000,
+    timestamp: now,
     token: token as Token,
 
     totalDepositedStability: floatToBigInt(faker.number.float({ min: 1000, max: 5000, precision: 0.0001 })).toString(),
@@ -224,7 +224,7 @@ const pastSwapEventsLength = faker.number.int({ min: 5, max: 90 });
 const pastSwapEvents = Array(pastSwapEventsLength)
   .fill(null)
   .map<SwapEvent>(() => {
-    const timestamp = faker.date.past({ years: 1 }).getTime();
+    const timestamp = Math.round(faker.date.past({ years: 1 }).getTime() / 1000);
     const size = floatToBigInt(faker.number.float({ min: 1, max: 1000, precision: 0.0001 })).toString();
     const token = faker.helpers.arrayElement(tokens);
 

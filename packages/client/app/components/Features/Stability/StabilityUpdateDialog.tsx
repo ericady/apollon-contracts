@@ -13,7 +13,7 @@ import { IBase } from '../../../../generated/types/StabilityPoolManager';
 import { Contracts, useEthers } from '../../../context/EthersProvider';
 import { GetBorrowerDebtTokensQuery, GetBorrowerDebtTokensQueryVariables } from '../../../generated/gql-types';
 import { GET_BORROWER_DEBT_TOKENS } from '../../../queries';
-import { floatToBigInt, roundCurrency } from '../../../utils/math';
+import { dangerouslyConvertBigIntToNumber, floatToBigInt, roundCurrency } from '../../../utils/math';
 import NumberInput from '../../FormControls/NumberInput';
 import CrossIcon from '../../Icons/CrossIcon';
 import DiamondIcon from '../../Icons/DiamondIcon';
@@ -52,11 +52,17 @@ const StabilityUpdateDialog = () => {
     reset(emptyValues);
   };
 
-  const fillMaxInputValue = (tokenAddress: string, walletAmount: number, compoundedDeposit: number) => {
+  const fillMaxInputValue = (tokenAddress: string, walletAmount: bigint, compoundedDeposit: bigint) => {
     if (tabValue === 'DEPOSIT') {
-      setValue(tokenAddress, walletAmount.toString(), { shouldValidate: true, shouldDirty: true });
+      setValue(tokenAddress, dangerouslyConvertBigIntToNumber(walletAmount, 9, 9).toString(), {
+        shouldValidate: true,
+        shouldDirty: true,
+      });
     } else {
-      setValue(tokenAddress, compoundedDeposit.toString(), { shouldValidate: true, shouldDirty: true });
+      setValue(tokenAddress, dangerouslyConvertBigIntToNumber(compoundedDeposit, 9, 9).toString(), {
+        shouldValidate: true,
+        shouldDirty: true,
+      });
     }
   };
 
@@ -161,7 +167,7 @@ const StabilityUpdateDialog = () => {
                         <div style={{ marginTop: 6 }}>
                           <Label variant="success">{token.symbol}</Label>
                           <Typography sx={{ fontWeight: '400', marginTop: '10px' }}>
-                            {roundCurrency(compoundedDeposit, 5, 5)}
+                            {roundCurrency(dangerouslyConvertBigIntToNumber(compoundedDeposit, 12, 6), 5, 5)}
                           </Typography>
                           <Typography variant="label" paragraph>
                             remaining deposit
@@ -185,11 +191,11 @@ const StabilityUpdateDialog = () => {
                             max:
                               tabValue === 'DEPOSIT'
                                 ? {
-                                    value: walletAmount,
+                                    value: dangerouslyConvertBigIntToNumber(walletAmount, 9, 9),
                                     message: 'Your wallet does not contain the specified amount.',
                                   }
                                 : {
-                                    value: compoundedDeposit,
+                                    value: dangerouslyConvertBigIntToNumber(compoundedDeposit, 9, 9),
                                     message: 'Your deposited stability does not contain the specified amount.',
                                   },
                           }}
@@ -204,7 +210,7 @@ const StabilityUpdateDialog = () => {
                                   data-testid="apollon-stability-update-dialog-deposit-funds-label"
                                   color="info.main"
                                 >
-                                  {roundCurrency(walletAmount, 5, 5)}
+                                  {roundCurrency(dangerouslyConvertBigIntToNumber(walletAmount, 12, 6), 5, 5)}
                                 </Typography>
                                 <Typography variant="label" paragraph>
                                   Wallet
@@ -218,7 +224,7 @@ const StabilityUpdateDialog = () => {
                                   data-testid="apollon-stability-update-dialog-withdraw-funds-label"
                                   color="info.main"
                                 >
-                                  {roundCurrency(compoundedDeposit, 5, 5)}
+                                  {roundCurrency(dangerouslyConvertBigIntToNumber(compoundedDeposit, 12, 6), 5, 5)}
                                 </Typography>
                                 <Typography variant="label" paragraph>
                                   remaining deposit

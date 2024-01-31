@@ -266,7 +266,7 @@ const getProductionCacheConfig = ({
 
         compoundedDeposit: {
           read(_, { readField, cache }) {
-            return BigInt(10000000000000000000);
+            return BigInt(7000000000000000000);
             const token = readField('token') as Readonly<Reference>;
 
             const tokenData = cache.readFragment<TokenFragmentFragment>({
@@ -438,7 +438,8 @@ const getProductionCacheConfig = ({
           return {
             __typename: 'SystemInfo',
             id: 'SystemInfo',
-            totalCollateralRatio: SchemaDataFreshnessManager.StoragePool.totalCollateralRatio.value(),
+            totalCollateralRatio: BigInt(1000000000000000000),
+            // totalCollateralRatio: SchemaDataFreshnessManager.StoragePool.totalCollateralRatio.value(),
             recoveryModeActive: SchemaDataFreshnessManager.StoragePool.recoveryModeActive.value() as unknown as boolean,
           } as SystemInfo;
         },
