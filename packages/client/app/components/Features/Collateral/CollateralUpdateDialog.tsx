@@ -43,9 +43,8 @@ type Props = {
 };
 
 type FieldValues = {
-  [Contracts.ERC20.JUSD]: string;
   [Contracts.ERC20.DFI]: string;
-  [Contracts.ERC20.ETH]: string;
+  [Contracts.ERC20.BTC]: string;
   [Contracts.ERC20.USDT]: string;
 };
 
@@ -73,9 +72,8 @@ const CollateralUpdateDialog = ({ buttonVariant, buttonSx = {} }: Props) => {
 
   const methods = useForm<FieldValues>({
     defaultValues: {
-      [Contracts.ERC20.JUSD]: '',
       [Contracts.ERC20.DFI]: '',
-      [Contracts.ERC20.ETH]: '',
+      [Contracts.ERC20.BTC]: '',
       [Contracts.ERC20.USDT]: '',
     },
     reValidateMode: 'onChange',
@@ -190,10 +188,10 @@ const CollateralUpdateDialog = ({ buttonVariant, buttonSx = {} }: Props) => {
     setIsOpen(false);
   };
 
-  const allTokenAmount = watch([Contracts.ERC20.JUSD, Contracts.ERC20.DFI, Contracts.ERC20.ETH, Contracts.ERC20.USDT]);
+  const allTokenAmount = watch([Contracts.ERC20.DFI, Contracts.ERC20.BTC, Contracts.ERC20.USDT]);
   const allTokenAmountUSD =
     allTokenAmount.reduce((acc, curr, index) => {
-      const address = [Contracts.ERC20.JUSD, Contracts.ERC20.DFI, Contracts.ERC20.ETH, Contracts.ERC20.USDT][index];
+      const address = [Contracts.ERC20.DFI, Contracts.ERC20.BTC, Contracts.ERC20.USDT][index];
       const { token } = collateralToDeposit.find(({ token }) => token.address === address)!;
 
       return acc + (isNaN(parseFloat(curr)) ? 0 : parseFloat(curr) * bigIntStringToFloat(token.priceUSD));

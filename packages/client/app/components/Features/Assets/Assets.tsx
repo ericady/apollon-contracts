@@ -48,21 +48,18 @@ function Assets() {
   const { selectedToken, setSelectedToken, JUSDToken } = useSelectedToken();
 
   // TODO: Implement a filter for only JUSD to subgraph
-  const { data } = useQuery<GetAllPoolsQuery, GetAllPoolsQueryVariables>(GET_ALL_POOLS);
+  const { data } = useQuery<GetAllPoolsQuery, GetAllPoolsQueryVariables>(GET_ALL_POOLS, { pollInterval: 3000 });
   const { data: pastTokenPrices } = useQuery<GetPastTokenPricesQuery, GetPastTokenPricesQueryVariables>(
     GET_TOKEN_PRICES_24h_AGO,
   );
-
-  console.log('data: ', data);
-  console.log('pastTokenPrices: ', pastTokenPrices);
 
   const tokens = useMemo<SelectedToken[]>(() => {
     const jUSDPools =
       data?.pools.filter(({ liquidity }) => {
         const [tokenA, tokenB] = liquidity;
         return (
-          getCheckSum(tokenA.token.address) === getCheckSum(Contracts.ERC20.JUSD) ||
-          getCheckSum(tokenB.token.address) === getCheckSum(Contracts.ERC20.JUSD)
+          getCheckSum(tokenA.token.address) === getCheckSum(Contracts.DebtToken.STABLE) ||
+          getCheckSum(tokenB.token.address) === getCheckSum(Contracts.DebtToken.STABLE)
         );
       }) ?? [];
 
@@ -70,7 +67,8 @@ function Assets() {
     return jUSDPools
       .map<SelectedToken>(({ id, liquidity, swapFee, volume30dUSD }) => {
         const [tokenA, tokenB] = liquidity;
-        const token = tokenA.token.address === Contracts.ERC20.JUSD ? tokenB.token : tokenA.token;
+        const token =
+          getCheckSum(tokenA.token.address) === getCheckSum(Contracts.DebtToken.STABLE) ? tokenB.token : tokenA.token;
 
         const pastToken = pastTokenPrices?.tokenCandles.find(
           ({ token: pastToken }) => token.address === pastToken.address,
@@ -91,7 +89,7 @@ function Assets() {
           pool: {
             id,
             liqudityPair:
-              tokenA.token.address === Contracts.ERC20.JUSD
+              getCheckSum(tokenA.token.address) === getCheckSum(Contracts.DebtToken.STABLE)
                 ? [BigInt(tokenA.totalAmount), BigInt(tokenB.totalAmount)]
                 : [BigInt(tokenB.totalAmount), BigInt(tokenA.totalAmount)],
           },

@@ -1,3 +1,4 @@
+import { log } from '@graphprotocol/graph-ts';
 import {
   OwnershipTransferred as OwnershipTransferredEvent,
   PairCreated as PairCreatedEvent,
@@ -6,7 +7,6 @@ import {
 import { SystemInfo } from '../generated/schema';
 import { handleCreatePool } from './entities/pool-entity';
 import { handleCreateTokenCandleSingleton } from './entities/token-candle-entity';
-import { log } from '@graphprotocol/graph-ts';
 
 export function handleOwnershipTransferred(event: OwnershipTransferredEvent): void {}
 

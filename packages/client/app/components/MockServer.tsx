@@ -14,9 +14,6 @@ function MockServer({ children }: PropsWithChildren<{}>) {
       import('../../mocks').then(async (module) => {
         await module.default();
         setMockStarted(true);
-        if (location.pathname === '/') {
-          replace('/spot');
-        }
       });
     } else if (process.env.NEXT_PUBLIC_API_MOCKING === 'e2e') {
       setMockStarted(true);
@@ -25,6 +22,14 @@ function MockServer({ children }: PropsWithChildren<{}>) {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
+
+  useEffect(() => {
+    if (mockStarted && location.pathname === '/') {
+      replace('/spot');
+    }
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [mockStarted]);
 
   if (!mockStarted)
     return (

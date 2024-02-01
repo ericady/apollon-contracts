@@ -60,7 +60,7 @@ const oneDayInSeconds = 24 * 60 * 60;
 const JUSD: Omit<Token, 'priceUSDOracle'> = {
   id: faker.string.uuid(),
   __typename: 'Token',
-  address: Contracts.ERC20.JUSD,
+  address: Contracts.DebtToken.JUSD,
   symbol: 'JUSD',
   createdAt: (faker.date.past().getTime() / 1000).toString(),
   priceUSD: floatToBigInt(faker.number.float({ min: 1, max: 5000, precision: 0.01 })).toString(),
@@ -78,22 +78,21 @@ export const tokens: Omit<Token, 'priceUSDOracle'>[] = Array(10)
     createdAt: (faker.date.past().getTime() / 1000).toString(),
     priceUSD: floatToBigInt(faker.number.float({ min: 1, max: 5000, precision: 0.01 })).toString(),
     isPoolToken: faker.datatype.boolean(),
-  }));
-
-// 5 hard tokens always with JUSD
-const collateralTokens: Omit<Token, 'priceUSDOracle'>[] = Object.entries(Contracts.ERC20)
-  .map<Omit<Token, 'priceUSDOracle'>>(([symbol, address]) => ({
-    id: faker.string.uuid(),
-    __typename: 'Token',
-    address,
-    symbol,
-    createdAt: (faker.date.past().getTime() / 1000).toString(),
-    priceUSD: floatToBigInt(faker.number.float({ min: 1, max: 5000, precision: 0.01 })).toString(),
-    isPoolToken: faker.datatype.boolean(),
   }))
   .concat(JUSD);
 
-collateralTokens.shift();
+// 5 hard tokens always with JUSD
+const collateralTokens: Omit<Token, 'priceUSDOracle'>[] = Object.entries(Contracts.ERC20).map<
+  Omit<Token, 'priceUSDOracle'>
+>(([symbol, address]) => ({
+  id: faker.string.uuid(),
+  __typename: 'Token',
+  address,
+  symbol,
+  createdAt: (faker.date.past().getTime() / 1000).toString(),
+  priceUSD: floatToBigInt(faker.number.float({ min: 1, max: 5000, precision: 0.01 })).toString(),
+  isPoolToken: faker.datatype.boolean(),
+}));
 
 const collateralTokenMeta: Omit<CollateralTokenMeta, 'walletAmount' | 'troveLockedAmount' | 'stabilityGainedAmount'>[] =
   collateralTokens.map<Omit<CollateralTokenMeta, 'walletAmount' | 'troveLockedAmount' | 'stabilityGainedAmount'>>(

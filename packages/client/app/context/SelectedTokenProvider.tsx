@@ -3,8 +3,12 @@
 import { useQuery } from '@apollo/client';
 import { ethers } from 'ethers';
 import { createContext, useContext, useState } from 'react';
-import { GetCollateralTokensQuery, GetCollateralTokensQueryVariables } from '../generated/gql-types';
-import { GET_BORROWER_COLLATERAL_TOKENS } from '../queries';
+import {
+  GetBorrowerDebtTokensQuery,
+  GetBorrowerDebtTokensQueryVariables,
+  GetCollateralTokensQuery,
+} from '../generated/gql-types';
+import { GET_BORROWER_DEBT_TOKENS } from '../queries';
 import { Contracts, useEthers } from './EthersProvider';
 
 export type SelectedToken = {
@@ -39,17 +43,14 @@ export default function SelectedTokenProvider({ children }: { children: React.Re
 
   const [selectedToken, setSelectedToken] = useState<SelectedToken | null>(null);
 
-  const { data } = useQuery<GetCollateralTokensQuery, GetCollateralTokensQueryVariables>(
-    GET_BORROWER_COLLATERAL_TOKENS,
-    {
-      fetchPolicy: 'cache-first',
-      variables: {
-        borrower: address,
-      },
+  const { data } = useQuery<GetBorrowerDebtTokensQuery, GetBorrowerDebtTokensQueryVariables>(GET_BORROWER_DEBT_TOKENS, {
+    fetchPolicy: 'cache-first',
+    variables: {
+      borrower: address,
     },
-  );
+  });
 
-  const JUSDToken = data?.collateralTokenMetas.find(({ token }) => token.address === Contracts.ERC20.JUSD)?.token;
+  const JUSDToken = data?.debtTokenMetas.find(({ token }) => token.address === Contracts.DebtToken.STABLE)?.token;
   const tokenRatio =
     JUSDToken === undefined || selectedToken === null
       ? ethers.parseEther('1')

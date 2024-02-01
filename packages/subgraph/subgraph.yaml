@@ -395,6 +395,10 @@ dataSources:
       abis:
         - name: DebtToken
           file: ./abis/DebtToken.json
+        - name: StabilityPoolManager
+          file: ./abis/StabilityPoolManager.json
+        - name: StabilityPool
+          file: ./abis/StabilityPool.json
       eventHandlers:
         - event: Approval(indexed address,indexed address,uint256)
           handler: handleApproval
@@ -418,12 +422,13 @@ dataSources:
       abis:
         - name: DebtToken
           file: ./abis/DebtToken.json
+        - name: StabilityPoolManager
+          file: ./abis/StabilityPoolManager.json
+        - name: StabilityPool
+          file: ./abis/StabilityPool.json
       eventHandlers:
         - event: Approval(indexed address,indexed address,uint256)
           handler: handleApproval
         - event: Transfer(indexed address,indexed address,uint256)
           handler: handleTransfer
       file: ./src/debt-token.ts
-      
-      
-

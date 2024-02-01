@@ -18,7 +18,6 @@ export function handleReserveCapChanged(event: ReserveCapChangedEvent): void {
   // handleCreateUpdateDebtTokenMeta(event, stableDebtToken);
   // FIXME: There is an exception still. Test it, fix it, then run it.
   // handleUpdateDebtTokenMeta_totalReserve30dAverage(event, stableDebtToken, event.params.newGovReserveCap);
-
   // handleCreateUpdateDebtTokenMeta(event, govToken, event.params.newGovReserveCap);
   // handleUpdateDebtTokenMeta_totalReserve30dAverage(event, govToken, event.params.newGovReserveCap);
 }

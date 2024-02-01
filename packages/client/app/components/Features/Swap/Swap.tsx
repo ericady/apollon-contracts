@@ -114,7 +114,7 @@ const Swap = () => {
           title: 'Approve jUSD spending.',
           transaction: {
             methodCall: async () => {
-              return collateralTokenContracts[Contracts.ERC20.JUSD]!.approve(
+              return debtTokenContracts[Contracts.DebtToken.STABLE]!.approve(
                 selectedToken!.pool.id,
                 floatToBigInt(jUSDAmount),
               );

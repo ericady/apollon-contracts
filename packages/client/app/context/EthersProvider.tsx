@@ -16,6 +16,7 @@ import {
   SwapPair,
   TroveManager,
 } from '../../generated/types';
+import { getCheckSum } from '../utils/crypto';
 import { SchemaDataFreshnessManager } from './CustomApolloProvider';
 import borrowerOperationsAbi from './abis/BorrowerOperations.json';
 import debtTokenAbi from './abis/DebtToken.json';
@@ -40,40 +41,47 @@ declare global {
 
 export const isDebtTokenAddress = (
   address: string,
-): address is '0x7a2088a1bFc9d81c55368AE168C2C02570cB814F' | '0x67d269191c92Caf3cD7723F116c85e6E9bf55933' => {
-  return Object.values(Contracts.DebtToken).includes(address as any);
+): address is '0x7a2088a1bfc9d81c55368ae168c2c02570cb814f' | '0x67d269191c92caf3cd7723f116c85e6e9bf55933' => {
+  return Object.values(Contracts.DebtToken)
+    .map((address) => getCheckSum(address))
+    .includes(getCheckSum(address) as any);
 };
 export const isCollateralTokenAddress = (
   address: string,
 ): address is
   | '0x59b670e9fA9D0A427751Af201D676719a970857b'
   | '0xc6e7DF5E7b4f2A278906862b61205850344D4e7d'
-  | '0x9E545E3C0baAB3E08CdfD552C960A1050f373042'
   | '0xa82fF9aFd8f496c3d6ac40E2a0F282E47488CFc9' => {
-  return Object.values(Contracts.ERC20).includes(address as any);
+  return Object.values(Contracts.ERC20)
+    .map((address) => getCheckSum(address))
+    .includes(getCheckSum(address) as any);
 };
-export const isPoolAddress = (address: string): address is '0x687E100f79ceD7Cc8b2BD19Eb326a28885F5b371' => {
-  return Object.values(Contracts.SwapPairs).includes(address as any);
+
+export const isPoolAddress = (
+  address: string,
+): address is '0x4d76502cc4d4581d4b52fb77bdd408b27d1894c1' | '0x8c07031a425a562df93226a91fd5c6288cc034fc' => {
+  return Object.values(Contracts.SwapPairs)
+    .map((address) => getCheckSum(address))
+    .includes(getCheckSum(address) as any);
 };
 
 // TODO: These are the demo/production contracts. Replace them with the real ones.
 export const Contracts = {
   DebtToken: {
-    STABLE: '0x7a2088a1bFc9d81c55368AE168C2C02570cB814F',
-    STOCK_1: '0x67d269191c92Caf3cD7723F116c85e6E9bf55933',
+    STABLE: '0x7a2088a1bfc9d81c55368ae168c2c02570cb814f',
+    STOCK_1: '0x67d269191c92caf3cd7723f116c85e6e9bf55933',
   },
   ERC20: {
-    // Please always keep it first
-    JUSD: '0x59b670e9fA9D0A427751Af201D676719a970857b',
-    ETH: '0xc6e7DF5E7b4f2A278906862b61205850344D4e7d',
-    USDT: '0x9E545E3C0baAB3E08CdfD552C960A1050f373042',
+    USDT: '0x59b670e9fA9D0A427751Af201D676719a970857b',
+    BTC: '0xc6e7DF5E7b4f2A278906862b61205850344D4e7d',
     DFI: '0xa82fF9aFd8f496c3d6ac40E2a0F282E47488CFc9',
   },
   TroveManager: '0xCf7Ed3AccA5a467e9e704C703E8D87F634fB0Fc9',
   StabilityPoolManager: '0xDc64a140Aa3E981100a9becA4E685f962f0cF6C9',
   SwapOperations: '0x610178dA211FEF7D417bC0e6FeD39F05609AD788',
   SwapPairs: {
-    STOCK_1: '0x687E100f79ceD7Cc8b2BD19Eb326a28885F5b371',
+    BTC: '0x4d76502cc4d4581d4b52fb77bdd408b27d1894c1',
+    USDT: '0x8c07031a425a562df93226a91fd5c6288cc034fc',
   },
   BorrowerOperations: '0x5FbDB2315678afecb367f032d93F642f64180aa3',
   StoragePool: '0x5FC8d32690cc91D4c39d9d3abcBD16989F875707',
@@ -83,7 +91,7 @@ export const Contracts = {
 type AllDebtTokenContracts = Partial<{ [Key in keyof (typeof SchemaDataFreshnessManager)['DebtToken']]: DebtToken }>;
 type AllCollateralTokenContracts = Partial<{ [Key in keyof (typeof SchemaDataFreshnessManager)['ERC20']]: ERC20 }>;
 type AllSwapPairContracts = Partial<{
-  [Key in keyof (typeof Contracts)['SwapPairs']]: SwapPair;
+  [Key in keyof (typeof SchemaDataFreshnessManager)['SwapPairs']]: SwapPair;
 }>;
 
 export const EthersContext = createContext<{
@@ -157,9 +165,14 @@ export default function EthersProvider({ children }: { children: React.ReactNode
         const debtTokenContractWithSigner = debtTokenContract.connect(newSigner) as DebtToken;
         setDebtTokenContracts({ [Contracts.DebtToken.STABLE]: debtTokenContractWithSigner });
 
-        const collateralTokenContracts = new Contract(Contracts.ERC20.ETH, ERC20Abi, provider);
-        const collateralTokenContractsWithSigner = collateralTokenContracts.connect(newSigner) as ERC20;
-        setCollateralTokenContracts({ [Contracts.ERC20.ETH]: collateralTokenContractsWithSigner });
+        const collateralTokenContractUSDT = new Contract(Contracts.ERC20.USDT, ERC20Abi, provider);
+        const collateralTokenContractWithSignerUSDT = collateralTokenContractUSDT.connect(newSigner) as ERC20;
+        const collateralTokenContractBTC = new Contract(Contracts.ERC20.BTC, ERC20Abi, provider);
+        const collateralTokenContractWithSignerBTC = collateralTokenContractBTC.connect(newSigner) as ERC20;
+        setCollateralTokenContracts({
+          [Contracts.ERC20.USDT]: collateralTokenContractWithSignerUSDT,
+          [Contracts.ERC20.BTC]: collateralTokenContractWithSignerBTC,
+        });
 
         const troveManagerContract = new Contract(
           Contracts.TroveManager,
@@ -185,9 +198,14 @@ export default function EthersProvider({ children }: { children: React.ReactNode
         const swapOperationsContractWithSigner = swapOperationsContract.connect(newSigner);
         setSwapOperationsContract(swapOperationsContractWithSigner);
 
-        const swapPairContracts = new Contract(Contracts.SwapPairs.STOCK_1, swapPairAbi, provider);
-        const swapPairContractsWithSigner = swapPairContracts.connect(newSigner) as SwapPair;
-        setSwapPairContracts({ STOCK_1: swapPairContractsWithSigner });
+        const swapPairContractBTC = new Contract(Contracts.SwapPairs.BTC, swapPairAbi, provider);
+        const swapPairContractBTCWithSigner = swapPairContractBTC.connect(newSigner) as SwapPair;
+        const swapPairContractUSDT = new Contract(Contracts.SwapPairs.BTC, swapPairAbi, provider);
+        const swapPairContractUSDTWithSigner = swapPairContractUSDT.connect(newSigner) as SwapPair;
+        setSwapPairContracts({
+          [Contracts.SwapPairs.BTC]: swapPairContractBTCWithSigner,
+          [Contracts.SwapPairs.USDT]: swapPairContractUSDTWithSigner,
+        });
 
         const borrowerOperationsContract = new Contract(Contracts.BorrowerOperations, borrowerOperationsAbi, provider);
         const borrowerOperationsContractWithSigner = borrowerOperationsContract.connect(
@@ -227,8 +245,12 @@ export default function EthersProvider({ children }: { children: React.ReactNode
         ) as unknown as DebtToken;
         setDebtTokenContracts({ [Contracts.DebtToken.STABLE]: debtTokenContract });
 
-        const collateralTokenContracts = new Contract(Contracts.ERC20.ETH, ERC20Abi, provider) as unknown as ERC20;
-        setCollateralTokenContracts({ [Contracts.ERC20.ETH]: collateralTokenContracts });
+        const collateralTokenContractUSDT = new Contract(Contracts.ERC20.USDT, ERC20Abi, provider) as unknown as ERC20;
+        const collateralTokenContractBTC = new Contract(Contracts.ERC20.BTC, ERC20Abi, provider) as unknown as ERC20;
+        setCollateralTokenContracts({
+          [Contracts.ERC20.USDT]: collateralTokenContractUSDT,
+          [Contracts.ERC20.BTC]: collateralTokenContractBTC,
+        });
 
         const troveManagerContract = new Contract(
           Contracts.TroveManager,
@@ -251,12 +273,16 @@ export default function EthersProvider({ children }: { children: React.ReactNode
         ) as unknown as SwapOperations;
         setSwapOperationsContract(swapOperationsContract);
 
-        const swapPairContracts = new Contract(
-          Contracts.SwapPairs.STOCK_1,
+        const swapPairContractBTC = new Contract(Contracts.SwapPairs.BTC, swapPairAbi, provider) as unknown as SwapPair;
+        const swapPairContractUSDT = new Contract(
+          Contracts.SwapPairs.USDT,
           swapPairAbi,
           provider,
         ) as unknown as SwapPair;
-        setSwapPairContracts({ STOCK_1: swapPairContracts });
+        setSwapPairContracts({
+          [Contracts.SwapPairs.BTC]: swapPairContractBTC,
+          [Contracts.SwapPairs.USDT]: swapPairContractUSDT,
+        });
 
         const borrowerOperationsContract = new Contract(
           Contracts.BorrowerOperations,

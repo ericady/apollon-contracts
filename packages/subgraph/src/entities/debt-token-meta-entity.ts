@@ -1,6 +1,7 @@
 import { Address, BigInt, ethereum } from '@graphprotocol/graph-ts';
 import { Address as EventAddress } from '@graphprotocol/graph-ts/common/numbers';
 import { BorrowerOperations } from '../../generated/BorrowerOperations/BorrowerOperations';
+import { DebtToken } from '../../generated/DebtToken_STABLE/DebtToken';
 import { ReservePool } from '../../generated/ReservePool/ReservePool';
 import { StabilityOffsetAddedGainsStruct, StabilityPool } from '../../generated/StabilityPool/StabilityPool';
 import { StabilityPoolManager } from '../../generated/StabilityPoolManager/StabilityPoolManager';
@@ -14,8 +15,6 @@ import {
   TotalSupplyAverage,
   TotalSupplyAverageChunk,
 } from '../../generated/schema';
-import { log } from '@graphprotocol/graph-ts';
-import { DebtToken } from '../../generated/DebtToken_STABLE/DebtToken';
 
 export const stableDebtToken = EventAddress.fromString('0x6c3f90f043a72fa612cbac8115ee7e52bde6e490');
 export const govToken = EventAddress.fromString('0x9f8f72aa9304c8b593d555f12ef6589cc3a579a2');
@@ -29,6 +28,7 @@ export function handleCreateUpdateDebtTokenMeta(
 
   if (debtTokenMeta === null) {
     debtTokenMeta = new DebtTokenMeta(`DebtTokenMeta-${tokenAddress.toHexString()}`);
+    createDebtTokenMeta_stabilityDepositAPY_totalReserve30dAverage_totalSupply30dAverage(event, tokenAddress);
   }
 
   const tokenContract = DebtToken.bind(tokenAddress);
@@ -75,13 +75,58 @@ export function handleCreateUpdateDebtTokenMeta(
   debtTokenMeta.save();
 }
 
+function createDebtTokenMeta_stabilityDepositAPY_totalReserve30dAverage_totalSupply30dAverage(
+  event: ethereum.Event,
+  tokenAddress: Address,
+): void {
+  // create new chunk
+  const firstStabilityDepositChunk = new StabilityDepositChunk(`StabilityDepositChunk-${tokenAddress.toHexString()}-0`);
+  firstStabilityDepositChunk.timestamp = event.block.timestamp;
+  firstStabilityDepositChunk.profit = new BigInt(0);
+  firstStabilityDepositChunk.volume = new BigInt(0);
+  firstStabilityDepositChunk.save();
+
+  // create new APY
+  const stabilityDepositAPYEntity = new StabilityDepositAPY(`StabilityDepositAPY-${tokenAddress.toHexString()}`);
+  stabilityDepositAPYEntity.index = 0;
+  stabilityDepositAPYEntity.profit = new BigInt(0);
+  stabilityDepositAPYEntity.volume = new BigInt(0);
+  stabilityDepositAPYEntity.save();
+
+  const totalReserveAverage = new TotalReserveAverage(`TotalReserveAverage-${tokenAddress.toHexString()}`);
+  totalReserveAverage.value = new BigInt(0);
+  totalReserveAverage.index = 0;
+  totalReserveAverage.save();
+
+  // "TotalReserveAverageChunk" + token + index
+  const totalReserveAverageFirstChunk = new TotalReserveAverageChunk(
+    `TotalReserveAverageChunk-${tokenAddress.toHexString()}-0`,
+  );
+  totalReserveAverageFirstChunk.timestamp = event.block.timestamp;
+  totalReserveAverageFirstChunk.value = new BigInt(0);
+  totalReserveAverageFirstChunk.save();
+
+  const totalSupplyAverage = new TotalSupplyAverage(`TotalSupplyAverage-${tokenAddress.toHexString()}`);
+  totalSupplyAverage.value = new BigInt(0);
+  totalSupplyAverage.index = 0;
+  totalSupplyAverage.save();
+
+  // "TotalSupplyAverageChunk" + token + index
+  const totalSupplyAverageFirstChunk = new TotalSupplyAverageChunk(
+    `TotalSupplyAverageChunk-${tokenAddress.toHexString()}-0`,
+  );
+  totalSupplyAverageFirstChunk.timestamp = event.block.timestamp;
+  totalSupplyAverageFirstChunk.value = new BigInt(0);
+  totalSupplyAverageFirstChunk.save();
+}
+
 export function handleUpdateDebtTokenMeta_stabilityDepositAPY(
   event: ethereum.Event,
   tokenAddress: Address,
   lostDeposit: BigInt,
   collGain: StabilityOffsetAddedGainsStruct[],
 ): void {
-  let stabilityDepositAPYEntity = StabilityDepositAPY.load(`StabilityDepositAPY-${tokenAddress.toHexString()}`);
+  const stabilityDepositAPYEntity = StabilityDepositAPY.load(`StabilityDepositAPY-${tokenAddress.toHexString()}`)!;
 
   // Calculate Profit from gained colls and lost debts
   const tokenContract = DebtToken.bind(tokenAddress);
@@ -101,60 +146,42 @@ export function handleUpdateDebtTokenMeta_stabilityDepositAPY(
 
   const profit = allGains.minus(loss);
 
-  // If there is no chunk at all create a new one and a new APY
-  if (stabilityDepositAPYEntity === null) {
+  const lastIndex = stabilityDepositAPYEntity.index;
+  const latestChunk = StabilityDepositChunk.load(`StabilityDepositChunk-${tokenAddress.toHexString()}-${lastIndex}`)!;
+
+  // check if latest chunk is outdated after 60min
+  const sixtyMin = BigInt.fromI32(60 * 60);
+  const isOutdated = latestChunk.timestamp.gt(event.block.timestamp.plus(sixtyMin));
+
+  if (isOutdated) {
     // create new chunk
-    const firstStabilityDepositChunk = new StabilityDepositChunk(
-      `StabilityDepositChunk-${tokenAddress.toHexString()}-0`,
+    const newStabilityDepositChunk = new StabilityDepositChunk(
+      `StabilityDepositChunk-${tokenAddress.toHexString()}-${lastIndex + 1}`,
     );
-    firstStabilityDepositChunk.timestamp = event.block.timestamp;
-    firstStabilityDepositChunk.profit = profit;
-    firstStabilityDepositChunk.volume = lostDeposit;
-    firstStabilityDepositChunk.save();
+    newStabilityDepositChunk.timestamp = event.block.timestamp;
+    newStabilityDepositChunk.profit = profit;
+    newStabilityDepositChunk.volume = lostDeposit;
+    newStabilityDepositChunk.save();
 
-    // create new APY
-    stabilityDepositAPYEntity = new StabilityDepositAPY(`StabilityDepositAPY-${tokenAddress.toHexString()}`);
-    stabilityDepositAPYEntity.index = 0;
-    firstStabilityDepositChunk.profit = profit;
-    firstStabilityDepositChunk.volume = lostDeposit;
-  } else {
-    const lastIndex = stabilityDepositAPYEntity.index;
-    const latestChunk = StabilityDepositChunk.load(`StabilityDepositChunk-${tokenAddress.toHexString()}-${lastIndex}`)!;
-
-    // check if latest chunk is outdated after 60min
-    const sixtyMin = BigInt.fromI32(60 * 60);
-    const isOutdated = latestChunk.timestamp.gt(event.block.timestamp.plus(sixtyMin));
-
-    if (isOutdated) {
-      // create new chunk
-      const newStabilityDepositChunk = new StabilityDepositChunk(
-        `StabilityDepositChunk-${tokenAddress.toHexString()}-${lastIndex + 1}`,
-      );
-      newStabilityDepositChunk.timestamp = event.block.timestamp;
-      newStabilityDepositChunk.profit = profit;
-      newStabilityDepositChunk.volume = lostDeposit;
-      newStabilityDepositChunk.save();
-
-      // only remove last chunk from APY if it is older that 30d
-      if (lastIndex > 30 * 24) {
-        // remove last chunk from APY but add latest profit and volume too
-        stabilityDepositAPYEntity.profit = stabilityDepositAPYEntity.profit.minus(latestChunk.profit).plus(profit);
-        stabilityDepositAPYEntity.volume = stabilityDepositAPYEntity.volume.minus(latestChunk.volume).plus(lostDeposit);
-      } else {
-        // in the first 30d just add profit + volume
-        stabilityDepositAPYEntity.profit = stabilityDepositAPYEntity.profit.plus(profit);
-        stabilityDepositAPYEntity.volume = stabilityDepositAPYEntity.volume.plus(lostDeposit);
-      }
-      stabilityDepositAPYEntity.index = lastIndex + 1;
+    // only remove last chunk from APY if it is older that 30d
+    if (lastIndex > 30 * 24) {
+      // remove last chunk from APY but add latest profit and volume too
+      stabilityDepositAPYEntity.profit = stabilityDepositAPYEntity.profit.minus(latestChunk.profit).plus(profit);
+      stabilityDepositAPYEntity.volume = stabilityDepositAPYEntity.volume.minus(latestChunk.volume).plus(lostDeposit);
     } else {
-      // just update profit + volume
-      latestChunk.profit = latestChunk.profit.plus(profit);
-      latestChunk.volume = latestChunk.volume.plus(lostDeposit);
-      latestChunk.save();
-
+      // in the first 30d just add profit + volume
       stabilityDepositAPYEntity.profit = stabilityDepositAPYEntity.profit.plus(profit);
       stabilityDepositAPYEntity.volume = stabilityDepositAPYEntity.volume.plus(lostDeposit);
     }
+    stabilityDepositAPYEntity.index = lastIndex + 1;
+  } else {
+    // just update profit + volume
+    latestChunk.profit = latestChunk.profit.plus(profit);
+    latestChunk.volume = latestChunk.volume.plus(lostDeposit);
+    latestChunk.save();
+
+    stabilityDepositAPYEntity.profit = stabilityDepositAPYEntity.profit.plus(profit);
+    stabilityDepositAPYEntity.volume = stabilityDepositAPYEntity.volume.plus(lostDeposit);
   }
 
   stabilityDepositAPYEntity.save();
@@ -166,64 +193,50 @@ export const handleUpdateDebtTokenMeta_totalReserve30dAverage = (
   totalReserve: BigInt,
 ): void => {
   // Load Avergae or intialise it
-  let totalReserveAverage = TotalReserveAverage.load(`TotalReserveAverage-${tokenAddress.toHexString()}`);
+  const totalReserveAverage = TotalReserveAverage.load(`TotalReserveAverage-${tokenAddress.toHexString()}`)!;
 
-  if (totalReserveAverage === null) {
-    totalReserveAverage = new TotalReserveAverage(`TotalReserveAverage-${tokenAddress.toHexString()}`);
-    totalReserveAverage.value = totalReserve;
-    totalReserveAverage.index = 0;
+  //  Add additional chunks the average has not been recalculated in the last 60 mins with last value (because there has been no update).
+  let lastChunk = TotalReserveAverageChunk.load(
+    `TotalReserveAverageChunk-${tokenAddress.toHexString()}-${totalReserveAverage.index.toString()}`,
+  )!;
+  let moreThanOneChunkOutdated = lastChunk.timestamp.lt(event.block.timestamp.minus(BigInt.fromI32(2 * 60 * 60)));
 
-    // "TotalReserveAverageChunk" + token + index
-    const totalReserveAverageFirstChunk = new TotalReserveAverageChunk(
-      `TotalReserveAverageChunk-${tokenAddress.toHexString()}-0`,
-    );
-    totalReserveAverageFirstChunk.timestamp = event.block.timestamp;
-    totalReserveAverageFirstChunk.value = totalReserve;
-    totalReserveAverageFirstChunk.save();
-  } else {
-    //  Add additional chunks the average has not been recalculated in the last 60 mins with last value (because there has been no update).
-    let lastChunk = TotalReserveAverageChunk.load(
+  while (moreThanOneChunkOutdated) {
+    totalReserveAverage.index = totalReserveAverage.index + 1;
+    const totalReserveAverageNewChunk = new TotalReserveAverageChunk(
       `TotalReserveAverageChunk-${tokenAddress.toHexString()}-${totalReserveAverage.index.toString()}`,
-    )!;
-    let moreThanOneChunkOutdated = lastChunk.timestamp.lt(event.block.timestamp.minus(BigInt.fromI32(2 * 60 * 60)));
+    );
+    totalReserveAverageNewChunk.timestamp = lastChunk.timestamp.plus(BigInt.fromI32(60 * 60));
+    totalReserveAverageNewChunk.value = lastChunk.value;
+    totalReserveAverageNewChunk.save();
 
-    while (moreThanOneChunkOutdated) {
-      totalReserveAverage.index = totalReserveAverage.index + 1;
-      const totalReserveAverageNewChunk = new TotalReserveAverageChunk(
-        `TotalReserveAverageChunk-${tokenAddress.toHexString()}-${totalReserveAverage.index.toString()}`,
-      );
-      totalReserveAverageNewChunk.timestamp = lastChunk.timestamp.plus(BigInt.fromI32(60 * 60));
-      totalReserveAverageNewChunk.value = lastChunk.value;
-      totalReserveAverageNewChunk.save();
+    lastChunk = totalReserveAverageNewChunk;
+    moreThanOneChunkOutdated = lastChunk.timestamp.lt(event.block.timestamp.minus(BigInt.fromI32(2 * 60 * 60)));
+  }
 
-      lastChunk = totalReserveAverageNewChunk;
-      moreThanOneChunkOutdated = lastChunk.timestamp.lt(event.block.timestamp.minus(BigInt.fromI32(2 * 60 * 60)));
-    }
+  // Add the last chunk.
+  if (lastChunk.timestamp.lt(event.block.timestamp.minus(BigInt.fromI32(60 * 60)))) {
+    // Add a new chunk anyway
+    totalReserveAverage.index = totalReserveAverage.index + 1;
 
-    // Add the last chunk.
-    if (lastChunk.timestamp.lt(event.block.timestamp.minus(BigInt.fromI32(60 * 60)))) {
-      // Add a new chunk anyway
-      totalReserveAverage.index = totalReserveAverage.index + 1;
+    const totalReserveAverageNewChunk = new TotalReserveAverageChunk(
+      `TotalReserveAverageChunk-${tokenAddress.toHexString()}-${totalReserveAverage.index.toString()}`,
+    );
+    totalReserveAverageNewChunk.timestamp = lastChunk.timestamp.plus(BigInt.fromI32(60 * 60));
+    totalReserveAverageNewChunk.value = totalReserve;
+    totalReserveAverageNewChunk.save();
 
-      const totalReserveAverageNewChunk = new TotalReserveAverageChunk(
-        `TotalReserveAverageChunk-${tokenAddress.toHexString()}-${totalReserveAverage.index.toString()}`,
-      );
-      totalReserveAverageNewChunk.timestamp = lastChunk.timestamp.plus(BigInt.fromI32(60 * 60));
-      totalReserveAverageNewChunk.value = totalReserve;
-      totalReserveAverageNewChunk.save();
-
-      // recalculate average based on if its the first 30 days or not
-      if (totalReserveAverage.index < 24 * 30) {
-        totalReserveAverage.value = totalReserveAverage.value
-          .div(BigInt.fromI32(totalReserveAverage.index - 1 / totalReserveAverage.index))
-          .plus(totalReserveAverageNewChunk.value.div(BigInt.fromI32(totalReserveAverage.index)));
-      } else {
-        // Otherwise remove last chunk and add new chunk and recalculate average
-        const dividedByChunks = BigInt.fromI32(30 * 24);
-        totalReserveAverage.value = totalReserveAverage.value
-          .plus(totalReserveAverageNewChunk.value.div(dividedByChunks))
-          .minus(lastChunk.value.div(dividedByChunks));
-      }
+    // recalculate average based on if its the first 30 days or not
+    if (totalReserveAverage.index < 24 * 30) {
+      totalReserveAverage.value = totalReserveAverage.value
+        .div(BigInt.fromI32(totalReserveAverage.index - 1 / totalReserveAverage.index))
+        .plus(totalReserveAverageNewChunk.value.div(BigInt.fromI32(totalReserveAverage.index)));
+    } else {
+      // Otherwise remove last chunk and add new chunk and recalculate average
+      const dividedByChunks = BigInt.fromI32(30 * 24);
+      totalReserveAverage.value = totalReserveAverage.value
+        .plus(totalReserveAverageNewChunk.value.div(dividedByChunks))
+        .minus(lastChunk.value.div(dividedByChunks));
     }
   }
 
@@ -237,64 +250,50 @@ export const handleUpdateDebtTokenMeta_totalSupply30dAverage = (event: ethereum.
   const totalSupplyUSD = totalSupply.times(tokenPrice);
 
   // Load Avergae or intialise it
-  let totalSupplyAverage = TotalSupplyAverage.load(`TotalSupplyAverage-${tokenAddress.toHexString()}`);
+  const totalSupplyAverage = TotalSupplyAverage.load(`TotalSupplyAverage-${tokenAddress.toHexString()}`)!;
 
-  if (totalSupplyAverage === null) {
-    totalSupplyAverage = new TotalSupplyAverage(`TotalSupplyAverage-${tokenAddress.toHexString()}`);
-    totalSupplyAverage.value = totalSupplyUSD;
-    totalSupplyAverage.index = 0;
+  //  Add additional chunks the average has not been recalculated in the last 60 mins with last value (because there has been no update).
+  let lastChunk = TotalSupplyAverageChunk.load(
+    `TotalSupplyAverageChunk-${tokenAddress.toHexString()}-${totalSupplyAverage.index.toString()}`,
+  )!;
+  let moreThanOneChunkOutdated = lastChunk.timestamp.lt(event.block.timestamp.minus(BigInt.fromI32(2 * 60 * 60)));
 
-    // "TotalSupplyAverageChunk" + token + index
-    const totalSupplyAverageFirstChunk = new TotalSupplyAverageChunk(
-      `TotalSupplyAverageChunk-${tokenAddress.toHexString()}-0`,
-    );
-    totalSupplyAverageFirstChunk.timestamp = event.block.timestamp;
-    totalSupplyAverageFirstChunk.value = totalSupplyUSD;
-    totalSupplyAverageFirstChunk.save();
-  } else {
-    //  Add additional chunks the average has not been recalculated in the last 60 mins with last value (because there has been no update).
-    let lastChunk = TotalSupplyAverageChunk.load(
+  while (moreThanOneChunkOutdated) {
+    totalSupplyAverage.index = totalSupplyAverage.index + 1;
+    const totalSupplyAverageNewChunk = new TotalSupplyAverageChunk(
       `TotalSupplyAverageChunk-${tokenAddress.toHexString()}-${totalSupplyAverage.index.toString()}`,
-    )!;
-    let moreThanOneChunkOutdated = lastChunk.timestamp.lt(event.block.timestamp.minus(BigInt.fromI32(2 * 60 * 60)));
+    );
+    totalSupplyAverageNewChunk.timestamp = lastChunk.timestamp.plus(BigInt.fromI32(60 * 60));
+    totalSupplyAverageNewChunk.value = lastChunk.value;
+    totalSupplyAverageNewChunk.save();
 
-    while (moreThanOneChunkOutdated) {
-      totalSupplyAverage.index = totalSupplyAverage.index + 1;
-      const totalSupplyAverageNewChunk = new TotalSupplyAverageChunk(
-        `TotalSupplyAverageChunk-${tokenAddress.toHexString()}-${totalSupplyAverage.index.toString()}`,
-      );
-      totalSupplyAverageNewChunk.timestamp = lastChunk.timestamp.plus(BigInt.fromI32(60 * 60));
-      totalSupplyAverageNewChunk.value = lastChunk.value;
-      totalSupplyAverageNewChunk.save();
+    lastChunk = totalSupplyAverageNewChunk;
+    moreThanOneChunkOutdated = lastChunk.timestamp.lt(event.block.timestamp.minus(BigInt.fromI32(2 * 60 * 60)));
+  }
 
-      lastChunk = totalSupplyAverageNewChunk;
-      moreThanOneChunkOutdated = lastChunk.timestamp.lt(event.block.timestamp.minus(BigInt.fromI32(2 * 60 * 60)));
-    }
+  // Add the last chunk.
+  if (lastChunk.timestamp.lt(event.block.timestamp.minus(BigInt.fromI32(60 * 60)))) {
+    // Add a new chunk anyway
+    totalSupplyAverage.index = totalSupplyAverage.index + 1;
 
-    // Add the last chunk.
-    if (lastChunk.timestamp.lt(event.block.timestamp.minus(BigInt.fromI32(60 * 60)))) {
-      // Add a new chunk anyway
-      totalSupplyAverage.index = totalSupplyAverage.index + 1;
+    const totalSupplyAverageNewChunk = new TotalSupplyAverageChunk(
+      `TotalSupplyAverageChunk-${tokenAddress.toHexString()}-${totalSupplyAverage.index.toString()}`,
+    );
+    totalSupplyAverageNewChunk.timestamp = lastChunk.timestamp.plus(BigInt.fromI32(60 * 60));
+    totalSupplyAverageNewChunk.value = totalSupplyUSD;
+    totalSupplyAverageNewChunk.save();
 
-      const totalSupplyAverageNewChunk = new TotalSupplyAverageChunk(
-        `TotalSupplyAverageChunk-${tokenAddress.toHexString()}-${totalSupplyAverage.index.toString()}`,
-      );
-      totalSupplyAverageNewChunk.timestamp = lastChunk.timestamp.plus(BigInt.fromI32(60 * 60));
-      totalSupplyAverageNewChunk.value = totalSupplyUSD;
-      totalSupplyAverageNewChunk.save();
-
-      // recalculate average based on if its the first 30 days or not
-      if (totalSupplyAverage.index < 24 * 30) {
-        totalSupplyAverage.value = totalSupplyAverage.value
-          .div(BigInt.fromI32(totalSupplyAverage.index - 1 / totalSupplyAverage.index))
-          .plus(totalSupplyAverageNewChunk.value.div(BigInt.fromI32(totalSupplyAverage.index)));
-      } else {
-        // Otherwise remove last chunk and add new chunk and recalculate average
-        const dividedByChunks = BigInt.fromI32(30 * 24);
-        totalSupplyAverage.value = totalSupplyAverage.value
-          .plus(totalSupplyAverageNewChunk.value.div(dividedByChunks))
-          .minus(lastChunk.value.div(dividedByChunks));
-      }
+    // recalculate average based on if its the first 30 days or not
+    if (totalSupplyAverage.index < 24 * 30) {
+      totalSupplyAverage.value = totalSupplyAverage.value
+        .div(BigInt.fromI32(totalSupplyAverage.index - 1 / totalSupplyAverage.index))
+        .plus(totalSupplyAverageNewChunk.value.div(BigInt.fromI32(totalSupplyAverage.index)));
+    } else {
+      // Otherwise remove last chunk and add new chunk and recalculate average
+      const dividedByChunks = BigInt.fromI32(30 * 24);
+      totalSupplyAverage.value = totalSupplyAverage.value
+        .plus(totalSupplyAverageNewChunk.value.div(dividedByChunks))
+        .minus(lastChunk.value.div(dividedByChunks));
     }
   }
 
