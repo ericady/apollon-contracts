@@ -43,7 +43,7 @@ type StepState = {
  * In testing the real implementation is kept because it can be mocked.
  */
 const createDemoSteps = (steps: TransactionStep[]): TransactionStep[] => {
-  if (process.env.NODE_ENV !== 'test') {
+  if (process.env.NODE_ENV !== 'test' && process.env.NEXT_PUBLIC_CONTRACT_MOCKING !== 'disabled') {
     return steps.map(({ transaction, ...props }, index) => {
       const signTimeout = Math.random() * 1000;
       const mineTimeout = Math.random() * 1000;
@@ -136,7 +136,8 @@ export default function TransactionDialogProvider({ children }: { children: Reac
               setTimeout(() => setActiveStep(undefined), 5000);
             }
           })
-          .catch(() => {
+          .catch((err) => {
+            console.log('Transaction ERROR: ', err);
             enqueueSnackbar('Transaction was rejected.', { variant: 'error' });
           });
       });

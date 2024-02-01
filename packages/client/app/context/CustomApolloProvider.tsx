@@ -205,7 +205,7 @@ const getProductionCacheConfig = ({
                 borrower
               ) {
                 SchemaDataFreshnessManager.DebtToken[tokenData.address].troveMintedAmount.fetch({
-                  troveManagerContract: troveManagerContract,
+                  troveManagerContract,
                   borrower,
                 });
               }
@@ -228,10 +228,10 @@ const getProductionCacheConfig = ({
                 isFieldOutdated(SchemaDataFreshnessManager.DebtToken[tokenData.address], 'troveRepableDebtAmount') &&
                 borrower
               ) {
-                SchemaDataFreshnessManager.DebtToken[tokenData.address].troveRepableDebtAmount.fetch(
+                SchemaDataFreshnessManager.DebtToken[tokenData.address].troveRepableDebtAmount.fetch({
                   troveManagerContract,
                   borrower,
-                );
+                });
               }
               return SchemaDataFreshnessManager.DebtToken[tokenData.address].troveRepableDebtAmount.value();
             }
