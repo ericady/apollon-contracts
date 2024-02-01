@@ -13,6 +13,7 @@ import {
   ReservePool,
   SortedTroves,
   HintHelpers,
+  CollSurplusPool,
 } from '../typechain';
 import { parseUnits } from 'ethers';
 
@@ -25,6 +26,7 @@ export interface Contracts {
   hintHelpers: HintHelpers;
   stabilityPoolManager: MockStabilityPoolManager;
   storagePool: StoragePool;
+  collSurplusPool: CollSurplusPool;
   reservePool: ReservePool;
   collTokenManager: CollTokenManager;
   debtTokenManager: DebtTokenManager;
@@ -59,6 +61,9 @@ export const deployCore = async (): Promise<Contracts> => {
   const storagePoolFactory = await ethers.getContractFactory('StoragePool');
   const storagePool = await storagePoolFactory.deploy();
 
+  const collSurplusPoolFactory = await ethers.getContractFactory('CollSurplusPool');
+  const collSurplusPool = await collSurplusPoolFactory.deploy();
+
   const reservePoolFactory = await ethers.getContractFactory('ReservePool');
   const reservePool = await reservePoolFactory.deploy();
 
@@ -83,6 +88,7 @@ export const deployCore = async (): Promise<Contracts> => {
     hintHelpers,
     stabilityPoolManager,
     storagePool,
+    collSurplusPool,
     reservePool,
     collTokenManager,
     debtTokenManager,
@@ -121,7 +127,8 @@ export const connectCoreContracts = async (contracts: Contracts) => {
     contracts.debtTokenManager,
     contracts.collTokenManager,
     contracts.swapOperations,
-    contracts.sortedTroves
+    contracts.sortedTroves,
+    contracts.collSurplusPool
   );
 
   await contracts.redemptionOperations.setAddresses(
@@ -139,7 +146,8 @@ export const connectCoreContracts = async (contracts: Contracts) => {
     contracts.priceFeed,
     contracts.debtTokenManager,
     contracts.collTokenManager,
-    contracts.stabilityPoolManager
+    contracts.stabilityPoolManager,
+    contracts.collSurplusPool
   );
 
   await contracts.storagePool.setAddresses(
@@ -169,6 +177,8 @@ export const connectCoreContracts = async (contracts: Contracts) => {
     contracts.priceFeed,
     contracts.debtTokenManager
   );
+
+  await contracts.collSurplusPool.setAddresses(contracts.liquidationOperations, contracts.borrowerOperations);
 };
 
 export const deployAndLinkToken = async (contracts: Contracts) => {

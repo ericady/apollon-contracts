@@ -959,6 +959,11 @@
                         "internalType": "uint256",
                         "name": "toOffset",
                         "type": "uint256"
+                    },
+                    {
+                        "internalType": "uint256",
+                        "name": "collSurplus",
+                        "type": "uint256"
                     }
                 ],
                 "internalType": "struct IBase.RAmount[]",

@@ -26,6 +26,7 @@ interface IBase {
     uint toLiquidate; // amount + pendingReward - gasCompensation
     uint toRedistribute; // across other open troves
     uint toOffset; // by stability pools
+    uint collSurplus; // coll only, in case of an ICR > MCR liquidation
   }
 
   struct CAmount {

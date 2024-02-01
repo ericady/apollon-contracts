@@ -16,7 +16,8 @@ interface ILiquidationOperations is IBBase {
     address _priceFeed,
     address _debtTokenManager,
     address _collTokenManager,
-    address _stabilityPoolManager
+    address _stabilityPoolManager,
+    address _collSurplusPool
   );
 
   event LiquidationSummary(

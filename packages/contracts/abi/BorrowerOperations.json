@@ -177,6 +177,12 @@
                 "internalType": "address",
                 "name": "_sortedTrovesAddress",
                 "type": "address"
+            },
+            {
+                "indexed": false,
+                "internalType": "address",
+                "name": "_collSurplusPoolAddress",
+                "type": "address"
             }
         ],
         "name": "BorrowerOperationsInitialized",
@@ -432,9 +438,29 @@
     },
     {
         "inputs": [],
+        "name": "claimCollateral",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [],
         "name": "closeTrove",
         "outputs": [],
         "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [],
+        "name": "collSurplusPool",
+        "outputs": [
+            {
+                "internalType": "contract ICollSurplusPool",
+                "name": "",
+                "type": "address"
+            }
+        ],
+        "stateMutability": "view",
         "type": "function"
     },
     {
@@ -747,6 +773,11 @@
             {
                 "internalType": "address",
                 "name": "_sortedTrovesAddress",
+                "type": "address"
+            },
+            {
+                "internalType": "address",
+                "name": "_collSurplusPoolAddress",
                 "type": "address"
             }
         ],

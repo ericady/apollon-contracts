@@ -4,7 +4,6 @@ pragma solidity ^0.8.9;
 
 import './IBase.sol';
 
-// Common interface for the Pools.
 interface IStoragePool is IBase {
   // --- Events ---
 

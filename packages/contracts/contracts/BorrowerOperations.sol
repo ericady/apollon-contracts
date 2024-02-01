@@ -16,6 +16,7 @@ import './Interfaces/IPriceFeed.sol';
 import './Interfaces/IBBase.sol';
 import './Interfaces/ICollTokenManager.sol';
 import './Interfaces/ISortedTroves.sol';
+import './Interfaces/ICollSurplusPool.sol';
 
 contract BorrowerOperations is LiquityBase, Ownable(msg.sender), CheckContract, IBorrowerOperations {
   string public constant NAME = 'BorrowerOperations';
@@ -29,11 +30,9 @@ contract BorrowerOperations is LiquityBase, Ownable(msg.sender), CheckContract, 
   IReservePool public reservePool;
   IPriceFeed public priceFeed;
   ISortedTroves public sortedTroves;
+  ICollSurplusPool public collSurplusPool;
   address stabilityPoolAddress;
   address swapOperations;
-
-  //    ILQTYStaking public lqtyStaking;
-  //    address public lqtyStakingAddress;
 
   /* --- Variable container structs  ---
 
@@ -102,7 +101,8 @@ contract BorrowerOperations is LiquityBase, Ownable(msg.sender), CheckContract, 
     address _debtTokenManagerAddress,
     address _collTokenManagerAddress,
     address _swapOperationsAddress,
-    address _sortedTrovesAddress
+    address _sortedTrovesAddress,
+    address _collSurplusPoolAddress
   ) external onlyOwner {
     checkContract(_troveManagerAddress);
     checkContract(_storagePoolAddress);
@@ -113,6 +113,7 @@ contract BorrowerOperations is LiquityBase, Ownable(msg.sender), CheckContract, 
     checkContract(_collTokenManagerAddress);
     checkContract(_swapOperationsAddress);
     checkContract(_sortedTrovesAddress);
+    checkContract(_collSurplusPoolAddress);
 
     troveManager = ITroveManager(_troveManagerAddress);
     storagePool = IStoragePool(_storagePoolAddress);
@@ -123,6 +124,7 @@ contract BorrowerOperations is LiquityBase, Ownable(msg.sender), CheckContract, 
     collTokenManager = ICollTokenManager(_collTokenManagerAddress);
     swapOperations = _swapOperationsAddress;
     sortedTroves = ISortedTroves(_sortedTrovesAddress);
+    collSurplusPool = ICollSurplusPool(_collSurplusPoolAddress);
 
     emit BorrowerOperationsInitialized(
       _troveManagerAddress,
@@ -133,7 +135,8 @@ contract BorrowerOperations is LiquityBase, Ownable(msg.sender), CheckContract, 
       _debtTokenManagerAddress,
       _collTokenManagerAddress,
       _swapOperationsAddress,
-      _sortedTrovesAddress
+      _sortedTrovesAddress,
+      _collSurplusPoolAddress
     );
 
     renounceOwnership();
@@ -470,6 +473,13 @@ contract BorrowerOperations is LiquityBase, Ownable(msg.sender), CheckContract, 
 
     contractsCache.troveManager.removeStake(vars.collTokenAddresses, borrower);
     contractsCache.troveManager.closeTroveByProtocol(vars.collTokenAddresses, borrower, Status.closedByOwner);
+  }
+
+  /**
+   * Claim remaining collateral from a redemption or from a liquidation with ICR > MCR in Recovery Mode
+   */
+  function claimCollateral() external override {
+    collSurplusPool.claimColl(msg.sender);
   }
 
   // --- Helper functions ---

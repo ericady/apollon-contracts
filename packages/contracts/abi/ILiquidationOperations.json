@@ -52,6 +52,12 @@
                 "internalType": "address",
                 "name": "_stabilityPoolManager",
                 "type": "address"
+            },
+            {
+                "indexed": false,
+                "internalType": "address",
+                "name": "_collSurplusPool",
+                "type": "address"
             }
         ],
         "name": "LiquidationOperationsInitialized",

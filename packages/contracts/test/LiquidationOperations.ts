@@ -25,7 +25,7 @@ import {
 import { assert, expect } from 'chai';
 import { formatUnits, parseUnits } from 'ethers';
 
-describe('LiquidationOperations', () => {
+describe.only('LiquidationOperations', () => {
   let signers: SignerWithAddress[];
   let owner: SignerWithAddress;
   let alice: SignerWithAddress;

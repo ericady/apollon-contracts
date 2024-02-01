@@ -17,7 +17,8 @@ interface IBorrowerOperations is IBBase {
     address _debtTokenManagerAddress,
     address _collTokenManagerAddress,
     address _swapOperationsAddress,
-    address _sortedTrovesAddress
+    address _sortedTrovesAddress,
+    address _collSurplusPoolAddress
   );
   event TroveCreated(address _borrower, uint arrayIndex);
   event PaidBorrowingFee(address indexed _borrower, uint amount);
@@ -62,6 +63,8 @@ interface IBorrowerOperations is IBBase {
   ) external;
 
   function closeTrove() external;
+
+  function claimCollateral() external;
 
   function getCompositeDebt(DebtTokenAmount[] memory _debts) external view returns (uint);
 }

@@ -556,7 +556,7 @@ contract TroveManager is LiquityBase, Ownable(msg.sender), CheckContract, ITrove
     // initialize empty coll tokens
     for (uint i = 0; i < trove.collTokens.length; i++) {
       address token = address(trove.collTokens[i]);
-      amounts[i] = RAmount(token, true, trove.colls[trove.collTokens[i]], 0, 0, 0, 0, 0);
+      amounts[i] = RAmount(token, true, trove.colls[trove.collTokens[i]], 0, 0, 0, 0, 0, 0);
     }
 
     // initialize empty debt tokens and find the stable entry
@@ -565,7 +565,7 @@ contract TroveManager is LiquityBase, Ownable(msg.sender), CheckContract, ITrove
       if (trove.debtTokens[i].isStableCoin()) stableCoinIndex = i + trove.collTokens.length;
 
       address token = address(trove.debtTokens[i]);
-      amounts[i + trove.collTokens.length] = RAmount(token, false, trove.debts[trove.debtTokens[i]], 0, 0, 0, 0, 0);
+      amounts[i + trove.collTokens.length] = RAmount(token, false, trove.debts[trove.debtTokens[i]], 0, 0, 0, 0, 0, 0);
     }
 
     // applying rewards (from default pool) + adding gas compensation + toLiquidate

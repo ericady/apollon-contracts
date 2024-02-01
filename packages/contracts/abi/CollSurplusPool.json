@@ -1,22 +1,17 @@
 [
     {
         "inputs": [],
-        "name": "EmptyArray",
-        "type": "error"
-    },
-    {
-        "inputs": [],
         "name": "FeeExceedMaxPercentage",
         "type": "error"
     },
     {
         "inputs": [],
-        "name": "NoLiquidatableTrove",
+        "name": "NotContract",
         "type": "error"
     },
     {
         "inputs": [],
-        "name": "NotContract",
+        "name": "NotFromProtocol",
         "type": "error"
     },
     {
@@ -50,116 +45,63 @@
         "anonymous": false,
         "inputs": [
             {
-                "indexed": false,
+                "indexed": true,
                 "internalType": "address",
-                "name": "_troveManager",
+                "name": "_account",
                 "type": "address"
             },
             {
+                "components": [
+                    {
+                        "internalType": "address",
+                        "name": "tokenAddress",
+                        "type": "address"
+                    },
+                    {
+                        "internalType": "uint256",
+                        "name": "amount",
+                        "type": "uint256"
+                    }
+                ],
                 "indexed": false,
-                "internalType": "address",
-                "name": "_storgePool",
-                "type": "address"
-            },
-            {
-                "indexed": false,
-                "internalType": "address",
-                "name": "_priceFeed",
-                "type": "address"
-            },
-            {
-                "indexed": false,
-                "internalType": "address",
-                "name": "_debtTokenManager",
-                "type": "address"
-            },
-            {
-                "indexed": false,
-                "internalType": "address",
-                "name": "_collTokenManager",
-                "type": "address"
-            },
-            {
-                "indexed": false,
-                "internalType": "address",
-                "name": "_stabilityPoolManager",
-                "type": "address"
-            },
-            {
-                "indexed": false,
-                "internalType": "address",
-                "name": "_collSurplusPool",
-                "type": "address"
+                "internalType": "struct IBase.TokenAmount[]",
+                "name": "_collSurplus",
+                "type": "tuple[]"
             }
         ],
-        "name": "LiquidationOperationsInitialized",
+        "name": "CollBalanceUpdated",
         "type": "event"
     },
     {
         "anonymous": false,
         "inputs": [
             {
-                "components": [
-                    {
-                        "internalType": "address",
-                        "name": "tokenAddress",
-                        "type": "address"
-                    },
-                    {
-                        "internalType": "uint256",
-                        "name": "amount",
-                        "type": "uint256"
-                    }
-                ],
                 "indexed": false,
-                "internalType": "struct IBase.TokenAmount[]",
-                "name": "liquidatedDebt",
-                "type": "tuple[]"
-            },
-            {
-                "components": [
-                    {
-                        "internalType": "address",
-                        "name": "tokenAddress",
-                        "type": "address"
-                    },
-                    {
-                        "internalType": "uint256",
-                        "name": "amount",
-                        "type": "uint256"
-                    }
-                ],
-                "indexed": false,
-                "internalType": "struct IBase.TokenAmount[]",
-                "name": "liquidatedColl",
-                "type": "tuple[]"
-            },
-            {
-                "indexed": false,
-                "internalType": "uint256",
-                "name": "totalStableCoinGasCompensation",
-                "type": "uint256"
-            },
-            {
-                "components": [
-                    {
-                        "internalType": "address",
-                        "name": "tokenAddress",
-                        "type": "address"
-                    },
-                    {
-                        "internalType": "uint256",
-                        "name": "amount",
-                        "type": "uint256"
-                    }
-                ],
-                "indexed": false,
-                "internalType": "struct IBase.TokenAmount[]",
-                "name": "totalCollGasCompensation",
-                "type": "tuple[]"
+                "internalType": "address",
+                "name": "_to",
+                "type": "address"
             }
         ],
-        "name": "LiquidationSummary",
+        "name": "CollClaimed",
+        "type": "event"
+    },
+    {
+        "anonymous": false,
+        "inputs": [
+            {
+                "indexed": false,
+                "internalType": "address",
+                "name": "_liquidationOperationsAddress",
+                "type": "address"
+            },
+            {
+                "indexed": false,
+                "internalType": "address",
+                "name": "_borrowerOperationsAddress",
+                "type": "address"
+            }
+        ],
+        "name": "CollSurplusPoolInitialized",
         "type": "event"
     },
     {
@@ -340,48 +282,74 @@
     {
         "inputs": [
             {
-                "internalType": "address[]",
-                "name": "_troveArray",
-                "type": "address[]"
+                "internalType": "address",
+                "name": "_account",
+                "type": "address"
+            },
+            {
+                "components": [
+                    {
+                        "internalType": "address",
+                        "name": "tokenAddress",
+                        "type": "address"
+                    },
+                    {
+                        "internalType": "bool",
+                        "name": "isColl",
+                        "type": "bool"
+                    },
+                    {
+                        "internalType": "uint256",
+                        "name": "amount",
+                        "type": "uint256"
+                    },
+                    {
+                        "internalType": "uint256",
+                        "name": "pendingReward",
+                        "type": "uint256"
+                    },
+                    {
+                        "internalType": "uint256",
+                        "name": "gasCompensation",
+                        "type": "uint256"
+                    },
+                    {
+                        "internalType": "uint256",
+                        "name": "toLiquidate",
+                        "type": "uint256"
+                    },
+                    {
+                        "internalType": "uint256",
+                        "name": "toRedistribute",
+                        "type": "uint256"
+                    },
+                    {
+                        "internalType": "uint256",
+                        "name": "toOffset",
+                        "type": "uint256"
+                    },
+                    {
+                        "internalType": "uint256",
+                        "name": "collSurplus",
+                        "type": "uint256"
+                    }
+                ],
+                "internalType": "struct IBase.RAmount[]",
+                "name": "_collSurplus",
+                "type": "tuple[]"
             }
         ],
-        "name": "batchLiquidateTroves",
+        "name": "accountSurplus",
         "outputs": [],
         "stateMutability": "nonpayable",
         "type": "function"
     },
     {
         "inputs": [],
-        "name": "collSurplusPool",
+        "name": "borrowerOperationsAddress",
         "outputs": [
             {
-                "internalType": "contract ICollSurplusPool",
-                "name": "",
-                "type": "address"
-            }
-        ],
-        "stateMutability": "view",
-        "type": "function"
-    },
-    {
-        "inputs": [],
-        "name": "collTokenManager",
-        "outputs": [
-            {
-                "internalType": "contract ICollTokenManager",
-                "name": "",
-                "type": "address"
-            }
-        ],
-        "stateMutability": "view",
-        "type": "function"
-    },
-    {
-        "inputs": [],
-        "name": "debtTokenManager",
-        "outputs": [
-            {
-                "internalType": "contract IDebtTokenManager",
+                "internalType": "address",
                 "name": "",
                 "type": "address"
             }
@@ -393,18 +361,49 @@
         "inputs": [
             {
                 "internalType": "address",
-                "name": "_borrower",
+                "name": "_account",
                 "type": "address"
             }
         ],
-        "name": "liquidate",
+        "name": "claimColl",
         "outputs": [],
         "stateMutability": "nonpayable",
         "type": "function"
     },
     {
+        "inputs": [
+            {
+                "internalType": "address",
+                "name": "_account",
+                "type": "address"
+            }
+        ],
+        "name": "getCollateral",
+        "outputs": [
+            {
+                "components": [
+                    {
+                        "internalType": "address",
+                        "name": "tokenAddress",
+                        "type": "address"
+                    },
+                    {
+                        "internalType": "uint256",
+                        "name": "amount",
+                        "type": "uint256"
+                    }
+                ],
+                "internalType": "struct IBase.TokenAmount[]",
+                "name": "",
+                "type": "tuple[]"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
         "inputs": [],
-        "name": "owner",
+        "name": "liquidationOperationsAddress",
         "outputs": [
             {
                 "internalType": "address",
@@ -417,10 +416,10 @@
     },
     {
         "inputs": [],
-        "name": "priceFeed",
+        "name": "owner",
         "outputs": [
             {
-                "internalType": "contract IPriceFeed",
+                "internalType": "address",
                 "name": "",
                 "type": "address"
             }
@@ -439,69 +438,18 @@
         "inputs": [
             {
                 "internalType": "address",
-                "name": "_troveManagerAddress",
+                "name": "_liquidationOperationsAddress",
                 "type": "address"
             },
             {
                 "internalType": "address",
-                "name": "_storagePoolAddress",
-                "type": "address"
-            },
-            {
-                "internalType": "address",
-                "name": "_priceFeedAddress",
-                "type": "address"
-            },
-            {
-                "internalType": "address",
-                "name": "_debtTokenManagerAddress",
-                "type": "address"
-            },
-            {
-                "internalType": "address",
-                "name": "_collTokenManagerAddress",
-                "type": "address"
-            },
-            {
-                "internalType": "address",
-                "name": "_stabilityPoolManagerAddress",
-                "type": "address"
-            },
-            {
-                "internalType": "address",
-                "name": "_collSurplusPoolAddress",
+                "name": "_borrowerOperationsAddress",
                 "type": "address"
             }
         ],
         "name": "setAddresses",
         "outputs": [],
         "stateMutability": "nonpayable",
-        "type": "function"
-    },
-    {
-        "inputs": [],
-        "name": "stabilityPoolManager",
-        "outputs": [
-            {
-                "internalType": "contract IStabilityPoolManager",
-                "name": "",
-                "type": "address"
-            }
-        ],
-        "stateMutability": "view",
-        "type": "function"
-    },
-    {
-        "inputs": [],
-        "name": "storagePool",
-        "outputs": [
-            {
-                "internalType": "contract IStoragePool",
-                "name": "",
-                "type": "address"
-            }
-        ],
-        "stateMutability": "view",
         "type": "function"
     },
     {
@@ -515,19 +463,6 @@
         "name": "transferOwnership",
         "outputs": [],
         "stateMutability": "nonpayable",
-        "type": "function"
-    },
-    {
-        "inputs": [],
-        "name": "troveManager",
-        "outputs": [
-            {
-                "internalType": "contract ITroveManager",
-                "name": "",
-                "type": "address"
-            }
-        ],
-        "stateMutability": "view",
         "type": "function"
     }
 ]
