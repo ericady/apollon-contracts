@@ -27,8 +27,11 @@ import {
   withdrawalColl,
   increaseDebt,
   repayDebt,
+  getDomain,
+  PermitTypes,
+  getHints,
 } from '../utils/testHelper';
-import { parseUnits } from 'ethers';
+import { AbiCoder, Signature, keccak256, parseUnits, solidityPacked, toUtf8Bytes } from 'ethers';
 import { time } from '@nomicfoundation/hardhat-network-helpers';
 import apollonTesting from '../ignition/modules/apollonTesting';
 
@@ -118,6 +121,44 @@ describe('BorrowerOperations', () => {
       // Add 1 BTC
       const collTopUp = parseUnits('1', 9);
       await addColl(alice, contracts, [{ tokenAddress: BTC, amount: collTopUp }], true);
+
+      const pool_BTC_After = await storagePool.getValue(BTC, true, 0);
+      const pool_RawBTC_After = await BTC.balanceOf(storagePool);
+      expect(pool_BTC_After).to.be.equal(pool_BTC_Before + collTopUp);
+      expect(pool_RawBTC_After).to.be.equal(pool_RawBTC_Before + collTopUp);
+    });
+    it('add collaterals with permit', async () => {
+      const aliceColl = parseUnits('0.05', 9);
+      await open(alice, aliceColl, parseUnits('150'));
+
+      const pool_BTC_Before = await storagePool.getValue(BTC, true, 0);
+      const pool_RawBTC_Before = await BTC.balanceOf(storagePool);
+
+      expect(pool_BTC_Before).to.be.equal(aliceColl);
+      expect(pool_RawBTC_Before).to.be.equal(aliceColl);
+
+      // Add 1 BTC
+      const collTopUp = parseUnits('1', 9);
+      const amount = parseUnits('1', 9);
+      const deadline = 100000000000000;
+      const nonce = await BTC.nonces(alice);
+      const domain = await getDomain(BTC);
+      const signature = await alice.signTypedData(domain, PermitTypes, {
+        owner: alice.address,
+        spender: borrowerOperations.target,
+        value: amount,
+        nonce: nonce,
+        deadline: deadline,
+      });
+      const { v, r, s } = Signature.from(signature);
+      const collaterals = [{ tokenAddress: BTC, amount: collTopUp }];
+      const afterPathCR = await contracts.troveManager.getICRIncludingPatch(alice, collaterals, [], [], []);
+      const [upperHint, lowerHint] = await getHints(contracts, afterPathCR);
+
+      await BTC.unprotectedMint(alice, amount);
+      await borrowerOperations
+        .connect(alice)
+        .addCollWithPermit(collaterals, deadline, [v], [r], [s], upperHint, lowerHint);
 
       const pool_BTC_After = await storagePool.getValue(BTC, true, 0);
       const pool_RawBTC_After = await BTC.balanceOf(storagePool);
@@ -1945,6 +1986,37 @@ describe('BorrowerOperations', () => {
         collToken: BTC,
         collAmount: parseUnits('1', 9),
       });
+      expect(await troveManager.getTroveStatus(alice)).to.be.equal(1);
+    });
+
+    it('opens a trove with permit', async () => {
+      const amount = parseUnits('1', 9);
+      const deadline = 100000000000000;
+      const nonce = await BTC.nonces(alice);
+      const domain = await getDomain(BTC);
+      const signature = await alice.signTypedData(domain, PermitTypes, {
+        owner: alice.address,
+        spender: borrowerOperations.target,
+        value: amount,
+        nonce: nonce,
+        deadline: deadline,
+      });
+      const { v, r, s } = Signature.from(signature);
+
+      await BTC.unprotectedMint(alice, amount);
+      await borrowerOperations.connect(alice).openTroveWithPermit(
+        [
+          {
+            tokenAddress: BTC,
+            amount: amount,
+          },
+        ],
+        deadline,
+        [v],
+        [r],
+        [s]
+      );
+
       expect(await troveManager.getTroveStatus(alice)).to.be.equal(1);
     });
 

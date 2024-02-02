@@ -1,6 +1,6 @@
 import { SignerWithAddress } from '@nomicfoundation/hardhat-ethers/signers';
 import { time } from '@nomicfoundation/hardhat-network-helpers';
-import { MockDebtToken, MockERC20, StabilityPoolManager, contracts } from '../typechain';
+import { EIP712, MockDebtToken, MockERC20, StabilityPoolManager, contracts } from '../typechain';
 import { Contracts } from './deploymentHelpers';
 import { ethers } from 'hardhat';
 import { expect } from 'chai';
@@ -9,6 +9,26 @@ import { parseUnits } from 'ethers';
 import { AddressZero } from '@ethersproject/constants';
 
 export const MAX_BORROWING_FEE = parseUnits('0.05');
+
+export const PermitTypes = {
+  Permit: [
+    { name: 'owner', type: 'address' },
+    { name: 'spender', type: 'address' },
+    { name: 'value', type: 'uint256' },
+    { name: 'nonce', type: 'uint256' },
+    { name: 'deadline', type: 'uint256' },
+  ],
+};
+
+export const getDomain = async (token: EIP712) => {
+  const domain = await token.eip712Domain();
+  return {
+    chainId: domain.chainId,
+    name: domain.name,
+    verifyingContract: domain.verifyingContract,
+    version: domain.version,
+  };
+};
 
 export const openTrove = async ({
   from,
@@ -89,7 +109,7 @@ export const redeem = async (
   let lastIteration;
   let stableRemaining: bigint = toRedeem;
   while (stableRemaining > 0n) {
-    let trove = lastIteration
+    let trove: any = lastIteration
       ? await contracts.sortedTroves.getPrev(lastIteration.trove)
       : await contracts.sortedTroves.getLast();
 
@@ -116,7 +136,7 @@ export const redeem = async (
   return contracts.redemptionOperations.connect(from).redeemCollateral(toRedeem, iterations, maxFeePercentage);
 };
 
-async function getHints(contracts: Contracts, cr: bigint) {
+export async function getHints(contracts: Contracts, cr: bigint) {
   let hint;
   const amountStableTroves = await contracts.sortedTroves.getSize();
   if (amountStableTroves === 0n) hint = AddressZero;
@@ -305,8 +325,12 @@ export const getStableFeeFromStableBorrowingEvent = async (
 export const getRedemptionMeta = async (tx: ContractTransactionResponse | null, contracts: Contracts) => {
   const receipt = await tx?.wait();
 
-  const meta = {
+  const meta: {
+    redemptions: any[];
+    totals: any[];
+  } = {
     redemptions: [],
+    totals: [],
   };
   for (const log of receipt?.logs ?? []) {
     const logData = contracts.redemptionOperations.interface.parseLog(log as any);
