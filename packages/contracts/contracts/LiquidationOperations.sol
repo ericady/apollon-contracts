@@ -216,7 +216,11 @@ contract LiquidationOperations is LiquityBase, Ownable(msg.sender), CheckContrac
       );
     }
 
-    troveManager.closeTroveByProtocol(outerVars.collTokenAddresses, trove, Status.closedByLiquidationInNormalMode);
+    troveManager.closeTroveByProtocol(
+      outerVars.collTokenAddresses,
+      trove,
+      outerVars.isRecoveryMode ? Status.closedByLiquidationInRecoveryMode : Status.closedByLiquidationInNormalMode
+    );
     _mergeCollGasAndSurplusCompensation(
       vars.troveAmountsIncludingRewards,
       outerVars.totalCollGasCompensation,
