@@ -28,6 +28,21 @@ interface ISwapOperations is IBBase {
   );
   event PairCreated(address indexed token0, address indexed token1, address pair, uint);
 
+  struct RemoveLiquidtyPermitParams {
+    address tokenA;
+    address tokenB;
+    uint liquidity;
+    uint amountAMin;
+    uint amountBMin;
+    uint deadline;
+    bool approveMax;
+    address _upperHint;
+    address _lowerHint;
+    uint8 v;
+    bytes32 r;
+    bytes32 s;
+  }
+
   // **** GETTER ****
 
   function allPairs(uint) external view returns (address pair);
@@ -78,7 +93,7 @@ interface ISwapOperations is IBBase {
     uint amountBDesired,
     uint amountAMin,
     uint amountBMin,
-    uint _maxMintFeePercentage,
+    MintMeta memory _mintMeta,
     uint deadline,
     uint8[] memory v,
     bytes32[] memory r,
@@ -98,16 +113,7 @@ interface ISwapOperations is IBBase {
   ) external returns (uint amountA, uint amountB);
 
   function removeLiquidityWithPermit(
-    address tokenA,
-    address tokenB,
-    uint liquidity,
-    uint amountAMin,
-    uint amountBMin,
-    uint deadline,
-    bool approveMax,
-    uint8 v,
-    bytes32 r,
-    bytes32 s
+    RemoveLiquidtyPermitParams memory params
   ) external returns (uint amountA, uint amountB);
 
   function swapExactTokensForTokens(

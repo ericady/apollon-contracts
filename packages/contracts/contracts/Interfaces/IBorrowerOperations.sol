@@ -62,7 +62,9 @@ interface IBorrowerOperations is IBBase {
     uint deadline,
     uint8[] memory v,
     bytes32[] memory r,
-    bytes32[] memory s
+    bytes32[] memory s,
+    address _upperHint,
+    address _lowerHint
   ) external;
 
   function withdrawColl(TokenAmount[] memory _colls, address _upperHint, address _lowerHint) external;

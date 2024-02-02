@@ -267,6 +267,16 @@
                 "internalType": "bytes32[]",
                 "name": "s",
                 "type": "bytes32[]"
+            },
+            {
+                "internalType": "address",
+                "name": "_upperHint",
+                "type": "address"
+            },
+            {
+                "internalType": "address",
+                "name": "_lowerHint",
+                "type": "address"
             }
         ],
         "name": "addCollWithPermit",

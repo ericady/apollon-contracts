@@ -279,7 +279,9 @@ contract BorrowerOperations is LiquityBase, Ownable(msg.sender), CheckContract, 
     uint deadline,
     uint8[] memory v,
     bytes32[] memory r,
-    bytes32[] memory s
+    bytes32[] memory s,
+    address _upperHint,
+    address _lowerHint
   ) external {
     for (uint i = 0; i < _colls.length; i++) {
       IERC20Permit(_colls[i].tokenAddress).permit(
@@ -292,7 +294,7 @@ contract BorrowerOperations is LiquityBase, Ownable(msg.sender), CheckContract, 
         s[i]
       );
     }
-    addColl(_colls);
+    addColl(_colls, _upperHint, _lowerHint);
   }
 
   // Withdraw collateral from a trove

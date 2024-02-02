@@ -230,7 +230,7 @@ contract SwapOperations is ISwapOperations, Ownable(msg.sender), CheckContract, 
     uint amountBDesired,
     uint amountAMin,
     uint amountBMin,
-    uint _maxMintFeePercentage,
+    MintMeta memory _mintMeta,
     uint deadline,
     uint8[] memory v,
     bytes32[] memory r,
@@ -238,17 +238,7 @@ contract SwapOperations is ISwapOperations, Ownable(msg.sender), CheckContract, 
   ) external returns (uint amountA, uint amountB, uint liquidity) {
     IERC20Permit(tokenA).permit(msg.sender, address(this), amountADesired, deadline, v[0], r[0], s[0]);
     IERC20Permit(tokenB).permit(msg.sender, address(this), amountBDesired, deadline, v[1], r[1], s[1]);
-    return
-      addLiquidity(
-        tokenA,
-        tokenB,
-        amountADesired,
-        amountBDesired,
-        amountAMin,
-        amountBMin,
-        _maxMintFeePercentage,
-        deadline
-      );
+    return addLiquidity(tokenA, tokenB, amountADesired, amountBDesired, amountAMin, amountBMin, _mintMeta, deadline);
   }
 
   struct RemovalVars {
@@ -297,21 +287,22 @@ contract SwapOperations is ISwapOperations, Ownable(msg.sender), CheckContract, 
   }
 
   function removeLiquidityWithPermit(
-    address tokenA,
-    address tokenB,
-    uint liquidity,
-    uint amountAMin,
-    uint amountBMin,
-    uint deadline,
-    bool approveMax,
-    uint8 v,
-    bytes32 r,
-    bytes32 s
-  ) external virtual override returns (uint amountA, uint amountB) {
-    address pair = getPair[tokenA][tokenB];
-    uint value = approveMax ? type(uint).max : liquidity;
-    ISwapPair(pair).permit(msg.sender, address(this), value, deadline, v, r, s);
-    (amountA, amountB) = removeLiquidity(tokenA, tokenB, liquidity, amountAMin, amountBMin, deadline);
+    RemoveLiquidtyPermitParams memory params
+  ) external virtual override returns (uint, uint) {
+    uint value = params.approveMax ? type(uint).max : params.liquidity;
+    address pair = getPair[params.tokenA][params.tokenB];
+    ISwapPair(pair).permit(msg.sender, address(this), value, params.deadline, params.v, params.r, params.s);
+    return
+      removeLiquidity(
+        params.tokenA,
+        params.tokenB,
+        params.liquidity,
+        params.amountAMin,
+        params.amountBMin,
+        params._upperHint,
+        params._lowerHint,
+        params.deadline
+      );
   }
 
   // **** SWAP ****
