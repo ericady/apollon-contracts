@@ -9,6 +9,7 @@ import {
   GetCollateralTokensQuery,
 } from '../generated/gql-types';
 import { GET_BORROWER_DEBT_TOKENS } from '../queries';
+import { getCheckSum } from '../utils/crypto';
 import { Contracts, useEthers } from './EthersProvider';
 
 export type SelectedToken = {
@@ -21,7 +22,10 @@ export type SelectedToken = {
   priceUSD24hAgo: bigint;
   volume30dUSD: bigint;
   pool: {
+    // id to fetch from API
     id: string;
+    // Contract address of SwapPair
+    address: string;
     liqudityPair: bigint[];
   };
 };

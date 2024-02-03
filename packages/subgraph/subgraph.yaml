@@ -266,6 +266,8 @@ dataSources:
           file: ./abis/ERC20.json
         - name: PriceFeed
           file: ./abis/PriceFeed.json
+        - name: StoragePool
+          file: ./abis/StoragePool.json
       eventHandlers:
         - event: CollTokenAdded(address)
           handler: handleCollTokenAdded

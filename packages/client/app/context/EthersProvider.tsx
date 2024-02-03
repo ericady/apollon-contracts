@@ -50,7 +50,7 @@ export const isCollateralTokenAddress = (
   address: string,
 ): address is
   | '0x59b670e9fA9D0A427751Af201D676719a970857b'
-  | '0xc6e7DF5E7b4f2A278906862b61205850344D4e7d'
+  | '0xc6e7df5e7b4f2a278906862b61205850344d4e7d'
   | '0xa82fF9aFd8f496c3d6ac40E2a0F282E47488CFc9' => {
   return Object.values(Contracts.ERC20)
     .map((address) => getCheckSum(address))
@@ -73,7 +73,7 @@ export const Contracts = {
   },
   ERC20: {
     USDT: '0x59b670e9fA9D0A427751Af201D676719a970857b',
-    BTC: '0xc6e7DF5E7b4f2A278906862b61205850344D4e7d',
+    BTC: '0xc6e7df5e7b4f2a278906862b61205850344d4e7d',
     DFI: '0xa82fF9aFd8f496c3d6ac40E2a0F282E47488CFc9',
   },
   TroveManager: '0xCf7Ed3AccA5a467e9e704C703E8D87F634fB0Fc9',
@@ -87,12 +87,11 @@ export const Contracts = {
   StoragePool: '0x5FC8d32690cc91D4c39d9d3abcBD16989F875707',
 } as const;
 
-// TODO: Remove Partial
-type AllDebtTokenContracts = Partial<{ [Key in keyof (typeof SchemaDataFreshnessManager)['DebtToken']]: DebtToken }>;
-type AllCollateralTokenContracts = Partial<{ [Key in keyof (typeof SchemaDataFreshnessManager)['ERC20']]: ERC20 }>;
-type AllSwapPairContracts = Partial<{
+type AllDebtTokenContracts = { [Key in keyof (typeof SchemaDataFreshnessManager)['DebtToken']]: DebtToken };
+type AllCollateralTokenContracts = { [Key in keyof (typeof SchemaDataFreshnessManager)['ERC20']]: ERC20 };
+type AllSwapPairContracts = {
   [Key in keyof (typeof SchemaDataFreshnessManager)['SwapPairs']]: SwapPair;
-}>;
+};
 
 export const EthersContext = createContext<{
   // provider: BrowserProvider | null;
@@ -161,17 +160,25 @@ export default function EthersProvider({ children }: { children: React.ReactNode
         const newSigner = await provider!.getSigner();
         setSigner(newSigner);
 
-        const debtTokenContract = new Contract(Contracts.DebtToken.STABLE, debtTokenAbi, provider);
-        const debtTokenContractWithSigner = debtTokenContract.connect(newSigner) as DebtToken;
-        setDebtTokenContracts({ [Contracts.DebtToken.STABLE]: debtTokenContractWithSigner });
+        const debtTokenContractStable = new Contract(Contracts.DebtToken.STABLE, debtTokenAbi, provider);
+        const debtTokenContractStableWithSigner = debtTokenContractStable.connect(newSigner) as DebtToken;
+        const debtTokenContractSTOCK_1 = new Contract(Contracts.DebtToken.STOCK_1, debtTokenAbi, provider);
+        const debtTokenContractSTOCK_1WithSigner = debtTokenContractSTOCK_1.connect(newSigner) as DebtToken;
+        setDebtTokenContracts({
+          [Contracts.DebtToken.STABLE]: debtTokenContractStableWithSigner,
+          [Contracts.DebtToken.STOCK_1]: debtTokenContractSTOCK_1WithSigner,
+        });
 
         const collateralTokenContractUSDT = new Contract(Contracts.ERC20.USDT, ERC20Abi, provider);
         const collateralTokenContractWithSignerUSDT = collateralTokenContractUSDT.connect(newSigner) as ERC20;
         const collateralTokenContractBTC = new Contract(Contracts.ERC20.BTC, ERC20Abi, provider);
         const collateralTokenContractWithSignerBTC = collateralTokenContractBTC.connect(newSigner) as ERC20;
+        const collateralTokenContractDFI = new Contract(Contracts.ERC20.DFI, ERC20Abi, provider);
+        const collateralTokenContractWithSignerDFI = collateralTokenContractDFI.connect(newSigner) as ERC20;
         setCollateralTokenContracts({
           [Contracts.ERC20.USDT]: collateralTokenContractWithSignerUSDT,
           [Contracts.ERC20.BTC]: collateralTokenContractWithSignerBTC,
+          [Contracts.ERC20.DFI]: collateralTokenContractWithSignerDFI,
         });
 
         const troveManagerContract = new Contract(
@@ -238,18 +245,28 @@ export default function EthersProvider({ children }: { children: React.ReactNode
   useEffect(() => {
     if (provider) {
       try {
-        const debtTokenContract = new Contract(
+        const debtTokenContractSTABLE = new Contract(
           Contracts.DebtToken.STABLE,
           debtTokenAbi,
           provider,
         ) as unknown as DebtToken;
-        setDebtTokenContracts({ [Contracts.DebtToken.STABLE]: debtTokenContract });
+        const debtTokenContractSTOCK_1 = new Contract(
+          Contracts.DebtToken.STOCK_1,
+          debtTokenAbi,
+          provider,
+        ) as unknown as DebtToken;
+        setDebtTokenContracts({
+          [Contracts.DebtToken.STABLE]: debtTokenContractSTABLE,
+          [Contracts.DebtToken.STOCK_1]: debtTokenContractSTOCK_1,
+        });
 
         const collateralTokenContractUSDT = new Contract(Contracts.ERC20.USDT, ERC20Abi, provider) as unknown as ERC20;
         const collateralTokenContractBTC = new Contract(Contracts.ERC20.BTC, ERC20Abi, provider) as unknown as ERC20;
+        const collateralTokenContractDFI = new Contract(Contracts.ERC20.DFI, ERC20Abi, provider) as unknown as ERC20;
         setCollateralTokenContracts({
           [Contracts.ERC20.USDT]: collateralTokenContractUSDT,
           [Contracts.ERC20.BTC]: collateralTokenContractBTC,
+          [Contracts.ERC20.DFI]: collateralTokenContractDFI,
         });
 
         const troveManagerContract = new Contract(

@@ -21,8 +21,25 @@ export function handleCreateUpdateCollateralTokenMeta(event: ethereum.Event, tok
   const storagePoolContract = StoragePool.bind(Address.fromBytes(systemInfo.storagePool));
 
   collateralTokenMeta.totalValueLockedUSD = storagePoolContract.getTokenTotalAmount(tokenAddress, true);
+  collateralTokenMeta.totalValueLockedUSD30dAverage = `TotalValueLockedAverage-${tokenAddress.toHexString()}`;
+  collateralTokenMeta.save();
 
-  handleUpdateCollateralTokenMeta_totalValueLockedUSD30dAverage(event, tokenAddress, collateralTokenMeta);
+}
+
+export const handleCreateCollateralTokenMeta_totalValueLockedUSD30dAverage = (event: ethereum.Event, tokenAddress: Address): void => {
+  const collateralTokenMeta = CollateralTokenMeta.load(`CollateralTokenMeta-${tokenAddress.toHexString()}`)!;
+
+
+  const tvlAverage = new TotalValueLockedAverage(`TotalValueLockedAverage-${tokenAddress.toHexString()}`);
+  tvlAverage.value = collateralTokenMeta.totalValueLockedUSD;
+  tvlAverage.index = 0;
+  tvlAverage.save();
+
+  // "TotalValueLockedChunk" + token + index
+  const tvlAverageFirstChunk = new TotalValueLockedChunk(`TotalValueLockedChunk-${tokenAddress.toHexString()}-0`);
+  tvlAverageFirstChunk.timestamp = event.block.timestamp;
+  tvlAverageFirstChunk.value = collateralTokenMeta.totalValueLockedUSD;
+  tvlAverageFirstChunk.save();
 }
 
 export const handleUpdateCollateralTokenMeta_totalValueLockedUSD30dAverage = (
@@ -35,19 +52,7 @@ export const handleUpdateCollateralTokenMeta_totalValueLockedUSD30dAverage = (
   }
 
   // Load Avergae or intialise it
-  let tvlAverage = TotalValueLockedAverage.load(`TotalValueLockedAverage-${tokenAddress.toHexString()}`);
-
-  if (tvlAverage === null) {
-    tvlAverage = new TotalValueLockedAverage(`TotalValueLockedAverage-${tokenAddress.toHexString()}`);
-    tvlAverage.value = collateralTokenMeta.totalValueLockedUSD;
-    tvlAverage.index = 0;
-
-    // "TotalValueLockedChunk" + token + index
-    const tvlAverageFirstChunk = new TotalValueLockedChunk(`TotalValueLockedChunk-${tokenAddress.toHexString()}-0`);
-    tvlAverageFirstChunk.timestamp = event.block.timestamp;
-    tvlAverageFirstChunk.value = collateralTokenMeta.totalValueLockedUSD;
-    tvlAverageFirstChunk.save();
-  } else {
+  const tvlAverage = TotalValueLockedAverage.load(`TotalValueLockedAverage-${tokenAddress.toHexString()}`)!;
     //  Add additional chunks the average has not been recalculated in the last 60 mins with last value (because there has been no update).
     let lastChunk = TotalValueLockedChunk.load(
       `TotalValueLockedChunk-${tokenAddress.toHexString()}-${tvlAverage.index.toString()}`,
@@ -91,10 +96,7 @@ export const handleUpdateCollateralTokenMeta_totalValueLockedUSD30dAverage = (
           .plus(tvlAverageNewChunk.value.div(dividedByChunks))
           .minus(lastChunk.value.div(dividedByChunks));
       }
-    }
   }
 
   tvlAverage.save();
-  collateralTokenMeta.totalValueLockedUSD30dAverage = tvlAverage.id;
-  collateralTokenMeta.save();
 };

@@ -180,7 +180,7 @@ const getProductionCacheConfig = ({
                 borrower
               ) {
                 SchemaDataFreshnessManager.DebtToken[tokenData.address].walletAmount.fetch(
-                  debtTokenContracts[Contracts.DebtToken.STABLE],
+                  debtTokenContracts[tokenData.address],
                   borrower,
                 );
               }
@@ -823,7 +823,6 @@ export const SchemaDataFreshnessManager: ContractDataFreshnessManager<typeof Con
         fetch: async (debtTokenContract: DebtToken, borrower: AddressLike) => {
           SchemaDataFreshnessManager.DebtToken[Contracts.DebtToken.STABLE].walletAmount.lastFetched = Date.now();
           const borrowerBalance = await debtTokenContract.balanceOf(borrower);
-
           SchemaDataFreshnessManager.DebtToken[Contracts.DebtToken.STABLE].walletAmount.value(borrowerBalance);
         },
         value: makeVar(defaultFieldValue),

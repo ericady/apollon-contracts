@@ -65,7 +65,7 @@ function Assets() {
 
     // get token address from local storage and set isFavorite if it is present
     return jUSDPools
-      .map<SelectedToken>(({ id, liquidity, swapFee, volume30dUSD }) => {
+      .map<SelectedToken>(({ id, address, liquidity, swapFee, volume30dUSD }) => {
         const [tokenA, tokenB] = liquidity;
         const token =
           getCheckSum(tokenA.token.address) === getCheckSum(Contracts.DebtToken.STABLE) ? tokenB.token : tokenA.token;
@@ -88,6 +88,7 @@ function Assets() {
           volume30dUSD: BigInt(volume30dUSD.value),
           pool: {
             id,
+            address,
             liqudityPair:
               getCheckSum(tokenA.token.address) === getCheckSum(Contracts.DebtToken.STABLE)
                 ? [BigInt(tokenA.totalAmount), BigInt(tokenB.totalAmount)]

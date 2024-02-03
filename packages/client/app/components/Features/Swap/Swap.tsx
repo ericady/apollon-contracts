@@ -7,7 +7,7 @@ import Typography from '@mui/material/Typography';
 import { ethers } from 'ethers';
 import { ChangeEvent, useEffect, useState } from 'react';
 import { FormProvider, useController, useForm } from 'react-hook-form';
-import { Contracts, useEthers } from '../../../context/EthersProvider';
+import { Contracts, isCollateralTokenAddress, isDebtTokenAddress, useEthers } from '../../../context/EthersProvider';
 import { useSelectedToken } from '../../../context/SelectedTokenProvider';
 import { useTransactionDialog } from '../../../context/TransactionDialogProvider';
 import { WIDGET_HEIGHTS } from '../../../utils/contants';
@@ -115,7 +115,7 @@ const Swap = () => {
           transaction: {
             methodCall: async () => {
               return debtTokenContracts[Contracts.DebtToken.STABLE]!.approve(
-                selectedToken!.pool.id,
+                selectedToken!.pool.address,
                 floatToBigInt(jUSDAmount),
               );
             },
@@ -144,11 +144,23 @@ const Swap = () => {
           title: `Approve spending of ${selectedToken?.symbol}`,
           transaction: {
             methodCall: async () => {
-              // @ts-ignore
-              return debtTokenContracts[selectedToken!.address].approve(
-                selectedToken!.pool.id,
-                floatToBigInt(tokenAmount),
-              );
+              if (isCollateralTokenAddress(selectedToken!.address)) {
+                return collateralTokenContracts[selectedToken!.address].approve(
+                  selectedToken!.pool.address,
+                  floatToBigInt(tokenAmount),
+                );
+              }
+
+              if (isDebtTokenAddress(selectedToken!.address)) {
+                return debtTokenContracts[selectedToken!.address].approve(
+                  selectedToken!.pool.address,
+                  floatToBigInt(tokenAmount),
+                );
+              }
+
+              // TODO: Log fall through
+              console.error('Fallthrough contract:', selectedToken!.address);
+              return new Promise(() => {});
             },
             waitForResponseOf: [],
           },
