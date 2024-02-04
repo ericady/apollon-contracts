@@ -20,6 +20,7 @@ interface IStoragePool is IBase {
   // --- Custom Errors ---
 
   error NotFromBOorTroveMorSP();
+  error PoolEntryDoesntExist();
 
   // --- Functions ---
 

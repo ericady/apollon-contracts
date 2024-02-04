@@ -71,6 +71,11 @@
     },
     {
         "inputs": [],
+        "name": "PairRequiresStable",
+        "type": "error"
+    },
+    {
+        "inputs": [],
         "name": "TransferFromFailed",
         "type": "error"
     },

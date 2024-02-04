@@ -222,6 +222,19 @@
     },
     {
         "inputs": [],
+        "name": "GOV_SWAP_FEE",
+        "outputs": [
+            {
+                "internalType": "uint32",
+                "name": "",
+                "type": "uint32"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [],
         "name": "MAX_BORROWING_FEE",
         "outputs": [
             {

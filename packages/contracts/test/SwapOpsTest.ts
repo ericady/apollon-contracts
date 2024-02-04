@@ -10,6 +10,7 @@ import {
   TroveManager,
   SwapPair,
   SwapOperations,
+  DebtTokenManager
 } from '../typechain';
 import { expect, assert } from 'chai';
 import {
@@ -28,7 +29,7 @@ import { parseUnits } from 'ethers';
 import { MockERC20Interface } from '../typechain/contracts/Mock/MockERC20';
 import apollonTesting from '../ignition/modules/apollonTesting';
 
-describe('SwapOperations', () => {
+describe.only('SwapOperations', () => {
   let signers: SignerWithAddress[];
   let owner: SignerWithAddress;
   let alice: SignerWithAddress;
@@ -46,6 +47,7 @@ describe('SwapOperations', () => {
   let STABLE: MockDebtToken;
   let STOCK: MockDebtToken;
   let BTC: MockERC20;
+  let ETH: MockERC20;
   let USDT: MockERC20;
 
   let contracts: any;
@@ -55,6 +57,7 @@ describe('SwapOperations', () => {
   let storagePool: StoragePool;
   let stabilityPoolManager: StabilityPoolManager;
   let swapOperations: SwapOperations;
+  let debtTokenManager: DebtTokenManager;
 
   const open = async (user: SignerWithAddress, collAmount: bigint, debtAmount: bigint) => {
     return await openTrove({
@@ -62,7 +65,10 @@ describe('SwapOperations', () => {
       contracts,
       collToken: BTC,
       collAmount: collAmount,
-      debts: [{ tokenAddress: STABLE, amount: debtAmount }],
+      debts: (debtAmount === parseUnits('0')
+        ? []
+        : [{ tokenAddress: STABLE, amount: debtAmount }]
+      ),
     });
   };
 
@@ -75,30 +81,71 @@ describe('SwapOperations', () => {
   };
 
   const add = async (
-    user: SignerWithAddress,
-    tokenA: MockERC20,
-    tokenB: MockERC20,
-    amountA: bigint,
-    amountB: bigint,
-    create: boolean = false
-  ): Promise<SwapPair> => {
+    user: SignerWithAddress, 
+    tokenA: MockERC20, 
+    tokenB: MockERC20, 
+    amountA: bigint, 
+    amountB: bigint, 
+    mint: boolean = true, 
+    create: boolean = true
+  ) : Promise<SwapPair> => {
     //create pair
-    if (create) {
-      await swapOperations.connect(owner).createPair(tokenA, tokenB);
+    if (create)
+    {
+      await swapOperations.connect(owner).createPair(
+        tokenA,
+        tokenB
+      );
+    }    
+
+    //mint
+    if (mint)
+    {
+      await tokenA.unprotectedMint(user, amountA);
+      await tokenB.unprotectedMint(user, amountB);
     }
 
-    //get pair
-    const pairAddress = await swapOperations.getPair(tokenA, tokenB);
-    const pair: SwapPair = await ethers.getContractAt('SwapPair', pairAddress);
-
-    //add liquidty to another pair
-    await tokenA.unprotectedMint(user, amountA);
-    await tokenB.unprotectedMint(user, amountB);
+    //approve
     await tokenA.connect(user).approve(swapOperations, amountA);
     await tokenB.connect(user).approve(swapOperations, amountB);
-    await swapOperations.connect(user).addLiquidity(tokenA, tokenB, amountA, amountB, 0, 0, 0, await deadline());
+
+    //add liquidty to pair
+    await swapOperations.connect(user).addLiquidity(
+      tokenA,
+      tokenB,
+      amountA,
+      amountB,
+      0,
+      0,
+      await swapOperations.MAX_BORROWING_FEE(),
+      await deadline()
+    );
+
+    //get pair    
+    const pairAddress = await swapOperations.getPair(
+      tokenA,
+      tokenB
+    );
+    const pair: SwapPair = await ethers.getContractAt('SwapPair', pairAddress);   
 
     return pair;
+  };
+
+  const remove = async (
+    signer: SignerWithAddress,
+    tokenA: MockERC20, 
+    tokenB: MockERC20,
+    amount: bigint
+  ) =>
+  {
+    await swapOperations.connect(signer).removeLiquidity(
+      tokenA,
+      tokenB,
+      amount,
+      0,
+      0,
+      await deadline()
+    );
   };
 
   const tokenAmount = (token: MockDebtToken, amount: bigint) => {
@@ -123,11 +170,13 @@ describe('SwapOperations', () => {
     storagePool = contracts.storagePool;
     stabilityPoolManager = contracts.stabilityPoolManager;
     swapOperations = contracts.swapOperations;
+    debtTokenManager = contracts.debtTokenManager;
 
-    STABLE = contracts.STABLE;
-    STOCK = contracts.STOCK;
-    BTC = contracts.BTC;
-    USDT = contracts.USDT;
+    STABLE = contracts.debtToken.STABLE;
+    STOCK = contracts.debtToken.STOCK;
+    BTC = contracts.collToken.BTC;
+    ETH = contracts.collToken.ETH;
+    USDT = contracts.collToken.USDT;
   });
 
   it('should not be possible to mint directly from the borrowerOps', async () => {
@@ -151,8 +200,16 @@ describe('SwapOperations', () => {
     await open(alice, parseUnits('1', 9), parseUnits('150'));
 
     //create pair & add liquidity
-    const pair = await add(alice, STABLE, STOCK, amount, amount, true);
-
+    const pair = await add(
+      alice,
+      STABLE,
+      STOCK,
+      amount,
+      amount,
+      true,
+      true
+    );
+    
     //mint
     await expect(pair.connect(alice).mint(alice)).to.be.revertedWithCustomError(pair, 'NotFromSwapOperations');
 
@@ -171,7 +228,15 @@ describe('SwapOperations', () => {
     await open(alice, parseUnits('1', 9), parseUnits('150'));
 
     //create pair & add liquidity
-    const pair = await add(alice, STABLE, STOCK, amount, amount, true);
+    const pair = await add(
+      alice,
+      STABLE,
+      STOCK,
+      amount,
+      amount,
+      true,
+      true
+    );
 
     //check if transfer function doesn't exist
     expect((pair as any).transfer).to.be.eql(undefined, 'Transfer function defined');
@@ -180,25 +245,115 @@ describe('SwapOperations', () => {
     expect((pair as any).transferFrom).to.be.eql(undefined, 'TransferFrom function defined');
   });
 
-  describe('remove liquidity', () => {
+  describe.only('remove liquidity', () => {
     it.skip('todo default uniswap tests...', async () => {
       // todo
     });
 
-    it.skip('zero borrower debts (no active trove), default uniswap behavior', async () => {
-      // todo
+    it('zero borrower debts (no active trove), default uniswap behavior', async () => {
+      const amount = parseUnits('1000');
+
+      //create pair & add liquidity (alice)
+      const pair = await add(
+        alice,
+        STABLE,
+        STOCK,
+        amount,
+        amount,
+        true,
+        true
+      );
+
+      //remove liquidity
+      await remove(
+        alice,
+        STABLE,
+        STOCK,
+        await pair.balanceOf(alice)
+      );
+      expect(await pair.balanceOf(alice)).to.be.equal(0);
     });
 
-    it.skip('empty trove (only stable gas comp debt), pool should not repay that', async () => {
-      // todo
+    it('empty trove (only stable gas comp debt), pool should not repay that', async () => {
+      const amount = parseUnits('1000');
+
+      //open trove
+      await open(alice, parseUnits('1', 9), parseUnits('0'));
+
+      //create pair & add liquidity (alice)
+      const pair = await add(
+        alice,
+        STABLE,
+        STOCK,
+        amount,
+        amount,
+        true,
+        true
+      );
+
+      //remove liquidity
+      await remove(
+        alice,
+        STABLE,
+        STOCK,
+        await pair.balanceOf(alice)
+      );
+      expect(await pair.balanceOf(alice)).to.be.equal(0);
     });
 
-    it.skip('smaller debts, complete repay expected', async () => {
-      // todo
+    it('smaller debts, complete repay expected', async () => {
+      const amount = parseUnits('1000');
+
+      //open trove
+      await open(alice, parseUnits('1', 9), parseUnits('150'));
+
+      //create pair & add liquidity (alice)
+      const pair = await add(
+        alice,
+        STABLE,
+        STOCK,
+        amount,
+        amount,
+        true,
+        true
+      );
+
+      //remove liquidity
+      await remove(
+        alice,
+        STABLE,
+        STOCK,
+        await pair.balanceOf(alice)
+      );
+      expect(await pair.balanceOf(alice)).to.be.equal(0);
     });
 
-    it.skip('huge debts, partial repay expected', async () => {
-      // todo
+    it('huge debts, partial repay expected', async () => {
+      const amount = parseUnits('1000');
+
+      //open trove
+      await open(bob, parseUnits('1', 9), parseUnits('150'));
+      await open(alice, parseUnits('1', 9), parseUnits('15000'));
+
+      //create pair & add liquidity (alice)
+      const pair = await add(
+        alice,
+        STABLE,
+        STOCK,
+        amount,
+        amount,
+        true,
+        true
+      );
+
+      //remove liquidity
+      await remove(
+        alice,
+        STABLE,
+        STOCK,
+        await pair.balanceOf(alice)
+      );
+      expect(await pair.balanceOf(alice)).to.be.equal(0);
     });
   });
 
@@ -207,22 +362,128 @@ describe('SwapOperations', () => {
       // todo
     });
 
-    it.skip('borrower has enough funds for the op, no trove needed', async () => {
-      // todo
+    it('borrower has enough funds for the op, no trove needed', async () => {
+      const amount = parseUnits('1000');
+
+      //create pair & add liquidity (bob)
+      await add(
+        bob,
+        STABLE,
+        STOCK,
+        amount,
+        amount,
+        true,
+        true
+      );
+
+      //add liquidty (alice)
+      const pair = await add(
+        alice,
+        STABLE,
+        STOCK,
+        amount,
+        amount,
+        true,
+        false
+      );
+      expect(await pair.balanceOf(alice)).to.be.greaterThan(0);
     });
 
-    it.skip('low collateral trove, minting should fail because of bad trove CR', async () => {
-      // todo
+    it('low collateral trove, minting should fail because of bad trove CR', async () => {
+      const amount = parseUnits('1000');
+
+      //create pair & add liquidity (bob)
+      await add(
+        bob,
+        STABLE,
+        STOCK,
+        amount,
+        amount,
+        true,
+        true
+      );
+
+      //open troves
+      await open(alice, parseUnits('1', 8), parseUnits('150'));
+
+      //add liquidity (alice)
+      await expect(
+        add(
+          alice,
+          STABLE,
+          STOCK,
+          amount,
+          amount,
+          false,
+          false
+        )
+      ).to.be.revertedWithCustomError(borrowerOperations, 'ICR_lt_MCR');
     });
 
-    it.skip('high collateral trove, missing token should be minted from senders trove', async () => {
-      // todo
+    it('high collateral trove, missing token should be minted from senders trove', async () => {
+      const amount = parseUnits('1000');
+
+      //create pair & add liquidity (bob)
+      await add(
+        bob,
+        STABLE,
+        STOCK,
+        amount,
+        amount,
+        true,
+        true
+      );
+
+      //open trove (alice)
+      await open(alice, parseUnits('1000', 8), parseUnits('150'));
+
+      //add liquidity without tokens (alice)
+      const pair = await add(
+        alice,
+        STABLE,
+        STOCK,
+        amount,
+        amount,
+        false,
+        false
+      );
+      expect(await pair.balanceOf(alice)).to.be.greaterThan(0);
     });
   });
 
   describe('swaps', () => {
-    it.skip('test dynamic swap fee based on oracle/dex price diff', async () => {
-      // todo
+    it('test dynamic swap fee based on oracle/dex price diff', async () => {
+      //open troves
+      await open(alice, parseUnits('1', 9), parseUnits('150'));
+
+      //create pair & add liquidity
+      const pair = await add(
+        alice,
+        STABLE,
+        STOCK,
+        parseUnits('15000'), //100 Stocks at price of 150$
+        parseUnits('100'), 
+        true,
+        true
+      );
+
+      //check initial fee
+      const baseFee = await pair.SWAP_BASE_FEE();     
+      expect(
+        await pair.getSwapFee()
+      ).to.be.eq(baseFee);      
+
+      //check dex price > oracle price
+      await priceFeed.setTokenPrice(STOCK, parseUnits('140'));
+      expect(
+        await pair.getSwapFee()
+      ).to.be.eq(baseFee);
+
+      //check dex price < oracle price
+      await priceFeed.setTokenPrice(STOCK, parseUnits('160'));
+      expect(
+        await pair.getSwapFee()
+      ).to.not.be.eq(baseFee);
     });
   });
 
@@ -235,9 +496,17 @@ describe('SwapOperations', () => {
         await open(bob, parseUnits('1', 9), parseUnits('150'));
 
         //create pair & add liquidity (bob)
-        await add(bob, STABLE, STOCK, amount, amount, true);
+        await add(
+          bob,
+          STABLE,
+          STOCK,
+          amount,
+          amount,
+          true,
+          true
+        );
 
-        //open long (alice)
+        //open STOCK long (alice)
         await expect(
           swapOperations
             .connect(alice)
@@ -252,8 +521,47 @@ describe('SwapOperations', () => {
         ).to.be.revertedWithCustomError(borrowerOperations, 'TroveClosedOrNotExist');
       });
 
-      it.skip('open with unknown debt token', async () => {
-        // todo
+      it('open with unknown debt token', async () => {
+        const amount = parseUnits('1000');
+
+        //open troves
+        await open(alice, parseUnits('1', 9), parseUnits('150'));
+        await open(bob, parseUnits('1'), parseUnits('150'));
+
+        //create pair & add liquidity
+        await add(
+          alice,
+          STABLE,
+          BTC,
+          amount,
+          amount,
+          true,
+          true
+        );
+
+        //open BTC long (check balance before and after)
+        expect(await BTC.balanceOf(alice)).to.eq(parseUnits('0'));
+        await swapOperations.connect(alice).openLongPosition(
+          parseUnits('1'),
+          0,
+          BTC,
+          alice,
+          await swapOperations.MAX_BORROWING_FEE(),
+          await deadline()
+        );
+        expect(await BTC.balanceOf(alice)).to.greaterThan(parseUnits('0'));
+
+        //open ETH long
+        expect(          
+          swapOperations.connect(alice).openLongPosition(
+            parseUnits('1'),
+            0,
+            ETH,
+            alice,
+            await swapOperations.MAX_BORROWING_FEE(),
+            await deadline()
+          )
+        ).to.be.revertedWithCustomError(swapOperations, 'PairDoesNotExist');
       });
 
       it('open with no enough collateral, should fail', async () => {
@@ -264,9 +572,17 @@ describe('SwapOperations', () => {
         await open(bob, parseUnits('1'), parseUnits('150'));
 
         //create pair & add liquidity
-        await add(alice, STABLE, STOCK, amount, amount, true);
+        await add(
+          alice,
+          STABLE,
+          STOCK,
+          amount,
+          amount,
+          true,
+          true
+        );
 
-        //open long
+        //open STOCK long
         await expect(
           swapOperations
             .connect(alice)
@@ -289,21 +605,152 @@ describe('SwapOperations', () => {
         await open(bob, parseUnits('1'), parseUnits('150'));
 
         //create pair & add liquidity
-        await add(alice, STABLE, STOCK, amount, amount, true);
+        await add(
+          alice,
+          STABLE,
+          STOCK,
+          amount,
+          amount,
+          true,
+          true
+        );
 
-        //open long (check balance before and after)
-        expect(await STOCK.balanceOf(alice)).to.eq(0);
-        await swapOperations
-          .connect(alice)
-          .openLongPosition(
-            parseUnits('1'),
+        //open STOCK long (check balance before and after)
+        expect(await STOCK.balanceOf(alice)).to.eq(parseUnits('0'));
+        await swapOperations.connect(alice).openLongPosition(
+          parseUnits('1'),
+          0,
+          STOCK,
+          alice,
+          await swapOperations.MAX_BORROWING_FEE(),
+          await deadline()
+        );
+        expect(await STOCK.balanceOf(alice)).to.greaterThan(parseUnits('0'));
+      });
+    });
+
+    describe('short', () => {
+      it('open without trove, should fail', async () => {
+        const amount = parseUnits('1000');
+
+        //open trove (bob)
+        await open(bob, parseUnits('1', 9), parseUnits('150'));
+
+        //create pair & add liquidity (bob)
+        await add(
+          bob,
+          STABLE,
+          STOCK,
+          amount,
+          amount,
+          true,
+          true
+        );
+
+        //open STOCK short (alice)
+        await expect(
+            swapOperations.connect(alice).openShortPosition(
+            parseUnits('100'),
             0,
             STOCK,
             alice,
             await swapOperations.MAX_BORROWING_FEE(),
             await deadline()
-          );
-        expect(await STOCK.balanceOf(alice)).to.greaterThan(0);
+          )
+        ).to.be.revertedWithCustomError(borrowerOperations, 'TroveClosedOrNotExist');
+      });
+
+      it('open with unknown debt token (should fail)', async () => {
+        const amount = parseUnits('1000');
+
+        //open troves
+        await open(alice, parseUnits('1', 9), parseUnits('150'));
+        await open(bob, parseUnits('1'), parseUnits('150'));
+
+        //create pair & add liquidity
+        await add(
+          alice,
+          STABLE,
+          BTC,
+          amount,
+          amount,
+          true,
+          true
+        );
+
+        //open BTC short
+        expect(          
+          swapOperations.connect(alice).openShortPosition(
+            parseUnits('1'),
+            0,
+            BTC,
+            alice,
+            await swapOperations.MAX_BORROWING_FEE(),
+            await deadline()
+          )
+        ).to.be.revertedWithCustomError(debtTokenManager, 'InvalidDebtToken');
+      });
+
+      it('open with no enough collateral, should fail', async () => {
+        const amount = parseUnits('1000');
+
+        //open troves
+        await open(alice, parseUnits('1', 9), parseUnits('150'));
+        await open(bob, parseUnits('1'), parseUnits('150'));
+
+        //create pair & add liquidity
+        await add(
+          alice,
+          STABLE,
+          STOCK,
+          amount,
+          amount,
+          true,
+          true
+        );
+
+        //open STOCK short
+        await expect(
+            swapOperations.connect(alice).openShortPosition(
+            parseUnits('1000000'),
+            0,
+            STOCK,
+            alice,
+            await swapOperations.MAX_BORROWING_FEE(),
+            await deadline()
+          )
+        ).to.be.revertedWithCustomError(borrowerOperations, 'ICR_lt_MCR');
+      });
+
+      it('open', async () => {
+        const amount = parseUnits('1000');
+
+        //open troves
+        await open(alice, parseUnits('1', 9), parseUnits('150'));
+        await open(bob, parseUnits('1'), parseUnits('150'));
+
+        //create pair & add liquidity
+        await add(
+          alice,
+          STABLE,
+          STOCK,
+          amount,
+          amount,
+          true,
+          true
+        );
+
+        //open short (check balance before and after)
+        expect(await STABLE.balanceOf(alice)).to.eq(parseUnits('150')); //initial debts
+        await swapOperations.connect(alice).openShortPosition(
+          parseUnits('1'),
+          0,
+          STOCK,
+          alice,
+          await swapOperations.MAX_BORROWING_FEE(),
+          await deadline()
+        );
+        expect(await STABLE.balanceOf(alice)).to.greaterThan(parseUnits('150')); //initial debts
       });
     });
   });

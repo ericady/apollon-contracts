@@ -19,6 +19,7 @@ interface ISwapOperations is IBBase {
   error InsufficientAmount();
   error InvalidPath();
   error TransferFromFailed();
+  error PairRequiresStable();  
 
   event SwapOperationsInitialized(
     address borrowerOperations,

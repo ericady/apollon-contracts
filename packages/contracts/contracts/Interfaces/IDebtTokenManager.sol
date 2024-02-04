@@ -11,6 +11,12 @@ interface IDebtTokenManager {
   event DebtTokenManagerInitialized(address _stabilityPoolManagerAddress);
   event DebtTokenAdded(address _debtTokenAddress);
 
+  // --- Custom Errors ---
+
+  error InvalidDebtToken();
+  error SymbolAlreadyExists();
+  error StableCoinAlreadyExists();
+
   // --- Functions ---
 
   function getStableCoin() external view returns (IDebtToken);

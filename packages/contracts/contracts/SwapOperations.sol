@@ -14,19 +14,20 @@ import './Dependencies/CheckContract.sol';
 import './Interfaces/ITroveManager.sol';
 
 contract SwapOperations is ISwapOperations, Ownable(msg.sender), CheckContract, LiquityBase {
-  // --- Custom Errors ---
 
-  error PairRequiresStable();
-
-  // --- Attributes ---
+  // --- Connected contract declarations ---
 
   ITroveManager public troveManager;
   IBorrowerOperations public borrowerOperations;
   address public priceFeedAddress;
   IDebtTokenManager public debtTokenManager;
 
+  // --- Data structures ---
+
   mapping(address => mapping(address => address)) public getPair;
   address[] public allPairs;
+
+  // --- Dependency setters ---
 
   function setAddresses(
     address _borrowerOperationsAddress,
@@ -60,7 +61,7 @@ contract SwapOperations is ISwapOperations, Ownable(msg.sender), CheckContract, 
     _;
   }
 
-  // **** PAIR MANAGEMENT ****
+  // --- Pair Management ---
 
   function allPairsLength() external view returns (uint) {
     return allPairs.length;
@@ -89,7 +90,7 @@ contract SwapOperations is ISwapOperations, Ownable(msg.sender), CheckContract, 
     emit PairCreated(token0, token1, pair, allPairs.length);
   }
 
-  // **** GETTER FUNCTIONS ****
+  // --- Getter functions ---
 
   function quote(uint amountA, uint reserveA, uint reserveB) public pure virtual override returns (uint amountB) {
     if (amountA == 0) revert InsufficientAmount();
@@ -155,7 +156,7 @@ contract SwapOperations is ISwapOperations, Ownable(msg.sender), CheckContract, 
     }
   }
 
-  // **** LIQUIDITY FUNCTIONS ****
+  // --- Liquidity functions ---
 
   struct ProvidingVars {
     address pair;
@@ -210,9 +211,23 @@ contract SwapOperations is ISwapOperations, Ownable(msg.sender), CheckContract, 
 
     // mint new tokens if the sender did not have enough
     if (vars.fromMintA != 0 || vars.fromMintB != 0) {
-      TokenAmount[] memory debtsToMint = new TokenAmount[](2);
-      debtsToMint[0] = TokenAmount(tokenA, vars.fromMintA);
-      debtsToMint[1] = TokenAmount(tokenB, vars.fromMintB);
+      TokenAmount[] memory debtsToMint;
+      if (vars.fromMintA != 0 && vars.fromMintB != 0)
+      {
+        // mint both
+        debtsToMint = new TokenAmount[](2);
+        debtsToMint[0] = TokenAmount(tokenA, vars.fromMintA);
+        debtsToMint[1] = TokenAmount(tokenB, vars.fromMintB);
+      }
+      else
+      {   
+        // mint only 1 token    
+        debtsToMint = new TokenAmount[](1);
+        debtsToMint[0] = (vars.fromMintA != 0
+          ? TokenAmount(tokenA, vars.fromMintA) // mint A
+          : TokenAmount(tokenB, vars.fromMintB) // mint B
+        );
+      }
       borrowerOperations.increaseDebt(msg.sender, vars.pair, debtsToMint, _mintMeta);
     }
 
@@ -288,7 +303,9 @@ contract SwapOperations is ISwapOperations, Ownable(msg.sender), CheckContract, 
 
   // **** SWAP ****
   // requires the initial amount to have already been sent to the first pair
+  // --- Swap functions ---
 
+  // requires the initial amount to have already been sent to the first pair
   function _swap(uint[] memory amounts, address[] memory path, address _to) internal virtual {
     for (uint i; i < path.length - 1; i++) {
       (address input, address output) = (path[i], path[i + 1]);
@@ -341,6 +358,7 @@ contract SwapOperations is ISwapOperations, Ownable(msg.sender), CheckContract, 
     IERC20Permit(path[0]).permit(msg.sender, address(this), amountIn, deadline, v, r, s);
     return swapExactTokensForTokens(amountIn, amountOutMin, path, to, deadline);
   }
+  // --- Position functions ---
 
   function openLongPosition(
     uint stableToMintIn,
@@ -349,7 +367,7 @@ contract SwapOperations is ISwapOperations, Ownable(msg.sender), CheckContract, 
     address to,
     MintMeta memory _mintMeta,
     uint deadline
-  ) external override returns (uint[] memory amounts) {
+  ) external override ensure(deadline) returns (uint[] memory amounts) {
     address[] memory path = new address[](2);
     path[0] = address(debtTokenManager.getStableCoin());
     path[1] = debtTokenAddress;
@@ -364,7 +382,7 @@ contract SwapOperations is ISwapOperations, Ownable(msg.sender), CheckContract, 
     address to,
     MintMeta memory _mintMeta,
     uint deadline
-  ) external override returns (uint[] memory amounts) {
+  ) external override ensure(deadline) returns (uint[] memory amounts) {
     address[] memory path = new address[](2);
     path[0] = debtTokenAddress;
     path[1] = address(debtTokenManager.getStableCoin());
@@ -380,10 +398,12 @@ contract SwapOperations is ISwapOperations, Ownable(msg.sender), CheckContract, 
     MintMeta memory _mintMeta
   ) internal returns (uint[] memory amounts) {
     address pair = getPair[path[0]][path[1]];
-    if (pair == address(0)) revert PairDoesNotExist();
+    if (pair == address(0)) revert PairDoesNotExist();        
 
     amounts = getAmountsOut(amountIn, path);
     if (amounts[amounts.length - 1] < amountOutMin) revert InsufficientOutputAmount();
+
+    debtTokenManager.getDebtToken(path[0]); //check if debt token
 
     // mint the debt token and transfer it to the pair
     TokenAmount[] memory debtsToMint = new TokenAmount[](1);
@@ -396,7 +416,7 @@ contract SwapOperations is ISwapOperations, Ownable(msg.sender), CheckContract, 
     return amounts;
   }
 
-  // **** HELPER FUNCTIONS ****
+  // --- Helper functions ---
 
   function getReserves(
     address tokenA,

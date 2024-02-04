@@ -23,6 +23,11 @@
             },
             {
                 "internalType": "address",
+                "name": "_debtTokenManagerAddress",
+                "type": "address"
+            },
+            {
+                "internalType": "address",
                 "name": "_priceFeedAddress",
                 "type": "address"
             },
@@ -109,7 +114,7 @@
     },
     {
         "inputs": [],
-        "name": "NotFromBOorTroveMorSP",
+        "name": "NotFromBOorTroveMorSPorDebtToken",
         "type": "error"
     },
     {
@@ -278,6 +283,19 @@
         "name": "burn",
         "outputs": [],
         "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [],
+        "name": "debtTokenManagerAddress",
+        "outputs": [
+            {
+                "internalType": "address",
+                "name": "",
+                "type": "address"
+            }
+        ],
+        "stateMutability": "view",
         "type": "function"
     },
     {

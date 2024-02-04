@@ -38,6 +38,11 @@
     },
     {
         "inputs": [],
+        "name": "PoolEntryDoesntExist",
+        "type": "error"
+    },
+    {
+        "inputs": [],
         "name": "ZeroAddress",
         "type": "error"
     },
@@ -168,6 +173,19 @@
                 "internalType": "address",
                 "name": "",
                 "type": "address"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [],
+        "name": "GOV_SWAP_FEE",
+        "outputs": [
+            {
+                "internalType": "uint32",
+                "name": "",
+                "type": "uint32"
             }
         ],
         "stateMutability": "view",

@@ -7,6 +7,7 @@ import '@openzeppelin/contracts/utils/cryptography/MessageHashUtils.sol';
 import './Dependencies/CheckContract.sol';
 import './Interfaces/IDebtToken.sol';
 import './Interfaces/IPriceFeed.sol';
+import './Interfaces/IDebtTokenManager.sol';
 
 /*
  *
@@ -61,6 +62,7 @@ contract DebtToken is CheckContract, IDebtToken {
   address public immutable redemptionOperationsAddress;
   address public immutable borrowerOperationsAddress;
   address public immutable stabilityPoolManagerAddress;
+  address public immutable debtTokenManagerAddress;
   IPriceFeed public immutable priceFeed;
 
   constructor(
@@ -68,7 +70,8 @@ contract DebtToken is CheckContract, IDebtToken {
     address _redemptionOperationsAddress,
     address _borrowerOperationsAddress,
     address _stabilityPoolManagerAddress,
-    address _priceFeedAddress,
+    address _debtTokenManagerAddress,
+    address _priceFeedAddress,    
     string memory _symbol,
     string memory _name,
     string memory _version,
@@ -79,12 +82,14 @@ contract DebtToken is CheckContract, IDebtToken {
     checkContract(_borrowerOperationsAddress);
     checkContract(_stabilityPoolManagerAddress);
     checkContract(_priceFeedAddress);
+    checkContract(_debtTokenManagerAddress);
 
     troveManagerAddress = _troveManagerAddress;
     redemptionOperationsAddress = _redemptionOperationsAddress;
     borrowerOperationsAddress = _borrowerOperationsAddress;
     stabilityPoolManagerAddress = _stabilityPoolManagerAddress;
-    priceFeed = IPriceFeed(_priceFeedAddress);
+    debtTokenManagerAddress = _debtTokenManagerAddress;
+    priceFeed = IPriceFeed(_priceFeedAddress);    
 
     _NAME = _name;
     _SYMBOL = _symbol;
@@ -116,7 +121,7 @@ contract DebtToken is CheckContract, IDebtToken {
   }
 
   function burn(address _account, uint256 _amount) external override {
-    _requireCallerIsBOorTroveMorSPorRO();
+    _requireCallerIsBOorTroveMorSPorROorDebtToken();
     _burn(_account, _amount);
   }
 
@@ -268,13 +273,14 @@ contract DebtToken is CheckContract, IDebtToken {
     if (msg.sender != borrowerOperationsAddress) revert NotFromBorrowerOps();
   }
 
-  function _requireCallerIsBOorTroveMorSPorRO() internal view {
+  function _requireCallerIsBOorTroveMorSPorROorDebtToken() internal view {
     if (
       msg.sender != borrowerOperationsAddress &&
       msg.sender != troveManagerAddress &&
       msg.sender != stabilityPoolManagerAddress &&
-      msg.sender != redemptionOperationsAddress
-    ) revert NotFromBOorTroveMorSP();
+      msg.sender != redemptionOperationsAddress && 
+      !IDebtTokenManager(debtTokenManagerAddress).isDebtToken(address(this))
+    ) revert NotFromBOorTroveMorSPorDebtToken();
   }
 
   function _requireCallerIsStabilityPoolManager() internal view {

@@ -10,7 +10,7 @@ import './IBase.sol';
 interface IDebtToken is IERC20, IERC20Metadata, IERC2612, IBase {
   // --- Custom Errors ---
   error NotFromBorrowerOps();
-  error NotFromBOorTroveMorSP();
+  error NotFromBOorTroveMorSPorDebtToken();
   error NotFromSPManager();
   error NotFromTroveMorSP();
   error NotAllowedDirectTransfer();

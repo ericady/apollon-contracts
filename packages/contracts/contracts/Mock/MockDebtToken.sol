@@ -12,7 +12,8 @@ contract MockDebtToken is DebtToken {
     address _redeemerOperationsAddress,
     address _borrowerOperationsAddress,
     address _stabilityPoolManagerAddress,
-    address _priceFeedAddress,
+    address _debtTokenManagerAddress,
+    address _priceFeedAddress,    
     string memory _symbol,
     string memory _name,
     string memory _version,
@@ -23,6 +24,7 @@ contract MockDebtToken is DebtToken {
       _redeemerOperationsAddress,
       _borrowerOperationsAddress,
       _stabilityPoolManagerAddress,
+      _debtTokenManagerAddress,
       _priceFeedAddress,
       _symbol,
       _name,
@@ -46,7 +48,7 @@ contract MockDebtToken is DebtToken {
     _transfer(_sender, _poolAddress, _amount);
   }
 
-  function callInternalApprove(address owner, address spender, uint256 amount) external returns (bool) {
+  function callInternalApprove(address owner, address spender, uint256 amount) external {
     _approve(owner, spender, amount);
   }
 

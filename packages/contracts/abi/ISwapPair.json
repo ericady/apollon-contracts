@@ -488,11 +488,6 @@
                 "internalType": "address",
                 "name": "to",
                 "type": "address"
-            },
-            {
-                "internalType": "bytes",
-                "name": "data",
-                "type": "bytes"
             }
         ],
         "name": "swap",

@@ -1,5 +1,20 @@
 [
     {
+        "inputs": [],
+        "name": "InvalidDebtToken",
+        "type": "error"
+    },
+    {
+        "inputs": [],
+        "name": "StableCoinAlreadyExists",
+        "type": "error"
+    },
+    {
+        "inputs": [],
+        "name": "SymbolAlreadyExists",
+        "type": "error"
+    },
+    {
         "anonymous": false,
         "inputs": [
             {

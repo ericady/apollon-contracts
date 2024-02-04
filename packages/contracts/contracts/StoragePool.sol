@@ -117,7 +117,7 @@ contract StoragePool is LiquityBase, Ownable(msg.sender), CheckContract, IStorag
 
   function _subtractValue(address _tokenAddress, bool _isColl, PoolType _poolType, uint _amount) internal {
     PoolEntry storage entry = poolEntries[_tokenAddress][_isColl];
-    require(entry.exists, 'StoragePool: PoolEntry does not exist');
+    if (!entry.exists) revert PoolEntryDoesntExist();
 
     entry.poolTypes[_poolType] -= _amount;
     entry.totalAmount -= _amount;
@@ -134,7 +134,7 @@ contract StoragePool is LiquityBase, Ownable(msg.sender), CheckContract, IStorag
     _requireCallerIsProtocol();
 
     PoolEntry storage entry = poolEntries[_tokenAddress][_isColl];
-    require(entry.exists, 'StoragePool: PoolEntry does not exist');
+    if (!entry.exists) revert PoolEntryDoesntExist();
 
     entry.poolTypes[_fromType] -= _amount;
     emit StoragePoolValueUpdated(_tokenAddress, _isColl, _fromType, entry.poolTypes[_fromType]);
