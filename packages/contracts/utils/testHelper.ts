@@ -164,8 +164,8 @@ export const whaleShrimpTroveInit = async (
   signers: SignerWithAddress[],
   depositStability: Boolean = true
 ) => {
-  const STABLE: MockDebtToken = contracts.debtToken.STABLE;
-  const BTC: MockERC20 = contracts.collToken.BTC;
+  const STABLE: MockDebtToken = contracts.STABLE;
+  const BTC: MockERC20 = contracts.BTC;
   const stabilityPoolManager: StabilityPoolManager = contracts.stabilityPoolManager;
 
   let defaulter_1: SignerWithAddress;
@@ -180,7 +180,7 @@ export const whaleShrimpTroveInit = async (
   await openTrove({
     from: whale,
     contracts,
-    collToken: contracts.collToken.BTC,
+    collToken: contracts.BTC,
     collAmount: parseUnits('1', 9),
     debts: [{ tokenAddress: STABLE, amount: parseUnits('1850') }],
   });
