@@ -155,16 +155,13 @@ contract SwapPair is ISwapPair, SwapERC20, LiquityBase {
   // fee is returned in 1e6 (SWAP_FEE_PRECISION)
   function getSwapFee() public view override returns (uint32 swapFee) {
     // find stable coin
-    address stableCoin = address(debtTokenManager.getStableCoin());
-    address nonStableCoin = token0 == stableCoin ? token1 : token0;
+    address nonStableCoin = token1;
     if (!debtTokenManager.isDebtToken(nonStableCoin)) return SWAP_BASE_FEE; // no dynamic fee if the pool is not an stable/stock pool
     if (totalSupply == 0) return SWAP_BASE_FEE; //inital mint
 
     // query prices
     uint oraclePrice = priceFeed.getPrice(nonStableCoin);
-    uint dexPrice = (nonStableCoin == token0)
-      ? (reserve1 * DECIMAL_PRECISION) / reserve0
-      : (reserve0 * DECIMAL_PRECISION) / reserve1; // todo does the token digits matter here?
+    uint dexPrice = (reserve0 * DECIMAL_PRECISION) / reserve1; // todo does the token digits matter here?
 
     if (oraclePrice < dexPrice) return SWAP_BASE_FEE;
     uint priceRatio = (oraclePrice * DECIMAL_PRECISION) / dexPrice;
