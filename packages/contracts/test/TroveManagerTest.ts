@@ -7,14 +7,12 @@ import {
   StabilityPoolManager,
   StoragePool,
   LiquidationOperations,
-  RedemptionOperations,
-  BorrowerOperations,
 } from '../typechain';
-import { Contracts, deployCore, connectCoreContracts, deployAndLinkToken } from '../utils/deploymentHelpers';
 import { SignerWithAddress } from '@nomicfoundation/hardhat-ethers/signers';
-import { openTrove, whaleShrimpTroveInit, getTCR, TroveStatus, addColl, repayDebt, redeem } from '../utils/testHelper';
+import { openTrove, whaleShrimpTroveInit, getTCR, TroveStatus, repayDebt } from '../utils/testHelper';
 import { assert, expect } from 'chai';
 import { parseUnits } from 'ethers';
+import apollonTesting from '../ignition/modules/apollonTesting';
 
 describe('TroveManager', () => {
   let signers: SignerWithAddress[];
@@ -36,10 +34,8 @@ describe('TroveManager', () => {
   let troveManager: MockTroveManager;
 
   let stabilityPoolManager: StabilityPoolManager;
-  let redemptionOperations: RedemptionOperations;
   let liquidationOperations: LiquidationOperations;
-  let contracts: Contracts;
-  let borrowerOperations: BorrowerOperations;
+  let contracts: any;
 
   before(async () => {
     signers = await ethers.getSigners();
@@ -47,20 +43,16 @@ describe('TroveManager', () => {
   });
 
   beforeEach(async () => {
-    contracts = await deployCore();
-    await connectCoreContracts(contracts);
-    await deployAndLinkToken(contracts);
+    // @ts-ignore
+    contracts = await ignition.deploy(apollonTesting);
 
     priceFeed = contracts.priceFeed;
     troveManager = contracts.troveManager;
-    redemptionOperations = contracts.redemptionOperations;
     liquidationOperations = contracts.liquidationOperations;
     storagePool = contracts.storagePool;
     stabilityPoolManager = contracts.stabilityPoolManager;
-    borrowerOperations = contracts.borrowerOperations;
-
-    STABLE = contracts.debtToken.STABLE;
-    BTC = contracts.collToken.BTC;
+    STABLE = contracts.STABLE;
+    BTC = contracts.BTC;
   });
 
   describe('TroveOwners', () => {
@@ -70,7 +62,7 @@ describe('TroveManager', () => {
       await openTrove({
         from: whale,
         contracts,
-        collToken: contracts.collToken.BTC,
+        collToken: contracts.BTC,
         collAmount: parseUnits('1', 9),
         debts: [{ tokenAddress: STABLE, amount: parseUnits('1850') }],
       });

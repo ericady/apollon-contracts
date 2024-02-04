@@ -1,6 +1,5 @@
 import { SignerWithAddress } from '@nomicfoundation/hardhat-ethers/signers';
 import { ethers } from 'hardhat';
-import { Contracts, connectCoreContracts, deployAndLinkToken, deployCore } from '../utils/deploymentHelpers';
 import {
   MockBorrowerOperations,
   MockDebtToken,
@@ -27,6 +26,7 @@ import {
 } from '../utils/testHelper';
 import { parseUnits } from 'ethers';
 import { MockERC20Interface } from '../typechain/contracts/Mock/MockERC20';
+import apollonTesting from '../ignition/modules/apollonTesting';
 
 describe('SwapOperations', () => {
   let signers: SignerWithAddress[];
@@ -48,7 +48,7 @@ describe('SwapOperations', () => {
   let BTC: MockERC20;
   let USDT: MockERC20;
 
-  let contracts: Contracts;
+  let contracts: any;
   let priceFeed: MockPriceFeed;
   let troveManager: TroveManager;
   let borrowerOperations: MockBorrowerOperations;
@@ -114,9 +114,8 @@ describe('SwapOperations', () => {
   });
 
   beforeEach(async () => {
-    contracts = await deployCore();
-    await connectCoreContracts(contracts);
-    await deployAndLinkToken(contracts);
+    // @ts-ignore
+    contracts = await ignition.deploy(apollonTesting);
 
     priceFeed = contracts.priceFeed;
     troveManager = contracts.troveManager;
@@ -125,10 +124,10 @@ describe('SwapOperations', () => {
     stabilityPoolManager = contracts.stabilityPoolManager;
     swapOperations = contracts.swapOperations;
 
-    STABLE = contracts.debtToken.STABLE;
-    STOCK = contracts.debtToken.STOCK;
-    BTC = contracts.collToken.BTC;
-    USDT = contracts.collToken.USDT;
+    STABLE = contracts.STABLE;
+    STOCK = contracts.STOCK;
+    BTC = contracts.BTC;
+    USDT = contracts.USDT;
   });
 
   it('should not be possible to mint directly from the borrowerOps', async () => {

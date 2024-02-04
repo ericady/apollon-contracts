@@ -1,6 +1,5 @@
 import { SignerWithAddress } from '@nomicfoundation/hardhat-ethers/signers';
 import { ethers } from 'hardhat';
-import { Contracts, connectCoreContracts, deployAndLinkToken, deployCore } from '../utils/deploymentHelpers';
 import {
   LiquidationOperations,
   MockDebtToken,
@@ -12,6 +11,7 @@ import {
 import { expect } from 'chai';
 import { openTrove } from '../utils/testHelper';
 import { parseUnits } from 'ethers';
+import apollonTesting from '../ignition/modules/apollonTesting';
 
 describe('Reserve Pool', () => {
   let alice: SignerWithAddress;
@@ -21,7 +21,7 @@ describe('Reserve Pool', () => {
   let STABLE: MockDebtToken;
   let BTC: MockERC20;
 
-  let contracts: Contracts;
+  let contracts: any;
   let priceFeed: MockPriceFeed;
   let liquidationOperations: LiquidationOperations;
   let reservePool: ReservePool;
@@ -32,17 +32,15 @@ describe('Reserve Pool', () => {
   });
 
   beforeEach(async () => {
-    contracts = await deployCore();
-    await connectCoreContracts(contracts);
-    await deployAndLinkToken(contracts);
+    // @ts-ignore
+    contracts = await ignition.deploy(apollonTesting);
 
     priceFeed = contracts.priceFeed;
     liquidationOperations = contracts.liquidationOperations;
     reservePool = contracts.reservePool;
     stabilityPoolManager = contracts.stabilityPoolManager;
-
-    STABLE = contracts.debtToken.STABLE;
-    BTC = contracts.collToken.BTC;
+    STABLE = contracts.STABLE;
+    BTC = contracts.BTC;
   });
 
   describe('reserveCap()', () => {

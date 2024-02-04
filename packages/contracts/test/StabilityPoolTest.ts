@@ -1,8 +1,6 @@
 import { SignerWithAddress } from '@nomicfoundation/hardhat-ethers/signers';
 import { ethers } from 'hardhat';
-import { Contracts, connectCoreContracts, deployAndLinkToken, deployCore } from '../utils/deploymentHelpers';
 import {
-  MockBorrowerOperations,
   LiquidationOperations,
   MockDebtToken,
   MockERC20,
@@ -23,17 +21,16 @@ import {
   increaseDebt,
 } from '../utils/testHelper';
 import { parseUnits } from 'ethers';
+import apollonTesting from '../ignition/modules/apollonTesting';
 
 describe('StabilityPool', () => {
   let signers: SignerWithAddress[];
-  let owner: SignerWithAddress;
   let alice: SignerWithAddress;
   let bob: SignerWithAddress;
   let carol: SignerWithAddress;
   let whale: SignerWithAddress;
   let dennis: SignerWithAddress;
   let erin: SignerWithAddress;
-  let flyn: SignerWithAddress;
 
   let defaulter_1: SignerWithAddress;
   let defaulter_2: SignerWithAddress;
@@ -44,51 +41,34 @@ describe('StabilityPool', () => {
   let BTC: MockERC20;
   let USDT: MockERC20;
 
-  let contracts: Contracts;
+  let contracts: any;
   let priceFeed: MockPriceFeed;
   let troveManager: TroveManager;
-  let borrowerOperations: MockBorrowerOperations;
   let storagePool: StoragePool;
   let stabilityPoolManager: StabilityPoolManager;
   let liquidationOperations: LiquidationOperations;
 
   before(async () => {
     signers = await ethers.getSigners();
-    [owner, defaulter_1, defaulter_2, defaulter_3, whale, alice, bob, carol, dennis, erin, flyn] = signers;
+    [, defaulter_1, defaulter_2, defaulter_3, whale, alice, bob, carol, dennis, erin] = signers;
   });
 
   describe('Stability Pool Mechanisms', async () => {
     beforeEach(async () => {
-      contracts = await deployCore();
-      await connectCoreContracts(contracts);
-      await deployAndLinkToken(contracts);
+      // @ts-ignore
+      contracts = await ignition.deploy(apollonTesting);
 
       priceFeed = contracts.priceFeed;
       troveManager = contracts.troveManager;
-      borrowerOperations = contracts.borrowerOperations;
       storagePool = contracts.storagePool;
       stabilityPoolManager = contracts.stabilityPoolManager;
       liquidationOperations = contracts.liquidationOperations;
 
-      STABLE = contracts.debtToken.STABLE;
-      STOCK = contracts.debtToken.STOCK;
-      BTC = contracts.collToken.BTC;
-      USDT = contracts.collToken.USDT;
+      STABLE = contracts.STABLE;
+      STOCK = contracts.STOCK;
+      BTC = contracts.BTC;
+      USDT = contracts.USDT;
     });
-
-    // todo gov token tests missing
-    // it("provideToSP(), new deposit: when SP > 0, triggers LQTY reward event - increases the sum G", async () => {
-    // it("provideToSP(), new deposit: when SP is empty, doesn't update G", async () => {
-    // it("provideToSP(), new deposit: depositor does not receive any LQTY rewards", async () => {
-    // it("provideToSP(), new deposit after past full withdrawal: depositor does not receive any LQTY rewards", async () => {
-    // it("provideToSP(), new eligible deposit: tagged front end receives LQTY rewards", async () => {
-    // it("provideToSP(), topup: triggers LQTY reward event - increases the sum G", async () => {
-    // it("provideToSP(), topup: depositor receives LQTY rewards", async () => {
-    // it("withdrawFromSP(): succeeds when amount is 0 and system has an undercollateralized trove", async () => {
-    // it("withdrawFromSP(): triggers LQTY reward event - increases the sum G", async () => {
-    // it("withdrawFromSP(), partial withdrawal: depositor receives LQTY rewards", async () => {
-    // it("withdrawETHGainToTrove(): triggers LQTY reward event - increases the sum G", async () => {
-    // it("withdrawETHGainToTrove(), eligible deposit: depositor receives LQTY rewards", async () => {
 
     describe('provideToSP()', () => {
       // increases recorded stable at Stability Pool
@@ -239,7 +219,7 @@ describe('StabilityPool', () => {
         await openTrove({
           from: whale,
           contracts,
-          collToken: contracts.collToken.BTC,
+          collToken: contracts.BTC,
           collAmount: parseUnits('1', 9),
           debts: [{ tokenAddress: STOCK, amount: parseUnits('1') }],
         });
@@ -567,7 +547,7 @@ describe('StabilityPool', () => {
         await openTrove({
           from: whale,
           contracts,
-          collToken: contracts.collToken.BTC,
+          collToken: contracts.BTC,
           collAmount: parseUnits('1', 9),
           debts: [{ tokenAddress: STABLE, amount: parseUnits('5000') }],
         });
@@ -650,7 +630,7 @@ describe('StabilityPool', () => {
         await openTrove({
           from: whale,
           contracts,
-          collToken: contracts.collToken.BTC,
+          collToken: contracts.BTC,
           collAmount: parseUnits('1', 9),
           debts: [{ tokenAddress: STABLE, amount: parseUnits('1850') }],
         });

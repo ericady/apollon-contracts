@@ -1,69 +1,29 @@
 import { SignerWithAddress } from '@nomicfoundation/hardhat-ethers/signers';
 import { expect } from 'chai';
 import { ethers } from 'hardhat';
-import {
-  BorrowerOperations,
-  MockDebtToken,
-  MockERC20,
-  MockPriceFeed,
-  RedemptionOperations,
-  StabilityPoolManager,
-  StoragePool,
-  TroveManager,
-} from '../typechain';
+import { MockDebtToken, MockERC20, StabilityPoolManager, StoragePool, TroveManager } from '../typechain';
+import apollonTesting from '../ignition/modules/apollonTesting';
 
 describe('Access Control: Apollon functions with the caller restricted to Apollon contract(s)', () => {
-  let owner: SignerWithAddress;
   let alice: SignerWithAddress;
   let bob: SignerWithAddress;
-  let carol: SignerWithAddress;
 
   let troveManager: TroveManager;
   let storagePool: StoragePool;
   let stabilityPoolManager: StabilityPoolManager;
-  let borrowerOperations: BorrowerOperations;
-  let redemptionOperations: RedemptionOperations;
-  let priceFeed: MockPriceFeed;
-
   let BTC: MockERC20;
   let stableDebt: MockDebtToken;
 
   before(async () => {
-    [owner, alice, bob, carol] = await ethers.getSigners();
+    [, alice, bob] = await ethers.getSigners();
 
-    const borrowerOperationsFactory = await ethers.getContractFactory('BorrowerOperations');
-    borrowerOperations = await borrowerOperationsFactory.deploy();
-
-    const redemptionOperationsFactory = await ethers.getContractFactory('RedemptionOperations');
-    redemptionOperations = await redemptionOperationsFactory.deploy();
-
-    const troveManagerFactory = await ethers.getContractFactory('TroveManager');
-    troveManager = await troveManagerFactory.deploy();
-
-    const stabilityPoolManagerFactory = await ethers.getContractFactory('StabilityPoolManager');
-    stabilityPoolManager = await stabilityPoolManagerFactory.deploy();
-
-    const storagePoolFactory = await ethers.getContractFactory('StoragePool');
-    storagePool = await storagePoolFactory.deploy();
-
-    const priceFeedFactory = await ethers.getContractFactory('MockPriceFeed');
-    priceFeed = await priceFeedFactory.deploy();
-
-    const mockTokenFactory = await ethers.getContractFactory('MockERC20');
-    BTC = await mockTokenFactory.deploy('Bitcoin', 'BTC', 9);
-
-    const mockDebtTokenFactory = await ethers.getContractFactory('MockDebtToken');
-    stableDebt = await mockDebtTokenFactory.deploy(
-      troveManager,
-      redemptionOperations,
-      borrowerOperations,
-      stabilityPoolManager,
-      priceFeed,
-      'STABLE',
-      'STABLE',
-      '1',
-      true
-    );
+    // @ts-ignore
+    const contracts = await ignition.deploy(apollonTesting);
+    troveManager = contracts.troveManager;
+    storagePool = contracts.storagePool;
+    stabilityPoolManager = contracts.stabilityPoolManager;
+    BTC = contracts.BTC;
+    stableDebt = contracts.STABLE;
   });
 
   describe('TroveManager', () => {
@@ -233,7 +193,7 @@ describe('Access Control: Apollon functions with the caller restricted to Apollo
     // it('sendToPool(): reverts when called by an account that is not StabilityPool', async () => {
     //   // Attempt call from alice
     //   try {
-    //     const txAlice = await coreContracts.debtToken.STABLE.sendToPool(bob, activePool.address, 100, { from: alice });
+    //     const txAlice = await coreContracts.STABLE.sendToPool(bob, activePool.address, 100, { from: alice });
     //   } catch (err) {
     //     assert.include(err.message, 'revert');
     //     assert.include(err.message, 'Caller is not the StabilityPool');

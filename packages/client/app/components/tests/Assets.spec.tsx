@@ -25,7 +25,7 @@ test.afterAll(() => {
 });
 
 test.describe('Assets', () => {
-  test.only('should render Assets with mocked data', async ({ mount, page }) => {
+  test('should render Assets with mocked data', async ({ mount, page }) => {
     // We need to mock the exact same data to generate the exact same snapshot
     await page.route('https://flyby-router-demo.herokuapp.com/', async (route) => {
       if (JSON.parse(route.request().postData()!).operationName === 'GetAllPools') {

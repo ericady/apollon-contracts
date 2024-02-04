@@ -1,18 +1,10 @@
 import { ethers } from 'hardhat';
-import {
-  MockDebtToken,
-  MockERC20,
-  MockPriceFeed,
-  TroveManager,
-  StoragePool,
-  MockBorrowerOperations,
-  MockStabilityPoolManager,
-} from '../typechain';
-import { Contracts, deployCore, connectCoreContracts, deployAndLinkToken } from '../utils/deploymentHelpers';
+import { MockDebtToken, TroveManager, MockBorrowerOperations, MockStabilityPoolManager } from '../typechain';
 import { SignerWithAddress } from '@nomicfoundation/hardhat-ethers/signers';
 import { assertRevert } from '../utils/testHelper';
 import { assert, expect } from 'chai';
 import { AbiCoder, Signature, keccak256, solidityPacked, toUtf8Bytes } from 'ethers';
+import apollonTesting from '../ignition/modules/apollonTesting';
 
 const PERMIT_TYPEHASH = keccak256(
   toUtf8Bytes('Permit(address owner,address spender,uint256 value,uint256 nonce,uint256 deadline)')
@@ -27,7 +19,6 @@ describe('DebtToken', () => {
   let STABLE: MockDebtToken;
   let STOCK: MockDebtToken;
 
-  let contracts: Contracts;
   let troveManager: TroveManager;
   let borrowerOperations: MockBorrowerOperations;
   let stabilityPoolManager: MockStabilityPoolManager;
@@ -38,16 +29,13 @@ describe('DebtToken', () => {
   });
 
   beforeEach(async () => {
-    contracts = await deployCore();
-    await connectCoreContracts(contracts);
-    await deployAndLinkToken(contracts);
-
+    // @ts-ignore
+    const contracts = await ignition.deploy(apollonTesting);
     troveManager = contracts.troveManager;
     borrowerOperations = contracts.borrowerOperations;
     stabilityPoolManager = contracts.stabilityPoolManager;
-
-    STABLE = contracts.debtToken.STABLE;
-    STOCK = contracts.debtToken.STOCK;
+    STABLE = contracts.STABLE;
+    STOCK = contracts.STOCK;
   });
 
   const getDomainSeparator = (name: string, contractAddress: string, chainId: bigint, version: string) => {

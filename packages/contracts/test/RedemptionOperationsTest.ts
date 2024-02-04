@@ -7,52 +7,45 @@ import {
   StoragePool,
   RedemptionOperations,
 } from '../typechain';
-import { Contracts, deployCore, connectCoreContracts, deployAndLinkToken } from '../utils/deploymentHelpers';
 import { SignerWithAddress } from '@nomicfoundation/hardhat-ethers/signers';
 import { getRedemptionMeta, MAX_BORROWING_FEE, openTrove, redeem, whaleShrimpTroveInit } from '../utils/testHelper';
 import { assert, expect } from 'chai';
 import { parseUnits, ZeroAddress } from 'ethers';
+import apollonTesting from '../ignition/modules/apollonTesting';
 
 // todo continue tests from "redeemCollateral(): ends the redemption sequence when max iterations have been reached"
 // todo sortedTroves test
 
 describe('RedemptionOperations', () => {
   let signers: SignerWithAddress[];
-  let owner: SignerWithAddress;
-  let carol: SignerWithAddress;
   let alice: SignerWithAddress;
   let bob: SignerWithAddress;
   let defaulter_1: SignerWithAddress;
   let defaulter_2: SignerWithAddress;
   let erin: SignerWithAddress;
 
-  let storagePool: StoragePool;
-
-  let STABLE: MockDebtToken;
-  let BTC: MockERC20;
-
+  let contracts: any;
   let priceFeed: MockPriceFeed;
   let troveManager: MockTroveManager;
   let redemptionOperations: RedemptionOperations;
-  let contracts: Contracts;
+  let storagePool: StoragePool;
+  let STABLE: MockDebtToken;
+  let BTC: MockERC20;
 
   before(async () => {
     signers = await ethers.getSigners();
-    [owner, defaulter_1, defaulter_2, , , alice, bob, carol, , erin] = signers;
+    [, defaulter_1, defaulter_2, , , alice, bob, , , erin] = signers;
   });
 
   beforeEach(async () => {
-    contracts = await deployCore();
-    await connectCoreContracts(contracts);
-    await deployAndLinkToken(contracts);
-
+    // @ts-ignore
+    contracts = await ignition.deploy(apollonTesting);
     priceFeed = contracts.priceFeed;
     troveManager = contracts.troveManager;
     redemptionOperations = contracts.redemptionOperations;
     storagePool = contracts.storagePool;
-
-    STABLE = contracts.debtToken.STABLE;
-    BTC = contracts.collToken.BTC;
+    STABLE = contracts.STABLE;
+    BTC = contracts.BTC;
   });
 
   describe('redeemCollateral()', () => {

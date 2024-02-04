@@ -7,10 +7,8 @@ import {
   StabilityPoolManager,
   StoragePool,
   LiquidationOperations,
-  RedemptionOperations,
   BorrowerOperations,
 } from '../typechain';
-import { Contracts, deployCore, connectCoreContracts, deployAndLinkToken } from '../utils/deploymentHelpers';
 import { SignerWithAddress } from '@nomicfoundation/hardhat-ethers/signers';
 import {
   TroveStatus,
@@ -23,11 +21,11 @@ import {
   repayDebt,
 } from '../utils/testHelper';
 import { assert, expect } from 'chai';
-import { formatUnits, parseUnits } from 'ethers';
+import { parseUnits } from 'ethers';
+import apollonTesting from '../ignition/modules/apollonTesting';
 
-describe.only('LiquidationOperations', () => {
+describe('LiquidationOperations', () => {
   let signers: SignerWithAddress[];
-  let owner: SignerWithAddress;
   let alice: SignerWithAddress;
   let bob: SignerWithAddress;
   let carol: SignerWithAddress;
@@ -48,31 +46,27 @@ describe.only('LiquidationOperations', () => {
   let troveManager: MockTroveManager;
 
   let stabilityPoolManager: StabilityPoolManager;
-  let redemptionOperations: RedemptionOperations;
   let liquidationOperations: LiquidationOperations;
   let borrowerOperations: BorrowerOperations;
-  let contracts: Contracts;
+  let contracts: any;
 
   before(async () => {
     signers = await ethers.getSigners();
-    [owner, defaulter_1, defaulter_2, defaulter_3, whale, alice, bob, carol, dennis, erin] = signers;
+    [, defaulter_1, defaulter_2, defaulter_3, whale, alice, bob, carol, dennis, erin] = signers;
   });
 
   beforeEach(async () => {
-    contracts = await deployCore();
-    await connectCoreContracts(contracts);
-    await deployAndLinkToken(contracts);
+    // @ts-ignore
+    contracts = await ignition.deploy(apollonTesting);
 
     priceFeed = contracts.priceFeed;
     troveManager = contracts.troveManager;
-    redemptionOperations = contracts.redemptionOperations;
     liquidationOperations = contracts.liquidationOperations;
     storagePool = contracts.storagePool;
     stabilityPoolManager = contracts.stabilityPoolManager;
     borrowerOperations = contracts.borrowerOperations;
-
-    STABLE = contracts.debtToken.STABLE;
-    BTC = contracts.collToken.BTC;
+    STABLE = contracts.STABLE;
+    BTC = contracts.BTC;
   });
 
   describe('in Normal Mode', () => {

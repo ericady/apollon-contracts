@@ -119,10 +119,10 @@ contract LiquidationOperations is LiquityBase, Ownable(msg.sender), CheckContrac
     vars.remainingStabilities = stabilityPoolManager.getRemainingStability(vars.collTokenAddresses);
     _initializeEmptyTokensToRedistribute(vars); // all set to 0 (nothing to redistribute)
 
-    bool atLeastOneTroveLiquidated;
+    bool atLeastOneTroveLiquidated = false;
     for (uint i = 0; i < _troveArray.length; i++) {
       address trove = _troveArray[i];
-      if (troveManager.isTroveActive(trove) == false) continue; // Skip non-active troves
+      if (!troveManager.isTroveActive(trove)) continue; // Skip non-active troves
       if (troveManager.getTroveOwnersCount() <= 1) continue; // don't liquidate if last trove
 
       bool liquidated = _executeTroveLiquidation(vars, trove);

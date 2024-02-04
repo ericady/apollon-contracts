@@ -1,6 +1,5 @@
 import { SignerWithAddress } from '@nomicfoundation/hardhat-ethers/signers';
 import { ethers } from 'hardhat';
-import { Contracts, connectCoreContracts, deployAndLinkToken, deployCore } from '../utils/deploymentHelpers';
 import {
   MockBorrowerOperations,
   MockDebtToken,
@@ -8,18 +7,14 @@ import {
   MockPriceFeed,
   MockTroveManager,
   LiquidationOperations,
-  StabilityPoolManager,
   StoragePool,
-  TroveManager,
 } from '../typechain';
 import { expect } from 'chai';
 import {
-  TimeValues,
   MAX_BORROWING_FEE,
   checkRecoveryMode,
   fastForwardTime,
   getLatestBlockTimestamp,
-  getStabilityPool,
   getTCR,
   getTroveEntireColl,
   getTroveEntireDebt,
@@ -35,6 +30,7 @@ import {
 } from '../utils/testHelper';
 import { parseUnits } from 'ethers';
 import { time } from '@nomicfoundation/hardhat-network-helpers';
+import apollonTesting from '../ignition/modules/apollonTesting';
 
 describe('BorrowerOperations', () => {
   let alice: SignerWithAddress;
@@ -44,15 +40,14 @@ describe('BorrowerOperations', () => {
   let dennis: SignerWithAddress;
   let erin: SignerWithAddress;
 
-  let STABLE: MockDebtToken;
-  let BTC: MockERC20;
-
-  let contracts: Contracts;
+  let contracts: any;
   let priceFeed: MockPriceFeed;
   let troveManager: MockTroveManager;
   let borrowerOperations: MockBorrowerOperations;
   let storagePool: StoragePool;
   let liquidationOperations: LiquidationOperations;
+  let STABLE: MockDebtToken;
+  let BTC: MockERC20;
 
   const open = async (user: SignerWithAddress, collAmount: bigint, debtAmount: bigint) => {
     return await openTrove({
@@ -69,18 +64,15 @@ describe('BorrowerOperations', () => {
   });
 
   beforeEach(async () => {
-    contracts = await deployCore();
-    await connectCoreContracts(contracts);
-    await deployAndLinkToken(contracts);
-
-    priceFeed = contracts.priceFeed;
+    // @ts-ignore
+    contracts = await ignition.deploy(apollonTesting);
     troveManager = contracts.troveManager;
-    borrowerOperations = contracts.borrowerOperations;
     storagePool = contracts.storagePool;
+    BTC = contracts.BTC;
+    STABLE = contracts.STABLE;
+    borrowerOperations = contracts.borrowerOperations;
     liquidationOperations = contracts.liquidationOperations;
-
-    STABLE = contracts.debtToken.STABLE;
-    BTC = contracts.collToken.BTC;
+    priceFeed = contracts.priceFeed;
   });
 
   // --- addColl() ---

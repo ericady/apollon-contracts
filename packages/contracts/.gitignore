@@ -1,8 +1,8 @@
 # Buidler contract JSONs
 /artifacts
 
-# Truffle contract JSONs
-/build/contracts
+# localhost deployment
+/ignition/deployments/chain-1337
 
 /bin
 

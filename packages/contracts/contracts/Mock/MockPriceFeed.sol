@@ -11,7 +11,6 @@ import '@openzeppelin/contracts/token/ERC20/extensions/IERC20Metadata.sol';
  */
 contract MockPriceFeed is IPriceFeed {
   mapping(address => uint256) private tokenPrices;
-  uint256 private _price = 1e18; // 1$
 
   // --- Functions ---
 
@@ -28,8 +27,7 @@ contract MockPriceFeed is IPriceFeed {
 
     uint256 tokenPrice = tokenPrices[_tokenAddress];
     if (tokenPrice != 0) return tokenPrice;
-
-    return _price;
+    return 1e18; // 1$ as fallback
   }
 
   function setTokenPrice(address tokenAddress, uint256 price) external returns (bool) {
