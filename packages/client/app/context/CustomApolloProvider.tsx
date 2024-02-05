@@ -1069,19 +1069,15 @@ export const SchemaDataFreshnessManager: ContractDataFreshnessManager<typeof Con
   StabilityPoolManager: {},
   SwapOperations: {},
   SwapPairs: {
-    '0x4d76502cc4d4581d4b52fb77bdd408b27d1894c1': {
+    [Contracts.SwapPairs.BTC]: {
       borrowerAmount: {
         fetch: async (swapPairContract: SwapPair, borrower: AddressLike, totalAmount: number, totalReserve: number) => {
-          SchemaDataFreshnessManager.SwapPairs[
-            '0x4d76502cc4d4581d4b52fb77bdd408b27d1894c1'
-          ].borrowerAmount.lastFetched = Date.now();
+          SchemaDataFreshnessManager.SwapPairs[Contracts.SwapPairs.BTC].borrowerAmount.lastFetched = Date.now();
           const userPoolBalance = await swapPairContract.balanceOf(borrower);
 
           const amount = userPoolBalance / (floatToBigInt(totalReserve) * floatToBigInt(totalAmount));
 
-          SchemaDataFreshnessManager.SwapPairs['0x4d76502cc4d4581d4b52fb77bdd408b27d1894c1'].borrowerAmount.value(
-            amount,
-          );
+          SchemaDataFreshnessManager.SwapPairs[Contracts.SwapPairs.BTC].borrowerAmount.value(amount);
         },
         value: makeVar(defaultFieldValue),
         lastFetched: 0,
@@ -1089,31 +1085,26 @@ export const SchemaDataFreshnessManager: ContractDataFreshnessManager<typeof Con
       },
       swapFee: {
         fetch: async (swapPairContract: SwapPair) => {
-          SchemaDataFreshnessManager.SwapPairs['0x4d76502cc4d4581d4b52fb77bdd408b27d1894c1'].swapFee.lastFetched =
-            Date.now();
+          SchemaDataFreshnessManager.SwapPairs[Contracts.SwapPairs.BTC].swapFee.lastFetched = Date.now();
 
           const swapFee = await swapPairContract.getSwapFee();
 
-          SchemaDataFreshnessManager.SwapPairs['0x4d76502cc4d4581d4b52fb77bdd408b27d1894c1'].swapFee.value(swapFee);
+          SchemaDataFreshnessManager.SwapPairs[Contracts.SwapPairs.BTC].swapFee.value(swapFee);
         },
         value: makeVar(defaultFieldValue),
         lastFetched: 0,
         timeout: 1000 * 5,
       },
     },
-    '0x8c07031a425a562df93226a91fd5c6288cc034fc': {
+    [Contracts.SwapPairs.USDT]: {
       borrowerAmount: {
         fetch: async (swapPairContract: SwapPair, borrower: AddressLike, totalAmount: number, totalReserve: number) => {
-          SchemaDataFreshnessManager.SwapPairs[
-            '0x8c07031a425a562df93226a91fd5c6288cc034fc'
-          ].borrowerAmount.lastFetched = Date.now();
+          SchemaDataFreshnessManager.SwapPairs[Contracts.SwapPairs.USDT].borrowerAmount.lastFetched = Date.now();
           const userPoolBalance = await swapPairContract.balanceOf(borrower);
 
           const amount = userPoolBalance / (floatToBigInt(totalReserve) * floatToBigInt(totalAmount));
 
-          SchemaDataFreshnessManager.SwapPairs['0x8c07031a425a562df93226a91fd5c6288cc034fc'].borrowerAmount.value(
-            amount,
-          );
+          SchemaDataFreshnessManager.SwapPairs[Contracts.SwapPairs.USDT].borrowerAmount.value(amount);
         },
         value: makeVar(defaultFieldValue),
         lastFetched: 0,
@@ -1121,11 +1112,36 @@ export const SchemaDataFreshnessManager: ContractDataFreshnessManager<typeof Con
       },
       swapFee: {
         fetch: async (swapPairContract: SwapPair) => {
-          SchemaDataFreshnessManager.SwapPairs['0x8c07031a425a562df93226a91fd5c6288cc034fc'].swapFee.lastFetched =
-            Date.now();
+          SchemaDataFreshnessManager.SwapPairs[Contracts.SwapPairs.USDT].swapFee.lastFetched = Date.now();
           const swapFee = await swapPairContract.getSwapFee();
 
-          SchemaDataFreshnessManager.SwapPairs['0x8c07031a425a562df93226a91fd5c6288cc034fc'].swapFee.value(swapFee);
+          SchemaDataFreshnessManager.SwapPairs[Contracts.SwapPairs.USDT].swapFee.value(swapFee);
+        },
+        value: makeVar(defaultFieldValue),
+        lastFetched: 0,
+        timeout: 1000 * 5,
+      },
+    },
+    [Contracts.SwapPairs.DFI]: {
+      borrowerAmount: {
+        fetch: async (swapPairContract: SwapPair, borrower: AddressLike, totalAmount: number, totalReserve: number) => {
+          SchemaDataFreshnessManager.SwapPairs[Contracts.SwapPairs.DFI].borrowerAmount.lastFetched = Date.now();
+          const userPoolBalance = await swapPairContract.balanceOf(borrower);
+
+          const amount = userPoolBalance / (floatToBigInt(totalReserve) * floatToBigInt(totalAmount));
+
+          SchemaDataFreshnessManager.SwapPairs[Contracts.SwapPairs.DFI].borrowerAmount.value(amount);
+        },
+        value: makeVar(defaultFieldValue),
+        lastFetched: 0,
+        timeout: 1000 * 5,
+      },
+      swapFee: {
+        fetch: async (swapPairContract: SwapPair) => {
+          SchemaDataFreshnessManager.SwapPairs[Contracts.SwapPairs.DFI].swapFee.lastFetched = Date.now();
+          const swapFee = await swapPairContract.getSwapFee();
+
+          SchemaDataFreshnessManager.SwapPairs[Contracts.SwapPairs.DFI].swapFee.value(swapFee);
         },
         value: makeVar(defaultFieldValue),
         lastFetched: 0,

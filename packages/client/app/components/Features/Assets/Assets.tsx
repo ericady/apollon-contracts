@@ -48,7 +48,7 @@ function Assets() {
   const { selectedToken, setSelectedToken, JUSDToken } = useSelectedToken();
 
   // TODO: Implement a filter for only JUSD to subgraph
-  const { data } = useQuery<GetAllPoolsQuery, GetAllPoolsQueryVariables>(GET_ALL_POOLS, { pollInterval: 3000 });
+  const { data } = useQuery<GetAllPoolsQuery, GetAllPoolsQueryVariables>(GET_ALL_POOLS);
   const { data: pastTokenPrices } = useQuery<GetPastTokenPricesQuery, GetPastTokenPricesQueryVariables>(
     GET_TOKEN_PRICES_24h_AGO,
   );
@@ -57,6 +57,7 @@ function Assets() {
     const jUSDPools =
       data?.pools.filter(({ liquidity }) => {
         const [tokenA, tokenB] = liquidity;
+
         return (
           getCheckSum(tokenA.token.address) === getCheckSum(Contracts.DebtToken.STABLE) ||
           getCheckSum(tokenB.token.address) === getCheckSum(Contracts.DebtToken.STABLE)
@@ -97,7 +98,9 @@ function Assets() {
         };
       })
       .sort((a) => (a.isFavorite ? -1 : 1));
-  }, [data, favoritedAssets]);
+  }, [data, favoritedAssets, pastTokenPrices]);
+
+  console.log('tokens: ', tokens);
 
   const toggleFavorite = (address: string) => {
     const favoritedAssetsFromLS: string[] = JSON.parse(

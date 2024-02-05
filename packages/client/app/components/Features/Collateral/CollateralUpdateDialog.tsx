@@ -94,7 +94,7 @@ const CollateralUpdateDialog = ({ buttonVariant, buttonSx = {} }: Props) => {
   };
 
   const collateralToDeposit: GetCollateralTokensQuery['collateralTokenMetas'] = data?.collateralTokenMetas ?? [];
-
+  console.log('collateralToDeposit: ', collateralToDeposit);
   if (collateralToDeposit.length === 0)
     return (
       <Button

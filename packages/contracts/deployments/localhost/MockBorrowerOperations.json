@@ -1,0 +1,1205 @@
+{
+  "address": "0x5FbDB2315678afecb367f032d93F642f64180aa3",
+  "abi": [
+    {
+      "inputs": [],
+      "name": "ActiveTrove",
+      "type": "error"
+    },
+    {
+      "inputs": [],
+      "name": "CollWithdrawPermittedInRM",
+      "type": "error"
+    },
+    {
+      "inputs": [],
+      "name": "FeeExceedMaxPercentage",
+      "type": "error"
+    },
+    {
+      "inputs": [],
+      "name": "ICRDecreasedInRM",
+      "type": "error"
+    },
+    {
+      "inputs": [],
+      "name": "ICR_lt_CCR",
+      "type": "error"
+    },
+    {
+      "inputs": [],
+      "name": "ICR_lt_MCR",
+      "type": "error"
+    },
+    {
+      "inputs": [],
+      "name": "InsufficientDebtToRepay",
+      "type": "error"
+    },
+    {
+      "inputs": [],
+      "name": "MaxFee_gt_100_InRM",
+      "type": "error"
+    },
+    {
+      "inputs": [],
+      "name": "MaxFee_out_Range",
+      "type": "error"
+    },
+    {
+      "inputs": [],
+      "name": "NotAllowedInRecoveryMode",
+      "type": "error"
+    },
+    {
+      "inputs": [],
+      "name": "NotBorrower",
+      "type": "error"
+    },
+    {
+      "inputs": [],
+      "name": "NotContract",
+      "type": "error"
+    },
+    {
+      "inputs": [],
+      "name": "NotFromStabilityPool",
+      "type": "error"
+    },
+    {
+      "inputs": [],
+      "name": "NotFromSwapOps",
+      "type": "error"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "owner",
+          "type": "address"
+        }
+      ],
+      "name": "OwnableInvalidOwner",
+      "type": "error"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "account",
+          "type": "address"
+        }
+      ],
+      "name": "OwnableUnauthorizedAccount",
+      "type": "error"
+    },
+    {
+      "inputs": [],
+      "name": "Repaid_gt_CurrentDebt",
+      "type": "error"
+    },
+    {
+      "inputs": [],
+      "name": "TCR_lt_CCR",
+      "type": "error"
+    },
+    {
+      "inputs": [],
+      "name": "TroveClosedOrNotExist",
+      "type": "error"
+    },
+    {
+      "inputs": [],
+      "name": "WithdrawAmount_gt_Coll",
+      "type": "error"
+    },
+    {
+      "inputs": [],
+      "name": "ZeroAddress",
+      "type": "error"
+    },
+    {
+      "inputs": [],
+      "name": "ZeroDebtChange",
+      "type": "error"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": false,
+          "internalType": "address",
+          "name": "_troveManagerAddress",
+          "type": "address"
+        },
+        {
+          "indexed": false,
+          "internalType": "address",
+          "name": "_storagePoolAddress",
+          "type": "address"
+        },
+        {
+          "indexed": false,
+          "internalType": "address",
+          "name": "_stabilityPoolAddress",
+          "type": "address"
+        },
+        {
+          "indexed": false,
+          "internalType": "address",
+          "name": "_reservePoolAddress",
+          "type": "address"
+        },
+        {
+          "indexed": false,
+          "internalType": "address",
+          "name": "_priceFeedAddress",
+          "type": "address"
+        },
+        {
+          "indexed": false,
+          "internalType": "address",
+          "name": "_debtTokenManagerAddress",
+          "type": "address"
+        },
+        {
+          "indexed": false,
+          "internalType": "address",
+          "name": "_collTokenManagerAddress",
+          "type": "address"
+        },
+        {
+          "indexed": false,
+          "internalType": "address",
+          "name": "_swapOperationsAddress",
+          "type": "address"
+        }
+      ],
+      "name": "BorrowerOperationsInitialized",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "internalType": "address",
+          "name": "previousOwner",
+          "type": "address"
+        },
+        {
+          "indexed": true,
+          "internalType": "address",
+          "name": "newOwner",
+          "type": "address"
+        }
+      ],
+      "name": "OwnershipTransferred",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": true,
+          "internalType": "address",
+          "name": "_borrower",
+          "type": "address"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "amount",
+          "type": "uint256"
+        }
+      ],
+      "name": "SentBorrowingFeesToReserve",
+      "type": "event"
+    },
+    {
+      "anonymous": false,
+      "inputs": [
+        {
+          "indexed": false,
+          "internalType": "address",
+          "name": "_borrower",
+          "type": "address"
+        },
+        {
+          "indexed": false,
+          "internalType": "uint256",
+          "name": "arrayIndex",
+          "type": "uint256"
+        }
+      ],
+      "name": "TroveCreated",
+      "type": "event"
+    },
+    {
+      "inputs": [],
+      "name": "BORROWING_FEE_FLOOR",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "CCR",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "MAX_BORROWING_FEE",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "MCR",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "NAME",
+      "outputs": [
+        {
+          "internalType": "string",
+          "name": "",
+          "type": "string"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "PERCENT_DIVISOR",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "REDEMPTION_FEE_FLOOR",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "STABLE_COIN_GAS_COMPENSATION",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "SWAP_BASE_FEE",
+      "outputs": [
+        {
+          "internalType": "uint32",
+          "name": "",
+          "type": "uint32"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "SWAP_FEE_PRECISION",
+      "outputs": [
+        {
+          "internalType": "uint32",
+          "name": "",
+          "type": "uint32"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "_100pct",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "components": [
+            {
+              "internalType": "address",
+              "name": "tokenAddress",
+              "type": "address"
+            },
+            {
+              "internalType": "uint256",
+              "name": "amount",
+              "type": "uint256"
+            }
+          ],
+          "internalType": "struct IBase.TokenAmount[]",
+          "name": "_colls",
+          "type": "tuple[]"
+        }
+      ],
+      "name": "addColl",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "closeTrove",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "collTokenManager",
+      "outputs": [
+        {
+          "internalType": "contract ICollTokenManager",
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "debtTokenManager",
+      "outputs": [
+        {
+          "internalType": "contract IDebtTokenManager",
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "components": [
+            {
+              "internalType": "contract IDebtToken",
+              "name": "debtToken",
+              "type": "address"
+            },
+            {
+              "internalType": "uint256",
+              "name": "netDebt",
+              "type": "uint256"
+            },
+            {
+              "internalType": "uint256",
+              "name": "borrowingFee",
+              "type": "uint256"
+            }
+          ],
+          "internalType": "struct IBBase.DebtTokenAmount[]",
+          "name": "_debts",
+          "type": "tuple[]"
+        }
+      ],
+      "name": "getCompositeDebt",
+      "outputs": [
+        {
+          "internalType": "uint256",
+          "name": "",
+          "type": "uint256"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "_borrower",
+          "type": "address"
+        },
+        {
+          "internalType": "address",
+          "name": "_to",
+          "type": "address"
+        },
+        {
+          "components": [
+            {
+              "internalType": "address",
+              "name": "tokenAddress",
+              "type": "address"
+            },
+            {
+              "internalType": "uint256",
+              "name": "amount",
+              "type": "uint256"
+            }
+          ],
+          "internalType": "struct IBase.TokenAmount[]",
+          "name": "_debts",
+          "type": "tuple[]"
+        },
+        {
+          "internalType": "uint256",
+          "name": "_maxFeePercentage",
+          "type": "uint256"
+        }
+      ],
+      "name": "increaseDebt",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "components": [
+            {
+              "internalType": "address",
+              "name": "tokenAddress",
+              "type": "address"
+            },
+            {
+              "internalType": "uint256",
+              "name": "amount",
+              "type": "uint256"
+            }
+          ],
+          "internalType": "struct IBase.TokenAmount[]",
+          "name": "_debts",
+          "type": "tuple[]"
+        },
+        {
+          "internalType": "uint256",
+          "name": "_maxFeePercentage",
+          "type": "uint256"
+        }
+      ],
+      "name": "increaseDebts",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "components": [
+            {
+              "internalType": "address",
+              "name": "tokenAddress",
+              "type": "address"
+            },
+            {
+              "internalType": "uint256",
+              "name": "amount",
+              "type": "uint256"
+            }
+          ],
+          "internalType": "struct IBase.TokenAmount[]",
+          "name": "_colls",
+          "type": "tuple[]"
+        }
+      ],
+      "name": "openTrove",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "owner",
+      "outputs": [
+        {
+          "internalType": "address",
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "priceFeed",
+      "outputs": [
+        {
+          "internalType": "contract IPriceFeed",
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "renounceOwnership",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "components": [
+            {
+              "internalType": "address",
+              "name": "tokenAddress",
+              "type": "address"
+            },
+            {
+              "internalType": "uint256",
+              "name": "amount",
+              "type": "uint256"
+            }
+          ],
+          "internalType": "struct IBase.TokenAmount[]",
+          "name": "_debts",
+          "type": "tuple[]"
+        }
+      ],
+      "name": "repayDebt",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "borrower",
+          "type": "address"
+        },
+        {
+          "components": [
+            {
+              "internalType": "address",
+              "name": "tokenAddress",
+              "type": "address"
+            },
+            {
+              "internalType": "uint256",
+              "name": "amount",
+              "type": "uint256"
+            }
+          ],
+          "internalType": "struct IBase.TokenAmount[]",
+          "name": "_debts",
+          "type": "tuple[]"
+        }
+      ],
+      "name": "repayDebtFromPoolBurn",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "reservePool",
+      "outputs": [
+        {
+          "internalType": "contract IReservePool",
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "_troveManagerAddress",
+          "type": "address"
+        },
+        {
+          "internalType": "address",
+          "name": "_storagePoolAddress",
+          "type": "address"
+        },
+        {
+          "internalType": "address",
+          "name": "_stabilityPoolAddress",
+          "type": "address"
+        },
+        {
+          "internalType": "address",
+          "name": "_reservePoolAddress",
+          "type": "address"
+        },
+        {
+          "internalType": "address",
+          "name": "_priceFeedAddress",
+          "type": "address"
+        },
+        {
+          "internalType": "address",
+          "name": "_debtTokenManagerAddress",
+          "type": "address"
+        },
+        {
+          "internalType": "address",
+          "name": "_collTokenManagerAddress",
+          "type": "address"
+        },
+        {
+          "internalType": "address",
+          "name": "_swapOperations",
+          "type": "address"
+        }
+      ],
+      "name": "setAddresses",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "storagePool",
+      "outputs": [
+        {
+          "internalType": "contract IStoragePool",
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "_account",
+          "type": "address"
+        },
+        {
+          "internalType": "uint256",
+          "name": "_amount",
+          "type": "uint256"
+        },
+        {
+          "internalType": "contract IDebtToken",
+          "name": "_debtToken",
+          "type": "address"
+        }
+      ],
+      "name": "testDebtToken_burn",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "_account",
+          "type": "address"
+        },
+        {
+          "internalType": "uint256",
+          "name": "_amount",
+          "type": "uint256"
+        },
+        {
+          "internalType": "contract IDebtToken",
+          "name": "_debtToken",
+          "type": "address"
+        }
+      ],
+      "name": "testDebtToken_mint",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "_tokenAddress",
+          "type": "address"
+        },
+        {
+          "internalType": "bool",
+          "name": "_isColl",
+          "type": "bool"
+        },
+        {
+          "internalType": "enum IBase.PoolType",
+          "name": "_poolType",
+          "type": "uint8"
+        },
+        {
+          "internalType": "uint256",
+          "name": "_amount",
+          "type": "uint256"
+        }
+      ],
+      "name": "testStoragePool_addValue",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "_tokenAddress",
+          "type": "address"
+        },
+        {
+          "internalType": "bool",
+          "name": "_isColl",
+          "type": "bool"
+        },
+        {
+          "internalType": "enum IBase.PoolType",
+          "name": "_poolType",
+          "type": "uint8"
+        },
+        {
+          "internalType": "uint256",
+          "name": "_amount",
+          "type": "uint256"
+        }
+      ],
+      "name": "testStoragePool_subtractValue",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "_tokenAddress",
+          "type": "address"
+        },
+        {
+          "internalType": "bool",
+          "name": "_isColl",
+          "type": "bool"
+        },
+        {
+          "internalType": "enum IBase.PoolType",
+          "name": "_fromType",
+          "type": "uint8"
+        },
+        {
+          "internalType": "enum IBase.PoolType",
+          "name": "_toType",
+          "type": "uint8"
+        },
+        {
+          "internalType": "uint256",
+          "name": "_amount",
+          "type": "uint256"
+        }
+      ],
+      "name": "testStoragePool_transferBetweenTypes",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "_receiver",
+          "type": "address"
+        },
+        {
+          "internalType": "address",
+          "name": "_tokenAddress",
+          "type": "address"
+        },
+        {
+          "internalType": "bool",
+          "name": "_isColl",
+          "type": "bool"
+        },
+        {
+          "internalType": "enum IBase.PoolType",
+          "name": "_poolType",
+          "type": "uint8"
+        },
+        {
+          "internalType": "uint256",
+          "name": "_amount",
+          "type": "uint256"
+        }
+      ],
+      "name": "testStoragePool_withdrawalValue",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address[]",
+          "name": "collTokenAddresses",
+          "type": "address[]"
+        },
+        {
+          "internalType": "address",
+          "name": "_borrower",
+          "type": "address"
+        }
+      ],
+      "name": "testTroveManager_closeTrove",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "_borrower",
+          "type": "address"
+        },
+        {
+          "components": [
+            {
+              "internalType": "contract IDebtToken",
+              "name": "debtToken",
+              "type": "address"
+            },
+            {
+              "internalType": "uint256",
+              "name": "netDebt",
+              "type": "uint256"
+            },
+            {
+              "internalType": "uint256",
+              "name": "borrowingFee",
+              "type": "uint256"
+            }
+          ],
+          "internalType": "struct IBBase.DebtTokenAmount[]",
+          "name": "_debtTokenAmounts",
+          "type": "tuple[]"
+        }
+      ],
+      "name": "testTroveManager_increaseTroveDebt",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "_borrower",
+          "type": "address"
+        },
+        {
+          "internalType": "uint256",
+          "name": "_num",
+          "type": "uint256"
+        }
+      ],
+      "name": "testTroveManager_setTroveStatus",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "internalType": "address",
+          "name": "newOwner",
+          "type": "address"
+        }
+      ],
+      "name": "transferOwnership",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    },
+    {
+      "inputs": [],
+      "name": "troveManager",
+      "outputs": [
+        {
+          "internalType": "contract ITroveManager",
+          "name": "",
+          "type": "address"
+        }
+      ],
+      "stateMutability": "view",
+      "type": "function"
+    },
+    {
+      "inputs": [
+        {
+          "components": [
+            {
+              "internalType": "address",
+              "name": "tokenAddress",
+              "type": "address"
+            },
+            {
+              "internalType": "uint256",
+              "name": "amount",
+              "type": "uint256"
+            }
+          ],
+          "internalType": "struct IBase.TokenAmount[]",
+          "name": "_colls",
+          "type": "tuple[]"
+        }
+      ],
+      "name": "withdrawColl",
+      "outputs": [],
+      "stateMutability": "nonpayable",
+      "type": "function"
+    }
+  ],
+  "transactionHash": "0x66da72391c61356f356703094fc37b5aa250e1e62d1f2f2f9d4ef37a819e9fa0",
+  "receipt": {
+    "to": null,
+    "from": "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266",
+    "contractAddress": "0x5FbDB2315678afecb367f032d93F642f64180aa3",
+    "transactionIndex": 0,
+    "gasUsed": "3485020",
+    "logsBloom": "0x00000000000000000000000000000000000000000000000000800000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000001000000000000000000000000000000000040020000000000000100000800000000000000000000000000000000400000000000000000000000000000000000000000000000000000000200000000000000000000000000000000000000000000000000000000000000000000000000000040000000200000000000000000000000002000000000000000000020000000000000000000000000000000000000000000000000000000000000000000",
+    "blockHash": "0x3bd778e5b651bb1e0b7a85d4db85f25661c84ca6aca2e4af5b632096d199b2ae",
+    "transactionHash": "0x66da72391c61356f356703094fc37b5aa250e1e62d1f2f2f9d4ef37a819e9fa0",
+    "logs": [
+      {
+        "transactionIndex": 0,
+        "blockNumber": 1,
+        "transactionHash": "0x66da72391c61356f356703094fc37b5aa250e1e62d1f2f2f9d4ef37a819e9fa0",
+        "address": "0x5FbDB2315678afecb367f032d93F642f64180aa3",
+        "topics": [
+          "0x8be0079c531659141344cd1fd0a4f28419497f9722a3daafe3b4186f6b6457e0",
+          "0x0000000000000000000000000000000000000000000000000000000000000000",
+          "0x000000000000000000000000f39fd6e51aad88f6f4ce6ab8827279cfffb92266"
+        ],
+        "data": "0x",
+        "logIndex": 0,
+        "blockHash": "0x3bd778e5b651bb1e0b7a85d4db85f25661c84ca6aca2e4af5b632096d199b2ae"
+      }
+    ],
+    "blockNumber": 1,
+    "cumulativeGasUsed": "3485020",
+    "status": 1,
+    "byzantium": true
+  },
+  "args": [],
+  "numDeployments": 1,
+  "solcInputHash": "a1ba766827c404575f799519d1eb71c4",
+  "metadata": "{\"compiler\":{\"version\":\"0.8.20+commit.a1b79de6\"},\"language\":\"Solidity\",\"output\":{\"abi\":[{\"inputs\":[],\"name\":\"ActiveTrove\",\"type\":\"error\"},{\"inputs\":[],\"name\":\"CollWithdrawPermittedInRM\",\"type\":\"error\"},{\"inputs\":[],\"name\":\"FeeExceedMaxPercentage\",\"type\":\"error\"},{\"inputs\":[],\"name\":\"ICRDecreasedInRM\",\"type\":\"error\"},{\"inputs\":[],\"name\":\"ICR_lt_CCR\",\"type\":\"error\"},{\"inputs\":[],\"name\":\"ICR_lt_MCR\",\"type\":\"error\"},{\"inputs\":[],\"name\":\"InsufficientDebtToRepay\",\"type\":\"error\"},{\"inputs\":[],\"name\":\"MaxFee_gt_100_InRM\",\"type\":\"error\"},{\"inputs\":[],\"name\":\"MaxFee_out_Range\",\"type\":\"error\"},{\"inputs\":[],\"name\":\"NotAllowedInRecoveryMode\",\"type\":\"error\"},{\"inputs\":[],\"name\":\"NotBorrower\",\"type\":\"error\"},{\"inputs\":[],\"name\":\"NotContract\",\"type\":\"error\"},{\"inputs\":[],\"name\":\"NotFromStabilityPool\",\"type\":\"error\"},{\"inputs\":[],\"name\":\"NotFromSwapOps\",\"type\":\"error\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"owner\",\"type\":\"address\"}],\"name\":\"OwnableInvalidOwner\",\"type\":\"error\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"account\",\"type\":\"address\"}],\"name\":\"OwnableUnauthorizedAccount\",\"type\":\"error\"},{\"inputs\":[],\"name\":\"Repaid_gt_CurrentDebt\",\"type\":\"error\"},{\"inputs\":[],\"name\":\"TCR_lt_CCR\",\"type\":\"error\"},{\"inputs\":[],\"name\":\"TroveClosedOrNotExist\",\"type\":\"error\"},{\"inputs\":[],\"name\":\"WithdrawAmount_gt_Coll\",\"type\":\"error\"},{\"inputs\":[],\"name\":\"ZeroAddress\",\"type\":\"error\"},{\"inputs\":[],\"name\":\"ZeroDebtChange\",\"type\":\"error\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"address\",\"name\":\"_troveManagerAddress\",\"type\":\"address\"},{\"indexed\":false,\"internalType\":\"address\",\"name\":\"_storagePoolAddress\",\"type\":\"address\"},{\"indexed\":false,\"internalType\":\"address\",\"name\":\"_stabilityPoolAddress\",\"type\":\"address\"},{\"indexed\":false,\"internalType\":\"address\",\"name\":\"_reservePoolAddress\",\"type\":\"address\"},{\"indexed\":false,\"internalType\":\"address\",\"name\":\"_priceFeedAddress\",\"type\":\"address\"},{\"indexed\":false,\"internalType\":\"address\",\"name\":\"_debtTokenManagerAddress\",\"type\":\"address\"},{\"indexed\":false,\"internalType\":\"address\",\"name\":\"_collTokenManagerAddress\",\"type\":\"address\"},{\"indexed\":false,\"internalType\":\"address\",\"name\":\"_swapOperationsAddress\",\"type\":\"address\"}],\"name\":\"BorrowerOperationsInitialized\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"address\",\"name\":\"previousOwner\",\"type\":\"address\"},{\"indexed\":true,\"internalType\":\"address\",\"name\":\"newOwner\",\"type\":\"address\"}],\"name\":\"OwnershipTransferred\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":true,\"internalType\":\"address\",\"name\":\"_borrower\",\"type\":\"address\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"amount\",\"type\":\"uint256\"}],\"name\":\"SentBorrowingFeesToReserve\",\"type\":\"event\"},{\"anonymous\":false,\"inputs\":[{\"indexed\":false,\"internalType\":\"address\",\"name\":\"_borrower\",\"type\":\"address\"},{\"indexed\":false,\"internalType\":\"uint256\",\"name\":\"arrayIndex\",\"type\":\"uint256\"}],\"name\":\"TroveCreated\",\"type\":\"event\"},{\"inputs\":[],\"name\":\"BORROWING_FEE_FLOOR\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"CCR\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"MAX_BORROWING_FEE\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"MCR\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"NAME\",\"outputs\":[{\"internalType\":\"string\",\"name\":\"\",\"type\":\"string\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"PERCENT_DIVISOR\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"REDEMPTION_FEE_FLOOR\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"STABLE_COIN_GAS_COMPENSATION\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"SWAP_BASE_FEE\",\"outputs\":[{\"internalType\":\"uint32\",\"name\":\"\",\"type\":\"uint32\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"SWAP_FEE_PRECISION\",\"outputs\":[{\"internalType\":\"uint32\",\"name\":\"\",\"type\":\"uint32\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"_100pct\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"components\":[{\"internalType\":\"address\",\"name\":\"tokenAddress\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"amount\",\"type\":\"uint256\"}],\"internalType\":\"struct IBase.TokenAmount[]\",\"name\":\"_colls\",\"type\":\"tuple[]\"}],\"name\":\"addColl\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"closeTrove\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"collTokenManager\",\"outputs\":[{\"internalType\":\"contract ICollTokenManager\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"debtTokenManager\",\"outputs\":[{\"internalType\":\"contract IDebtTokenManager\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"components\":[{\"internalType\":\"contract IDebtToken\",\"name\":\"debtToken\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"netDebt\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"borrowingFee\",\"type\":\"uint256\"}],\"internalType\":\"struct IBBase.DebtTokenAmount[]\",\"name\":\"_debts\",\"type\":\"tuple[]\"}],\"name\":\"getCompositeDebt\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"_borrower\",\"type\":\"address\"},{\"internalType\":\"address\",\"name\":\"_to\",\"type\":\"address\"},{\"components\":[{\"internalType\":\"address\",\"name\":\"tokenAddress\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"amount\",\"type\":\"uint256\"}],\"internalType\":\"struct IBase.TokenAmount[]\",\"name\":\"_debts\",\"type\":\"tuple[]\"},{\"internalType\":\"uint256\",\"name\":\"_maxFeePercentage\",\"type\":\"uint256\"}],\"name\":\"increaseDebt\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"components\":[{\"internalType\":\"address\",\"name\":\"tokenAddress\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"amount\",\"type\":\"uint256\"}],\"internalType\":\"struct IBase.TokenAmount[]\",\"name\":\"_debts\",\"type\":\"tuple[]\"},{\"internalType\":\"uint256\",\"name\":\"_maxFeePercentage\",\"type\":\"uint256\"}],\"name\":\"increaseDebts\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"components\":[{\"internalType\":\"address\",\"name\":\"tokenAddress\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"amount\",\"type\":\"uint256\"}],\"internalType\":\"struct IBase.TokenAmount[]\",\"name\":\"_colls\",\"type\":\"tuple[]\"}],\"name\":\"openTrove\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"owner\",\"outputs\":[{\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"priceFeed\",\"outputs\":[{\"internalType\":\"contract IPriceFeed\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"renounceOwnership\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"components\":[{\"internalType\":\"address\",\"name\":\"tokenAddress\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"amount\",\"type\":\"uint256\"}],\"internalType\":\"struct IBase.TokenAmount[]\",\"name\":\"_debts\",\"type\":\"tuple[]\"}],\"name\":\"repayDebt\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"borrower\",\"type\":\"address\"},{\"components\":[{\"internalType\":\"address\",\"name\":\"tokenAddress\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"amount\",\"type\":\"uint256\"}],\"internalType\":\"struct IBase.TokenAmount[]\",\"name\":\"_debts\",\"type\":\"tuple[]\"}],\"name\":\"repayDebtFromPoolBurn\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"reservePool\",\"outputs\":[{\"internalType\":\"contract IReservePool\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"_troveManagerAddress\",\"type\":\"address\"},{\"internalType\":\"address\",\"name\":\"_storagePoolAddress\",\"type\":\"address\"},{\"internalType\":\"address\",\"name\":\"_stabilityPoolAddress\",\"type\":\"address\"},{\"internalType\":\"address\",\"name\":\"_reservePoolAddress\",\"type\":\"address\"},{\"internalType\":\"address\",\"name\":\"_priceFeedAddress\",\"type\":\"address\"},{\"internalType\":\"address\",\"name\":\"_debtTokenManagerAddress\",\"type\":\"address\"},{\"internalType\":\"address\",\"name\":\"_collTokenManagerAddress\",\"type\":\"address\"},{\"internalType\":\"address\",\"name\":\"_swapOperations\",\"type\":\"address\"}],\"name\":\"setAddresses\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"storagePool\",\"outputs\":[{\"internalType\":\"contract IStoragePool\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"_account\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"_amount\",\"type\":\"uint256\"},{\"internalType\":\"contract IDebtToken\",\"name\":\"_debtToken\",\"type\":\"address\"}],\"name\":\"testDebtToken_burn\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"_account\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"_amount\",\"type\":\"uint256\"},{\"internalType\":\"contract IDebtToken\",\"name\":\"_debtToken\",\"type\":\"address\"}],\"name\":\"testDebtToken_mint\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"_tokenAddress\",\"type\":\"address\"},{\"internalType\":\"bool\",\"name\":\"_isColl\",\"type\":\"bool\"},{\"internalType\":\"enum IBase.PoolType\",\"name\":\"_poolType\",\"type\":\"uint8\"},{\"internalType\":\"uint256\",\"name\":\"_amount\",\"type\":\"uint256\"}],\"name\":\"testStoragePool_addValue\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"_tokenAddress\",\"type\":\"address\"},{\"internalType\":\"bool\",\"name\":\"_isColl\",\"type\":\"bool\"},{\"internalType\":\"enum IBase.PoolType\",\"name\":\"_poolType\",\"type\":\"uint8\"},{\"internalType\":\"uint256\",\"name\":\"_amount\",\"type\":\"uint256\"}],\"name\":\"testStoragePool_subtractValue\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"_tokenAddress\",\"type\":\"address\"},{\"internalType\":\"bool\",\"name\":\"_isColl\",\"type\":\"bool\"},{\"internalType\":\"enum IBase.PoolType\",\"name\":\"_fromType\",\"type\":\"uint8\"},{\"internalType\":\"enum IBase.PoolType\",\"name\":\"_toType\",\"type\":\"uint8\"},{\"internalType\":\"uint256\",\"name\":\"_amount\",\"type\":\"uint256\"}],\"name\":\"testStoragePool_transferBetweenTypes\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"_receiver\",\"type\":\"address\"},{\"internalType\":\"address\",\"name\":\"_tokenAddress\",\"type\":\"address\"},{\"internalType\":\"bool\",\"name\":\"_isColl\",\"type\":\"bool\"},{\"internalType\":\"enum IBase.PoolType\",\"name\":\"_poolType\",\"type\":\"uint8\"},{\"internalType\":\"uint256\",\"name\":\"_amount\",\"type\":\"uint256\"}],\"name\":\"testStoragePool_withdrawalValue\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address[]\",\"name\":\"collTokenAddresses\",\"type\":\"address[]\"},{\"internalType\":\"address\",\"name\":\"_borrower\",\"type\":\"address\"}],\"name\":\"testTroveManager_closeTrove\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"_borrower\",\"type\":\"address\"},{\"components\":[{\"internalType\":\"contract IDebtToken\",\"name\":\"debtToken\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"netDebt\",\"type\":\"uint256\"},{\"internalType\":\"uint256\",\"name\":\"borrowingFee\",\"type\":\"uint256\"}],\"internalType\":\"struct IBBase.DebtTokenAmount[]\",\"name\":\"_debtTokenAmounts\",\"type\":\"tuple[]\"}],\"name\":\"testTroveManager_increaseTroveDebt\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"_borrower\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"_num\",\"type\":\"uint256\"}],\"name\":\"testTroveManager_setTroveStatus\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"address\",\"name\":\"newOwner\",\"type\":\"address\"}],\"name\":\"transferOwnership\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"troveManager\",\"outputs\":[{\"internalType\":\"contract ITroveManager\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"components\":[{\"internalType\":\"address\",\"name\":\"tokenAddress\",\"type\":\"address\"},{\"internalType\":\"uint256\",\"name\":\"amount\",\"type\":\"uint256\"}],\"internalType\":\"struct IBase.TokenAmount[]\",\"name\":\"_colls\",\"type\":\"tuple[]\"}],\"name\":\"withdrawColl\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"}],\"devdoc\":{\"errors\":{\"OwnableInvalidOwner(address)\":[{\"details\":\"The owner is not a valid owner account. (eg. `address(0)`)\"}],\"OwnableUnauthorizedAccount(address)\":[{\"details\":\"The caller account is not authorized to perform an operation.\"}]},\"kind\":\"dev\",\"methods\":{\"owner()\":{\"details\":\"Returns the address of the current owner.\"},\"renounceOwnership()\":{\"details\":\"Leaves the contract without owner. It will not be possible to call `onlyOwner` functions. Can only be called by the current owner. NOTE: Renouncing ownership will leave the contract without an owner, thereby disabling any functionality that is only available to the owner.\"},\"transferOwnership(address)\":{\"details\":\"Transfers ownership of the contract to a new account (`newOwner`). Can only be called by the current owner.\"}},\"version\":1},\"userdoc\":{\"kind\":\"user\",\"methods\":{},\"version\":1}},\"settings\":{\"compilationTarget\":{\"contracts/Mock/MockBorrowerOperations.sol\":\"MockBorrowerOperations\"},\"evmVersion\":\"paris\",\"libraries\":{},\"metadata\":{\"bytecodeHash\":\"ipfs\",\"useLiteralContent\":true},\"optimizer\":{\"enabled\":true,\"runs\":200},\"remappings\":[]},\"sources\":{\"@openzeppelin/contracts/access/Ownable.sol\":{\"content\":\"// SPDX-License-Identifier: MIT\\n// OpenZeppelin Contracts (last updated v5.0.0) (access/Ownable.sol)\\n\\npragma solidity ^0.8.20;\\n\\nimport {Context} from \\\"../utils/Context.sol\\\";\\n\\n/**\\n * @dev Contract module which provides a basic access control mechanism, where\\n * there is an account (an owner) that can be granted exclusive access to\\n * specific functions.\\n *\\n * The initial owner is set to the address provided by the deployer. This can\\n * later be changed with {transferOwnership}.\\n *\\n * This module is used through inheritance. It will make available the modifier\\n * `onlyOwner`, which can be applied to your functions to restrict their use to\\n * the owner.\\n */\\nabstract contract Ownable is Context {\\n    address private _owner;\\n\\n    /**\\n     * @dev The caller account is not authorized to perform an operation.\\n     */\\n    error OwnableUnauthorizedAccount(address account);\\n\\n    /**\\n     * @dev The owner is not a valid owner account. (eg. `address(0)`)\\n     */\\n    error OwnableInvalidOwner(address owner);\\n\\n    event OwnershipTransferred(address indexed previousOwner, address indexed newOwner);\\n\\n    /**\\n     * @dev Initializes the contract setting the address provided by the deployer as the initial owner.\\n     */\\n    constructor(address initialOwner) {\\n        if (initialOwner == address(0)) {\\n            revert OwnableInvalidOwner(address(0));\\n        }\\n        _transferOwnership(initialOwner);\\n    }\\n\\n    /**\\n     * @dev Throws if called by any account other than the owner.\\n     */\\n    modifier onlyOwner() {\\n        _checkOwner();\\n        _;\\n    }\\n\\n    /**\\n     * @dev Returns the address of the current owner.\\n     */\\n    function owner() public view virtual returns (address) {\\n        return _owner;\\n    }\\n\\n    /**\\n     * @dev Throws if the sender is not the owner.\\n     */\\n    function _checkOwner() internal view virtual {\\n        if (owner() != _msgSender()) {\\n            revert OwnableUnauthorizedAccount(_msgSender());\\n        }\\n    }\\n\\n    /**\\n     * @dev Leaves the contract without owner. It will not be possible to call\\n     * `onlyOwner` functions. Can only be called by the current owner.\\n     *\\n     * NOTE: Renouncing ownership will leave the contract without an owner,\\n     * thereby disabling any functionality that is only available to the owner.\\n     */\\n    function renounceOwnership() public virtual onlyOwner {\\n        _transferOwnership(address(0));\\n    }\\n\\n    /**\\n     * @dev Transfers ownership of the contract to a new account (`newOwner`).\\n     * Can only be called by the current owner.\\n     */\\n    function transferOwnership(address newOwner) public virtual onlyOwner {\\n        if (newOwner == address(0)) {\\n            revert OwnableInvalidOwner(address(0));\\n        }\\n        _transferOwnership(newOwner);\\n    }\\n\\n    /**\\n     * @dev Transfers ownership of the contract to a new account (`newOwner`).\\n     * Internal function without access restriction.\\n     */\\n    function _transferOwnership(address newOwner) internal virtual {\\n        address oldOwner = _owner;\\n        _owner = newOwner;\\n        emit OwnershipTransferred(oldOwner, newOwner);\\n    }\\n}\\n\",\"keccak256\":\"0xff6d0bb2e285473e5311d9d3caacb525ae3538a80758c10649a4d61029b017bb\",\"license\":\"MIT\"},\"@openzeppelin/contracts/token/ERC20/IERC20.sol\":{\"content\":\"// SPDX-License-Identifier: MIT\\n// OpenZeppelin Contracts (last updated v5.0.0) (token/ERC20/IERC20.sol)\\n\\npragma solidity ^0.8.20;\\n\\n/**\\n * @dev Interface of the ERC20 standard as defined in the EIP.\\n */\\ninterface IERC20 {\\n    /**\\n     * @dev Emitted when `value` tokens are moved from one account (`from`) to\\n     * another (`to`).\\n     *\\n     * Note that `value` may be zero.\\n     */\\n    event Transfer(address indexed from, address indexed to, uint256 value);\\n\\n    /**\\n     * @dev Emitted when the allowance of a `spender` for an `owner` is set by\\n     * a call to {approve}. `value` is the new allowance.\\n     */\\n    event Approval(address indexed owner, address indexed spender, uint256 value);\\n\\n    /**\\n     * @dev Returns the value of tokens in existence.\\n     */\\n    function totalSupply() external view returns (uint256);\\n\\n    /**\\n     * @dev Returns the value of tokens owned by `account`.\\n     */\\n    function balanceOf(address account) external view returns (uint256);\\n\\n    /**\\n     * @dev Moves a `value` amount of tokens from the caller's account to `to`.\\n     *\\n     * Returns a boolean value indicating whether the operation succeeded.\\n     *\\n     * Emits a {Transfer} event.\\n     */\\n    function transfer(address to, uint256 value) external returns (bool);\\n\\n    /**\\n     * @dev Returns the remaining number of tokens that `spender` will be\\n     * allowed to spend on behalf of `owner` through {transferFrom}. This is\\n     * zero by default.\\n     *\\n     * This value changes when {approve} or {transferFrom} are called.\\n     */\\n    function allowance(address owner, address spender) external view returns (uint256);\\n\\n    /**\\n     * @dev Sets a `value` amount of tokens as the allowance of `spender` over the\\n     * caller's tokens.\\n     *\\n     * Returns a boolean value indicating whether the operation succeeded.\\n     *\\n     * IMPORTANT: Beware that changing an allowance with this method brings the risk\\n     * that someone may use both the old and the new allowance by unfortunate\\n     * transaction ordering. One possible solution to mitigate this race\\n     * condition is to first reduce the spender's allowance to 0 and set the\\n     * desired value afterwards:\\n     * https://github.com/ethereum/EIPs/issues/20#issuecomment-263524729\\n     *\\n     * Emits an {Approval} event.\\n     */\\n    function approve(address spender, uint256 value) external returns (bool);\\n\\n    /**\\n     * @dev Moves a `value` amount of tokens from `from` to `to` using the\\n     * allowance mechanism. `value` is then deducted from the caller's\\n     * allowance.\\n     *\\n     * Returns a boolean value indicating whether the operation succeeded.\\n     *\\n     * Emits a {Transfer} event.\\n     */\\n    function transferFrom(address from, address to, uint256 value) external returns (bool);\\n}\\n\",\"keccak256\":\"0xc6a8ff0ea489379b61faa647490411b80102578440ab9d84e9a957cc12164e70\",\"license\":\"MIT\"},\"@openzeppelin/contracts/token/ERC20/extensions/IERC20Metadata.sol\":{\"content\":\"// SPDX-License-Identifier: MIT\\n// OpenZeppelin Contracts (last updated v5.0.0) (token/ERC20/extensions/IERC20Metadata.sol)\\n\\npragma solidity ^0.8.20;\\n\\nimport {IERC20} from \\\"../IERC20.sol\\\";\\n\\n/**\\n * @dev Interface for the optional metadata functions from the ERC20 standard.\\n */\\ninterface IERC20Metadata is IERC20 {\\n    /**\\n     * @dev Returns the name of the token.\\n     */\\n    function name() external view returns (string memory);\\n\\n    /**\\n     * @dev Returns the symbol of the token.\\n     */\\n    function symbol() external view returns (string memory);\\n\\n    /**\\n     * @dev Returns the decimals places of the token.\\n     */\\n    function decimals() external view returns (uint8);\\n}\\n\",\"keccak256\":\"0xaa761817f6cd7892fcf158b3c776b34551cde36f48ff9703d53898bc45a94ea2\",\"license\":\"MIT\"},\"@openzeppelin/contracts/utils/Address.sol\":{\"content\":\"// SPDX-License-Identifier: MIT\\n// OpenZeppelin Contracts (last updated v5.0.0) (utils/Address.sol)\\n\\npragma solidity ^0.8.20;\\n\\n/**\\n * @dev Collection of functions related to the address type\\n */\\nlibrary Address {\\n    /**\\n     * @dev The ETH balance of the account is not enough to perform the operation.\\n     */\\n    error AddressInsufficientBalance(address account);\\n\\n    /**\\n     * @dev There's no code at `target` (it is not a contract).\\n     */\\n    error AddressEmptyCode(address target);\\n\\n    /**\\n     * @dev A call to an address target failed. The target may have reverted.\\n     */\\n    error FailedInnerCall();\\n\\n    /**\\n     * @dev Replacement for Solidity's `transfer`: sends `amount` wei to\\n     * `recipient`, forwarding all available gas and reverting on errors.\\n     *\\n     * https://eips.ethereum.org/EIPS/eip-1884[EIP1884] increases the gas cost\\n     * of certain opcodes, possibly making contracts go over the 2300 gas limit\\n     * imposed by `transfer`, making them unable to receive funds via\\n     * `transfer`. {sendValue} removes this limitation.\\n     *\\n     * https://consensys.net/diligence/blog/2019/09/stop-using-soliditys-transfer-now/[Learn more].\\n     *\\n     * IMPORTANT: because control is transferred to `recipient`, care must be\\n     * taken to not create reentrancy vulnerabilities. Consider using\\n     * {ReentrancyGuard} or the\\n     * https://solidity.readthedocs.io/en/v0.8.20/security-considerations.html#use-the-checks-effects-interactions-pattern[checks-effects-interactions pattern].\\n     */\\n    function sendValue(address payable recipient, uint256 amount) internal {\\n        if (address(this).balance < amount) {\\n            revert AddressInsufficientBalance(address(this));\\n        }\\n\\n        (bool success, ) = recipient.call{value: amount}(\\\"\\\");\\n        if (!success) {\\n            revert FailedInnerCall();\\n        }\\n    }\\n\\n    /**\\n     * @dev Performs a Solidity function call using a low level `call`. A\\n     * plain `call` is an unsafe replacement for a function call: use this\\n     * function instead.\\n     *\\n     * If `target` reverts with a revert reason or custom error, it is bubbled\\n     * up by this function (like regular Solidity function calls). However, if\\n     * the call reverted with no returned reason, this function reverts with a\\n     * {FailedInnerCall} error.\\n     *\\n     * Returns the raw returned data. To convert to the expected return value,\\n     * use https://solidity.readthedocs.io/en/latest/units-and-global-variables.html?highlight=abi.decode#abi-encoding-and-decoding-functions[`abi.decode`].\\n     *\\n     * Requirements:\\n     *\\n     * - `target` must be a contract.\\n     * - calling `target` with `data` must not revert.\\n     */\\n    function functionCall(address target, bytes memory data) internal returns (bytes memory) {\\n        return functionCallWithValue(target, data, 0);\\n    }\\n\\n    /**\\n     * @dev Same as {xref-Address-functionCall-address-bytes-}[`functionCall`],\\n     * but also transferring `value` wei to `target`.\\n     *\\n     * Requirements:\\n     *\\n     * - the calling contract must have an ETH balance of at least `value`.\\n     * - the called Solidity function must be `payable`.\\n     */\\n    function functionCallWithValue(address target, bytes memory data, uint256 value) internal returns (bytes memory) {\\n        if (address(this).balance < value) {\\n            revert AddressInsufficientBalance(address(this));\\n        }\\n        (bool success, bytes memory returndata) = target.call{value: value}(data);\\n        return verifyCallResultFromTarget(target, success, returndata);\\n    }\\n\\n    /**\\n     * @dev Same as {xref-Address-functionCall-address-bytes-}[`functionCall`],\\n     * but performing a static call.\\n     */\\n    function functionStaticCall(address target, bytes memory data) internal view returns (bytes memory) {\\n        (bool success, bytes memory returndata) = target.staticcall(data);\\n        return verifyCallResultFromTarget(target, success, returndata);\\n    }\\n\\n    /**\\n     * @dev Same as {xref-Address-functionCall-address-bytes-}[`functionCall`],\\n     * but performing a delegate call.\\n     */\\n    function functionDelegateCall(address target, bytes memory data) internal returns (bytes memory) {\\n        (bool success, bytes memory returndata) = target.delegatecall(data);\\n        return verifyCallResultFromTarget(target, success, returndata);\\n    }\\n\\n    /**\\n     * @dev Tool to verify that a low level call to smart-contract was successful, and reverts if the target\\n     * was not a contract or bubbling up the revert reason (falling back to {FailedInnerCall}) in case of an\\n     * unsuccessful call.\\n     */\\n    function verifyCallResultFromTarget(\\n        address target,\\n        bool success,\\n        bytes memory returndata\\n    ) internal view returns (bytes memory) {\\n        if (!success) {\\n            _revert(returndata);\\n        } else {\\n            // only check if target is a contract if the call was successful and the return data is empty\\n            // otherwise we already know that it was a contract\\n            if (returndata.length == 0 && target.code.length == 0) {\\n                revert AddressEmptyCode(target);\\n            }\\n            return returndata;\\n        }\\n    }\\n\\n    /**\\n     * @dev Tool to verify that a low level call was successful, and reverts if it wasn't, either by bubbling the\\n     * revert reason or with a default {FailedInnerCall} error.\\n     */\\n    function verifyCallResult(bool success, bytes memory returndata) internal pure returns (bytes memory) {\\n        if (!success) {\\n            _revert(returndata);\\n        } else {\\n            return returndata;\\n        }\\n    }\\n\\n    /**\\n     * @dev Reverts with returndata if present. Otherwise reverts with {FailedInnerCall}.\\n     */\\n    function _revert(bytes memory returndata) private pure {\\n        // Look for revert reason and bubble it up if present\\n        if (returndata.length > 0) {\\n            // The easiest way to bubble the revert reason is using memory via assembly\\n            /// @solidity memory-safe-assembly\\n            assembly {\\n                let returndata_size := mload(returndata)\\n                revert(add(32, returndata), returndata_size)\\n            }\\n        } else {\\n            revert FailedInnerCall();\\n        }\\n    }\\n}\\n\",\"keccak256\":\"0xaf28a975a78550e45f65e559a3ad6a5ad43b9b8a37366999abd1b7084eb70721\",\"license\":\"MIT\"},\"@openzeppelin/contracts/utils/Context.sol\":{\"content\":\"// SPDX-License-Identifier: MIT\\n// OpenZeppelin Contracts (last updated v5.0.0) (utils/Context.sol)\\n\\npragma solidity ^0.8.20;\\n\\n/**\\n * @dev Provides information about the current execution context, including the\\n * sender of the transaction and its data. While these are generally available\\n * via msg.sender and msg.data, they should not be accessed in such a direct\\n * manner, since when dealing with meta-transactions the account sending and\\n * paying for execution may not be the actual sender (as far as an application\\n * is concerned).\\n *\\n * This contract is only required for intermediate, library-like contracts.\\n */\\nabstract contract Context {\\n    function _msgSender() internal view virtual returns (address) {\\n        return msg.sender;\\n    }\\n\\n    function _msgData() internal view virtual returns (bytes calldata) {\\n        return msg.data;\\n    }\\n}\\n\",\"keccak256\":\"0x75a4ee64c68dbd5f38bddd06e664a64c8271b4caa554fb6f0607dfd672bb4bf3\",\"license\":\"MIT\"},\"contracts/BorrowerOperations.sol\":{\"content\":\"// SPDX-License-Identifier: MIT\\n\\npragma solidity ^0.8.9;\\n\\nimport '@openzeppelin/contracts/token/ERC20/IERC20.sol';\\nimport '@openzeppelin/contracts/access/Ownable.sol';\\nimport './Dependencies/LiquityBase.sol';\\nimport './Dependencies/CheckContract.sol';\\nimport './Interfaces/IBorrowerOperations.sol';\\nimport './Interfaces/ITroveManager.sol';\\nimport './Interfaces/IDebtToken.sol';\\nimport './Interfaces/IDebtTokenManager.sol';\\nimport './Interfaces/IStoragePool.sol';\\nimport './Interfaces/IReservePool.sol';\\nimport './Interfaces/IPriceFeed.sol';\\nimport './Interfaces/IBBase.sol';\\nimport './Interfaces/ICollTokenManager.sol';\\n\\ncontract BorrowerOperations is LiquityBase, Ownable(msg.sender), CheckContract, IBorrowerOperations {\\n  string public constant NAME = 'BorrowerOperations';\\n\\n  // --- Connected contract declarations ---\\n\\n  ITroveManager public troveManager;\\n  IDebtTokenManager public debtTokenManager;\\n  ICollTokenManager public collTokenManager;\\n  IStoragePool public storagePool;\\n  IReservePool public reservePool;\\n  IPriceFeed public priceFeed;\\n  address stabilityPoolAddress;\\n  address swapOperations;\\n\\n  //    ILQTYStaking public lqtyStaking;\\n  //    address public lqtyStakingAddress;\\n\\n  /* --- Variable container structs  ---\\n\\n    Used to hold, return and assign variables inside a function, in order to avoid the error:\\n    \\\"CompilerError: Stack too deep\\\". */\\n\\n  struct LocalVariables_openTrove {\\n    address[] collTokenAddresses;\\n    //\\n    TokenAmount[] colls;\\n    DebtTokenAmount[] debts;\\n    uint compositeDebtInUSD;\\n    uint compositeCollInUSD;\\n    uint ICR;\\n    uint NICR;\\n    uint arrayIndex;\\n    //\\n    bool isInRecoveryMode;\\n    uint TCR;\\n    uint entireSystemColl;\\n    uint entireSystemDebt;\\n  }\\n\\n  struct LocalVariables_adjustTrove {\\n    address[] collTokenAddresses;\\n    //\\n    TokenAmount[] colls;\\n    DebtTokenAmount[] debts;\\n    DebtTokenAmount stableCoinEntry;\\n    //\\n    uint oldCompositeDebtInUSD;\\n    uint oldCompositeCollInUSD;\\n    uint oldICR;\\n    //\\n    uint newCompositeDebtInUSD;\\n    uint newCompositeCollInUSD;\\n    uint newICR;\\n    uint newNCR;\\n    //\\n    uint stake;\\n    bool isInRecoveryMode;\\n    uint TCR;\\n    uint newTCR;\\n    uint entireSystemColl;\\n    uint entireSystemDebt;\\n  }\\n\\n  struct LocalVariables_closeTrove {\\n    bool isInRecoveryMode;\\n    uint newTCR;\\n    uint entireSystemColl;\\n    uint entireSystemDebt;\\n  }\\n\\n  struct ContractsCache {\\n    ITroveManager troveManager;\\n    IStoragePool storagePool;\\n    IDebtTokenManager debtTokenManager;\\n    ICollTokenManager collTokenManager;\\n  }\\n\\n  // --- Dependency setters ---\\n\\n  function setAddresses(\\n    address _troveManagerAddress,\\n    address _storagePoolAddress,\\n    address _stabilityPoolAddress,\\n    address _reservePoolAddress,\\n    address _priceFeedAddress,\\n    address _debtTokenManagerAddress,\\n    address _collTokenManagerAddress,\\n    address _swapOperations\\n  ) external onlyOwner {\\n    checkContract(_troveManagerAddress);\\n    checkContract(_storagePoolAddress);\\n    checkContract(_stabilityPoolAddress);\\n    checkContract(_reservePoolAddress);\\n    checkContract(_priceFeedAddress);\\n    checkContract(_debtTokenManagerAddress);\\n    checkContract(_collTokenManagerAddress);\\n    checkContract(_swapOperations);\\n\\n    troveManager = ITroveManager(_troveManagerAddress);\\n    storagePool = IStoragePool(_storagePoolAddress);\\n    stabilityPoolAddress = _stabilityPoolAddress;\\n    reservePool = IReservePool(_reservePoolAddress);\\n    priceFeed = IPriceFeed(_priceFeedAddress);\\n    debtTokenManager = IDebtTokenManager(_debtTokenManagerAddress);\\n    collTokenManager = ICollTokenManager(_collTokenManagerAddress);\\n    swapOperations = _swapOperations;\\n\\n    emit BorrowerOperationsInitialized(\\n      _troveManagerAddress,\\n      _storagePoolAddress,\\n      _stabilityPoolAddress,\\n      _reservePoolAddress,\\n      _priceFeedAddress,\\n      _debtTokenManagerAddress,\\n      _collTokenManagerAddress,\\n      _swapOperations\\n    );\\n\\n    renounceOwnership();\\n  }\\n\\n  // --- Borrower Trove Operations ---\\n\\n  function openTrove(TokenAmount[] memory _colls) external override {\\n    ContractsCache memory contractsCache = ContractsCache(\\n      troveManager,\\n      storagePool,\\n      debtTokenManager,\\n      collTokenManager\\n    );\\n    LocalVariables_openTrove memory vars;\\n    vars.collTokenAddresses = contractsCache.collTokenManager.getCollTokenAddresses();\\n    address borrower = msg.sender;\\n\\n    _requireTroveIsNotActive(contractsCache.troveManager, borrower);\\n\\n    // adding gas compensation to the net debt\\n    DebtTokenAmount memory stableCoinAmount = DebtTokenAmount(\\n      contractsCache.debtTokenManager.getStableCoin(),\\n      STABLE_COIN_GAS_COMPENSATION,\\n      0\\n    );\\n    vars.debts = new DebtTokenAmount[](1);\\n    vars.debts[0] = stableCoinAmount;\\n    // ICR is based on the composite debt, i.e. the requested debt amount + borrowing fee + debt gas comp.\\n    vars.compositeDebtInUSD = _getCompositeDebt(vars.debts);\\n\\n    vars.colls = _colls;\\n    vars.compositeCollInUSD = _getCompositeColl(vars.colls);\\n\\n    vars.ICR = LiquityMath._computeCR(vars.compositeCollInUSD, vars.compositeDebtInUSD);\\n    vars.NICR = LiquityMath._computeNominalCR(vars.compositeCollInUSD, vars.compositeDebtInUSD);\\n\\n    (\\n      // checking collateral ratios\\n      vars.isInRecoveryMode,\\n      vars.TCR,\\n      vars.entireSystemColl,\\n      vars.entireSystemDebt\\n    ) = contractsCache.storagePool.checkRecoveryMode();\\n    if (vars.isInRecoveryMode) {\\n      _requireICRisAboveCCR(vars.ICR); // > 150 %\\n    } else {\\n      _requireICRisAboveMCR(vars.ICR); // > 110 %\\n\\n      uint newTCR = _getNewTCRFromTroveChange(\\n        vars.compositeCollInUSD,\\n        true,\\n        vars.compositeDebtInUSD,\\n        true,\\n        vars.entireSystemColl,\\n        vars.entireSystemDebt\\n      ); // bools: coll increase, debt increase\\n      _requireNewTCRisAboveCCR(newTCR); // > 150 %\\n    }\\n\\n    // Set the trove struct's properties\\n    contractsCache.troveManager.setTroveStatus(borrower, 1); // active\\n    contractsCache.troveManager.increaseTroveColl(borrower, vars.colls);\\n    contractsCache.troveManager.increaseTroveDebt(borrower, vars.debts);\\n    contractsCache.troveManager.updateTroveRewardSnapshots(borrower);\\n    contractsCache.troveManager.updateStakeAndTotalStakes(vars.collTokenAddresses, borrower);\\n\\n    vars.arrayIndex = contractsCache.troveManager.addTroveOwnerToArray(borrower);\\n\\n    // Move the coll to the active pool\\n    for (uint i = 0; i < vars.colls.length; i++) {\\n      TokenAmount memory collTokenAmount = vars.colls[i];\\n      _poolAddColl(\\n        borrower,\\n        contractsCache.storagePool,\\n        collTokenAmount.tokenAddress,\\n        collTokenAmount.amount,\\n        PoolType.Active\\n      );\\n    }\\n\\n    // Move the stable coin gas compensation to the Gas Pool\\n    contractsCache.storagePool.addValue(\\n      address(stableCoinAmount.debtToken),\\n      false,\\n      PoolType.GasCompensation,\\n      stableCoinAmount.netDebt\\n    );\\n    stableCoinAmount.debtToken.mint(address(contractsCache.storagePool), stableCoinAmount.netDebt);\\n\\n    emit TroveCreated(borrower, vars.arrayIndex);\\n  }\\n\\n  // Send collateral to a trove\\n  function addColl(TokenAmount[] memory _colls) external override {\\n    address borrower = msg.sender;\\n    (ContractsCache memory contractsCache, LocalVariables_adjustTrove memory vars) = _prepareTroveAdjustment(borrower);\\n\\n    vars.newCompositeCollInUSD += _getCompositeColl(_colls);\\n\\n    contractsCache.troveManager.increaseTroveColl(borrower, _colls);\\n\\n    for (uint i = 0; i < _colls.length; i++) {\\n      TokenAmount memory collTokenAmount = _colls[i];\\n      _poolAddColl(\\n        borrower,\\n        contractsCache.storagePool,\\n        collTokenAmount.tokenAddress,\\n        collTokenAmount.amount,\\n        PoolType.Active\\n      );\\n    }\\n\\n    _finaliseTrove(false, false, contractsCache, vars, borrower);\\n  }\\n\\n  // Withdraw collateral from a trove\\n  function withdrawColl(TokenAmount[] memory _colls) external override {\\n    address borrower = msg.sender;\\n    (ContractsCache memory contractsCache, LocalVariables_adjustTrove memory vars) = _prepareTroveAdjustment(borrower);\\n\\n    uint withdrawCompositeInUSD = _getCompositeColl(_colls);\\n    if (withdrawCompositeInUSD > vars.newCompositeCollInUSD) revert WithdrawAmount_gt_Coll();\\n    vars.newCompositeCollInUSD -= withdrawCompositeInUSD;\\n\\n    contractsCache.troveManager.decreaseTroveColl(borrower, _colls);\\n\\n    for (uint i = 0; i < _colls.length; i++) {\\n      TokenAmount memory collTokenAmount = _colls[i];\\n\\n      // checking is the trove has enough coll for the withdrawal\\n      TokenAmount memory existingColl;\\n      for (uint ii = 0; ii < vars.colls.length; ii++) {\\n        if (vars.colls[ii].tokenAddress != collTokenAmount.tokenAddress) continue;\\n        existingColl = vars.colls[ii];\\n        break;\\n      }\\n      assert(existingColl.amount >= collTokenAmount.amount);\\n\\n      _poolSubtractColl(\\n        borrower,\\n        contractsCache.storagePool,\\n        collTokenAmount.tokenAddress,\\n        collTokenAmount.amount,\\n        PoolType.Active\\n      );\\n    }\\n\\n    _finaliseTrove(true, false, contractsCache, vars, borrower);\\n  }\\n\\n  function increaseDebt(\\n    address _borrower,\\n    address _to,\\n    TokenAmount[] memory _debts,\\n    uint _maxFeePercentage\\n  ) external override {\\n    _requireCallerIsSwapOperations();\\n    _increaseDebt(_borrower, _to, _debts, _maxFeePercentage);\\n  }\\n\\n  // increasing debt off a trove\\n  function _increaseDebt(address _borrower, address _to, TokenAmount[] memory _debts, uint _maxFeePercentage) internal {\\n    (ContractsCache memory contractsCache, LocalVariables_adjustTrove memory vars) = _prepareTroveAdjustment(_borrower);\\n\\n    _requireValidMaxFeePercentage(_maxFeePercentage, vars.isInRecoveryMode);\\n\\n    // checking if new debt is above the minimum\\n    for (uint i = 0; i < _debts.length; i++) _requireNonZeroDebtChange(_debts[i].amount);\\n\\n    (\\n      DebtTokenAmount[] memory debtsToAdd,\\n      DebtTokenAmount memory stableCoinAmount\\n    ) = _getDebtTokenAmountsWithFetchedPrices(contractsCache.debtTokenManager, _debts);\\n\\n    // adding the borrowing fee to the net debt\\n    uint borrowingFeesPaid = 0;\\n    if (!vars.isInRecoveryMode)\\n      borrowingFeesPaid = _addBorrowingFees(\\n        contractsCache.troveManager,\\n        debtsToAdd,\\n        stableCoinAmount,\\n        _maxFeePercentage\\n      );\\n\\n    vars.newCompositeDebtInUSD += _getCompositeDebt(debtsToAdd);\\n    contractsCache.troveManager.increaseTroveDebt(_borrower, debtsToAdd);\\n\\n    for (uint i = 0; i < debtsToAdd.length; i++) {\\n      DebtTokenAmount memory debtTokenAmount = debtsToAdd[i];\\n      _poolAddDebt(\\n        _to,\\n        contractsCache.storagePool,\\n        debtTokenAmount.debtToken,\\n        debtTokenAmount.netDebt,\\n        debtTokenAmount.borrowingFee\\n      );\\n    }\\n\\n    _finaliseTrove(false, true, contractsCache, vars, _borrower);\\n  }\\n\\n  // repay debt of a trove\\n  function repayDebt(TokenAmount[] memory _debts) external override {\\n    address borrower = msg.sender;\\n\\n    (ContractsCache memory contractsCache, LocalVariables_adjustTrove memory vars) = _prepareTroveAdjustment(borrower);\\n    DebtTokenAmount[] memory debtsToRemove = _handleRepayStates(contractsCache, vars, borrower, _debts);\\n\\n    for (uint i = 0; i < debtsToRemove.length; i++) {\\n      DebtTokenAmount memory debtTokenAmount = debtsToRemove[i];\\n      _poolRepayDebt(\\n        borrower,\\n        contractsCache.storagePool,\\n        debtTokenAmount.debtToken,\\n        debtTokenAmount.netDebt // it is not possible to repay the gasComp, this happens only when the trove is closed\\n      );\\n    }\\n\\n    _finaliseTrove(false, false, contractsCache, vars, borrower);\\n  }\\n\\n  // repay debt of a trove directly from swap ops after pool liquidity removal (burning)\\n  // the debt tokens are directly burned from the swap ops\\n  function repayDebtFromPoolBurn(address borrower, TokenAmount[] memory _debts) external override {\\n    _requireCallerIsSwapOperations();\\n\\n    (ContractsCache memory contractsCache, LocalVariables_adjustTrove memory vars) = _prepareTroveAdjustment(borrower);\\n    DebtTokenAmount[] memory debtsToRemove = _handleRepayStates(contractsCache, vars, borrower, _debts);\\n\\n    for (uint i = 0; i < debtsToRemove.length; i++) {\\n      DebtTokenAmount memory debtTokenAmount = debtsToRemove[i];\\n      contractsCache.storagePool.subtractValue(\\n        address(debtTokenAmount.debtToken),\\n        false,\\n        PoolType.Active,\\n        debtTokenAmount.netDebt\\n      );\\n    }\\n\\n    _finaliseTrove(false, false, contractsCache, vars, borrower);\\n  }\\n\\n  function _handleRepayStates(\\n    ContractsCache memory contractsCache,\\n    LocalVariables_adjustTrove memory vars,\\n    address borrower,\\n    TokenAmount[] memory _debts\\n  ) internal returns (DebtTokenAmount[] memory debtsToRemove) {\\n    (debtsToRemove, ) = _getDebtTokenAmountsWithFetchedPrices(contractsCache.debtTokenManager, _debts);\\n    vars.newCompositeDebtInUSD -= _getCompositeDebt(debtsToRemove);\\n    contractsCache.troveManager.decreaseTroveDebt(borrower, debtsToRemove);\\n\\n    for (uint i = 0; i < debtsToRemove.length; i++) {\\n      DebtTokenAmount memory debtTokenAmount = debtsToRemove[i];\\n      address debtTokenAddress = address(debtTokenAmount.debtToken);\\n\\n      // checking if the trove has enough debt for the repayment (gas comp needs to remain)\\n      DebtTokenAmount memory existingDebt;\\n      for (uint ii = 0; ii < vars.debts.length; ii++) {\\n        if (address(vars.debts[ii].debtToken) != debtTokenAddress) continue;\\n        existingDebt = vars.debts[ii];\\n        break;\\n      }\\n      _requireAtLeastMinNetDebt(existingDebt.netDebt, debtTokenAmount.netDebt);\\n      if (debtTokenAmount.debtToken.isStableCoin())\\n        _requireValidStableCoinRepayment(existingDebt.netDebt, debtTokenAmount.netDebt);\\n    }\\n\\n    return debtsToRemove;\\n  }\\n\\n  function closeTrove() external override {\\n    address borrower = msg.sender;\\n    (ContractsCache memory contractsCache, LocalVariables_adjustTrove memory vars) = _prepareTroveAdjustment(borrower);\\n\\n    _requireNotInRecoveryMode(vars.isInRecoveryMode);\\n\\n    uint newTCR = _getNewTCRFromTroveChange(\\n      vars.oldCompositeCollInUSD,\\n      false,\\n      vars.oldCompositeDebtInUSD,\\n      false,\\n      vars.entireSystemColl,\\n      vars.entireSystemDebt\\n    );\\n    _requireNewTCRisAboveCCR(newTCR);\\n\\n    // repay any open debts\\n    for (uint i = 0; i < vars.debts.length; i++) {\\n      DebtTokenAmount memory debtTokenAmount = vars.debts[i];\\n\\n      uint toRepay;\\n      if (debtTokenAmount.debtToken.isStableCoin()) toRepay = debtTokenAmount.netDebt - STABLE_COIN_GAS_COMPENSATION;\\n      else toRepay = debtTokenAmount.netDebt;\\n      if (toRepay == 0) continue;\\n\\n      _poolRepayDebt(borrower, contractsCache.storagePool, debtTokenAmount.debtToken, toRepay);\\n    }\\n\\n    // burn the gas compensation\\n    _poolBurnGasComp(contractsCache.storagePool, vars.stableCoinEntry.debtToken);\\n\\n    // Send the collateral back to the user\\n    for (uint i = 0; i < vars.colls.length; i++) {\\n      TokenAmount memory collTokenAmount = vars.colls[i];\\n\\n      _poolSubtractColl(\\n        borrower,\\n        contractsCache.storagePool,\\n        collTokenAmount.tokenAddress,\\n        collTokenAmount.amount,\\n        PoolType.Active\\n      );\\n    }\\n\\n    contractsCache.troveManager.removeStake(vars.collTokenAddresses, borrower);\\n    contractsCache.troveManager.closeTroveByProtocol(vars.collTokenAddresses, borrower, Status.closedByOwner);\\n  }\\n\\n  // --- Helper functions ---\\n\\n  function _prepareTroveAdjustment(\\n    address _borrower\\n  ) internal returns (ContractsCache memory contractsCache, LocalVariables_adjustTrove memory vars) {\\n    contractsCache = ContractsCache(troveManager, storagePool, debtTokenManager, collTokenManager);\\n    vars.collTokenAddresses = contractsCache.collTokenManager.getCollTokenAddresses();\\n\\n    (vars.isInRecoveryMode, vars.TCR, vars.entireSystemColl, vars.entireSystemDebt) = contractsCache\\n      .storagePool\\n      .checkRecoveryMode();\\n\\n    _requireTroveisActive(contractsCache.troveManager, _borrower);\\n    contractsCache.troveManager.applyPendingRewards(_borrower); // from redistributions\\n\\n    // fetching old/current debts and colls including prices + calc ICR\\n    (vars.debts, vars.stableCoinEntry) = _getDebtTokenAmountsWithFetchedPrices(\\n      contractsCache.debtTokenManager,\\n      contractsCache.troveManager.getTroveDebt(_borrower)\\n    );\\n    vars.oldCompositeDebtInUSD = _getCompositeDebt(vars.debts);\\n    vars.newCompositeDebtInUSD = vars.oldCompositeDebtInUSD;\\n\\n    vars.colls = contractsCache.troveManager.getTroveColl(_borrower);\\n    vars.oldCompositeCollInUSD = _getCompositeColl(vars.colls);\\n    vars.newCompositeCollInUSD = vars.oldCompositeCollInUSD;\\n\\n    vars.oldICR = LiquityMath._computeCR(vars.oldCompositeCollInUSD, vars.oldCompositeDebtInUSD);\\n\\n    return (contractsCache, vars);\\n  }\\n\\n  function _finaliseTrove(\\n    bool _isCollWithdrawal,\\n    bool _isDebtIncrease,\\n    ContractsCache memory contractsCache,\\n    LocalVariables_adjustTrove memory vars,\\n    address _borrower\\n  ) internal {\\n    // calculate the new ICR\\n    vars.newICR = LiquityMath._computeCR(vars.newCompositeCollInUSD, vars.newCompositeDebtInUSD);\\n    vars.newNCR = LiquityMath._computeNominalCR(vars.newCompositeCollInUSD, vars.newCompositeDebtInUSD);\\n\\n    // Check the adjustment satisfies all conditions for the current system mode\\n    _requireValidAdjustmentInCurrentMode(_isCollWithdrawal, _isDebtIncrease, vars);\\n\\n    // update troves stake\\n    contractsCache.troveManager.updateStakeAndTotalStakes(vars.collTokenAddresses, _borrower);\\n  }\\n\\n  function _getNewTCRFromTroveChange(\\n    uint _collChange,\\n    bool _isCollIncrease,\\n    uint _debtChange,\\n    bool _isDebtIncrease,\\n    uint entireSystemColl,\\n    uint entireSystemDebt\\n  ) internal pure returns (uint) {\\n    uint totalColl = _isCollIncrease ? entireSystemColl + _collChange : entireSystemColl - _collChange;\\n    uint totalDebt = _isDebtIncrease ? entireSystemDebt + _debtChange : entireSystemDebt - _debtChange;\\n\\n    uint newTCR = LiquityMath._computeCR(totalColl, totalDebt);\\n    return newTCR;\\n  }\\n\\n  function _addBorrowingFees(\\n    ITroveManager _troveManager,\\n    DebtTokenAmount[] memory _debts,\\n    DebtTokenAmount memory _stableCoinAmount,\\n    uint _maxFeePercentage\\n  ) internal returns (uint borrowingFee) {\\n    uint compositeDebtInUSD = _getCompositeDebt(_debts);\\n\\n    _troveManager.decayBaseRateFromBorrowing(); // decay the baseRate state variable\\n    borrowingFee = _troveManager.getBorrowingFee(compositeDebtInUSD); // calculated in stable price\\n    _requireUserAcceptsFee(borrowingFee, compositeDebtInUSD, _maxFeePercentage);\\n    uint stableCoinPrice = _stableCoinAmount.debtToken.getPrice();\\n    borrowingFee = (borrowingFee * DECIMAL_PRECISION) / stableCoinPrice;\\n\\n    // update troves debts\\n    _stableCoinAmount.netDebt += borrowingFee;\\n    _stableCoinAmount.borrowingFee += borrowingFee;\\n\\n    return borrowingFee;\\n  }\\n\\n  function _poolAddColl(\\n    address _borrower,\\n    IStoragePool _pool,\\n    address _collAddress,\\n    uint _amount,\\n    PoolType _poolType\\n  ) internal {\\n    _pool.addValue(_collAddress, true, _poolType, _amount);\\n    IERC20(_collAddress).transferFrom(_borrower, address(_pool), _amount);\\n  }\\n\\n  function _poolSubtractColl(\\n    address _borrower,\\n    IStoragePool _pool,\\n    address _collAddress,\\n    uint _amount,\\n    PoolType _poolType\\n  ) internal {\\n    _pool.withdrawalValue(_borrower, _collAddress, true, _poolType, _amount);\\n  }\\n\\n  function _poolAddDebt(\\n    address _tokenRecipient,\\n    IStoragePool _storagePool,\\n    IDebtToken _debtToken,\\n    uint _netDebtIncrease,\\n    uint _borrowingFee\\n  ) internal {\\n    _storagePool.addValue(address(_debtToken), false, PoolType.Active, _netDebtIncrease);\\n\\n    // payout issued debt to the recipient\\n    uint mintAmount = _netDebtIncrease - _borrowingFee;\\n    if (mintAmount > 0) _debtToken.mint(_tokenRecipient, mintAmount);\\n\\n    if (_borrowingFee == 0) return;\\n\\n    // forward the borrowing fee to the reserve pool (or gov staking)\\n    uint govStakingPayout = _borrowingFee;\\n    uint missingStableForReserveCap = reservePool.stableAmountUntilCap();\\n    if (missingStableForReserveCap > 0) {\\n      uint reserveTransfer = LiquityMath._min(_borrowingFee, missingStableForReserveCap);\\n      govStakingPayout -= reserveTransfer;\\n\\n      _debtToken.mint(address(reservePool), reserveTransfer);\\n      emit SentBorrowingFeesToReserve(_tokenRecipient, reserveTransfer);\\n    }\\n\\n    if (govStakingPayout > 0) {\\n      // todo transfer to gov staking contract\\n    }\\n  }\\n\\n  function _poolRepayDebt(\\n    address _borrower,\\n    IStoragePool _storagePool,\\n    IDebtToken _debtToken,\\n    uint _repayAmount\\n  ) internal {\\n    _requireSufficientDebtBalance(_debtToken, _borrower, _repayAmount);\\n    _storagePool.subtractValue(address(_debtToken), false, PoolType.Active, _repayAmount);\\n    _debtToken.burn(_borrower, _repayAmount);\\n  }\\n\\n  function _poolBurnGasComp(IStoragePool _storagePool, IDebtToken _stableCoin) internal {\\n    _storagePool.subtractValue(address(_stableCoin), false, PoolType.GasCompensation, STABLE_COIN_GAS_COMPENSATION);\\n    _stableCoin.burn(address(_storagePool), STABLE_COIN_GAS_COMPENSATION);\\n  }\\n\\n  // --- 'Require' wrapper functions ---\\n\\n  function _requireCallerIsSwapOperations() internal view {\\n    if (msg.sender != swapOperations) revert NotFromSwapOps();\\n  }\\n\\n  function _requireCallerIsBorrower(address _borrower) internal view {\\n    if (msg.sender != _borrower) revert NotBorrower();\\n  }\\n\\n  function _requireTroveisActive(ITroveManager _troveManager, address _borrower) internal view {\\n    uint status = _troveManager.getTroveStatus(_borrower);\\n    if (status != 1) revert TroveClosedOrNotExist();\\n  }\\n\\n  function _requireNotInRecoveryMode(bool _isInRecoveryMode) internal pure {\\n    if (_isInRecoveryMode) revert NotAllowedInRecoveryMode();\\n  }\\n\\n  function _requireTroveIsNotActive(ITroveManager _troveManager, address _borrower) internal view {\\n    uint status = _troveManager.getTroveStatus(_borrower);\\n    if (status == 1) revert ActiveTrove();\\n  }\\n\\n  function _requireSufficientDebtBalance(IDebtToken _debtToken, address _borrower, uint _debtRepayment) internal view {\\n    if (_debtToken.balanceOf(_borrower) < _debtRepayment) revert InsufficientDebtToRepay();\\n  }\\n\\n  // adds stableCoin debt including gas compensation if not already included\\n  function _getDebtTokenAmountsWithFetchedPrices(\\n    IDebtTokenManager _dTokenManager,\\n    TokenAmount[] memory _debts\\n  ) internal view returns (DebtTokenAmount[] memory debtTokenAmounts, DebtTokenAmount memory stableCoinEntry) {\\n    address stableCoinAddress = address(_dTokenManager.getStableCoin());\\n\\n    bool stableCoinIncluded = false;\\n    for (uint i = 0; i < _debts.length; i++) {\\n      if (_debts[i].tokenAddress != stableCoinAddress) continue;\\n\\n      stableCoinIncluded = true;\\n      break;\\n    }\\n\\n    if (stableCoinIncluded) debtTokenAmounts = new DebtTokenAmount[](_debts.length);\\n    else debtTokenAmounts = new DebtTokenAmount[](_debts.length + 1);\\n\\n    for (uint i = 0; i < _debts.length; i++) {\\n      IDebtToken debtToken = _dTokenManager.getDebtToken(_debts[i].tokenAddress);\\n      debtTokenAmounts[i] = DebtTokenAmount(debtToken, _debts[i].amount, 0);\\n\\n      if (stableCoinIncluded && debtToken.isStableCoin()) stableCoinEntry = debtTokenAmounts[i];\\n    }\\n\\n    if (!stableCoinIncluded) {\\n      IDebtToken debtToken = _dTokenManager.getStableCoin();\\n      debtTokenAmounts[_debts.length] = DebtTokenAmount(debtToken, 0, 0);\\n      stableCoinEntry = debtTokenAmounts[_debts.length];\\n    }\\n\\n    return (debtTokenAmounts, stableCoinEntry);\\n  }\\n\\n  function _requireNonZeroDebtChange(uint _change) internal pure {\\n    if (_change == 0) revert ZeroDebtChange();\\n  }\\n\\n  function _requireValidAdjustmentInCurrentMode(\\n    bool _isCollWithdrawal,\\n    bool _isDebtIncrease,\\n    LocalVariables_adjustTrove memory _vars\\n  ) internal pure {\\n    /*\\n     *In Recovery Mode, only allow:\\n     *\\n     * - Pure collateral top-up\\n     * - Pure debt repayment\\n     * - Collateral top-up with debt repayment\\n     * - A debt increase combined with a collateral top-up which makes the ICR >= 150% and improves the ICR (and by extension improves the TCR).\\n     *\\n     * In Normal Mode, ensure:\\n     *\\n     * - The new ICR is above MCR\\n     * - The adjustment won't pull the TCR below CCR\\n     */\\n    if (_vars.isInRecoveryMode) {\\n      // BorrowerOps: Collateral withdrawal not permitted Recovery Mode\\n      if (_isCollWithdrawal) revert CollWithdrawPermittedInRM();\\n      if (_isDebtIncrease) _requireICRisAboveCCR(_vars.newICR);\\n    } else {\\n      // if Normal Mode\\n      _requireICRisAboveMCR(_vars.newICR);\\n\\n      uint collChange = _vars.newCompositeCollInUSD > _vars.oldCompositeCollInUSD\\n        ? _vars.newCompositeCollInUSD - _vars.oldCompositeCollInUSD\\n        : _vars.oldCompositeCollInUSD - _vars.newCompositeCollInUSD;\\n      uint debtChange = _vars.newCompositeDebtInUSD > _vars.oldCompositeDebtInUSD\\n        ? _vars.newCompositeDebtInUSD - _vars.oldCompositeDebtInUSD\\n        : _vars.oldCompositeDebtInUSD - _vars.newCompositeDebtInUSD;\\n      _vars.newTCR = _getNewTCRFromTroveChange(\\n        collChange,\\n        !_isCollWithdrawal,\\n        debtChange,\\n        _isDebtIncrease,\\n        _vars.entireSystemColl,\\n        _vars.entireSystemDebt\\n      );\\n\\n      _requireNewTCRisAboveCCR(_vars.newTCR);\\n    }\\n  }\\n\\n  function _requireICRisAboveMCR(uint _newICR) internal pure {\\n    // BorrowerOps: An operation that would result in ICR < MCR is not permitted\\n    if (_newICR < MCR) revert ICR_lt_MCR();\\n  }\\n\\n  function _requireICRisAboveCCR(uint _newICR) internal pure {\\n    // BorrowerOps: Operation must leave trove with ICR >= CCR\\n    if (_newICR < CCR) revert ICR_lt_CCR();\\n  }\\n\\n  function _requireNewICRisAboveOldICR(uint _newICR, uint _oldICR) internal pure {\\n    // BorrowerOps: Cannot decrease your Trove's ICR in Recovery Mode\\n    if (_newICR < _oldICR) revert ICRDecreasedInRM();\\n  }\\n\\n  function _requireNewTCRisAboveCCR(uint _newTCR) internal pure {\\n    // BorrowerOps: An operation that would result in TCR < CCR is not permitted\\n    if (_newTCR < CCR) revert TCR_lt_CCR();\\n  }\\n\\n  function _requireAtLeastMinNetDebt(uint _netDebt, uint _repayment) internal pure {\\n    // TODO: It should be netDebt - repayment > minDebt, but no min debt defined yet, check later\\n    if (_netDebt < _repayment) revert Repaid_gt_CurrentDebt();\\n  }\\n\\n  function _requireValidStableCoinRepayment(uint _currentDebt, uint _debtRepayment) internal pure {\\n    // BorrowerOps: Amount repaid must not be larger than the Trove's debt\\n    if (_debtRepayment > (_currentDebt - STABLE_COIN_GAS_COMPENSATION)) revert Repaid_gt_CurrentDebt();\\n  }\\n\\n  function _requireValidMaxFeePercentage(uint _maxFeePercentage, bool _isInRecoveryMode) internal pure {\\n    if (_isInRecoveryMode) {\\n      if (_maxFeePercentage > MAX_BORROWING_FEE) revert MaxFee_gt_100_InRM();\\n    } else {\\n      if (_maxFeePercentage < BORROWING_FEE_FLOOR || _maxFeePercentage > MAX_BORROWING_FEE) revert MaxFee_out_Range();\\n    }\\n  }\\n\\n  // --- ICR and TCR getters ---\\n\\n  function getCompositeDebt(DebtTokenAmount[] memory _debts) external view override returns (uint) {\\n    return _getCompositeDebt(_debts);\\n  }\\n\\n  function _getNetDebt(DebtTokenAmount[] memory _debts) internal view returns (uint) {\\n    return _getCompositeDebt(_debts) - STABLE_COIN_GAS_COMPENSATION;\\n  }\\n\\n  // Returns the composite debt (drawn debt + gas compensation) of a trove, for the purpose of ICR calculation\\n  function _getCompositeDebt(DebtTokenAmount[] memory _debts) internal view returns (uint debtInUSD) {\\n    for (uint i = 0; i < _debts.length; i++) {\\n      debtInUSD += priceFeed.getUSDValue(address(_debts[i].debtToken), _debts[i].netDebt);\\n    }\\n  }\\n\\n  function _getCompositeColl(TokenAmount[] memory _colls) internal view returns (uint collInUSD) {\\n    for (uint i = 0; i < _colls.length; i++) {\\n      collInUSD += priceFeed.getUSDValue(_colls[i].tokenAddress, _colls[i].amount);\\n    }\\n  }\\n}\\n\",\"keccak256\":\"0xbd250af7eaefa318e5f6b3c84efa9b748a66c463b1a5174d6d786a6b8088e827\",\"license\":\"MIT\"},\"contracts/Dependencies/CheckContract.sol\":{\"content\":\"// SPDX-License-Identifier: MIT\\n\\npragma solidity ^0.8.9;\\n\\nimport '@openzeppelin/contracts/utils/Address.sol';\\n\\ncontract CheckContract {\\n  using Address for address;\\n\\n  error ZeroAddress();\\n  error NotContract();\\n\\n  /**\\n   * Check that the account is an already deployed non-destroyed contract.\\n   * See: https://github.com/OpenZeppelin/openzeppelin-contracts/blob/master/contracts/utils/Address.sol#L12\\n   */\\n  function checkContract(address _account) internal view {\\n    if (_account == address(0)) revert ZeroAddress();\\n\\n    uint256 size;\\n    assembly {\\n      size := extcodesize(_account)\\n    }\\n    if (size == 0) revert NotContract();\\n  }\\n}\\n\",\"keccak256\":\"0x482f75ff862c7f4f9bec69557c4756e1a41a037cda5c3c3392bbbf101e1e1385\",\"license\":\"MIT\"},\"contracts/Dependencies/IERC2612.sol\":{\"content\":\"// SPDX-License-Identifier: MIT\\n\\npragma solidity ^0.8.9;\\n\\n/**\\n * @dev Interface of the ERC2612 standard as defined in the EIP.\\n *\\n * Adds the {permit} method, which can be used to change one's\\n * {IERC20-allowance} without having to send a transaction, by signing a\\n * message. This allows users to spend tokens without having to hold Ether.\\n *\\n * See https://eips.ethereum.org/EIPS/eip-2612.\\n *\\n * Code adapted from https://github.com/OpenZeppelin/openzeppelin-contracts/pull/2237/\\n */\\ninterface IERC2612 {\\n  /**\\n   * @dev Sets `amount` as the allowance of `spender` over `owner`'s tokens,\\n   * given `owner`'s signed approval.\\n   *\\n   * IMPORTANT: The same issues {IERC20-approve} has related to transaction\\n   * ordering also apply here.\\n   *\\n   * Emits an {Approval} event.\\n   *\\n   * Requirements:\\n   *\\n   * - `owner` cannot be the zero address.\\n   * - `spender` cannot be the zero address.\\n   * - `deadline` must be a timestamp in the future.\\n   * - `v`, `r` and `s` must be a valid `secp256k1` signature from `owner`\\n   * over the EIP712-formatted function arguments.\\n   * - the signature must use ``owner``'s current nonce (see {nonces}).\\n   *\\n   * For more information on the signature format, see the\\n   * https://eips.ethereum.org/EIPS/eip-2612#specification[relevant EIP\\n   * section].\\n   */\\n  function permit(\\n    address owner,\\n    address spender,\\n    uint256 amount,\\n    uint256 deadline,\\n    uint8 v,\\n    bytes32 r,\\n    bytes32 s\\n  ) external;\\n\\n  /**\\n   * @dev Returns the current ERC2612 nonce for `owner`. This value must be\\n   * included whenever a signature is generated for {permit}.\\n   *\\n   * Every successful call to {permit} increases `owner`'s nonce by one. This\\n   * prevents a signature from being used multiple times.\\n   *\\n   * `owner` can limit the time a Permit is valid for by setting `deadline` to\\n   * a value in the near future. The deadline argument can be set to uint(-1) to\\n   * create Permits that effectively never expire.\\n   */\\n  function nonces(address owner) external view returns (uint256);\\n\\n  function version() external view returns (string memory);\\n\\n  function permitTypeHash() external view returns (bytes32);\\n\\n  function domainSeparator() external view returns (bytes32);\\n}\\n\",\"keccak256\":\"0x53d56e6e532f4b96025d7fb71a098764919f12ad5b390d698201332a6fc60c9d\",\"license\":\"MIT\"},\"contracts/Dependencies/LiquityBase.sol\":{\"content\":\"// SPDX-License-Identifier: MIT\\n\\npragma solidity ^0.8.9;\\n\\nimport './LiquityMath.sol';\\nimport '../Interfaces/IBase.sol';\\n\\n/*\\n * Base contract for TroveManager, BorrowerOperations and StabilityPool. Contains global system constants and\\n * common functions.\\n */\\ncontract LiquityBase is IBase {\\n  uint internal constant DECIMAL_PRECISION = 1e18;\\n  uint32 public constant SWAP_FEE_PRECISION = 1e6;\\n  uint32 public constant SWAP_BASE_FEE = 3e3; // 0.3%\\n  uint public constant _100pct = 1e18; // 1e18 == 100%\\n  uint public constant MCR = 1.1e18; // 110%, Minimum collateral ratio for individual troves\\n  uint public constant CCR = 1.5e18; // 150%, Critical system collateral ratio. If the system's total collateral ratio (TCR) falls below the CCR, Recovery Mode is triggered.\\n  uint public constant STABLE_COIN_GAS_COMPENSATION = 200e18; // Amount of stable to be locked in gas pool on opening troves\\n  uint public constant PERCENT_DIVISOR = 200; // dividing by 200 yields 0.5%\\n  uint public constant MAX_BORROWING_FEE = 0.05e18; // 5%\\n  uint public constant BORROWING_FEE_FLOOR = 0.005e18; // 0.5%\\n  uint public constant REDEMPTION_FEE_FLOOR = 0.005e18; // 0.5%\\n\\n  // Return the coll amount of to be drawn from a trove's collateral and sent as gas compensation.\\n  function _getCollGasCompensation(uint _collAmount) internal pure returns (uint) {\\n    return _collAmount / PERCENT_DIVISOR;\\n  }\\n\\n  function _requireUserAcceptsFee(uint _fee, uint _amount, uint _maxFeePercentage) internal pure {\\n    if (_fee == 0) return;\\n\\n    uint feePercentage = (_fee * DECIMAL_PRECISION) / _amount;\\n    // Fee exceeded provided maximum\\n    if (feePercentage > _maxFeePercentage) revert FeeExceedMaxPercentage();\\n  }\\n}\\n\",\"keccak256\":\"0xd635d362aeae2f89023daba55875e04566f4e35fdac4bd3895ea4969cffc1308\",\"license\":\"MIT\"},\"contracts/Dependencies/LiquityMath.sol\":{\"content\":\"// SPDX-License-Identifier: MIT\\n\\npragma solidity ^0.8.9;\\n\\nlibrary LiquityMath {\\n  uint internal constant DECIMAL_PRECISION = 1e18;\\n\\n  /* Precision for Nominal ICR (independent of price). Rationale for the value:\\n   *\\n   * - Making it \\u201ctoo high\\u201d could lead to overflows.\\n   * - Making it \\u201ctoo low\\u201d could lead to an ICR equal to zero, due to truncation from Solidity floor division.\\n   *\\n   * This value of 1e20 is chosen for safety: the NICR will only overflow for numerator > ~1e39 ETH,\\n   * and will only truncate to 0 if the denominator is at least 1e20 times greater than the numerator.\\n   *\\n   */\\n  uint internal constant NICR_PRECISION = 1e20;\\n\\n  function _min(uint _a, uint _b) internal pure returns (uint) {\\n    return (_a < _b) ? _a : _b;\\n  }\\n\\n  function _max(uint _a, uint _b) internal pure returns (uint) {\\n    return (_a >= _b) ? _a : _b;\\n  }\\n\\n  /*\\n   * Multiply two decimal numbers and use normal rounding rules:\\n   * -round product up if 19'th mantissa digit >= 5\\n   * -round product down if 19'th mantissa digit < 5\\n   *\\n   * Used only inside the exponentiation, _decPow().\\n   */\\n  function decMul(uint x, uint y) internal pure returns (uint decProd) {\\n    uint prod_xy = x * y;\\n\\n    decProd = (prod_xy + DECIMAL_PRECISION / 2) / DECIMAL_PRECISION;\\n  }\\n\\n  /*\\n   * _decPow: Exponentiation function for 18-digit decimal base, and integer exponent n.\\n   *\\n   * Uses the efficient \\\"exponentiation by squaring\\\" algorithm. O(log(n)) complexity.\\n   *\\n   * Called by two functions that represent time in units of minutes:\\n   * 1) TroveManager._calcDecayedBaseRate\\n   * 2) CommunityIssuance._getCumulativeIssuanceFraction\\n   *\\n   * The exponent is capped to avoid reverting due to overflow. The cap 525600000 equals\\n   * \\\"minutes in 1000 years\\\": 60 * 24 * 365 * 1000\\n   *\\n   * If a period of > 1000 years is ever used as an exponent in either of the above functions, the result will be\\n   * negligibly different from just passing the cap, since:\\n   *\\n   * In function 1), the decayed base rate will be 0 for 1000 years or > 1000 years\\n   * In function 2), the difference in tokens issued at 1000 years and any time > 1000 years, will be negligible\\n   */\\n  function _decPow(uint _base, uint _minutes) internal pure returns (uint) {\\n    if (_minutes > 525600000) {\\n      _minutes = 525600000;\\n    } // cap to avoid overflow\\n\\n    if (_minutes == 0) {\\n      return DECIMAL_PRECISION;\\n    }\\n\\n    uint y = DECIMAL_PRECISION;\\n    uint x = _base;\\n    uint n = _minutes;\\n\\n    // Exponentiation-by-squaring\\n    while (n > 1) {\\n      if (n % 2 == 0) {\\n        x = decMul(x, x);\\n        n = n / 2;\\n      } else {\\n        // if (n % 2 != 0)\\n        y = decMul(x, y);\\n        x = decMul(x, x);\\n        n = (n - 1) / 2;\\n      }\\n    }\\n\\n    return decMul(x, y);\\n  }\\n\\n  function _getAbsoluteDifference(uint _a, uint _b) internal pure returns (uint) {\\n    return (_a >= _b) ? _a - _b : _b - _a;\\n  }\\n\\n  function _computeNominalCR(uint _coll, uint _debt) internal pure returns (uint) {\\n    if (_debt > 0) {\\n      return (_coll * NICR_PRECISION) / _debt;\\n    }\\n    // Return the maximal value for uint256 if the Trove has a debt of 0. Represents \\\"infinite\\\" CR.\\n    else {\\n      // if (_debt == 0)\\n      return 2 ** 256 - 1;\\n    }\\n  }\\n\\n  function _computeCR(uint _coll, uint _debt) internal pure returns (uint) {\\n    if (_debt > 0) return (_coll * DECIMAL_PRECISION) / _debt;\\n\\n    // Return the maximal value for uint256 if the Trove has a debt of 0. Represents \\\"infinite\\\" CR.\\n    // if (_debt == 0)\\n    return 2 ** 256 - 1;\\n  }\\n\\n  // babylonian method (https://en.wikipedia.org/wiki/Methods_of_computing_square_roots#Babylonian_method)\\n  function _sqrt(uint y) internal pure returns (uint z) {\\n    if (y > 3) {\\n      z = y;\\n      uint x = y / 2 + 1;\\n      while (x < z) {\\n        z = x;\\n        x = (y / x + x) / 2;\\n      }\\n    } else if (y != 0) {\\n      z = 1;\\n    }\\n  }\\n}\\n\",\"keccak256\":\"0x5234c90c541302a3eda2b75f02ae3945837771ccc5bb19e2af1839602ba35f9b\",\"license\":\"MIT\"},\"contracts/Interfaces/IBBase.sol\":{\"content\":\"// SPDX-License-Identifier: MIT\\n\\npragma solidity ^0.8.9;\\n\\nimport './IBase.sol';\\nimport './IDebtToken.sol';\\nimport './IStabilityPool.sol';\\n\\ninterface IBBase is IBase {\\n  enum Status {\\n    nonExistent,\\n    active,\\n    closedByOwner,\\n    closedByLiquidationInNormalMode,\\n    closedByLiquidationInRecoveryMode\\n  }\\n\\n  struct DebtTokenAmount {\\n    IDebtToken debtToken;\\n    uint netDebt;\\n    uint borrowingFee; // only in case of stable coin\\n  }\\n\\n  struct RemainingStability {\\n    IStabilityPool stabilityPool;\\n    address tokenAddress;\\n    uint remaining;\\n    uint debtToOffset; // debt amount which will be removed from the stability pool to liquidate the trove\\n    TokenAmount[] collGained; // coll which will be sent to the SP as rewards (multiple entries with same token address are possible)\\n  }\\n}\\n\",\"keccak256\":\"0x2b777c348158b33cbf6d0cbcf74a3981eadb257b388a47d110b3fdb60d9d55cb\",\"license\":\"MIT\"},\"contracts/Interfaces/IBase.sol\":{\"content\":\"// SPDX-License-Identifier: MIT\\n\\npragma solidity ^0.8.9;\\n\\ninterface IBase {\\n  enum PoolType {\\n    Active, // assets in active troves\\n    Default, // assets from redistributions, which are not yet claimed by the trove owners\\n    GasCompensation // stableCoin from gas compensation\\n  }\\n\\n  error FeeExceedMaxPercentage();\\n\\n  struct RAmount {\\n    address tokenAddress;\\n    bool isColl; // coll or debt token\\n    uint amount; // initial value in trove\\n    uint pendingReward; // gained rewards since deposit\\n    uint gasCompensation; // gas compensation for liquidation\\n    uint toLiquidate; // amount + pendingReward - gasCompensation\\n    uint toRedistribute; // across other open troves\\n    uint toOffset; // by stability pools\\n  }\\n\\n  struct CAmount {\\n    address tokenAddress;\\n    bool isColl; // coll or debt token\\n    uint amount;\\n  }\\n\\n  struct TokenAmount {\\n    address tokenAddress;\\n    uint amount;\\n  }\\n}\\n\",\"keccak256\":\"0x85f943dcc809f64cc30144f14495c5cdb556371a835f0d6022c7409a7d867fef\",\"license\":\"MIT\"},\"contracts/Interfaces/IBorrowerOperations.sol\":{\"content\":\"// SPDX-License-Identifier: MIT\\n\\npragma solidity ^0.8.9;\\n\\nimport './IBBase.sol';\\n\\n// Common interface for the Trove Manager.\\ninterface IBorrowerOperations is IBBase {\\n  // --- Events ---\\n\\n  event BorrowerOperationsInitialized(\\n    address _troveManagerAddress,\\n    address _storagePoolAddress,\\n    address _stabilityPoolAddress,\\n    address _reservePoolAddress,\\n    address _priceFeedAddress,\\n    address _debtTokenManagerAddress,\\n    address _collTokenManagerAddress,\\n    address _swapOperationsAddress\\n  );\\n  event TroveCreated(address _borrower, uint arrayIndex);\\n  event SentBorrowingFeesToReserve(address indexed _borrower, uint amount);\\n\\n  // --- Custom Errors ---\\n\\n  error NotFromStabilityPool();\\n  error NotFromSwapOps();\\n  error CollWithdrawPermittedInRM();\\n  error ICR_lt_MCR();\\n  error ICR_lt_CCR();\\n  error TCR_lt_CCR();\\n  error ICRDecreasedInRM();\\n  error MaxFee_gt_100_InRM();\\n  error MaxFee_out_Range();\\n  error Repaid_gt_CurrentDebt();\\n  error TroveClosedOrNotExist();\\n  error ActiveTrove();\\n  error NotAllowedInRecoveryMode();\\n  error NotBorrower();\\n  error WithdrawAmount_gt_Coll();\\n  error ZeroDebtChange();\\n  error InsufficientDebtToRepay();\\n\\n  // --- Functions ---\\n\\n  function openTrove(TokenAmount[] memory _colls) external;\\n\\n  function addColl(TokenAmount[] memory _colls) external;\\n\\n  function withdrawColl(TokenAmount[] memory _colls) external;\\n\\n  function increaseDebt(address _borrower, address _to, TokenAmount[] memory _debts, uint _maxFeePercentage) external;\\n\\n  function repayDebt(TokenAmount[] memory _debts) external;\\n\\n  function repayDebtFromPoolBurn(address borrower, TokenAmount[] memory _debts) external;\\n\\n  function closeTrove() external;\\n\\n  function getCompositeDebt(DebtTokenAmount[] memory _debts) external view returns (uint);\\n}\\n\",\"keccak256\":\"0x2b60cd43029db162ff3f063834ea034723ad669603fda7d48451a3434bab8bf3\",\"license\":\"MIT\"},\"contracts/Interfaces/ICollTokenManager.sol\":{\"content\":\"// SPDX-License-Identifier: MIT\\n\\npragma solidity ^0.8.9;\\n\\ninterface ICollTokenManager {\\n  // --- Events ---\\n  event CollTokenManagerInitialized(address _priceFeedAddress);\\n  event CollTokenAdded(address _collTokenAddress);\\n\\n  // --- Custom Errors ---\\n  error TokenAlreadyAdded();\\n\\n  // --- Functions ---\\n\\n  function getCollTokenAddresses() external view returns (address[] memory);\\n\\n  function addCollToken(address _tokenAddress) external;\\n}\\n\",\"keccak256\":\"0x841232977bec6eff931b093b931a48a17dec71e92b89c9d603975787f9d5ca42\",\"license\":\"MIT\"},\"contracts/Interfaces/IDebtToken.sol\":{\"content\":\"// SPDX-License-Identifier: MIT\\n\\npragma solidity ^0.8.9;\\n\\nimport '@openzeppelin/contracts/token/ERC20/IERC20.sol';\\nimport '@openzeppelin/contracts/token/ERC20/extensions/IERC20Metadata.sol';\\nimport '../Dependencies/IERC2612.sol';\\nimport './IBase.sol';\\n\\ninterface IDebtToken is IERC20, IERC20Metadata, IERC2612, IBase {\\n  // --- Custom Errors ---\\n  error NotFromBorrowerOps();\\n  error NotFromBOorTroveMorSP();\\n  error NotFromSPManager();\\n  error NotFromTroveMorSP();\\n  error NotAllowedDirectTransfer();\\n  error InvalidSignature();\\n  error ExpiredDeadline();\\n  error InsufficientBalance();\\n\\n  // --- Functions ---\\n\\n  function isStableCoin() external view returns (bool);\\n\\n  function getPrice() external view returns (uint);\\n\\n  function mint(address _account, uint256 _amount) external;\\n\\n  function burn(address _account, uint256 _amount) external;\\n\\n  function sendToPool(address _sender, address _poolAddress, uint256 _amount) external;\\n\\n  function totalSupply() external view override returns (uint256);\\n\\n  function balanceOf(address account) external view override returns (uint256);\\n\\n  function transfer(address recipient, uint256 amount) external override returns (bool);\\n\\n  function allowance(address owner, address spender) external view override returns (uint256);\\n\\n  function approve(address spender, uint256 amount) external override returns (bool);\\n\\n  function transferFrom(address sender, address recipient, uint256 amount) external override returns (bool);\\n\\n  function increaseAllowance(address spender, uint256 addedValue) external returns (bool);\\n\\n  function decreaseAllowance(address spender, uint256 subtractedValue) external returns (bool);\\n\\n  function domainSeparator() external view override returns (bytes32);\\n\\n  function permit(\\n    address owner,\\n    address spender,\\n    uint amount,\\n    uint deadline,\\n    uint8 v,\\n    bytes32 r,\\n    bytes32 s\\n  ) external override;\\n\\n  function nonces(address owner) external view override returns (uint256);\\n\\n  function name() external view override returns (string memory);\\n\\n  function symbol() external view override returns (string memory);\\n\\n  function decimals() external view override returns (uint8);\\n\\n  function version() external view override returns (string memory);\\n\\n  function permitTypeHash() external view override returns (bytes32);\\n}\\n\",\"keccak256\":\"0x4da05b4ce909788d8e8f3129c3bb4a4da599ac75935faefb66c3b78cdecd23aa\",\"license\":\"MIT\"},\"contracts/Interfaces/IDebtTokenManager.sol\":{\"content\":\"// SPDX-License-Identifier: MIT\\n\\npragma solidity ^0.8.9;\\n\\nimport './IDebtToken.sol';\\n\\n// Common interface for the dToken Manager.\\ninterface IDebtTokenManager {\\n  // --- Events ---\\n\\n  event DebtTokenManagerInitialized(address _stabilityPoolManagerAddress);\\n  event DebtTokenAdded(address _debtTokenAddress);\\n\\n  // --- Functions ---\\n\\n  function getStableCoin() external view returns (IDebtToken);\\n\\n  function isDebtToken(address _address) external view returns (bool);\\n\\n  function getDebtToken(address _address) external view returns (IDebtToken);\\n\\n  function getDebtTokenAddresses() external view returns (address[] memory);\\n\\n  function addDebtToken(address _debtTokenAddress) external;\\n}\\n\",\"keccak256\":\"0x9b263476d765d2c26c970271959c453c2e4607bcf2c58cea71c621d8dc714bb5\",\"license\":\"MIT\"},\"contracts/Interfaces/IPriceFeed.sol\":{\"content\":\"// SPDX-License-Identifier: MIT\\n\\npragma solidity ^0.8.9;\\n\\nimport './IBase.sol';\\n\\ninterface IPriceFeed is IBase {\\n  enum Status {\\n    working,\\n    oraclesUntrusted\\n  }\\n\\n  // --- Events ---\\n  event LastGoodPriceUpdated(address _token, uint _lastGoodPrice);\\n  event PriceFeedStatusChanged(address _token, Status newStatus);\\n  event TokenPriceChanged(address _token);\\n\\n  // --- Function ---\\n  function getPrice(address _tokenAddress) external view returns (uint price);\\n\\n  function getUSDValue(address _token, uint _amount) external view returns (uint usdValue);\\n\\n  function getAmountFromUSDValue(address _token, uint256 _usdValue) external view returns (uint amount);\\n}\\n\",\"keccak256\":\"0x9d8a68437d1b6eb73f5728bb0415e59b802a6a6fff6b2b4c442fd9cb9b97e041\",\"license\":\"MIT\"},\"contracts/Interfaces/IReservePool.sol\":{\"content\":\"// SPDX-License-Identifier: MIT\\n\\npragma solidity ^0.8.9;\\n\\nimport './IBBase.sol';\\nimport './IDebtToken.sol';\\n\\ninterface IReservePool is IBBase {\\n  error NotFromSPM();\\n\\n  event ReservePoolInitialized(\\n    address _stabilityPoolManager,\\n    address _priceFeed,\\n    address _stableDebtTokenAddress,\\n    address _govTokenAddress\\n  );\\n  event ReserveCapChanged(uint newReserveCap, uint newGovReserveCap);\\n  event WithdrewReserves(uint govAmount, uint stableAmount);\\n\\n  function stableDebtToken() external view returns (IDebtToken);\\n\\n  function govToken() external view returns (IERC20);\\n\\n  function setRelativeStableCap(uint _relativeStableCap) external;\\n\\n  function stableAmountUntilCap() external view returns (uint);\\n\\n  function isGovReserveCapReached() external view returns (bool);\\n\\n  function withdrawValue(address stabilityPool, uint withdrawAmount) external returns (uint usedGov, uint usedStable);\\n}\\n\",\"keccak256\":\"0xf97d0b0249e9d675ff045749add7e6768629d2fb1c17980ffa26af7952d9fc59\",\"license\":\"MIT\"},\"contracts/Interfaces/IStabilityPool.sol\":{\"content\":\"// SPDX-License-Identifier: MIT\\n\\npragma solidity ^0.8.9;\\n\\nimport './IDebtToken.sol';\\nimport './IBase.sol';\\n\\ninterface IStabilityPool is IBase {\\n  // --- Events ---\\n\\n  event StabilityPoolInitialized(address stabilityPoolManagerAddress, address depositTokenAddress);\\n\\n  event StabilityProvided(address user, uint amount);\\n  event StabilityWithdrawn(address user, uint amount);\\n  event StabilityGainsWithdrawn(address user, uint depositLost, TokenAmount[] gainsWithdrawn);\\n\\n  // used as trigger to update the users compounded deposit and current coll gains (there is not user specific event for that)\\n  event StabilityOffset(uint removedDeposit, TokenAmount[] addedGains);\\n\\n  event P_Updated(uint _P);\\n  event S_Updated(address _tokenAddress, uint _S, uint128 _epoch, uint128 _scale);\\n  event EpochUpdated(uint128 _currentEpoch);\\n  event ScaleUpdated(uint128 _currentScale);\\n  event DepositSnapshotUpdated(address indexed _depositor);\\n  // event G_Updated(uint _G, uint128 _epoch, uint128 _scale);\\n\\n  // --- Errors  ---\\n\\n  error NotFromStabilityPoolManager();\\n  error ZeroAmount();\\n  error NotOneTrove();\\n\\n  // --- Functions ---\\n\\n  function getDepositToken() external view returns (IDebtToken);\\n\\n  function getTotalDeposit() external view returns (uint);\\n\\n  function getDepositorDeposit(address _depositor) external view returns (uint);\\n\\n  function getCompoundedDebtDeposit(address _depositor) external view returns (uint);\\n\\n  function getTotalGainedColl() external view returns (TokenAmount[] memory coll);\\n\\n  function getDepositorCollGain(address _depositor, address _collToken) external view returns (uint);\\n\\n  function getDepositorCollSnapshot(address _depositor, address _collToken) external view returns (uint);\\n\\n  function provideToSP(address user, uint _amount) external;\\n\\n  function withdrawFromSP(address user, uint _amount) external;\\n\\n  function withdrawGains(address user) external;\\n\\n  function offset(uint _debtToOffset, TokenAmount[] memory _collToAdd) external;\\n}\\n\",\"keccak256\":\"0x06a29f5b91ef199ee97ca6da3d02425eeb24045a78c8167e4d44f10aa6c9181c\",\"license\":\"MIT\"},\"contracts/Interfaces/IStoragePool.sol\":{\"content\":\"// SPDX-License-Identifier: MIT\\n\\npragma solidity ^0.8.9;\\n\\nimport './IBase.sol';\\n\\n// Common interface for the Pools.\\ninterface IStoragePool is IBase {\\n  // --- Events ---\\n\\n  event StoragePoolInitialized(\\n    address _borrowerOperationsAddress,\\n    address _troveManagerAddress,\\n    address _redemptionOperationsAddress,\\n    address _liquidationOperationsAddress,\\n    address _stabilityPoolManagerAddress,\\n    address _priceFeedAddress\\n  );\\n  event StoragePoolValueUpdated(address _tokenAddress, bool _isColl, PoolType _poolType, uint _updatedAmount);\\n\\n  // --- Custom Errors ---\\n\\n  error NotFromBOorTroveMorSP();\\n\\n  // --- Functions ---\\n\\n  function getValue(address _tokenAddress, bool _isColl, PoolType _poolType) external view returns (uint);\\n\\n  function addValue(address _tokenAddress, bool _isColl, PoolType _poolType, uint _amount) external;\\n\\n  function subtractValue(address _tokenAddress, bool _isColl, PoolType _poolType, uint _amount) external;\\n\\n  function withdrawalValue(\\n    address _receiver,\\n    address _tokenAddress,\\n    bool _isColl,\\n    PoolType _poolType,\\n    uint _amount\\n  ) external;\\n\\n  function transferBetweenTypes(\\n    address _tokenAddress,\\n    bool _isCool,\\n    PoolType _fromType,\\n    PoolType _toType,\\n    uint _amount\\n  ) external;\\n\\n  function getEntireSystemColl() external view returns (uint entireSystemColl);\\n\\n  function getEntireSystemDebt() external view returns (uint entireSystemDebt);\\n\\n  function getTokenTotalAmount(address _tokenAddress, bool _isColl) external view returns (uint);\\n\\n  function checkRecoveryMode()\\n    external\\n    view\\n    returns (bool isInRecoveryMode, uint TCR, uint entireSystemColl, uint entireSystemDebt);\\n}\\n\",\"keccak256\":\"0x5fab91bf7a2ce4ff43aea3b6ccc34b56d96dac82f287867384cd92e5db0f8cc8\",\"license\":\"MIT\"},\"contracts/Interfaces/ITroveManager.sol\":{\"content\":\"// SPDX-License-Identifier: MIT\\n\\npragma solidity ^0.8.9;\\n\\nimport './IStabilityPool.sol';\\nimport './IDebtToken.sol';\\nimport './IBBase.sol';\\nimport './IPriceFeed.sol';\\nimport './IDebtTokenManager.sol';\\n\\n// Common interface for the Trove Manager.\\ninterface ITroveManager is IBBase {\\n  // --- Events ---\\n\\n  event TroveManagerInitialized(\\n    address _borrowerOperationsAddress,\\n    address _redemptionOperationsAddress,\\n    address _liquidationOperationsAddress,\\n    address _storagePoolAddress,\\n    address _priceFeedAddress\\n  );\\n\\n  event TroveAppliedRewards(address _borrower, CAmount[] _appliedRewards);\\n  event TroveClosed(address _borrower, Status _closingState);\\n  event TroveIndexUpdated(address _borrower, uint _newIndex);\\n  event TroveCollChanged(address _borrower, address[] _collTokenAddresses);\\n\\n  event BaseRateUpdated(uint _baseRate);\\n  event LastFeeOpTimeUpdated(uint _lastFeeOpTime);\\n  event TotalStakesUpdated(TokenAmount[] _totalStakes);\\n  event SystemSnapshotsUpdated(TokenAmount[] _totalStakesSnapshot, TokenAmount[] _totalCollateralSnapshot);\\n  event LTermsUpdated(CAmount[] _liquidatedTokens);\\n  event TroveSnapshotsUpdated(CAmount[] _liquidatedTokens);\\n\\n  // --- Errors ---\\n\\n  error NotFromBorrowerOrRedemptionOps();\\n  error InvalidTrove();\\n  error ExceedDebtBalance();\\n  error OnlyOneTrove();\\n  error ZeroAmount();\\n  error LessThanMCR();\\n  error InvalidMaxFeePercent();\\n\\n  // --- Functions ---\\n\\n  function getTroveOwnersCount() external view returns (uint);\\n\\n  function getTroveStatus(address _borrower) external view returns (uint);\\n\\n  function isTroveActive(address _borrower) external view returns (bool);\\n\\n  function setTroveStatus(address _borrower, uint num) external;\\n\\n  //\\n\\n  function getNominalICR(address _borrower) external returns (uint);\\n\\n  function getCurrentICR(address _borrower) external view returns (uint ICR, uint currentDebtInUSD);\\n\\n  //\\n\\n  function updateStakeAndTotalStakes(address[] memory collTokenAddresses, address _borrower) external;\\n\\n  function removeStake(address[] memory collTokenAddresses, address _borrower) external;\\n\\n  function updateSystemSnapshots_excludeCollRemainder(TokenAmount[] memory totalCollGasCompensation) external;\\n\\n  function getTroveStakes(address _borrower, address _token) external view returns (uint);\\n\\n  function getTroveStakeValue(address _borrower) external view returns (uint);\\n\\n  //\\n\\n  function redistributeDebtAndColl(address[] memory collTokenAddresses, CAmount[] memory toRedistribute) external;\\n\\n  function getPendingReward(\\n    address _borrower,\\n    address _tokenAddress,\\n    bool _isColl\\n  ) external view returns (uint pendingReward);\\n\\n  function applyPendingRewards(address _borrower) external;\\n\\n  function updateTroveRewardSnapshots(address _borrower) external;\\n\\n  //\\n\\n  function increaseTroveColl(address _borrower, TokenAmount[] memory _collTokenAmounts) external;\\n\\n  function decreaseTroveColl(address _borrower, TokenAmount[] memory _collTokenAmounts) external;\\n\\n  function increaseTroveDebt(address _borrower, DebtTokenAmount[] memory _debtTokenAmounts) external;\\n\\n  function decreaseTroveDebt(address _borrower, DebtTokenAmount[] memory _debtTokenAmounts) external;\\n\\n  //\\n\\n  function getEntireDebtAndColl(\\n    address _borrower\\n  )\\n    external\\n    view\\n    returns (\\n      RAmount[] memory amounts,\\n      uint troveCollInUSD,\\n      uint troveDebtInUSD,\\n      uint troveDebtInUSDWithoutGasCompensation\\n    );\\n\\n  function getTroveDebt(address _borrower) external view returns (TokenAmount[] memory);\\n\\n  function getTroveRepayableDebt(address _borrower, address _debtTokenAddress) external view returns (uint amount);\\n\\n  function getTroveRepayableDebts(address _borrower) external view returns (TokenAmount[] memory);\\n\\n  function getTroveColl(address _borrower) external view returns (TokenAmount[] memory);\\n\\n  function getTroveWithdrawableColl(address _borrower, address _collTokenAddress) external view returns (uint amount);\\n\\n  function getTroveWithdrawableColls(address _borrower) external view returns (TokenAmount[] memory colls);\\n\\n  //\\n\\n  function addTroveOwnerToArray(address _borrower) external returns (uint128 index);\\n\\n  function closeTroveByProtocol(address[] memory collTokenAddresses, address _borrower, Status closedStatus) external;\\n\\n  //\\n\\n  function getBaseRate() external view returns (uint);\\n\\n  function getBorrowingRate() external view returns (uint);\\n\\n  function getBorrowingRateWithDecay() external view returns (uint);\\n\\n  function getBorrowingFee(uint LUSDDebt) external view returns (uint);\\n\\n  function getBorrowingFeeWithDecay(uint _LUSDDebt) external view returns (uint);\\n\\n  function decayBaseRateFromBorrowing() external;\\n\\n  function updateBaseRateFromRedemption(uint _totalRedeemedStable, uint _totalStableCoinSupply) external;\\n\\n  function calcDecayedBaseRate() external view returns (uint);\\n}\\n\",\"keccak256\":\"0xc91fe5746ad02a514565adf54bb16d28d1c60110001b1c9f9bac9966757f0ea5\",\"license\":\"MIT\"},\"contracts/Mock/MockBorrowerOperations.sol\":{\"content\":\"// SPDX-License-Identifier: MIT\\n\\npragma solidity ^0.8.9;\\n\\nimport '../BorrowerOperations.sol';\\n\\n/* Tester contract inherits from TroveManager, and provides external functions \\nfor testing the parent's internal functions. */\\n\\ncontract MockBorrowerOperations is BorrowerOperations {\\n  function increaseDebts(TokenAmount[] memory _debts, uint _maxFeePercentage) external {\\n    // separate minting is allowed for better testing\\n    // _requireCallerIsSwapOperations();\\n\\n    _increaseDebt(msg.sender, msg.sender, _debts, _maxFeePercentage);\\n  }\\n\\n  // Payable fallback function\\n\\n  // STORAGE POOL TESTER PROXIES\\n  function testStoragePool_addValue(address _tokenAddress, bool _isColl, PoolType _poolType, uint _amount) external {\\n    storagePool.addValue(_tokenAddress, _isColl, _poolType, _amount);\\n  }\\n\\n  function testStoragePool_subtractValue(\\n    address _tokenAddress,\\n    bool _isColl,\\n    PoolType _poolType,\\n    uint _amount\\n  ) external {\\n    storagePool.subtractValue(_tokenAddress, _isColl, _poolType, _amount);\\n  }\\n\\n  function testStoragePool_transferBetweenTypes(\\n    address _tokenAddress,\\n    bool _isColl,\\n    PoolType _fromType,\\n    PoolType _toType,\\n    uint _amount\\n  ) external {\\n    storagePool.transferBetweenTypes(_tokenAddress, _isColl, _fromType, _toType, _amount);\\n  }\\n\\n  function testStoragePool_withdrawalValue(\\n    address _receiver,\\n    address _tokenAddress,\\n    bool _isColl,\\n    PoolType _poolType,\\n    uint _amount\\n  ) external {\\n    storagePool.withdrawalValue(_receiver, _tokenAddress, _isColl, _poolType, _amount);\\n  }\\n\\n  // DEBTTOKEN TESTER PROXIES\\n\\n  function testDebtToken_mint(address _account, uint256 _amount, IDebtToken _debtToken) external {\\n    _debtToken.mint(_account, _amount);\\n  }\\n\\n  function testDebtToken_burn(address _account, uint256 _amount, IDebtToken _debtToken) external {\\n    _debtToken.burn(_account, _amount);\\n  }\\n\\n  // TROVE MANAGER TESTER PROXIES\\n\\n  function testTroveManager_increaseTroveDebt(address _borrower, DebtTokenAmount[] memory _debtTokenAmounts) external {\\n    troveManager.increaseTroveDebt(_borrower, _debtTokenAmounts);\\n  }\\n\\n  function testTroveManager_setTroveStatus(address _borrower, uint _num) external {\\n    troveManager.setTroveStatus(_borrower, _num);\\n  }\\n\\n  function testTroveManager_closeTrove(address[] memory collTokenAddresses, address _borrower) external {\\n    troveManager.closeTroveByProtocol(collTokenAddresses, _borrower, Status.closedByOwner);\\n  }\\n}\\n\",\"keccak256\":\"0x7e256161bddf3fee8ce430e1c1241be685a89c6b70decd3a0cf5b87c79128bec\",\"license\":\"MIT\"}},\"version\":1}",
+  "bytecode": "0x60806040523480156200001157600080fd5b5033806200003957604051631e4fbdf760e01b81526000600482015260240160405180910390fd5b62000044816200004b565b506200009b565b600080546001600160a01b038381166001600160a01b0319831681178455604051919092169283917f8be0079c531659141344cd1fd0a4f28419497f9722a3daafe3b4186f6b6457e09190a35050565b613d9e80620000ab6000396000f3fe608060405234801561001057600080fd5b506004361061023d5760003560e01c80638a72e3691161013b578063c58bfe22116100b8578063e67729e31161007c578063e67729e3146104ef578063eb95c493146104f9578063f2fde38b1461050c578063f8af4a251461051f578063f92d3433146102d157600080fd5b8063c58bfe2214610490578063c592859e146104a3578063c5e7f964146104b6578063d733cfd0146104c9578063ddbeb714146104dc57600080fd5b806393f5ba5d116100ff57806393f5ba5d14610406578063943ebeae14610419578063a3f4df7e1461042c578063c239c6ff1461046a578063c51627b11461047d57600080fd5b80638a72e369146103ac5780638cf6e507146103bf5780638d63c665146103d25780638da5cb5b146103e2578063915efcee146103f357600080fd5b8063502afb04116101c9578063715018a61161018d578063715018a61461036057806372fe25aa14610368578063741bef1a1461037757806377a7b0911461038a578063794e57241461039d57600080fd5b8063502afb04146102fa578063522a86fe146103185780635733d58f1461032b578063573fd4a01461033a5780635a2def671461034d57600080fd5b80630e704d50116102105780630e704d50146102ad57806324092669146102b557806328d28b5b146102d15780633d83908a146102df5780634870dd9a146102f257600080fd5b80630266f044146102425780630664811714610272578063070cd706146102875780630d07e99f1461029a575b600080fd5b600554610255906001600160a01b031681565b6040516001600160a01b0390911681526020015b60405180910390f35b610285610280366004613185565b610532565b005b61028561029536600461331f565b61059f565b6102856102a83660046133f8565b610cbd565b610285610d25565b6102c366b1a2bc2ec5000081565b604051908152602001610269565b6102c36611c37937e0800081565b600154610255906001600160a01b031681565b6102c360c881565b610303610bb881565b60405163ffffffff9091168152602001610269565b600254610255906001600160a01b031681565b6102c36714d1120d7b16000081565b61028561034836600461331f565b610f7f565b61028561035b366004613447565b61107d565b6102856110b2565b6102c3670de0b6b3a764000081565b600654610255906001600160a01b031681565b61028561039836600461331f565b6110c6565b6102c3670f43fc2c04ee000081565b6102856103ba3660046134f2565b6112b7565b6102856103cd366004613552565b611327565b6102c3680ad78ebc5ac620000081565b6000546001600160a01b0316610255565b61028561040136600461331f565b61135e565b610285610414366004613595565b6113e3565b600354610255906001600160a01b031681565b61045d60405180604001604052806012815260200171426f72726f7765724f7065726174696f6e7360701b81525081565b60405161026991906135d9565b610285610478366004613627565b6113f3565b61028561048b366004613669565b611458565b61028561049e366004613695565b61148a565b6102856104b13660046136da565b611570565b6102c36104c4366004613743565b611584565b6102856104d7366004613777565b611595565b600454610255906001600160a01b031681565b610303620f424081565b610285610507366004613627565b6116d7565b61028561051a366004613820565b611705565b61028561052d366004613185565b611748565b600480546040516304b86aad60e21b81526001600160a01b03909116916312e1aab49161056791889188918891889101613867565b600060405180830381600087803b15801561058157600080fd5b505af1158015610595573d6000803e3d6000fd5b5050505050505050565b60408051608080820183526001546001600160a01b0390811683526004548116602080850191909152600254821684860152600354909116606080850191909152845161018081018652818152918201819052938101849052600093810184905290810183905260a0810183905260c0810183905260e081018390526101008101839052610120810183905261014081018390526101608101929092529081606001516001600160a01b031663efc5f8c56040518163ffffffff1660e01b8152600401600060405180830381865afa15801561067f573d6000803e3d6000fd5b505050506040513d6000823e601f3d908101601f191682016040526106a7919081019061389b565b8152815133906106b7908261177d565b6000604051806060016040528085604001516001600160a01b0316631bd817c96040518163ffffffff1660e01b8152600401602060405180830381865afa158015610706573d6000803e3d6000fd5b505050506040513d601f19601f8201168201806040525081019061072a9190613934565b6001600160a01b03168152680ad78ebc5ac62000006020820152600060409182015280516001808252818301909252919250816020015b61076961308d565b81526020019060019003908161076157505060408401819052805182919060009061079657610796613951565b60200260200101819052506107ae8360400151611813565b6060840152602083018590526107c3856118f5565b6080840181905260608401516107d991906119d1565b60a0840152608083015160608401516107f29190611a07565b8360c001818152505083602001516001600160a01b03166343a124fa6040518163ffffffff1660e01b8152600401608060405180830381865afa15801561083d573d6000803e3d6000fd5b505050506040513d601f19601f820116820180604052508101906108619190613967565b6101608701526101408601526101208501521580156101008501526108925761088d8360a00151611a2c565b6108d0565b61089f8360a00151611a55565b60006108c38460800151600186606001516001886101400151896101600151611a7e565b90506108ce81611add565b505b8351604051635d6b480f60e01b81526001600160a01b0390911690635d6b480f906109029085906001906004016139a6565b600060405180830381600087803b15801561091c57600080fd5b505af1158015610930573d6000803e3d6000fd5b50508551602086015160405163d317458f60e01b81526001600160a01b03909216935063d317458f9250610969918691906004016139bf565b600060405180830381600087803b15801561098357600080fd5b505af1158015610997573d6000803e3d6000fd5b5050855160408087015190516309bfc81160e41b81526001600160a01b039092169350639bfc811092506109d091869190600401613a24565b600060405180830381600087803b1580156109ea57600080fd5b505af11580156109fe573d6000803e3d6000fd5b505085516040516382fe3eb960e01b81526001600160a01b03868116600483015290911692506382fe3eb99150602401600060405180830381600087803b158015610a4857600080fd5b505af1158015610a5c573d6000803e3d6000fd5b5050855185516040516309d9efd960e21b81526001600160a01b039092169350632767bf649250610a91918690600401613ad7565b600060405180830381600087803b158015610aab57600080fd5b505af1158015610abf573d6000803e3d6000fd5b505085516040516315d549f160e01b81526001600160a01b03868116600483015290911692506315d549f191506024016020604051808303816000875af1158015610b0e573d6000803e3d6000fd5b505050506040513d601f19601f82011682018060405250810190610b329190613b01565b6001600160801b031660e084015260005b836020015151811015610b9f57600084602001518281518110610b6857610b68613951565b60200260200101519050610b8c848760200151836000015184602001516000611b06565b5080610b9781613b40565b915050610b43565b50602080850151825191830151604051633891012160e21b81526001600160a01b039092169263e244048492610bde9260009160029190600401613867565b600060405180830381600087803b158015610bf857600080fd5b505af1158015610c0c573d6000803e3d6000fd5b50508251602080880151908501516040516340c10f1960e01b81526001600160a01b0390931694506340c10f199350610c47926004016139a6565b600060405180830381600087803b158015610c6157600080fd5b505af1158015610c75573d6000803e3d6000fd5b505050507f59cfd0cd754bc5748b6770e94a4ffa5f678d885cb899dcfadc5734edb97c67ab828460e00151604051610cae9291906139a6565b60405180910390a15050505050565b6001546040516309bfc81160e41b81526001600160a01b0390911690639bfc811090610cef9085908590600401613a24565b600060405180830381600087803b158015610d0957600080fd5b505af1158015610d1d573d6000803e3d6000fd5b505050505050565b33600080610d3283611be6565b91509150610d44816101800151611ee8565b6000610d688260a00151600084608001516000866101e00151876102000151611a7e565b9050610d7381611add565b60005b826040015151811015610e7157600083604001518281518110610d9b57610d9b613951565b60200260200101519050600081600001516001600160a01b031663b55fe4e76040518163ffffffff1660e01b8152600401602060405180830381865afa158015610de9573d6000803e3d6000fd5b505050506040513d601f19601f82011682018060405250810190610e0d9190613b59565b15610e3257680ad78ebc5ac62000008260200151610e2b9190613b76565b9050610e39565b5060208101515b80600003610e48575050610e5f565b610e5c878760200151846000015184611f07565b50505b80610e6981613b40565b915050610d76565b50610e888360200151836060015160000151611fa5565b60005b826020015151811015610ee757600083602001518281518110610eb057610eb0613951565b60200260200101519050610ed486866020015183600001518460200151600061204b565b5080610edf81613b40565b915050610e8b565b5082518251604051630609d6b760e11b81526001600160a01b0390921691630c13ad6e91610f19918890600401613ad7565b600060405180830381600087803b158015610f3357600080fd5b505af1158015610f47573d6000803e3d6000fd5b505084518451604051638918b9e160e01b81526001600160a01b039092169350638918b9e19250610567918890600290600401613b89565b33600080610f8c83611be6565b91509150610f99846118f5565b8161010001818151610fab9190613bcb565b905250815160405163d317458f60e01b81526001600160a01b039091169063d317458f90610fdf90869088906004016139bf565b600060405180830381600087803b158015610ff957600080fd5b505af115801561100d573d6000803e3d6000fd5b5050505060005b845181101561106857600085828151811061103157611031613951565b60200260200101519050611055858560200151836000015184602001516000611b06565b508061106081613b40565b915050611014565b50611077600080848487612080565b50505050565b600154604051638918b9e160e01b81526001600160a01b0390911690638918b9e190610cef9085908590600290600401613b89565b6110ba6120f0565b6110c4600061211d565b565b336000806110d383611be6565b9150915060006110e2856118f5565b905081610100015181111561110a5760405163641f6d2960e11b815260040160405180910390fd5b80826101000181815161111d9190613b76565b9052508251604051635988e97160e11b81526001600160a01b039091169063b311d2e29061115190879089906004016139bf565b600060405180830381600087803b15801561116b57600080fd5b505af115801561117f573d6000803e3d6000fd5b5050505060005b85518110156112a05760008682815181106111a3576111a3613951565b602002602001015190506111d3604051806040016040528060006001600160a01b03168152602001600081525090565b60005b8560200151518110156112585782600001516001600160a01b03168660200151828151811061120757611207613951565b6020026020010151600001516001600160a01b031603611246578560200151818151811061123757611237613951565b60200260200101519150611258565b8061125081613b40565b9150506111d6565b5081602001518160200151101561127157611271613bde565b61128b87876020015184600001518560200151600061204b565b5050808061129890613b40565b915050611186565b506112b060016000858588612080565b5050505050565b60048054604051632f5ed88d60e11b81526001600160a01b0390911691635ebdb11a916112ee918991899189918991899101613bf4565b600060405180830381600087803b15801561130857600080fd5b505af115801561131c573d6000803e3d6000fd5b505050505050505050565b6004805460405163b403b99760e01b81526001600160a01b039091169163b403b997916112ee918991899189918991899101613c36565b3360008061136b83611be6565b91509150600061137d8383868861216d565b905060005b81518110156113d457600082828151811061139f5761139f613951565b602002602001015190506113c186866020015183600001518460200151611f07565b50806113cc81613b40565b915050611382565b506112b0600080858588612080565b6113ef3333848461236b565b5050565b6040516340c10f1960e01b81526001600160a01b038216906340c10f199061142190869086906004016139a6565b600060405180830381600087803b15801561143b57600080fd5b505af115801561144f573d6000803e3d6000fd5b50505050505050565b600154604051635d6b480f60e01b81526001600160a01b0390911690635d6b480f90610cef90859085906004016139a6565b6114926124eb565b60008061149e84611be6565b9150915060006114b08383878761216d565b905060005b81518110156115615760008282815181106114d2576114d2613951565b6020026020010151905084602001516001600160a01b03166312e1aab4826000015160008085602001516040518563ffffffff1660e01b815260040161151b9493929190613867565b600060405180830381600087803b15801561153557600080fd5b505af1158015611549573d6000803e3d6000fd5b5050505050808061155990613b40565b9150506114b5565b506112b0600080858589612080565b6115786124eb565b6110778484848461236b565b600061158f82611813565b92915050565b61159d6120f0565b6115a688612516565b6115af87612516565b6115b886612516565b6115c185612516565b6115ca84612516565b6115d383612516565b6115dc82612516565b6115e581612516565b600180546001600160a01b038a81166001600160a01b03199283168117909355600480548b83169084168117909155600780548b84169085168117909155600580548b85169086168117909155600680548b86169087168117909155600280548b87169088168117909155600380548b8816908916811790915560088054978b16979098168717909755604080519889526020890195909552938701929092526060860152608085015260a084015260c083019190915260e08201527f73734d4d2078a1cdbfa7bd5d848114fa2c7a041f43c3ce7a3c41fa07db2d69f0906101000160405180910390a16105956110b2565b604051632770a7eb60e21b81526001600160a01b03821690639dc29fac9061142190869086906004016139a6565b61170d6120f0565b6001600160a01b03811661173c57604051631e4fbdf760e01b8152600060048201526024015b60405180910390fd5b6117458161211d565b50565b60048054604051633891012160e21b81526001600160a01b039091169163e24404849161056791889188918891889101613867565b6040516321e3780160e01b81526001600160a01b038281166004830152600091908416906321e3780190602401602060405180830381865afa1580156117c7573d6000803e3d6000fd5b505050506040513d601f19601f820116820180604052508101906117eb9190613c63565b90508060010361180e57604051636ac7a93960e01b815260040160405180910390fd5b505050565b6000805b82518110156118ef5760065483516001600160a01b039091169063fa76dcf29085908490811061184957611849613951565b60200260200101516000015185848151811061186757611867613951565b6020026020010151602001516040518363ffffffff1660e01b81526004016118909291906139a6565b602060405180830381865afa1580156118ad573d6000803e3d6000fd5b505050506040513d601f19601f820116820180604052508101906118d19190613c63565b6118db9083613bcb565b9150806118e781613b40565b915050611817565b50919050565b6000805b82518110156118ef5760065483516001600160a01b039091169063fa76dcf29085908490811061192b5761192b613951565b60200260200101516000015185848151811061194957611949613951565b6020026020010151602001516040518363ffffffff1660e01b81526004016119729291906139a6565b602060405180830381865afa15801561198f573d6000803e3d6000fd5b505050506040513d601f19601f820116820180604052508101906119b39190613c63565b6119bd9083613bcb565b9150806119c981613b40565b9150506118f9565b600081156119fd57816119ec670de0b6b3a764000085613c7c565b6119f69190613c93565b905061158f565b5060001992915050565b60008115611a2357816119ec68056bc75e2d6310000085613c7c565b5060001961158f565b6714d1120d7b1600008110156117455760405163c2c7ac8b60e01b815260040160405180910390fd5b670f43fc2c04ee00008110156117455760405163da43584160e01b815260040160405180910390fd5b60008086611a9557611a908885613b76565b611a9f565b611a9f8885613bcb565b9050600085611ab757611ab28785613b76565b611ac1565b611ac18785613bcb565b90506000611acf83836119d1565b9a9950505050505050505050565b6714d1120d7b16000081101561174557604051630242425360e31b815260040160405180910390fd5b604051633891012160e21b81526001600160a01b0385169063e244048490611b3990869060019086908890600401613867565b600060405180830381600087803b158015611b5357600080fd5b505af1158015611b67573d6000803e3d6000fd5b50506040516323b872dd60e01b81526001600160a01b038881166004830152878116602483015260448201869052861692506323b872dd91506064016020604051808303816000875af1158015611bc2573d6000803e3d6000fd5b505050506040513d601f19601f82011682018060405250810190610d1d9190613b59565b604080516080810182526000808252602082018190529181018290526060810191909152611c126130b7565b604080516080810182526001546001600160a01b039081168252600480548216602084015260025482168385015260035490911660608301819052835163efc5f8c560e01b815293519295509263efc5f8c592818301926000928290030181865afa158015611c85573d6000803e3d6000fd5b505050506040513d6000823e601f3d908101601f19168201604052611cad919081019061389b565b816000018190525081602001516001600160a01b03166343a124fa6040518163ffffffff1660e01b8152600401608060405180830381865afa158015611cf7573d6000803e3d6000fd5b505050506040513d601f19601f82011682018060405250810190611d1b9190613967565b6102008501526101e08401526101a083015215156101808201528151611d419084612561565b8151604051630b07655760e01b81526001600160a01b03858116600483015290911690630b07655790602401600060405180830381600087803b158015611d8757600080fd5b505af1158015611d9b573d6000803e3d6000fd5b505050506040828101518351915163d66a255360e01b81526001600160a01b038681166004830152611e1c93169063d66a255390602401600060405180830381865afa158015611def573d6000803e3d6000fd5b505050506040513d6000823e601f3d908101601f19168201604052611e179190810190613cb5565b6125f2565b606083015260408201819052611e3190611813565b6080820181905260e082015281516040516309019aaf60e31b81526001600160a01b0385811660048301529091169063480cd57890602401600060405180830381865afa158015611e86573d6000803e3d6000fd5b505050506040513d6000823e601f3d908101601f19168201604052611eae9190810190613cb5565b60208201819052611ebe906118f5565b60a0820181905261010082018190526080820151611edc91906119d1565b60c08201529092909150565b80156117455760405163a1e634ad60e01b815260040160405180910390fd5b611f128285836129fd565b6040516304b86aad60e21b81526001600160a01b038416906312e1aab490611f4590859060009081908790600401613867565b600060405180830381600087803b158015611f5f57600080fd5b505af1158015611f73573d6000803e3d6000fd5b5050604051632770a7eb60e21b81526001600160a01b0385169250639dc29fac915061056790879085906004016139a6565b6040516304b86aad60e21b81526001600160a01b038316906312e1aab490611fe2908490600090600290680ad78ebc5ac620000090600401613867565b600060405180830381600087803b158015611ffc57600080fd5b505af1158015612010573d6000803e3d6000fd5b5050604051632770a7eb60e21b81526001600160a01b0384169250639dc29fac9150610cef908590680ad78ebc5ac6200000906004016139a6565b60405163b403b99760e01b81526001600160a01b0385169063b403b997906112ee908890879060019087908990600401613c36565b6120938261010001518360e001516119d1565b61012083015261010082015160e08301516120ae9190611a07565b6101408301526120bf858584612a89565b825182516040516309d9efd960e21b81526001600160a01b0390921691632767bf64916112ee918590600401613ad7565b6000546001600160a01b031633146110c45760405163118cdaa760e01b8152336004820152602401611733565b600080546001600160a01b038381166001600160a01b0319831681178455604051919092169283917f8be0079c531659141344cd1fd0a4f28419497f9722a3daafe3b4186f6b6457e09190a35050565b606061217d8560400151836125f2565b50905061218981611813565b8460e00181815161219a9190613b76565b9052508451604051637120442f60e11b81526001600160a01b039091169063e240885e906121ce9086908590600401613a24565b600060405180830381600087803b1580156121e857600080fd5b505af11580156121fc573d6000803e3d6000fd5b5050505060005b815181101561236257600082828151811061222057612220613951565b6020026020010151905060008160000151905061223b61308d565b60005b8860400151518110156122bc57826001600160a01b03168960400151828151811061226b5761226b613951565b6020026020010151600001516001600160a01b0316036122aa578860400151818151811061229b5761229b613951565b602002602001015191506122bc565b806122b481613b40565b91505061223e565b506122cf81602001518460200151612b82565b82600001516001600160a01b031663b55fe4e76040518163ffffffff1660e01b8152600401602060405180830381865afa158015612311573d6000803e3d6000fd5b505050506040513d601f19601f820116820180604052508101906123359190613b59565b1561234c5761234c81602001518460200151612ba3565b505050808061235a90613b40565b915050612203565b50949350505050565b60008061237786611be6565b9150915061238a83826101800151612bd6565b60005b84518110156123ce576123bc8582815181106123ab576123ab613951565b602002602001015160200151612c3d565b806123c681613b40565b91505061238d565b506000806123e08460400151876125f2565b9150915060008361018001516124015784516123fe90848489612c5e565b90505b61240a83611813565b8460e00181815161241b9190613bcb565b90525084516040516309bfc81160e41b81526001600160a01b0390911690639bfc81109061244f908c908790600401613a24565b600060405180830381600087803b15801561246957600080fd5b505af115801561247d573d6000803e3d6000fd5b5050505060005b83518110156124db5760008482815181106124a1576124a1613951565b602002602001015190506124c88a8860200151836000015184602001518560400151612df4565b50806124d381613b40565b915050612484565b5061131c6000600187878d612080565b6008546001600160a01b031633146110c457604051630dc6009560e01b815260040160405180910390fd5b6001600160a01b03811661253d5760405163d92e233d60e01b815260040160405180910390fd5b803b60008190036113ef57604051636f7c43f160e01b815260040160405180910390fd5b6040516321e3780160e01b81526001600160a01b038281166004830152600091908416906321e3780190602401602060405180830381865afa1580156125ab573d6000803e3d6000fd5b505050506040513d601f19601f820116820180604052508101906125cf9190613c63565b90508060011461180e576040516380534bfb60e01b815260040160405180910390fd5b60606125fc61308d565b6000846001600160a01b0316631bd817c96040518163ffffffff1660e01b8152600401602060405180830381865afa15801561263c573d6000803e3d6000fd5b505050506040513d601f19601f820116820180604052508101906126609190613934565b90506000805b85518110156126c057826001600160a01b031686828151811061268b5761268b613951565b6020026020010151600001516001600160a01b0316036126ae57600191506126c0565b806126b881613b40565b915050612666565b5080156127215784516001600160401b038111156126e0576126e06131d4565b60405190808252806020026020018201604052801561271957816020015b61270661308d565b8152602001906001900390816126fe5790505b509350612782565b845161272e906001613bcb565b6001600160401b03811115612745576127456131d4565b60405190808252806020026020018201604052801561277e57816020015b61276b61308d565b8152602001906001900390816127635790505b5093505b60005b8551811015612925576000876001600160a01b031663a95bbced8884815181106127b1576127b1613951565b6020908102919091010151516040516001600160e01b031960e084901b1681526001600160a01b039091166004820152602401602060405180830381865afa158015612801573d6000803e3d6000fd5b505050506040513d601f19601f820116820180604052508101906128259190613934565b90506040518060600160405280826001600160a01b0316815260200188848151811061285357612853613951565b6020026020010151602001518152602001600081525086838151811061287b5761287b613951565b60200260200101819052508280156128f05750806001600160a01b031663b55fe4e76040518163ffffffff1660e01b8152600401602060405180830381865afa1580156128cc573d6000803e3d6000fd5b505050506040513d601f19601f820116820180604052508101906128f09190613b59565b156129125785828151811061290757612907613951565b602002602001015194505b508061291d81613b40565b915050612785565b50806129f4576000866001600160a01b0316631bd817c96040518163ffffffff1660e01b8152600401602060405180830381865afa15801561296b573d6000803e3d6000fd5b505050506040513d601f19601f8201168201806040525081019061298f9190613934565b90506040518060600160405280826001600160a01b03168152602001600081526020016000815250858751815181106129ca576129ca613951565b6020026020010181905250848651815181106129e8576129e8613951565b60200260200101519350505b50509250929050565b6040516370a0823160e01b81526001600160a01b0383811660048301528291908516906370a0823190602401602060405180830381865afa158015612a46573d6000803e3d6000fd5b505050506040513d601f19601f82011682018060405250810190612a6a9190613c63565b101561180e57604051631636dca160e01b815260040160405180910390fd5b80610180015115612ac7578215612ab357604051632be87da560e01b815260040160405180910390fd5b811561180e5761180e816101200151611a2c565b612ad5816101200151611a55565b60008160a0015182610100015111612b01578161010001518260a00151612afc9190613b76565b612b16565b8160a00151826101000151612b169190613b76565b9050600082608001518360e0015111612b42578260e001518360800151612b3d9190613b76565b612b56565b82608001518360e00151612b569190613b76565b9050612b718286158387876101e00151886102000151611a7e565b6101c084018190526112b090611add565b808210156113ef5760405163f73d990960e01b815260040160405180910390fd5b612bb6680ad78ebc5ac620000083613b76565b8111156113ef5760405163f73d990960e01b815260040160405180910390fd5b8015612c045766b1a2bc2ec500008211156113ef5760405163607a31bf60e01b815260040160405180910390fd5b6611c37937e08000821080612c1f575066b1a2bc2ec5000082115b156113ef576040516309c3707b60e01b815260040160405180910390fd5b80600003611745576040516316068ef760e21b815260040160405180910390fd5b600080612c6a85611813565b9050856001600160a01b0316635dba4c4a6040518163ffffffff1660e01b8152600401600060405180830381600087803b158015612ca757600080fd5b505af1158015612cbb573d6000803e3d6000fd5b5050604051630631203b60e41b8152600481018490526001600160a01b038916925063631203b09150602401602060405180830381865afa158015612d04573d6000803e3d6000fd5b505050506040513d601f19601f82011682018060405250810190612d289190613c63565b9150612d35828285613026565b600084600001516001600160a01b03166398d5fdca6040518163ffffffff1660e01b8152600401602060405180830381865afa158015612d79573d6000803e3d6000fd5b505050506040513d601f19601f82011682018060405250810190612d9d9190613c63565b905080612db2670de0b6b3a764000085613c7c565b612dbc9190613c93565b92508285602001818151612dd09190613bcb565b905250604085018051849190612de7908390613bcb565b9052505050949350505050565b604051633891012160e21b81526001600160a01b0385169063e244048490612e2790869060009081908890600401613867565b600060405180830381600087803b158015612e4157600080fd5b505af1158015612e55573d6000803e3d6000fd5b5050505060008183612e679190613b76565b90508015612ed0576040516340c10f1960e01b81526001600160a01b038516906340c10f1990612e9d90899085906004016139a6565b600060405180830381600087803b158015612eb757600080fd5b505af1158015612ecb573d6000803e3d6000fd5b505050505b81600003612ede57506112b0565b60055460408051630e054ca160e21b8152905184926000926001600160a01b03909116916338153284916004808201926020929091908290030181865afa158015612f2d573d6000803e3d6000fd5b505050506040513d601f19601f82011682018060405250810190612f519190613c63565b90508015610595576000612f658583613075565b9050612f718184613b76565b6005546040516340c10f1960e01b81529194506001600160a01b03808a16926340c10f1992612fa692169085906004016139a6565b600060405180830381600087803b158015612fc057600080fd5b505af1158015612fd4573d6000803e3d6000fd5b50505050886001600160a01b03167f0bd746804bfad30038ce5b8180f4eea08b19748e6fe3df76ecf93c8f4fc966408260405161301391815260200190565b60405180910390a2505050505050505050565b8260000361303357505050565b600082613048670de0b6b3a764000086613c7c565b6130529190613c93565b905081811115611077576040516351a2c47360e11b815260040160405180910390fd5b60008183106130845781613086565b825b9392505050565b604051806060016040528060006001600160a01b0316815260200160008152602001600081525090565b6040518061022001604052806060815260200160608152602001606081526020016130e061308d565b81526020016000815260200160008152602001600081526020016000815260200160008152602001600081526020016000815260200160008152602001600015158152602001600081526020016000815260200160008152602001600081525090565b6001600160a01b038116811461174557600080fd5b803561316381613143565b919050565b801515811461174557600080fd5b80356003811061316357600080fd5b6000806000806080858703121561319b57600080fd5b84356131a681613143565b935060208501356131b681613168565b92506131c460408601613176565b9396929550929360600135925050565b634e487b7160e01b600052604160045260246000fd5b604080519081016001600160401b038111828210171561320c5761320c6131d4565b60405290565b604051606081016001600160401b038111828210171561320c5761320c6131d4565b604051601f8201601f191681016001600160401b038111828210171561325c5761325c6131d4565b604052919050565b60006001600160401b0382111561327d5761327d6131d4565b5060051b60200190565b600082601f83011261329857600080fd5b813560206132ad6132a883613264565b613234565b82815260069290921b840181019181810190868411156132cc57600080fd5b8286015b8481101561331457604081890312156132e95760008081fd5b6132f16131ea565b81356132fc81613143565b815281850135858201528352918301916040016132d0565b509695505050505050565b60006020828403121561333157600080fd5b81356001600160401b0381111561334757600080fd5b61335384828501613287565b949350505050565b600082601f83011261336c57600080fd5b8135602061337c6132a883613264565b8281526060928302850182019282820191908785111561339b57600080fd5b8387015b858110156133eb5781818a0312156133b75760008081fd5b6133bf613212565b81356133ca81613143565b8152818601358682015260408083013590820152845292840192810161339f565b5090979650505050505050565b6000806040838503121561340b57600080fd5b823561341681613143565b915060208301356001600160401b0381111561343157600080fd5b61343d8582860161335b565b9150509250929050565b6000806040838503121561345a57600080fd5b82356001600160401b0381111561347057600080fd5b8301601f8101851361348157600080fd5b803560206134916132a883613264565b82815260059290921b830181019181810190888411156134b057600080fd5b938201935b838510156134d75784356134c881613143565b825293820193908201906134b5565b95506134e69050868201613158565b93505050509250929050565b600080600080600060a0868803121561350a57600080fd5b853561351581613143565b9450602086013561352581613168565b935061353360408701613176565b925061354160608701613176565b949793965091946080013592915050565b600080600080600060a0868803121561356a57600080fd5b853561357581613143565b9450602086013561358581613143565b9350604086013561353381613168565b600080604083850312156135a857600080fd5b82356001600160401b038111156135be57600080fd5b6135ca85828601613287565b95602094909401359450505050565b600060208083528351808285015260005b81811015613606578581018301518582016040015282016135ea565b506000604082860101526040601f19601f8301168501019250505092915050565b60008060006060848603121561363c57600080fd5b833561364781613143565b925060208401359150604084013561365e81613143565b809150509250925092565b6000806040838503121561367c57600080fd5b823561368781613143565b946020939093013593505050565b600080604083850312156136a857600080fd5b82356136b381613143565b915060208301356001600160401b038111156136ce57600080fd5b61343d85828601613287565b600080600080608085870312156136f057600080fd5b84356136fb81613143565b9350602085013561370b81613143565b925060408501356001600160401b0381111561372657600080fd5b61373287828801613287565b949793965093946060013593505050565b60006020828403121561375557600080fd5b81356001600160401b0381111561376b57600080fd5b6133538482850161335b565b600080600080600080600080610100898b03121561379457600080fd5b883561379f81613143565b975060208901356137af81613143565b965060408901356137bf81613143565b955060608901356137cf81613143565b945060808901356137df81613143565b935060a08901356137ef81613143565b925060c08901356137ff81613143565b915060e089013561380f81613143565b809150509295985092959890939650565b60006020828403121561383257600080fd5b813561308681613143565b634e487b7160e01b600052602160045260246000fd5b600381106138635761386361383d565b9052565b6001600160a01b038516815283151560208201526080810161388c6040830185613853565b82606083015295945050505050565b600060208083850312156138ae57600080fd5b82516001600160401b038111156138c457600080fd5b8301601f810185136138d557600080fd5b80516138e36132a882613264565b81815260059190911b8201830190838101908783111561390257600080fd5b928401925b8284101561392957835161391a81613143565b82529284019290840190613907565b979650505050505050565b60006020828403121561394657600080fd5b815161308681613143565b634e487b7160e01b600052603260045260246000fd5b6000806000806080858703121561397d57600080fd5b845161398881613168565b60208601516040870151606090970151919890975090945092505050565b6001600160a01b03929092168252602082015260400190565b6001600160a01b0383811682526040602080840182905284518483018190526000938683019290916060870190865b81811015613a155785518051861684528401518484015294830194918601916001016139ee565b50909998505050505050505050565b6001600160a01b038381168252604060208084018290528451848301819052600093606092909183870190888301875b82811015613a835781518051871685528581015186860152880151888501529286019290840190600101613a54565b50919a9950505050505050505050565b600081518084526020808501945080840160005b83811015613acc5781516001600160a01b031687529582019590820190600101613aa7565b509495945050505050565b604081526000613aea6040830185613a93565b905060018060a01b03831660208301529392505050565b600060208284031215613b1357600080fd5b81516001600160801b038116811461308657600080fd5b634e487b7160e01b600052601160045260246000fd5b600060018201613b5257613b52613b2a565b5060010190565b600060208284031215613b6b57600080fd5b815161308681613168565b8181038181111561158f5761158f613b2a565b606081526000613b9c6060830186613a93565b6001600160a01b0385166020840152905060058310613bbd57613bbd61383d565b826040830152949350505050565b8082018082111561158f5761158f613b2a565b634e487b7160e01b600052600160045260246000fd5b6001600160a01b0386168152841515602082015260a08101613c196040830186613853565b613c266060830185613853565b8260808301529695505050505050565b6001600160a01b03868116825285166020820152831515604082015260a08101613c266060830185613853565b600060208284031215613c7557600080fd5b5051919050565b808202811582820484141761158f5761158f613b2a565b600082613cb057634e487b7160e01b600052601260045260246000fd5b500490565b60006020808385031215613cc857600080fd5b82516001600160401b03811115613cde57600080fd5b8301601f81018513613cef57600080fd5b8051613cfd6132a882613264565b81815260069190911b82018301908381019087831115613d1c57600080fd5b928401925b828410156139295760408489031215613d3a5760008081fd5b613d426131ea565b8451613d4d81613143565b81528486015186820152825260409093019290840190613d2156fea2646970667358221220131e5c2593beb10c8f1b199cee630789df5e7dcec517c23ef57fe954a786ab9964736f6c63430008140033",
+  "deployedBytecode": "0x608060405234801561001057600080fd5b506004361061023d5760003560e01c80638a72e3691161013b578063c58bfe22116100b8578063e67729e31161007c578063e67729e3146104ef578063eb95c493146104f9578063f2fde38b1461050c578063f8af4a251461051f578063f92d3433146102d157600080fd5b8063c58bfe2214610490578063c592859e146104a3578063c5e7f964146104b6578063d733cfd0146104c9578063ddbeb714146104dc57600080fd5b806393f5ba5d116100ff57806393f5ba5d14610406578063943ebeae14610419578063a3f4df7e1461042c578063c239c6ff1461046a578063c51627b11461047d57600080fd5b80638a72e369146103ac5780638cf6e507146103bf5780638d63c665146103d25780638da5cb5b146103e2578063915efcee146103f357600080fd5b8063502afb04116101c9578063715018a61161018d578063715018a61461036057806372fe25aa14610368578063741bef1a1461037757806377a7b0911461038a578063794e57241461039d57600080fd5b8063502afb04146102fa578063522a86fe146103185780635733d58f1461032b578063573fd4a01461033a5780635a2def671461034d57600080fd5b80630e704d50116102105780630e704d50146102ad57806324092669146102b557806328d28b5b146102d15780633d83908a146102df5780634870dd9a146102f257600080fd5b80630266f044146102425780630664811714610272578063070cd706146102875780630d07e99f1461029a575b600080fd5b600554610255906001600160a01b031681565b6040516001600160a01b0390911681526020015b60405180910390f35b610285610280366004613185565b610532565b005b61028561029536600461331f565b61059f565b6102856102a83660046133f8565b610cbd565b610285610d25565b6102c366b1a2bc2ec5000081565b604051908152602001610269565b6102c36611c37937e0800081565b600154610255906001600160a01b031681565b6102c360c881565b610303610bb881565b60405163ffffffff9091168152602001610269565b600254610255906001600160a01b031681565b6102c36714d1120d7b16000081565b61028561034836600461331f565b610f7f565b61028561035b366004613447565b61107d565b6102856110b2565b6102c3670de0b6b3a764000081565b600654610255906001600160a01b031681565b61028561039836600461331f565b6110c6565b6102c3670f43fc2c04ee000081565b6102856103ba3660046134f2565b6112b7565b6102856103cd366004613552565b611327565b6102c3680ad78ebc5ac620000081565b6000546001600160a01b0316610255565b61028561040136600461331f565b61135e565b610285610414366004613595565b6113e3565b600354610255906001600160a01b031681565b61045d60405180604001604052806012815260200171426f72726f7765724f7065726174696f6e7360701b81525081565b60405161026991906135d9565b610285610478366004613627565b6113f3565b61028561048b366004613669565b611458565b61028561049e366004613695565b61148a565b6102856104b13660046136da565b611570565b6102c36104c4366004613743565b611584565b6102856104d7366004613777565b611595565b600454610255906001600160a01b031681565b610303620f424081565b610285610507366004613627565b6116d7565b61028561051a366004613820565b611705565b61028561052d366004613185565b611748565b600480546040516304b86aad60e21b81526001600160a01b03909116916312e1aab49161056791889188918891889101613867565b600060405180830381600087803b15801561058157600080fd5b505af1158015610595573d6000803e3d6000fd5b5050505050505050565b60408051608080820183526001546001600160a01b0390811683526004548116602080850191909152600254821684860152600354909116606080850191909152845161018081018652818152918201819052938101849052600093810184905290810183905260a0810183905260c0810183905260e081018390526101008101839052610120810183905261014081018390526101608101929092529081606001516001600160a01b031663efc5f8c56040518163ffffffff1660e01b8152600401600060405180830381865afa15801561067f573d6000803e3d6000fd5b505050506040513d6000823e601f3d908101601f191682016040526106a7919081019061389b565b8152815133906106b7908261177d565b6000604051806060016040528085604001516001600160a01b0316631bd817c96040518163ffffffff1660e01b8152600401602060405180830381865afa158015610706573d6000803e3d6000fd5b505050506040513d601f19601f8201168201806040525081019061072a9190613934565b6001600160a01b03168152680ad78ebc5ac62000006020820152600060409182015280516001808252818301909252919250816020015b61076961308d565b81526020019060019003908161076157505060408401819052805182919060009061079657610796613951565b60200260200101819052506107ae8360400151611813565b6060840152602083018590526107c3856118f5565b6080840181905260608401516107d991906119d1565b60a0840152608083015160608401516107f29190611a07565b8360c001818152505083602001516001600160a01b03166343a124fa6040518163ffffffff1660e01b8152600401608060405180830381865afa15801561083d573d6000803e3d6000fd5b505050506040513d601f19601f820116820180604052508101906108619190613967565b6101608701526101408601526101208501521580156101008501526108925761088d8360a00151611a2c565b6108d0565b61089f8360a00151611a55565b60006108c38460800151600186606001516001886101400151896101600151611a7e565b90506108ce81611add565b505b8351604051635d6b480f60e01b81526001600160a01b0390911690635d6b480f906109029085906001906004016139a6565b600060405180830381600087803b15801561091c57600080fd5b505af1158015610930573d6000803e3d6000fd5b50508551602086015160405163d317458f60e01b81526001600160a01b03909216935063d317458f9250610969918691906004016139bf565b600060405180830381600087803b15801561098357600080fd5b505af1158015610997573d6000803e3d6000fd5b5050855160408087015190516309bfc81160e41b81526001600160a01b039092169350639bfc811092506109d091869190600401613a24565b600060405180830381600087803b1580156109ea57600080fd5b505af11580156109fe573d6000803e3d6000fd5b505085516040516382fe3eb960e01b81526001600160a01b03868116600483015290911692506382fe3eb99150602401600060405180830381600087803b158015610a4857600080fd5b505af1158015610a5c573d6000803e3d6000fd5b5050855185516040516309d9efd960e21b81526001600160a01b039092169350632767bf649250610a91918690600401613ad7565b600060405180830381600087803b158015610aab57600080fd5b505af1158015610abf573d6000803e3d6000fd5b505085516040516315d549f160e01b81526001600160a01b03868116600483015290911692506315d549f191506024016020604051808303816000875af1158015610b0e573d6000803e3d6000fd5b505050506040513d601f19601f82011682018060405250810190610b329190613b01565b6001600160801b031660e084015260005b836020015151811015610b9f57600084602001518281518110610b6857610b68613951565b60200260200101519050610b8c848760200151836000015184602001516000611b06565b5080610b9781613b40565b915050610b43565b50602080850151825191830151604051633891012160e21b81526001600160a01b039092169263e244048492610bde9260009160029190600401613867565b600060405180830381600087803b158015610bf857600080fd5b505af1158015610c0c573d6000803e3d6000fd5b50508251602080880151908501516040516340c10f1960e01b81526001600160a01b0390931694506340c10f199350610c47926004016139a6565b600060405180830381600087803b158015610c6157600080fd5b505af1158015610c75573d6000803e3d6000fd5b505050507f59cfd0cd754bc5748b6770e94a4ffa5f678d885cb899dcfadc5734edb97c67ab828460e00151604051610cae9291906139a6565b60405180910390a15050505050565b6001546040516309bfc81160e41b81526001600160a01b0390911690639bfc811090610cef9085908590600401613a24565b600060405180830381600087803b158015610d0957600080fd5b505af1158015610d1d573d6000803e3d6000fd5b505050505050565b33600080610d3283611be6565b91509150610d44816101800151611ee8565b6000610d688260a00151600084608001516000866101e00151876102000151611a7e565b9050610d7381611add565b60005b826040015151811015610e7157600083604001518281518110610d9b57610d9b613951565b60200260200101519050600081600001516001600160a01b031663b55fe4e76040518163ffffffff1660e01b8152600401602060405180830381865afa158015610de9573d6000803e3d6000fd5b505050506040513d601f19601f82011682018060405250810190610e0d9190613b59565b15610e3257680ad78ebc5ac62000008260200151610e2b9190613b76565b9050610e39565b5060208101515b80600003610e48575050610e5f565b610e5c878760200151846000015184611f07565b50505b80610e6981613b40565b915050610d76565b50610e888360200151836060015160000151611fa5565b60005b826020015151811015610ee757600083602001518281518110610eb057610eb0613951565b60200260200101519050610ed486866020015183600001518460200151600061204b565b5080610edf81613b40565b915050610e8b565b5082518251604051630609d6b760e11b81526001600160a01b0390921691630c13ad6e91610f19918890600401613ad7565b600060405180830381600087803b158015610f3357600080fd5b505af1158015610f47573d6000803e3d6000fd5b505084518451604051638918b9e160e01b81526001600160a01b039092169350638918b9e19250610567918890600290600401613b89565b33600080610f8c83611be6565b91509150610f99846118f5565b8161010001818151610fab9190613bcb565b905250815160405163d317458f60e01b81526001600160a01b039091169063d317458f90610fdf90869088906004016139bf565b600060405180830381600087803b158015610ff957600080fd5b505af115801561100d573d6000803e3d6000fd5b5050505060005b845181101561106857600085828151811061103157611031613951565b60200260200101519050611055858560200151836000015184602001516000611b06565b508061106081613b40565b915050611014565b50611077600080848487612080565b50505050565b600154604051638918b9e160e01b81526001600160a01b0390911690638918b9e190610cef9085908590600290600401613b89565b6110ba6120f0565b6110c4600061211d565b565b336000806110d383611be6565b9150915060006110e2856118f5565b905081610100015181111561110a5760405163641f6d2960e11b815260040160405180910390fd5b80826101000181815161111d9190613b76565b9052508251604051635988e97160e11b81526001600160a01b039091169063b311d2e29061115190879089906004016139bf565b600060405180830381600087803b15801561116b57600080fd5b505af115801561117f573d6000803e3d6000fd5b5050505060005b85518110156112a05760008682815181106111a3576111a3613951565b602002602001015190506111d3604051806040016040528060006001600160a01b03168152602001600081525090565b60005b8560200151518110156112585782600001516001600160a01b03168660200151828151811061120757611207613951565b6020026020010151600001516001600160a01b031603611246578560200151818151811061123757611237613951565b60200260200101519150611258565b8061125081613b40565b9150506111d6565b5081602001518160200151101561127157611271613bde565b61128b87876020015184600001518560200151600061204b565b5050808061129890613b40565b915050611186565b506112b060016000858588612080565b5050505050565b60048054604051632f5ed88d60e11b81526001600160a01b0390911691635ebdb11a916112ee918991899189918991899101613bf4565b600060405180830381600087803b15801561130857600080fd5b505af115801561131c573d6000803e3d6000fd5b505050505050505050565b6004805460405163b403b99760e01b81526001600160a01b039091169163b403b997916112ee918991899189918991899101613c36565b3360008061136b83611be6565b91509150600061137d8383868861216d565b905060005b81518110156113d457600082828151811061139f5761139f613951565b602002602001015190506113c186866020015183600001518460200151611f07565b50806113cc81613b40565b915050611382565b506112b0600080858588612080565b6113ef3333848461236b565b5050565b6040516340c10f1960e01b81526001600160a01b038216906340c10f199061142190869086906004016139a6565b600060405180830381600087803b15801561143b57600080fd5b505af115801561144f573d6000803e3d6000fd5b50505050505050565b600154604051635d6b480f60e01b81526001600160a01b0390911690635d6b480f90610cef90859085906004016139a6565b6114926124eb565b60008061149e84611be6565b9150915060006114b08383878761216d565b905060005b81518110156115615760008282815181106114d2576114d2613951565b6020026020010151905084602001516001600160a01b03166312e1aab4826000015160008085602001516040518563ffffffff1660e01b815260040161151b9493929190613867565b600060405180830381600087803b15801561153557600080fd5b505af1158015611549573d6000803e3d6000fd5b5050505050808061155990613b40565b9150506114b5565b506112b0600080858589612080565b6115786124eb565b6110778484848461236b565b600061158f82611813565b92915050565b61159d6120f0565b6115a688612516565b6115af87612516565b6115b886612516565b6115c185612516565b6115ca84612516565b6115d383612516565b6115dc82612516565b6115e581612516565b600180546001600160a01b038a81166001600160a01b03199283168117909355600480548b83169084168117909155600780548b84169085168117909155600580548b85169086168117909155600680548b86169087168117909155600280548b87169088168117909155600380548b8816908916811790915560088054978b16979098168717909755604080519889526020890195909552938701929092526060860152608085015260a084015260c083019190915260e08201527f73734d4d2078a1cdbfa7bd5d848114fa2c7a041f43c3ce7a3c41fa07db2d69f0906101000160405180910390a16105956110b2565b604051632770a7eb60e21b81526001600160a01b03821690639dc29fac9061142190869086906004016139a6565b61170d6120f0565b6001600160a01b03811661173c57604051631e4fbdf760e01b8152600060048201526024015b60405180910390fd5b6117458161211d565b50565b60048054604051633891012160e21b81526001600160a01b039091169163e24404849161056791889188918891889101613867565b6040516321e3780160e01b81526001600160a01b038281166004830152600091908416906321e3780190602401602060405180830381865afa1580156117c7573d6000803e3d6000fd5b505050506040513d601f19601f820116820180604052508101906117eb9190613c63565b90508060010361180e57604051636ac7a93960e01b815260040160405180910390fd5b505050565b6000805b82518110156118ef5760065483516001600160a01b039091169063fa76dcf29085908490811061184957611849613951565b60200260200101516000015185848151811061186757611867613951565b6020026020010151602001516040518363ffffffff1660e01b81526004016118909291906139a6565b602060405180830381865afa1580156118ad573d6000803e3d6000fd5b505050506040513d601f19601f820116820180604052508101906118d19190613c63565b6118db9083613bcb565b9150806118e781613b40565b915050611817565b50919050565b6000805b82518110156118ef5760065483516001600160a01b039091169063fa76dcf29085908490811061192b5761192b613951565b60200260200101516000015185848151811061194957611949613951565b6020026020010151602001516040518363ffffffff1660e01b81526004016119729291906139a6565b602060405180830381865afa15801561198f573d6000803e3d6000fd5b505050506040513d601f19601f820116820180604052508101906119b39190613c63565b6119bd9083613bcb565b9150806119c981613b40565b9150506118f9565b600081156119fd57816119ec670de0b6b3a764000085613c7c565b6119f69190613c93565b905061158f565b5060001992915050565b60008115611a2357816119ec68056bc75e2d6310000085613c7c565b5060001961158f565b6714d1120d7b1600008110156117455760405163c2c7ac8b60e01b815260040160405180910390fd5b670f43fc2c04ee00008110156117455760405163da43584160e01b815260040160405180910390fd5b60008086611a9557611a908885613b76565b611a9f565b611a9f8885613bcb565b9050600085611ab757611ab28785613b76565b611ac1565b611ac18785613bcb565b90506000611acf83836119d1565b9a9950505050505050505050565b6714d1120d7b16000081101561174557604051630242425360e31b815260040160405180910390fd5b604051633891012160e21b81526001600160a01b0385169063e244048490611b3990869060019086908890600401613867565b600060405180830381600087803b158015611b5357600080fd5b505af1158015611b67573d6000803e3d6000fd5b50506040516323b872dd60e01b81526001600160a01b038881166004830152878116602483015260448201869052861692506323b872dd91506064016020604051808303816000875af1158015611bc2573d6000803e3d6000fd5b505050506040513d601f19601f82011682018060405250810190610d1d9190613b59565b604080516080810182526000808252602082018190529181018290526060810191909152611c126130b7565b604080516080810182526001546001600160a01b039081168252600480548216602084015260025482168385015260035490911660608301819052835163efc5f8c560e01b815293519295509263efc5f8c592818301926000928290030181865afa158015611c85573d6000803e3d6000fd5b505050506040513d6000823e601f3d908101601f19168201604052611cad919081019061389b565b816000018190525081602001516001600160a01b03166343a124fa6040518163ffffffff1660e01b8152600401608060405180830381865afa158015611cf7573d6000803e3d6000fd5b505050506040513d601f19601f82011682018060405250810190611d1b9190613967565b6102008501526101e08401526101a083015215156101808201528151611d419084612561565b8151604051630b07655760e01b81526001600160a01b03858116600483015290911690630b07655790602401600060405180830381600087803b158015611d8757600080fd5b505af1158015611d9b573d6000803e3d6000fd5b505050506040828101518351915163d66a255360e01b81526001600160a01b038681166004830152611e1c93169063d66a255390602401600060405180830381865afa158015611def573d6000803e3d6000fd5b505050506040513d6000823e601f3d908101601f19168201604052611e179190810190613cb5565b6125f2565b606083015260408201819052611e3190611813565b6080820181905260e082015281516040516309019aaf60e31b81526001600160a01b0385811660048301529091169063480cd57890602401600060405180830381865afa158015611e86573d6000803e3d6000fd5b505050506040513d6000823e601f3d908101601f19168201604052611eae9190810190613cb5565b60208201819052611ebe906118f5565b60a0820181905261010082018190526080820151611edc91906119d1565b60c08201529092909150565b80156117455760405163a1e634ad60e01b815260040160405180910390fd5b611f128285836129fd565b6040516304b86aad60e21b81526001600160a01b038416906312e1aab490611f4590859060009081908790600401613867565b600060405180830381600087803b158015611f5f57600080fd5b505af1158015611f73573d6000803e3d6000fd5b5050604051632770a7eb60e21b81526001600160a01b0385169250639dc29fac915061056790879085906004016139a6565b6040516304b86aad60e21b81526001600160a01b038316906312e1aab490611fe2908490600090600290680ad78ebc5ac620000090600401613867565b600060405180830381600087803b158015611ffc57600080fd5b505af1158015612010573d6000803e3d6000fd5b5050604051632770a7eb60e21b81526001600160a01b0384169250639dc29fac9150610cef908590680ad78ebc5ac6200000906004016139a6565b60405163b403b99760e01b81526001600160a01b0385169063b403b997906112ee908890879060019087908990600401613c36565b6120938261010001518360e001516119d1565b61012083015261010082015160e08301516120ae9190611a07565b6101408301526120bf858584612a89565b825182516040516309d9efd960e21b81526001600160a01b0390921691632767bf64916112ee918590600401613ad7565b6000546001600160a01b031633146110c45760405163118cdaa760e01b8152336004820152602401611733565b600080546001600160a01b038381166001600160a01b0319831681178455604051919092169283917f8be0079c531659141344cd1fd0a4f28419497f9722a3daafe3b4186f6b6457e09190a35050565b606061217d8560400151836125f2565b50905061218981611813565b8460e00181815161219a9190613b76565b9052508451604051637120442f60e11b81526001600160a01b039091169063e240885e906121ce9086908590600401613a24565b600060405180830381600087803b1580156121e857600080fd5b505af11580156121fc573d6000803e3d6000fd5b5050505060005b815181101561236257600082828151811061222057612220613951565b6020026020010151905060008160000151905061223b61308d565b60005b8860400151518110156122bc57826001600160a01b03168960400151828151811061226b5761226b613951565b6020026020010151600001516001600160a01b0316036122aa578860400151818151811061229b5761229b613951565b602002602001015191506122bc565b806122b481613b40565b91505061223e565b506122cf81602001518460200151612b82565b82600001516001600160a01b031663b55fe4e76040518163ffffffff1660e01b8152600401602060405180830381865afa158015612311573d6000803e3d6000fd5b505050506040513d601f19601f820116820180604052508101906123359190613b59565b1561234c5761234c81602001518460200151612ba3565b505050808061235a90613b40565b915050612203565b50949350505050565b60008061237786611be6565b9150915061238a83826101800151612bd6565b60005b84518110156123ce576123bc8582815181106123ab576123ab613951565b602002602001015160200151612c3d565b806123c681613b40565b91505061238d565b506000806123e08460400151876125f2565b9150915060008361018001516124015784516123fe90848489612c5e565b90505b61240a83611813565b8460e00181815161241b9190613bcb565b90525084516040516309bfc81160e41b81526001600160a01b0390911690639bfc81109061244f908c908790600401613a24565b600060405180830381600087803b15801561246957600080fd5b505af115801561247d573d6000803e3d6000fd5b5050505060005b83518110156124db5760008482815181106124a1576124a1613951565b602002602001015190506124c88a8860200151836000015184602001518560400151612df4565b50806124d381613b40565b915050612484565b5061131c6000600187878d612080565b6008546001600160a01b031633146110c457604051630dc6009560e01b815260040160405180910390fd5b6001600160a01b03811661253d5760405163d92e233d60e01b815260040160405180910390fd5b803b60008190036113ef57604051636f7c43f160e01b815260040160405180910390fd5b6040516321e3780160e01b81526001600160a01b038281166004830152600091908416906321e3780190602401602060405180830381865afa1580156125ab573d6000803e3d6000fd5b505050506040513d601f19601f820116820180604052508101906125cf9190613c63565b90508060011461180e576040516380534bfb60e01b815260040160405180910390fd5b60606125fc61308d565b6000846001600160a01b0316631bd817c96040518163ffffffff1660e01b8152600401602060405180830381865afa15801561263c573d6000803e3d6000fd5b505050506040513d601f19601f820116820180604052508101906126609190613934565b90506000805b85518110156126c057826001600160a01b031686828151811061268b5761268b613951565b6020026020010151600001516001600160a01b0316036126ae57600191506126c0565b806126b881613b40565b915050612666565b5080156127215784516001600160401b038111156126e0576126e06131d4565b60405190808252806020026020018201604052801561271957816020015b61270661308d565b8152602001906001900390816126fe5790505b509350612782565b845161272e906001613bcb565b6001600160401b03811115612745576127456131d4565b60405190808252806020026020018201604052801561277e57816020015b61276b61308d565b8152602001906001900390816127635790505b5093505b60005b8551811015612925576000876001600160a01b031663a95bbced8884815181106127b1576127b1613951565b6020908102919091010151516040516001600160e01b031960e084901b1681526001600160a01b039091166004820152602401602060405180830381865afa158015612801573d6000803e3d6000fd5b505050506040513d601f19601f820116820180604052508101906128259190613934565b90506040518060600160405280826001600160a01b0316815260200188848151811061285357612853613951565b6020026020010151602001518152602001600081525086838151811061287b5761287b613951565b60200260200101819052508280156128f05750806001600160a01b031663b55fe4e76040518163ffffffff1660e01b8152600401602060405180830381865afa1580156128cc573d6000803e3d6000fd5b505050506040513d601f19601f820116820180604052508101906128f09190613b59565b156129125785828151811061290757612907613951565b602002602001015194505b508061291d81613b40565b915050612785565b50806129f4576000866001600160a01b0316631bd817c96040518163ffffffff1660e01b8152600401602060405180830381865afa15801561296b573d6000803e3d6000fd5b505050506040513d601f19601f8201168201806040525081019061298f9190613934565b90506040518060600160405280826001600160a01b03168152602001600081526020016000815250858751815181106129ca576129ca613951565b6020026020010181905250848651815181106129e8576129e8613951565b60200260200101519350505b50509250929050565b6040516370a0823160e01b81526001600160a01b0383811660048301528291908516906370a0823190602401602060405180830381865afa158015612a46573d6000803e3d6000fd5b505050506040513d601f19601f82011682018060405250810190612a6a9190613c63565b101561180e57604051631636dca160e01b815260040160405180910390fd5b80610180015115612ac7578215612ab357604051632be87da560e01b815260040160405180910390fd5b811561180e5761180e816101200151611a2c565b612ad5816101200151611a55565b60008160a0015182610100015111612b01578161010001518260a00151612afc9190613b76565b612b16565b8160a00151826101000151612b169190613b76565b9050600082608001518360e0015111612b42578260e001518360800151612b3d9190613b76565b612b56565b82608001518360e00151612b569190613b76565b9050612b718286158387876101e00151886102000151611a7e565b6101c084018190526112b090611add565b808210156113ef5760405163f73d990960e01b815260040160405180910390fd5b612bb6680ad78ebc5ac620000083613b76565b8111156113ef5760405163f73d990960e01b815260040160405180910390fd5b8015612c045766b1a2bc2ec500008211156113ef5760405163607a31bf60e01b815260040160405180910390fd5b6611c37937e08000821080612c1f575066b1a2bc2ec5000082115b156113ef576040516309c3707b60e01b815260040160405180910390fd5b80600003611745576040516316068ef760e21b815260040160405180910390fd5b600080612c6a85611813565b9050856001600160a01b0316635dba4c4a6040518163ffffffff1660e01b8152600401600060405180830381600087803b158015612ca757600080fd5b505af1158015612cbb573d6000803e3d6000fd5b5050604051630631203b60e41b8152600481018490526001600160a01b038916925063631203b09150602401602060405180830381865afa158015612d04573d6000803e3d6000fd5b505050506040513d601f19601f82011682018060405250810190612d289190613c63565b9150612d35828285613026565b600084600001516001600160a01b03166398d5fdca6040518163ffffffff1660e01b8152600401602060405180830381865afa158015612d79573d6000803e3d6000fd5b505050506040513d601f19601f82011682018060405250810190612d9d9190613c63565b905080612db2670de0b6b3a764000085613c7c565b612dbc9190613c93565b92508285602001818151612dd09190613bcb565b905250604085018051849190612de7908390613bcb565b9052505050949350505050565b604051633891012160e21b81526001600160a01b0385169063e244048490612e2790869060009081908890600401613867565b600060405180830381600087803b158015612e4157600080fd5b505af1158015612e55573d6000803e3d6000fd5b5050505060008183612e679190613b76565b90508015612ed0576040516340c10f1960e01b81526001600160a01b038516906340c10f1990612e9d90899085906004016139a6565b600060405180830381600087803b158015612eb757600080fd5b505af1158015612ecb573d6000803e3d6000fd5b505050505b81600003612ede57506112b0565b60055460408051630e054ca160e21b8152905184926000926001600160a01b03909116916338153284916004808201926020929091908290030181865afa158015612f2d573d6000803e3d6000fd5b505050506040513d601f19601f82011682018060405250810190612f519190613c63565b90508015610595576000612f658583613075565b9050612f718184613b76565b6005546040516340c10f1960e01b81529194506001600160a01b03808a16926340c10f1992612fa692169085906004016139a6565b600060405180830381600087803b158015612fc057600080fd5b505af1158015612fd4573d6000803e3d6000fd5b50505050886001600160a01b03167f0bd746804bfad30038ce5b8180f4eea08b19748e6fe3df76ecf93c8f4fc966408260405161301391815260200190565b60405180910390a2505050505050505050565b8260000361303357505050565b600082613048670de0b6b3a764000086613c7c565b6130529190613c93565b905081811115611077576040516351a2c47360e11b815260040160405180910390fd5b60008183106130845781613086565b825b9392505050565b604051806060016040528060006001600160a01b0316815260200160008152602001600081525090565b6040518061022001604052806060815260200160608152602001606081526020016130e061308d565b81526020016000815260200160008152602001600081526020016000815260200160008152602001600081526020016000815260200160008152602001600015158152602001600081526020016000815260200160008152602001600081525090565b6001600160a01b038116811461174557600080fd5b803561316381613143565b919050565b801515811461174557600080fd5b80356003811061316357600080fd5b6000806000806080858703121561319b57600080fd5b84356131a681613143565b935060208501356131b681613168565b92506131c460408601613176565b9396929550929360600135925050565b634e487b7160e01b600052604160045260246000fd5b604080519081016001600160401b038111828210171561320c5761320c6131d4565b60405290565b604051606081016001600160401b038111828210171561320c5761320c6131d4565b604051601f8201601f191681016001600160401b038111828210171561325c5761325c6131d4565b604052919050565b60006001600160401b0382111561327d5761327d6131d4565b5060051b60200190565b600082601f83011261329857600080fd5b813560206132ad6132a883613264565b613234565b82815260069290921b840181019181810190868411156132cc57600080fd5b8286015b8481101561331457604081890312156132e95760008081fd5b6132f16131ea565b81356132fc81613143565b815281850135858201528352918301916040016132d0565b509695505050505050565b60006020828403121561333157600080fd5b81356001600160401b0381111561334757600080fd5b61335384828501613287565b949350505050565b600082601f83011261336c57600080fd5b8135602061337c6132a883613264565b8281526060928302850182019282820191908785111561339b57600080fd5b8387015b858110156133eb5781818a0312156133b75760008081fd5b6133bf613212565b81356133ca81613143565b8152818601358682015260408083013590820152845292840192810161339f565b5090979650505050505050565b6000806040838503121561340b57600080fd5b823561341681613143565b915060208301356001600160401b0381111561343157600080fd5b61343d8582860161335b565b9150509250929050565b6000806040838503121561345a57600080fd5b82356001600160401b0381111561347057600080fd5b8301601f8101851361348157600080fd5b803560206134916132a883613264565b82815260059290921b830181019181810190888411156134b057600080fd5b938201935b838510156134d75784356134c881613143565b825293820193908201906134b5565b95506134e69050868201613158565b93505050509250929050565b600080600080600060a0868803121561350a57600080fd5b853561351581613143565b9450602086013561352581613168565b935061353360408701613176565b925061354160608701613176565b949793965091946080013592915050565b600080600080600060a0868803121561356a57600080fd5b853561357581613143565b9450602086013561358581613143565b9350604086013561353381613168565b600080604083850312156135a857600080fd5b82356001600160401b038111156135be57600080fd5b6135ca85828601613287565b95602094909401359450505050565b600060208083528351808285015260005b81811015613606578581018301518582016040015282016135ea565b506000604082860101526040601f19601f8301168501019250505092915050565b60008060006060848603121561363c57600080fd5b833561364781613143565b925060208401359150604084013561365e81613143565b809150509250925092565b6000806040838503121561367c57600080fd5b823561368781613143565b946020939093013593505050565b600080604083850312156136a857600080fd5b82356136b381613143565b915060208301356001600160401b038111156136ce57600080fd5b61343d85828601613287565b600080600080608085870312156136f057600080fd5b84356136fb81613143565b9350602085013561370b81613143565b925060408501356001600160401b0381111561372657600080fd5b61373287828801613287565b949793965093946060013593505050565b60006020828403121561375557600080fd5b81356001600160401b0381111561376b57600080fd5b6133538482850161335b565b600080600080600080600080610100898b03121561379457600080fd5b883561379f81613143565b975060208901356137af81613143565b965060408901356137bf81613143565b955060608901356137cf81613143565b945060808901356137df81613143565b935060a08901356137ef81613143565b925060c08901356137ff81613143565b915060e089013561380f81613143565b809150509295985092959890939650565b60006020828403121561383257600080fd5b813561308681613143565b634e487b7160e01b600052602160045260246000fd5b600381106138635761386361383d565b9052565b6001600160a01b038516815283151560208201526080810161388c6040830185613853565b82606083015295945050505050565b600060208083850312156138ae57600080fd5b82516001600160401b038111156138c457600080fd5b8301601f810185136138d557600080fd5b80516138e36132a882613264565b81815260059190911b8201830190838101908783111561390257600080fd5b928401925b8284101561392957835161391a81613143565b82529284019290840190613907565b979650505050505050565b60006020828403121561394657600080fd5b815161308681613143565b634e487b7160e01b600052603260045260246000fd5b6000806000806080858703121561397d57600080fd5b845161398881613168565b60208601516040870151606090970151919890975090945092505050565b6001600160a01b03929092168252602082015260400190565b6001600160a01b0383811682526040602080840182905284518483018190526000938683019290916060870190865b81811015613a155785518051861684528401518484015294830194918601916001016139ee565b50909998505050505050505050565b6001600160a01b038381168252604060208084018290528451848301819052600093606092909183870190888301875b82811015613a835781518051871685528581015186860152880151888501529286019290840190600101613a54565b50919a9950505050505050505050565b600081518084526020808501945080840160005b83811015613acc5781516001600160a01b031687529582019590820190600101613aa7565b509495945050505050565b604081526000613aea6040830185613a93565b905060018060a01b03831660208301529392505050565b600060208284031215613b1357600080fd5b81516001600160801b038116811461308657600080fd5b634e487b7160e01b600052601160045260246000fd5b600060018201613b5257613b52613b2a565b5060010190565b600060208284031215613b6b57600080fd5b815161308681613168565b8181038181111561158f5761158f613b2a565b606081526000613b9c6060830186613a93565b6001600160a01b0385166020840152905060058310613bbd57613bbd61383d565b826040830152949350505050565b8082018082111561158f5761158f613b2a565b634e487b7160e01b600052600160045260246000fd5b6001600160a01b0386168152841515602082015260a08101613c196040830186613853565b613c266060830185613853565b8260808301529695505050505050565b6001600160a01b03868116825285166020820152831515604082015260a08101613c266060830185613853565b600060208284031215613c7557600080fd5b5051919050565b808202811582820484141761158f5761158f613b2a565b600082613cb057634e487b7160e01b600052601260045260246000fd5b500490565b60006020808385031215613cc857600080fd5b82516001600160401b03811115613cde57600080fd5b8301601f81018513613cef57600080fd5b8051613cfd6132a882613264565b81815260069190911b82018301908381019087831115613d1c57600080fd5b928401925b828410156139295760408489031215613d3a5760008081fd5b613d426131ea565b8451613d4d81613143565b81528486015186820152825260409093019290840190613d2156fea2646970667358221220131e5c2593beb10c8f1b199cee630789df5e7dcec517c23ef57fe954a786ab9964736f6c63430008140033",
+  "devdoc": {
+    "errors": {
+      "OwnableInvalidOwner(address)": [
+        {
+          "details": "The owner is not a valid owner account. (eg. `address(0)`)"
+        }
+      ],
+      "OwnableUnauthorizedAccount(address)": [
+        {
+          "details": "The caller account is not authorized to perform an operation."
+        }
+      ]
+    },
+    "kind": "dev",
+    "methods": {
+      "owner()": {
+        "details": "Returns the address of the current owner."
+      },
+      "renounceOwnership()": {
+        "details": "Leaves the contract without owner. It will not be possible to call `onlyOwner` functions. Can only be called by the current owner. NOTE: Renouncing ownership will leave the contract without an owner, thereby disabling any functionality that is only available to the owner."
+      },
+      "transferOwnership(address)": {
+        "details": "Transfers ownership of the contract to a new account (`newOwner`). Can only be called by the current owner."
+      }
+    },
+    "version": 1
+  },
+  "userdoc": {
+    "kind": "user",
+    "methods": {},
+    "version": 1
+  },
+  "storageLayout": {
+    "storage": [
+      {
+        "astId": 8,
+        "contract": "contracts/Mock/MockBorrowerOperations.sol:MockBorrowerOperations",
+        "label": "_owner",
+        "offset": 0,
+        "slot": "0",
+        "type": "t_address"
+      },
+      {
+        "astId": 2393,
+        "contract": "contracts/Mock/MockBorrowerOperations.sol:MockBorrowerOperations",
+        "label": "troveManager",
+        "offset": 0,
+        "slot": "1",
+        "type": "t_contract(ITroveManager)8742"
+      },
+      {
+        "astId": 2396,
+        "contract": "contracts/Mock/MockBorrowerOperations.sol:MockBorrowerOperations",
+        "label": "debtTokenManager",
+        "offset": 0,
+        "slot": "2",
+        "type": "t_contract(IDebtTokenManager)7138"
+      },
+      {
+        "astId": 2399,
+        "contract": "contracts/Mock/MockBorrowerOperations.sol:MockBorrowerOperations",
+        "label": "collTokenManager",
+        "offset": 0,
+        "slot": "3",
+        "type": "t_contract(ICollTokenManager)6894"
+      },
+      {
+        "astId": 2402,
+        "contract": "contracts/Mock/MockBorrowerOperations.sol:MockBorrowerOperations",
+        "label": "storagePool",
+        "offset": 0,
+        "slot": "4",
+        "type": "t_contract(IStoragePool)7863"
+      },
+      {
+        "astId": 2405,
+        "contract": "contracts/Mock/MockBorrowerOperations.sol:MockBorrowerOperations",
+        "label": "reservePool",
+        "offset": 0,
+        "slot": "5",
+        "type": "t_contract(IReservePool)7432"
+      },
+      {
+        "astId": 2408,
+        "contract": "contracts/Mock/MockBorrowerOperations.sol:MockBorrowerOperations",
+        "label": "priceFeed",
+        "offset": 0,
+        "slot": "6",
+        "type": "t_contract(IPriceFeed)7272"
+      },
+      {
+        "astId": 2410,
+        "contract": "contracts/Mock/MockBorrowerOperations.sol:MockBorrowerOperations",
+        "label": "stabilityPoolAddress",
+        "offset": 0,
+        "slot": "7",
+        "type": "t_address"
+      },
+      {
+        "astId": 2412,
+        "contract": "contracts/Mock/MockBorrowerOperations.sol:MockBorrowerOperations",
+        "label": "swapOperations",
+        "offset": 0,
+        "slot": "8",
+        "type": "t_address"
+      }
+    ],
+    "types": {
+      "t_address": {
+        "encoding": "inplace",
+        "label": "address",
+        "numberOfBytes": "20"
+      },
+      "t_contract(ICollTokenManager)6894": {
+        "encoding": "inplace",
+        "label": "contract ICollTokenManager",
+        "numberOfBytes": "20"
+      },
+      "t_contract(IDebtTokenManager)7138": {
+        "encoding": "inplace",
+        "label": "contract IDebtTokenManager",
+        "numberOfBytes": "20"
+      },
+      "t_contract(IPriceFeed)7272": {
+        "encoding": "inplace",
+        "label": "contract IPriceFeed",
+        "numberOfBytes": "20"
+      },
+      "t_contract(IReservePool)7432": {
+        "encoding": "inplace",
+        "label": "contract IReservePool",
+        "numberOfBytes": "20"
+      },
+      "t_contract(IStoragePool)7863": {
+        "encoding": "inplace",
+        "label": "contract IStoragePool",
+        "numberOfBytes": "20"
+      },
+      "t_contract(ITroveManager)8742": {
+        "encoding": "inplace",
+        "label": "contract ITroveManager",
+        "numberOfBytes": "20"
+      }
+    }
+  }
+}

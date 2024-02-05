@@ -9,7 +9,6 @@ import {
   GetCollateralTokensQuery,
 } from '../generated/gql-types';
 import { GET_BORROWER_DEBT_TOKENS } from '../queries';
-import { getCheckSum } from '../utils/crypto';
 import { Contracts, useEthers } from './EthersProvider';
 
 export type SelectedToken = {

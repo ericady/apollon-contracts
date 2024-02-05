@@ -41,7 +41,7 @@ declare global {
 
 export const isDebtTokenAddress = (
   address: string,
-): address is '0x7a2088a1bfc9d81c55368ae168c2c02570cb814f' | '0x67d269191c92caf3cd7723f116c85e6e9bf55933' => {
+): address is '0x84ea74d481ee0a5332c457a4d796187f6ba67feb' | '0x67d269191c92caf3cd7723f116c85e6e9bf55933' => {
   return Object.values(Contracts.DebtToken)
     .map((address) => getCheckSum(address))
     .includes(getCheckSum(address) as any);
@@ -49,9 +49,9 @@ export const isDebtTokenAddress = (
 export const isCollateralTokenAddress = (
   address: string,
 ): address is
-  | '0x59b670e9fA9D0A427751Af201D676719a970857b'
+  | '0x59b670e9fa9d0a427751af201d676719a970857b'
   | '0xc6e7df5e7b4f2a278906862b61205850344d4e7d'
-  | '0xa82fF9aFd8f496c3d6ac40E2a0F282E47488CFc9' => {
+  | '0x4ed7c70f96b99c776995fb64377f0d4ab3b0e1c1' => {
   return Object.values(Contracts.ERC20)
     .map((address) => getCheckSum(address))
     .includes(getCheckSum(address) as any);
@@ -59,7 +59,10 @@ export const isCollateralTokenAddress = (
 
 export const isPoolAddress = (
   address: string,
-): address is '0x4d76502cc4d4581d4b52fb77bdd408b27d1894c1' | '0x8c07031a425a562df93226a91fd5c6288cc034fc' => {
+): address is
+  | '0x44039144a891c35e2c947cc9a64f796419f38dcc'
+  | '0x12ef5e38f5fde51e7eab0e820d14be6838aff235'
+  | '0x0c6484bcba94a1bcc3fda9904977181b03c143e7' => {
   return Object.values(Contracts.SwapPairs)
     .map((address) => getCheckSum(address))
     .includes(getCheckSum(address) as any);
@@ -68,20 +71,21 @@ export const isPoolAddress = (
 // TODO: These are the demo/production contracts. Replace them with the real ones.
 export const Contracts = {
   DebtToken: {
-    STABLE: '0x7a2088a1bfc9d81c55368ae168c2c02570cb814f',
-    STOCK_1: '0x67d269191c92caf3cd7723f116c85e6e9bf55933',
+    STABLE: '0x67d269191c92caf3cd7723f116c85e6e9bf55933',
+    STOCK_1: '0x84ea74d481ee0a5332c457a4d796187f6ba67feb',
   },
   ERC20: {
-    USDT: '0x59b670e9fA9D0A427751Af201D676719a970857b',
+    USDT: '0x59b670e9fa9d0a427751af201d676719a970857b',
     BTC: '0xc6e7df5e7b4f2a278906862b61205850344d4e7d',
-    DFI: '0xa82fF9aFd8f496c3d6ac40E2a0F282E47488CFc9',
+    DFI: '0x4ed7c70f96b99c776995fb64377f0d4ab3b0e1c1',
   },
   TroveManager: '0xCf7Ed3AccA5a467e9e704C703E8D87F634fB0Fc9',
   StabilityPoolManager: '0xDc64a140Aa3E981100a9becA4E685f962f0cF6C9',
   SwapOperations: '0x610178dA211FEF7D417bC0e6FeD39F05609AD788',
   SwapPairs: {
-    BTC: '0x4d76502cc4d4581d4b52fb77bdd408b27d1894c1',
-    USDT: '0x8c07031a425a562df93226a91fd5c6288cc034fc',
+    BTC: '0x44039144a891c35e2c947cc9a64f796419f38dcc',
+    USDT: '0x12ef5e38f5fde51e7eab0e820d14be6838aff235',
+    DFI: '0x0c6484bcba94a1bcc3fda9904977181b03c143e7',
   },
   BorrowerOperations: '0x5FbDB2315678afecb367f032d93F642f64180aa3',
   StoragePool: '0x5FC8d32690cc91D4c39d9d3abcBD16989F875707',
@@ -209,9 +213,12 @@ export default function EthersProvider({ children }: { children: React.ReactNode
         const swapPairContractBTCWithSigner = swapPairContractBTC.connect(newSigner) as SwapPair;
         const swapPairContractUSDT = new Contract(Contracts.SwapPairs.BTC, swapPairAbi, provider);
         const swapPairContractUSDTWithSigner = swapPairContractUSDT.connect(newSigner) as SwapPair;
+        const swapPairContractDFI = new Contract(Contracts.SwapPairs.DFI, swapPairAbi, provider);
+        const swapPairContractDFIWithSigner = swapPairContractDFI.connect(newSigner) as SwapPair;
         setSwapPairContracts({
           [Contracts.SwapPairs.BTC]: swapPairContractBTCWithSigner,
           [Contracts.SwapPairs.USDT]: swapPairContractUSDTWithSigner,
+          [Contracts.SwapPairs.DFI]: swapPairContractDFIWithSigner,
         });
 
         const borrowerOperationsContract = new Contract(Contracts.BorrowerOperations, borrowerOperationsAbi, provider);
@@ -296,9 +303,11 @@ export default function EthersProvider({ children }: { children: React.ReactNode
           swapPairAbi,
           provider,
         ) as unknown as SwapPair;
+        const swapPairContractDFI = new Contract(Contracts.SwapPairs.DFI, swapPairAbi, provider) as unknown as SwapPair;
         setSwapPairContracts({
           [Contracts.SwapPairs.BTC]: swapPairContractBTC,
           [Contracts.SwapPairs.USDT]: swapPairContractUSDT,
+          [Contracts.SwapPairs.DFI]: swapPairContractDFI,
         });
 
         const borrowerOperationsContract = new Contract(

@@ -82,19 +82,19 @@ function createDebtTokenMeta_stabilityDepositAPY_totalReserve30dAverage_totalSup
   // create new chunk
   const firstStabilityDepositChunk = new StabilityDepositChunk(`StabilityDepositChunk-${tokenAddress.toHexString()}-0`);
   firstStabilityDepositChunk.timestamp = event.block.timestamp;
-  firstStabilityDepositChunk.profit = new BigInt(0);
-  firstStabilityDepositChunk.volume = new BigInt(0);
+  firstStabilityDepositChunk.profit = BigInt.fromI32(0);
+  firstStabilityDepositChunk.volume = BigInt.fromI32(0);
   firstStabilityDepositChunk.save();
 
   // create new APY
   const stabilityDepositAPYEntity = new StabilityDepositAPY(`StabilityDepositAPY-${tokenAddress.toHexString()}`);
   stabilityDepositAPYEntity.index = 0;
-  stabilityDepositAPYEntity.profit = new BigInt(0);
-  stabilityDepositAPYEntity.volume = new BigInt(0);
+  stabilityDepositAPYEntity.profit = BigInt.fromI32(0);
+  stabilityDepositAPYEntity.volume = BigInt.fromI32(0);
   stabilityDepositAPYEntity.save();
 
   const totalReserveAverage = new TotalReserveAverage(`TotalReserveAverage-${tokenAddress.toHexString()}`);
-  totalReserveAverage.value = new BigInt(0);
+  totalReserveAverage.value = BigInt.fromI32(0);
   totalReserveAverage.index = 0;
   totalReserveAverage.save();
 
@@ -103,11 +103,11 @@ function createDebtTokenMeta_stabilityDepositAPY_totalReserve30dAverage_totalSup
     `TotalReserveAverageChunk-${tokenAddress.toHexString()}-0`,
   );
   totalReserveAverageFirstChunk.timestamp = event.block.timestamp;
-  totalReserveAverageFirstChunk.value = new BigInt(0);
+  totalReserveAverageFirstChunk.value = BigInt.fromI32(0);
   totalReserveAverageFirstChunk.save();
 
   const totalSupplyAverage = new TotalSupplyAverage(`TotalSupplyAverage-${tokenAddress.toHexString()}`);
-  totalSupplyAverage.value = new BigInt(0);
+  totalSupplyAverage.value = BigInt.fromI32(0);
   totalSupplyAverage.index = 0;
   totalSupplyAverage.save();
 
@@ -116,7 +116,7 @@ function createDebtTokenMeta_stabilityDepositAPY_totalReserve30dAverage_totalSup
     `TotalSupplyAverageChunk-${tokenAddress.toHexString()}-0`,
   );
   totalSupplyAverageFirstChunk.timestamp = event.block.timestamp;
-  totalSupplyAverageFirstChunk.value = new BigInt(0);
+  totalSupplyAverageFirstChunk.value = BigInt.fromI32(0);
   totalSupplyAverageFirstChunk.save();
 }
 

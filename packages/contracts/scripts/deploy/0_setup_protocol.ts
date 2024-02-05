@@ -169,12 +169,19 @@ const deployProtocol: DeployFunction = async (hre: HardhatRuntimeEnvironment) =>
     args: ['USDT', 'USDT', 18],
     log: true,
   });
+  const DFIDeployment = await deploy('MockERC20', {
+    from: deployer,
+    args: ['DFI', 'DFI', 18],
+    log: true,
+  });
   await collTokenManager.addCollToken(BTCDeployment.address);
   await collTokenManager.addCollToken(USDTDeployment.address);
+  await collTokenManager.addCollToken(DFIDeployment.address);
 
   const priceFeed = await ethers.getContractAt('MockPriceFeed', priceFeedDeployment.address);
   await priceFeed.setTokenPrice(BTCDeployment.address, parseUnits('21000'));
   await priceFeed.setTokenPrice(USDTDeployment.address, parseUnits('1'));
+  await priceFeed.setTokenPrice(DFIDeployment.address, parseUnits('0.1'));
 
   const STABLEDeployment = await deploy('MockDebtToken', {
     from: deployer,
@@ -233,32 +240,37 @@ const deployProtocol: DeployFunction = async (hre: HardhatRuntimeEnvironment) =>
   const USDT = await ethers.getContractAt('MockERC20', USDTDeployment.address);
   await USDT.unprotectedMint(deployer, parseUnits('1000'));
 
+  const DFI = await ethers.getContractAt('MockERC20', DFIDeployment.address);
+  await DFI.unprotectedMint(deployer, parseUnits('1000'));
+
   const STABLE = await ethers.getContractAt('MockDebtToken', STABLEDeployment.address);
   await STABLE.unprotectedMint(deployer, parseUnits('10000'));
 
-
-  console.log(deployer, await swapOps.owner(), swapOpsDeployment.address);
   await swapOps.createPair(BTCDeployment.address, STABLEDeployment.address, { from: deployer });
   await swapOps.createPair(USDTDeployment.address, STABLEDeployment.address, { from: deployer });
+  await swapOps.createPair(DFIDeployment.address, STABLEDeployment.address, { from: deployer });
 
   const pair1 = await swapOps.getPair(BTC.target, STABLE.target);
   const pair2 = await swapOps.getPair(USDT.target, STABLE.target);
+  const pair3 = await swapOps.getPair(DFI.target, STABLE.target);
   console.log('BTC/STOCK Pair:', pair1);
   console.log('USDT/STOCK Pair:', pair2);
+  console.log('DFI/STOCK Pair:', pair3);
 
   await BTC.approve(swapOps.target, MaxUint256);
   await USDT.approve(swapOps.target, MaxUint256);
+  await DFI.approve(swapOps.target, MaxUint256);
   await STABLE.approve(swapOps.target, MaxUint256);
 
   const deadline = (await getLatestBlockTimestamp()) + 100;
   await swapOps.addLiquidity(BTC.target, STABLE.target, parseUnits('500', 9), parseUnits('500'), 0, 0, 0, deadline);
   await swapOps.addLiquidity(USDT.target, STABLE.target, parseUnits('500', 9), parseUnits('500'), 0, 0, 0, deadline);
-
+  await swapOps.addLiquidity(DFI.target, STABLE.target, parseUnits('500', 9), parseUnits('500'), 0, 0, 0, deadline);
 
   // DEMO ACCOUNT
-  const demoAcc = "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266"
-  await BTC.unprotectedMint(demoAcc, parseUnits('100', 9));
-  await USDT.unprotectedMint(demoAcc, parseUnits('100'));
+  // const demoAcc = "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266"
+  // await BTC.unprotectedMint(demoAcc, parseUnits('100', 9));
+  // await USDT.unprotectedMint(demoAcc, parseUnits('100'));
 };
 
 deployProtocol.tags = ['DeployProtocol'];
