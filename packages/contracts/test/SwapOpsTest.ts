@@ -10,7 +10,8 @@ import {
   TroveManager,
   SwapPair,
   SwapOperations,
-  DebtTokenManager
+  DebtTokenManager,
+  IBase
 } from '../typechain';
 import { expect, assert } from 'chai';
 import {
@@ -82,8 +83,7 @@ describe.only('SwapOperations', () => {
 
   const add = async (
     user: SignerWithAddress, 
-    tokenA: MockERC20, 
-    tokenB: MockERC20, 
+    tokenB: MockDebtToken | MockERC20, 
     amountA: bigint, 
     amountB: bigint, 
     mint: boolean = true, 
@@ -93,7 +93,7 @@ describe.only('SwapOperations', () => {
     if (create)
     {
       await swapOperations.connect(owner).createPair(
-        tokenA,
+        STABLE,
         tokenB
       );
     }    
@@ -101,29 +101,29 @@ describe.only('SwapOperations', () => {
     //mint
     if (mint)
     {
-      await tokenA.unprotectedMint(user, amountA);
+      await STABLE.unprotectedMint(user, amountA);
       await tokenB.unprotectedMint(user, amountB);
     }
 
     //approve
-    await tokenA.connect(user).approve(swapOperations, amountA);
+    await STABLE.connect(user).approve(swapOperations, amountA);
     await tokenB.connect(user).approve(swapOperations, amountB);
 
     //add liquidty to pair
     await swapOperations.connect(user).addLiquidity(
-      tokenA,
+      STABLE,
       tokenB,
       amountA,
       amountB,
       0,
       0,
-      await swapOperations.MAX_BORROWING_FEE(),
+      await mintMeta(),
       await deadline()
     );
 
     //get pair    
     const pairAddress = await swapOperations.getPair(
-      tokenA,
+      STABLE,
       tokenB
     );
     const pair: SwapPair = await ethers.getContractAt('SwapPair', pairAddress);   
@@ -131,19 +131,30 @@ describe.only('SwapOperations', () => {
     return pair;
   };
 
+  const mintMeta = async (): IBase.MintMetaStruct =>
+  {
+    return [
+      '0x0000000000000000000000000000000000000000',
+      '0x0000000000000000000000000000000000000000',
+      await swapOperations.MAX_BORROWING_FEE()
+    ]
+  };
+
   const remove = async (
     signer: SignerWithAddress,
-    tokenA: MockERC20, 
-    tokenB: MockERC20,
+    tokenB: MockDebtToken | MockERC20,
     amount: bigint
   ) =>
   {
+    //remove liquidity
     await swapOperations.connect(signer).removeLiquidity(
-      tokenA,
+      STABLE,
       tokenB,
       amount,
       0,
       0,
+      '0x0000000000000000000000000000000000000000',
+      '0x0000000000000000000000000000000000000000',
       await deadline()
     );
   };
@@ -172,11 +183,11 @@ describe.only('SwapOperations', () => {
     swapOperations = contracts.swapOperations;
     debtTokenManager = contracts.debtTokenManager;
 
-    STABLE = contracts.debtToken.STABLE;
-    STOCK = contracts.debtToken.STOCK;
-    BTC = contracts.collToken.BTC;
-    ETH = contracts.collToken.ETH;
-    USDT = contracts.collToken.USDT;
+    STABLE = contracts.STABLE;
+    STOCK = contracts.STOCK;
+    BTC = contracts.BTC;
+    ETH = contracts.ETH;
+    USDT = contracts.USDT;
   });
 
   it('should not be possible to mint directly from the borrowerOps', async () => {
@@ -188,7 +199,7 @@ describe.only('SwapOperations', () => {
           alice.getAddress(),
           alice.getAddress(),
           [tokenAmount(STABLE, parseUnits('100'))],
-          MAX_BORROWING_FEE
+          await mintMeta()
         )
     ).to.be.revertedWithCustomError(borrowerOperations, 'NotFromSwapOps');
   });
@@ -202,7 +213,6 @@ describe.only('SwapOperations', () => {
     //create pair & add liquidity
     const pair = await add(
       alice,
-      STABLE,
       STOCK,
       amount,
       amount,
@@ -215,7 +225,7 @@ describe.only('SwapOperations', () => {
 
     //burn
     const balance = await pair.balanceOf(alice);
-    await expect(pair.connect(alice).burn(alice, balance, 0, 0)).to.be.revertedWithCustomError(
+    await expect(pair.connect(alice).burn(alice, balance, 0)).to.be.revertedWithCustomError(
       pair,
       'NotFromSwapOperations'
     );
@@ -230,7 +240,6 @@ describe.only('SwapOperations', () => {
     //create pair & add liquidity
     const pair = await add(
       alice,
-      STABLE,
       STOCK,
       amount,
       amount,
@@ -245,7 +254,7 @@ describe.only('SwapOperations', () => {
     expect((pair as any).transferFrom).to.be.eql(undefined, 'TransferFrom function defined');
   });
 
-  describe.only('remove liquidity', () => {
+  describe('remove liquidity', () => {
     it.skip('todo default uniswap tests...', async () => {
       // todo
     });
@@ -256,7 +265,6 @@ describe.only('SwapOperations', () => {
       //create pair & add liquidity (alice)
       const pair = await add(
         alice,
-        STABLE,
         STOCK,
         amount,
         amount,
@@ -267,7 +275,6 @@ describe.only('SwapOperations', () => {
       //remove liquidity
       await remove(
         alice,
-        STABLE,
         STOCK,
         await pair.balanceOf(alice)
       );
@@ -283,7 +290,6 @@ describe.only('SwapOperations', () => {
       //create pair & add liquidity (alice)
       const pair = await add(
         alice,
-        STABLE,
         STOCK,
         amount,
         amount,
@@ -294,7 +300,6 @@ describe.only('SwapOperations', () => {
       //remove liquidity
       await remove(
         alice,
-        STABLE,
         STOCK,
         await pair.balanceOf(alice)
       );
@@ -310,7 +315,6 @@ describe.only('SwapOperations', () => {
       //create pair & add liquidity (alice)
       const pair = await add(
         alice,
-        STABLE,
         STOCK,
         amount,
         amount,
@@ -321,7 +325,6 @@ describe.only('SwapOperations', () => {
       //remove liquidity
       await remove(
         alice,
-        STABLE,
         STOCK,
         await pair.balanceOf(alice)
       );
@@ -338,7 +341,6 @@ describe.only('SwapOperations', () => {
       //create pair & add liquidity (alice)
       const pair = await add(
         alice,
-        STABLE,
         STOCK,
         amount,
         amount,
@@ -349,7 +351,6 @@ describe.only('SwapOperations', () => {
       //remove liquidity
       await remove(
         alice,
-        STABLE,
         STOCK,
         await pair.balanceOf(alice)
       );
@@ -368,7 +369,6 @@ describe.only('SwapOperations', () => {
       //create pair & add liquidity (bob)
       await add(
         bob,
-        STABLE,
         STOCK,
         amount,
         amount,
@@ -379,7 +379,6 @@ describe.only('SwapOperations', () => {
       //add liquidty (alice)
       const pair = await add(
         alice,
-        STABLE,
         STOCK,
         amount,
         amount,
@@ -395,7 +394,6 @@ describe.only('SwapOperations', () => {
       //create pair & add liquidity (bob)
       await add(
         bob,
-        STABLE,
         STOCK,
         amount,
         amount,
@@ -410,7 +408,6 @@ describe.only('SwapOperations', () => {
       await expect(
         add(
           alice,
-          STABLE,
           STOCK,
           amount,
           amount,
@@ -426,7 +423,6 @@ describe.only('SwapOperations', () => {
       //create pair & add liquidity (bob)
       await add(
         bob,
-        STABLE,
         STOCK,
         amount,
         amount,
@@ -440,7 +436,6 @@ describe.only('SwapOperations', () => {
       //add liquidity without tokens (alice)
       const pair = await add(
         alice,
-        STABLE,
         STOCK,
         amount,
         amount,
@@ -459,7 +454,6 @@ describe.only('SwapOperations', () => {
       //create pair & add liquidity
       const pair = await add(
         alice,
-        STABLE,
         STOCK,
         parseUnits('15000'), //100 Stocks at price of 150$
         parseUnits('100'), 
@@ -498,7 +492,6 @@ describe.only('SwapOperations', () => {
         //create pair & add liquidity (bob)
         await add(
           bob,
-          STABLE,
           STOCK,
           amount,
           amount,
@@ -515,7 +508,7 @@ describe.only('SwapOperations', () => {
               0,
               STOCK,
               alice,
-              await swapOperations.MAX_BORROWING_FEE(),
+              await mintMeta(),
               await deadline()
             )
         ).to.be.revertedWithCustomError(borrowerOperations, 'TroveClosedOrNotExist');
@@ -531,7 +524,6 @@ describe.only('SwapOperations', () => {
         //create pair & add liquidity
         await add(
           alice,
-          STABLE,
           BTC,
           amount,
           amount,
@@ -546,7 +538,7 @@ describe.only('SwapOperations', () => {
           0,
           BTC,
           alice,
-          await swapOperations.MAX_BORROWING_FEE(),
+          await mintMeta(),
           await deadline()
         );
         expect(await BTC.balanceOf(alice)).to.greaterThan(parseUnits('0'));
@@ -558,7 +550,7 @@ describe.only('SwapOperations', () => {
             0,
             ETH,
             alice,
-            await swapOperations.MAX_BORROWING_FEE(),
+            await mintMeta(),
             await deadline()
           )
         ).to.be.revertedWithCustomError(swapOperations, 'PairDoesNotExist');
@@ -574,7 +566,6 @@ describe.only('SwapOperations', () => {
         //create pair & add liquidity
         await add(
           alice,
-          STABLE,
           STOCK,
           amount,
           amount,
@@ -591,7 +582,7 @@ describe.only('SwapOperations', () => {
               0,
               STOCK,
               alice,
-              await swapOperations.MAX_BORROWING_FEE(),
+              await mintMeta(),
               await deadline()
             )
         ).to.be.revertedWithCustomError(borrowerOperations, 'ICR_lt_MCR');
@@ -607,7 +598,6 @@ describe.only('SwapOperations', () => {
         //create pair & add liquidity
         await add(
           alice,
-          STABLE,
           STOCK,
           amount,
           amount,
@@ -622,7 +612,7 @@ describe.only('SwapOperations', () => {
           0,
           STOCK,
           alice,
-          await swapOperations.MAX_BORROWING_FEE(),
+          await mintMeta(),
           await deadline()
         );
         expect(await STOCK.balanceOf(alice)).to.greaterThan(parseUnits('0'));
@@ -639,7 +629,6 @@ describe.only('SwapOperations', () => {
         //create pair & add liquidity (bob)
         await add(
           bob,
-          STABLE,
           STOCK,
           amount,
           amount,
@@ -654,7 +643,7 @@ describe.only('SwapOperations', () => {
             0,
             STOCK,
             alice,
-            await swapOperations.MAX_BORROWING_FEE(),
+            await mintMeta(),
             await deadline()
           )
         ).to.be.revertedWithCustomError(borrowerOperations, 'TroveClosedOrNotExist');
@@ -670,7 +659,6 @@ describe.only('SwapOperations', () => {
         //create pair & add liquidity
         await add(
           alice,
-          STABLE,
           BTC,
           amount,
           amount,
@@ -685,7 +673,7 @@ describe.only('SwapOperations', () => {
             0,
             BTC,
             alice,
-            await swapOperations.MAX_BORROWING_FEE(),
+            await mintMeta(),
             await deadline()
           )
         ).to.be.revertedWithCustomError(debtTokenManager, 'InvalidDebtToken');
@@ -701,7 +689,6 @@ describe.only('SwapOperations', () => {
         //create pair & add liquidity
         await add(
           alice,
-          STABLE,
           STOCK,
           amount,
           amount,
@@ -716,7 +703,7 @@ describe.only('SwapOperations', () => {
             0,
             STOCK,
             alice,
-            await swapOperations.MAX_BORROWING_FEE(),
+            await mintMeta(),
             await deadline()
           )
         ).to.be.revertedWithCustomError(borrowerOperations, 'ICR_lt_MCR');
@@ -732,7 +719,6 @@ describe.only('SwapOperations', () => {
         //create pair & add liquidity
         await add(
           alice,
-          STABLE,
           STOCK,
           amount,
           amount,
@@ -747,7 +733,7 @@ describe.only('SwapOperations', () => {
           0,
           STOCK,
           alice,
-          await swapOperations.MAX_BORROWING_FEE(),
+          await mintMeta(),
           await deadline()
         );
         expect(await STABLE.balanceOf(alice)).to.greaterThan(parseUnits('150')); //initial debts
