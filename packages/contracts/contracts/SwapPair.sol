@@ -115,11 +115,11 @@ contract SwapPair is ISwapPair, SwapERC20, LiquityBase {
   // directly burns debt tokens if the user has any left to repay
   function burn(
     address to,
+    uint liquidity,
     uint debt0,
     uint debt1
   ) external lock returns (uint amount0, uint amount1, uint burned0, uint burned1) {
     _requireCallerIsOperations();
-    uint liquidity = balanceOf[address(this)];
 
     (uint112 _reserve0, uint112 _reserve1, ) = getReserves();
 

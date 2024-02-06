@@ -112,10 +112,6 @@ interface ISwapOperations is IBBase {
     uint deadline
   ) external returns (uint amountA, uint amountB);
 
-  function removeLiquidityWithPermit(
-    RemoveLiquidtyPermitParams memory params
-  ) external returns (uint amountA, uint amountB);
-
   function swapExactTokensForTokens(
     uint amountIn,
     uint amountOutMin,

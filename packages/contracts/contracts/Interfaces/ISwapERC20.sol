@@ -18,18 +18,4 @@ interface ISwapERC20 {
   function totalSupply() external view returns (uint);
 
   function balanceOf(address owner) external view returns (uint);
-
-  function DOMAIN_SEPARATOR() external view returns (bytes32);
-
-  function PERMIT_TYPEHASH() external pure returns (bytes32);
-
-  function nonces(address owner) external view returns (uint);
-
-  function approve(address spender, uint value) external returns (bool);
-
-  function transfer(address to, uint value) external returns (bool);
-
-  function transferFrom(address from, address to, uint value) external returns (bool);
-
-  function permit(address owner, address spender, uint deadline, uint value, uint8 v, bytes32 r, bytes32 s) external;
 }

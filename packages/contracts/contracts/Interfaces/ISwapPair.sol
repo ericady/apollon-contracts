@@ -53,6 +53,7 @@ interface ISwapPair is ISwapERC20 {
 
   function burn(
     address to,
+    uint liquidity,
     uint debt0,
     uint debt1
   ) external returns (uint amount0, uint amount1, uint burned0, uint burned1);
