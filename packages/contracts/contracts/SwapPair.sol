@@ -132,10 +132,10 @@ contract SwapPair is ISwapPair, SwapERC20, LiquityBase {
       amount1 = (liquidity * balance1) / _totalSupply; // using balances ensures pro-rata distribution
 
       if (amount0 == 0 || amount1 == 0) revert InsufficientLiquidityBurned();
-      _burn(address(this), liquidity);
+      _burn(to, liquidity);
     }
 
-    // check if the user as any debts left to repay
+    // check if the user has any debts left to repay
     burned0 = LiquityMath._min(debt0, amount0);
     burned1 = LiquityMath._min(debt1, amount1);
     if (burned0 != 0) IDebtToken(token0).burn(address(this), burned0);
