@@ -94,7 +94,6 @@ const CollateralUpdateDialog = ({ buttonVariant, buttonSx = {} }: Props) => {
   };
 
   const collateralToDeposit: GetCollateralTokensQuery['collateralTokenMetas'] = data?.collateralTokenMetas ?? [];
-  console.log('collateralToDeposit: ', collateralToDeposit);
   if (collateralToDeposit.length === 0)
     return (
       <Button
@@ -159,6 +158,7 @@ const CollateralUpdateDialog = ({ buttonVariant, buttonSx = {} }: Props) => {
           title: hasNoOpenTrove ? 'Open Trove.' : 'Add Collateral to Trove.',
           transaction: {
             methodCall: () => {
+
               if (hasNoOpenTrove) {
                 return borrowerOperationsContract.openTrove(tokenAmounts);
               } else {

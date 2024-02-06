@@ -8,7 +8,7 @@ import {
   TypePolicy,
   makeVar,
 } from '@apollo/client';
-import { AddressLike, ethers } from 'ethers';
+import { AddressLike } from 'ethers';
 import { PropsWithChildren } from 'react';
 import { DebtToken, ERC20, StabilityPoolManager, StoragePool, SwapPair, TroveManager } from '../../generated/types';
 import { SystemInfo, TokenFragmentFragment, TroveManager as TroveManagerType } from '../generated/gql-types';
@@ -303,7 +303,10 @@ const getProductionCacheConfig = ({
 
             if (tokenData?.address && borrower && isCollateralTokenAddress(tokenData.address)) {
               if (isFieldOutdated(SchemaDataFreshnessManager.ERC20[tokenData.address], 'walletAmount')) {
-                SchemaDataFreshnessManager.ERC20[tokenData.address].walletAmount.fetch(collateralTokenContracts[tokenData.address]  , borrower);
+                SchemaDataFreshnessManager.ERC20[tokenData.address].walletAmount.fetch(
+                  collateralTokenContracts[tokenData.address],
+                  borrower,
+                );
               }
 
               return SchemaDataFreshnessManager.ERC20[tokenData.address].walletAmount.value();
@@ -522,7 +525,6 @@ export const ContractDataFreshnessManager: {
           tokenAddress,
           amount,
         }));
-        console.log('tokenAmounts: ', tokenAmounts);
 
         ContractDataFreshnessManager.TroveManager.getTroveRepayableDebts.value = tokenAmounts;
 
@@ -693,10 +695,10 @@ export const SchemaDataFreshnessManager: ContractDataFreshnessManager<typeof Con
       walletAmount: {
         fetch: async (collTokenContract: ERC20, depositor: AddressLike) => {
           SchemaDataFreshnessManager.ERC20[Contracts.ERC20.BTC].walletAmount.lastFetched = Date.now();
-          
+
           // Only for native Token
           // const balanceWei = await provider.getBalance(Contracts.ERC20.BTC);
-          const walletAmount = await collTokenContract.balanceOf(depositor)
+          const walletAmount = await collTokenContract.balanceOf(depositor);
 
           SchemaDataFreshnessManager.ERC20[Contracts.ERC20.BTC].walletAmount.value(walletAmount);
         },
@@ -768,8 +770,8 @@ export const SchemaDataFreshnessManager: ContractDataFreshnessManager<typeof Con
       walletAmount: {
         fetch: async (collTokenContract: ERC20, depositor: AddressLike) => {
           SchemaDataFreshnessManager.ERC20[Contracts.ERC20.DFI].walletAmount.lastFetched = Date.now();
-       
-          const walletAmount = await collTokenContract.balanceOf(depositor)
+
+          const walletAmount = await collTokenContract.balanceOf(depositor);
 
           SchemaDataFreshnessManager.ERC20[Contracts.ERC20.DFI].walletAmount.value(walletAmount);
         },
@@ -841,8 +843,8 @@ export const SchemaDataFreshnessManager: ContractDataFreshnessManager<typeof Con
       walletAmount: {
         fetch: async (collTokenContract: ERC20, depositor: AddressLike) => {
           SchemaDataFreshnessManager.ERC20[Contracts.ERC20.USDT].walletAmount.lastFetched = Date.now();
-          
-          const walletAmount = await collTokenContract.balanceOf(depositor)
+
+          const walletAmount = await collTokenContract.balanceOf(depositor);
 
           SchemaDataFreshnessManager.ERC20[Contracts.ERC20.USDT].walletAmount.value(walletAmount);
         },

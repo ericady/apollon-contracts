@@ -102,7 +102,8 @@ function CollateralRatioVisualization({
 
   const getRatios = useCallback(() => {
     const oldRatio = collateralValue / debtValue;
-    const newRatio =  addedDebtUSD > 0 ? collateralValue / (debtValue + addedDebtUSD) : (collateralValue - addedDebtUSD) / (debtValue);
+    const newRatio =
+      addedDebtUSD > 0 ? collateralValue / (debtValue + addedDebtUSD) : (collateralValue - addedDebtUSD) / debtValue;
 
     return [oldRatio, newRatio];
   }, [addedDebtUSD, collateralValue, debtValue]);

@@ -14,4 +14,5 @@ You can choose the combination you need.
 3. Have fun testing.
 
 # Preparations for testing
+
 - add all the ERC tokens to your local Metamask wallet. To do this just click "Add new Token" and paste the address, you will see active balances of your ERC20.

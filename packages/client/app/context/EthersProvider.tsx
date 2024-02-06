@@ -246,7 +246,17 @@ export default function EthersProvider({ children }: { children: React.ReactNode
     }
   };
 
-  // TODO: try to implement automatic login if user has been seen and allow resolving of view fields
+  // Log in automaticall if we know the user already.
+  useEffect(() => {
+    if (typeof window.ethereum !== 'undefined') {
+      window.ethereum.request({ method: 'eth_accounts' }).then((accounts) => {
+        if (accounts.length > 0) {
+          connectWallet();
+        }
+      });
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   // This use effect initializes the contracts to do initial read operations.
   useEffect(() => {

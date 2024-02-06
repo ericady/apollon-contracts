@@ -291,6 +291,10 @@ const deployProtocol: DeployFunction = async (hre: HardhatRuntimeEnvironment) =>
   console.log(await DFI.balanceOf(demoAcc))
 
   const anotherUser = "0x70997970C51812dc3A010C7d01b50e0d17dc79C8"
+  // const anotherUserSigner = await ethers.provider.getSigner(anotherUser);
+  // const borrowerOperationsAsAnotherUser = borrowerOperations.connect(anotherUserSigner);
+  // const swapOperationsAsAnotherUser = swapOperations.connect(anotherUserSigner);
+  
   await BTC.unprotectedMint(anotherUser, parseUnits('10000'));
   await USDT.unprotectedMint(anotherUser, parseUnits('10000'));
   await DFI.unprotectedMint(anotherUser, parseUnits('10000'));
@@ -298,6 +302,28 @@ const deployProtocol: DeployFunction = async (hre: HardhatRuntimeEnvironment) =>
   await borrowerOperations.mock_increaseTroveColl(anotherUser, [{ amount: parseUnits('1000'), tokenAddress: BTC.target  }, 
   { amount: parseUnits('1000'), tokenAddress: USDT.target  }, 
   { amount: parseUnits('1000'), tokenAddress: DFI.target  }])
+  
+  // TODO: Can go the defined way to open a trove
+  // await BTC.connect(anotherUserSigner).approve(borrowerOperationsAsAnotherUser.target, MaxUint256);
+  // await USDT.connect(anotherUserSigner).approve(borrowerOperationsAsAnotherUser.target, MaxUint256);
+  // await DFI.connect(anotherUserSigner).approve(borrowerOperationsAsAnotherUser.target, MaxUint256);
+  // await STABLE.connect(anotherUserSigner).approve(borrowerOperationsAsAnotherUser.target, MaxUint256);
+
+  // await borrowerOperationsAsAnotherUser.openTrove([{ amount: parseUnits('1000'), tokenAddress: BTC.target  }, 
+  // { amount: parseUnits('1000'), tokenAddress: USDT.target  }, 
+  // { amount: parseUnits('1000'), tokenAddress: DFI.target  }]);
+  // console.log("Trove opened")
+  // await swapOperationsAsAnotherUser.addLiquidity(BTC.target, STABLE.target, parseUnits('500'), parseUnits('500'), 0, 0, parseUnits('0.01'), deadline);
+
+  
+  // await BTC.unprotectedMint(swapOperations.target, parseUnits('100000'));
+  // await USDT.unprotectedMint(swapOperations.target, parseUnits('100000'));
+  // await DFI.unprotectedMint(swapOperations.target, parseUnits('100000'));
+  // await STABLE.unprotectedMint(swapOperations.target, parseUnits('100000'));
+
+  // await swapOperations.mock_mint(pair1, swapOperations.target)
+  // await swapOperations.mock_mint(pair2, swapOperations.target)
+  // await swapOperations.mock_mint(pair3, swapOperations.target)
 };
 
 deployProtocol.tags = ['DeployProtocol'];

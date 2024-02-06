@@ -32,7 +32,7 @@ export type TransactionStep = {
 };
 
 type StepState = {
-  resultPromise?: Promise<void>;
+  resultPromise?: ContractTransactionResponse;
   transactionReceipt?: ContractTransactionReceipt | null;
   status: 'pending' | 'success' | 'error' | 'waiting';
   error?: string;
@@ -102,30 +102,41 @@ export default function TransactionDialogProvider({ children }: { children: Reac
         transaction: { methodCall, waitForResponseOf },
       } = steps[activeStep];
       // First wait if previous necessary steps have been mined
-      Promise.all(waitForResponseOf.map((stepIndex) => stepsState[stepIndex].resultPromise)).then(async () => {
+      Promise.all(waitForResponseOf.map((stepIndex) => stepsState[stepIndex].resultPromise?.wait())).then(async () => {
         // wait for signing
         methodCall()
           .then((resultPromise) => {
             // set initial mining state and update it once Promise resolves.
+            const activeStepSaved = activeStep;
+            resultPromise
+              .wait()
+              .then((transactionReceipt) => {
+                setStepsState((stepsState) => {
+                  const newStepsState = [...stepsState];
+                  newStepsState[activeStepSaved] = { status: 'success', transactionReceipt };
+                  return newStepsState;
+                });
+              })
+              .catch((error) => {
+                setStepsState((stepsState) => {
+                  const newStepsState = [...stepsState];
+                  newStepsState[activeStepSaved] = {
+                    status: 'success',
+                    transactionReceipt: newStepsState[activeStepSaved].transactionReceipt,
+                    error,
+                  };
+                  return newStepsState;
+                });
+              });
+
             setStepsState((stepsState) => {
               const currentStep = activeStep;
               const newStepsState = [...stepsState];
               newStepsState[currentStep] = {
                 status: 'pending',
-                resultPromise: resultPromise
-                  .wait()
-                  .then((transactionReceipt) => {
-                    setStepsState((stepsState) => {
-                      const newStepsState = [...stepsState];
-                      newStepsState[currentStep] = { status: 'success', transactionReceipt };
-                      return newStepsState;
-                    });
-                  })
-                  .catch((error) => {
-                    newStepsState[currentStep] = { status: 'error', error };
-                    setStepsState(newStepsState);
-                  }),
+                resultPromise: resultPromise,
               };
+
               return newStepsState;
             });
 
