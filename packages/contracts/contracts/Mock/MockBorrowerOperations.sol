@@ -15,6 +15,10 @@ contract MockBorrowerOperations is BorrowerOperations {
     _increaseDebt(msg.sender, msg.sender, _debts, _meta);
   }
 
+  function mock_increaseTroveColl(address _borrower, TokenAmount[] memory _collTokenAmounts) external {
+    troveManager.increaseTroveColl(_borrower, _collTokenAmounts);
+  }
+
   // Payable fallback function
 
   // STORAGE POOL TESTER PROXIES

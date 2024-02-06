@@ -100,8 +100,6 @@ function Assets() {
       .sort((a) => (a.isFavorite ? -1 : 1));
   }, [data, favoritedAssets, pastTokenPrices]);
 
-  console.log('tokens: ', tokens);
-
   const toggleFavorite = (address: string) => {
     const favoritedAssetsFromLS: string[] = JSON.parse(
       window.localStorage.getItem(FAVORITE_ASSETS_LOCALSTORAGE_KEY) ?? '[]',

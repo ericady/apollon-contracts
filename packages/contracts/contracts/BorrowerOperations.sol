@@ -215,7 +215,7 @@ contract BorrowerOperations is LiquityBase, Ownable(msg.sender), CheckContract, 
     );
     stableCoinAmount.debtToken.mint(address(contractsCache.storagePool), stableCoinAmount.netDebt);
 
-    emit TroveCreated(borrower, vars.arrayIndex);
+    emit TroveCreated(borrower, _colls);
   }
 
   function openTroveWithPermit(

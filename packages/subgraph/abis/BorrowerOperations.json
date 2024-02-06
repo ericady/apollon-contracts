@@ -224,10 +224,22 @@
         "type": "address"
       },
       {
+        "components": [
+          {
+            "internalType": "address",
+            "name": "tokenAddress",
+            "type": "address"
+          },
+          {
+            "internalType": "uint256",
+            "name": "amount",
+            "type": "uint256"
+          }
+        ],
         "indexed": false,
-        "internalType": "uint256",
-        "name": "arrayIndex",
-        "type": "uint256"
+        "internalType": "struct IBase.TokenAmount[]",
+        "name": "_colls",
+        "type": "tuple[]"
       }
     ],
     "name": "TroveCreated",

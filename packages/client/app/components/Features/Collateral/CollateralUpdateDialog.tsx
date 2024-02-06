@@ -150,7 +150,7 @@ const CollateralUpdateDialog = ({ buttonVariant, buttonSx = {} }: Props) => {
             methodCall: async () => {
               // @ts-ignore
               const collContract = collateralTokenContracts[tokenAddress] as ERC20;
-              return collContract.approve(Contracts.StoragePool, amount);
+              return collContract.approve(Contracts.BorrowerOperations, amount);
             },
             waitForResponseOf: [],
           },

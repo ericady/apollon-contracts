@@ -29,6 +29,8 @@ dataSources:
       abis:
         - name: TroveManager
           file: ./abis/TroveManager.json
+        - name: StoragePool
+          file: ./abis/StoragePool.json
       eventHandlers:
         - event: BaseRateUpdated(uint256)
           handler: handleBaseRateUpdated
@@ -197,7 +199,7 @@ dataSources:
       eventHandlers:
         - event: OwnershipTransferred(indexed address,indexed address)
           handler: handleOwnershipTransferred
-        - event: TroveCreated(address,uint256)
+        - event: TroveCreated(address,(address,uint256)[])
           handler: handleTroveCreated
       file: ./src/borrower-operations.ts
   - kind: ethereum

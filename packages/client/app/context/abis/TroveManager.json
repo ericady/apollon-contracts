@@ -1,12 +1,27 @@
 [
     {
         "inputs": [],
+        "name": "ExceedDebtBalance",
+        "type": "error"
+    },
+    {
+        "inputs": [],
         "name": "FeeExceedMaxPercentage",
         "type": "error"
     },
     {
         "inputs": [],
+        "name": "InvalidMaxFeePercent",
+        "type": "error"
+    },
+    {
+        "inputs": [],
         "name": "InvalidTrove",
+        "type": "error"
+    },
+    {
+        "inputs": [],
+        "name": "LessThanMCR",
         "type": "error"
     },
     {
@@ -49,6 +64,11 @@
     {
         "inputs": [],
         "name": "ZeroAddress",
+        "type": "error"
+    },
+    {
+        "inputs": [],
+        "name": "ZeroAmount",
         "type": "error"
     },
     {
@@ -319,12 +339,6 @@
                 "internalType": "address",
                 "name": "_priceFeedAddress",
                 "type": "address"
-            },
-            {
-                "indexed": false,
-                "internalType": "address",
-                "name": "_sortedTrovesAddress",
-                "type": "address"
             }
         ],
         "name": "TroveManagerInitialized",
@@ -407,19 +421,6 @@
                 "internalType": "uint256",
                 "name": "",
                 "type": "uint256"
-            }
-        ],
-        "stateMutability": "view",
-        "type": "function"
-    },
-    {
-        "inputs": [],
-        "name": "GOV_STAKING_ADDRESS",
-        "outputs": [
-            {
-                "internalType": "address",
-                "name": "",
-                "type": "address"
             }
         ],
         "stateMutability": "view",
@@ -947,81 +948,13 @@
                 "internalType": "address",
                 "name": "_borrower",
                 "type": "address"
-            },
-            {
-                "components": [
-                    {
-                        "internalType": "address",
-                        "name": "tokenAddress",
-                        "type": "address"
-                    },
-                    {
-                        "internalType": "uint256",
-                        "name": "amount",
-                        "type": "uint256"
-                    }
-                ],
-                "internalType": "struct IBase.TokenAmount[]",
-                "name": "addedColl",
-                "type": "tuple[]"
-            },
-            {
-                "components": [
-                    {
-                        "internalType": "address",
-                        "name": "tokenAddress",
-                        "type": "address"
-                    },
-                    {
-                        "internalType": "uint256",
-                        "name": "amount",
-                        "type": "uint256"
-                    }
-                ],
-                "internalType": "struct IBase.TokenAmount[]",
-                "name": "removedColl",
-                "type": "tuple[]"
-            },
-            {
-                "components": [
-                    {
-                        "internalType": "address",
-                        "name": "tokenAddress",
-                        "type": "address"
-                    },
-                    {
-                        "internalType": "uint256",
-                        "name": "amount",
-                        "type": "uint256"
-                    }
-                ],
-                "internalType": "struct IBase.TokenAmount[]",
-                "name": "addedDebt",
-                "type": "tuple[]"
-            },
-            {
-                "components": [
-                    {
-                        "internalType": "address",
-                        "name": "tokenAddress",
-                        "type": "address"
-                    },
-                    {
-                        "internalType": "uint256",
-                        "name": "amount",
-                        "type": "uint256"
-                    }
-                ],
-                "internalType": "struct IBase.TokenAmount[]",
-                "name": "removedDebt",
-                "type": "tuple[]"
             }
         ],
-        "name": "getICRIncludingPatch",
+        "name": "getNominalICR",
         "outputs": [
             {
                 "internalType": "uint256",
-                "name": "ICR",
+                "name": "",
                 "type": "uint256"
             }
         ],
@@ -1616,11 +1549,6 @@
                 "internalType": "address",
                 "name": "_priceFeedAddress",
                 "type": "address"
-            },
-            {
-                "internalType": "address",
-                "name": "_sortedTrovesAddress",
-                "type": "address"
             }
         ],
         "name": "setAddresses",
@@ -1644,19 +1572,6 @@
         "name": "setTroveStatus",
         "outputs": [],
         "stateMutability": "nonpayable",
-        "type": "function"
-    },
-    {
-        "inputs": [],
-        "name": "sortedTroves",
-        "outputs": [
-            {
-                "internalType": "contract ISortedTroves",
-                "name": "",
-                "type": "address"
-            }
-        ],
-        "stateMutability": "view",
         "type": "function"
     },
     {

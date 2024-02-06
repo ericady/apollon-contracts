@@ -13,6 +13,7 @@ import { PropsWithChildren } from 'react';
 import { DebtToken, ERC20, StabilityPoolManager, StoragePool, SwapPair, TroveManager } from '../../generated/types';
 import { SystemInfo, TokenFragmentFragment, TroveManager as TroveManagerType } from '../generated/gql-types';
 import { TOKEN_FRAGMENT } from '../queries';
+import { getCheckSum } from '../utils/crypto';
 import { floatToBigInt } from '../utils/math';
 import { CustomApolloProvider_DevMode } from './CustomApolloProvider_dev';
 import { Contracts, isCollateralTokenAddress, isDebtTokenAddress, isPoolAddress, useEthers } from './EthersProvider';
@@ -300,9 +301,9 @@ const getProductionCacheConfig = ({
               fragment: TOKEN_FRAGMENT,
             });
 
-            if (tokenData?.address && isCollateralTokenAddress(tokenData.address)) {
+            if (tokenData?.address && borrower && isCollateralTokenAddress(tokenData.address)) {
               if (isFieldOutdated(SchemaDataFreshnessManager.ERC20[tokenData.address], 'walletAmount')) {
-                SchemaDataFreshnessManager.ERC20[tokenData.address].walletAmount.fetch(provider, tokenData.address);
+                SchemaDataFreshnessManager.ERC20[tokenData.address].walletAmount.fetch(collateralTokenContracts[tokenData.address]  , borrower);
               }
 
               return SchemaDataFreshnessManager.ERC20[tokenData.address].walletAmount.value();
@@ -319,8 +320,8 @@ const getProductionCacheConfig = ({
               fragment: TOKEN_FRAGMENT,
             });
 
-            if (tokenData?.address && isCollateralTokenAddress(tokenData.address)) {
-              if (isFieldOutdated(SchemaDataFreshnessManager.ERC20[tokenData.address], 'walletAmount')) {
+            if (tokenData?.address && borrower && isCollateralTokenAddress(tokenData.address)) {
+              if (isFieldOutdated(SchemaDataFreshnessManager.ERC20[tokenData.address], 'troveLockedAmount')) {
                 SchemaDataFreshnessManager.ERC20[tokenData.address].troveLockedAmount.fetch({
                   troveManagerContract: troveManagerContract,
                   borrower,
@@ -341,7 +342,7 @@ const getProductionCacheConfig = ({
               fragment: TOKEN_FRAGMENT,
             });
 
-            if (tokenData?.address && isCollateralTokenAddress(tokenData.address)) {
+            if (tokenData?.address && borrower && isCollateralTokenAddress(tokenData.address)) {
               if (isFieldOutdated(SchemaDataFreshnessManager.ERC20[tokenData.address], 'stabilityGainedAmount')) {
                 SchemaDataFreshnessManager.ERC20[tokenData.address].stabilityGainedAmount.fetch({
                   stabilityPoolManagerContract,
@@ -455,25 +456,35 @@ type ContractValue<T> = {
   timeout: number;
 };
 
+type TokenAmount = {
+  tokenAddress: string;
+  amount: bigint;
+};
+
 /**
  * This manages the data fetching from the contracts if the data is reused. E.g.: get many debts from the trovemanager isntead of making individual calls.
  */
 export const ContractDataFreshnessManager: {
   TroveManager: Pick<
     {
-      [K in keyof TroveManager]: ContractValue<ReturnType<TroveManager[K]>>;
+      [K in keyof TroveManager]: ContractValue<TokenAmount[]>;
     },
     'getTroveDebt' | 'getTroveRepayableDebts' | 'getTroveWithdrawableColls'
   >;
   StabilityPoolManager: Pick<
     {
-      [K in keyof StabilityPoolManager]: ContractValue<ReturnType<StabilityPoolManager[K]>>;
+      [K in keyof StabilityPoolManager]: ContractValue<TokenAmount[]>;
     },
     'getDepositorDeposits' | 'getDepositorCollGains' | 'getDepositorCompoundedDeposits'
   >;
   StoragePool: Pick<
     {
-      [K in keyof StoragePool]: ContractValue<ReturnType<StoragePool[K]>>;
+      [K in keyof StoragePool]: ContractValue<{
+        isInRecoveryMode: boolean;
+        TCR: bigint;
+        entireSystemColl: bigint;
+        entireSystemDebt: bigint;
+      }>;
     },
     'checkRecoveryMode'
   >;
@@ -484,7 +495,19 @@ export const ContractDataFreshnessManager: {
         ContractDataFreshnessManager.TroveManager.getTroveDebt.lastFetched = Date.now();
         const troveDebt = await troveManagerContract.getTroveDebt(borrower);
 
-        ContractDataFreshnessManager.TroveManager.getTroveDebt.value = troveDebt;
+        const tokenAmounts = troveDebt.map(([tokenAddress, amount]) => ({
+          tokenAddress,
+          amount,
+        }));
+
+        ContractDataFreshnessManager.TroveManager.getTroveDebt.value = tokenAmounts;
+
+        // Update the values of all tokens after fetching.
+        Object.values(Contracts.DebtToken).forEach((tokenAddress) => {
+          if (isDebtTokenAddress(tokenAddress)) {
+            SchemaDataFreshnessManager.DebtToken[tokenAddress].troveMintedAmount.fetch();
+          }
+        });
       },
       value: [],
       lastFetched: 0,
@@ -493,9 +516,22 @@ export const ContractDataFreshnessManager: {
     getTroveRepayableDebts: {
       fetch: async (troveManagerContract: TroveManager, borrower: AddressLike) => {
         ContractDataFreshnessManager.TroveManager.getTroveRepayableDebts.lastFetched = Date.now();
-        const troveRepayableDebt = await troveManagerContract.getTroveRepayableDebts(borrower);
+        const troveRepayableDebts = await troveManagerContract.getTroveRepayableDebts(borrower);
 
-        ContractDataFreshnessManager.TroveManager.getTroveRepayableDebts.value = troveRepayableDebt;
+        const tokenAmounts = troveRepayableDebts.map(([tokenAddress, amount]) => ({
+          tokenAddress,
+          amount,
+        }));
+        console.log('tokenAmounts: ', tokenAmounts);
+
+        ContractDataFreshnessManager.TroveManager.getTroveRepayableDebts.value = tokenAmounts;
+
+        // Update the values of all tokens after fetching.
+        Object.values(Contracts.DebtToken).forEach((tokenAddress) => {
+          if (isDebtTokenAddress(tokenAddress)) {
+            SchemaDataFreshnessManager.DebtToken[tokenAddress].troveRepableDebtAmount.fetch();
+          }
+        });
       },
       value: [],
       lastFetched: 0,
@@ -506,7 +542,19 @@ export const ContractDataFreshnessManager: {
         ContractDataFreshnessManager.TroveManager.getTroveWithdrawableColls.lastFetched = Date.now();
         const troveColl = await troveManagerContract.getTroveWithdrawableColls(borrower);
 
-        ContractDataFreshnessManager.TroveManager.getTroveWithdrawableColls.value = troveColl;
+        const tokenAmounts = troveColl.map(([tokenAddress, amount]) => ({
+          tokenAddress,
+          amount,
+        }));
+
+        ContractDataFreshnessManager.TroveManager.getTroveWithdrawableColls.value = tokenAmounts;
+
+        // Update the values of all tokens after fetching.
+        Object.values(Contracts.ERC20).forEach((tokenAddress) => {
+          if (isCollateralTokenAddress(tokenAddress)) {
+            SchemaDataFreshnessManager.ERC20[tokenAddress].troveLockedAmount.fetch();
+          }
+        });
       },
       value: [],
       lastFetched: 0,
@@ -518,9 +566,21 @@ export const ContractDataFreshnessManager: {
     getDepositorDeposits: {
       fetch: async (stabilityPoolManagerContract: StabilityPoolManager, depositor: AddressLike) => {
         ContractDataFreshnessManager.StabilityPoolManager.getDepositorDeposits.lastFetched = Date.now();
-        const tokenAmount = await stabilityPoolManagerContract.getDepositorDeposits(depositor);
+        const depositorDeposits = await stabilityPoolManagerContract.getDepositorDeposits(depositor);
 
-        ContractDataFreshnessManager.StabilityPoolManager.getDepositorDeposits.value = tokenAmount;
+        const tokenAmounts = depositorDeposits.map(([tokenAddress, amount]) => ({
+          tokenAddress,
+          amount,
+        }));
+
+        ContractDataFreshnessManager.StabilityPoolManager.getDepositorDeposits.value = tokenAmounts;
+
+        // Update the values of all tokens after fetching.
+        Object.values(Contracts.DebtToken).forEach((tokenAddress) => {
+          if (isDebtTokenAddress(tokenAddress)) {
+            SchemaDataFreshnessManager.DebtToken[tokenAddress].providedStability.fetch();
+          }
+        });
       },
       value: [],
       lastFetched: 0,
@@ -530,12 +590,24 @@ export const ContractDataFreshnessManager: {
     getDepositorCollGains: {
       fetch: async (stabilityPoolManagerContract: StabilityPoolManager, depositor: AddressLike) => {
         ContractDataFreshnessManager.StabilityPoolManager.getDepositorCollGains.lastFetched = Date.now();
-        const tokenAmount = await stabilityPoolManagerContract.getDepositorCollGains(
+        const depositorCollGains = await stabilityPoolManagerContract.getDepositorCollGains(
           depositor,
           Object.values(Contracts.ERC20),
         );
 
-        ContractDataFreshnessManager.StabilityPoolManager.getDepositorCollGains.value = tokenAmount;
+        const tokenAmounts = depositorCollGains.map(([tokenAddress, amount]) => ({
+          tokenAddress,
+          amount,
+        }));
+
+        ContractDataFreshnessManager.StabilityPoolManager.getDepositorCollGains.value = tokenAmounts;
+
+        // Update the values of all tokens after fetching.
+        Object.values(Contracts.ERC20).forEach((tokenAddress) => {
+          if (isCollateralTokenAddress(tokenAddress)) {
+            SchemaDataFreshnessManager.ERC20[tokenAddress].stabilityGainedAmount.fetch();
+          }
+        });
       },
       value: [],
       lastFetched: 0,
@@ -545,9 +617,22 @@ export const ContractDataFreshnessManager: {
     getDepositorCompoundedDeposits: {
       fetch: async (stabilityPoolManagerContract: StabilityPoolManager, depositor: AddressLike) => {
         ContractDataFreshnessManager.StabilityPoolManager.getDepositorCompoundedDeposits.lastFetched = Date.now();
-        const tokenAmount = await stabilityPoolManagerContract.getDepositorCompoundedDeposits(depositor);
+        const depositorCompoundedDeposits =
+          await stabilityPoolManagerContract.getDepositorCompoundedDeposits(depositor);
 
-        ContractDataFreshnessManager.StabilityPoolManager.getDepositorCompoundedDeposits.value = tokenAmount;
+        const tokenAmounts = depositorCompoundedDeposits.map(([tokenAddress, amount]) => ({
+          tokenAddress,
+          amount,
+        }));
+
+        ContractDataFreshnessManager.StabilityPoolManager.getDepositorCompoundedDeposits.value = tokenAmounts;
+
+        // Update the values of all tokens after fetching.
+        Object.values(Contracts.DebtToken).forEach((tokenAddress) => {
+          if (isDebtTokenAddress(tokenAddress)) {
+            SchemaDataFreshnessManager.DebtToken[tokenAddress].compoundedDeposit.fetch();
+          }
+        });
       },
       value: [],
       lastFetched: 0,
@@ -567,7 +652,11 @@ export const ContractDataFreshnessManager: {
           TCR: systemTCR,
           entireSystemColl,
           entireSystemDebt,
-        } as any;
+        };
+
+        // Update the values of all tokens after fetching.
+        SchemaDataFreshnessManager.StoragePool.totalCollateralRatio.fetch();
+        SchemaDataFreshnessManager.StoragePool.recoveryModeActive.fetch();
       },
       value: {
         isInRecoveryMode: false,
@@ -602,11 +691,14 @@ export const SchemaDataFreshnessManager: ContractDataFreshnessManager<typeof Con
       },
 
       walletAmount: {
-        fetch: async (provider: ethers.JsonRpcProvider, address: AddressLike) => {
+        fetch: async (collTokenContract: ERC20, depositor: AddressLike) => {
           SchemaDataFreshnessManager.ERC20[Contracts.ERC20.BTC].walletAmount.lastFetched = Date.now();
-          const balanceWei = await provider.getBalance(address);
+          
+          // Only for native Token
+          // const balanceWei = await provider.getBalance(Contracts.ERC20.BTC);
+          const walletAmount = await collTokenContract.balanceOf(depositor)
 
-          SchemaDataFreshnessManager.ERC20[Contracts.ERC20.BTC].walletAmount.value(balanceWei);
+          SchemaDataFreshnessManager.ERC20[Contracts.ERC20.BTC].walletAmount.value(walletAmount);
         },
         value: makeVar(defaultFieldValue),
         lastFetched: 0,
@@ -625,7 +717,7 @@ export const SchemaDataFreshnessManager: ContractDataFreshnessManager<typeof Con
           SchemaDataFreshnessManager.ERC20[Contracts.ERC20.BTC].troveLockedAmount.lastFetched = Date.now();
 
           const tokenAmount = ContractDataFreshnessManager.TroveManager.getTroveWithdrawableColls.value.find(
-            ({ tokenAddress }) => tokenAddress === Contracts.ERC20.BTC,
+            ({ tokenAddress }) => getCheckSum(tokenAddress) === getCheckSum(Contracts.ERC20.BTC),
           )?.amount;
           if (tokenAmount) {
             SchemaDataFreshnessManager.ERC20[Contracts.ERC20.BTC].troveLockedAmount.value(tokenAmount);
@@ -648,7 +740,7 @@ export const SchemaDataFreshnessManager: ContractDataFreshnessManager<typeof Con
           SchemaDataFreshnessManager.ERC20[Contracts.ERC20.BTC].stabilityGainedAmount.lastFetched = Date.now();
 
           const tokenAmount = ContractDataFreshnessManager.StabilityPoolManager.getDepositorCollGains.value.find(
-            ({ tokenAddress }) => tokenAddress === Contracts.ERC20.BTC,
+            ({ tokenAddress }) => getCheckSum(tokenAddress) === getCheckSum(Contracts.ERC20.BTC),
           )?.amount;
           if (tokenAmount) {
             SchemaDataFreshnessManager.ERC20[Contracts.ERC20.BTC].stabilityGainedAmount.value(tokenAmount);
@@ -674,11 +766,12 @@ export const SchemaDataFreshnessManager: ContractDataFreshnessManager<typeof Con
       },
 
       walletAmount: {
-        fetch: async (provider: ethers.JsonRpcProvider, address: AddressLike) => {
+        fetch: async (collTokenContract: ERC20, depositor: AddressLike) => {
           SchemaDataFreshnessManager.ERC20[Contracts.ERC20.DFI].walletAmount.lastFetched = Date.now();
-          const balanceWei = await provider.getBalance(address);
+       
+          const walletAmount = await collTokenContract.balanceOf(depositor)
 
-          SchemaDataFreshnessManager.ERC20[Contracts.ERC20.DFI].walletAmount.value(balanceWei);
+          SchemaDataFreshnessManager.ERC20[Contracts.ERC20.DFI].walletAmount.value(walletAmount);
         },
         value: makeVar(defaultFieldValue),
         lastFetched: 0,
@@ -697,7 +790,7 @@ export const SchemaDataFreshnessManager: ContractDataFreshnessManager<typeof Con
           SchemaDataFreshnessManager.ERC20[Contracts.ERC20.DFI].troveLockedAmount.lastFetched = Date.now();
 
           const tokenAmount = ContractDataFreshnessManager.TroveManager.getTroveWithdrawableColls.value.find(
-            ({ tokenAddress }) => tokenAddress === Contracts.ERC20.DFI,
+            ({ tokenAddress }) => getCheckSum(tokenAddress) === getCheckSum(Contracts.ERC20.DFI),
           )?.amount;
           if (tokenAmount) {
             SchemaDataFreshnessManager.ERC20[Contracts.ERC20.DFI].troveLockedAmount.value(tokenAmount);
@@ -720,7 +813,7 @@ export const SchemaDataFreshnessManager: ContractDataFreshnessManager<typeof Con
           SchemaDataFreshnessManager.ERC20[Contracts.ERC20.DFI].stabilityGainedAmount.lastFetched = Date.now();
 
           const tokenAmount = ContractDataFreshnessManager.StabilityPoolManager.getDepositorCollGains.value.find(
-            ({ tokenAddress }) => tokenAddress === Contracts.ERC20.DFI,
+            ({ tokenAddress }) => getCheckSum(tokenAddress) === getCheckSum(Contracts.ERC20.DFI),
           )?.amount;
           if (tokenAmount) {
             SchemaDataFreshnessManager.ERC20[Contracts.ERC20.DFI].stabilityGainedAmount.value(tokenAmount);
@@ -746,11 +839,12 @@ export const SchemaDataFreshnessManager: ContractDataFreshnessManager<typeof Con
       },
 
       walletAmount: {
-        fetch: async (provider: ethers.JsonRpcProvider, address: AddressLike) => {
+        fetch: async (collTokenContract: ERC20, depositor: AddressLike) => {
           SchemaDataFreshnessManager.ERC20[Contracts.ERC20.USDT].walletAmount.lastFetched = Date.now();
-          const balanceWei = await provider.getBalance(address);
+          
+          const walletAmount = await collTokenContract.balanceOf(depositor)
 
-          SchemaDataFreshnessManager.ERC20[Contracts.ERC20.USDT].walletAmount.value(balanceWei);
+          SchemaDataFreshnessManager.ERC20[Contracts.ERC20.USDT].walletAmount.value(walletAmount);
         },
         value: makeVar(defaultFieldValue),
         lastFetched: 0,
@@ -769,7 +863,7 @@ export const SchemaDataFreshnessManager: ContractDataFreshnessManager<typeof Con
           SchemaDataFreshnessManager.ERC20[Contracts.ERC20.USDT].troveLockedAmount.lastFetched = Date.now();
 
           const tokenAmount = ContractDataFreshnessManager.TroveManager.getTroveWithdrawableColls.value.find(
-            ({ tokenAddress }) => tokenAddress === Contracts.ERC20.USDT,
+            ({ tokenAddress }) => getCheckSum(tokenAddress) === getCheckSum(Contracts.ERC20.USDT),
           )?.amount;
           if (tokenAmount) {
             SchemaDataFreshnessManager.ERC20[Contracts.ERC20.USDT].troveLockedAmount.value(tokenAmount);
@@ -792,7 +886,7 @@ export const SchemaDataFreshnessManager: ContractDataFreshnessManager<typeof Con
           SchemaDataFreshnessManager.ERC20[Contracts.ERC20.USDT].stabilityGainedAmount.lastFetched = Date.now();
 
           const tokenAmount = ContractDataFreshnessManager.StabilityPoolManager.getDepositorCollGains.value.find(
-            ({ tokenAddress }) => tokenAddress === Contracts.ERC20.USDT,
+            ({ tokenAddress }) => getCheckSum(tokenAddress) === getCheckSum(Contracts.ERC20.USDT),
           )?.amount;
           if (tokenAmount) {
             SchemaDataFreshnessManager.ERC20[Contracts.ERC20.USDT].stabilityGainedAmount.value(tokenAmount);
@@ -842,7 +936,7 @@ export const SchemaDataFreshnessManager: ContractDataFreshnessManager<typeof Con
           SchemaDataFreshnessManager.DebtToken[Contracts.DebtToken.STABLE].troveMintedAmount.lastFetched = Date.now();
 
           const tokenAmount = ContractDataFreshnessManager.TroveManager.getTroveDebt.value.find(
-            ({ tokenAddress }) => tokenAddress === Contracts.DebtToken.STABLE,
+            ({ tokenAddress }) => getCheckSum(tokenAddress) === getCheckSum(Contracts.DebtToken.STABLE),
           )?.amount;
           if (tokenAmount) {
             SchemaDataFreshnessManager.DebtToken[Contracts.DebtToken.STABLE].troveMintedAmount.value(tokenAmount);
@@ -866,7 +960,7 @@ export const SchemaDataFreshnessManager: ContractDataFreshnessManager<typeof Con
             Date.now();
 
           const repayableDebt = ContractDataFreshnessManager.TroveManager.getTroveRepayableDebts.value.find(
-            ({ tokenAddress }) => tokenAddress === Contracts.DebtToken.STABLE,
+            ({ tokenAddress }) => getCheckSum(tokenAddress) === getCheckSum(Contracts.DebtToken.STABLE),
           )?.amount;
           if (repayableDebt) {
             SchemaDataFreshnessManager.DebtToken[Contracts.DebtToken.STABLE].troveRepableDebtAmount.value(
@@ -891,7 +985,7 @@ export const SchemaDataFreshnessManager: ContractDataFreshnessManager<typeof Con
           SchemaDataFreshnessManager.DebtToken[Contracts.DebtToken.STABLE].providedStability.lastFetched = Date.now();
 
           const tokenAmount = ContractDataFreshnessManager.StabilityPoolManager.getDepositorDeposits.value.find(
-            ({ tokenAddress }) => tokenAddress === Contracts.DebtToken.STABLE,
+            ({ tokenAddress }) => getCheckSum(tokenAddress) === getCheckSum(Contracts.DebtToken.STABLE),
           )?.amount;
           if (tokenAmount) {
             SchemaDataFreshnessManager.DebtToken[Contracts.DebtToken.STABLE].providedStability.value(tokenAmount);
@@ -915,7 +1009,7 @@ export const SchemaDataFreshnessManager: ContractDataFreshnessManager<typeof Con
 
           const compoundedDeposit =
             ContractDataFreshnessManager.StabilityPoolManager.getDepositorCompoundedDeposits.value.find(
-              ({ tokenAddress }) => tokenAddress === Contracts.DebtToken.STABLE,
+              ({ tokenAddress }) => getCheckSum(tokenAddress) === getCheckSum(Contracts.DebtToken.STABLE),
             )?.amount;
 
           if (compoundedDeposit) {
@@ -965,7 +1059,7 @@ export const SchemaDataFreshnessManager: ContractDataFreshnessManager<typeof Con
           SchemaDataFreshnessManager.DebtToken[Contracts.DebtToken.STOCK_1].troveMintedAmount.lastFetched = Date.now();
 
           const tokenAmount = ContractDataFreshnessManager.TroveManager.getTroveDebt.value.find(
-            ({ tokenAddress }) => tokenAddress === Contracts.DebtToken.STOCK_1,
+            ({ tokenAddress }) => getCheckSum(tokenAddress) === getCheckSum(Contracts.DebtToken.STOCK_1),
           )?.amount;
           if (tokenAmount) {
             SchemaDataFreshnessManager.DebtToken[Contracts.DebtToken.STOCK_1].troveMintedAmount.value(tokenAmount);
@@ -989,7 +1083,7 @@ export const SchemaDataFreshnessManager: ContractDataFreshnessManager<typeof Con
             Date.now();
 
           const repayableDebt = ContractDataFreshnessManager.TroveManager.getTroveRepayableDebts.value.find(
-            ({ tokenAddress }) => tokenAddress === Contracts.DebtToken.STOCK_1,
+            ({ tokenAddress }) => getCheckSum(tokenAddress) === getCheckSum(Contracts.DebtToken.STOCK_1),
           )?.amount;
           if (repayableDebt) {
             SchemaDataFreshnessManager.DebtToken[Contracts.DebtToken.STOCK_1].troveRepableDebtAmount.value(
@@ -1014,7 +1108,7 @@ export const SchemaDataFreshnessManager: ContractDataFreshnessManager<typeof Con
           SchemaDataFreshnessManager.DebtToken[Contracts.DebtToken.STOCK_1].providedStability.lastFetched = Date.now();
 
           const tokenAmount = ContractDataFreshnessManager.StabilityPoolManager.getDepositorDeposits.value.find(
-            ({ tokenAddress }) => tokenAddress === Contracts.DebtToken.STOCK_1,
+            ({ tokenAddress }) => getCheckSum(tokenAddress) === getCheckSum(Contracts.DebtToken.STOCK_1),
           )?.amount;
           if (tokenAmount) {
             SchemaDataFreshnessManager.DebtToken[Contracts.DebtToken.STOCK_1].providedStability.value(tokenAmount);
@@ -1038,7 +1132,7 @@ export const SchemaDataFreshnessManager: ContractDataFreshnessManager<typeof Con
 
           const compoundedDeposit =
             ContractDataFreshnessManager.StabilityPoolManager.getDepositorCompoundedDeposits.value.find(
-              ({ tokenAddress }) => tokenAddress === Contracts.DebtToken.STOCK_1,
+              ({ tokenAddress }) => getCheckSum(tokenAddress) === getCheckSum(Contracts.DebtToken.STOCK_1),
             )?.amount;
 
           if (compoundedDeposit) {

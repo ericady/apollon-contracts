@@ -161,7 +161,7 @@ const deployProtocol: DeployFunction = async (hre: HardhatRuntimeEnvironment) =>
   // Link contracts
   const BTCDeployment = await deploy('MockERC20', {
     from: deployer,
-    args: ['Bitcoin', 'BTC', 9],
+    args: ['Bitcoin', 'BTC', 18],
     log: true,
   });
   const USDTDeployment = await deploy('MockERC20', {
@@ -235,7 +235,7 @@ const deployProtocol: DeployFunction = async (hre: HardhatRuntimeEnvironment) =>
   const swapOps = await ethers.getContractAt('SwapOperations', swapOpsDeployment.address);
 
   const BTC = await ethers.getContractAt('MockERC20', BTCDeployment.address);
-  await BTC.unprotectedMint(deployer, parseUnits('1000', 9));
+  await BTC.unprotectedMint(deployer, parseUnits('1000'));
 
   const USDT = await ethers.getContractAt('MockERC20', USDTDeployment.address);
   await USDT.unprotectedMint(deployer, parseUnits('1000'));
@@ -263,14 +263,41 @@ const deployProtocol: DeployFunction = async (hre: HardhatRuntimeEnvironment) =>
   await STABLE.approve(swapOps.target, MaxUint256);
 
   const deadline = (await getLatestBlockTimestamp()) + 100;
-  await swapOps.addLiquidity(BTC.target, STABLE.target, parseUnits('500', 9), parseUnits('500'), 0, 0, 0, deadline);
-  await swapOps.addLiquidity(USDT.target, STABLE.target, parseUnits('500', 9), parseUnits('500'), 0, 0, 0, deadline);
-  await swapOps.addLiquidity(DFI.target, STABLE.target, parseUnits('500', 9), parseUnits('500'), 0, 0, 0, deadline);
+  await swapOps.addLiquidity(BTC.target, STABLE.target, parseUnits('500'), parseUnits('500'), 0, 0, 0, deadline);
+  await swapOps.addLiquidity(USDT.target, STABLE.target, parseUnits('500'), parseUnits('500'), 0, 0, 0, deadline);
+  await swapOps.addLiquidity(DFI.target, STABLE.target, parseUnits('500'), parseUnits('500'), 0, 0, 0, deadline);
+
+  // Init StoragePool
+  await BTC.unprotectedMint(troveManager, parseUnits('100000'));
+  await USDT.unprotectedMint(troveManager, parseUnits('100000'));
+  await DFI.unprotectedMint(troveManager, parseUnits('100000'));
+
+  await borrowerOperations.testStoragePool_addValue(BTC.target, true, 0, parseUnits('10000'))
+  await borrowerOperations.testStoragePool_addValue(USDT.target, true, 0, parseUnits('10000'))
+  await borrowerOperations.testStoragePool_addValue(DFI.target, true, 0, parseUnits('10000'))
+
+  await borrowerOperations.testStoragePool_addValue(BTC.target, true, 1, parseUnits('10000'))
+  await borrowerOperations.testStoragePool_addValue(USDT.target, true, 1, parseUnits('10000'))
+  await borrowerOperations.testStoragePool_addValue(DFI.target, true, 1, parseUnits('10000'))
 
   // DEMO ACCOUNT
-  // const demoAcc = "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266"
-  // await BTC.unprotectedMint(demoAcc, parseUnits('100', 9));
-  // await USDT.unprotectedMint(demoAcc, parseUnits('100'));
+  const demoAcc = "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266"
+  await BTC.unprotectedMint(demoAcc, parseUnits('1000'));
+  await USDT.unprotectedMint(demoAcc, parseUnits('1000'));
+
+  // TODO: This is weird, why does the demo account have DFI? And why so weird amounts?
+  console.log(await BTC.balanceOf(demoAcc))
+  console.log(await USDT.balanceOf(demoAcc))
+  console.log(await DFI.balanceOf(demoAcc))
+
+  const anotherUser = "0x70997970C51812dc3A010C7d01b50e0d17dc79C8"
+  await BTC.unprotectedMint(anotherUser, parseUnits('10000'));
+  await USDT.unprotectedMint(anotherUser, parseUnits('10000'));
+  await DFI.unprotectedMint(anotherUser, parseUnits('10000'));
+
+  await borrowerOperations.mock_increaseTroveColl(anotherUser, [{ amount: parseUnits('1000'), tokenAddress: BTC.target  }, 
+  { amount: parseUnits('1000'), tokenAddress: USDT.target  }, 
+  { amount: parseUnits('1000'), tokenAddress: DFI.target  }])
 };
 
 deployProtocol.tags = ['DeployProtocol'];

@@ -19,7 +19,7 @@ interface IBorrowerOperations is IBBase {
     address _sortedTrovesAddress,
     address _collSurplusPoolAddress
   );
-  event TroveCreated(address _borrower, uint arrayIndex);
+  event TroveCreated(address _borrower, TokenAmount[] _colls);
   event PaidBorrowingFee(address indexed _borrower, uint amount);
 
   // --- Custom Errors ---

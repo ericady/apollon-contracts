@@ -88,7 +88,9 @@ function CollateralTable() {
           backgroundColor: isDarkMode ? '#1e1b27' : '#f8f8f8',
         }}
       >
-        <CollateralPieVisualization borrowerCollateralTokens={borrowerCollateralTokens} />
+        <CollateralPieVisualization
+          borrowerCollateralTokens={borrowerCollateralTokens.filter(({ troveLockedAmount }) => troveLockedAmount > 0)}
+        />
       </Box>
       <Box sx={{ width: '100%', borderLeft: '1px solid', borderColor: 'table.border' }}>
         <div style={{ padding: '20px' }}>

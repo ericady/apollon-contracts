@@ -6,6 +6,7 @@ import {
   TotalValueLockedAverage,
   TotalValueLockedChunk,
 } from '../../generated/schema';
+// import { log } from '@graphprotocol/graph-ts';
 
 export function handleCreateUpdateCollateralTokenMeta(event: ethereum.Event, tokenAddress: Address): void {
   let collateralTokenMeta = CollateralTokenMeta.load(`CollateralTokenMeta-${tokenAddress.toHexString()}`);

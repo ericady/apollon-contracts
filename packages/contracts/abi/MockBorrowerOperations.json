@@ -240,10 +240,22 @@
                 "type": "address"
             },
             {
+                "components": [
+                    {
+                        "internalType": "address",
+                        "name": "tokenAddress",
+                        "type": "address"
+                    },
+                    {
+                        "internalType": "uint256",
+                        "name": "amount",
+                        "type": "uint256"
+                    }
+                ],
                 "indexed": false,
-                "internalType": "uint256",
-                "name": "arrayIndex",
-                "type": "uint256"
+                "internalType": "struct IBase.TokenAmount[]",
+                "name": "_colls",
+                "type": "tuple[]"
             }
         ],
         "name": "TroveCreated",
@@ -635,6 +647,36 @@
             }
         ],
         "name": "increaseDebts",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "address",
+                "name": "_borrower",
+                "type": "address"
+            },
+            {
+                "components": [
+                    {
+                        "internalType": "address",
+                        "name": "tokenAddress",
+                        "type": "address"
+                    },
+                    {
+                        "internalType": "uint256",
+                        "name": "amount",
+                        "type": "uint256"
+                    }
+                ],
+                "internalType": "struct IBase.TokenAmount[]",
+                "name": "_collTokenAmounts",
+                "type": "tuple[]"
+            }
+        ],
+        "name": "mock_increaseTroveColl",
         "outputs": [],
         "stateMutability": "nonpayable",
         "type": "function"
