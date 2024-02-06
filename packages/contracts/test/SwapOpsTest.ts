@@ -225,7 +225,7 @@ describe.only('SwapOperations', () => {
 
     //burn
     const balance = await pair.balanceOf(alice);
-    await expect(pair.connect(alice).burn(alice, balance, 0)).to.be.revertedWithCustomError(
+    await expect(pair.connect(alice).burn(alice, balance, 0, 0)).to.be.revertedWithCustomError(
       pair,
       'NotFromSwapOperations'
     );
@@ -255,8 +255,28 @@ describe.only('SwapOperations', () => {
   });
 
   describe('remove liquidity', () => {
-    it.skip('todo default uniswap tests...', async () => {
-      // todo
+    it('default uniswap tests', async () => {
+      const amount = parseUnits('1000');
+
+      //create pair & add liquidity (alice)
+      const pair = await add(
+        alice,
+        STOCK,
+        amount,
+        amount,
+        true,
+        true
+      );
+
+      //remove liquidity
+      await remove(
+        alice,
+        STOCK,
+        await pair.balanceOf(alice)
+      );
+      expect(await pair.balanceOf(alice)).to.be.equal(0);
+      expect(await STABLE.balanceOf(alice)).to.be.greaterThan(0);
+      expect(await STOCK.balanceOf(alice)).to.be.greaterThan(0);
     });
 
     it('zero borrower debts (no active trove), default uniswap behavior', async () => {
@@ -359,8 +379,26 @@ describe.only('SwapOperations', () => {
   });
 
   describe('add liquidity', () => {
-    it.skip('todo default uniswap tests...', async () => {
-      // todo
+    it('default uniswap tests', async () => {
+      const amount = parseUnits('1000');
+
+      //create pair & add liquidity
+      const pair = await add(
+        alice,
+        STOCK,
+        amount,
+        amount,
+        true,
+        true
+      );
+      expect(await STABLE.balanceOf(alice)).to.be.equal(0);
+      expect(await STOCK.balanceOf(alice)).to.be.equal(0);
+
+      //check reserves
+      const res = await pair.getReserves();
+      expect(
+        res._reserve0
+      ).to.be.equal(res._reserve1);
     });
 
     it('borrower has enough funds for the op, no trove needed', async () => {
