@@ -155,7 +155,7 @@ contract RedemptionOperations is LiquityBase, Ownable(msg.sender), CheckContract
 
     // Decay the baseRate due to time passed, and then increase it according to the size of this redemption.
     // Use the saved total stable supply value, from before it was reduced by the redemption.
-    troveManager.updateBaseRateFromRedemption(vars.totalRedeemedStable, vars.totalStableSupplyAtStart);
+    troveManager.updateStableCoinBaseRateFromRedemption(vars.totalRedeemedStable, vars.totalStableSupplyAtStart);
 
     // Calculate the redemption fee
     for (uint i = 0; i < vars.totalCollDrawn.length; i++) {
@@ -255,11 +255,11 @@ contract RedemptionOperations is LiquityBase, Ownable(msg.sender), CheckContract
   }
 
   function getRedemptionRate() public view override returns (uint) {
-    return _calcRedemptionRate(troveManager.getBaseRate());
+    return _calcRedemptionRate(troveManager.getStableCoinBaseRate());
   }
 
   function getRedemptionRateWithDecay() public view override returns (uint) {
-    return _calcRedemptionRate(troveManager.calcDecayedBaseRate());
+    return _calcRedemptionRate(troveManager.calcDecayedStableCoinBaseRate());
   }
 
   function _calcRedemptionRate(uint _baseRate) internal pure returns (uint) {
@@ -282,9 +282,7 @@ contract RedemptionOperations is LiquityBase, Ownable(msg.sender), CheckContract
     if (_collDrawn == 0) return 0;
 
     uint redemptionFee = (_redemptionRate * _collDrawn) / DECIMAL_PRECISION;
-
-    // TroveManager: Fee would eat up all returned collateral
-    if (redemptionFee >= _collDrawn) revert TooHighRedeemFee();
+    if (redemptionFee >= _collDrawn) revert TooHighRedeemFee(); // Fee would eat up all returned collateral
     return redemptionFee;
   }
 }

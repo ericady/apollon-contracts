@@ -26,7 +26,7 @@ interface ITroveManager is IBBase {
   event TroveIndexUpdated(address _borrower, uint _newIndex);
   event TroveCollChanged(address _borrower, address[] _collTokenAddresses);
 
-  event BaseRateUpdated(uint _baseRate);
+  event StableCoinBaseRateUpdated(uint _baseRate);
   event LastFeeOpTimeUpdated(uint _lastFeeOpTime);
   event TotalStakesUpdated(TokenAmount[] _totalStakes);
   event SystemSnapshotsUpdated(TokenAmount[] _totalStakesSnapshot, TokenAmount[] _totalCollateralSnapshot);
@@ -131,19 +131,19 @@ interface ITroveManager is IBBase {
 
   //
 
-  function getBaseRate() external view returns (uint);
+  function getStableCoinBaseRate() external view returns (uint);
 
-  function getBorrowingRate() external view returns (uint);
+  function getBorrowingRate(bool isStableCoin) external view returns (uint);
 
-  function getBorrowingRateWithDecay() external view returns (uint);
+  function getBorrowingRateWithDecay(bool isStableCoin) external view returns (uint);
 
-  function getBorrowingFee(uint LUSDDebt) external view returns (uint);
+  function getBorrowingFee(uint debt, bool isStableCoin) external view returns (uint);
 
-  function getBorrowingFeeWithDecay(uint _LUSDDebt) external view returns (uint);
+  function getBorrowingFeeWithDecay(uint debt, bool isStableCoin) external view returns (uint);
 
-  function decayBaseRateFromBorrowing() external;
+  function decayStableCoinBaseRateFromBorrowing(uint borrowedStable) external;
 
-  function updateBaseRateFromRedemption(uint _totalRedeemedStable, uint _totalStableCoinSupply) external;
+  function updateStableCoinBaseRateFromRedemption(uint _totalRedeemedStable, uint _totalStableCoinSupply) external;
 
-  function calcDecayedBaseRate() external view returns (uint);
+  function calcDecayedStableCoinBaseRate() external view returns (uint);
 }

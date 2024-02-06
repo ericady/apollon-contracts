@@ -609,19 +609,20 @@ contract BorrowerOperations is LiquityBase, Ownable(msg.sender), CheckContract, 
     DebtTokenAmount memory _stableCoinAmount,
     uint _maxFeePercentage
   ) internal returns (uint borrowingFee) {
-    _troveManager.decayBaseRateFromBorrowing(); // decay the baseRate state variable
+    _troveManager.decayStableCoinBaseRateFromBorrowing(_stableCoinAmount.netDebt); // decay the baseRate state variable
 
     uint compositeDebtInUSD = _getCompositeDebt(_debts);
-    borrowingFee = _troveManager.getBorrowingFee(compositeDebtInUSD); // calculated in stable price
+    uint stableCoinDebtInUSE = priceFeed.getUSDValue(address(_stableCoinAmount.debtToken), _stableCoinAmount.netDebt);
+    borrowingFee =
+      _troveManager.getBorrowingFee(compositeDebtInUSD - stableCoinDebtInUSE, false) +
+      _troveManager.getBorrowingFee(stableCoinDebtInUSE, true);
     _requireUserAcceptsFee(borrowingFee, compositeDebtInUSD, _maxFeePercentage);
 
+    // update troves debts
     uint stableCoinPrice = _stableCoinAmount.debtToken.getPrice();
     borrowingFee = (borrowingFee * DECIMAL_PRECISION) / stableCoinPrice;
-
-    // update troves debts
     _stableCoinAmount.netDebt += borrowingFee;
     _stableCoinAmount.borrowingFee += borrowingFee;
-
     return borrowingFee;
   }
 

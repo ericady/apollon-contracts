@@ -55,19 +55,6 @@
         "anonymous": false,
         "inputs": [
             {
-                "indexed": false,
-                "internalType": "uint256",
-                "name": "_baseRate",
-                "type": "uint256"
-            }
-        ],
-        "name": "BaseRateUpdated",
-        "type": "event"
-    },
-    {
-        "anonymous": false,
-        "inputs": [
-            {
                 "components": [
                     {
                         "internalType": "address",
@@ -124,6 +111,19 @@
             }
         ],
         "name": "OwnershipTransferred",
+        "type": "event"
+    },
+    {
+        "anonymous": false,
+        "inputs": [
+            {
+                "indexed": false,
+                "internalType": "uint256",
+                "name": "_baseRate",
+                "type": "uint256"
+            }
+        ],
+        "name": "StableCoinBaseRateUpdated",
         "type": "event"
     },
     {
@@ -632,19 +632,6 @@
     },
     {
         "inputs": [],
-        "name": "baseRate",
-        "outputs": [
-            {
-                "internalType": "uint256",
-                "name": "",
-                "type": "uint256"
-            }
-        ],
-        "stateMutability": "view",
-        "type": "function"
-    },
-    {
-        "inputs": [],
         "name": "borrowerOperationsAddress",
         "outputs": [
             {
@@ -658,7 +645,7 @@
     },
     {
         "inputs": [],
-        "name": "calcDecayedBaseRate",
+        "name": "calcDecayedStableCoinBaseRate",
         "outputs": [
             {
                 "internalType": "uint256",
@@ -693,8 +680,14 @@
         "type": "function"
     },
     {
-        "inputs": [],
-        "name": "decayBaseRateFromBorrowing",
+        "inputs": [
+            {
+                "internalType": "uint256",
+                "name": "borrowedStable",
+                "type": "uint256"
+            }
+        ],
+        "name": "decayStableCoinBaseRateFromBorrowing",
         "outputs": [],
         "stateMutability": "nonpayable",
         "type": "function"
@@ -765,24 +758,16 @@
         "type": "function"
     },
     {
-        "inputs": [],
-        "name": "getBaseRate",
-        "outputs": [
-            {
-                "internalType": "uint256",
-                "name": "",
-                "type": "uint256"
-            }
-        ],
-        "stateMutability": "view",
-        "type": "function"
-    },
-    {
         "inputs": [
             {
                 "internalType": "uint256",
                 "name": "_debtValue",
                 "type": "uint256"
+            },
+            {
+                "internalType": "bool",
+                "name": "isStableCoin",
+                "type": "bool"
             }
         ],
         "name": "getBorrowingFee",
@@ -802,6 +787,11 @@
                 "internalType": "uint256",
                 "name": "_debtValue",
                 "type": "uint256"
+            },
+            {
+                "internalType": "bool",
+                "name": "isStableCoin",
+                "type": "bool"
             }
         ],
         "name": "getBorrowingFeeWithDecay",
@@ -816,7 +806,13 @@
         "type": "function"
     },
     {
-        "inputs": [],
+        "inputs": [
+            {
+                "internalType": "bool",
+                "name": "isStableCoin",
+                "type": "bool"
+            }
+        ],
         "name": "getBorrowingRate",
         "outputs": [
             {
@@ -829,7 +825,13 @@
         "type": "function"
     },
     {
-        "inputs": [],
+        "inputs": [
+            {
+                "internalType": "bool",
+                "name": "isStableCoin",
+                "type": "bool"
+            }
+        ],
         "name": "getBorrowingRateWithDecay",
         "outputs": [
             {
@@ -1056,6 +1058,19 @@
             {
                 "internalType": "uint256",
                 "name": "pendingReward",
+                "type": "uint256"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [],
+        "name": "getStableCoinBaseRate",
+        "outputs": [
+            {
+                "internalType": "uint256",
+                "name": "",
                 "type": "uint256"
             }
         ],
@@ -1666,6 +1681,19 @@
     },
     {
         "inputs": [],
+        "name": "stableCoinBaseRate",
+        "outputs": [
+            {
+                "internalType": "uint256",
+                "name": "",
+                "type": "uint256"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [],
         "name": "storagePool",
         "outputs": [
             {
@@ -1760,7 +1788,7 @@
                 "type": "uint256"
             }
         ],
-        "name": "updateBaseRateFromRedemption",
+        "name": "updateStableCoinBaseRateFromRedemption",
         "outputs": [],
         "stateMutability": "nonpayable",
         "type": "function"

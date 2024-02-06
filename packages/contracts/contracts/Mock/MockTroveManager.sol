@@ -20,28 +20,11 @@ contract MockTroveManager is TroveManager {
     return liquidatedTokens[tokenAddress][isColl];
   }
 
-  //  function unprotectedDecayBaseRateFromBorrowing() external returns (uint) {
-  //    baseRate = this.calcDecayedBaseRate();
-  //    assert(baseRate >= 0 && baseRate <= DECIMAL_PRECISION);
-  //
-  //    _updateLastFeeOpTime();
-  //    return baseRate;
-  //  }
-  //
-  //  function minutesPassedSinceLastFeeOp() external view returns (uint) {
-  //    return _minutesPassedSinceLastFeeOp();
-  //  }
-  //
   function setLastFeeOpTimeToNow() external {
     lastFeeOperationTime = block.timestamp;
   }
 
   function setBaseRate(uint _baseRate) external {
-    baseRate = _baseRate;
+    stableCoinBaseRate = _baseRate;
   }
-  //
-  //  function callInternalRemoveTroveOwner(address _troveOwner) external {
-  //    uint troveOwnersArrayLength = TroveOwners.length;
-  //    _removeTroveOwner(_troveOwner, troveOwnersArrayLength);
-  //  }
 }

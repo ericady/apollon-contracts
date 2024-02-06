@@ -41,7 +41,7 @@ contract TroveManager is LiquityBase, Ownable(msg.sender), CheckContract, ITrove
    * Corresponds to (1 / ALPHA) in the white paper.
    */
   uint public constant BETA = 2;
-  uint public baseRate;
+  uint public stableCoinBaseRate;
 
   // The timestamp of the latest fee operation (redemption or new dToken issuance)
   uint public lastFeeOperationTime;
@@ -727,89 +727,91 @@ contract TroveManager is LiquityBase, Ownable(msg.sender), CheckContract, ITrove
 
   /**
    *
-   * helper
+   * Helper
    *
    **/
 
-  function getBaseRate() external view override returns (uint) {
-    return baseRate;
+  function getStableCoinBaseRate() external view override returns (uint) {
+    return stableCoinBaseRate;
   }
 
-  function getBorrowingRate() public view override returns (uint) {
-    return _calcBorrowingRate(baseRate);
+  function getBorrowingRate(bool isStableCoin) public view override returns (uint) {
+    if (!isStableCoin) return BORROWING_FEE_FLOOR;
+    return _calcBorrowingRate(stableCoinBaseRate);
   }
 
-  function getBorrowingRateWithDecay() public view override returns (uint) {
-    return _calcBorrowingRate(calcDecayedBaseRate());
+  function getBorrowingRateWithDecay(bool isStableCoin) public view override returns (uint) {
+    if (!isStableCoin) return BORROWING_FEE_FLOOR;
+    return _calcBorrowingRate(calcDecayedStableCoinBaseRate());
   }
 
-  function _calcBorrowingRate(uint _baseRate) internal pure returns (uint) {
-    return LiquityMath._min(BORROWING_FEE_FLOOR + _baseRate, MAX_BORROWING_FEE);
+  function _calcBorrowingRate(uint _stableCoinBaseRate) internal pure returns (uint) {
+    return LiquityMath._min(BORROWING_FEE_FLOOR + _stableCoinBaseRate, MAX_BORROWING_FEE);
   }
 
-  function getBorrowingFee(uint _debtValue) external view override returns (uint) {
-    return _calcBorrowingFee(getBorrowingRate(), _debtValue);
+  function getBorrowingFee(uint _debtValue, bool isStableCoin) external view override returns (uint) {
+    return _calcBorrowingFee(getBorrowingRate(isStableCoin), _debtValue);
   }
 
-  function getBorrowingFeeWithDecay(uint _debtValue) external view override returns (uint) {
-    return _calcBorrowingFee(getBorrowingRateWithDecay(), _debtValue);
+  function getBorrowingFeeWithDecay(uint _debtValue, bool isStableCoin) external view override returns (uint) {
+    return _calcBorrowingFee(getBorrowingRateWithDecay(isStableCoin), _debtValue);
   }
 
   function _calcBorrowingFee(uint _borrowingRate, uint _debtValue) internal pure returns (uint) {
     return (_borrowingRate * _debtValue) / DECIMAL_PRECISION;
   }
 
-  // Updates the baseRate state variable based on time elapsed since the last redemption or LUSD borrowing operation.
-  function decayBaseRateFromBorrowing() external override {
+  // Updates the stableCoinBaseRate state variable based on time elapsed since the last redemption or stable borrowing operation.
+  function decayStableCoinBaseRateFromBorrowing(uint borrowedStable) external override {
     _requireCallerIsBorrowerOpsOrRedemptionOpsOrLiquidationOps();
 
-    uint decayedBaseRate = calcDecayedBaseRate();
-    assert(decayedBaseRate <= DECIMAL_PRECISION); // The baseRate can decay to 0
+    if (borrowedStable == 0) return; // only decay the stableCoinBaseRate if stable was borrowed (not stocks)
 
-    baseRate = decayedBaseRate;
-    emit BaseRateUpdated(decayedBaseRate);
-
-    _updateLastFeeOpTime();
+    uint decayedStableCoinBaseRate = calcDecayedStableCoinBaseRate();
+    assert(decayedStableCoinBaseRate <= DECIMAL_PRECISION); // The stableCoinBaseRate can decay to 0
+    _updateLastFeeOpTime(decayedStableCoinBaseRate);
   }
 
   /*
-   * This function has two impacts on the baseRate state variable:
-   * 1) decays the baseRate based on time passed since last redemption or stable coin borrowing operation.
+   * This function has two impacts on the stableCoinBaseRate state variable:
+   * 1) decays the stableCoinBaseRate based on time passed since last redemption or stable coin borrowing operation.
    * then,
-   * 2) increases the baseRate based on the amount redeemed, as a proportion of total supply
+   * 2) increases the stableCoinBaseRate based on the amount redeemed, as a proportion of total supply
    */
-  function updateBaseRateFromRedemption(uint _totalRedeemedStable, uint _totalStableCoinSupply) external override {
+  function updateStableCoinBaseRateFromRedemption(
+    uint _totalRedeemedStable,
+    uint _totalStableCoinSupply
+  ) external override {
     _requireCallerIsBorrowerOpsOrRedemptionOpsOrLiquidationOps();
 
-    uint decayedBaseRate = calcDecayedBaseRate();
+    uint decayedStableCoinBaseRate = calcDecayedStableCoinBaseRate();
     uint redeemedStableFraction = (_totalRedeemedStable * DECIMAL_PRECISION) / _totalStableCoinSupply;
 
-    // cap baseRate at a maximum of 100%
-    uint newBaseRate = LiquityMath._min(decayedBaseRate + (redeemedStableFraction / BETA), DECIMAL_PRECISION);
-    assert(newBaseRate > 0); // Base rate is always non-zero after redemption
-
-    // Update the baseRate state variable
-    baseRate = newBaseRate;
-    emit BaseRateUpdated(newBaseRate);
-
-    _updateLastFeeOpTime();
+    uint newStableCoinBaseRate = LiquityMath._min(
+      decayedStableCoinBaseRate + (redeemedStableFraction / BETA),
+      DECIMAL_PRECISION
+    ); // cap stableCoinBaseRate at a maximum of 100%
+    assert(newStableCoinBaseRate > 0); // Base rate is always non-zero after redemption
+    _updateLastFeeOpTime(newStableCoinBaseRate);
   }
 
   // Update the last fee operation time only if time passed >= decay interval. This prevents base rate griefing.
-  function _updateLastFeeOpTime() internal {
-    uint timePassed = block.timestamp - lastFeeOperationTime;
+  function _updateLastFeeOpTime(uint newStableCoinBaseRate) internal {
+    stableCoinBaseRate = newStableCoinBaseRate; // Update the StableCoinBaseRate state variable
+    emit StableCoinBaseRateUpdated(newStableCoinBaseRate);
 
+    uint timePassed = block.timestamp - lastFeeOperationTime;
     if (timePassed >= 1 minutes) {
       lastFeeOperationTime = block.timestamp;
       emit LastFeeOpTimeUpdated(block.timestamp);
     }
   }
 
-  function calcDecayedBaseRate() public view override returns (uint) {
+  function calcDecayedStableCoinBaseRate() public view override returns (uint) {
     uint minutesPassed = _minutesPassedSinceLastFeeOp();
     uint decayFactor = LiquityMath._decPow(MINUTE_DECAY_FACTOR, minutesPassed);
 
-    return (baseRate * decayFactor) / DECIMAL_PRECISION;
+    return (stableCoinBaseRate * decayFactor) / DECIMAL_PRECISION;
   }
 
   function _minutesPassedSinceLastFeeOp() internal view returns (uint) {
