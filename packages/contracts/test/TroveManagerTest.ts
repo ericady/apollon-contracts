@@ -135,8 +135,7 @@ describe('TroveManager', () => {
       expect(ICR_A[0]).to.be.gt(TCR);
 
       // Attempt to liquidate alice and dennis, which skips alice in the liquidation since it is immune
-      await liquidationOperations.liquidate(alice);
-      await liquidationOperations.liquidate(dennis);
+      await liquidationOperations.batchLiquidateTroves([alice, dennis]);
       const alice_Status = await troveManager.getTroveStatus(alice);
       assert.equal(alice_Status.toString(), TroveStatus.ACTIVE.toString());
       const dennis_Status = await troveManager.getTroveStatus(dennis);

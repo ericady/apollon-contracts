@@ -717,26 +717,6 @@ describe('StabilityPool', () => {
       //   );
       // });
 
-      // function is incomplete, it does not revert anything if user has no active deposit
-      it('reverts when user has no active deposit', async () => {
-        await whaleShrimpTroveInit(contracts, signers, false);
-
-        const provideToSP = parseUnits('1000');
-
-        await stabilityPoolManager.connect(alice).provideStability([{ tokenAddress: STABLE, amount: provideToSP }]);
-
-        const alice_initialDeposit = await stabilityPoolManager.getDepositorDeposit(alice, STABLE);
-        console.warn('☢️ ~ it ~ alice_initialDeposit:', alice_initialDeposit);
-
-        const bob_initialDeposit = await stabilityPoolManager.getDepositorDeposit(bob, STABLE);
-        console.warn('☢️ ~ it ~ bob_initialDeposit:', bob_initialDeposit);
-
-        const bobWith = await stabilityPoolManager
-          .connect(bob)
-          .withdrawStability([{ tokenAddress: STABLE, amount: provideToSP }]);
-        console.warn('☢️ ~ it ~ bobWith:', bobWith);
-      });
-
       it('partial retrieval - retrieves correct stable amount and the entire btc Gain, and updates deposit', async () => {
         // --- SETUP ---
         await whaleShrimpTroveInit(contracts, signers);
@@ -1344,26 +1324,6 @@ describe('StabilityPool', () => {
     });
 
     describe('withdrawGains():', () => {
-      // function is incomplete, it does not revert anything if user has no active deposit
-      it('reverts when user has no active deposit', async () => {
-        await whaleShrimpTroveInit(contracts, signers, false);
-
-        const provideToSP = parseUnits('1000');
-
-        await stabilityPoolManager.connect(alice).provideStability([{ tokenAddress: STABLE, amount: provideToSP }]);
-
-        const alice_initialDeposit = await stabilityPoolManager.getDepositorDeposit(alice, STABLE);
-        console.warn('☢️ ~ it ~ alice_initialDeposit:', alice_initialDeposit);
-
-        const bob_initialDeposit = await stabilityPoolManager.getDepositorDeposit(bob, STABLE);
-        console.warn('☢️ ~ it ~ bob_initialDeposit:', bob_initialDeposit);
-
-        const bobWith = await stabilityPoolManager
-          .connect(bob)
-          .provideStability([{ tokenAddress: STABLE, amount: provideToSP }]);
-        console.warn('☢️ ~ it ~ bobWith:', bobWith);
-      });
-
       it("Applies stable loss to user's deposit, and redirects coll reward to user's wallet", async () => {
         await whaleShrimpTroveInit(contracts, signers);
 

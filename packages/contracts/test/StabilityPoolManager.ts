@@ -7,26 +7,23 @@ import {
   StabilityPoolManager,
   StoragePool,
   LiquidationOperations,
-  RedemptionOperations,
   BorrowerOperations,
+  RedemptionOperations,
 } from '../typechain';
-import { Contracts, deployCore, connectCoreContracts, deployAndLinkToken } from '../utils/deploymentHelpers';
 import { SignerWithAddress } from '@nomicfoundation/hardhat-ethers/signers';
 import { whaleShrimpTroveInit } from '../utils/testHelper';
 import { assert, expect } from 'chai';
-import { formatUnits, parseUnits } from 'ethers';
-import { check } from 'prettier';
+import { parseUnits } from 'ethers';
+import apollonTesting from '../ignition/modules/apollonTesting';
 
 describe('StabilityPoolManager', () => {
   let signers: SignerWithAddress[];
-  let owner: SignerWithAddress;
   let alice: SignerWithAddress;
   let bob: SignerWithAddress;
   let carol: SignerWithAddress;
   let whale: SignerWithAddress;
   let dennis: SignerWithAddress;
   let erin: SignerWithAddress;
-  let flyn: SignerWithAddress;
 
   let defaulter_1: SignerWithAddress;
   let defaulter_2: SignerWithAddress;
@@ -35,30 +32,29 @@ describe('StabilityPoolManager', () => {
   let storagePool: StoragePool;
 
   let STABLE: MockDebtToken;
-  let STOCK: MockDebtToken;
-  let BTC: MockERC20;
   let USDT: MockERC20;
+  let STOCK: MockERC20;
+  let BTC: MockERC20;
 
   let priceFeed: MockPriceFeed;
   let troveManager: MockTroveManager;
 
   let stabilityPoolManager: StabilityPoolManager;
-  let redemptionOperations: RedemptionOperations;
   let liquidationOperations: LiquidationOperations;
   let borrowerOperations: BorrowerOperations;
-  let contracts: Contracts;
+  let redemptionOperations: RedemptionOperations;
+  let contracts: any;
 
   let redemptionFee: bigint;
 
   before(async () => {
     signers = await ethers.getSigners();
-    [owner, defaulter_1, defaulter_2, defaulter_3, whale, alice, bob, carol, dennis, erin, flyn] = signers;
+    [, defaulter_1, defaulter_2, defaulter_3, whale, alice, bob, carol, dennis, erin] = signers;
   });
 
   beforeEach(async () => {
-    contracts = await deployCore();
-    await connectCoreContracts(contracts);
-    await deployAndLinkToken(contracts);
+    // @ts-ignore
+    contracts = await ignition.deploy(apollonTesting);
 
     priceFeed = contracts.priceFeed;
     troveManager = contracts.troveManager;
@@ -68,10 +64,10 @@ describe('StabilityPoolManager', () => {
     stabilityPoolManager = contracts.stabilityPoolManager;
     borrowerOperations = contracts.borrowerOperations;
 
-    STABLE = contracts.debtToken.STABLE;
-    STOCK = contracts.debtToken.STOCK;
-    BTC = contracts.collToken.BTC;
-    USDT = contracts.collToken.USDT;
+    STABLE = contracts.STABLE;
+    STOCK = contracts.STOCK;
+    BTC = contracts.BTC;
+    USDT = contracts.USDT;
 
     redemptionFee = await redemptionOperations.getRedemptionRate();
   });

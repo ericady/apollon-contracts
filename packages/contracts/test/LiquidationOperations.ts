@@ -116,7 +116,7 @@ describe('LiquidationOperations', () => {
         const activePoolDebt_After = await storagePool.getValue(STABLE, false, 0);
         assert.equal(
           activePoolDebt_After,
-          activePoolDebt_Before - borrowedDebt - (await troveManager.getBorrowingFee(borrowedDebt))
+          activePoolDebt_Before - borrowedDebt - (await troveManager.getBorrowingFee(borrowedDebt, true))
         );
       });
 
@@ -143,7 +143,7 @@ describe('LiquidationOperations', () => {
 
         const liquidatedDebt = parseUnits('100');
         const defaultPoolDebtAfter = await storagePool.getValue(STABLE, false, 1);
-        expect(defaultPoolDebtAfter).to.be.equal(liquidatedDebt + (await troveManager.getBorrowingFee(liquidatedDebt)));
+        expect(defaultPoolDebtAfter).to.be.equal(liquidatedDebt + (await troveManager.getBorrowingFee(liquidatedDebt, true)));
       });
 
       it("removes the Trove's stake from the total stakes", async () => {
@@ -1156,8 +1156,7 @@ describe('LiquidationOperations', () => {
       expect(ICR_A[0]).to.be.gt(TCR);
 
       // Attempt to liquidate alice and dennis, which skips alice in the liquidation since it is immune
-      await liquidationOperations.liquidate(alice);
-      await liquidationOperations.liquidate(dennis);
+      await liquidationOperations.batchLiquidateTroves([alice, dennis]);
       const alice_Status = await troveManager.getTroveStatus(alice);
       assert.equal(alice_Status.toString(), TroveStatus.ACTIVE.toString());
       const dennis_Status = await troveManager.getTroveStatus(dennis);
