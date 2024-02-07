@@ -113,9 +113,9 @@ interface ITroveManager is IBBase {
 
   function getTroveDebt(address _borrower) external view returns (TokenAmount[] memory);
 
-  function getTroveRepayableDebt(address _borrower, address _debtTokenAddress) external view returns (uint amount);
+  function getTroveRepayableDebt(address _borrower, address _debtTokenAddress, bool _includingStableCoinGasCompensation) external view returns (uint amount);
 
-  function getTroveRepayableDebts(address _borrower) external view returns (TokenAmount[] memory);
+  function getTroveRepayableDebts(address _borrower, bool _includingStableCoinGasCompensation) external view returns (TokenAmount[] memory);
 
   function getTroveColl(address _borrower) external view returns (TokenAmount[] memory);
 

@@ -212,15 +212,12 @@ contract SwapOperations is ISwapOperations, Ownable(msg.sender), CheckContract, 
     // mint new tokens if the sender did not have enough
     if (vars.fromMintA != 0 || vars.fromMintB != 0) {
       TokenAmount[] memory debtsToMint;
-      if (vars.fromMintA != 0 && vars.fromMintB != 0)
-      {
+      if (vars.fromMintA != 0 && vars.fromMintB != 0) {
         // mint both
         debtsToMint = new TokenAmount[](2);
         debtsToMint[0] = TokenAmount(tokenA, vars.fromMintA);
         debtsToMint[1] = TokenAmount(tokenB, vars.fromMintB);
-      }
-      else
-      {   
+      } else {   
         // mint only 1 token    
         debtsToMint = new TokenAmount[](1);
         debtsToMint[0] = (vars.fromMintA != 0
@@ -284,15 +281,26 @@ contract SwapOperations is ISwapOperations, Ownable(msg.sender), CheckContract, 
       msg.sender,
       liquidity,
       // check if there are some debts which has to be repaid first
-      troveManager.getTroveRepayableDebt(msg.sender, vars.token0),
-      troveManager.getTroveRepayableDebt(msg.sender, vars.token1)
+      troveManager.getTroveRepayableDebt(msg.sender, vars.token0, false),
+      troveManager.getTroveRepayableDebt(msg.sender, vars.token1, false)
     );
 
     // handle trove debt repayment
     if (vars.burned0 != 0 || vars.burned1 != 0) {
-      TokenAmount[] memory debtsToRepay = new TokenAmount[](2);
-      debtsToRepay[0] = TokenAmount(vars.token0, vars.burned0);
-      debtsToRepay[1] = TokenAmount(vars.token1, vars.burned1);
+      TokenAmount[] memory debtsToRepay;
+      if (vars.burned0 != 0 && vars.burned1 != 0) {
+        // repay both
+        debtsToRepay = new TokenAmount[](2);
+        debtsToRepay[0] = TokenAmount(vars.token0, vars.burned0);
+        debtsToRepay[1] = TokenAmount(vars.token1, vars.burned1);
+      } else {
+        // repay only 1 token
+        debtsToRepay = new TokenAmount[](1);
+        debtsToRepay[0] = (vars.burned0 != 0
+          ? TokenAmount(vars.token0, vars.burned0)
+          : TokenAmount(vars.token1, vars.burned1)
+        );
+      }
       borrowerOperations.repayDebtFromPoolBurn(msg.sender, debtsToRepay, _upperHint, _lowerHint);
     }
 

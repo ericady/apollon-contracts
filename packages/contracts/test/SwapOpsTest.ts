@@ -5,58 +5,35 @@ import {
   MockDebtToken,
   MockERC20,
   MockPriceFeed,
-  StabilityPoolManager,
-  StoragePool,
   TroveManager,
   SwapPair,
   SwapOperations,
   DebtTokenManager,
   IBase
 } from '../typechain';
-import { expect, assert } from 'chai';
+import { expect } from 'chai';
 import {
-  getStabilityPool,
   openTrove,
-  assertRevert,
-  whaleShrimpTroveInit,
-  fastForwardTime,
-  TimeValues,
-  getEmittedLiquidationValues,
-  increaseDebt,
-  MAX_BORROWING_FEE,
   getLatestBlockTimestamp,
 } from '../utils/testHelper';
 import { parseUnits } from 'ethers';
-import { MockERC20Interface } from '../typechain/contracts/Mock/MockERC20';
 import apollonTesting from '../ignition/modules/apollonTesting';
 
-describe.only('SwapOperations', () => {
+describe('SwapOperations', () => {
   let signers: SignerWithAddress[];
   let owner: SignerWithAddress;
   let alice: SignerWithAddress;
   let bob: SignerWithAddress;
-  let carol: SignerWithAddress;
-  let whale: SignerWithAddress;
-  let dennis: SignerWithAddress;
-  let erin: SignerWithAddress;
-  let flyn: SignerWithAddress;
-
-  let defaulter_1: SignerWithAddress;
-  let defaulter_2: SignerWithAddress;
-  let defaulter_3: SignerWithAddress;
 
   let STABLE: MockDebtToken;
   let STOCK: MockDebtToken;
   let BTC: MockERC20;
   let ETH: MockERC20;
-  let USDT: MockERC20;
 
   let contracts: any;
   let priceFeed: MockPriceFeed;
   let troveManager: TroveManager;
   let borrowerOperations: MockBorrowerOperations;
-  let storagePool: StoragePool;
-  let stabilityPoolManager: StabilityPoolManager;
   let swapOperations: SwapOperations;
   let debtTokenManager: DebtTokenManager;
 
@@ -71,10 +48,6 @@ describe.only('SwapOperations', () => {
         : [{ tokenAddress: STABLE, amount: debtAmount }]
       ),
     });
-  };
-
-  const increase = async (user: SignerWithAddress, debts: any[], maxFeePercentage = MAX_BORROWING_FEE) => {
-    return increaseDebt(user, contracts, debts, maxFeePercentage);
   };
 
   const deadline = async (): Promise<number> => {
@@ -168,7 +141,7 @@ describe.only('SwapOperations', () => {
 
   before(async () => {
     signers = await ethers.getSigners();
-    [owner, defaulter_1, defaulter_2, defaulter_3, whale, alice, bob, carol, dennis, erin, flyn] = signers;
+    [owner, alice, bob] = signers;
   });
 
   beforeEach(async () => {
@@ -178,8 +151,6 @@ describe.only('SwapOperations', () => {
     priceFeed = contracts.priceFeed;
     troveManager = contracts.troveManager;
     borrowerOperations = contracts.borrowerOperations;
-    storagePool = contracts.storagePool;
-    stabilityPoolManager = contracts.stabilityPoolManager;
     swapOperations = contracts.swapOperations;
     debtTokenManager = contracts.debtTokenManager;
 
@@ -187,7 +158,6 @@ describe.only('SwapOperations', () => {
     STOCK = contracts.STOCK;
     BTC = contracts.BTC;
     ETH = contracts.ETH;
-    USDT = contracts.USDT;
   });
 
   it('should not be possible to mint directly from the borrowerOps', async () => {
@@ -349,6 +319,13 @@ describe.only('SwapOperations', () => {
         await pair.balanceOf(alice)
       );
       expect(await pair.balanceOf(alice)).to.be.equal(0);
+      expect(
+        await troveManager.getTroveRepayableDebt(
+          alice,
+          STABLE,
+          false
+        )
+      ).to.be.equal(0);
     });
 
     it('huge debts, partial repay expected', async () => {
@@ -375,6 +352,13 @@ describe.only('SwapOperations', () => {
         await pair.balanceOf(alice)
       );
       expect(await pair.balanceOf(alice)).to.be.equal(0);
+      expect(
+        await troveManager.getTroveRepayableDebt(
+          alice,
+          STABLE,
+          false
+        )
+      ).to.be.greaterThan(0);
     });
   });
 

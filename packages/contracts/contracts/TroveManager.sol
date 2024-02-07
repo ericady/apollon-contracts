@@ -617,20 +617,56 @@ contract TroveManager is LiquityBase, Ownable(msg.sender), CheckContract, ITrove
 
   function getTroveRepayableDebt(
     address _borrower,
-    address _debtTokenAddress
+    address _debtTokenAddress,
+    bool _includingStableCoinGasCompensation
   ) external view override returns (uint amount) {
+    if (Troves[_borrower].status != Status.active) return 0;
+
+    return _getTroveRepayableDebt(
+      _borrower,
+      _debtTokenAddress,
+      _includingStableCoinGasCompensation
+    );
+  }
+
+  function getTroveRepayableDebts(
+    address _borrower,
+    bool _includingStableCoinGasCompensation
+  ) external view override returns (TokenAmount[] memory debts) {
+    Trove storage trove = Troves[_borrower];
+    if (trove.status != Status.active) return new TokenAmount[](0);
+
+    address debtTokenAddress;
+    debts = new TokenAmount[](trove.debtTokens.length);
+    for (uint i = 0; i < debts.length; i++) {
+      debtTokenAddress = address(trove.debtTokens[i]);
+      debts[i] = TokenAmount(
+        debtTokenAddress,
+        _getTroveRepayableDebt(
+          _borrower,
+          debtTokenAddress,
+          _includingStableCoinGasCompensation
+        )
+      );
+    }
+
+    return debts;
+  }
+
+  function _getTroveRepayableDebt(
+    address _borrower,
+    address _debtTokenAddress,
+    bool _includingStableCoinGasCompensation
+  ) internal view returns (uint amount) {
     Trove storage trove = Troves[_borrower];
     if (trove.status != Status.active) return 0;
 
-    return trove.debts[IDebtToken(_debtTokenAddress)] + getPendingReward(_borrower, _debtTokenAddress, false);
-  }
-
-  function getTroveRepayableDebts(address _borrower) external view override returns (TokenAmount[] memory debts) {
-    debts = getTroveDebt(_borrower);
-    for (uint i = 0; i < debts.length; i++)
-      debts[i].amount += getPendingReward(_borrower, debts[i].tokenAddress, false);
-
-    return debts;
+    return trove.debts[IDebtToken(_debtTokenAddress)]
+      + getPendingReward(_borrower, _debtTokenAddress, false)
+      - (!_includingStableCoinGasCompensation && IDebtToken(_debtTokenAddress).isStableCoin()
+        ? STABLE_COIN_GAS_COMPENSATION
+        : 0
+      );
   }
 
   function getTroveColl(address _borrower) public view override returns (TokenAmount[] memory colls) {

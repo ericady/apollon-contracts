@@ -220,7 +220,7 @@ contract RedemptionOperations is LiquityBase, Ownable(msg.sender), CheckContract
 
     // stable coin debt should always exists because of the gas comp
     TokenAmount[] memory troveDebt = _includePendingRewards
-      ? troveManager.getTroveRepayableDebts(_borrower) // with pending rewards
+      ? troveManager.getTroveRepayableDebts(_borrower, true) // with pending rewards
       : troveManager.getTroveDebt(_borrower); // without pending rewards
     if (troveDebt.length == 0) revert InvalidRedemptionHint();
     for (uint i = 0; i < troveDebt.length; i++) {
