@@ -7,27 +7,39 @@ import './Interfaces/ITroveManager.sol';
 import './Interfaces/ISortedTroves.sol';
 import './Dependencies/LiquityBase.sol';
 import './Dependencies/CheckContract.sol';
+import './Interfaces/IRedemptionOperations.sol';
 
 contract HintHelpers is LiquityBase, Ownable(msg.sender), CheckContract {
   string public constant NAME = 'HintHelpers';
 
   ISortedTroves public sortedTroves;
   ITroveManager public troveManager;
+  IRedemptionOperations public redemptionOperations;
 
   // --- Events ---
 
-  event HintHelpersInitialized(address _sortedTrovesAddress, address _troveManagerAddress);
+  event HintHelpersInitialized(
+    address _sortedTrovesAddress,
+    address _troveManagerAddress,
+    address _redemptionOperations
+  );
 
   // --- Dependency setters ---
 
-  function setAddresses(address _sortedTrovesAddress, address _troveManagerAddress) external onlyOwner {
+  function setAddresses(
+    address _sortedTrovesAddress,
+    address _troveManagerAddress,
+    address _redemptionOperations
+  ) external onlyOwner {
     checkContract(_sortedTrovesAddress);
     checkContract(_troveManagerAddress);
+    checkContract(_redemptionOperations);
 
     sortedTroves = ISortedTroves(_sortedTrovesAddress);
     troveManager = ITroveManager(_troveManagerAddress);
+    redemptionOperations = IRedemptionOperations(_redemptionOperations);
 
-    emit HintHelpersInitialized(_sortedTrovesAddress, _troveManagerAddress);
+    emit HintHelpersInitialized(_sortedTrovesAddress, _troveManagerAddress, _redemptionOperations);
     renounceOwnership();
   }
 
@@ -46,7 +58,7 @@ contract HintHelpers is LiquityBase, Ownable(msg.sender), CheckContract {
     uint _CR,
     uint _numTrials,
     uint _inputRandomSeed
-  ) external view returns (address hintAddress, uint diff, uint latestRandomSeed) {
+  ) public view returns (address hintAddress, uint diff, uint latestRandomSeed) {
     uint arrayLength = sortedTroves.getSize();
     if (arrayLength == 0) return (address(0), 0, _inputRandomSeed);
 
@@ -70,5 +82,45 @@ contract HintHelpers is LiquityBase, Ownable(msg.sender), CheckContract {
 
       i++;
     }
+  }
+
+  function getRedemptionIterationHints(
+    uint _amountToRedeem,
+    uint _numTrails,
+    uint _inputRandomSeed
+  ) external view returns (RedeemIteration[] memory) {
+    uint iteration = 0;
+    RedeemIteration[] memory iterations = new RedeemIteration[](100);
+    RedeemIteration memory lastIteration;
+
+    while (_amountToRedeem > 0) {
+      address trove = lastIteration.trove != address(0)
+        ? sortedTroves.getPrev(lastIteration.trove)
+        : sortedTroves.getLast();
+      if (trove == address(0)) break;
+
+      SingleRedemptionVariables memory simulatedRedemption = redemptionOperations.calculateTroveRedemption(
+        trove,
+        _amountToRedeem,
+        true
+      );
+      _amountToRedeem -= simulatedRedemption.stableCoinLot;
+
+      address approxHint;
+      (approxHint, , _inputRandomSeed) = getApproxHint(simulatedRedemption.resultingCR, _numTrails, _inputRandomSeed);
+      (address upperHint, address lowerHint) = sortedTroves.findInsertPosition(
+        simulatedRedemption.resultingCR,
+        approxHint,
+        approxHint
+      );
+
+      lastIteration = RedeemIteration(trove, upperHint, lowerHint, simulatedRedemption.resultingCR);
+      iterations[iteration] = lastIteration;
+      iteration++;
+    }
+
+    RedeemIteration[] memory result = new RedeemIteration[](iteration);
+    for (uint i = 0; i < iteration; i++) result[i] = iterations[i];
+    return result;
   }
 }

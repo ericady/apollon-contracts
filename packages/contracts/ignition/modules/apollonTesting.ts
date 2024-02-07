@@ -34,7 +34,7 @@ export default buildModule('ApollonTesting', m => {
   const sortedTrovesLinks = [contracts.troveManager, contracts.borrowerOperations, contracts.redemptionOperations];
   m.call(contracts.sortedTroves, 'setAddresses', sortedTrovesLinks, { after: sortedTrovesLinks });
 
-  const hintHelpersLinks = [contracts.sortedTroves, contracts.troveManager];
+  const hintHelpersLinks = [contracts.sortedTroves, contracts.troveManager, contracts.redemptionOperations];
   m.call(contracts.hintHelpers, 'setAddresses', hintHelpersLinks, { after: hintHelpersLinks });
 
   const borrowerOperationsLinks = [

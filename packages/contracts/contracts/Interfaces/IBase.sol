@@ -39,4 +39,22 @@ interface IBase {
     address tokenAddress;
     uint amount;
   }
+
+  struct RedeemIteration {
+    address trove;
+    address upperHint;
+    address lowerHint;
+    uint expectedCR;
+  }
+
+  struct SingleRedemptionVariables {
+    TokenAmount stableCoinEntry;
+    //
+    uint stableCoinLot; // redeemer pays for the debts of the trove owner
+    TokenAmount[] collLots; // will be removed from the troves coll and paid to the redeemer
+    //
+    uint troveCollInUSD;
+    uint troveDebtInUSD;
+    uint resultingCR;
+  }
 }

@@ -13,9 +13,6 @@ import { assert, expect } from 'chai';
 import { parseUnits, ZeroAddress } from 'ethers';
 import apollonTesting from '../ignition/modules/apollonTesting';
 
-// todo continue tests from "redeemCollateral(): ends the redemption sequence when max iterations have been reached"
-// todo sortedTroves test
-
 describe('RedemptionOperations', () => {
   let signers: SignerWithAddress[];
   let alice: SignerWithAddress;

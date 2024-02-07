@@ -17,24 +17,6 @@ interface IRedemptionOperations is IBBase {
     uint sendToRedeemer;
   }
 
-  struct RedeemIteration {
-    address trove;
-    address upperHint;
-    address lowerHint;
-    uint expectedCR;
-  }
-
-  struct SingleRedemptionVariables {
-    TokenAmount stableCoinEntry;
-    //
-    uint stableCoinLot; // redeemer pays for the debts of the trove owner
-    TokenAmount[] collLots; // will be removed from the troves coll and paid to the redeemer
-    //
-    uint troveCollInUSD;
-    uint troveDebtInUSD;
-    uint resultingCR;
-  }
-
   // --- Events ---
 
   event RedemptionOperationsInitialized(
@@ -78,7 +60,7 @@ interface IRedemptionOperations is IBBase {
     address _borrower,
     uint _redeemMaxAmount,
     bool _includePendingRewards
-  ) external returns (SingleRedemptionVariables memory vars);
+  ) external view returns (SingleRedemptionVariables memory vars);
 
   function getRedemptionRate() external view returns (uint);
 

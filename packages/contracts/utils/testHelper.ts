@@ -1,7 +1,6 @@
 import { SignerWithAddress } from '@nomicfoundation/hardhat-ethers/signers';
 import { time } from '@nomicfoundation/hardhat-network-helpers';
-import { EIP712, MockDebtToken, MockERC20, StabilityPoolManager, contracts } from '../typechain';
-import { Contracts } from './deploymentHelpers';
+import { EIP712, MockDebtToken, MockERC20, StabilityPoolManager } from '../typechain';
 import { ethers } from 'hardhat';
 import { expect } from 'chai';
 import { AddressLike, ContractTransactionResponse } from 'ethers';
@@ -105,35 +104,17 @@ export const redeem = async (
   contracts: Contracts,
   maxFeePercentage = MAX_BORROWING_FEE
 ) => {
-  const iterations = [];
-  let lastIteration;
-  let stableRemaining: bigint = toRedeem;
-  while (stableRemaining > 0n) {
-    let trove: any = lastIteration
-      ? await contracts.sortedTroves.getPrev(lastIteration.trove)
-      : await contracts.sortedTroves.getLast();
-
-    if (trove === AddressZero) {
-      // no troves left in the list, now we need to pick troves randomly
-      // todo
-      // todo pick a random trove should be added via test case...
-      console.log('empty list');
-    }
-
-    const simulatedRedemption = await contracts.redemptionOperations.calculateTroveRedemption(
-      trove,
-      stableRemaining,
-      true
-    );
-    stableRemaining -= simulatedRedemption.stableCoinLot;
-    const expectedCR = simulatedRedemption.resultingCR;
-
-    const [upperHint, lowerHint] = await getHints(contracts, expectedCR);
-    lastIteration = { trove, upperHint, lowerHint, expectedCR };
-    iterations.push(lastIteration);
-  }
-
-  return contracts.redemptionOperations.connect(from).redeemCollateral(toRedeem, iterations, maxFeePercentage);
+  const amountStableTroves = await contracts.sortedTroves.getSize();
+  const iterations = await contracts.hintHelpers.getRedemptionIterationHints(
+    toRedeem,
+    Math.round(Math.min(4000, 15 * Math.sqrt(Number(amountStableTroves)))),
+    Math.round(Math.random() * 100000000000)
+  );
+  return contracts.redemptionOperations.connect(from).redeemCollateral(
+    toRedeem,
+    iterations.map((i: any[]) => ({ trove: i[0], upperHint: i[1], lowerHint: i[2], expectedCR: i[3] })),
+    maxFeePercentage
+  );
 };
 
 export async function getHints(contracts: Contracts, cr: bigint) {
