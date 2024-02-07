@@ -122,6 +122,11 @@
     "type": "error"
   },
   {
+    "inputs": [],
+    "name": "ZeroDebtRepay",
+    "type": "error"
+  },
+  {
     "anonymous": false,
     "inputs": [
       {
@@ -171,6 +176,18 @@
         "internalType": "address",
         "name": "_swapOperationsAddress",
         "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "address",
+        "name": "_sortedTrovesAddress",
+        "type": "address"
+      },
+      {
+        "indexed": false,
+        "internalType": "address",
+        "name": "_collSurplusPoolAddress",
+        "type": "address"
       }
     ],
     "name": "BorrowerOperationsInitialized",
@@ -211,7 +228,7 @@
         "type": "uint256"
       }
     ],
-    "name": "SentBorrowingFeesToReserve",
+    "name": "PaidBorrowingFee",
     "type": "event"
   },
   {
@@ -266,6 +283,32 @@
         "internalType": "uint256",
         "name": "",
         "type": "uint256"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "GOV_STAKING_ADDRESS",
+    "outputs": [
+      {
+        "internalType": "address",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "GOV_SWAP_FEE",
+    "outputs": [
+      {
+        "internalType": "uint32",
+        "name": "",
+        "type": "uint32"
       }
     ],
     "stateMutability": "view",
@@ -406,9 +449,81 @@
         "internalType": "struct IBase.TokenAmount[]",
         "name": "_colls",
         "type": "tuple[]"
+      },
+      {
+        "internalType": "address",
+        "name": "_upperHint",
+        "type": "address"
+      },
+      {
+        "internalType": "address",
+        "name": "_lowerHint",
+        "type": "address"
       }
     ],
     "name": "addColl",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "components": [
+          {
+            "internalType": "address",
+            "name": "tokenAddress",
+            "type": "address"
+          },
+          {
+            "internalType": "uint256",
+            "name": "amount",
+            "type": "uint256"
+          }
+        ],
+        "internalType": "struct IBase.TokenAmount[]",
+        "name": "_colls",
+        "type": "tuple[]"
+      },
+      {
+        "internalType": "uint256",
+        "name": "deadline",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint8[]",
+        "name": "v",
+        "type": "uint8[]"
+      },
+      {
+        "internalType": "bytes32[]",
+        "name": "r",
+        "type": "bytes32[]"
+      },
+      {
+        "internalType": "bytes32[]",
+        "name": "s",
+        "type": "bytes32[]"
+      },
+      {
+        "internalType": "address",
+        "name": "_upperHint",
+        "type": "address"
+      },
+      {
+        "internalType": "address",
+        "name": "_lowerHint",
+        "type": "address"
+      }
+    ],
+    "name": "addCollWithPermit",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "claimCollateral",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
@@ -418,6 +533,19 @@
     "name": "closeTrove",
     "outputs": [],
     "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "collSurplusPool",
+    "outputs": [
+      {
+        "internalType": "contract ICollSurplusPool",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
     "type": "function"
   },
   {
@@ -512,9 +640,26 @@
         "type": "tuple[]"
       },
       {
-        "internalType": "uint256",
-        "name": "_maxFeePercentage",
-        "type": "uint256"
+        "components": [
+          {
+            "internalType": "address",
+            "name": "upperHint",
+            "type": "address"
+          },
+          {
+            "internalType": "address",
+            "name": "lowerHint",
+            "type": "address"
+          },
+          {
+            "internalType": "uint256",
+            "name": "maxFeePercentage",
+            "type": "uint256"
+          }
+        ],
+        "internalType": "struct IBase.MintMeta",
+        "name": "_meta",
+        "type": "tuple"
       }
     ],
     "name": "increaseDebt",
@@ -543,6 +688,51 @@
       }
     ],
     "name": "openTrove",
+    "outputs": [],
+    "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [
+      {
+        "components": [
+          {
+            "internalType": "address",
+            "name": "tokenAddress",
+            "type": "address"
+          },
+          {
+            "internalType": "uint256",
+            "name": "amount",
+            "type": "uint256"
+          }
+        ],
+        "internalType": "struct IBase.TokenAmount[]",
+        "name": "_colls",
+        "type": "tuple[]"
+      },
+      {
+        "internalType": "uint256",
+        "name": "deadline",
+        "type": "uint256"
+      },
+      {
+        "internalType": "uint8[]",
+        "name": "v",
+        "type": "uint8[]"
+      },
+      {
+        "internalType": "bytes32[]",
+        "name": "r",
+        "type": "bytes32[]"
+      },
+      {
+        "internalType": "bytes32[]",
+        "name": "s",
+        "type": "bytes32[]"
+      }
+    ],
+    "name": "openTroveWithPermit",
     "outputs": [],
     "stateMutability": "nonpayable",
     "type": "function"
@@ -598,6 +788,16 @@
         "internalType": "struct IBase.TokenAmount[]",
         "name": "_debts",
         "type": "tuple[]"
+      },
+      {
+        "internalType": "address",
+        "name": "_upperHint",
+        "type": "address"
+      },
+      {
+        "internalType": "address",
+        "name": "_lowerHint",
+        "type": "address"
       }
     ],
     "name": "repayDebt",
@@ -628,6 +828,16 @@
         "internalType": "struct IBase.TokenAmount[]",
         "name": "_debts",
         "type": "tuple[]"
+      },
+      {
+        "internalType": "address",
+        "name": "_upperHint",
+        "type": "address"
+      },
+      {
+        "internalType": "address",
+        "name": "_lowerHint",
+        "type": "address"
       }
     ],
     "name": "repayDebtFromPoolBurn",
@@ -687,13 +897,36 @@
       },
       {
         "internalType": "address",
-        "name": "_swapOperations",
+        "name": "_swapOperationsAddress",
+        "type": "address"
+      },
+      {
+        "internalType": "address",
+        "name": "_sortedTrovesAddress",
+        "type": "address"
+      },
+      {
+        "internalType": "address",
+        "name": "_collSurplusPoolAddress",
         "type": "address"
       }
     ],
     "name": "setAddresses",
     "outputs": [],
     "stateMutability": "nonpayable",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "sortedTroves",
+    "outputs": [
+      {
+        "internalType": "contract ISortedTroves",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
     "type": "function"
   },
   {
@@ -753,6 +986,16 @@
         "internalType": "struct IBase.TokenAmount[]",
         "name": "_colls",
         "type": "tuple[]"
+      },
+      {
+        "internalType": "address",
+        "name": "_upperHint",
+        "type": "address"
+      },
+      {
+        "internalType": "address",
+        "name": "_lowerHint",
+        "type": "address"
       }
     ],
     "name": "withdrawColl",

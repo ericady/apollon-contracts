@@ -1,6 +1,11 @@
 [
   {
     "inputs": [],
+    "name": "InvalidDebtToken",
+    "type": "error"
+  },
+  {
+    "inputs": [],
     "name": "NotContract",
     "type": "error"
   },
@@ -24,6 +29,16 @@
       }
     ],
     "name": "OwnableUnauthorizedAccount",
+    "type": "error"
+  },
+  {
+    "inputs": [],
+    "name": "StableCoinAlreadyExists",
+    "type": "error"
+  },
+  {
+    "inputs": [],
+    "name": "SymbolAlreadyExists",
     "type": "error"
   },
   {

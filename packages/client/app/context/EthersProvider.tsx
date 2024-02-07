@@ -10,6 +10,8 @@ import {
   BorrowerOperations,
   DebtToken,
   ERC20,
+  HintHelpers,
+  SortedTroves,
   StabilityPoolManager,
   StoragePool,
   SwapOperations,
@@ -21,6 +23,8 @@ import { SchemaDataFreshnessManager } from './CustomApolloProvider';
 import borrowerOperationsAbi from './abis/BorrowerOperations.json';
 import debtTokenAbi from './abis/DebtToken.json';
 import ERC20Abi from './abis/ERC20.json';
+import hintHelpersAbi from './abis/HintHelpers.json';
+import sortedTrovesAbi from './abis/SortedTroves.json';
 import stabilityPoolManagerAbi from './abis/StabilityPoolManager.json';
 import storagePoolAbi from './abis/StoragePool.json';
 import swapOperationsAbi from './abis/SwapOperations.json';
@@ -89,6 +93,8 @@ export const Contracts = {
   },
   BorrowerOperations: '0x5FbDB2315678afecb367f032d93F642f64180aa3',
   StoragePool: '0x5FC8d32690cc91D4c39d9d3abcBD16989F875707',
+  SortedTroves: '0x5FC8d32690cc91D4c39d9d3abcBD16989F875707',
+  HintHelpers: '0x5FC8d32690cc91D4c39d9d3abcBD16989F875707',
 } as const;
 
 type AllDebtTokenContracts = { [Key in keyof (typeof SchemaDataFreshnessManager)['DebtToken']]: DebtToken };
@@ -111,6 +117,8 @@ export const EthersContext = createContext<{
     swapPairContracts: AllSwapPairContracts;
     borrowerOperationsContract: BorrowerOperations;
     storagePoolContract: StoragePool;
+    sortedTrovesContract: SortedTroves;
+    hintHelpersContract: HintHelpers;
   };
   connectWallet: () => void;
 }>({
@@ -126,6 +134,8 @@ export const EthersContext = createContext<{
     swapPairContracts: undefined,
     borrowerOperationsContract: undefined,
     storagePoolContract: undefined,
+    sortedTrovesContract: undefined,
+    hintHelpersContract: undefined,
   } as any,
   connectWallet: () => {},
 });
@@ -156,6 +166,8 @@ export default function EthersProvider({ children }: { children: React.ReactNode
   const [swapPairContracts, setSwapPairContracts] = useState<AllSwapPairContracts>();
   const [borrowerOperationsContract, setBorrowerOperationsContract] = useState<BorrowerOperations>();
   const [storagePoolContract, setStoragePoolContract] = useState<StoragePool>();
+  const [sortedTrovesContract, setSortedTrovesContract] = useState<SortedTroves>();
+  const [hintHelpersContract, setHintHelpersContract] = useState<HintHelpers>();
 
   const connectWallet = async () => {
     try {
@@ -231,6 +243,14 @@ export default function EthersProvider({ children }: { children: React.ReactNode
         const storagePoolContractWithSigner = storagePoolContract.connect(newSigner) as StoragePool;
         setStoragePoolContract(storagePoolContractWithSigner);
 
+        const sortedTrovesContract = new Contract(Contracts.SortedTroves, sortedTrovesAbi, provider);
+        const sortedTrovesContractWithSigner = sortedTrovesContract.connect(newSigner) as SortedTroves;
+        setSortedTrovesContract(sortedTrovesContractWithSigner);
+
+        const hintHelpersContract = new Contract(Contracts.HintHelpers, hintHelpersAbi, provider);
+        const hintHelpersContractWithSigner = hintHelpersContract.connect(newSigner) as HintHelpers;
+        setHintHelpersContract(hintHelpersContractWithSigner);
+
         try {
           // Request account access
           const accounts = await window.ethereum.request({
@@ -255,7 +275,7 @@ export default function EthersProvider({ children }: { children: React.ReactNode
         }
       });
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // This use effect initializes the contracts to do initial read operations.
@@ -333,6 +353,20 @@ export default function EthersProvider({ children }: { children: React.ReactNode
           provider,
         ) as unknown as StoragePool;
         setStoragePoolContract(storagePoolContract);
+
+        const sortedTrovesContract = new Contract(
+          Contracts.SortedTroves,
+          sortedTrovesAbi,
+          provider,
+        ) as unknown as SortedTroves;
+        setSortedTrovesContract(sortedTrovesContract);
+
+        const hintHelpersContract = new Contract(
+          Contracts.HintHelpers,
+          hintHelpersAbi,
+          provider,
+        ) as unknown as HintHelpers;
+        setHintHelpersContract(hintHelpersContract);
       } catch (error) {
         // console.error(error);
       }
@@ -356,7 +390,9 @@ export default function EthersProvider({ children }: { children: React.ReactNode
     !swapOperationsContract ||
     !swapPairContracts ||
     !borrowerOperationsContract ||
-    !storagePoolContract
+    !storagePoolContract ||
+    !sortedTrovesContract ||
+    !hintHelpersContract
   )
     return null;
 
@@ -376,6 +412,8 @@ export default function EthersProvider({ children }: { children: React.ReactNode
           swapPairContracts,
           borrowerOperationsContract,
           storagePoolContract,
+          sortedTrovesContract,
+          hintHelpersContract,
         },
       }}
     >
@@ -398,6 +436,8 @@ export function useEthers(): {
     swapPairContracts: AllSwapPairContracts;
     borrowerOperationsContract: BorrowerOperations;
     storagePoolContract: StoragePool;
+    sortedTrovesContract: SortedTroves;
+    hintHelpersContract: HintHelpers;
   };
   connectWallet: () => void;
 } {

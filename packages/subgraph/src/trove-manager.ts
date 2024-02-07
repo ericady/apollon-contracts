@@ -1,5 +1,4 @@
 import {
-  BaseRateUpdated as BaseRateUpdatedEvent,
   LTermsUpdated as LTermsUpdatedEvent,
   LastFeeOpTimeUpdated as LastFeeOpTimeUpdatedEvent,
   OwnershipTransferred as OwnershipTransferredEvent,
@@ -12,8 +11,6 @@ import {
   TroveSnapshotsUpdated as TroveSnapshotsUpdatedEvent,
 } from '../generated/TroveManager/TroveManager';
 import { handleCreateUpdateCollateralTokenMeta } from './entities/collateral-token-meta-entity';
-
-export function handleBaseRateUpdated(event: BaseRateUpdatedEvent): void {}
 
 export function handleLTermsUpdated(event: LTermsUpdatedEvent): void {}
 

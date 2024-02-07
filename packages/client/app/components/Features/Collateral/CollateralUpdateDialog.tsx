@@ -23,6 +23,7 @@ import { Contracts, useEthers } from '../../../context/EthersProvider';
 import { useTransactionDialog } from '../../../context/TransactionDialogProvider';
 import { GetCollateralTokensQuery, GetCollateralTokensQueryVariables } from '../../../generated/gql-types';
 import { GET_BORROWER_COLLATERAL_TOKENS } from '../../../queries';
+import { getHints } from '../../../utils/crypto';
 import {
   bigIntStringToFloat,
   dangerouslyConvertBigIntToNumber,
@@ -56,7 +57,13 @@ const CollateralUpdateDialog = ({ buttonVariant, buttonSx = {} }: Props) => {
 
   const {
     address,
-    contracts: { borrowerOperationsContract, collateralTokenContracts },
+    contracts: {
+      borrowerOperationsContract,
+      collateralTokenContracts,
+      sortedTrovesContract,
+      troveManagerContract,
+      hintHelpersContract,
+    },
   } = useEthers();
   const { setSteps } = useTransactionDialog();
 
@@ -157,13 +164,24 @@ const CollateralUpdateDialog = ({ buttonVariant, buttonSx = {} }: Props) => {
         {
           title: hasNoOpenTrove ? 'Open Trove.' : 'Add Collateral to Trove.',
           transaction: {
-            methodCall: () => {
-
+            methodCall: async () => {
               if (hasNoOpenTrove) {
                 return borrowerOperationsContract.openTrove(tokenAmounts);
               } else {
-                // @ts-ignore TODO: fix this parameters
-                return borrowerOperationsContract.addColl(tokenAmounts);
+                const [upperHint, lowerHint] = await getHints(
+                  troveManagerContract,
+                  sortedTrovesContract,
+                  hintHelpersContract,
+                  {
+                    borrower: address,
+                    addedColl: tokenAmounts,
+                    addedDebt: [],
+                    removedColl: [],
+                    removedDebt: [],
+                  },
+                );
+
+                return borrowerOperationsContract.addColl(tokenAmounts, upperHint, lowerHint);
               }
             },
             // wait for all approvals
