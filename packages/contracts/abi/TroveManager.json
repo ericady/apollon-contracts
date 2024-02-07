@@ -1189,6 +1189,11 @@
                 "internalType": "address",
                 "name": "_debtTokenAddress",
                 "type": "address"
+            },
+            {
+                "internalType": "bool",
+                "name": "_includingStableCoinGasCompensation",
+                "type": "bool"
             }
         ],
         "name": "getTroveRepayableDebt",
@@ -1208,6 +1213,11 @@
                 "internalType": "address",
                 "name": "_borrower",
                 "type": "address"
+            },
+            {
+                "internalType": "bool",
+                "name": "_includingStableCoinGasCompensation",
+                "type": "bool"
             }
         ],
         "name": "getTroveRepayableDebts",

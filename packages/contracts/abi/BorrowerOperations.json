@@ -122,6 +122,11 @@
         "type": "error"
     },
     {
+        "inputs": [],
+        "name": "ZeroDebtRepay",
+        "type": "error"
+    },
+    {
         "anonymous": false,
         "inputs": [
             {
