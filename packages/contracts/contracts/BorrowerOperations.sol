@@ -453,8 +453,11 @@ contract BorrowerOperations is LiquityBase, Ownable(msg.sender), CheckContract, 
     contractsCache.troveManager.decreaseTroveDebt(borrower, debtsToRemove);
 
     for (uint i = 0; i < debtsToRemove.length; i++) {
-      DebtTokenAmount memory debtTokenAmount = debtsToRemove[i];
+      DebtTokenAmount memory debtTokenAmount = debtsToRemove[i];      
       address debtTokenAddress = address(debtTokenAmount.debtToken);
+
+      // check zero amount
+      if (debtTokenAmount.netDebt == 0) revert ZeroDebtRepay();
 
       // checking if the trove has enough debt for the repayment (gas comp needs to remain)
       DebtTokenAmount memory existingDebt;

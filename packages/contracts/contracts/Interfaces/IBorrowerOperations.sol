@@ -42,6 +42,7 @@ interface IBorrowerOperations is IBBase {
   error WithdrawAmount_gt_Coll();
   error ZeroDebtChange();
   error InsufficientDebtToRepay();
+  error ZeroDebtRepay();
 
   // --- Functions ---
 
