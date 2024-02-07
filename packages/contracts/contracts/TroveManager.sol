@@ -129,6 +129,10 @@ contract TroveManager is LiquityBase, Ownable(msg.sender), CheckContract, ITrove
     return TroveOwners.length;
   }
 
+  function getTroveOwners() external view returns (address[] memory) {
+    return TroveOwners;
+  }
+
   function getTroveStatus(address _borrower) external view override returns (uint) {
     return uint(Troves[_borrower].status);
   }
