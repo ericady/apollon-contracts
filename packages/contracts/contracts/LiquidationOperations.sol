@@ -186,8 +186,8 @@ contract LiquidationOperations is LiquityBase, Ownable(msg.sender), CheckContrac
     ) = troveManager.getEntireDebtAndColl(trove);
     vars.ICR = LiquityMath._computeCR(vars.troveCollInUSD, vars.troveDebtInUSD);
 
-    // ICR >= TCR, skipping liquidation, no matter what mode
-    if (vars.ICR >= outerVars.TCR) return false;
+    // ICR > TCR, skipping liquidation, no matter what mode
+    if (vars.ICR > outerVars.TCR) return false;
 
     // ICR >= MCR in normal mode, skipping liquidation
     if (vars.ICR >= MCR && !outerVars.isRecoveryMode) return false;

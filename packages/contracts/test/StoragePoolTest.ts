@@ -63,7 +63,7 @@ describe('StoragePool', () => {
       it('subtractValue() revert if the token does not yet have an entry', async () => {
         await assertRevert(
           borrowerOperations.testStoragePool_subtractValue(STABLE, false, 0, 100n),
-          'StoragePool: PoolEntry does not exist'
+          'PoolEntryDoesntExist'
         );
       });
 
@@ -164,7 +164,7 @@ describe('StoragePool', () => {
       it('transferBetweenTypes() revert if the token does not yet have an entry', async () => {
         await assertRevert(
           borrowerOperations.testStoragePool_transferBetweenTypes(STABLE, false, 0, 2, 10),
-          'StoragePool: PoolEntry does not exist'
+          'PoolEntryDoesntExist'
         );
       });
 

@@ -690,7 +690,7 @@ describe('BorrowerOperations', () => {
       await troveManager.setBaseRate(parseUnits('0.05'));
 
       // Check baseRate is now non-zero
-      const baseRate_1 = await troveManager.baseRate();
+      const baseRate_1 = await troveManager.getStableCoinBaseRate();
       expect(baseRate_1).to.be.equal(parseUnits('0.05'));
 
       // 2 hours pass
@@ -700,7 +700,7 @@ describe('BorrowerOperations', () => {
       await increaseDebt(dennis, contracts, [{ tokenAddress: STABLE, amount: parseUnits('1') }]);
 
       // Check baseRate has decreased
-      const baseRate_2 = await troveManager.baseRate();
+      const baseRate_2 = await troveManager.getStableCoinBaseRate();
       expect(baseRate_2).to.be.lt(baseRate_1);
 
       // 1 hour passes
@@ -709,7 +709,7 @@ describe('BorrowerOperations', () => {
       // E withdraws LUSD
       await increaseDebt(carol, contracts, [{ tokenAddress: STABLE, amount: parseUnits('1') }]);
 
-      const baseRate_3 = await troveManager.baseRate();
+      const baseRate_3 = await troveManager.getStableCoinBaseRate();
       expect(baseRate_3).to.be.lt(baseRate_2);
     });
     it('reverts if max fee > 100%', async () => {
@@ -742,7 +742,7 @@ describe('BorrowerOperations', () => {
       await troveManager.setBaseRate(parseUnits('0.05'));
       await troveManager.setLastFeeOpTimeToNow();
 
-      let baseRate = await troveManager.baseRate(); // expect 5% base rate
+      let baseRate = await troveManager.getStableCoinBaseRate(); // expect 5% base rate
       expect(baseRate).to.be.equal(parseUnits('0.05'));
 
       // Attempt with maxFee > 5%
@@ -750,13 +750,13 @@ describe('BorrowerOperations', () => {
         increaseDebt(alice, contracts, [{ tokenAddress: STABLE, amount: parseUnits('1') }], MAX_BORROWING_FEE + 1n)
       ).to.be.revertedWithCustomError(borrowerOperations, 'MaxFee_out_Range');
 
-      baseRate = await troveManager.baseRate(); // expect 5% base rate
+      baseRate = await troveManager.getStableCoinBaseRate(); // expect 5% base rate
       expect(baseRate).to.be.equal(parseUnits('0.05'));
 
       // Attempt with maxFee = 5%
       await increaseDebt(alice, contracts, [{ tokenAddress: STABLE, amount: parseUnits('1') }], parseUnits('0.05'));
 
-      baseRate = await troveManager.baseRate(); // expect 5% base rate
+      baseRate = await troveManager.getStableCoinBaseRate(); // expect 5% base rate
       expect(baseRate).to.be.equal(parseUnits('0.05'));
     });
     it("doesn't change base rate if it is already zero", async () => {
@@ -765,7 +765,7 @@ describe('BorrowerOperations', () => {
       await open(bob, parseUnits('2', 9), parseUnits('20000'));
 
       // Check baseRate is zero
-      const baseRate_1 = await troveManager.baseRate();
+      const baseRate_1 = await troveManager.getStableCoinBaseRate();
       expect(baseRate_1).to.be.equal(0n);
 
       // 2 hours pass
@@ -775,7 +775,7 @@ describe('BorrowerOperations', () => {
       await increaseDebt(alice, contracts, [{ tokenAddress: STABLE, amount: parseUnits('37') }]);
 
       // Check baseRate is still 0
-      const baseRate_2 = await troveManager.baseRate();
+      const baseRate_2 = await troveManager.getStableCoinBaseRate();
       expect(baseRate_2).to.be.equal(0n);
 
       // 1 hour passes
@@ -784,7 +784,7 @@ describe('BorrowerOperations', () => {
       // E opens trove
       await increaseDebt(bob, contracts, [{ tokenAddress: STABLE, amount: parseUnits('12') }]);
 
-      const baseRate_3 = await troveManager.baseRate();
+      const baseRate_3 = await troveManager.getStableCoinBaseRate();
       expect(baseRate_3).to.be.equal(0n);
     });
     it("lastFeeOpTime doesn't update if less time than decay interval has passed since the last fee operation", async () => {
@@ -797,7 +797,7 @@ describe('BorrowerOperations', () => {
       await troveManager.setLastFeeOpTimeToNow();
 
       // Check baseRate is now non-zero
-      const baseRate_1 = await troveManager.baseRate();
+      const baseRate_1 = await troveManager.getStableCoinBaseRate();
       expect(baseRate_1).to.be.equal(parseUnits('0.05'));
 
       const lastFeeOpTime_1 = await troveManager.lastFeeOperationTime();
@@ -840,7 +840,7 @@ describe('BorrowerOperations', () => {
       await troveManager.setLastFeeOpTimeToNow();
 
       // Check baseRate is now non-zero
-      const baseRate_1 = await troveManager.baseRate();
+      const baseRate_1 = await troveManager.getStableCoinBaseRate();
       expect(baseRate_1).to.be.equal(parseUnits('0.05'));
 
       // 30 seconds pass
@@ -856,7 +856,7 @@ describe('BorrowerOperations', () => {
       await increaseDebt(bob, contracts, [{ tokenAddress: STABLE, amount: parseUnits('1') }]);
 
       // Check base rate has decreased even though Borrower tried to stop it decaying
-      const baseRate_2 = await troveManager.baseRate();
+      const baseRate_2 = await troveManager.getStableCoinBaseRate();
       expect(baseRate_2).to.be.lt(baseRate_1);
     });
     // TODO: Take care after staking enabled
@@ -899,7 +899,7 @@ describe('BorrowerOperations', () => {
     //   await troveManager.setLastFeeOpTimeToNow();
 
     //   // Check baseRate is now non-zero
-    //   const baseRate_1 = await troveManager.baseRate();
+    //   const baseRate_1 = await troveManager.getStableCoinBaseRate();
     //   assert.isTrue(baseRate_1.gt(toBN('0')));
 
     //   // 2 hours pass
@@ -956,7 +956,7 @@ describe('BorrowerOperations', () => {
     //     await troveManager.setLastFeeOpTimeToNow();
 
     //     // Check baseRate is now non-zero
-    //     const baseRate_1 = await troveManager.baseRate();
+    //     const baseRate_1 = await troveManager.getStableCoinBaseRate();
     //     assert.isTrue(baseRate_1.gt(toBN('0')));
 
     //     // 2 hours pass
@@ -1014,7 +1014,7 @@ describe('BorrowerOperations', () => {
     //   await troveManager.setLastFeeOpTimeToNow();
 
     //   // Check baseRate is now non-zero
-    //   const baseRate_1 = await troveManager.baseRate();
+    //   const baseRate_1 = await troveManager.getStableCoinBaseRate();
     //   assert.isTrue(baseRate_1.gt(toBN('0')));
 
     //   // 2 hours pass
@@ -1067,7 +1067,7 @@ describe('BorrowerOperations', () => {
     //   await troveManager.setLastFeeOpTimeToNow();
 
     //   // Check baseRate is now non-zero
-    //   const baseRate_1 = await troveManager.baseRate();
+    //   const baseRate_1 = await troveManager.getStableCoinBaseRate();
     //   assert.isTrue(baseRate_1.gt(toBN('0')));
 
     //   // 2 hours pass
@@ -1114,7 +1114,7 @@ describe('BorrowerOperations', () => {
     //   });
 
     //   // Check baseRate is zero
-    //   const baseRate_1 = await troveManager.baseRate();
+    //   const baseRate_1 = await troveManager.getStableCoinBaseRate();
     //   assert.equal(baseRate_1, '0');
 
     //   // A artificially receives LQTY, then stakes it
@@ -1162,7 +1162,7 @@ describe('BorrowerOperations', () => {
     //   });
 
     //   // Check baseRate is zero
-    //   const baseRate_1 = await troveManager.baseRate();
+    //   const baseRate_1 = await troveManager.getStableCoinBaseRate();
     //   assert.equal(baseRate_1, '0');
 
     //   // 2 hours pass
@@ -1943,11 +1943,11 @@ describe('BorrowerOperations', () => {
       // assert.isTrue(A_Coll.eq(A_emittedColl));
       // assert.isTrue(B_Coll.eq(B_emittedColl));
       // assert.isTrue(C_Coll.eq(C_emittedColl));
-      // const baseRateBefore = await troveManager.baseRate();
+      // const baseRateBefore = await troveManager.getStableCoinBaseRate();
       // // Artificially make baseRate 5%
       // await troveManager.setBaseRate(dec(5, 16));
       // await troveManager.setLastFeeOpTimeToNow();
-      // assert.isTrue((await troveManager.baseRate()).gt(baseRateBefore));
+      // assert.isTrue((await troveManager.getStableCoinBaseRate()).gt(baseRateBefore));
       // const txD = (
       //   await openTrove({
       //     extraLUSDAmount: toBN(dec(5000, 18)),
@@ -2031,7 +2031,7 @@ describe('BorrowerOperations', () => {
       await troveManager.setLastFeeOpTimeToNow();
 
       // Check baseRate is now non-zero
-      const baseRate_1 = await troveManager.baseRate();
+      const baseRate_1 = await troveManager.getStableCoinBaseRate();
       expect(baseRate_1).to.be.equal(parseUnits('0.05'));
 
       // 2 hours pass
@@ -2041,7 +2041,7 @@ describe('BorrowerOperations', () => {
       await open(dennis, parseUnits('1', 9), parseUnits('1000'));
 
       // Check baseRate has decreased
-      const baseRate_2 = await troveManager.baseRate();
+      const baseRate_2 = await troveManager.getStableCoinBaseRate();
       expect(baseRate_2).to.be.lt(baseRate_1);
 
       // 1 hour passes
@@ -2050,7 +2050,7 @@ describe('BorrowerOperations', () => {
       // E opens trove
       await open(erin, parseUnits('1', 9), parseUnits('1000'));
 
-      const baseRate_3 = await troveManager.baseRate();
+      const baseRate_3 = await troveManager.getStableCoinBaseRate();
       expect(baseRate_3).to.be.lt(baseRate_2);
     });
 
@@ -2061,7 +2061,7 @@ describe('BorrowerOperations', () => {
       await open(carol, parseUnits('4', 9), parseUnits('40000'));
 
       // Check baseRate is zero
-      const baseRate_1 = await troveManager.baseRate();
+      const baseRate_1 = await troveManager.getStableCoinBaseRate();
       expect(baseRate_1).to.be.equal(0n);
 
       // 2 hours pass
@@ -2071,7 +2071,7 @@ describe('BorrowerOperations', () => {
       await open(dennis, parseUnits('1', 9), parseUnits('1000'));
 
       // Check baseRate is still 0
-      const baseRate_2 = await troveManager.baseRate();
+      const baseRate_2 = await troveManager.getStableCoinBaseRate();
       expect(baseRate_2).to.be.equal(0n);
 
       // 1 hour passes
@@ -2080,7 +2080,7 @@ describe('BorrowerOperations', () => {
       // E opens trove
       await open(erin, parseUnits('1', 9), parseUnits('1000'));
 
-      const baseRate_3 = await troveManager.baseRate();
+      const baseRate_3 = await troveManager.getStableCoinBaseRate();
       expect(baseRate_3).to.be.equal(0n);
     });
 
@@ -2095,7 +2095,7 @@ describe('BorrowerOperations', () => {
       await troveManager.setLastFeeOpTimeToNow();
 
       // Check baseRate is now non-zero
-      const baseRate_1 = await troveManager.baseRate();
+      const baseRate_1 = await troveManager.getStableCoinBaseRate();
       expect(baseRate_1).to.be.equal(parseUnits('0.05'));
 
       const lastFeeOpTime_1 = await troveManager.lastFeeOperationTime();
@@ -2137,7 +2137,7 @@ describe('BorrowerOperations', () => {
       await troveManager.setLastFeeOpTimeToNow();
 
       // Check baseRate is non-zero
-      const baseRate_1 = await troveManager.baseRate();
+      const baseRate_1 = await troveManager.getStableCoinBaseRate();
       expect(baseRate_1).to.be.gt(0);
 
       // 59 minutes pass
@@ -2154,7 +2154,7 @@ describe('BorrowerOperations', () => {
       await open(erin, parseUnits('1', 9), parseUnits('1000'));
 
       // Check base rate has decreased even though Borrower tried to stop it decaying
-      const baseRate_2 = await troveManager.baseRate();
+      const baseRate_2 = await troveManager.getStableCoinBaseRate();
       expect(baseRate_2).to.be.lt(baseRate_1);
     });
 
@@ -2180,7 +2180,7 @@ describe('BorrowerOperations', () => {
       await troveManager.setLastFeeOpTimeToNow();
 
       // Check baseRate is now non-zero
-      const baseRate_1 = await troveManager.baseRate();
+      const baseRate_1 = await troveManager.getStableCoinBaseRate();
       expect(baseRate_1).to.be.gt(0);
 
       // 2 hours pass
@@ -2211,7 +2211,7 @@ describe('BorrowerOperations', () => {
       await troveManager.setLastFeeOpTimeToNow();
 
       // Check baseRate is now non-zero
-      const baseRate_1 = await troveManager.baseRate();
+      const baseRate_1 = await troveManager.getStableCoinBaseRate();
       expect(baseRate_1).to.be.gt(0);
 
       // 2 hours pass
@@ -2253,7 +2253,7 @@ describe('BorrowerOperations', () => {
       await troveManager.setLastFeeOpTimeToNow();
 
       // Check baseRate is now non-zero
-      const baseRate_1 = await troveManager.baseRate();
+      const baseRate_1 = await troveManager.getStableCoinBaseRate();
       expect(baseRate_1).to.be.gt(0);
 
       // 2 hours pass
@@ -2289,7 +2289,7 @@ describe('BorrowerOperations', () => {
       await troveManager.setLastFeeOpTimeToNow();
 
       // Check baseRate is non-zero
-      const baseRate_1 = await troveManager.baseRate();
+      const baseRate_1 = await troveManager.getStableCoinBaseRate();
       expect(baseRate_1).to.be.gt(0);
 
       // 2 hours pass
@@ -2314,7 +2314,7 @@ describe('BorrowerOperations', () => {
       await open(carol, parseUnits('1', 9), parseUnits('5000'));
 
       // Check baseRate is zero
-      const baseRate_1 = await troveManager.baseRate();
+      const baseRate_1 = await troveManager.getStableCoinBaseRate();
       expect(baseRate_1).to.be.gt(0);
 
       // 2 hours pass

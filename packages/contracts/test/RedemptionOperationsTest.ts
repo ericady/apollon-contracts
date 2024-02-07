@@ -65,10 +65,10 @@ describe('RedemptionOperations', () => {
         bobStableBalanceBefore = await STABLE.balanceOf(bob);
         btcStableBalanceBefore = await storagePool.getValue(BTC, true, 0);
 
-        defaulterTroveStableDebtBefore = await troveManager.getTroveRepayableDebt(defaulter_1, STABLE);
+        defaulterTroveStableDebtBefore = await troveManager.getTroveRepayableDebt(defaulter_1, STABLE, true);
         defaulterTroveBTCBefore = await troveManager.getTroveWithdrawableColl(defaulter_1, BTC);
 
-        defaulter2TroveStableDebtBefore = await troveManager.getTroveRepayableDebt(defaulter_2, STABLE);
+        defaulter2TroveStableDebtBefore = await troveManager.getTroveRepayableDebt(defaulter_2, STABLE, true);
         defaulter2TroveBTCBefore = await troveManager.getTroveWithdrawableColl(defaulter_2, BTC);
       });
 
@@ -107,7 +107,7 @@ describe('RedemptionOperations', () => {
 
         // checking defaulter 1
         const [, stableDrawn, collDrawn] = redemptionMeta.redemptions.find((f: any) => f[0] === defaulter_1.address);
-        const defaulterTroveStableDebtAfter = await troveManager.getTroveRepayableDebt(defaulter_1, STABLE);
+        const defaulterTroveStableDebtAfter = await troveManager.getTroveRepayableDebt(defaulter_1, STABLE, true);
         expect(defaulterTroveStableDebtAfter).to.be.equal(defaulterTroveStableDebtBefore - stableDrawn);
 
         const defaulterTroveBTCAfter = await troveManager.getTroveWithdrawableColl(defaulter_1, BTC);
@@ -120,7 +120,7 @@ describe('RedemptionOperations', () => {
           const [, stableDrawn2, collDrawn2] = redemptionMeta.redemptions.find(
             (f: any) => f[0] === defaulter_2.address
           );
-          const defaulter2TroveStableDebtAfter = await troveManager.getTroveRepayableDebt(defaulter_2, STABLE);
+          const defaulter2TroveStableDebtAfter = await troveManager.getTroveRepayableDebt(defaulter_2, STABLE, true);
           expect(defaulter2TroveStableDebtAfter).to.be.equal(defaulter2TroveStableDebtBefore - stableDrawn2);
 
           const defaulter2TroveBTCAfter = await troveManager.getTroveWithdrawableColl(defaulter_2, BTC);

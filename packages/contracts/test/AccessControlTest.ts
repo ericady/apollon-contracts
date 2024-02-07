@@ -178,14 +178,17 @@ describe('Access Control: Apollon functions with the caller restricted to Apollo
   });
 
   describe('DebtToken', () => {
-    //    mint
+    // mint
     it('mint(): reverts when called by an account that is not BorrowerOperations', async () => {
       await expect(stableDebt.mint(bob, 100)).to.be.revertedWithCustomError(stableDebt, 'NotFromBorrowerOps');
     });
 
     // burn
     it('burn(): reverts when called by an account that is not BO nor TroveM nor SP', async () => {
-      await expect(stableDebt.burn(bob, 100)).to.be.revertedWithCustomError(stableDebt, 'NotFromBOorTroveMorSP');
+      await expect(stableDebt.burn(bob, 100)).to.be.revertedWithCustomError(
+        stableDebt,
+        'NotFromBOorTroveMorSPorDebtToken'
+      );
     });
 
     // sendToPool

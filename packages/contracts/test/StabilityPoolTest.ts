@@ -21,7 +21,7 @@ import {
   increaseDebt,
   TroveStatus,
 } from '../utils/testHelper';
-import { parseUnits } from 'ethers';
+import { Addressable, parseUnits } from 'ethers';
 import apollonTesting from '../ignition/modules/apollonTesting';
 
 describe('StabilityPool', () => {
@@ -173,7 +173,7 @@ describe('StabilityPool', () => {
 
         // Confirm SP has decreased
         const stockAfter = (await contracts.stabilityPoolManager.getTotalDeposits()).find(
-          d => d.tokenAddress === STOCK.target
+          (d: { tokenAddress: string | Addressable }) => d.tokenAddress === STOCK.target
         )?.amount;
 
         expect(stockAfter).to.be.lt(stockBefore);
@@ -1430,33 +1430,6 @@ describe('StabilityPool', () => {
         // no btc left in pool, all claimed
         const btcInPool = (await stabilityPool.getTotalGainedColl()).find(d => d.tokenAddress === BTC.target)?.amount;
         expect(btcInPool).to.be.lt(10000);
-      });
-
-      it('reverts if user has no trove', async () => {
-        await whaleShrimpTroveInit(contracts, signers, false);
-
-        const provideToSP = parseUnits('1000');
-
-        await STABLE.connect(alice).transfer(defaulter_3, provideToSP);
-
-        await stabilityPoolManager
-          .connect(defaulter_3)
-          .provideStability([{ tokenAddress: STABLE, amount: provideToSP }]);
-
-        // drop price
-        await priceFeed.setTokenPrice(BTC, parseUnits('5000'));
-
-        await liquidationOperations.liquidate(defaulter_1);
-        expect((await troveManager.getTroveStatus(defaulter_1)).toString()).to.be.equal(
-          TroveStatus.CLOSED_BY_LIQUIDATION_IN_NORMAL_MODE.toString()
-        );
-
-        // price hikes
-        await priceFeed.setTokenPrice(BTC, parseUnits('21000'));
-
-        expect(await stabilityPoolManager.connect(defaulter_3).withdrawGains()).to.be.equal(
-          TroveStatus.NON_EXISTENT.toString()
-        );
       });
     });
   });

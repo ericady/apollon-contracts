@@ -71,7 +71,7 @@ contract DebtToken is CheckContract, IDebtToken {
     address _borrowerOperationsAddress,
     address _stabilityPoolManagerAddress,
     address _debtTokenManagerAddress,
-    address _priceFeedAddress,    
+    address _priceFeedAddress,
     string memory _symbol,
     string memory _name,
     string memory _version,
@@ -89,7 +89,7 @@ contract DebtToken is CheckContract, IDebtToken {
     borrowerOperationsAddress = _borrowerOperationsAddress;
     stabilityPoolManagerAddress = _stabilityPoolManagerAddress;
     debtTokenManagerAddress = _debtTokenManagerAddress;
-    priceFeed = IPriceFeed(_priceFeedAddress);    
+    priceFeed = IPriceFeed(_priceFeedAddress);
 
     _NAME = _name;
     _SYMBOL = _symbol;
@@ -278,8 +278,8 @@ contract DebtToken is CheckContract, IDebtToken {
       msg.sender != borrowerOperationsAddress &&
       msg.sender != troveManagerAddress &&
       msg.sender != stabilityPoolManagerAddress &&
-      msg.sender != redemptionOperationsAddress && 
-      !IDebtTokenManager(debtTokenManagerAddress).isDebtToken(address(this))
+      msg.sender != redemptionOperationsAddress &&
+      !IDebtTokenManager(debtTokenManagerAddress).isDebtToken(msg.sender)
     ) revert NotFromBOorTroveMorSPorDebtToken();
   }
 

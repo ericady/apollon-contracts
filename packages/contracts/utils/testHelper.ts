@@ -325,13 +325,7 @@ export const getStableFeeFromStableBorrowingEvent = async (
 export const getRedemptionMeta = async (tx: ContractTransactionResponse | null, contracts: Contracts) => {
   const receipt = await tx?.wait();
 
-  const meta: {
-    redemptions: any[];
-    totals: any[];
-  } = {
-    redemptions: [],
-    totals: [],
-  };
+  const meta: { redemptions: any[]; totals: any[] } = { redemptions: [], totals: [] };
   for (const log of receipt?.logs ?? []) {
     const logData = contracts.redemptionOperations.interface.parseLog(log as any);
     if (logData?.name === 'SuccessfulRedemption') meta.totals = logData.args;
