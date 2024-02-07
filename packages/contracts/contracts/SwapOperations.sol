@@ -14,7 +14,6 @@ import './Dependencies/CheckContract.sol';
 import './Interfaces/ITroveManager.sol';
 
 contract SwapOperations is ISwapOperations, Ownable(msg.sender), CheckContract, LiquityBase {
-
   // --- Connected contract declarations ---
 
   ITroveManager public troveManager;
@@ -25,6 +24,7 @@ contract SwapOperations is ISwapOperations, Ownable(msg.sender), CheckContract, 
   // --- Data structures ---
 
   mapping(address => mapping(address => address)) public getPair;
+  mapping(address => bool) public isPair;
   address[] public allPairs;
 
   // --- Dependency setters ---
@@ -51,9 +51,6 @@ contract SwapOperations is ISwapOperations, Ownable(msg.sender), CheckContract, 
       _priceFeedAddress,
       _debtTokenManager
     );
-
-    // Disabled to create pairs later
-    // renounceOwnership();
   }
 
   modifier ensure(uint deadline) {
@@ -86,6 +83,7 @@ contract SwapOperations is ISwapOperations, Ownable(msg.sender), CheckContract, 
     getPair[token0][token1] = pair;
     getPair[token1][token0] = pair; // populate mapping in the reverse direction
     allPairs.push(pair);
+    isPair[pair] = true;
 
     emit PairCreated(token0, token1, pair, allPairs.length);
   }
@@ -217,12 +215,13 @@ contract SwapOperations is ISwapOperations, Ownable(msg.sender), CheckContract, 
         debtsToMint = new TokenAmount[](2);
         debtsToMint[0] = TokenAmount(tokenA, vars.fromMintA);
         debtsToMint[1] = TokenAmount(tokenB, vars.fromMintB);
-      } else {   
-        // mint only 1 token    
+      } else {
+        // mint only 1 token
         debtsToMint = new TokenAmount[](1);
-        debtsToMint[0] = (vars.fromMintA != 0
-          ? TokenAmount(tokenA, vars.fromMintA) // mint A
-          : TokenAmount(tokenB, vars.fromMintB) // mint B
+        debtsToMint[0] = (
+          vars.fromMintA != 0
+            ? TokenAmount(tokenA, vars.fromMintA) // mint A
+            : TokenAmount(tokenB, vars.fromMintB) // mint B
         );
       }
       borrowerOperations.increaseDebt(msg.sender, vars.pair, debtsToMint, _mintMeta);
@@ -296,9 +295,8 @@ contract SwapOperations is ISwapOperations, Ownable(msg.sender), CheckContract, 
       } else {
         // repay only 1 token
         debtsToRepay = new TokenAmount[](1);
-        debtsToRepay[0] = (vars.burned0 != 0
-          ? TokenAmount(vars.token0, vars.burned0)
-          : TokenAmount(vars.token1, vars.burned1)
+        debtsToRepay[0] = (
+          vars.burned0 != 0 ? TokenAmount(vars.token0, vars.burned0) : TokenAmount(vars.token1, vars.burned1)
         );
       }
       borrowerOperations.repayDebtFromPoolBurn(msg.sender, debtsToRepay, _upperHint, _lowerHint);
@@ -366,6 +364,7 @@ contract SwapOperations is ISwapOperations, Ownable(msg.sender), CheckContract, 
     IERC20Permit(path[0]).permit(msg.sender, address(this), amountIn, deadline, v, r, s);
     return swapExactTokensForTokens(amountIn, amountOutMin, path, to, deadline);
   }
+
   // --- Position functions ---
 
   function openLongPosition(
@@ -406,7 +405,7 @@ contract SwapOperations is ISwapOperations, Ownable(msg.sender), CheckContract, 
     MintMeta memory _mintMeta
   ) internal returns (uint[] memory amounts) {
     address pair = getPair[path[0]][path[1]];
-    if (pair == address(0)) revert PairDoesNotExist();        
+    if (pair == address(0)) revert PairDoesNotExist();
 
     amounts = getAmountsOut(amountIn, path);
     if (amounts[amounts.length - 1] < amountOutMin) revert InsufficientOutputAmount();

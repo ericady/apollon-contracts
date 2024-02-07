@@ -19,7 +19,7 @@ interface ISwapOperations is IBBase {
   error InsufficientAmount();
   error InvalidPath();
   error TransferFromFailed();
-  error PairRequiresStable();  
+  error PairRequiresStable();
 
   event SwapOperationsInitialized(
     address borrowerOperations,
@@ -49,6 +49,8 @@ interface ISwapOperations is IBBase {
   function allPairs(uint) external view returns (address pair);
 
   function allPairsLength() external view returns (uint);
+
+  function isPair(address pair) external view returns (bool);
 
   function getPair(address tokenA, address tokenB) external view returns (address pair);
 

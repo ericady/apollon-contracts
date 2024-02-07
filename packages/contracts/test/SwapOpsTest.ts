@@ -224,7 +224,7 @@ describe('SwapOperations', () => {
       expect(await pair.balanceOf(alice)).to.be.equal(0);
     });
 
-    it.only('smaller debts, complete repay expected', async () => {
+    it('smaller debts, complete repay expected', async () => {
       const amount = parseUnits('1000');
 
       //open trove

@@ -8,6 +8,7 @@ import './Dependencies/CheckContract.sol';
 import './Interfaces/IDebtToken.sol';
 import './Interfaces/IPriceFeed.sol';
 import './Interfaces/IDebtTokenManager.sol';
+import './Interfaces/ISwapOperations.sol';
 
 /*
  *
@@ -63,6 +64,7 @@ contract DebtToken is CheckContract, IDebtToken {
   address public immutable borrowerOperationsAddress;
   address public immutable stabilityPoolManagerAddress;
   address public immutable debtTokenManagerAddress;
+  ISwapOperations public immutable swapOperations;
   IPriceFeed public immutable priceFeed;
 
   constructor(
@@ -72,6 +74,7 @@ contract DebtToken is CheckContract, IDebtToken {
     address _stabilityPoolManagerAddress,
     address _debtTokenManagerAddress,
     address _priceFeedAddress,
+    address _swapOperationsAddress,
     string memory _symbol,
     string memory _name,
     string memory _version,
@@ -83,6 +86,7 @@ contract DebtToken is CheckContract, IDebtToken {
     checkContract(_stabilityPoolManagerAddress);
     checkContract(_priceFeedAddress);
     checkContract(_debtTokenManagerAddress);
+    checkContract(_swapOperationsAddress);
 
     troveManagerAddress = _troveManagerAddress;
     redemptionOperationsAddress = _redemptionOperationsAddress;
@@ -90,6 +94,7 @@ contract DebtToken is CheckContract, IDebtToken {
     stabilityPoolManagerAddress = _stabilityPoolManagerAddress;
     debtTokenManagerAddress = _debtTokenManagerAddress;
     priceFeed = IPriceFeed(_priceFeedAddress);
+    swapOperations = ISwapOperations(_swapOperationsAddress);
 
     _NAME = _name;
     _SYMBOL = _symbol;
@@ -121,7 +126,13 @@ contract DebtToken is CheckContract, IDebtToken {
   }
 
   function burn(address _account, uint256 _amount) external override {
-    _requireCallerIsBOorTroveMorSPorROorDebtToken();
+    if (
+      msg.sender != borrowerOperationsAddress &&
+      msg.sender != stabilityPoolManagerAddress &&
+      msg.sender != redemptionOperationsAddress &&
+      !swapOperations.isPair(msg.sender)
+    ) revert NotFromBOorTroveMorSPorDebtToken();
+
     _burn(_account, _amount);
   }
 
@@ -271,16 +282,6 @@ contract DebtToken is CheckContract, IDebtToken {
 
   function _requireCallerIsBorrowerOperations() internal view {
     if (msg.sender != borrowerOperationsAddress) revert NotFromBorrowerOps();
-  }
-
-  function _requireCallerIsBOorTroveMorSPorROorDebtToken() internal view {
-    if (
-      msg.sender != borrowerOperationsAddress &&
-      msg.sender != troveManagerAddress &&
-      msg.sender != stabilityPoolManagerAddress &&
-      msg.sender != redemptionOperationsAddress &&
-      !IDebtTokenManager(debtTokenManagerAddress).isDebtToken(msg.sender)
-    ) revert NotFromBOorTroveMorSPorDebtToken();
   }
 
   function _requireCallerIsStabilityPoolManager() internal view {

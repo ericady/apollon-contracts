@@ -32,6 +32,11 @@
                 "type": "address"
             },
             {
+                "internalType": "address",
+                "name": "_swapOperationsAddress",
+                "type": "address"
+            },
+            {
                 "internalType": "string",
                 "name": "_symbol",
                 "type": "string"
@@ -559,6 +564,19 @@
         "outputs": [
             {
                 "internalType": "address",
+                "name": "",
+                "type": "address"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [],
+        "name": "swapOperations",
+        "outputs": [
+            {
+                "internalType": "contract ISwapOperations",
                 "name": "",
                 "type": "address"
             }
