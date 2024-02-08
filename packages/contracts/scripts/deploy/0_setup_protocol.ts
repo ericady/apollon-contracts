@@ -75,6 +75,18 @@ const deployProtocol: DeployFunction = async (hre: HardhatRuntimeEnvironment) =>
     log: true,
   });
 
+  const sortedTrovesDeployment = await deploy('SortedTroves', {
+    from: deployer,
+    args: [],
+    log: true,
+  });
+
+  const collSurplusPoolDeployment = await deploy('CollSurplusPool', {
+    from: deployer,
+    args: [],
+    log: true,
+  });
+
   // Connect core contracts
   const troveManager = await ethers.getContractAt('MockTroveManager', troveManagerDeployment.address);
   await troveManager.setAddresses(
@@ -83,6 +95,7 @@ const deployProtocol: DeployFunction = async (hre: HardhatRuntimeEnvironment) =>
     liquidationOperationsDeployment.address,
     storagePoolDeployment.address,
     priceFeedDeployment.address,
+    sortedTrovesDeployment.address,
   );
 
   const borrowerOperations = await ethers.getContractAt('MockBorrowerOperations', borrowerOperationsDeployment.address);
@@ -95,6 +108,8 @@ const deployProtocol: DeployFunction = async (hre: HardhatRuntimeEnvironment) =>
     debtTokenManagerDeployment.address,
     collTokenManagerDeployment.address,
     swapOperationsDeployment.address,
+    sortedTrovesDeployment.address,
+    collSurplusPoolDeployment.address
   );
 
   const redemptionOperations = await ethers.getContractAt(
@@ -107,6 +122,7 @@ const deployProtocol: DeployFunction = async (hre: HardhatRuntimeEnvironment) =>
     priceFeedDeployment.address,
     debtTokenManagerDeployment.address,
     collTokenManagerDeployment.address,
+    sortedTrovesDeployment.address,
   );
 
   const liquidationOperations = await ethers.getContractAt(
@@ -119,7 +135,8 @@ const deployProtocol: DeployFunction = async (hre: HardhatRuntimeEnvironment) =>
     priceFeedDeployment.address,
     debtTokenManagerDeployment.address,
     collTokenManagerDeployment.address,
-    stabilityPoolManagerDeployment.address
+    stabilityPoolManagerDeployment.address,
+    collSurplusPoolDeployment.address
   );
 
   const storagePool = await ethers.getContractAt('StoragePool', storagePoolDeployment.address);
@@ -190,6 +207,7 @@ const deployProtocol: DeployFunction = async (hre: HardhatRuntimeEnvironment) =>
       redemptionOperationsDeployment.address,
       borrowerOperationsDeployment.address,
       stabilityPoolManagerDeployment.address,
+      debtTokenManagerDeployment.address,
       priceFeedDeployment.address,
       'STABLE',
       'STABLE',
@@ -208,6 +226,7 @@ const deployProtocol: DeployFunction = async (hre: HardhatRuntimeEnvironment) =>
       redemptionOperationsDeployment.address,
       borrowerOperationsDeployment.address,
       stabilityPoolManagerDeployment.address,
+      debtTokenManagerDeployment.address,
       priceFeedDeployment.address,
       'STOCK',
       'STOCK',
@@ -260,12 +279,14 @@ const deployProtocol: DeployFunction = async (hre: HardhatRuntimeEnvironment) =>
   await BTC.approve(swapOps.target, MaxUint256);
   await USDT.approve(swapOps.target, MaxUint256);
   await DFI.approve(swapOps.target, MaxUint256);
-  await STABLE.approve(swapOps.target, MaxUint256);
+  await STABLE.approve(swapOps.target, MaxUint256) 
+
+  const maxFeePercentage = await swapOps.MAX_BORROWING_FEE();
 
   const deadline = (await getLatestBlockTimestamp()) + 100;
-  await swapOps.addLiquidity(BTC.target, STABLE.target, parseUnits('500'), parseUnits('500'), 0, 0, 0, deadline);
-  await swapOps.addLiquidity(USDT.target, STABLE.target, parseUnits('500'), parseUnits('500'), 0, 0, 0, deadline);
-  await swapOps.addLiquidity(DFI.target, STABLE.target, parseUnits('500'), parseUnits('500'), 0, 0, 0, deadline);
+  await swapOps.addLiquidity(BTC.target, STABLE.target, parseUnits('500'), parseUnits('500'), 0, 0, { upperHint: '0x0000000000000000000000000000000000000000', lowerHint: '0x0000000000000000000000000000000000000000', maxFeePercentage }, deadline);
+  await swapOps.addLiquidity(USDT.target, STABLE.target, parseUnits('500'), parseUnits('500'), 0, 0, { upperHint: '0x0000000000000000000000000000000000000000', lowerHint: '0x0000000000000000000000000000000000000000', maxFeePercentage }, deadline);
+  await swapOps.addLiquidity(DFI.target, STABLE.target, parseUnits('500'), parseUnits('500'), 0, 0, { upperHint: '0x0000000000000000000000000000000000000000', lowerHint: '0x0000000000000000000000000000000000000000', maxFeePercentage }, deadline);
 
   // Init StoragePool
   await BTC.unprotectedMint(troveManager, parseUnits('100000'));

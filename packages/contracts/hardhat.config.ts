@@ -2,11 +2,19 @@ import '@nomicfoundation/hardhat-ethers';
 import '@nomicfoundation/hardhat-verify';
 import '@nomicfoundation/hardhat-toolbox';
 import '@nomicfoundation/hardhat-network-helpers';
-import '@nomicfoundation/hardhat-ignition-ethers';
+import 'hardhat-deploy';
 import 'hardhat-abi-exporter';
 import 'hardhat-gas-reporter';
 import 'hardhat-contract-sizer';
 import 'solidity-coverage';
+import { HardhatUserConfig, subtask } from 'hardhat/config';
+import { TASK_COMPILE_SOLIDITY_GET_SOURCE_PATHS } from 'hardhat/builtin-tasks/task-names';
+
+// todo tmp, ignores all contracts with _hardhatIgnore in the name
+subtask(TASK_COMPILE_SOLIDITY_GET_SOURCE_PATHS).setAction(async (_, __, runSuper) => {
+  const paths = await runSuper();
+  return paths.filter((p: any) => !p.includes('_hardhatIgnore'));
+});
 
 import fs from 'fs';
 const getSecret = (secretKey: string, defaultValue = '') => {
@@ -21,18 +29,40 @@ const getSecret = (secretKey: string, defaultValue = '') => {
 
   return secret;
 };
+const alchemyUrl = () => {
+  return `https://eth-mainnet.alchemyapi.io/v2/${getSecret('alchemyAPIKey')}`;
+};
 
-export default {
-  solidity: {
-    compilers: [{ version: '0.8.20', settings: { optimizer: { enabled: true, runs: 200 } } }],
-  },
+const alchemyUrlRinkeby = () => {
+  return `https://eth-rinkeby.alchemyapi.io/v2/${getSecret('alchemyAPIKeyRinkeby')}`;
+};
+
+const config: HardhatUserConfig = {
   paths: {
     sources: './contracts',
     tests: './test',
     cache: './cache',
     artifacts: './artifacts',
+    deploy: './scripts/deploy',
+    deployments: './deployments',
+  },
+  solidity: {
+    compilers: [
+      {
+        version: '0.4.23',
+        settings: { optimizer: { enabled: true, runs: 100 } },
+      },
+      {
+        version: '0.8.20',
+        settings: { optimizer: { enabled: true, runs: 200 } },
+      },
+    ],
   },
   networks: {
+    localhost: {
+      chainId: 31337,
+      url: 'http://0.0.0.0:8545',
+    },
     hardhat: {
       gas: 10000000, // tx gas limit
       blockGasLimit: 15000000,
@@ -42,13 +72,8 @@ export default {
       throwOnCallFailures: true,
       allowUnlimitedContractSize: true,
     },
-    localhost: {
-      chainId: 1337,
-      url: 'http://0.0.0.0:8545',
-      accounts: ['0x60ddfe7f579ab6867cbe7a2dc03853dc141d7a4ab6dbefc0dae2d2b1bd4e487f'],
-    },
     mainnet: {
-      url: `https://eth-mainnet.alchemyapi.io/v2/${getSecret('alchemyAPIKey')}`,
+      url: alchemyUrl(),
       gasPrice: process.env.GAS_PRICE ? parseInt(process.env.GAS_PRICE) : 20000000000,
       accounts: [
         getSecret('DEPLOYER_PRIVATEKEY', '0x60ddfe7f579ab6867cbe7a2dc03853dc141d7a4ab6dbefc0dae2d2b1bd4e487f'),
@@ -56,27 +81,27 @@ export default {
       ],
     },
     rinkeby: {
-      url: `https://eth-rinkeby.alchemyapi.io/v2/${getSecret('alchemyAPIKeyRinkeby')}`,
+      url: alchemyUrlRinkeby(),
       gas: 10000000, // tx gas limit
       accounts: [
         getSecret('RINKEBY_DEPLOYER_PRIVATEKEY', '0x60ddfe7f579ab6867cbe7a2dc03853dc141d7a4ab6dbefc0dae2d2b1bd4e487f'),
       ],
     },
   },
+  namedAccounts: {
+    deployer: {
+      default: 0,
+    },
+  },
   etherscan: { apiKey: getSecret('ETHERSCAN_API_KEY') },
   mocha: { timeout: 12000000 },
+  // rpc: { host: 'localhost', port: 8545 },
   gasReporter: { enabled: process.env.REPORT_GAS ? true : false },
   contractSizer: {
     alphaSort: true,
     disambiguatePaths: false,
     runOnCompile: false,
     strict: true,
-  },
-  ignition: {
-    requiredConfirmations: 1,
-    blockPollingInterval: 100,
-    timeBeforeBumpingFees: 3 * 60 * 1000,
-    maxFeeBumps: 4,
   },
   abiExporter: {
     path: './abi',
@@ -91,3 +116,5 @@ export default {
     target: 'ethers-v6',
   },
 };
+
+export default config;
