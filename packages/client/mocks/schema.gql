@@ -13,6 +13,7 @@ type Token {
   isPoolToken: Boolean!
   # handled by client
   priceUSDOracle: bigint!
+  borrowingRate: bigint!
 }
 
 type DebtTokenMeta {
@@ -219,7 +220,6 @@ type SystemInfo {
 }
 
 type Query {
-  getTroveManager: TroveManager!
   getSystemInfo: SystemInfo!
 }
 

@@ -1,6 +1,7 @@
 import { Address, BigInt, ethereum } from '@graphprotocol/graph-ts';
 import { SwapPair } from '../../generated/SwapPair/SwapPair';
 import { Pool, PoolLiquidity, PoolVolume30d, PoolVolumeChunk } from '../../generated/schema';
+// import { log } from '@graphprotocol/graph-ts';
 
 // 15 minutes
 const chunkSize = 60;
@@ -56,7 +57,7 @@ export function handleCreatePool(event: ethereum.Event, token0: Address, token1:
   poolEntity.save();
 }
 
-export function handleUpdatePoolVolume(event: ethereum.Event, token0: Address, token1: Address, value: BigInt): void {
+export function handleUpdatePool_volume30dUSD(event: ethereum.Event, token0: Address, token1: Address, value: BigInt): void {
   const poolEntity = Pool.load(`Pool-${token0.toHexString()}-${token1.toHexString()}`)!;
 
   //   load last VolumeChunk and check if its outdated
@@ -119,7 +120,7 @@ export function handleUpdatePoolVolume(event: ethereum.Event, token0: Address, t
   recentVolume.save();
 }
 
-export function handleUpdatePoolTotalSupply(event: ethereum.Event, token0: Address, token1: Address): void {
+export function handleUpdatePool_totalSupply(event: ethereum.Event, token0: Address, token1: Address): void {
   const poolEntity = Pool.load(`Pool-${token0.toHexString()}-${token1.toHexString()}`)!;
 
   const swapPairContract = SwapPair.bind(event.address);
@@ -128,3 +129,14 @@ export function handleUpdatePoolTotalSupply(event: ethereum.Event, token0: Addre
 
   poolEntity.save();
 }
+
+  
+  export function handleUpdateLiquidity_totalAmount(event: ethereum.Event, token0: Address, token1: Address, reserve0: BigInt, reserve1: BigInt): void {
+    const liquidity0 = PoolLiquidity.load(token0.concat(token1))!;
+    liquidity0.totalAmount = reserve0;
+    liquidity0.save();
+  
+    const liquidity1 = PoolLiquidity.load(token1.concat(token0))!;
+    liquidity1.totalAmount = reserve1;
+    liquidity1.save();
+  }

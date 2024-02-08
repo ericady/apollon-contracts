@@ -6,7 +6,7 @@ dataSources:
     name: TroveManager
     network: localhost
     source:
-      address: '0xCf7Ed3AccA5a467e9e704C703E8D87F634fB0Fc9'
+      address: "0xCf7Ed3AccA5a467e9e704C703E8D87F634fB0Fc9"
       abi: TroveManager
       startBlock: 0
     mapping:
@@ -56,7 +56,7 @@ dataSources:
     name: StoragePool
     network: localhost
     source:
-      address: '0x5FC8d32690cc91D4c39d9d3abcBD16989F875707'
+      address: "0x5FC8d32690cc91D4c39d9d3abcBD16989F875707"
       abi: StoragePool
       startBlock: 0
     mapping:
@@ -80,7 +80,7 @@ dataSources:
     name: StabilityPool
     network: localhost
     source:
-      address: '0x25309189268017d8C79C8dacCbF44EC25C12FEB4'
+      address: "0x25309189268017d8C79C8dacCbF44EC25C12FEB4"
       abi: StabilityPool
       startBlock: 0
     mapping:
@@ -126,7 +126,7 @@ dataSources:
     name: StabilityPoolManager
     network: localhost
     source:
-      address: '0xDc64a140Aa3E981100a9becA4E685f962f0cF6C9'
+      address: "0xDc64a140Aa3E981100a9becA4E685f962f0cF6C9"
       abi: StabilityPoolManager
       startBlock: 0
     mapping:
@@ -150,7 +150,7 @@ dataSources:
     name: PriceFeed
     network: localhost
     source:
-      address: '0x8A791620dd6260079BF849Dc5567aDC3F2FdC318'
+      address: "0x8A791620dd6260079BF849Dc5567aDC3F2FdC318"
       abi: PriceFeed
       startBlock: 0
     mapping:
@@ -179,7 +179,7 @@ dataSources:
     name: BorrowerOperations
     network: localhost
     source:
-      address: '0x5FbDB2315678afecb367f032d93F642f64180aa3'
+      address: "0x5FbDB2315678afecb367f032d93F642f64180aa3"
       abi: BorrowerOperations
       startBlock: 0
     mapping:
@@ -193,6 +193,8 @@ dataSources:
       abis:
         - name: BorrowerOperations
           file: ./abis/BorrowerOperations.json
+        - name: StoragePool
+          file: ./abis/StoragePool.json
       eventHandlers:
         - event: OwnershipTransferred(indexed address,indexed address)
           handler: handleOwnershipTransferred
@@ -203,7 +205,7 @@ dataSources:
     name: DebtTokenManager
     network: localhost
     source:
-      address: '0x2279B7A0a67DB372996a5FaB50D91eAA73d2eBe6'
+      address: "0x2279B7A0a67DB372996a5FaB50D91eAA73d2eBe6"
       abi: DebtTokenManager
       startBlock: 6
     mapping:
@@ -217,7 +219,6 @@ dataSources:
       abis:
         - name: DebtTokenManager
           file: ./abis/DebtTokenManager.json
-        # Just including these ABIs for interaction
         - name: DebtToken
           file: ./abis/DebtToken.json
         - name: ERC20
@@ -244,7 +245,7 @@ dataSources:
     name: CollTokenManager
     network: localhost
     source:
-      address: '0xa513E6E4b8f2a923D98304ec87F64353C4D5C853'
+      address: "0xa513E6E4b8f2a923D98304ec87F64353C4D5C853"
       abi: CollTokenManager
       startBlock: 0
     mapping:
@@ -258,7 +259,6 @@ dataSources:
       abis:
         - name: CollTokenManager
           file: ./abis/CollTokenManager.json
-        # Just including these ABIs for interaction
         - name: DebtToken
           file: ./abis/DebtToken.json
         - name: ERC20
@@ -279,7 +279,7 @@ dataSources:
     name: SwapOperations
     network: localhost
     source:
-      address: '0x610178dA211FEF7D417bC0e6FeD39F05609AD788'
+      address: "0x610178dA211FEF7D417bC0e6FeD39F05609AD788"
       abi: SwapOperations
       startBlock: 0
     mapping:
@@ -307,7 +307,7 @@ dataSources:
     name: ReservePool
     network: localhost
     source:
-      address: '0x0165878A594ca255338adfa4d48449f69242Eb8F'
+      address: "0x0165878A594ca255338adfa4d48449f69242Eb8F"
       abi: ReservePool
       startBlock: 0
     mapping:
@@ -322,7 +322,6 @@ dataSources:
       abis:
         - name: ReservePool
           file: ./abis/ReservePool.json
-        # Just including these ABIs for interaction
         - name: DebtToken
           file: ./abis/DebtToken.json
         - name: StabilityPoolManager
@@ -344,13 +343,14 @@ dataSources:
           handler: handleWithdrewReserves
       file: ./src/reserve-pool.ts
 
-  - kind: ethereum
-    name: SwapPair
+# TEMPLATES
+
+templates:
+  - kind: ethereum/contract
+    name: SwapPairTemplate
     network: localhost
     source:
-      address: '0x687E100f79ceD7Cc8b2BD19Eb326a28885F5b371'
       abi: SwapPair
-      startBlock: 0
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.7
@@ -379,40 +379,32 @@ dataSources:
         - event: Transfer(indexed address,indexed address,uint256)
           handler: handleTransfer
       file: ./src/swap-pair.ts
-  - kind: ethereum
-    name: DebtToken_STABLE
+  - kind: ethereum/contract
+    name: ERC20Template
     network: localhost
     source:
-      address: '0x7a2088a1bFc9d81c55368AE168C2C02570cB814F'
-      abi: DebtToken
-      startBlock: 0
+      abi: ERC20
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.7
       language: wasm/assemblyscript
       entities:
-        - Approval
-        - Transfer
+        - ERC20Approval
+        - ERC20Transfer
       abis:
-        - name: DebtToken
-          file: ./abis/DebtToken.json
-        - name: StabilityPoolManager
-          file: ./abis/StabilityPoolManager.json
-        - name: StabilityPool
-          file: ./abis/StabilityPool.json
+        - name: ERC20
+          file: ./abis/ERC20.json
       eventHandlers:
         - event: Approval(indexed address,indexed address,uint256)
           handler: handleApproval
         - event: Transfer(indexed address,indexed address,uint256)
           handler: handleTransfer
-      file: ./src/debt-token.ts
-  - kind: ethereum
-    name: DebtToken_STOCK
+      file: ./src/erc-20.ts
+  - kind: ethereum/contract
+    name: DebtTokenTemplate
     network: localhost
     source:
-      address: '0x67d269191c92Caf3cD7723F116c85e6E9bf55933'
       abi: DebtToken
-      startBlock: 0
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.7

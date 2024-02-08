@@ -87,6 +87,12 @@ const deployProtocol: DeployFunction = async (hre: HardhatRuntimeEnvironment) =>
     log: true,
   });
 
+  const hintHelperDeployment = await deploy('HintHelpers', {
+    from: deployer,
+    args: [],
+    log: true,
+  });
+
   // Connect core contracts
   const troveManager = await ethers.getContractAt('MockTroveManager', troveManagerDeployment.address);
   await troveManager.setAddresses(
@@ -173,6 +179,25 @@ const deployProtocol: DeployFunction = async (hre: HardhatRuntimeEnvironment) =>
     troveManagerDeployment.address,
     priceFeedDeployment.address,
     debtTokenManagerDeployment.address
+  );
+
+  const sortedTroves = await ethers.getContractAt('SortedTroves', sortedTrovesDeployment.address);
+  await sortedTroves.setAddresses(
+    troveManagerDeployment.address,
+    borrowerOperationsDeployment.address,
+    redemptionOperationsDeployment.address
+  );
+
+  const collSurplusPool = await ethers.getContractAt('CollSurplusPool', collSurplusPoolDeployment.address);
+  await collSurplusPool.setAddresses(
+    liquidationOperationsDeployment.address,
+    borrowerOperationsDeployment.address
+  );
+
+  const hintHelpers = await ethers.getContractAt('HintHelpers', hintHelperDeployment.address);
+  await hintHelpers.setAddresses(
+    sortedTrovesDeployment.address,
+    troveManagerDeployment.address
   );
 
   // Link contracts
@@ -307,36 +332,39 @@ const deployProtocol: DeployFunction = async (hre: HardhatRuntimeEnvironment) =>
   await USDT.unprotectedMint(demoAcc, parseUnits('1000'));
 
   // TODO: This is weird, why does the demo account have DFI? And why so weird amounts?
-  console.log(await BTC.balanceOf(demoAcc))
-  console.log(await USDT.balanceOf(demoAcc))
-  console.log(await DFI.balanceOf(demoAcc))
+  // console.log(await BTC.balanceOf(demoAcc))
+  // console.log(await USDT.balanceOf(demoAcc))
+  // console.log(await DFI.balanceOf(demoAcc))
 
   const anotherUser = "0x70997970C51812dc3A010C7d01b50e0d17dc79C8"
-  // const anotherUserSigner = await ethers.provider.getSigner(anotherUser);
-  // const borrowerOperationsAsAnotherUser = borrowerOperations.connect(anotherUserSigner);
-  // const swapOperationsAsAnotherUser = swapOperations.connect(anotherUserSigner);
+  const anotherUserSigner = await ethers.provider.getSigner(anotherUser);
+  const borrowerOperationsAsAnotherUser = borrowerOperations.connect(anotherUserSigner);
+  const swapOperationsAsAnotherUser = swapOperations.connect(anotherUserSigner);
   
   await BTC.unprotectedMint(anotherUser, parseUnits('10000'));
   await USDT.unprotectedMint(anotherUser, parseUnits('10000'));
   await DFI.unprotectedMint(anotherUser, parseUnits('10000'));
+  await STABLE.unprotectedMint(anotherUser, parseUnits('10000'));
+
+  await BTC.connect(anotherUserSigner).approve(borrowerOperationsAsAnotherUser.target, MaxUint256);
+  await USDT.connect(anotherUserSigner).approve(borrowerOperationsAsAnotherUser.target, MaxUint256);
+  await DFI.connect(anotherUserSigner).approve(borrowerOperationsAsAnotherUser.target, MaxUint256);
+  await STABLE.connect(anotherUserSigner).approve(borrowerOperationsAsAnotherUser.target, MaxUint256);
+
+  await BTC.connect(anotherUserSigner).approve(pair1, MaxUint256);
+  await STABLE.connect(anotherUserSigner).approve(pair1, MaxUint256);
 
   await borrowerOperations.mock_increaseTroveColl(anotherUser, [{ amount: parseUnits('1000'), tokenAddress: BTC.target  }, 
   { amount: parseUnits('1000'), tokenAddress: USDT.target  }, 
   { amount: parseUnits('1000'), tokenAddress: DFI.target  }])
   
   // TODO: Can go the defined way to open a trove
-  // await BTC.connect(anotherUserSigner).approve(borrowerOperationsAsAnotherUser.target, MaxUint256);
-  // await USDT.connect(anotherUserSigner).approve(borrowerOperationsAsAnotherUser.target, MaxUint256);
-  // await DFI.connect(anotherUserSigner).approve(borrowerOperationsAsAnotherUser.target, MaxUint256);
-  // await STABLE.connect(anotherUserSigner).approve(borrowerOperationsAsAnotherUser.target, MaxUint256);
 
-  // await borrowerOperationsAsAnotherUser.openTrove([{ amount: parseUnits('1000'), tokenAddress: BTC.target  }, 
-  // { amount: parseUnits('1000'), tokenAddress: USDT.target  }, 
-  // { amount: parseUnits('1000'), tokenAddress: DFI.target  }]);
-  // console.log("Trove opened")
-  // await swapOperationsAsAnotherUser.addLiquidity(BTC.target, STABLE.target, parseUnits('500'), parseUnits('500'), 0, 0, parseUnits('0.01'), deadline);
+  await borrowerOperationsAsAnotherUser.openTrove([{ amount: parseUnits('1000'), tokenAddress: BTC.target  }, 
+  { amount: parseUnits('1000'), tokenAddress: USDT.target  }, 
+  { amount: parseUnits('1000'), tokenAddress: DFI.target  }]);
 
-  
+  // await swapOperationsAsAnotherUser.addLiquidity(BTC.target, STABLE.target, parseUnits('500'), parseUnits('500'), 0, 0, { upperHint: '0x0000000000000000000000000000000000000000', lowerHint: '0x0000000000000000000000000000000000000000', maxFeePercentage }, deadline);
   // await BTC.unprotectedMint(swapOperations.target, parseUnits('100000'));
   // await USDT.unprotectedMint(swapOperations.target, parseUnits('100000'));
   // await DFI.unprotectedMint(swapOperations.target, parseUnits('100000'));

@@ -175,16 +175,6 @@ const getProductionCacheConfig = ({
 
   Query: {
     fields: {
-      getTroveManager: {
-        read: () => {
-          return {
-            __typename: 'TroveManager',
-            id: Contracts.TroveManager,
-            borrowingRate: TroveManager_borrowingRate,
-          } as TroveManagerType;
-        },
-      },
-
       getSystemInfo: {
         read: () => {
           return {

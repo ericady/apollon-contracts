@@ -18,6 +18,7 @@ export const GET_ALL_POOLS = gql`
           address
           symbol
           priceUSD
+          borrowingRate @client
         }
       }
     }
@@ -83,6 +84,7 @@ export const GET_BORROWER_DEBT_TOKENS = gql`
         symbol
         priceUSD
         isPoolToken
+        borrowingRate @client
       }
     }
   }
@@ -261,15 +263,6 @@ export const TOKEN_FRAGMENT = gql`
 `;
 
 // -------------------- Client side queries that are only resolved by the cache --------------------
-
-export const GET_TROVEMANAGER = gql`
-  query GetTroveManager {
-    getTroveManager @client {
-      id
-      borrowingRate
-    }
-  }
-`;
 
 export const GET_SYSTEMINFO = gql`
   query GetSystemInfo {

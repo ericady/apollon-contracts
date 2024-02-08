@@ -15,6 +15,8 @@ import {
   TotalSupplyAverage,
   TotalSupplyAverageChunk,
 } from '../../generated/schema';
+// import { log } from '@graphprotocol/graph-ts';
+
 
 export const stableDebtToken = EventAddress.fromString('0x6c3f90f043a72fa612cbac8115ee7e52bde6e490');
 export const govToken = EventAddress.fromString('0x9f8f72aa9304c8b593d555f12ef6589cc3a579a2');

@@ -4,11 +4,13 @@ import {
   DebtTokenManagerInitialized as DebtTokenManagerInitializedEvent,
   OwnershipTransferred as OwnershipTransferredEvent,
 } from '../generated/DebtTokenManager/DebtTokenManager';
+import { DebtTokenTemplate } from '../generated/templates';
 import { handleCreateUpdateDebtTokenMeta } from './entities/debt-token-meta-entity';
 import { handleUpdateSystemInfo_stableCoin } from './entities/system-info-entity';
 import { handleCreateToken } from './entities/token-entity';
 
 export function handleDebtTokenAdded(event: DebtTokenAddedEvent): void {
+  DebtTokenTemplate.create(event.params._debtTokenAddress);
   const debtTokenManagerContract = DebtTokenManager.bind(event.address);
   const stableCoin = debtTokenManagerContract.getStableCoin();
   handleUpdateSystemInfo_stableCoin(event, stableCoin);

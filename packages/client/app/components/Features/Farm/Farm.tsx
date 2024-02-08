@@ -13,8 +13,6 @@ import { FormProvider, useForm } from 'react-hook-form';
 import { useEthers } from '../../../context/EthersProvider';
 import { useSelectedToken } from '../../../context/SelectedTokenProvider';
 import { useTransactionDialog } from '../../../context/TransactionDialogProvider';
-import { GetTroveManagerQuery, GetTroveManagerQueryVariables } from '../../../generated/gql-types';
-import { GET_TROVEMANAGER } from '../../../queries';
 import { WIDGET_HEIGHTS } from '../../../utils/contants';
 import {
   bigIntStringToFloat,
@@ -47,8 +45,6 @@ const Farm = () => {
   } = useEthers();
   const { setSteps } = useTransactionDialog();
   const { selectedToken, tokenRatio, JUSDToken } = useSelectedToken();
-
-  const { data } = useQuery<GetTroveManagerQuery, GetTroveManagerQueryVariables>(GET_TROVEMANAGER);
 
   const methods = useForm<FieldValues>({
     defaultValues: {
@@ -129,7 +125,7 @@ const Farm = () => {
     !isNaN(watchFarmShortValue) && selectedToken
       ? watchFarmShortValue * bigIntStringToFloat(selectedToken.priceUSD.toString())
       : 0;
-  const borrowingFee = data?.getTroveManager.borrowingRate;
+  const borrowingFee = tabValue === "Long" ? JUSDToken?.borrowingRate : selectedToken?.borrowingRate;
 
   /**
    * Must be exact due to contract call
@@ -258,7 +254,7 @@ const Farm = () => {
                   {selectedToken ? (
                     tabValue === 'Long' ? (
                       <span data-testid="apollon-farm-position-size">
-                        {!isNaN(watchFarmShortValue) && selectedToken && data
+                        {!isNaN(watchFarmShortValue) && selectedToken && borrowingFee
                           ? `${roundCurrency(
                               dangerouslyConvertBigIntToNumber(getExpectedPositionSize(), 9, 9),
                               5,
@@ -268,7 +264,7 @@ const Farm = () => {
                       </span>
                     ) : (
                       <span data-testid="apollon-farm-position-size">
-                        {!isNaN(watchFarmShortValue) && selectedToken && data
+                        {!isNaN(watchFarmShortValue) && selectedToken && borrowingFee
                           ? `${roundCurrency(dangerouslyConvertBigIntToNumber(getExpectedPositionSize()), 5, 5)} jUSD`
                           : '-'}
                       </span>
@@ -288,14 +284,14 @@ const Farm = () => {
                   }}
                 >
                   Price per unit:
-                  {selectedToken && data ? (
+                  {selectedToken && borrowingFee ? (
                     <span>
                       {roundCurrency(
                         dangerouslyConvertBigIntToNumber(
                           tokenRatio *
                             (ethers.parseEther('1') +
                               selectedToken.swapFee * ethers.parseUnits('1', 12) +
-                              borrowingFee!),
+                              borrowingFee),
                           30,
                           6,
                         ),
@@ -343,9 +339,9 @@ const Farm = () => {
                   }}
                 >
                   Borrowing fee:
-                  {data ? (
+                  {borrowingFee ? (
                     <span data-testid="apollon-farm-borrowing-fee">
-                      {displayPercentage(dangerouslyConvertBigIntToNumber(borrowingFee!, 0, 17))}
+                      {displayPercentage(dangerouslyConvertBigIntToNumber(borrowingFee, 0, 17))}
                     </span>
                   ) : (
                     <div style={{ display: 'flex', alignItems: 'center', gap: 5, width: 120 }}>

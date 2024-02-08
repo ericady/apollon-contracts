@@ -45,17 +45,21 @@ declare global {
 
 export const isDebtTokenAddress = (
   address: string,
-): address is '0x84ea74d481ee0a5332c457a4d796187f6ba67feb' | '0x67d269191c92caf3cd7723f116c85e6e9bf55933' => {
+): address is '0x95401dc811bb5740090279ba06cfa8fcf6113778' | '0x1613beb3b2c4f22ee086b2b38c1476a3ce7f78e8' => {
   return Object.values(Contracts.DebtToken)
     .map((address) => getCheckSum(address))
     .includes(getCheckSum(address) as any);
 };
+export const isStableCoinAddress = (address: string): address is '0x1613beb3b2c4f22ee086b2b38c1476a3ce7f78e8' => {
+  return getCheckSum(Contracts.DebtToken.STABLE) === getCheckSum(address);
+}
+
 export const isCollateralTokenAddress = (
   address: string,
 ): address is
-  | '0x59b670e9fa9d0a427751af201d676719a970857b'
-  | '0xc6e7df5e7b4f2a278906862b61205850344d4e7d'
-  | '0x4ed7c70f96b99c776995fb64377f0d4ab3b0e1c1' => {
+  | '0x09635f643e140090a9a8dcd712ed6285858cebef'
+  | '0x7a2088a1bfc9d81c55368ae168c2c02570cb814f'
+  | '0xc5a5c42992decbae36851359345fe25997f5c42d' => {
   return Object.values(Contracts.ERC20)
     .map((address) => getCheckSum(address))
     .includes(getCheckSum(address) as any);
@@ -64,9 +68,9 @@ export const isCollateralTokenAddress = (
 export const isPoolAddress = (
   address: string,
 ): address is
-  | '0x44039144a891c35e2c947cc9a64f796419f38dcc'
-  | '0x12ef5e38f5fde51e7eab0e820d14be6838aff235'
-  | '0x0c6484bcba94a1bcc3fda9904977181b03c143e7' => {
+| '0x7b320ddbd1426e8d5b30ed159184a93ca462bf00'
+  | '0x0f338e0aa373831b0500f63388b82220ac05fd6c'
+  | '0xe85a121b51e7d2b101ce7d8fb0126d5ac8e9365b' => {
   return Object.values(Contracts.SwapPairs)
     .map((address) => getCheckSum(address))
     .includes(getCheckSum(address) as any);
@@ -75,26 +79,26 @@ export const isPoolAddress = (
 // TODO: These are the demo/production contracts. Replace them with the real ones.
 export const Contracts = {
   DebtToken: {
-    STABLE: '0x67d269191c92caf3cd7723f116c85e6e9bf55933',
-    STOCK_1: '0x84ea74d481ee0a5332c457a4d796187f6ba67feb',
+    STABLE: '0x1613beb3b2c4f22ee086b2b38c1476a3ce7f78e8',
+    STOCK_1: '0x95401dc811bb5740090279ba06cfa8fcf6113778',
   },
   ERC20: {
-    USDT: '0x59b670e9fa9d0a427751af201d676719a970857b',
-    BTC: '0xc6e7df5e7b4f2a278906862b61205850344d4e7d',
-    DFI: '0x4ed7c70f96b99c776995fb64377f0d4ab3b0e1c1',
+    BTC: '0x7a2088a1bfc9d81c55368ae168c2c02570cb814f',
+    USDT: '0x09635f643e140090a9a8dcd712ed6285858cebef',
+    DFI: '0xc5a5c42992decbae36851359345fe25997f5c42d',
   },
   TroveManager: '0xCf7Ed3AccA5a467e9e704C703E8D87F634fB0Fc9',
   StabilityPoolManager: '0xDc64a140Aa3E981100a9becA4E685f962f0cF6C9',
   SwapOperations: '0x610178dA211FEF7D417bC0e6FeD39F05609AD788',
   SwapPairs: {
-    BTC: '0x44039144a891c35e2c947cc9a64f796419f38dcc',
-    USDT: '0x12ef5e38f5fde51e7eab0e820d14be6838aff235',
-    DFI: '0x0c6484bcba94a1bcc3fda9904977181b03c143e7',
+    BTC: '0x7b320ddbd1426e8d5b30ed159184a93ca462bf00',
+    USDT: '0x0f338e0aa373831b0500f63388b82220ac05fd6c',
+    DFI: '0xe85a121b51e7d2b101ce7d8fb0126d5ac8e9365b',
   },
   BorrowerOperations: '0x5FbDB2315678afecb367f032d93F642f64180aa3',
   StoragePool: '0x5FC8d32690cc91D4c39d9d3abcBD16989F875707',
-  SortedTroves: '0x5FC8d32690cc91D4c39d9d3abcBD16989F875707',
-  HintHelpers: '0x5FC8d32690cc91D4c39d9d3abcBD16989F875707',
+  SortedTroves: '0xB7f8BC63BbcaD18155201308C8f3540b07f84F5e',
+  HintHelpers: '0x0DCd1Bf9A1b36cE34237eEaFef220932846BCD82',
 } as const;
 
 type AllDebtTokenContracts = { [Key in keyof (typeof SchemaDataFreshnessManager)['DebtToken']]: DebtToken };

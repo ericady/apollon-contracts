@@ -121,7 +121,6 @@ export type Query = {
   getDebtUSDHistory: Array<Array<Scalars['Int']['output']>>;
   getReserveUSDHistory: Array<Array<Scalars['Int']['output']>>;
   getSystemInfo: SystemInfo;
-  getTroveManager: TroveManager;
   pools: Array<Pool>;
   swapEvents: Array<SwapEvent>;
   token: Token;
@@ -219,6 +218,7 @@ export type SystemInfo = {
 export type Token = {
   __typename: 'Token';
   address: Scalars['Bytes']['output'];
+  borrowingRate: Scalars['bigint']['output'];
   createdAt: Scalars['BigInt']['output'];
   id: Scalars['Bytes']['output'];
   isPoolToken: Scalars['Boolean']['output'];
@@ -321,7 +321,7 @@ export type TroveManager = {
 export type GetAllPoolsQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type GetAllPoolsQuery = { __typename: 'Query', pools: Array<{ __typename: 'Pool', id: string, address: string, swapFee: string, volume30dUSD: { __typename: 'PoolVolume30d', id: string, value: string }, liquidity: Array<{ __typename: 'PoolLiquidity', id: string, totalAmount: string, token: { __typename: 'Token', id: string, address: string, symbol: string, priceUSD: string } }> }> };
+export type GetAllPoolsQuery = { __typename: 'Query', pools: Array<{ __typename: 'Pool', id: string, address: string, swapFee: string, volume30dUSD: { __typename: 'PoolVolume30d', id: string, value: string }, liquidity: Array<{ __typename: 'PoolLiquidity', id: string, totalAmount: string, token: { __typename: 'Token', id: string, address: string, symbol: string, priceUSD: string, borrowingRate: bigint } }> }> };
 
 export type GetSelectedTokenQueryVariables = Exact<{
   address: Scalars['String']['input'];
@@ -340,7 +340,7 @@ export type GetBorrowerDebtTokensQueryVariables = Exact<{
 }>;
 
 
-export type GetBorrowerDebtTokensQuery = { __typename: 'Query', debtTokenMetas: Array<{ __typename: 'DebtTokenMeta', id: string, troveMintedAmount: bigint, walletAmount: bigint, providedStability: bigint, compoundedDeposit: bigint, troveRepableDebtAmount: bigint, totalDepositedStability: string, totalSupplyUSD: string, stabilityDepositAPY: { __typename: 'StabilityDepositAPY', id: string, profit: string, volume: string }, totalSupplyUSD30dAverage: { __typename: 'TotalSupplyAverage', id: string, value: string }, token: { __typename: 'Token', id: string, address: string, symbol: string, priceUSD: string, isPoolToken: boolean } }> };
+export type GetBorrowerDebtTokensQuery = { __typename: 'Query', debtTokenMetas: Array<{ __typename: 'DebtTokenMeta', id: string, troveMintedAmount: bigint, walletAmount: bigint, providedStability: bigint, compoundedDeposit: bigint, troveRepableDebtAmount: bigint, totalDepositedStability: string, totalSupplyUSD: string, stabilityDepositAPY: { __typename: 'StabilityDepositAPY', id: string, profit: string, volume: string }, totalSupplyUSD30dAverage: { __typename: 'TotalSupplyAverage', id: string, value: string }, token: { __typename: 'Token', id: string, address: string, symbol: string, priceUSD: string, isPoolToken: boolean, borrowingRate: bigint } }> };
 
 export type GetBorrowerSwapEventsQueryVariables = Exact<{
   where: SwapEvent_Filter;
@@ -409,11 +409,6 @@ export type GetPastTokenPricesQueryVariables = Exact<{ [key: string]: never; }>;
 export type GetPastTokenPricesQuery = { __typename: 'Query', tokenCandles: Array<{ __typename: 'TokenCandle', id: string, timestamp: number, close: string, volume: string, token: { __typename: 'Token', id: string, address: string } }> };
 
 export type TokenFragmentFragment = { __typename: 'Token', id: string, address: string };
-
-export type GetTroveManagerQueryVariables = Exact<{ [key: string]: never; }>;
-
-
-export type GetTroveManagerQuery = { __typename: 'Query', getTroveManager: { __typename: 'TroveManager', id: string, borrowingRate: bigint } };
 
 export type GetSystemInfoQueryVariables = Exact<{ [key: string]: never; }>;
 

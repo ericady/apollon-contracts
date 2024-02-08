@@ -1,4 +1,4 @@
-import { log } from '@graphprotocol/graph-ts';
+// import { log } from '@graphprotocol/graph-ts';
 import {
   OwnershipTransferred as OwnershipTransferredEvent,
   PairCreated as PairCreatedEvent,
@@ -7,6 +7,7 @@ import {
 import { SystemInfo } from '../generated/schema';
 import { handleCreatePool } from './entities/pool-entity';
 import { handleCreateTokenCandleSingleton } from './entities/token-candle-entity';
+import { SwapPairTemplate } from '../generated/templates'
 
 export function handleOwnershipTransferred(event: OwnershipTransferredEvent): void {}
 
@@ -24,8 +25,7 @@ export function handlePairCreated(event: PairCreatedEvent): void {
     );
   }
 
-  log.warning('PoolCreated: {}', [event.params.pair.toHexString()]);
-
+  SwapPairTemplate.create(event.params.pair);
   handleCreatePool(event, event.params.token0, event.params.token1, event.params.pair);
 }
 

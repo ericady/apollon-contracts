@@ -20,6 +20,7 @@ export type SelectedToken = {
   priceUSD: bigint;
   priceUSD24hAgo: bigint;
   volume30dUSD: bigint;
+  borrowingRate: bigint;
   pool: {
     // id to fetch from API
     id: string;
@@ -30,7 +31,7 @@ export type SelectedToken = {
 };
 
 export const SelectedTokenContext = createContext<{
-  JUSDToken: GetCollateralTokensQuery['collateralTokenMetas'][number]['token'] | undefined;
+  JUSDToken: GetBorrowerDebtTokensQuery['debtTokenMetas'][number]['token'] | undefined;
   tokenRatio: bigint;
   selectedToken: SelectedToken | null;
   setSelectedToken: (asset: SelectedToken) => void;
@@ -75,7 +76,7 @@ export default function SelectedTokenProvider({ children }: { children: React.Re
 }
 
 export function useSelectedToken(): {
-  JUSDToken: GetCollateralTokensQuery['collateralTokenMetas'][number]['token'] | undefined;
+  JUSDToken: GetBorrowerDebtTokensQuery['debtTokenMetas'][number]['token'] | undefined;
   tokenRatio: bigint;
   selectedToken: SelectedToken | null;
   setSelectedToken: (asset: SelectedToken) => void;

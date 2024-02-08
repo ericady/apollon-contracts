@@ -16,7 +16,7 @@ import { TOKEN_FRAGMENT } from '../queries';
 import { getCheckSum } from '../utils/crypto';
 import { floatToBigInt } from '../utils/math';
 import { CustomApolloProvider_DevMode } from './CustomApolloProvider_dev';
-import { Contracts, isCollateralTokenAddress, isDebtTokenAddress, isPoolAddress, useEthers } from './EthersProvider';
+import { Contracts, isCollateralTokenAddress, isDebtTokenAddress, isPoolAddress, isStableCoinAddress, useEthers } from './EthersProvider';
 
 const defaultFieldValue = BigInt(0);
 
@@ -157,6 +157,26 @@ const getProductionCacheConfig = ({
                   SchemaDataFreshnessManager.ERC20[address].priceUSDOracle.fetch(collateralTokenContracts[address]);
                 }
                 return SchemaDataFreshnessManager.ERC20[address].priceUSDOracle.value();
+              }
+            }
+          },
+        },
+        
+        borrowingRate: {
+          read(_, { readField }) {
+            const address = readField('address') as Readonly<string>;
+            if (address) {
+              if (isDebtTokenAddress(address)) {
+
+                if (isFieldOutdated(SchemaDataFreshnessManager.DebtToken[address], 'borrowingRate')) {
+                  SchemaDataFreshnessManager.DebtToken[address].borrowingRate.fetch(troveManagerContract);
+                }
+                return SchemaDataFreshnessManager.DebtToken[address].borrowingRate.value();
+              } else if (isCollateralTokenAddress(address)) {
+                if (isFieldOutdated(SchemaDataFreshnessManager.ERC20[address], 'borrowingRate')) {
+                  SchemaDataFreshnessManager.ERC20[address].borrowingRate.fetch(troveManagerContract);
+                }
+                return SchemaDataFreshnessManager.ERC20[address].borrowingRate.value();
               }
             }
           },
@@ -398,20 +418,6 @@ const getProductionCacheConfig = ({
 
   Query: {
     fields: {
-      getTroveManager: {
-        read: () => {
-          if (isFieldOutdated(SchemaDataFreshnessManager.TroveManager, 'borrowingRate')) {
-            SchemaDataFreshnessManager.TroveManager.borrowingRate.fetch(troveManagerContract);
-          }
-
-          return {
-            __typename: 'TroveManager',
-            id: Contracts.TroveManager,
-            borrowingRate: SchemaDataFreshnessManager.TroveManager.borrowingRate.value(),
-          } as TroveManagerType;
-        },
-      },
-
       getSystemInfo: {
         read: () => {
           if (isFieldOutdated(SchemaDataFreshnessManager.StoragePool as any, 'totalCollateralRatio')) {
@@ -519,7 +525,8 @@ export const ContractDataFreshnessManager: {
     getTroveRepayableDebts: {
       fetch: async (troveManagerContract: TroveManager, borrower: AddressLike) => {
         ContractDataFreshnessManager.TroveManager.getTroveRepayableDebts.lastFetched = Date.now();
-        const troveRepayableDebts = await troveManagerContract.getTroveRepayableDebts(borrower);
+        // FIXME: Call so that we can dinstiguish to real repayable
+        const troveRepayableDebts = await troveManagerContract.getTroveRepayableDebts(borrower, true);
 
         const tokenAmounts = troveRepayableDebts.map(([tokenAddress, amount]) => ({
           tokenAddress,
@@ -692,6 +699,19 @@ export const SchemaDataFreshnessManager: ContractDataFreshnessManager<typeof Con
         timeout: 1000 * 5,
       },
 
+      borrowingRate: {
+        fetch: async (troveManagerContract: TroveManager) => {
+          SchemaDataFreshnessManager.ERC20[Contracts.ERC20.BTC].borrowingRate.lastFetched = Date.now();
+
+          const borrowingRate = await troveManagerContract.getBorrowingRate(isStableCoinAddress(Contracts.ERC20.BTC));
+  
+          SchemaDataFreshnessManager.ERC20[Contracts.ERC20.BTC].borrowingRate.value(borrowingRate);
+        },
+        value: makeVar(defaultFieldValue),
+        lastFetched: 0,
+        timeout: 1000 * 5,
+      },
+
       walletAmount: {
         fetch: async (collTokenContract: ERC20, depositor: AddressLike) => {
           SchemaDataFreshnessManager.ERC20[Contracts.ERC20.BTC].walletAmount.lastFetched = Date.now();
@@ -761,6 +781,19 @@ export const SchemaDataFreshnessManager: ContractDataFreshnessManager<typeof Con
 
           // FIXME: Implement Coll Oracle Prices
           SchemaDataFreshnessManager.ERC20[Contracts.ERC20.DFI].priceUSDOracle.value(defaultFieldValue);
+        },
+        value: makeVar(defaultFieldValue),
+        lastFetched: 0,
+        timeout: 1000 * 5,
+      },
+
+      borrowingRate: {
+        fetch: async (troveManagerContract: TroveManager) => {
+          SchemaDataFreshnessManager.ERC20[Contracts.ERC20.DFI].borrowingRate.lastFetched = Date.now();
+
+          const borrowingRate = await troveManagerContract.getBorrowingRate(isStableCoinAddress(Contracts.ERC20.DFI));
+  
+          SchemaDataFreshnessManager.ERC20[Contracts.ERC20.DFI].borrowingRate.value(borrowingRate);
         },
         value: makeVar(defaultFieldValue),
         lastFetched: 0,
@@ -840,6 +873,19 @@ export const SchemaDataFreshnessManager: ContractDataFreshnessManager<typeof Con
         timeout: 1000 * 5,
       },
 
+      borrowingRate: {
+        fetch: async (troveManagerContract: TroveManager) => {
+          SchemaDataFreshnessManager.ERC20[Contracts.ERC20.USDT].borrowingRate.lastFetched = Date.now();
+
+          const borrowingRate = await troveManagerContract.getBorrowingRate(isStableCoinAddress(Contracts.ERC20.USDT));
+  
+          SchemaDataFreshnessManager.ERC20[Contracts.ERC20.USDT].borrowingRate.value(borrowingRate);
+        },
+        value: makeVar(defaultFieldValue),
+        lastFetched: 0,
+        timeout: 1000 * 5,
+      },
+
       walletAmount: {
         fetch: async (collTokenContract: ERC20, depositor: AddressLike) => {
           SchemaDataFreshnessManager.ERC20[Contracts.ERC20.USDT].walletAmount.lastFetched = Date.now();
@@ -909,6 +955,19 @@ export const SchemaDataFreshnessManager: ContractDataFreshnessManager<typeof Con
           const oraclePrice = await debtTokenContract.getPrice();
 
           SchemaDataFreshnessManager.DebtToken[Contracts.DebtToken.STABLE].priceUSDOracle.value(oraclePrice);
+        },
+        value: makeVar(defaultFieldValue),
+        lastFetched: 0,
+        timeout: 1000 * 5,
+      },
+
+      borrowingRate: {
+        fetch: async (troveManagerContract: TroveManager) => {
+          SchemaDataFreshnessManager.DebtToken[Contracts.DebtToken.STABLE].borrowingRate.lastFetched = Date.now();
+
+          const borrowingRate = await troveManagerContract.getBorrowingRate(isStableCoinAddress(Contracts.DebtToken.STABLE));
+  
+          SchemaDataFreshnessManager.DebtToken[Contracts.DebtToken.STABLE].borrowingRate.value(borrowingRate);
         },
         value: makeVar(defaultFieldValue),
         lastFetched: 0,
@@ -1037,6 +1096,19 @@ export const SchemaDataFreshnessManager: ContractDataFreshnessManager<typeof Con
         timeout: 1000 * 5,
       },
 
+      borrowingRate: {
+        fetch: async (troveManagerContract: TroveManager) => {
+          SchemaDataFreshnessManager.DebtToken[Contracts.DebtToken.STOCK_1].borrowingRate.lastFetched = Date.now();
+
+          const borrowingRate = await troveManagerContract.getBorrowingRate(isStableCoinAddress(Contracts.DebtToken.STOCK_1));
+  
+          SchemaDataFreshnessManager.DebtToken[Contracts.DebtToken.STOCK_1].borrowingRate.value(borrowingRate);
+        },
+        value: makeVar(defaultFieldValue),
+        lastFetched: 0,
+        timeout: 1000 * 5,
+      },
+
       walletAmount: {
         fetch: async (debtTokenContract: DebtToken, borrower: AddressLike) => {
           SchemaDataFreshnessManager.DebtToken[Contracts.DebtToken.STOCK_1].walletAmount.lastFetched = Date.now();
@@ -1149,21 +1221,7 @@ export const SchemaDataFreshnessManager: ContractDataFreshnessManager<typeof Con
       },
     },
   },
-  TroveManager: {
-    borrowingRate: {
-      fetch: async (troveManagerContract: TroveManager) => {
-        SchemaDataFreshnessManager.TroveManager.borrowingRate.lastFetched = Date.now();
-        const borrowingRate = await troveManagerContract.getBorrowingRate();
 
-        SchemaDataFreshnessManager.TroveManager.borrowingRate.value(borrowingRate);
-      },
-      value: makeVar(defaultFieldValue),
-      lastFetched: 0,
-      timeout: 1000 * 5,
-    },
-  },
-  StabilityPoolManager: {},
-  SwapOperations: {},
   SwapPairs: {
     [Contracts.SwapPairs.BTC]: {
       borrowerAmount: {
@@ -1246,8 +1304,6 @@ export const SchemaDataFreshnessManager: ContractDataFreshnessManager<typeof Con
     },
   },
 
-  BorrowerOperations: {},
-
   StoragePool: {
     totalCollateralRatio: {
       fetch: async (fetchSource?: { storagePoolContract: StoragePool }) => {
@@ -1279,6 +1335,13 @@ export const SchemaDataFreshnessManager: ContractDataFreshnessManager<typeof Con
       timeout: 1000 * 5,
     },
   },
+
+  StabilityPoolManager: {},
+  SwapOperations: {},
+  HintHelpers: {},
+  TroveManager: {},
+  SortedTroves: {},
+  BorrowerOperations: {},
 };
 
 // FIXME: The cache needs to be initialized with the contracts data.

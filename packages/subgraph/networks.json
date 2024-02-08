@@ -1,10 +1,10 @@
 {
   "localhost": {
     "DebtToken_STABLE": {
-      "address": "0x7F1667b13768D15fedD4ab3B006B4C2174410593"
+      "address": "0x9E545E3C0baAB3E08CdfD552C960A1050f373042"
     },
     "DebtToken_STOCK": {
-      "address": "0x67d269191c92Caf3cD7723F116c85e6E9bf55933"
+      "address": "0x851356ae760d987E095750cCeb3bC6014560891C"
     },
     "StabilityPool": {
       "address": "0x25309189268017d8C79C8dacCbF44EC25C12FEB4"
@@ -30,20 +30,23 @@
     "CollTokenManager": {
       "address": "0xa513E6E4b8f2a923D98304ec87F64353C4D5C853"
     },
-    "ERC20_1": {
-      "address": "0xc6e7DF5E7b4f2A278906862b61205850344D4e7d"
+    "ERC20_BTC": {
+      "address": "0xa85233C63b9Ee964Add6F2cffe00Fd84eb32338f"
     },
-    "ERC20_2": {
-      "address": "0x59b670e9fA9D0A427751Af201D676719a970857b"
+    "ERC20_USDT": {
+      "address": "0x4A679253410272dd5232B3Ff7cF5dbB88f295319"
     },
-    "ERC20_3": {
-      "address": "0x9E545E3C0baAB3E08CdfD552C960A1050f373042"
+    "ERC20_DFI": {
+      "address": "0x7a2088a1bFc9d81c55368AE168C2C02570cB814F"
     },
-    "ERC20_4": {
-      "address": "0xa82fF9aFd8f496c3d6ac40E2a0F282E47488CFc9"
-    },
-    "SwapPair": {
+    "SwapPair_BTC": {
       "address": "0x687E100f79ceD7Cc8b2BD19Eb326a28885F5b371"
+    },
+    "SwapPair_USDT": {
+      "address": "0xCa8D3e2F3228965c7b51B5f6a77096dcF0749e65"
+    },
+    "SwapPair_DFI": {
+      "address": "0xD707044d6a8925607615dD7B75986311328a34F2"
     },
     "ReservePool": {
       "address": "0x0165878A594ca255338adfa4d48449f69242Eb8F"

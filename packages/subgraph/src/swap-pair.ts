@@ -12,6 +12,7 @@ import { SystemInfo } from '../generated/schema';
 import { handleCreateSwapEvent } from './entities/swap-event-entity';
 import { handleUpdateTokenCandle_low_high, handleUpdateTokenCandle_volume } from './entities/token-candle-entity';
 import { handleUpdateToken_priceUSD } from './entities/token-entity';
+import { handleUpdateLiquidity_totalAmount, handleUpdatePool_totalSupply } from './entities/pool-entity';
 
 export function handleApproval(event: ApprovalEvent): void {}
 
@@ -115,6 +116,8 @@ export function handleSync(event: SyncEvent): void {
   const systemInfo = SystemInfo.load(`SystemInfo`)!;
   const stableCoin = systemInfo.stableCoin;
 
+  handleUpdateLiquidity_totalAmount(event, token0, token1, event.params.reserve0, event.params.reserve1)
+
   if (token0 === stableCoin || token1 === stableCoin) {
     const tokenPrice = handleUpdateTokenCandle_low_high(
       event,
@@ -125,6 +128,7 @@ export function handleSync(event: SyncEvent): void {
     handleUpdateToken_priceUSD(event, token0 === stableCoin ? token1 : token0, tokenPrice);
 
     // TODO: Maybe always update volume?
+    // FIXME: This looks wrong. Fix it later
     const swapPairReserves = swapPairContract.getReserves();
     // add total difference in reserves after sync
     const volume = swapPairReserves
@@ -142,4 +146,12 @@ export function handleSync(event: SyncEvent): void {
   }
 }
 
-export function handleTransfer(event: TransferEvent): void {}
+export function handleTransfer(event: TransferEvent): void {
+  const swapPairContract = SwapPair.bind(event.address);
+
+  const token0 = swapPairContract.token0();
+  const token1 = swapPairContract.token1();
+
+  // FIXME: Can be optimized because added/substracted value is already included in event. Do it later.
+  handleUpdatePool_totalSupply(event, token0, token1);
+}

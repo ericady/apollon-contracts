@@ -42,8 +42,7 @@ import {
   GET_SYSTEMINFO,
   GET_TOKEN_PRICES_24h_AGO,
   GET_TRADING_VIEW_CANDLES,
-  GET_TRADING_VIEW_LATEST_CANDLE,
-  GET_TROVEMANAGER,
+  GET_TRADING_VIEW_LATEST_CANDLE
 } from '../app/queries';
 import { bigIntStringToFloat, floatToBigInt } from '../app/utils/math';
 
@@ -578,18 +577,6 @@ export const handlers = [
   ),
 
   // -------------- Only resolved by local cache ---------------- only for local testing purposes
-
-  // GetTroveManager
-  graphql.query<{ getTroveManager: Query['getTroveManager'] }>(GET_TROVEMANAGER, (req, res, ctx) => {
-    return res(
-      ctx.data({
-        getTroveManager: {
-          __typename: 'TroveManager',
-          id: faker.string.uuid(),
-        } as TroveManager,
-      }),
-    );
-  }),
 
   // GetSystemInfo
   graphql.query<{ getSystemInfo: Query['getSystemInfo'] }>(GET_SYSTEMINFO, (req, res, ctx) => {
