@@ -52,7 +52,7 @@ export const isDebtTokenAddress = (
 };
 export const isStableCoinAddress = (address: string): address is '0x1613beb3b2c4f22ee086b2b38c1476a3ce7f78e8' => {
   return getCheckSum(Contracts.DebtToken.STABLE) === getCheckSum(address);
-}
+};
 
 export const isCollateralTokenAddress = (
   address: string,
@@ -68,7 +68,7 @@ export const isCollateralTokenAddress = (
 export const isPoolAddress = (
   address: string,
 ): address is
-| '0x7b320ddbd1426e8d5b30ed159184a93ca462bf00'
+  | '0x7b320ddbd1426e8d5b30ed159184a93ca462bf00'
   | '0x0f338e0aa373831b0500f63388b82220ac05fd6c'
   | '0xe85a121b51e7d2b101ce7d8fb0126d5ac8e9365b' => {
   return Object.values(Contracts.SwapPairs)

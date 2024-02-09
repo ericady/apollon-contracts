@@ -5,9 +5,9 @@ import {
   SwapOperationsInitialized as SwapOperationsInitializedEvent,
 } from '../generated/SwapOperations/SwapOperations';
 import { SystemInfo } from '../generated/schema';
+import { SwapPairTemplate } from '../generated/templates';
 import { handleCreatePool } from './entities/pool-entity';
 import { handleCreateTokenCandleSingleton } from './entities/token-candle-entity';
-import { SwapPairTemplate } from '../generated/templates'
 
 export function handleOwnershipTransferred(event: OwnershipTransferredEvent): void {}
 

@@ -9,7 +9,10 @@ import TableRow from '@mui/material/TableRow';
 import Typography from '@mui/material/Typography';
 import { useCallback, useMemo, useState } from 'react';
 import { useEthers } from '../../../context/EthersProvider';
-import { GetCollateralTokensQuery, GetCollateralTokensQueryVariables } from '../../../generated/gql-types';
+import {
+  GetBorrowerCollateralTokensQuery,
+  GetBorrowerCollateralTokensQueryVariables,
+} from '../../../generated/gql-types';
 import { GET_BORROWER_COLLATERAL_TOKENS } from '../../../queries';
 import { dangerouslyConvertBigIntToNumber, displayPercentage, roundCurrency, roundNumber } from '../../../utils/math';
 import DiamondIcon from '../../Icons/DiamondIcon';
@@ -46,7 +49,7 @@ function CollateralTable() {
 
   const [oldRatio, setOldRatio] = useState<null | number>(null);
 
-  const { data } = useQuery<GetCollateralTokensQuery, GetCollateralTokensQueryVariables>(
+  const { data } = useQuery<GetBorrowerCollateralTokensQuery, GetBorrowerCollateralTokensQueryVariables>(
     GET_BORROWER_COLLATERAL_TOKENS,
     {
       variables: { borrower: address },

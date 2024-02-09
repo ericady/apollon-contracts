@@ -9,7 +9,10 @@ import TableContainer from '@mui/material/TableContainer';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import { useEthers } from '../../../../context/EthersProvider';
-import { GetCollateralTokensQuery, GetCollateralTokensQueryVariables } from '../../../../generated/gql-types';
+import {
+  GetBorrowerCollateralTokensQuery,
+  GetBorrowerCollateralTokensQueryVariables,
+} from '../../../../generated/gql-types';
 import { GET_BORROWER_COLLATERAL_TOKENS } from '../../../../queries';
 import {
   bigIntStringToFloat,
@@ -30,7 +33,7 @@ import CollateralTokenTableLoader from './CollateralTokenTableLoader';
 const CollateralTokenTable = () => {
   const { address } = useEthers();
 
-  const { data } = useQuery<GetCollateralTokensQuery, GetCollateralTokensQueryVariables>(
+  const { data } = useQuery<GetBorrowerCollateralTokensQuery, GetBorrowerCollateralTokensQueryVariables>(
     GET_BORROWER_COLLATERAL_TOKENS,
     {
       variables: {

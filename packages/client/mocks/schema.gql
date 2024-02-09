@@ -19,13 +19,14 @@ type Token {
 type DebtTokenMeta {
   id: ID!
   token: Token!
-  timestamp: Int!
+  timestamp: BigInt!
   # handled by client
   walletAmount: bigint!
   troveMintedAmount: bigint!
   providedStability: bigint!
   compoundedDeposit: bigint!
   troveRepableDebtAmount: bigint!
+  troveDebtAmount: bigint!
 
   # global
   stabilityDepositAPY: StabilityDepositAPY!
@@ -59,7 +60,7 @@ type StabilityDepositAPY {
 type CollateralTokenMeta {
   id: ID!
   token: Token!
-  timestamp: Int!
+  timestamp: BigInt!
   # borrower specific
   walletAmount: bigint!
   troveLockedAmount: bigint!
@@ -94,7 +95,7 @@ enum LongShortDirection {
 type SwapEvent {
   id: Bytes!
   borrower: Bytes!
-  timestamp: Int!
+  timestamp: BigInt!
   #
   token: Token!
   direction: LongShortDirection! # Indicates whether the swap is LONG or SHORT
@@ -179,7 +180,7 @@ type BorrowerHistory {
   id: Bytes!
   borrower: Bytes!
   pool: Bytes!
-  timestamp: Int!
+  timestamp: BigInt!
   type: BorrowerHistoryType!
   values: [TokenAmount!]!
   # worth of the claimed tokens in USD at the time of the event, only set on CLAIMED_REWARDS
@@ -208,11 +209,6 @@ type Query {
 
 # ---------------- Client side contract calls ----------------
 
-type TroveManager {
-  id: ID!
-  borrowingRate: bigint!
-}
-
 type SystemInfo {
   id: ID!
   recoveryModeActive: Boolean!
@@ -234,7 +230,7 @@ type TokenCandle {
   high: BigInt!
   low: BigInt!
   open: BigInt!
-  timestamp: Int!
+  timestamp: BigInt!
   token: Token!
   volume: BigInt!
 }
@@ -245,7 +241,7 @@ type TokenCandleSingleton {
   id: ID!
   low: BigInt!
   open: BigInt!
-  timestamp: Int!
+  timestamp: BigInt!
   token: Bytes!
   volume: BigInt!
 }

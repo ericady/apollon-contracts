@@ -35,6 +35,8 @@ function HistoryTable() {
     },
   );
 
+  console.log('data: ', data);
+
   const handleScroll: TableContainerProps['onScroll'] = (event) => {
     const scrollableDiv = event.target as HTMLDivElement;
     if (scrollableDiv.scrollTop + scrollableDiv.clientHeight >= scrollableDiv.scrollHeight) {

@@ -17,8 +17,9 @@ export const constructFromUnixTimestamp = (timestamp: number) => {
  *
  * @param timestamp unix timestamp in seconds
  */
-export const formatUnixTimestamp = (timestamp: number, withDelta = true) => {
-  const { day, daysFromToday, hours, minutes, month, year } = constructFromUnixTimestamp(timestamp);
+export const formatUnixTimestamp = (timestamp: string, withDelta = true) => {
+  const numericDate = Number(timestamp) * 1000;
+  const { day, daysFromToday, hours, minutes, month, year } = constructFromUnixTimestamp(numericDate);
 
   return withDelta
     ? `${day}.${month}.${year} ${hours}:${minutes}(-${daysFromToday}d)`

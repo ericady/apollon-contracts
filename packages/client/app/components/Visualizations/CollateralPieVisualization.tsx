@@ -1,11 +1,11 @@
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 import { Typography, useTheme } from '@mui/material';
 import { Cell, Pie, PieChart } from 'recharts';
-import { GetCollateralTokensQuery, Token } from '../../generated/gql-types';
+import { GetBorrowerCollateralTokensQuery, Token } from '../../generated/gql-types';
 import { roundCurrency } from '../../utils/math';
 
 type Props = {
-  borrowerCollateralTokens: (GetCollateralTokensQuery['collateralTokenMetas'][number] & {
+  borrowerCollateralTokens: (GetBorrowerCollateralTokensQuery['collateralTokenMetas'][number] & {
     chartColor?: string;
     troveValueUSD: number;
   })[];

@@ -84,7 +84,7 @@ function DebtTokenTable() {
                     bigIntStringToFloat(debtToken.stabilityDepositAPY.volume),
                 },
                 walletAmount: dangerouslyConvertBigIntToNumber(debtToken.walletAmount, 12, 6),
-                troveRepableDebtAmount: dangerouslyConvertBigIntToNumber(debtToken.troveRepableDebtAmount, 12, 6),
+                troveDebtAmount: dangerouslyConvertBigIntToNumber(debtToken.troveDebtAmount, 12, 6),
               }))
               .map(
                 (
@@ -93,7 +93,7 @@ function DebtTokenTable() {
                     totalDepositedStability,
                     token,
                     walletAmount,
-                    troveRepableDebtAmount,
+                    troveDebtAmount,
                     totalSupplyUSD,
                     totalSupplyUSD30dAverage,
                   },
@@ -112,7 +112,7 @@ function DebtTokenTable() {
                         borderBottom: index === data.debtTokenMetas.length - 1 ? 'none' : '',
                       }}
                     >
-                      {roundCurrency(troveRepableDebtAmount, 5, 5)}
+                      {roundCurrency(troveDebtAmount, 5, 5)}
                     </TableCell>
                     <TableCell
                       align="right"

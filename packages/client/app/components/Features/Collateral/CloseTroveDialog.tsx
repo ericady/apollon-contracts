@@ -7,7 +7,10 @@ import Typography from '@mui/material/Typography';
 import { useState } from 'react';
 import { useEthers } from '../../../context/EthersProvider';
 import { useTransactionDialog } from '../../../context/TransactionDialogProvider';
-import { GetCollateralTokensQuery, GetCollateralTokensQueryVariables } from '../../../generated/gql-types';
+import {
+  GetBorrowerCollateralTokensQuery,
+  GetBorrowerCollateralTokensQueryVariables,
+} from '../../../generated/gql-types';
 import { GET_BORROWER_COLLATERAL_TOKENS } from '../../../queries';
 import CrossIcon from '../../Icons/CrossIcon';
 import DiamondIcon from '../../Icons/DiamondIcon';
@@ -26,7 +29,7 @@ const CloseTroveDialog = ({ buttonVariant, buttonSx = {} }: Props) => {
   } = useEthers();
   const { setSteps } = useTransactionDialog();
 
-  const { data } = useQuery<GetCollateralTokensQuery, GetCollateralTokensQueryVariables>(
+  const { data } = useQuery<GetBorrowerCollateralTokensQuery, GetBorrowerCollateralTokensQueryVariables>(
     GET_BORROWER_COLLATERAL_TOKENS,
     {
       variables: {
@@ -36,7 +39,8 @@ const CloseTroveDialog = ({ buttonVariant, buttonSx = {} }: Props) => {
     },
   );
 
-  const collateralToDeposit: GetCollateralTokensQuery['collateralTokenMetas'] = data?.collateralTokenMetas ?? [];
+  const collateralToDeposit: GetBorrowerCollateralTokensQuery['collateralTokenMetas'] =
+    data?.collateralTokenMetas ?? [];
 
   if (collateralToDeposit.length === 0)
     return (

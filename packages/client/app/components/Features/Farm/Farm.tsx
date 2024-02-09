@@ -1,6 +1,5 @@
 'use client';
 
-import { useQuery } from '@apollo/client';
 import { Box, Skeleton } from '@mui/material';
 import Button from '@mui/material/Button';
 import InputAdornment from '@mui/material/InputAdornment';
@@ -14,6 +13,7 @@ import { useEthers } from '../../../context/EthersProvider';
 import { useSelectedToken } from '../../../context/SelectedTokenProvider';
 import { useTransactionDialog } from '../../../context/TransactionDialogProvider';
 import { WIDGET_HEIGHTS } from '../../../utils/contants';
+import { getHints } from '../../../utils/crypto';
 import {
   bigIntStringToFloat,
   dangerouslyConvertBigIntToNumber,
@@ -41,7 +41,7 @@ const Farm = () => {
 
   const {
     address,
-    contracts: { swapOperationsContract },
+    contracts: { swapOperationsContract, troveManagerContract, sortedTrovesContract, hintHelpersContract },
   } = useEthers();
   const { setSteps } = useTransactionDialog();
   const { selectedToken, tokenRatio, JUSDToken } = useSelectedToken();
@@ -74,6 +74,19 @@ const Farm = () => {
     const deadline = new Date().getTime() + 1000 * 60 * 2; // 2 minutes
     const _maxMintFeePercentage = floatToBigInt(0.02);
 
+    const [upperHint, lowerHint] = await getHints(troveManagerContract, sortedTrovesContract, hintHelpersContract, {
+      borrower: address,
+      addedColl: [],
+      addedDebt: [
+        {
+          tokenAddress: selectedToken!.address,
+          amount: floatToBigInt(farmShortValue),
+        },
+      ],
+      removedColl: [],
+      removedDebt: [],
+    });
+
     if (tabValue === 'Long') {
       setSteps([
         {
@@ -81,13 +94,16 @@ const Farm = () => {
           transaction: {
             methodCall: async () => {
               return swapOperationsContract.openLongPosition(
-                // @ts-ignore TODO: fix this parameters
                 floatToBigInt(farmShortValue),
                 (getExpectedPositionSize() * ethers.parseEther((1 - maxSlippage).toString())) /
                   ethers.parseUnits('1', 18),
                 selectedToken!.address,
                 address,
-                _maxMintFeePercentage,
+                {
+                  upperHint,
+                  lowerHint,
+                  maxFeePercentage: _maxMintFeePercentage,
+                },
                 deadline,
               );
             },
@@ -102,13 +118,16 @@ const Farm = () => {
           transaction: {
             methodCall: async () => {
               return swapOperationsContract.openShortPosition(
-                // @ts-ignore TODO: fix this parameters
-                floatToBigInt(farmShortValue),
                 (getExpectedPositionSize() * ethers.parseEther((1 - maxSlippage).toString())) /
                   ethers.parseUnits('1', 18),
+                floatToBigInt(farmShortValue),
                 selectedToken!.address,
                 address,
-                _maxMintFeePercentage,
+                {
+                  upperHint,
+                  lowerHint,
+                  maxFeePercentage: _maxMintFeePercentage,
+                },
                 deadline,
               );
             },
@@ -125,7 +144,7 @@ const Farm = () => {
     !isNaN(watchFarmShortValue) && selectedToken
       ? watchFarmShortValue * bigIntStringToFloat(selectedToken.priceUSD.toString())
       : 0;
-  const borrowingFee = tabValue === "Long" ? JUSDToken?.borrowingRate : selectedToken?.borrowingRate;
+  const borrowingFee = tabValue === 'Long' ? JUSDToken?.borrowingRate : selectedToken!.borrowingRate;
 
   /**
    * Must be exact due to contract call

@@ -68,6 +68,7 @@ export type DebtTokenMeta = {
   totalReserve30dAverage?: Maybe<TotalReserveAverage>;
   totalSupplyUSD: Scalars['BigInt']['output'];
   totalSupplyUSD30dAverage: TotalSupplyAverage;
+  troveDebtAmount: Scalars['bigint']['output'];
   troveMintedAmount: Scalars['bigint']['output'];
   troveRepableDebtAmount: Scalars['bigint']['output'];
   walletAmount: Scalars['bigint']['output'];
@@ -340,7 +341,7 @@ export type GetBorrowerDebtTokensQueryVariables = Exact<{
 }>;
 
 
-export type GetBorrowerDebtTokensQuery = { __typename: 'Query', debtTokenMetas: Array<{ __typename: 'DebtTokenMeta', id: string, troveMintedAmount: bigint, walletAmount: bigint, providedStability: bigint, compoundedDeposit: bigint, troveRepableDebtAmount: bigint, totalDepositedStability: string, totalSupplyUSD: string, stabilityDepositAPY: { __typename: 'StabilityDepositAPY', id: string, profit: string, volume: string }, totalSupplyUSD30dAverage: { __typename: 'TotalSupplyAverage', id: string, value: string }, token: { __typename: 'Token', id: string, address: string, symbol: string, priceUSD: string, isPoolToken: boolean, borrowingRate: bigint } }> };
+export type GetBorrowerDebtTokensQuery = { __typename: 'Query', debtTokenMetas: Array<{ __typename: 'DebtTokenMeta', id: string, troveMintedAmount: bigint, walletAmount: bigint, providedStability: bigint, compoundedDeposit: bigint, troveRepableDebtAmount: bigint, troveDebtAmount: bigint, totalDepositedStability: string, totalSupplyUSD: string, stabilityDepositAPY: { __typename: 'StabilityDepositAPY', id: string, profit: string, volume: string }, totalSupplyUSD30dAverage: { __typename: 'TotalSupplyAverage', id: string, value: string }, token: { __typename: 'Token', id: string, address: string, symbol: string, priceUSD: string, isPoolToken: boolean, borrowingRate: bigint } }> };
 
 export type GetBorrowerSwapEventsQueryVariables = Exact<{
   where: SwapEvent_Filter;
@@ -358,12 +359,12 @@ export type GetBorrowerLiquidityPoolsQueryVariables = Exact<{
 
 export type GetBorrowerLiquidityPoolsQuery = { __typename: 'Query', pools: Array<{ __typename: 'Pool', id: string, address: string, liquidityDepositAPY: string, totalSupply: string, borrowerAmount: bigint, liquidity: Array<{ __typename: 'PoolLiquidity', id: string, totalAmount: string, token: { __typename: 'Token', id: string, address: string, symbol: string, priceUSD: string } }>, volume30dUSD: { __typename: 'PoolVolume30d', value: string }, volume30dUSD30dAgo: { __typename: 'PoolVolume30d', value: string } }> };
 
-export type GetCollateralTokensQueryVariables = Exact<{
+export type GetBorrowerCollateralTokensQueryVariables = Exact<{
   borrower: Scalars['String']['input'];
 }>;
 
 
-export type GetCollateralTokensQuery = { __typename: 'Query', collateralTokenMetas: Array<{ __typename: 'CollateralTokenMeta', id: string, walletAmount: bigint, troveLockedAmount: bigint, stabilityGainedAmount: bigint, totalValueLockedUSD: string, token: { __typename: 'Token', id: string, address: string, symbol: string, priceUSD: string }, totalValueLockedUSD30dAverage: { __typename: 'TotalValueLockedAverage', id: string, value: string } }> };
+export type GetBorrowerCollateralTokensQuery = { __typename: 'Query', collateralTokenMetas: Array<{ __typename: 'CollateralTokenMeta', id: string, walletAmount: bigint, troveLockedAmount: bigint, stabilityGainedAmount: bigint, totalValueLockedUSD: string, token: { __typename: 'Token', id: string, address: string, symbol: string, priceUSD: string }, totalValueLockedUSD30dAverage: { __typename: 'TotalValueLockedAverage', id: string, value: string } }> };
 
 export type GetBorrowerStabilityHistoryQueryVariables = Exact<{
   where: BorrowerHistory_Filter;
@@ -409,6 +410,8 @@ export type GetPastTokenPricesQueryVariables = Exact<{ [key: string]: never; }>;
 export type GetPastTokenPricesQuery = { __typename: 'Query', tokenCandles: Array<{ __typename: 'TokenCandle', id: string, timestamp: number, close: string, volume: string, token: { __typename: 'Token', id: string, address: string } }> };
 
 export type TokenFragmentFragment = { __typename: 'Token', id: string, address: string };
+
+export type LiquidityFragmentFragment = { __typename: 'PoolLiquidity', id: string, totalAmount: string };
 
 export type GetSystemInfoQueryVariables = Exact<{ [key: string]: never; }>;
 

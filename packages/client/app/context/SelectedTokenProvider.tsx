@@ -3,11 +3,7 @@
 import { useQuery } from '@apollo/client';
 import { ethers } from 'ethers';
 import { createContext, useContext, useState } from 'react';
-import {
-  GetBorrowerDebtTokensQuery,
-  GetBorrowerDebtTokensQueryVariables,
-  GetCollateralTokensQuery,
-} from '../generated/gql-types';
+import { GetBorrowerDebtTokensQuery, GetBorrowerDebtTokensQueryVariables } from '../generated/gql-types';
 import { GET_BORROWER_DEBT_TOKENS } from '../queries';
 import { Contracts, useEthers } from './EthersProvider';
 

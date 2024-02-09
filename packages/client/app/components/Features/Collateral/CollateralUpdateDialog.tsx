@@ -21,7 +21,10 @@ import { ERC20 } from '../../../../generated/types';
 import { IBase } from '../../../../generated/types/BorrowerOperations';
 import { Contracts, useEthers } from '../../../context/EthersProvider';
 import { useTransactionDialog } from '../../../context/TransactionDialogProvider';
-import { GetCollateralTokensQuery, GetCollateralTokensQueryVariables } from '../../../generated/gql-types';
+import {
+  GetBorrowerCollateralTokensQuery,
+  GetBorrowerCollateralTokensQueryVariables,
+} from '../../../generated/gql-types';
 import { GET_BORROWER_COLLATERAL_TOKENS } from '../../../queries';
 import { getHints } from '../../../utils/crypto';
 import {
@@ -67,7 +70,7 @@ const CollateralUpdateDialog = ({ buttonVariant, buttonSx = {} }: Props) => {
   } = useEthers();
   const { setSteps } = useTransactionDialog();
 
-  const { data } = useQuery<GetCollateralTokensQuery, GetCollateralTokensQueryVariables>(
+  const { data } = useQuery<GetBorrowerCollateralTokensQuery, GetBorrowerCollateralTokensQueryVariables>(
     GET_BORROWER_COLLATERAL_TOKENS,
     {
       variables: {
@@ -100,7 +103,8 @@ const CollateralUpdateDialog = ({ buttonVariant, buttonSx = {} }: Props) => {
     reset();
   };
 
-  const collateralToDeposit: GetCollateralTokensQuery['collateralTokenMetas'] = data?.collateralTokenMetas ?? [];
+  const collateralToDeposit: GetBorrowerCollateralTokensQuery['collateralTokenMetas'] =
+    data?.collateralTokenMetas ?? [];
   if (collateralToDeposit.length === 0)
     return (
       <Button
@@ -194,8 +198,22 @@ const CollateralUpdateDialog = ({ buttonVariant, buttonSx = {} }: Props) => {
         {
           title: 'Withdraw Collateral',
           transaction: {
-            // @ts-ignore TODO: fix this parameters
-            methodCall: () => borrowerOperationsContract.withdrawColl(tokenAmounts),
+            methodCall: async () => {
+              const [upperHint, lowerHint] = await getHints(
+                troveManagerContract,
+                sortedTrovesContract,
+                hintHelpersContract,
+                {
+                  borrower: address,
+                  addedColl: [],
+                  addedDebt: [],
+                  removedColl: tokenAmounts,
+                  removedDebt: [],
+                },
+              );
+
+              return borrowerOperationsContract.withdrawColl(tokenAmounts, upperHint, lowerHint);
+            },
             waitForResponseOf: [],
           },
         },

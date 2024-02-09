@@ -1,47 +1,27 @@
-import { newMockEvent } from "matchstick-as"
-import { ethereum, Address, BigInt } from "@graphprotocol/graph-ts"
-import { Approval, Transfer } from "../generated/ERC20_BTC/ERC20"
+import { Address, BigInt, ethereum } from '@graphprotocol/graph-ts';
+import { newMockEvent } from 'matchstick-as';
+import { Approval, Transfer } from '../generated/ERC20_BTC/ERC20';
 
-export function createApprovalEvent(
-  owner: Address,
-  spender: Address,
-  value: BigInt
-): Approval {
-  let approvalEvent = changetype<Approval>(newMockEvent())
+export function createApprovalEvent(owner: Address, spender: Address, value: BigInt): Approval {
+  let approvalEvent = changetype<Approval>(newMockEvent());
 
-  approvalEvent.parameters = new Array()
+  approvalEvent.parameters = new Array();
 
-  approvalEvent.parameters.push(
-    new ethereum.EventParam("owner", ethereum.Value.fromAddress(owner))
-  )
-  approvalEvent.parameters.push(
-    new ethereum.EventParam("spender", ethereum.Value.fromAddress(spender))
-  )
-  approvalEvent.parameters.push(
-    new ethereum.EventParam("value", ethereum.Value.fromUnsignedBigInt(value))
-  )
+  approvalEvent.parameters.push(new ethereum.EventParam('owner', ethereum.Value.fromAddress(owner)));
+  approvalEvent.parameters.push(new ethereum.EventParam('spender', ethereum.Value.fromAddress(spender)));
+  approvalEvent.parameters.push(new ethereum.EventParam('value', ethereum.Value.fromUnsignedBigInt(value)));
 
-  return approvalEvent
+  return approvalEvent;
 }
 
-export function createTransferEvent(
-  from: Address,
-  to: Address,
-  value: BigInt
-): Transfer {
-  let transferEvent = changetype<Transfer>(newMockEvent())
+export function createTransferEvent(from: Address, to: Address, value: BigInt): Transfer {
+  let transferEvent = changetype<Transfer>(newMockEvent());
 
-  transferEvent.parameters = new Array()
+  transferEvent.parameters = new Array();
 
-  transferEvent.parameters.push(
-    new ethereum.EventParam("from", ethereum.Value.fromAddress(from))
-  )
-  transferEvent.parameters.push(
-    new ethereum.EventParam("to", ethereum.Value.fromAddress(to))
-  )
-  transferEvent.parameters.push(
-    new ethereum.EventParam("value", ethereum.Value.fromUnsignedBigInt(value))
-  )
+  transferEvent.parameters.push(new ethereum.EventParam('from', ethereum.Value.fromAddress(from)));
+  transferEvent.parameters.push(new ethereum.EventParam('to', ethereum.Value.fromAddress(to)));
+  transferEvent.parameters.push(new ethereum.EventParam('value', ethereum.Value.fromUnsignedBigInt(value)));
 
-  return transferEvent
+  return transferEvent;
 }

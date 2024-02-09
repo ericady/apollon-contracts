@@ -57,7 +57,12 @@ export function handleCreatePool(event: ethereum.Event, token0: Address, token1:
   poolEntity.save();
 }
 
-export function handleUpdatePool_volume30dUSD(event: ethereum.Event, token0: Address, token1: Address, value: BigInt): void {
+export function handleUpdatePool_volume30dUSD(
+  event: ethereum.Event,
+  token0: Address,
+  token1: Address,
+  value: BigInt,
+): void {
   const poolEntity = Pool.load(`Pool-${token0.toHexString()}-${token1.toHexString()}`)!;
 
   //   load last VolumeChunk and check if its outdated
@@ -130,13 +135,18 @@ export function handleUpdatePool_totalSupply(event: ethereum.Event, token0: Addr
   poolEntity.save();
 }
 
-  
-  export function handleUpdateLiquidity_totalAmount(event: ethereum.Event, token0: Address, token1: Address, reserve0: BigInt, reserve1: BigInt): void {
-    const liquidity0 = PoolLiquidity.load(token0.concat(token1))!;
-    liquidity0.totalAmount = reserve0;
-    liquidity0.save();
-  
-    const liquidity1 = PoolLiquidity.load(token1.concat(token0))!;
-    liquidity1.totalAmount = reserve1;
-    liquidity1.save();
-  }
+export function handleUpdateLiquidity_totalAmount(
+  event: ethereum.Event,
+  token0: Address,
+  token1: Address,
+  reserve0: BigInt,
+  reserve1: BigInt,
+): void {
+  const liquidity0 = PoolLiquidity.load(token0.concat(token1))!;
+  liquidity0.totalAmount = reserve0;
+  liquidity0.save();
+
+  const liquidity1 = PoolLiquidity.load(token1.concat(token0))!;
+  liquidity1.totalAmount = reserve1;
+  liquidity1.save();
+}

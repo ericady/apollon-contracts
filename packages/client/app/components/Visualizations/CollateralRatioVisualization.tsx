@@ -4,10 +4,10 @@ import { Box, Typography, useTheme } from '@mui/material';
 import { useCallback, useEffect } from 'react';
 import { useEthers } from '../../context/EthersProvider';
 import {
+  GetBorrowerCollateralTokensQuery,
+  GetBorrowerCollateralTokensQueryVariables,
   GetBorrowerDebtTokensQuery,
   GetBorrowerDebtTokensQueryVariables,
-  GetCollateralTokensQuery,
-  GetCollateralTokensQueryVariables,
 } from '../../generated/gql-types';
 import { GET_BORROWER_COLLATERAL_TOKENS, GET_BORROWER_DEBT_TOKENS } from '../../queries';
 import { bigIntStringToFloat, dangerouslyConvertBigIntToNumber, displayPercentage } from '../../utils/math';
@@ -74,13 +74,13 @@ function CollateralRatioVisualization({
     },
   );
 
-  const { data: collateralData } = useQuery<GetCollateralTokensQuery, GetCollateralTokensQueryVariables>(
-    GET_BORROWER_COLLATERAL_TOKENS,
-    {
-      variables: { borrower: address },
-      skip: !address,
-    },
-  );
+  const { data: collateralData } = useQuery<
+    GetBorrowerCollateralTokensQuery,
+    GetBorrowerCollateralTokensQueryVariables
+  >(GET_BORROWER_COLLATERAL_TOKENS, {
+    variables: { borrower: address },
+    skip: !address,
+  });
 
   const debtValue =
     debtData?.debtTokenMetas

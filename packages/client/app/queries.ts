@@ -66,6 +66,7 @@ export const GET_BORROWER_DEBT_TOKENS = gql`
       providedStability @client
       compoundedDeposit @client
       troveRepableDebtAmount @client
+      troveDebtAmount @client
 
       stabilityDepositAPY {
         id
@@ -142,7 +143,7 @@ export const GET_BORROWER_LIQUIDITY_POOLS = gql`
 // BALANCE PAGE
 
 export const GET_BORROWER_COLLATERAL_TOKENS = gql`
-  query GetCollateralTokens($borrower: String!) {
+  query GetBorrowerCollateralTokens($borrower: String!) {
     collateralTokenMetas(borrower: $borrower) {
       id
       token {
@@ -259,6 +260,13 @@ export const TOKEN_FRAGMENT = gql`
   fragment TokenFragment on Token {
     id
     address
+  }
+`;
+
+export const LIQUIDITY_FRAGMENT = gql`
+  fragment LiquidityFragment on PoolLiquidity {
+    id
+    totalAmount
   }
 `;
 

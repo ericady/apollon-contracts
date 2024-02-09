@@ -1,5 +1,6 @@
 'use client';
 
+import { useQuery } from '@apollo/client';
 import { Skeleton } from '@mui/material';
 import Button from '@mui/material/Button';
 import InputAdornment from '@mui/material/InputAdornment';
@@ -10,6 +11,13 @@ import { FormProvider, useController, useForm } from 'react-hook-form';
 import { Contracts, isCollateralTokenAddress, isDebtTokenAddress, useEthers } from '../../../context/EthersProvider';
 import { useSelectedToken } from '../../../context/SelectedTokenProvider';
 import { useTransactionDialog } from '../../../context/TransactionDialogProvider';
+import {
+  GetBorrowerCollateralTokensQuery,
+  GetBorrowerCollateralTokensQueryVariables,
+  GetBorrowerDebtTokensQuery,
+  GetBorrowerDebtTokensQueryVariables,
+} from '../../../generated/gql-types';
+import { GET_BORROWER_COLLATERAL_TOKENS, GET_BORROWER_DEBT_TOKENS } from '../../../queries';
 import { WIDGET_HEIGHTS } from '../../../utils/contants';
 import {
   dangerouslyConvertBigIntToNumber,
@@ -42,6 +50,34 @@ const Swap = () => {
   } = useEthers();
   const { setSteps } = useTransactionDialog();
   const { selectedToken, tokenRatio, JUSDToken } = useSelectedToken();
+
+  const { data: debtTokenData } = useQuery<GetBorrowerDebtTokensQuery, GetBorrowerDebtTokensQueryVariables>(
+    GET_BORROWER_DEBT_TOKENS,
+    {
+      variables: {
+        borrower: address,
+      },
+      skip: !address,
+    },
+  );
+  const { data: collTokenData } = useQuery<GetBorrowerCollateralTokensQuery, GetBorrowerCollateralTokensQueryVariables>(
+    GET_BORROWER_COLLATERAL_TOKENS,
+    {
+      variables: {
+        borrower: address,
+      },
+      skip: !address || !selectedToken?.address || !isCollateralTokenAddress(selectedToken.address),
+    },
+  );
+  const relevantToken: { walletAmount: bigint } = debtTokenData?.debtTokenMetas.find(({ token: { address } }) =>
+    isDebtTokenAddress(address),
+  ) ??
+    collTokenData?.collateralTokenMetas.find(({ token: { address } }) => isCollateralTokenAddress(address)) ?? {
+      walletAmount: BigInt(0),
+    };
+  const stableWalletAmount =
+    debtTokenData?.debtTokenMetas.find(({ token: { address } }) => address === Contracts.DebtToken.STABLE)
+      ?.walletAmount ?? BigInt(0);
 
   const methods = useForm<FieldValues>({
     defaultValues: {
@@ -158,9 +194,7 @@ const Swap = () => {
                 );
               }
 
-              // TODO: Log fall through
-              console.error('Fallthrough contract:', selectedToken!.address);
-              return new Promise(() => {});
+              return null as any;
             },
             waitForResponseOf: [],
           },
@@ -245,6 +279,10 @@ const Swap = () => {
                 rules={{
                   required: { value: true, message: 'You need to specify an amount.' },
                   min: { value: 0, message: 'Amount needs to be positive.' },
+                  max: {
+                    value: dangerouslyConvertBigIntToNumber(relevantToken.walletAmount, 9, 9),
+                    message: 'Amount exceeds wallet balance.',
+                  },
                 }}
                 disabled={!selectedToken}
                 onChange={(e: ChangeEvent<HTMLInputElement>) => {
@@ -274,6 +312,10 @@ const Swap = () => {
                 rules={{
                   required: { value: true, message: 'You need to specify an amount.' },
                   min: { value: 0, message: 'Amount needs to be positive.' },
+                  max: {
+                    value: dangerouslyConvertBigIntToNumber(stableWalletAmount, 9, 9),
+                    message: 'Amount exceeds wallet balance.',
+                  },
                 }}
                 disabled={!selectedToken}
                 onChange={(e: ChangeEvent<HTMLInputElement>) => {

@@ -17,7 +17,6 @@ import {
 } from '../../generated/schema';
 // import { log } from '@graphprotocol/graph-ts';
 
-
 export const stableDebtToken = EventAddress.fromString('0x6c3f90f043a72fa612cbac8115ee7e52bde6e490');
 export const govToken = EventAddress.fromString('0x9f8f72aa9304c8b593d555f12ef6589cc3a579a2');
 
@@ -82,7 +81,7 @@ function createDebtTokenMeta_stabilityDepositAPY_totalReserve30dAverage_totalSup
   tokenAddress: Address,
 ): void {
   // create new chunk
-  const firstStabilityDepositChunk = new StabilityDepositChunk(`StabilityDepositChunk-${tokenAddress.toHexString()}-0`);
+  const firstStabilityDepositChunk = new StabilityDepositChunk(`StabilityDepositChunk-${tokenAddress.toHexString()}-1`);
   firstStabilityDepositChunk.timestamp = event.block.timestamp;
   firstStabilityDepositChunk.profit = BigInt.fromI32(0);
   firstStabilityDepositChunk.volume = BigInt.fromI32(0);
@@ -90,19 +89,19 @@ function createDebtTokenMeta_stabilityDepositAPY_totalReserve30dAverage_totalSup
 
   // create new APY
   const stabilityDepositAPYEntity = new StabilityDepositAPY(`StabilityDepositAPY-${tokenAddress.toHexString()}`);
-  stabilityDepositAPYEntity.index = 0;
+  stabilityDepositAPYEntity.index = 1;
   stabilityDepositAPYEntity.profit = BigInt.fromI32(0);
   stabilityDepositAPYEntity.volume = BigInt.fromI32(0);
   stabilityDepositAPYEntity.save();
 
   const totalReserveAverage = new TotalReserveAverage(`TotalReserveAverage-${tokenAddress.toHexString()}`);
   totalReserveAverage.value = BigInt.fromI32(0);
-  totalReserveAverage.index = 0;
+  totalReserveAverage.index = 1;
   totalReserveAverage.save();
 
   // "TotalReserveAverageChunk" + token + index
   const totalReserveAverageFirstChunk = new TotalReserveAverageChunk(
-    `TotalReserveAverageChunk-${tokenAddress.toHexString()}-0`,
+    `TotalReserveAverageChunk-${tokenAddress.toHexString()}-1`,
   );
   totalReserveAverageFirstChunk.timestamp = event.block.timestamp;
   totalReserveAverageFirstChunk.value = BigInt.fromI32(0);
@@ -110,12 +109,12 @@ function createDebtTokenMeta_stabilityDepositAPY_totalReserve30dAverage_totalSup
 
   const totalSupplyAverage = new TotalSupplyAverage(`TotalSupplyAverage-${tokenAddress.toHexString()}`);
   totalSupplyAverage.value = BigInt.fromI32(0);
-  totalSupplyAverage.index = 0;
+  totalSupplyAverage.index = 1;
   totalSupplyAverage.save();
 
   // "TotalSupplyAverageChunk" + token + index
   const totalSupplyAverageFirstChunk = new TotalSupplyAverageChunk(
-    `TotalSupplyAverageChunk-${tokenAddress.toHexString()}-0`,
+    `TotalSupplyAverageChunk-${tokenAddress.toHexString()}-1`,
   );
   totalSupplyAverageFirstChunk.timestamp = event.block.timestamp;
   totalSupplyAverageFirstChunk.value = BigInt.fromI32(0);

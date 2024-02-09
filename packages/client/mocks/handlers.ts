@@ -25,7 +25,6 @@ import {
   TokenAmount,
   TokenCandle,
   TokenCandleSingleton,
-  TroveManager,
 } from '../app/generated/gql-types';
 import {
   GET_ALL_DEBT_TOKENS,
@@ -42,7 +41,7 @@ import {
   GET_SYSTEMINFO,
   GET_TOKEN_PRICES_24h_AGO,
   GET_TRADING_VIEW_CANDLES,
-  GET_TRADING_VIEW_LATEST_CANDLE
+  GET_TRADING_VIEW_LATEST_CANDLE,
 } from '../app/queries';
 import { bigIntStringToFloat, floatToBigInt } from '../app/utils/math';
 
@@ -56,19 +55,19 @@ const favoritedAssets: string[] = getFavoritedAssetsFromLS();
 const now = Math.round(Date.now() / 1000);
 const oneDayInSeconds = 24 * 60 * 60;
 
-const JUSD: Omit<Token, 'priceUSDOracle'> = {
+const JUSD: Omit<Token, 'priceUSDOracle'| 'borrowingRate'> = {
   id: faker.string.uuid(),
   __typename: 'Token',
-  address: Contracts.DebtToken.JUSD,
+  address: Contracts.DebtToken.STABLE,
   symbol: 'JUSD',
   createdAt: (faker.date.past().getTime() / 1000).toString(),
   priceUSD: floatToBigInt(faker.number.float({ min: 1, max: 5000, precision: 0.01 })).toString(),
   isPoolToken: faker.datatype.boolean(),
 };
 
-export const tokens: Omit<Token, 'priceUSDOracle'>[] = Array(10)
+export const tokens: Omit<Token, 'priceUSDOracle' | 'borrowingRate'>[] = Array(10)
   .fill(null)
-  .map<Omit<Token, 'priceUSDOracle'>>((_, index) => ({
+  .map<Omit<Token, 'priceUSDOracle'| 'borrowingRate'>>((_, index) => ({
     id: faker.string.uuid(),
     __typename: 'Token',
     address: index <= favoritedAssets.length - 1 ? favoritedAssets[index] : faker.finance.ethereumAddress(),
@@ -81,8 +80,8 @@ export const tokens: Omit<Token, 'priceUSDOracle'>[] = Array(10)
   .concat(JUSD);
 
 // 5 hard tokens always with JUSD
-const collateralTokens: Omit<Token, 'priceUSDOracle'>[] = Object.entries(Contracts.ERC20).map<
-  Omit<Token, 'priceUSDOracle'>
+const collateralTokens: Omit<Token, 'priceUSDOracle'| 'borrowingRate'>[] = Object.entries(Contracts.ERC20).map<
+  Omit<Token, 'priceUSDOracle'| 'borrowingRate'>
 >(([symbol, address]) => ({
   id: faker.string.uuid(),
   __typename: 'Token',
@@ -124,7 +123,7 @@ const userCollateralTokenMeta = [
 const debtTokenMeta = tokens.map<
   Omit<
     DebtTokenMeta,
-    'troveMintedAmount' | 'compoundedDeposit' | 'walletAmount' | 'providedStability' | 'troveRepableDebtAmount'
+    'troveMintedAmount' | 'compoundedDeposit' | 'walletAmount' | 'providedStability' | 'troveRepableDebtAmount' | 'troveDebtAmount'
   >
 >((token, index) => {
   const isGovOrStableDebtToken = index === tokens.length - 1 || index === tokens.length - 2;

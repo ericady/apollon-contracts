@@ -1,7 +1,6 @@
 import { ApolloClient, ApolloProvider, InMemoryCache, TypePolicies, TypePolicy } from '@apollo/client';
 import { PropsWithChildren } from 'react';
-import { SystemInfo, TroveManager as TroveManagerType } from '../generated/gql-types';
-import { Contracts } from './EthersProvider';
+import { SystemInfo } from '../generated/gql-types';
 
 type Props = {
   Token_priceUSDOracleValue: bigint;

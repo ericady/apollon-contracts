@@ -8,10 +8,10 @@ import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import { useEthers } from '../../../../context/EthersProvider';
 import {
+  GetBorrowerCollateralTokensQuery,
+  GetBorrowerCollateralTokensQueryVariables,
   GetBorrowerDebtTokensQuery,
   GetBorrowerDebtTokensQueryVariables,
-  GetCollateralTokensQuery,
-  GetCollateralTokensQueryVariables,
 } from '../../../../generated/gql-types';
 import { GET_BORROWER_COLLATERAL_TOKENS, GET_BORROWER_DEBT_TOKENS } from '../../../../queries';
 import {
@@ -36,8 +36,8 @@ function StabilityPoolTable() {
   } = useEthers();
 
   const { data: collateralData, loading: collateralDataLoading } = useQuery<
-    GetCollateralTokensQuery,
-    GetCollateralTokensQueryVariables
+    GetBorrowerCollateralTokensQuery,
+    GetBorrowerCollateralTokensQueryVariables
   >(GET_BORROWER_COLLATERAL_TOKENS, {
     variables: { borrower: address },
     skip: !address,
