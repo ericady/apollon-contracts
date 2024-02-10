@@ -5,15 +5,15 @@
                 "internalType": "uint256",
                 "name": "_requestId",
                 "type": "uint256"
+            },
+            {
+                "internalType": "bool",
+                "name": "_fetchPreviousValue",
+                "type": "bool"
             }
         ],
         "name": "getTellorCurrentValue",
         "outputs": [
-            {
-                "internalType": "bool",
-                "name": "",
-                "type": "bool"
-            },
             {
                 "internalType": "uint256",
                 "name": "",

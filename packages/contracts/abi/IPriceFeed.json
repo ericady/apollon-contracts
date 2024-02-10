@@ -1,7 +1,22 @@
 [
     {
         "inputs": [],
+        "name": "BadOracle",
+        "type": "error"
+    },
+    {
+        "inputs": [],
         "name": "FeeExceedMaxPercentage",
+        "type": "error"
+    },
+    {
+        "inputs": [],
+        "name": "NotFromTokenManager",
+        "type": "error"
+    },
+    {
+        "inputs": [],
+        "name": "UnknownOracleId",
         "type": "error"
     },
     {
@@ -10,49 +25,23 @@
             {
                 "indexed": false,
                 "internalType": "address",
-                "name": "_token",
+                "name": "tellorCallerAddress",
                 "type": "address"
             },
             {
                 "indexed": false,
-                "internalType": "uint256",
-                "name": "_lastGoodPrice",
-                "type": "uint256"
-            }
-        ],
-        "name": "LastGoodPriceUpdated",
-        "type": "event"
-    },
-    {
-        "anonymous": false,
-        "inputs": [
-            {
-                "indexed": false,
                 "internalType": "address",
-                "name": "_token",
+                "name": "debtTokenManagerAddress",
                 "type": "address"
             },
             {
                 "indexed": false,
-                "internalType": "enum IPriceFeed.Status",
-                "name": "newStatus",
-                "type": "uint8"
-            }
-        ],
-        "name": "PriceFeedStatusChanged",
-        "type": "event"
-    },
-    {
-        "anonymous": false,
-        "inputs": [
-            {
-                "indexed": false,
                 "internalType": "address",
-                "name": "_token",
+                "name": "collTokenManagerAddress",
                 "type": "address"
             }
         ],
-        "name": "TokenPriceChanged",
+        "name": "PriceFeedInitialized",
         "type": "event"
     },
     {
@@ -93,6 +82,11 @@
                 "internalType": "uint256",
                 "name": "price",
                 "type": "uint256"
+            },
+            {
+                "internalType": "bool",
+                "name": "isTrusted",
+                "type": "bool"
             }
         ],
         "stateMutability": "view",
@@ -120,6 +114,24 @@
             }
         ],
         "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "address",
+                "name": "_tokenAddress",
+                "type": "address"
+            },
+            {
+                "internalType": "uint256",
+                "name": "_oracleId",
+                "type": "uint256"
+            }
+        ],
+        "name": "initiateNewOracleId",
+        "outputs": [],
+        "stateMutability": "nonpayable",
         "type": "function"
     }
 ]

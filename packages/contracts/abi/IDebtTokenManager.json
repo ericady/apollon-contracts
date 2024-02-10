@@ -35,6 +35,12 @@
                 "internalType": "address",
                 "name": "_stabilityPoolManagerAddress",
                 "type": "address"
+            },
+            {
+                "indexed": false,
+                "internalType": "address",
+                "name": "_priceFeedAddress",
+                "type": "address"
             }
         ],
         "name": "DebtTokenManagerInitialized",
@@ -46,6 +52,11 @@
                 "internalType": "address",
                 "name": "_debtTokenAddress",
                 "type": "address"
+            },
+            {
+                "internalType": "uint256",
+                "name": "_tellorOracleId",
+                "type": "uint256"
             }
         ],
         "name": "addDebtToken",

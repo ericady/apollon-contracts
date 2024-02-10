@@ -100,6 +100,11 @@
                 "internalType": "address",
                 "name": "_tokenAddress",
                 "type": "address"
+            },
+            {
+                "internalType": "uint256",
+                "name": "_tellorOracleId",
+                "type": "uint256"
             }
         ],
         "name": "addCollToken",
@@ -154,10 +159,10 @@
     },
     {
         "inputs": [],
-        "name": "priceFeedAddress",
+        "name": "priceFeed",
         "outputs": [
             {
-                "internalType": "address",
+                "internalType": "contract IPriceFeed",
                 "name": "",
                 "type": "address"
             }
