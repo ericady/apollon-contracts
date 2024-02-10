@@ -19,19 +19,13 @@ contract PriceFeed is Ownable(msg.sender), CheckContract, IPriceFeed {
   uint public constant ORACLE_TIMEOUT = 60 * 30; // 30 minutes, Maximum time period allowed since latest round data timestamp.
   uint public constant MAX_PRICE_DEVIATION_FROM_PREVIOUS_ROUND = 0.5e18; // 50%, Maximum deviation allowed between two consecutive oracle prices, beyond which the oracles is considered unstable
 
-  struct PriceAt {
-    Status status;
-    uint timestamp;
-    uint price;
-  }
-  mapping(address => PriceAt) public prices;
   mapping(address => uint) public tokenToOracleId;
 
   struct TellorResponse {
-    bool ifRetrieve;
-    uint256 value;
-    uint256 timestamp;
     bool success;
+    uint256 timestamp;
+    uint price;
+    bool isTrusted;
   }
   ITellorCaller public tellorCaller;
 
@@ -59,16 +53,7 @@ contract PriceFeed is Ownable(msg.sender), CheckContract, IPriceFeed {
 
   function initiateNewOracleId(address _tokenAddress, uint _oracleId) external {
     _requireCallerIsTokenManager();
-
     tokenToOracleId[_tokenAddress] = _oracleId;
-
-    TellorResponse memory tellorResponse = _getCurrentTellorResponse(_oracleId);
-    if (_tellorIsUntrusted(tellorResponse)) revert BadOracle();
-
-    uint price = _scaleTellorPriceByDigits(tellorResponse);
-    prices[_tokenAddress] = PriceAt({ status: Status.working, timestamp: block.timestamp, price: price });
-    emit TokenPriceChanged(_tokenAddress, price);
-    emit PriceFeedStatusChanged(_tokenAddress, Status.working);
   }
 
   function _requireCallerIsTokenManager() internal view {
@@ -77,50 +62,31 @@ contract PriceFeed is Ownable(msg.sender), CheckContract, IPriceFeed {
 
   // --- Functions ---
 
-  function getPrice(address _tokenAddress) public override returns (uint price) {
-    (uint price, Status status) = getPriceAsView(_tokenAddress);
-
-    // if the status is untrusted, the old last price was returned
-    if (status == Status.untrusted) {
-      _changeStatus(_tokenAddress, Status.untrusted);
-      return price;
-    }
-
-    // storing the new price into the contract
-    prices[_tokenAddress].price = price;
-    prices[_tokenAddress].timestamp = block.timestamp;
-    emit TokenPriceChanged(_tokenAddress, price);
-    _changeStatus(_tokenAddress, Status.working);
-    return price;
-  }
-
-  function getPriceAsView(address _tokenAddress) public view override returns (uint price, Status status) {
-    PriceAt memory lastPriceAt = prices[_tokenAddress];
-
-    // check if the price is still valid
-    if (lastPriceAt.timestamp > 0 && block.timestamp - lastPriceAt.timestamp < PRICE_TTL) return lastPriceAt.price;
-
+  function getPrice(address _tokenAddress) public view override returns (uint price, bool isTrusted) {
     // map token to oracle id
     uint oracleId = tokenToOracleId[_tokenAddress];
     if (oracleId == 0) revert UnknownOracleId();
 
-    // price outdated, fetch new one
-    TellorResponse memory tellorResponse = _getCurrentTellorResponse(oracleId);
+    // fetch price
+    TellorResponse memory latestResponse = _getCurrentTellorResponse(oracleId, false);
+    TellorResponse memory previousResponse = _getCurrentTellorResponse(oracleId, true);
 
-    // check if the response is trusted, if not, return last price
-    if (_tellorIsUntrusted(tellorResponse)) return (lastPriceAt.price, Status.untrusted);
-
-    uint newPrice = _scaleTellorPriceByDigits(tellorResponse);
-
-    // check the price deviation, if it's too high, return last price
-    if (lastPriceAt.timestamp > 0) {
-      uint deviation = LiquityMath._getAbsoluteDifference(newPrice, lastPriceAt.price);
-      uint max = LiquityMath._max(newPrice, lastPriceAt.price);
-      if ((deviation * TARGET_DIGITS) / max > MAX_PRICE_DEVIATION_FROM_PREVIOUS_ROUND)
-        return (lastPriceAt.price, Status.untrusted);
+    if (!latestResponse.success) {
+      if (!previousResponse.success) revert BadOracle(); // both calls failed, unable to provide a price
+      return (previousResponse.price, false); // return previous price as untrusted, latest call failed
     }
 
-    return (newPrice, Status.working);
+    // latest call succeeded
+    if (!previousResponse.isTrusted || !latestResponse.isTrusted) return (latestResponse.price, false); // at least one price is untrusted, return latest price as untrusted
+
+    // compare price differance
+    uint deviation = LiquityMath._getAbsoluteDifference(latestResponse.price, previousResponse.price);
+    uint max = LiquityMath._max(latestResponse.price, previousResponse.price);
+    if (((deviation * TARGET_DIGITS) / max) > MAX_PRICE_DEVIATION_FROM_PREVIOUS_ROUND)
+      return (latestResponse.price, false); // price deviation is too high, return latest price as untrusted
+
+    // returning latest price as trusted
+    return (latestResponse.price, true);
   }
 
   /**
@@ -129,61 +95,45 @@ contract PriceFeed is Ownable(msg.sender), CheckContract, IPriceFeed {
    * @param _amount Amount of token to get USD value of
    * @return usdValue USD value of given amount in 18 decimals
    */
-  function getUSDValue(address _token, uint256 _amount) external override returns (uint usdValue) {
-    uint price = getPrice(_token);
+  function getUSDValue(address _token, uint256 _amount) external view override returns (uint usdValue) {
+    (uint price, ) = getPrice(_token);
     uint8 decimals = IERC20Metadata(_token).decimals();
     usdValue = (price * _amount) / 10 ** decimals;
   }
 
-  function getUSDValueAsView(address _token, uint256 _amount) external view override returns (uint usdValue) {
-    (uint price, ) = getPriceAsView(_token);
-    uint8 decimals = IERC20Metadata(_token).decimals();
-    usdValue = (price * _amount) / 10 ** decimals;
-  }
-
-  function getAmountFromUSDValue(address _token, uint256 _usdValue) external override returns (uint amount) {
-    uint price = getPrice(_token);
+  function getAmountFromUSDValue(address _token, uint256 _usdValue) external view override returns (uint amount) {
+    (uint price, ) = getPrice(_token);
     uint8 decimals = IERC20Metadata(_token).decimals();
     amount = (_usdValue * 10 ** decimals) / price;
   }
 
   // --- Helper functions ---
 
-  function _changeStatus(address _tokenAddress, Status _status) internal {
-    if (prices[_tokenAddress].status == _status) return; // No change in status, so no need to emit an event
-
-    prices[_tokenAddress].status = _status;
-    emit PriceFeedStatusChanged(_tokenAddress, _status);
-  }
-
-  function _tellorIsUntrusted(TellorResponse memory _response) internal view returns (bool) {
-    if (!_response.success) return true; // Check for response call reverted
-    if (_response.timestamp == 0 || _response.timestamp > block.timestamp) return true; // Check for an invalid timeStamp that is 0, or in the future
-    if (_response.value == 0) return true; // Check for zero price
-    if (block.timestamp - _response.timestamp > ORACLE_TIMEOUT) return true; // Check for timeout
-    return false;
-  }
-
-  function _scaleTellorPriceByDigits(TellorResponse memory _tellorResponse) internal pure returns (uint) {
-    return _tellorResponse.value * (10 ** (TARGET_DIGITS - TELLOR_DIGITS));
-  }
-
-  function _getCurrentTellorResponse(uint tellorOracleId) internal view returns (TellorResponse memory tellorResponse) {
-    try tellorCaller.getTellorCurrentValue(tellorOracleId) returns (
-      bool ifRetrieve,
+  function _getCurrentTellorResponse(
+    uint _tellorOracleId,
+    bool _fetchPreviousValue
+  ) internal view returns (TellorResponse memory tellorResponse) {
+    try tellorCaller.getTellorCurrentValue(_tellorOracleId, _fetchPreviousValue) returns (
       uint256 value,
       uint256 _timestampRetrieved
     ) {
       // If call to Tellor succeeds, return the response and success = true
-      tellorResponse.ifRetrieve = ifRetrieve;
-      tellorResponse.value = value;
       tellorResponse.timestamp = _timestampRetrieved;
-      tellorResponse.success = true;
+      tellorResponse.price = value * (10 ** (TARGET_DIGITS - TELLOR_DIGITS));
+      tellorResponse.success = value > 0;
+      tellorResponse.isTrusted = _isTellorResponseTrusted(tellorResponse);
 
       return (tellorResponse);
     } catch {
       // If call to Tellor reverts, return a zero response with success = false
       return (tellorResponse);
     }
+  }
+
+  function _isTellorResponseTrusted(TellorResponse memory _response) internal view returns (bool) {
+    if (!_response.success) return false; // Check for response call reverted
+    if (_response.timestamp == 0 || _response.timestamp > block.timestamp) return false; // Check for an invalid timeStamp that is 0, or in the future
+    if (block.timestamp - _response.timestamp > ORACLE_TIMEOUT) return false; // Check for timeout
+    return true;
   }
 }

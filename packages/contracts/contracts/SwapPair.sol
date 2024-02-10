@@ -160,7 +160,7 @@ contract SwapPair is ISwapPair, SwapERC20, LiquityBase {
     if (totalSupply == 0) return SWAP_BASE_FEE; //inital mint
 
     // query prices
-    uint oraclePrice = priceFeed.getPrice(nonStableCoin);
+    (uint oraclePrice, ) = priceFeed.getPrice(nonStableCoin);
     uint dexPrice = (reserve0 * DECIMAL_PRECISION) / reserve1; // todo does the token digits matter here?
 
     if (oraclePrice < dexPrice) return SWAP_BASE_FEE;

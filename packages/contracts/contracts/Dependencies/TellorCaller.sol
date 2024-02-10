@@ -27,17 +27,17 @@ contract TellorCaller is ITellorCaller {
    *
    * @dev Allows the user to get the latest value for the requestId specified
    * @param _requestId is the requestId to look up the value for
-   * @return ifRetrieve bool true if it is able to retrieve a value, the value, and the value's timestamp
+   * @param _fetchPreviousValue bool true if the previous value is desired
    * @return value the value retrieved
    * @return _timestampRetrieved the value's timestamp
    */
   function getTellorCurrentValue(
-    uint256 _requestId
-  ) external view override returns (bool ifRetrieve, uint256 value, uint256 _timestampRetrieved) {
+    uint256 _requestId,
+    bool _fetchPreviousValue
+  ) external view override returns (uint256 value, uint256 _timestampRetrieved) {
     uint256 _count = tellor.getNewValueCountbyRequestId(_requestId);
-    uint256 _time = tellor.getTimestampbyRequestIDandIndex(_requestId, _count - 1);
+    uint256 _time = tellor.getTimestampbyRequestIDandIndex(_requestId, _count - (_fetchPreviousValue ? 2 : 1));
     uint256 _value = tellor.retrieveData(_requestId, _time);
-    if (_value > 0) return (true, _value, _time);
-    return (false, 0, _time);
+    return (_value, _time);
   }
 }

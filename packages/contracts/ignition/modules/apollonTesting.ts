@@ -121,10 +121,22 @@ export default buildModule('ApollonTesting', m => {
   // setup mock tellor for testing
   contracts.mockTellor = m.contract('MockTellor', []);
   m.call(contracts.mockTellor, 'setUpdateTime', [1], { after: [contracts.mockTellor] }); // todo get current blocktime
-  m.call(contracts.mockTellor, 'setPrice', [1, parseUnits('21000', 6)], { after: [contracts.mockTellor] }); // BTC
-  m.call(contracts.mockTellor, 'setPrice', [2, parseUnits('1', 6)], { after: [contracts.mockTellor] }); // USDT
-  m.call(contracts.mockTellor, 'setPrice', [3, parseUnits('1', 6)], { after: [contracts.mockTellor] }); // STABLE
-  m.call(contracts.mockTellor, 'setPrice', [4, parseUnits('150', 6)], { after: [contracts.mockTellor] }); // STOCK
+  m.call(contracts.mockTellor, 'setPrice', [1, parseUnits('21000', 6)], {
+    id: 'btcPriceSet',
+    after: [contracts.mockTellor],
+  }); // BTC
+  m.call(contracts.mockTellor, 'setPrice', [2, parseUnits('1', 6)], {
+    id: 'usdtPriceSet',
+    after: [contracts.mockTellor],
+  }); // USDT
+  m.call(contracts.mockTellor, 'setPrice', [3, parseUnits('1', 6)], {
+    id: 'stablePriceSet',
+    after: [contracts.mockTellor],
+  }); // STABLE
+  m.call(contracts.mockTellor, 'setPrice', [4, parseUnits('150', 6)], {
+    id: 'stockPriceSet',
+    after: [contracts.mockTellor],
+  }); // STOCK
   contracts.tellorCaller = m.contract('TellorCaller', [contracts.mockTellor], {
     after: [contracts.mockTellor],
   });

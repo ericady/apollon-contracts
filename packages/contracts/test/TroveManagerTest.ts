@@ -56,7 +56,7 @@ describe('TroveManager', () => {
   });
 
   describe('TroveOwners', () => {
-    it.only('Should add new trove owner to the Trove Owners array', async function () {
+    it('Should add new trove owner to the Trove Owners array', async function () {
       const prevTroveOwnersCount = await troveManager.getTroveOwnersCount();
 
       await openTrove({
