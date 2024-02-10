@@ -4,7 +4,7 @@ import {
   LiquidationOperations,
   MockDebtToken,
   MockERC20,
-  MockPriceFeed,
+  PriceFeed,
   StabilityPoolManager,
   StoragePool,
   TroveManager,
@@ -20,6 +20,7 @@ import {
   getEmittedLiquidationValues,
   increaseDebt,
   TroveStatus,
+  setPrice,
 } from '../utils/testHelper';
 import { Addressable, parseUnits } from 'ethers';
 import apollonTesting from '../ignition/modules/apollonTesting';
@@ -43,7 +44,7 @@ describe('StabilityPool', () => {
   let USDT: MockERC20;
 
   let contracts: any;
-  let priceFeed: MockPriceFeed;
+  let priceFeed: PriceFeed;
   let troveManager: TroveManager;
   let storagePool: StoragePool;
   let stabilityPoolManager: StabilityPoolManager;
@@ -160,7 +161,7 @@ describe('StabilityPool', () => {
         });
 
         // price drops: defaulter's Troves fall below MCR, whale doesn't
-        await priceFeed.setTokenPrice(BTC, parseUnits('9500'));
+        await setPrice('BTC', '9500', contracts);
 
         const stockBefore = (await stabilityPoolManager.getTotalDeposits()).find(d => d.tokenAddress === STOCK.target)
           ?.amount;
@@ -268,7 +269,7 @@ describe('StabilityPool', () => {
         expect(alice_Snapshot_P_0).to.be.equal(parseUnits('1'));
 
         // price drops: defaulters' Troves fall below MCR, alice and whale Trove remain active
-        await priceFeed.setTokenPrice(BTC, parseUnits('9500'));
+        await setPrice('BTC', '9500', contracts);
 
         // 2 users with Trove with 2 STOCK drawn are closed
         // 0.04 BTC -> 50% to the whale, 50% to alice
@@ -364,7 +365,7 @@ describe('StabilityPool', () => {
         await whaleShrimpTroveInit(contracts, signers);
 
         // Price drops
-        await priceFeed.setTokenPrice(BTC, parseUnits('9500'));
+        await setPrice('BTC', '9500', contracts);
 
         // 2 defaulters are closed
         await liquidationOperations.liquidate(defaulter_1);
@@ -412,7 +413,7 @@ describe('StabilityPool', () => {
         await whaleShrimpTroveInit(contracts, signers);
 
         // Price drops
-        await priceFeed.setTokenPrice(BTC, parseUnits('9500'));
+        await setPrice('BTC', '9500', contracts);
 
         // Defaulters are liquidated
         await liquidationOperations.liquidate(defaulter_1);
@@ -447,7 +448,7 @@ describe('StabilityPool', () => {
         await whaleShrimpTroveInit(contracts, signers);
 
         // Price drops
-        await priceFeed.setTokenPrice(BTC, parseUnits('9500'));
+        await setPrice('BTC', '9500', contracts);
 
         // Get debt, collateral and ICR of all existing troves
         const whale_Debt_Before = (await troveManager.getTroveDebt(whale))[0][1];
@@ -520,7 +521,7 @@ describe('StabilityPool', () => {
         ).to.be.equal(parseUnits('2000'));
 
         // Price drops
-        await priceFeed.setTokenPrice(BTC, parseUnits('100'));
+        await setPrice('BTC', '100', contracts);
 
         // Liquidate bob
         await liquidationOperations.liquidate(bob);
@@ -600,11 +601,11 @@ describe('StabilityPool', () => {
           .provideStability([{ tokenAddress: STABLE, amount: parseUnits('1000') }]);
 
         // Price drops, defaulter is liquidated, A, B, C, D earn btc
-        await priceFeed.setTokenPrice(BTC, parseUnits('9500'));
+        await setPrice('BTC', '9500', contracts);
         await liquidationOperations.liquidate(defaulter_1);
 
         // Price bounces back
-        await priceFeed.setTokenPrice(BTC, parseUnits('21000'));
+        await setPrice('BTC', '21000', contracts);
 
         // A whale fully withdraw from the pool
         await stabilityPoolManager
@@ -709,7 +710,7 @@ describe('StabilityPool', () => {
       //     debts: [{ tokenAddress: STABLE, amount: parseUnits('1') }],
       //   });
       //   // btc drops, defaulter is in liquidation range (but not liquidated yet)
-      //   await priceFeed.setTokenPrice(BTC, parseUnits('9500'));
+      //           await setPrice('BTC', '9500', contracts);
       //
       //   // should not work, because there is a trove (defaulter) which is not liquidated yet
       //   await assertRevert(
@@ -726,7 +727,7 @@ describe('StabilityPool', () => {
         expect(stableInPoolA).to.be.equal(parseUnits('6000'));
 
         // price drops: defaulters' Troves fall below MCR, alice and whale Trove remain active
-        await priceFeed.setTokenPrice(BTC, parseUnits('5000'));
+        await setPrice('BTC', '5000', contracts);
 
         // 2 users with Trove with stable drawn are closed
         // @ts-ignore
@@ -786,7 +787,7 @@ describe('StabilityPool', () => {
         expect(stableInPoolA).to.be.equal(parseUnits('6000'));
 
         // price drops: defaulters' Troves fall below MCR, alice and whale Trove remain active
-        await priceFeed.setTokenPrice(BTC, parseUnits('5000'));
+        await setPrice('BTC', '5000', contracts);
 
         // 2 users with Trove with stable drawn are closed
         // @ts-ignore
@@ -819,7 +820,7 @@ describe('StabilityPool', () => {
         await whaleShrimpTroveInit(contracts, signers);
 
         // price drops: defaulters' Troves fall below MCR, alice and whale Trove remain active
-        await priceFeed.setTokenPrice(BTC, parseUnits('5000'));
+        await setPrice('BTC', '5000', contracts);
 
         // 2 users with Trove with stable drawn are closed
         await liquidationOperations.liquidate(defaulter_1);
@@ -871,7 +872,7 @@ describe('StabilityPool', () => {
         expect(alice_snapshot_P_Before).to.be.equal('1000000000000000000');
 
         // price drops: defaulters' Troves fall below MCR, alice and whale Trove remain active
-        await priceFeed.setTokenPrice(BTC, parseUnits('5000'));
+        await setPrice('BTC', '5000', contracts);
 
         // 2 defaulters liquidated
         await liquidationOperations.liquidate(defaulter_1);
@@ -897,7 +898,7 @@ describe('StabilityPool', () => {
         const stabilityPool = await getStabilityPool(contracts, STABLE);
 
         // price drops: defaulters' Troves fall below MCR, alice and whale Trove remain active
-        await priceFeed.setTokenPrice(BTC, parseUnits('5000'));
+        await setPrice('BTC', '5000', contracts);
 
         // 2 users with Trove with stable drawn are closed
         // @ts-ignore
@@ -936,7 +937,7 @@ describe('StabilityPool', () => {
         await whaleShrimpTroveInit(contracts, signers);
 
         // price drops: defaulters' Troves fall below MCR, alice and whale Trove remain active
-        await priceFeed.setTokenPrice(BTC, parseUnits('5000'));
+        await setPrice('BTC', '5000', contracts);
         await liquidationOperations.liquidate(defaulter_1);
 
         // All depositors attempt to withdraw
@@ -959,7 +960,7 @@ describe('StabilityPool', () => {
         await whaleShrimpTroveInit(contracts, signers);
 
         // price drops: defaulters' Troves fall below MCR, alice and whale Trove remain active
-        await priceFeed.setTokenPrice(BTC, parseUnits('5000'));
+        await setPrice('BTC', '5000', contracts);
         await liquidationOperations.liquidate(defaulter_1);
 
         // Bob issues a further 1000 stable from his trove
@@ -988,7 +989,7 @@ describe('StabilityPool', () => {
         await whaleShrimpTroveInit(contracts, signers);
 
         // price drops: defaulters' Troves fall below MCR, alice and whale Trove remain active
-        await priceFeed.setTokenPrice(BTC, parseUnits('5000'));
+        await setPrice('BTC', '5000', contracts);
         await liquidationOperations.liquidate(defaulter_1);
         await liquidationOperations.liquidate(defaulter_2);
 
@@ -1013,7 +1014,7 @@ describe('StabilityPool', () => {
         await whaleShrimpTroveInit(contracts, signers);
 
         // price drops: defaulters' Troves fall below MCR, alice and whale Trove remain active
-        await priceFeed.setTokenPrice(BTC, parseUnits('5000'));
+        await setPrice('BTC', '5000', contracts);
         await liquidationOperations.liquidate(defaulter_1);
         await liquidationOperations.liquidate(defaulter_2);
 
@@ -1046,7 +1047,7 @@ describe('StabilityPool', () => {
         await whaleShrimpTroveInit(contracts, signers);
 
         // price drops: defaulters' Troves fall below MCR, alice and whale Trove remain active
-        await priceFeed.setTokenPrice(BTC, parseUnits('5000'));
+        await setPrice('BTC', '5000', contracts);
         await liquidationOperations.liquidate(defaulter_1);
         await liquidationOperations.liquidate(defaulter_2);
 
@@ -1125,7 +1126,7 @@ describe('StabilityPool', () => {
       it("withdrawing 0 ETH Gain does not alter the caller's ETH balance, their trove collateral, or the ETH  in the Stability Pool", async () => {
         await whaleShrimpTroveInit(contracts, signers);
 
-        await priceFeed.setTokenPrice(BTC, parseUnits('5000'));
+        await setPrice('BTC', '5000', contracts);
         await liquidationOperations.liquidate(defaulter_1);
 
         // Dennis opens trove and deposits to Stability Pool
@@ -1164,7 +1165,7 @@ describe('StabilityPool', () => {
       it("Request to withdraw > caller's deposit only withdraws the caller's compounded deposit", async () => {
         await whaleShrimpTroveInit(contracts, signers);
 
-        await priceFeed.setTokenPrice(BTC, parseUnits('5000'));
+        await setPrice('BTC', '5000', contracts);
         await liquidationOperations.liquidate(defaulter_1);
 
         const alice_Stable_Balance_Before = await STABLE.balanceOf(alice);
@@ -1208,7 +1209,7 @@ describe('StabilityPool', () => {
         await whaleShrimpTroveInit(contracts, signers);
         const stabilityPool = await getStabilityPool(contracts, STABLE);
 
-        await priceFeed.setTokenPrice(BTC, parseUnits('5000'));
+        await setPrice('BTC', '5000', contracts);
         await liquidationOperations.liquidate(defaulter_1);
 
         const [isRecoveryModeBefore] = await storagePool.checkRecoveryMode();
@@ -1232,7 +1233,7 @@ describe('StabilityPool', () => {
         const LUSDinSP_Before = await stabilityPool.getTotalDeposit();
 
         // Price rises
-        await priceFeed.setTokenPrice(BTC, parseUnits('500'));
+        await setPrice('BTC', '500', contracts);
         const [isRecoveryModeAfter] = await storagePool.checkRecoveryMode();
         assert.isTrue(isRecoveryModeAfter);
 
@@ -1291,7 +1292,7 @@ describe('StabilityPool', () => {
           collAmount: parseUnits('1', 9),
           debts: [{ tokenAddress: STABLE, amount: parseUnits('7000') }],
         });
-        await priceFeed.setTokenPrice(BTC, parseUnits('5000'));
+        await setPrice('BTC', '5000', contracts);
         await liquidationOperations.liquidate(erin);
 
         const LUSDinSP = await stabilityPool.getTotalDeposit();
@@ -1329,7 +1330,7 @@ describe('StabilityPool', () => {
 
         const aliceBTCBefore = await BTC.balanceOf(alice);
 
-        await priceFeed.setTokenPrice(BTC, parseUnits('5000'));
+        await setPrice('BTC', '5000', contracts);
         await liquidationOperations.liquidate(defaulter_1);
 
         const stabilityPool = await getStabilityPool(contracts, STABLE);
@@ -1350,7 +1351,7 @@ describe('StabilityPool', () => {
         await whaleShrimpTroveInit(contracts, signers);
         const stabilityPool = await getStabilityPool(contracts, STABLE);
 
-        await priceFeed.setTokenPrice(BTC, parseUnits('5000'));
+        await setPrice('BTC', '5000', contracts);
         await liquidationOperations.liquidate(defaulter_1);
 
         await stabilityPoolManager.connect(alice).withdrawGains();
@@ -1377,7 +1378,7 @@ describe('StabilityPool', () => {
         await whaleShrimpTroveInit(contracts, signers);
         const stabilityPool = await getStabilityPool(contracts, STABLE);
 
-        await priceFeed.setTokenPrice(BTC, parseUnits('5000'));
+        await setPrice('BTC', '5000', contracts);
         await liquidationOperations.liquidate(defaulter_1);
 
         // All depositors attempt to withdraw
@@ -1398,10 +1399,10 @@ describe('StabilityPool', () => {
         const bob_Collateral_Before = await BTC.balanceOf(bob);
         const carol_Collateral_Before = await BTC.balanceOf(carol);
 
-        await priceFeed.setTokenPrice(BTC, parseUnits('5000'));
+        await setPrice('BTC', '5000', contracts);
         await liquidationOperations.liquidate(defaulter_1);
 
-        await priceFeed.setTokenPrice(BTC, parseUnits('5'));
+        await setPrice('BTC', '5', contracts);
         const [isRecoveryModeB] = await storagePool.checkRecoveryMode();
         assert.isTrue(isRecoveryModeB);
 

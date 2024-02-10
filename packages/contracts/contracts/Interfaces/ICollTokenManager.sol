@@ -14,5 +14,5 @@ interface ICollTokenManager {
 
   function getCollTokenAddresses() external view returns (address[] memory);
 
-  function addCollToken(address _tokenAddress) external;
+  function addCollToken(address _tokenAddress, uint _tellorOracleId) external;
 }

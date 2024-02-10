@@ -1,12 +1,5 @@
 import { ethers } from 'hardhat';
-import {
-  MockDebtToken,
-  MockERC20,
-  MockPriceFeed,
-  MockTroveManager,
-  StoragePool,
-  RedemptionOperations,
-} from '../typechain';
+import { MockDebtToken, MockERC20, PriceFeed, MockTroveManager, StoragePool, RedemptionOperations } from '../typechain';
 import { SignerWithAddress } from '@nomicfoundation/hardhat-ethers/signers';
 import { getRedemptionMeta, MAX_BORROWING_FEE, openTrove, redeem, whaleShrimpTroveInit } from '../utils/testHelper';
 import { assert, expect } from 'chai';
@@ -22,7 +15,7 @@ describe('RedemptionOperations', () => {
   let erin: SignerWithAddress;
 
   let contracts: any;
-  let priceFeed: MockPriceFeed;
+  let priceFeed: PriceFeed;
   let troveManager: MockTroveManager;
   let redemptionOperations: RedemptionOperations;
   let storagePool: StoragePool;

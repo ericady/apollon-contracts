@@ -2,7 +2,7 @@ import { ethers } from 'hardhat';
 import {
   MockDebtToken,
   MockERC20,
-  MockPriceFeed,
+  PriceFeed,
   MockTroveManager,
   StabilityPoolManager,
   StoragePool,
@@ -36,7 +36,7 @@ describe('StabilityPoolManager', () => {
   let STOCK: MockERC20;
   let BTC: MockERC20;
 
-  let priceFeed: MockPriceFeed;
+  let priceFeed: PriceFeed;
   let troveManager: MockTroveManager;
 
   let stabilityPoolManager: StabilityPoolManager;

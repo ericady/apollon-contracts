@@ -2,7 +2,7 @@
 
 pragma solidity ^0.8.9;
 
-import '../Interfaces/ITellorCaller.sol';
+import './ITellorCaller.sol';
 import './ITellor.sol';
 
 /*

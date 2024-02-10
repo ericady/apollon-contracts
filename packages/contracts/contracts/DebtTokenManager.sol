@@ -13,6 +13,7 @@ import './Interfaces/IStabilityPoolManager.sol';
 contract DebtTokenManager is Ownable(msg.sender), CheckContract, IDebtTokenManager {
   string public constant NAME = 'DTokenManager';
 
+  IPriceFeed public priceFeed;
   IStabilityPoolManager public stabilityPoolManager;
 
   // --- Data structures ---
@@ -24,10 +25,14 @@ contract DebtTokenManager is Ownable(msg.sender), CheckContract, IDebtTokenManag
 
   // --- Dependency setter ---
 
-  function setAddresses(address _stabilityPoolManagerAddress) external onlyOwner {
+  function setAddresses(address _stabilityPoolManagerAddress, address _priceFeedAddress) external onlyOwner {
     checkContract(_stabilityPoolManagerAddress);
+    checkContract(_priceFeedAddress);
+
     stabilityPoolManager = IStabilityPoolManager(_stabilityPoolManagerAddress);
-    emit DebtTokenManagerInitialized(_stabilityPoolManagerAddress);
+    priceFeed = IPriceFeed(_priceFeedAddress);
+
+    emit DebtTokenManagerInitialized(_stabilityPoolManagerAddress, _priceFeedAddress);
   }
 
   // --- Getters ---
@@ -52,8 +57,7 @@ contract DebtTokenManager is Ownable(msg.sender), CheckContract, IDebtTokenManag
 
   // --- Setters ---
 
-  // todo price oracle id/linking missing...
-  function addDebtToken(address _debtTokenAddress) external override onlyOwner {
+  function addDebtToken(address _debtTokenAddress, uint _tellorOracleId) external override onlyOwner {
     checkContract(_debtTokenAddress);
 
     IDebtToken debtToken = IDebtToken(_debtTokenAddress);
@@ -71,7 +75,7 @@ contract DebtTokenManager is Ownable(msg.sender), CheckContract, IDebtTokenManag
     if (isStableCoin) stableCoin = debtToken;
 
     stabilityPoolManager.addStabilityPool(debtToken);
-
+    priceFeed.initiateNewOracleId(_debtTokenAddress, _tellorOracleId);
     emit DebtTokenAdded(_debtTokenAddress);
   }
 }

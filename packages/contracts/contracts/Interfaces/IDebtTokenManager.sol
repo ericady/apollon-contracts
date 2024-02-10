@@ -8,7 +8,7 @@ import './IDebtToken.sol';
 interface IDebtTokenManager {
   // --- Events ---
 
-  event DebtTokenManagerInitialized(address _stabilityPoolManagerAddress);
+  event DebtTokenManagerInitialized(address _stabilityPoolManagerAddress, address _priceFeedAddress);
   event DebtTokenAdded(address _debtTokenAddress);
 
   // --- Custom Errors ---
@@ -27,5 +27,5 @@ interface IDebtTokenManager {
 
   function getDebtTokenAddresses() external view returns (address[] memory);
 
-  function addDebtToken(address _debtTokenAddress) external;
+  function addDebtToken(address _debtTokenAddress, uint _tellorOracleId) external;
 }

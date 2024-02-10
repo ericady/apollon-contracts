@@ -2,14 +2,14 @@ import { ethers } from 'hardhat';
 import {
   MockDebtToken,
   MockERC20,
-  MockPriceFeed,
+  PriceFeed,
   MockTroveManager,
   StabilityPoolManager,
   StoragePool,
   LiquidationOperations,
 } from '../typechain';
 import { SignerWithAddress } from '@nomicfoundation/hardhat-ethers/signers';
-import { openTrove, whaleShrimpTroveInit, getTCR, TroveStatus, repayDebt } from '../utils/testHelper';
+import { openTrove, whaleShrimpTroveInit, getTCR, TroveStatus, repayDebt, setPrice } from '../utils/testHelper';
 import { assert, expect } from 'chai';
 import { parseUnits } from 'ethers';
 import apollonTesting from '../ignition/modules/apollonTesting';
@@ -30,7 +30,7 @@ describe('TroveManager', () => {
   let STABLE: MockDebtToken;
   let BTC: MockERC20;
 
-  let priceFeed: MockPriceFeed;
+  let priceFeed: PriceFeed;
   let troveManager: MockTroveManager;
 
   let stabilityPoolManager: StabilityPoolManager;
@@ -56,7 +56,7 @@ describe('TroveManager', () => {
   });
 
   describe('TroveOwners', () => {
-    it('Should add new trove owner to the Trove Owners array', async function () {
+    it.only('Should add new trove owner to the Trove Owners array', async function () {
       const prevTroveOwnersCount = await troveManager.getTroveOwnersCount();
 
       await openTrove({
@@ -110,7 +110,7 @@ describe('TroveManager', () => {
       });
 
       //decrease price
-      await priceFeed.setTokenPrice(BTC, parseUnits('15000'));
+      await setPrice('BTC', '15000', contracts);
 
       // Confirm system is not in Recovery Mode
       const [isRecoveryModeBefore] = await storagePool.checkRecoveryMode();
@@ -123,7 +123,7 @@ describe('TroveManager', () => {
       await stabilityPoolManager.connect(carol).provideStability([{ tokenAddress: STABLE, amount: parseUnits('100') }]);
 
       //drop price again
-      await priceFeed.setTokenPrice(BTC, parseUnits('12000'));
+      await setPrice('BTC', '12000', contracts);
 
       //check recovery mode
       const [isRecoveryModeAfter] = await storagePool.checkRecoveryMode();
@@ -167,7 +167,7 @@ describe('TroveManager', () => {
       assert.isTrue(isRecoveryModeAfter_Active);
 
       //drop price again
-      await priceFeed.setTokenPrice(BTC, parseUnits('5000'));
+      await setPrice('BTC', '5000', contracts);
 
       //check trove length before liquidation
       const troveLengthBefore = await troveManager.getTroveOwnersCount();
@@ -188,7 +188,7 @@ describe('TroveManager', () => {
       await whaleShrimpTroveInit(contracts, signers);
 
       //decrease price
-      await priceFeed.setTokenPrice(BTC, parseUnits('5000'));
+      await setPrice('BTC', '5000', contracts);
 
       //check recovery mode status
       const [isRecoveryMode] = await storagePool.checkRecoveryMode();
@@ -202,7 +202,7 @@ describe('TroveManager', () => {
       const amountBeforePriceChange = await priceFeed.getAmountFromUSDValue(BTC, carolBtcRewardBefore);
 
       //drop price again
-      await priceFeed.setTokenPrice(BTC, parseUnits('3000'));
+      await setPrice('BTC', '3000', contracts);
       const isRecoveryModeAfterPriceChange = await storagePool.checkRecoveryMode();
       assert.isFalse(isRecoveryModeAfterPriceChange[0]);
 
@@ -215,7 +215,7 @@ describe('TroveManager', () => {
       await whaleShrimpTroveInit(contracts, signers, false);
 
       //decrease price
-      await priceFeed.setTokenPrice(BTC, parseUnits('5000'));
+      await setPrice('BTC', '5000', contracts);
       const [isRecoveryMode] = await storagePool.checkRecoveryMode();
       assert.isFalse(isRecoveryMode);
       await liquidationOperations.liquidate(defaulter_1);

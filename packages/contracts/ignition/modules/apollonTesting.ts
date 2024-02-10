@@ -16,7 +16,7 @@ export default buildModule('ApollonTesting', m => {
     reservePool: m.contract('ReservePool', []),
     collTokenManager: m.contract('CollTokenManager', []),
     debtTokenManager: m.contract('DebtTokenManager', []),
-    priceFeed: m.contract('MockPriceFeed', []),
+    priceFeed: m.contract('PriceFeed', []),
     swapOperations: m.contract('SwapOperations', []),
   };
 
@@ -86,7 +86,7 @@ export default buildModule('ApollonTesting', m => {
   ];
   m.call(contracts.storagePool, 'setAddresses', storagePoolLinks, { after: storagePoolLinks });
 
-  const debtTokenManagerLinks = [contracts.stabilityPoolManager];
+  const debtTokenManagerLinks = [contracts.stabilityPoolManager, contracts.priceFeed];
   const debtTokenLink = m.call(contracts.debtTokenManager, 'setAddresses', debtTokenManagerLinks, {
     after: debtTokenManagerLinks,
   });
@@ -117,6 +117,21 @@ export default buildModule('ApollonTesting', m => {
 
   const collSurplusPoolLinks = [contracts.liquidationOperations, contracts.borrowerOperations];
   m.call(contracts.collSurplusPool, 'setAddresses', collSurplusPoolLinks, { after: collSurplusPoolLinks });
+
+  // setup mock tellor for testing
+  contracts.mockTellor = m.contract('MockTellor', []);
+  m.call(contracts.mockTellor, 'setUpdateTime', [1], { after: [contracts.mockTellor] }); // todo get current blocktime
+  m.call(contracts.mockTellor, 'setPrice', [1, parseUnits('21000', 6)], { after: [contracts.mockTellor] }); // BTC
+  m.call(contracts.mockTellor, 'setPrice', [2, parseUnits('1', 6)], { after: [contracts.mockTellor] }); // USDT
+  m.call(contracts.mockTellor, 'setPrice', [3, parseUnits('1', 6)], { after: [contracts.mockTellor] }); // STABLE
+  m.call(contracts.mockTellor, 'setPrice', [4, parseUnits('150', 6)], { after: [contracts.mockTellor] }); // STOCK
+  contracts.tellorCaller = m.contract('TellorCaller', [contracts.mockTellor], {
+    after: [contracts.mockTellor],
+  });
+
+  // price feed setup / linking
+  const priceFeedLinks = [contracts.tellorCaller, contracts.debtTokenManager, contracts.collTokenManager];
+  m.call(contracts.priceFeed, 'setAddresses', priceFeedLinks, { after: priceFeedLinks });
 
   // testing setup
   contracts.BTC = m.contract('MockERC20', ['Bitcoin', 'BTC', 9n], { id: 'mockBTC' });
@@ -156,38 +171,21 @@ export default buildModule('ApollonTesting', m => {
     { id: 'mockSTOCK' }
   );
 
-  m.call(contracts.debtTokenManager, 'addDebtToken', [contracts.STABLE], {
-    id: 'addStable',
-    after: [contracts.STABLE, debtTokenLink],
-  });
-  m.call(contracts.debtTokenManager, 'addDebtToken', [contracts.STOCK], {
-    id: 'addStock',
-    after: [contracts.STOCK, debtTokenLink],
-  });
-  m.call(contracts.collTokenManager, 'addCollToken', [contracts.BTC], {
+  m.call(contracts.collTokenManager, 'addCollToken', [contracts.BTC, 1], {
     id: 'addBtc',
     after: [contracts.BTC, collTokenLink],
   });
-  m.call(contracts.collTokenManager, 'addCollToken', [contracts.USDT], {
+  m.call(contracts.collTokenManager, 'addCollToken', [contracts.USDT, 2], {
     id: 'addUsdt',
     after: [contracts.USDT, collTokenLink],
   });
-
-  m.call(contracts.priceFeed, 'setTokenPrice', [contracts.BTC, parseUnits('21000')], {
-    id: 'setBtcPrice',
-    after: [contracts.BTC],
+  m.call(contracts.debtTokenManager, 'addDebtToken', [contracts.STABLE, 3], {
+    id: 'addStable',
+    after: [contracts.STABLE, debtTokenLink],
   });
-  m.call(contracts.priceFeed, 'setTokenPrice', [contracts.USDT, parseUnits('1')], {
-    id: 'setUsdtPrice',
-    after: [contracts.USDT],
-  });
-  m.call(contracts.priceFeed, 'setTokenPrice', [contracts.STABLE, parseUnits('1')], {
-    id: 'setStablePrice',
-    after: [contracts.STABLE],
-  });
-  m.call(contracts.priceFeed, 'setTokenPrice', [contracts.STOCK, parseUnits('150')], {
-    id: 'setStockPrice',
-    after: [contracts.STOCK],
+  m.call(contracts.debtTokenManager, 'addDebtToken', [contracts.STOCK, 4], {
+    id: 'addStock',
+    after: [contracts.STOCK, debtTokenLink],
   });
 
   // reserve pool contract linking

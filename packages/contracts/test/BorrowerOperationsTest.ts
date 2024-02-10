@@ -4,7 +4,7 @@ import {
   MockBorrowerOperations,
   MockDebtToken,
   MockERC20,
-  MockPriceFeed,
+  PriceFeed,
   MockTroveManager,
   LiquidationOperations,
   StoragePool,
@@ -30,6 +30,7 @@ import {
   getDomain,
   PermitTypes,
   getHints,
+  setPrice,
 } from '../utils/testHelper';
 import { AbiCoder, Signature, keccak256, parseUnits, solidityPacked, toUtf8Bytes } from 'ethers';
 import { time } from '@nomicfoundation/hardhat-network-helpers';
@@ -44,7 +45,7 @@ describe('BorrowerOperations', () => {
   let erin: SignerWithAddress;
 
   let contracts: any;
-  let priceFeed: MockPriceFeed;
+  let priceFeed: PriceFeed;
   let troveManager: MockTroveManager;
   let borrowerOperations: MockBorrowerOperations;
   let storagePool: StoragePool;
@@ -86,7 +87,7 @@ describe('BorrowerOperations', () => {
       await open(bob, parseUnits('1', 9), parseUnits('100'));
 
       // Price drops
-      await priceFeed.setTokenPrice(BTC, parseUnits('1000', 18));
+      await setPrice('BTC', '1000', contracts);
       // System debt status,
       // Collateral:  1.05 BTC  ($1050)
       // Debt:        2 STOCK ($688.5 = $285 + $400 gas lock + $3.5 borrowing fee)
@@ -228,7 +229,7 @@ describe('BorrowerOperations', () => {
       // --- TEST ---
 
       // price drops to 1BTC:$10k, reducing Carol's ICR below MCR
-      await priceFeed.setTokenPrice(BTC, parseUnits('1000'));
+      await setPrice('BTC', '1000', contracts);
 
       // Liquidate Carol's Trove,
       await liquidationOperations.liquidate(carol);
@@ -321,7 +322,7 @@ describe('BorrowerOperations', () => {
       ).to.be.revertedWithCustomError(borrowerOperations, 'TroveClosedOrNotExist');
 
       // Price drops
-      await priceFeed.setTokenPrice(BTC, parseUnits('1000'));
+      await setPrice('BTC', '1000', contracts);
 
       // Bob gets liquidated
       await liquidationOperations.liquidate(bob);
@@ -339,7 +340,7 @@ describe('BorrowerOperations', () => {
 
       expect(await checkRecoveryMode(contracts)).to.be.false;
 
-      await priceFeed.setTokenPrice(BTC, parseUnits('1000'));
+      await setPrice('BTC', '1000', contracts);
 
       expect(await checkRecoveryMode(contracts)).to.be.true;
 
@@ -365,7 +366,7 @@ describe('BorrowerOperations', () => {
       await open(bob, bobColl, bobDebt);
 
       // Price drops
-      await priceFeed.setTokenPrice(BTC, parseUnits('1200'));
+      await setPrice('BTC', '1200', contracts);
 
       expect((await storagePool.checkRecoveryMode()).isInRecoveryMode).to.be.false;
       expect((await troveManager.getCurrentICR(alice)).ICR).to.be.lt(parseUnits('1.1')); // less than 110%
@@ -404,7 +405,7 @@ describe('BorrowerOperations', () => {
       // Withdrawal possible when recoveryMode == false
       await withdrawalColl(alice, contracts, [{ tokenAddress: BTC, amount: 1000 }]);
 
-      await priceFeed.setTokenPrice(BTC, parseUnits('1000'));
+      await setPrice('BTC', '1000', contracts);
 
       expect(await checkRecoveryMode(contracts)).to.be.true;
 
@@ -435,7 +436,7 @@ describe('BorrowerOperations', () => {
       ).to.be.revertedWithCustomError(borrowerOperations, 'WithdrawAmount_gt_Coll');
     });
     it("reverts when withdrawal would bring the user's ICR < MCR", async () => {
-      await priceFeed.setTokenPrice(BTC, parseUnits('11000'));
+      await setPrice('BTC', '11000', contracts);
       await open(whale, parseUnits('1.5', 9), parseUnits('1000'));
       // BOB ICR = 110%
       await open(bob, parseUnits('1', 9), parseUnits('9750'));
@@ -462,7 +463,7 @@ describe('BorrowerOperations', () => {
       // --- TEST ---
 
       // price drops to 1ETH:150LUSD, reducing TCR below 150%
-      await priceFeed.setTokenPrice(BTC, parseUnits('1000'));
+      await setPrice('BTC', '1000', contracts);
 
       //Alice tries to withdraw collateral during Recovery Mode
       await expect(withdrawalColl(alice, contracts, [{ tokenAddress: BTC, amount: 1 }])).to.be.revertedWithCustomError(
@@ -592,7 +593,7 @@ describe('BorrowerOperations', () => {
       // --- TEST ---
 
       // price drops to 1ETH:100LUSD, reducing Carol's ICR below MCR
-      await priceFeed.setTokenPrice(BTC, parseUnits('5000'));
+      await setPrice('BTC', '5000', contracts);
 
       // close Carol's Trove, liquidating her 1 ether and 180LUSD.
       await liquidationOperations.liquidate(carol);
@@ -668,7 +669,7 @@ describe('BorrowerOperations', () => {
       const bobDebt = parseUnits('5000');
       await open(bob, bobColl, bobDebt);
       // Price drops
-      await priceFeed.setTokenPrice(BTC, parseUnits('5000'));
+      await setPrice('BTC', '5000', contracts);
 
       expect(await checkRecoveryMode(contracts)).to.be.false;
       expect((await troveManager.getCurrentICR(bob)).ICR).to.be.lt(parseUnits('1.1'));
@@ -1217,7 +1218,7 @@ describe('BorrowerOperations', () => {
       // Withdrawal possible when recoveryMode == false
       await increaseDebt(alice, contracts, [{ tokenAddress: STABLE, amount: parseUnits('100') }]);
 
-      await priceFeed.setTokenPrice(BTC, parseUnits('100'));
+      await setPrice('BTC', '100', contracts);
 
       expect(await checkRecoveryMode(contracts)).to.be.true;
 
@@ -1258,7 +1259,7 @@ describe('BorrowerOperations', () => {
       // --- TEST ---
 
       // price drops to 1ETH:150LUSD, reducing TCR below 150%
-      await priceFeed.setTokenPrice(BTC, parseUnits('150'));
+      await setPrice('BTC', '150', contracts);
       expect(await getTCR(contracts)).to.be.lt(parseUnits('1.5'));
       expect(await checkRecoveryMode(contracts)).to.be.true;
 
@@ -1320,7 +1321,7 @@ describe('BorrowerOperations', () => {
       await open(bob, parseUnits('10', 9), parseUnits('1000'));
 
       // Price drops
-      await priceFeed.setTokenPrice(BTC, parseUnits('1000'));
+      await setPrice('BTC', '1000', contracts);
       const price = await priceFeed.getPrice(BTC);
 
       expect(await checkRecoveryMode(contracts)).to.be.false;
@@ -1454,7 +1455,7 @@ describe('BorrowerOperations', () => {
       expect(aliceDebtBefore).to.be.gt(borrowAmount);
 
       expect(await checkRecoveryMode(contracts)).to.be.false;
-      await priceFeed.setTokenPrice(BTC, parseUnits('5000'));
+      await setPrice('BTC', '5000', contracts);
       expect(await checkRecoveryMode(contracts)).to.be.true;
 
       await repayDebt(alice, contracts, [{ tokenAddress: STABLE, amount: aliceDebtBefore / 10n }]);
@@ -1531,7 +1532,7 @@ describe('BorrowerOperations', () => {
       // Bob successfully closes his trove
       await borrowerOperations.connect(bob).closeTrove();
 
-      await priceFeed.setTokenPrice(BTC, parseUnits('1000'));
+      await setPrice('BTC', '1000', contracts);
 
       expect(await checkRecoveryMode(contracts)).to.be.true;
 
@@ -1626,21 +1627,21 @@ describe('BorrowerOperations', () => {
       await open(bob, parseUnits('1', 9), parseUnits('10000'));
 
       // Price drops
-      await priceFeed.setTokenPrice(BTC, parseUnits('5000'));
+      await setPrice('BTC', '5000', contracts);
 
       // Liquidate Bob
       await liquidationOperations.liquidate(bob);
       expect(await troveManager.getTroveStatus(bob)).to.be.equal(4n);
 
       // // Price bounces back
-      await priceFeed.setTokenPrice(BTC, parseUnits('20000'));
+      await setPrice('BTC', '20000', contracts);
 
       // Alice and Carol open troves
       await open(alice, parseUnits('1', 9), parseUnits('10000'));
       await open(carol, parseUnits('1', 9), parseUnits('10000'));
 
       // Price drops ...again
-      await priceFeed.setTokenPrice(BTC, parseUnits('5000'));
+      await setPrice('BTC', '5000', contracts);
 
       // Get Alice's pending reward snapshots
       const L_BTC_A_Snapshot = await troveManager.rewardSnapshots(alice, BTC, true);
@@ -1824,7 +1825,7 @@ describe('BorrowerOperations', () => {
       // --- TEST ---
 
       // price drops to 1ETH:100LUSD, reducing Carol's ICR below MCR
-      await priceFeed.setTokenPrice(BTC, parseUnits('10000'));
+      await setPrice('BTC', '10000', contracts);
       // const price = await priceFeed.getPrice();
 
       // liquidate Carol's Trove, Alice and Bob earn rewards.
@@ -2354,7 +2355,7 @@ describe('BorrowerOperations', () => {
       expect(await checkRecoveryMode(contracts)).to.be.false;
 
       // price drops, and Recovery Mode kicks in
-      await priceFeed.setTokenPrice(BTC, parseUnits('5000'));
+      await setPrice('BTC', '5000', contracts);
 
       expect(await checkRecoveryMode(contracts)).to.be.true;
 
@@ -2377,7 +2378,7 @@ describe('BorrowerOperations', () => {
       );
 
       // price drops, and Recovery Mode kicks in
-      await priceFeed.setTokenPrice(BTC, parseUnits('5000'));
+      await setPrice('BTC', '5000', contracts);
 
       expect(await checkRecoveryMode(contracts)).to.be.true;
 
@@ -2389,7 +2390,7 @@ describe('BorrowerOperations', () => {
     });
 
     it('reverts when opening the trove would cause the TCR of the system to fall below the CCR', async () => {
-      await priceFeed.setTokenPrice(BTC, parseUnits('15000'));
+      await setPrice('BTC', '15000', contracts);
 
       // Alice creates trove with 150% ICR.  System TCR = 150%.
       await open(alice, parseUnits('1', 9), parseUnits('9751.243')); // 9751.243 + 48.756215 + 200 = 9999.999215
@@ -2420,7 +2421,7 @@ describe('BorrowerOperations', () => {
     });
 
     it('Can open a trove with ICR >= CCR when system is in Recovery Mode', async () => {
-      await priceFeed.setTokenPrice(BTC, parseUnits('15000'));
+      await setPrice('BTC', '15000', contracts);
       // --- SETUP ---
       //  Alice and Bob add coll and withdraw such  that the TCR is ~150%
       await open(alice, parseUnits('1', 9), parseUnits('9751.243'));
@@ -2430,7 +2431,7 @@ describe('BorrowerOperations', () => {
       expect(TCR).to.be.closeTo(parseUnits('1.5'), parseUnits('0.0001'));
 
       // price drops to 1ETH:100LUSD, reducing TCR below 150%
-      await priceFeed.setTokenPrice(BTC, parseUnits('14900'));
+      await setPrice('BTC', '14900', contracts);
 
       expect(await checkRecoveryMode(contracts)).to.be.true;
 
@@ -2448,7 +2449,7 @@ describe('BorrowerOperations', () => {
       // TODO: check the logics again
       // --- SETUP ---
       //  Alice and Bob add coll and withdraw such  that the TCR is ~150%
-      await priceFeed.setTokenPrice(BTC, parseUnits('15000'));
+      await setPrice('BTC', '15000', contracts);
       // --- SETUP ---
       //  Alice and Bob add coll and withdraw such  that the TCR is ~150%
       await open(alice, parseUnits('1', 9), parseUnits('9751.243'));
@@ -2458,7 +2459,7 @@ describe('BorrowerOperations', () => {
       expect(TCR).to.be.closeTo(parseUnits('1.5'), parseUnits('0.0001'));
 
       // price drops to 1ETH:100LUSD, reducing TCR below 150%
-      await priceFeed.setTokenPrice(BTC, parseUnits('14900'));
+      await setPrice('BTC', '14900', contracts);
 
       expect(await checkRecoveryMode(contracts)).to.be.true;
 

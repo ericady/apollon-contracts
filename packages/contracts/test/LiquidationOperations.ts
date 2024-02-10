@@ -2,7 +2,7 @@ import { ethers } from 'hardhat';
 import {
   MockDebtToken,
   MockERC20,
-  MockPriceFeed,
+  PriceFeed,
   MockTroveManager,
   StabilityPoolManager,
   StoragePool,
@@ -19,6 +19,7 @@ import {
   openTrove,
   whaleShrimpTroveInit,
   repayDebt,
+  setPrice,
 } from '../utils/testHelper';
 import { assert, expect } from 'chai';
 import { parseUnits } from 'ethers';
@@ -42,7 +43,7 @@ describe('LiquidationOperations', () => {
   let STABLE: MockDebtToken;
   let BTC: MockERC20;
 
-  let priceFeed: MockPriceFeed;
+  let priceFeed: PriceFeed;
   let troveManager: MockTroveManager;
 
   let stabilityPoolManager: StabilityPoolManager;
@@ -73,7 +74,7 @@ describe('LiquidationOperations', () => {
     describe('liquidate()', () => {
       it('closes a Trove that has ICR < MCR', async () => {
         await whaleShrimpTroveInit(contracts, signers, false);
-        await priceFeed.setTokenPrice(BTC, parseUnits('5000'));
+        await setPrice('BTC', '5000', contracts);
 
         const [isRecoveryMode] = await storagePool.checkRecoveryMode();
         assert.isFalse(isRecoveryMode);
@@ -96,7 +97,7 @@ describe('LiquidationOperations', () => {
 
       it('decreases ActivePool collateral by liquidated amount', async () => {
         await whaleShrimpTroveInit(contracts, signers, false);
-        await priceFeed.setTokenPrice(BTC, parseUnits('5000'));
+        await setPrice('BTC', '5000', contracts);
 
         const [isRecoveryMode] = await storagePool.checkRecoveryMode();
         assert.isFalse(isRecoveryMode);
@@ -122,7 +123,7 @@ describe('LiquidationOperations', () => {
 
       it('increases DefaultPool coll and debt by correct amounts', async () => {
         await whaleShrimpTroveInit(contracts, signers, false);
-        await priceFeed.setTokenPrice(BTC, parseUnits('5000'));
+        await setPrice('BTC', '5000', contracts);
 
         const [isRecoveryMode] = await storagePool.checkRecoveryMode();
         assert.isFalse(isRecoveryMode);
@@ -143,12 +144,14 @@ describe('LiquidationOperations', () => {
 
         const liquidatedDebt = parseUnits('100');
         const defaultPoolDebtAfter = await storagePool.getValue(STABLE, false, 1);
-        expect(defaultPoolDebtAfter).to.be.equal(liquidatedDebt + (await troveManager.getBorrowingFee(liquidatedDebt, true)));
+        expect(defaultPoolDebtAfter).to.be.equal(
+          liquidatedDebt + (await troveManager.getBorrowingFee(liquidatedDebt, true))
+        );
       });
 
       it("removes the Trove's stake from the total stakes", async () => {
         await whaleShrimpTroveInit(contracts, signers, false);
-        await priceFeed.setTokenPrice(BTC, parseUnits('5000'));
+        await setPrice('BTC', '5000', contracts);
 
         const [isRecoveryMode] = await storagePool.checkRecoveryMode();
         assert.isFalse(isRecoveryMode);
@@ -167,7 +170,7 @@ describe('LiquidationOperations', () => {
         await whaleShrimpTroveInit(contracts, signers, false);
 
         //price drops
-        await priceFeed.setTokenPrice(BTC, parseUnits('5000'));
+        await setPrice('BTC', '5000', contracts);
 
         const [isRecoveryMode] = await storagePool.checkRecoveryMode();
         assert.isFalse(isRecoveryMode);
@@ -207,7 +210,7 @@ describe('LiquidationOperations', () => {
         await whaleShrimpTroveInit(contracts, signers, false);
 
         //price drops
-        await priceFeed.setTokenPrice(BTC, parseUnits('5000'));
+        await setPrice('BTC', '5000', contracts);
 
         const [isRecoveryMode] = await storagePool.checkRecoveryMode();
         assert.isFalse(isRecoveryMode);
@@ -239,7 +242,7 @@ describe('LiquidationOperations', () => {
 
       it('updates the L_coll reward-per-unit-staked totals', async () => {
         await whaleShrimpTroveInit(contracts, signers, false);
-        await priceFeed.setTokenPrice(BTC, parseUnits('5000'));
+        await setPrice('BTC', '5000', contracts);
 
         const [isRecoveryMode] = await storagePool.checkRecoveryMode();
         assert.isFalse(isRecoveryMode);
@@ -298,7 +301,7 @@ describe('LiquidationOperations', () => {
 
       it('reverts if trove is already closedByLiquidation', async () => {
         await whaleShrimpTroveInit(contracts, signers, false);
-        await priceFeed.setTokenPrice(BTC, parseUnits('5000'));
+        await setPrice('BTC', '5000', contracts);
         await liquidationOperations.liquidate(defaulter_1);
 
         await expect(liquidationOperations.liquidate(defaulter_1)).to.be.revertedWithCustomError(
@@ -350,7 +353,7 @@ describe('LiquidationOperations', () => {
           .provideStability([{ tokenAddress: STABLE, amount: parseUnits('500') }]);
 
         // defaulter gets liquidated
-        await priceFeed.setTokenPrice(BTC, parseUnits('5000'));
+        await setPrice('BTC', '5000', contracts);
         await liquidationOperations.liquidate(defaulter_1);
 
         const stabilityPool = await getStabilityPool(contracts, STABLE);
@@ -371,7 +374,7 @@ describe('LiquidationOperations', () => {
         const btcBalanceBefore = await BTC.balanceOf(defaulter_1);
 
         // defaulter gets liquidated
-        await priceFeed.setTokenPrice(BTC, parseUnits('5000'));
+        await setPrice('BTC', '5000', contracts);
         await liquidationOperations.liquidate(defaulter_1);
 
         const btcBalanceAfter = await BTC.balanceOf(defaulter_1);
@@ -380,7 +383,7 @@ describe('LiquidationOperations', () => {
 
       it('liquidates based on entire collateral/debt (including pending rewards), not raw collateral/debt', async () => {
         await whaleShrimpTroveInit(contracts, signers, false);
-        await priceFeed.setTokenPrice(BTC, parseUnits('5000'));
+        await setPrice('BTC', '5000', contracts);
 
         const [aliceICRBefore] = await troveManager.getCurrentICR(alice);
         const [d1ICRBefore] = await troveManager.getCurrentICR(defaulter_1);
@@ -440,7 +443,7 @@ describe('LiquidationOperations', () => {
           .provideStability([{ tokenAddress: STABLE, amount: parseUnits('300') }]);
 
         // Price drops
-        await priceFeed.setTokenPrice(BTC, parseUnits('1300'));
+        await setPrice('BTC', '1300', contracts);
 
         // check recovery mode
         const [isRecoveryModeAfter] = await storagePool.checkRecoveryMode();
@@ -480,7 +483,7 @@ describe('LiquidationOperations', () => {
         await whaleShrimpTroveInit(contracts, signers, false);
 
         //drop the price
-        await priceFeed.setTokenPrice(BTC, parseUnits('5000'));
+        await setPrice('BTC', '5000', contracts);
 
         const TCR_1 = await getTCR(contracts);
 
@@ -545,7 +548,7 @@ describe('LiquidationOperations', () => {
         });
 
         //decrease price
-        await priceFeed.setTokenPrice(BTC, parseUnits('10000'));
+        await setPrice('BTC', '10000', contracts);
 
         //get entire system coll & debt
         const entireSystemColl_Before = await storagePool.getEntireSystemColl();
@@ -615,7 +618,7 @@ describe('LiquidationOperations', () => {
         await stabilityPoolManager.connect(bob).provideStability([{ tokenAddress: STABLE, amount: bobSPDeposit }]);
 
         // carol gets liquidated
-        await priceFeed.setTokenPrice(BTC, parseUnits('10000'));
+        await setPrice('BTC', '10000', contracts);
         const [isInRecoveryMode] = await storagePool.checkRecoveryMode();
         assert.isFalse(isInRecoveryMode);
         const liquidateCarol = await liquidationOperations.liquidate(carol);
@@ -624,7 +627,7 @@ describe('LiquidationOperations', () => {
         assert.equal(liquidateCarolTroveStatus.toString(), TroveStatus.CLOSED_BY_LIQUIDATION_IN_NORMAL_MODE.toString());
 
         // price increases, dennis ICR > 110% again
-        await priceFeed.setTokenPrice(BTC, parseUnits('17000'));
+        await setPrice('BTC', '17000', contracts);
         const getDennisCurrentICR = (await troveManager.getCurrentICR(bob)).ICR;
         expect(getDennisCurrentICR).to.be.gt(parseUnits('110', 16));
 
@@ -705,7 +708,7 @@ describe('LiquidationOperations', () => {
         await stabilityPoolManager.connect(dennis).provideStability([{ tokenAddress: STABLE, amount: dennisSPValue }]);
 
         // carol gets liquidated
-        await priceFeed.setTokenPrice(BTC, parseUnits('11000'));
+        await setPrice('BTC', '11000', contracts);
 
         // check not in recovery mode
         const [isInRecoveryMode] = await storagePool.checkRecoveryMode();
@@ -776,7 +779,7 @@ describe('LiquidationOperations', () => {
         await stabilityPoolManager.connect(bob).provideStability([{ tokenAddress: STABLE, amount: parseUnits('800') }]);
 
         //drop price
-        await priceFeed.setTokenPrice(BTC, parseUnits('1000'));
+        await setPrice('BTC', '1000', contracts);
 
         // Confirm system is not in Recovery Mode
         const [isRecoveryModeBefore] = await storagePool.checkRecoveryMode();
@@ -853,7 +856,7 @@ describe('LiquidationOperations', () => {
         });
 
         //drop price
-        await priceFeed.setTokenPrice(BTC, parseUnits('15000'));
+        await setPrice('BTC', '15000', contracts);
 
         //get System TCR
         const TCR = await getTCR(contracts);
@@ -875,7 +878,7 @@ describe('LiquidationOperations', () => {
         );
 
         // Price bounces back
-        await priceFeed.setTokenPrice(BTC, parseUnits('21000'));
+        await setPrice('BTC', '21000', contracts);
 
         //TCR should be same as before
         const TCR_AFTER = await getTCR(contracts);
@@ -942,7 +945,7 @@ describe('LiquidationOperations', () => {
       const MCR = await troveManager.MCR();
 
       //drop price
-      await priceFeed.setTokenPrice(BTC, parseUnits('16500'));
+      await setPrice('BTC', '16500', contracts);
 
       //check system is not in recovery
       const [isRecoveryMode] = await storagePool.checkRecoveryMode();
@@ -995,7 +998,7 @@ describe('LiquidationOperations', () => {
       const [isRecoveryMode] = await storagePool.checkRecoveryMode();
       assert.isFalse(isRecoveryMode);
 
-      await priceFeed.setTokenPrice(STABLE, parseUnits('5'));
+      await setPrice('STABLE', '5', contracts);
 
       const MCR = await troveManager.MCR();
 
@@ -1049,7 +1052,7 @@ describe('LiquidationOperations', () => {
       const [isRecoveryMode] = await storagePool.checkRecoveryMode();
       assert.isFalse(isRecoveryMode);
 
-      await priceFeed.setTokenPrice(STABLE, parseUnits('5'));
+      await setPrice('STABLE', '5', contracts);
 
       const MCR = await troveManager.MCR();
 
@@ -1131,7 +1134,7 @@ describe('LiquidationOperations', () => {
       });
 
       //decrease price
-      await priceFeed.setTokenPrice(BTC, parseUnits('15000'));
+      await setPrice('BTC', '15000', contracts);
 
       // Confirm system is not in Recovery Mode
       const [isRecoveryModeBefore] = await storagePool.checkRecoveryMode();
@@ -1144,7 +1147,7 @@ describe('LiquidationOperations', () => {
       await stabilityPoolManager.connect(carol).provideStability([{ tokenAddress: STABLE, amount: parseUnits('100') }]);
 
       //drop price again
-      await priceFeed.setTokenPrice(BTC, parseUnits('12000'));
+      await setPrice('BTC', '12000', contracts);
 
       //check recovery mode
       const [isRecoveryModeAfter] = await storagePool.checkRecoveryMode();
@@ -1188,7 +1191,7 @@ describe('LiquidationOperations', () => {
       assert.isTrue(isRecoveryModeAfter_Active);
 
       //drop price again
-      await priceFeed.setTokenPrice(BTC, parseUnits('5000'));
+      await setPrice('BTC', '5000', contracts);
 
       //check trove length before liquidation
       const troveLengthBefore = await troveManager.getTroveOwnersCount();
@@ -1223,7 +1226,7 @@ describe('LiquidationOperations', () => {
       await STABLE.connect(whale).transfer(bob.address, parseUnits('500'));
 
       //drop price
-      await priceFeed.setTokenPrice(BTC, parseUnits('5000'));
+      await setPrice('BTC', '5000', contracts);
 
       //check recovery mode
       const [isRecoveryModeBefore] = await storagePool.checkRecoveryMode();
@@ -1280,7 +1283,7 @@ describe('LiquidationOperations', () => {
       assert.equal((await troveManager.getTroveOwnersCount()).toString(), '7');
 
       //drop price
-      await priceFeed.setTokenPrice(BTC, parseUnits('5000'));
+      await setPrice('BTC', '5000', contracts);
 
       const [isRecoveryMode] = await storagePool.checkRecoveryMode();
       assert.isFalse(isRecoveryMode);

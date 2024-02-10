@@ -4,7 +4,7 @@ import {
   MockBorrowerOperations,
   MockDebtToken,
   MockERC20,
-  MockPriceFeed,
+  PriceFeed,
   TroveManager,
   SwapPair,
   SwapOperations,
@@ -12,7 +12,7 @@ import {
   IBase,
 } from '../typechain';
 import { expect } from 'chai';
-import { openTrove, getLatestBlockTimestamp } from '../utils/testHelper';
+import { openTrove, getLatestBlockTimestamp, setPrice } from '../utils/testHelper';
 import { parseUnits } from 'ethers';
 import apollonTesting from '../ignition/modules/apollonTesting';
 
@@ -28,7 +28,7 @@ describe('SwapOperations', () => {
   let ETH: MockERC20;
 
   let contracts: any;
-  let priceFeed: MockPriceFeed;
+  let priceFeed: PriceFeed;
   let troveManager: TroveManager;
   let borrowerOperations: MockBorrowerOperations;
   let swapOperations: SwapOperations;
@@ -332,11 +332,11 @@ describe('SwapOperations', () => {
       expect(await pair.getSwapFee()).to.be.eq(baseFee);
 
       //check dex price > oracle price
-      await priceFeed.setTokenPrice(STOCK, parseUnits('140'));
+      await setPrice('STOCK', '140', contracts);
       expect(await pair.getSwapFee()).to.be.eq(baseFee);
 
       //check dex price < oracle price
-      await priceFeed.setTokenPrice(STOCK, parseUnits('160'));
+      await setPrice('STOCK', '160', contracts);
       expect(await pair.getSwapFee()).to.not.be.eq(baseFee);
     });
   });

@@ -4,12 +4,12 @@ import {
   LiquidationOperations,
   MockDebtToken,
   MockERC20,
-  MockPriceFeed,
+  PriceFeed,
   ReservePool,
   StabilityPoolManager,
 } from '../typechain';
 import { expect } from 'chai';
-import { openTrove } from '../utils/testHelper';
+import { openTrove, setPrice } from '../utils/testHelper';
 import { parseUnits } from 'ethers';
 import apollonTesting from '../ignition/modules/apollonTesting';
 
@@ -22,7 +22,7 @@ describe('Reserve Pool', () => {
   let BTC: MockERC20;
 
   let contracts: any;
-  let priceFeed: MockPriceFeed;
+  let priceFeed: PriceFeed;
   let liquidationOperations: LiquidationOperations;
   let reservePool: ReservePool;
   let stabilityPoolManager: StabilityPoolManager;
@@ -143,7 +143,7 @@ describe('Reserve Pool', () => {
         .provideStability([{ tokenAddress: STABLE, amount: parseUnits('3000') }]);
 
       let reserveBalBefore = await STABLE.balanceOf(reservePool);
-      await priceFeed.setTokenPrice(BTC, parseUnits('10000'));
+      await setPrice('BTC', '10000', contracts);
       await liquidationOperations.liquidate(bob);
       let reserveBalAfter = await STABLE.balanceOf(reservePool);
 

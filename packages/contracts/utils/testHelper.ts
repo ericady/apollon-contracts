@@ -29,6 +29,16 @@ export const getDomain = async (token: EIP712) => {
   };
 };
 
+export const setPrice = async (tokenLabel: string, price: string, contracts: any) => {
+  const requestId = {
+    BTC: 1,
+    USDT: 2,
+    STABLE: 3,
+    STOCK: 4,
+  };
+  await contracts.mockTellor.setPrice(requestId[tokenLabel], parseUnits(price, 6));
+};
+
 export const openTrove = async ({
   from,
   contracts,
