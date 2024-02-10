@@ -1,6 +1,6 @@
 import { Address, BigInt, ethereum } from '@graphprotocol/graph-ts';
 import { newMockEvent } from 'matchstick-as';
-import { Approval, Burn, Mint, Swap, Sync, Transfer } from '../generated/SwapPair/SwapPair';
+import { Approval, Burn, Mint, Swap, Sync, Transfer } from '../generated/templates/SwapPairTemplate/SwapPair';
 
 export function createApprovalEvent(owner: Address, spender: Address, value: BigInt): Approval {
   let approvalEvent = changetype<Approval>(newMockEvent());

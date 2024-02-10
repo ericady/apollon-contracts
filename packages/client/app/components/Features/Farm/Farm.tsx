@@ -197,10 +197,9 @@ const Farm = () => {
     return Math.abs(priceImpact) > 1 ? 1 : Math.abs(priceImpact);
   };
 
-
   useEffect(() => {
-    reset()
-    setTabValue("Long")
+    reset();
+    setTabValue('Long');
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedToken]);
 
@@ -218,7 +217,11 @@ const Farm = () => {
       <div style={{ height: '466px', overflowY: 'scroll' }}>
         <Tabs value={tabValue} onChange={handleTabChange} variant="fullWidth" sx={{ mx: '-15px' }}>
           <Tab label="LONG" value="Long" />
-          <Tab label="SHORT" value="Short" disabled={selectedToken?.address ? isCollateralTokenAddress(selectedToken.address) : false}/>
+          <Tab
+            label="SHORT"
+            value="Short"
+            disabled={selectedToken?.address ? isCollateralTokenAddress(selectedToken.address) : false}
+          />
         </Tabs>
 
         <FormProvider {...methods}>

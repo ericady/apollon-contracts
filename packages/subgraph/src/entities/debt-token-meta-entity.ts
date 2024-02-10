@@ -1,9 +1,7 @@
 import { Address, BigInt, ethereum } from '@graphprotocol/graph-ts';
 import { Address as EventAddress } from '@graphprotocol/graph-ts/common/numbers';
 import { BorrowerOperations } from '../../generated/BorrowerOperations/BorrowerOperations';
-import { DebtToken } from '../../generated/DebtToken_STABLE/DebtToken';
 import { ReservePool } from '../../generated/ReservePool/ReservePool';
-import { StabilityOffsetAddedGainsStruct, StabilityPool } from '../../generated/StabilityPool/StabilityPool';
 import { StabilityPoolManager } from '../../generated/StabilityPoolManager/StabilityPoolManager';
 import {
   DebtTokenMeta,
@@ -15,6 +13,11 @@ import {
   TotalSupplyAverage,
   TotalSupplyAverageChunk,
 } from '../../generated/schema';
+import { DebtToken } from '../../generated/templates/DebtTokenTemplate/DebtToken';
+import {
+  StabilityOffsetAddedGainsStruct,
+  StabilityPool,
+} from '../../generated/templates/StabilityPoolTemplate/StabilityPool';
 // import { log } from '@graphprotocol/graph-ts';
 
 export const stableDebtToken = EventAddress.fromString('0x6c3f90f043a72fa612cbac8115ee7e52bde6e490');
@@ -60,9 +63,9 @@ export function handleCreateUpdateDebtTokenMeta(
       debtTokenMeta.totalReserve = tokenContract.balanceOf(reservePoolAddress);
     } else if (tokenAddress === govToken) {
       debtTokenMeta.totalReserve = govReserveCap ? govReserveCap : reservePoolContract.govReserveCap();
-    } 
+    }
   } else {
-      debtTokenMeta.totalReserve = BigInt.fromI32(0);
+    debtTokenMeta.totalReserve = BigInt.fromI32(0);
   }
 
   debtTokenMeta.totalDepositedStability = debtTokenStabilityPoolContract.getTotalDeposit();

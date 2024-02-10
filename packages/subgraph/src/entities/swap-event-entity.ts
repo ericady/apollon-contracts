@@ -1,5 +1,4 @@
 import { Address, BigInt, ethereum } from '@graphprotocol/graph-ts';
-import { SwapPair } from '../../generated/SwapPair/SwapPair';
 import { SwapEvent } from '../../generated/schema';
 
 export function handleCreateSwapEvent(
@@ -22,7 +21,7 @@ export function handleCreateSwapEvent(
   swapEvent.size = nonStableSize;
   swapEvent.totalPriceInStable = totalPriceInStable;
 
-  swapEvent.swapFee = currentSwapFee
+  swapEvent.swapFee = currentSwapFee;
 
   swapEvent.save();
 }

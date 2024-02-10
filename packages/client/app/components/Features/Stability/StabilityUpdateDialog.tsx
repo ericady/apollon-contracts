@@ -8,9 +8,9 @@ import Tabs from '@mui/material/Tabs';
 import Typography from '@mui/material/Typography';
 import { SyntheticEvent, useEffect, useState } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
-import { DebtToken } from '../../../../generated/types';
 import { IBase } from '../../../../generated/types/StabilityPoolManager';
 import { Contracts, isDebtTokenAddress, useEthers } from '../../../context/EthersProvider';
+import { useTransactionDialog } from '../../../context/TransactionDialogProvider';
 import { GetBorrowerDebtTokensQuery, GetBorrowerDebtTokensQueryVariables } from '../../../generated/gql-types';
 import { GET_BORROWER_DEBT_TOKENS } from '../../../queries';
 import { dangerouslyConvertBigIntToNumber, floatToBigInt, roundCurrency } from '../../../utils/math';
@@ -18,7 +18,6 @@ import NumberInput from '../../FormControls/NumberInput';
 import CrossIcon from '../../Icons/CrossIcon';
 import DiamondIcon from '../../Icons/DiamondIcon';
 import Label from '../../Label/Label';
-import { useTransactionDialog } from '../../../context/TransactionDialogProvider';
 
 type FieldValues = Record<string, string>;
 
@@ -100,17 +99,13 @@ const StabilityUpdateDialog = () => {
           title: 'Provide Stability to the Stability Pool.',
           transaction: {
             methodCall: () => {
-              return  stabilityPoolManagerContract.provideStability(tokenAmounts);
+              return stabilityPoolManagerContract.provideStability(tokenAmounts);
             },
             // wait for all approvals
             waitForResponseOf: Array.of(tokenAmounts.length).map((_, index) => index),
           },
         },
       ]);
-
-
-
-
     } else {
       setSteps([
         {
@@ -118,11 +113,9 @@ const StabilityUpdateDialog = () => {
           transaction: {
             methodCall: () => {
               return stabilityPoolManagerContract.withdrawStability(tokenAmounts);
-
             },
-          waitForResponseOf: [],
+            waitForResponseOf: [],
           },
-      
         },
       ]);
     }

@@ -1,6 +1,6 @@
 import { Address, BigInt, ethereum } from '@graphprotocol/graph-ts';
 import { newMockEvent } from 'matchstick-as';
-import { Approval, Transfer } from '../generated/ERC20_BTC/ERC20';
+import { Approval, Transfer } from '../generated/templates/ERC20Template/ERC20';
 
 export function createApprovalEvent(owner: Address, spender: Address, value: BigInt): Approval {
   let approvalEvent = changetype<Approval>(newMockEvent());

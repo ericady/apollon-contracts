@@ -1,4 +1,4 @@
-import { Approval as ApprovalEvent, Transfer as TransferEvent } from '../generated/ERC20_BTC/ERC20';
+import { Approval as ApprovalEvent, Transfer as TransferEvent } from '../generated/templates/ERC20Template/ERC20';
 
 export function handleApproval(event: ApprovalEvent): void {}
 

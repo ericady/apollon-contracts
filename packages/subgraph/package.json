@@ -2,7 +2,7 @@
   "name": "subgraph",
   "license": "UNLICENSED",
   "scripts": {
-    "codegen": "npm run sync:abis && graph codegen",
+    "codegen": "npm run sync:abis && rm -r generated && graph codegen",
     "build": "graph build",
     "deploy": "graph deploy --node https://api.studio.thegraph.com/deploy/ subgraph",
     "create-local": "graph create --node http://localhost:8020/ subgraph",

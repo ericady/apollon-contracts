@@ -1,4 +1,7 @@
-import { Approval as ApprovalEvent, Transfer as TransferEvent } from '../generated/DebtToken_STABLE/DebtToken';
+import {
+  Approval as ApprovalEvent,
+  Transfer as TransferEvent,
+} from '../generated/templates/DebtTokenTemplate/DebtToken';
 import {
   handleCreateUpdateDebtTokenMeta,
   handleUpdateDebtTokenMeta_totalSupply30dAverage,

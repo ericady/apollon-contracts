@@ -14,7 +14,12 @@ import {
 } from '../../../generated/gql-types';
 import { GET_BORROWER_SWAPS } from '../../../queries';
 import { formatUnixTimestamp } from '../../../utils/date';
-import { bigIntStringToFloat, dangerouslyConvertBigIntToNumber, divBigIntsToFloat, roundCurrency } from '../../../utils/math';
+import {
+  bigIntStringToFloat,
+  dangerouslyConvertBigIntToNumber,
+  divBigIntsToFloat,
+  roundCurrency,
+} from '../../../utils/math';
 import Label from '../../Label/Label';
 import HeaderCell from '../../Table/HeaderCell';
 import HistoryTableLoader from './HistoryTableLoader';
@@ -34,8 +39,6 @@ function HistoryTable() {
       },
     },
   );
-
-  console.log('data: ', data);
 
   const handleScroll: TableContainerProps['onScroll'] = (event) => {
     const scrollableDiv = event.target as HTMLDivElement;
@@ -109,14 +112,15 @@ function HistoryTable() {
                 <TableCell align="right">
                   {direction === LongShortDirection.Long
                     ? `${roundCurrency(
-                     dangerouslyConvertBigIntToNumber(BigInt(swapFee)  * BigInt(totalPriceInStable), 18, 6),
+                        dangerouslyConvertBigIntToNumber(BigInt(swapFee) * BigInt(totalPriceInStable), 18, 6),
                         5,
                         5,
                       )} jUSD`
                     : `${roundCurrency(
-                     dangerouslyConvertBigIntToNumber(BigInt(swapFee)  * BigInt(size), 18, 6), 5, 5)} ${
-                        token.symbol
-                      }`}
+                        dangerouslyConvertBigIntToNumber(BigInt(swapFee) * BigInt(size), 18, 6),
+                        5,
+                        5,
+                      )} ${token.symbol}`}
                 </TableCell>
               </TableRow>
             );

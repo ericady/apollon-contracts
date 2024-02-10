@@ -12,7 +12,7 @@ import {
   StabilityPoolInitialized,
   StabilityProvided,
   StabilityWithdrawn,
-} from '../generated/StabilityPool/StabilityPool';
+} from '../generated/templates/StabilityPoolTemplate/StabilityPool';
 import { MockStabilityPoolAddress } from './debt-token-utils';
 
 export function createDepositSnapshotUpdatedEvent(_depositor: Address): DepositSnapshotUpdated {

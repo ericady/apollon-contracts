@@ -55,7 +55,7 @@ const favoritedAssets: string[] = getFavoritedAssetsFromLS();
 const now = Math.round(Date.now() / 1000);
 const oneDayInSeconds = 24 * 60 * 60;
 
-const JUSD: Omit<Token, 'priceUSDOracle'| 'borrowingRate'> = {
+const JUSD: Omit<Token, 'priceUSDOracle' | 'borrowingRate'> = {
   id: faker.string.uuid(),
   __typename: 'Token',
   address: Contracts.DebtToken.STABLE,
@@ -67,7 +67,7 @@ const JUSD: Omit<Token, 'priceUSDOracle'| 'borrowingRate'> = {
 
 export const tokens: Omit<Token, 'priceUSDOracle' | 'borrowingRate'>[] = Array(10)
   .fill(null)
-  .map<Omit<Token, 'priceUSDOracle'| 'borrowingRate'>>((_, index) => ({
+  .map<Omit<Token, 'priceUSDOracle' | 'borrowingRate'>>((_, index) => ({
     id: faker.string.uuid(),
     __typename: 'Token',
     address: index <= favoritedAssets.length - 1 ? favoritedAssets[index] : faker.finance.ethereumAddress(),
@@ -80,8 +80,8 @@ export const tokens: Omit<Token, 'priceUSDOracle' | 'borrowingRate'>[] = Array(1
   .concat(JUSD);
 
 // 5 hard tokens always with JUSD
-const collateralTokens: Omit<Token, 'priceUSDOracle'| 'borrowingRate'>[] = Object.entries(Contracts.ERC20).map<
-  Omit<Token, 'priceUSDOracle'| 'borrowingRate'>
+const collateralTokens: Omit<Token, 'priceUSDOracle' | 'borrowingRate'>[] = Object.entries(Contracts.ERC20).map<
+  Omit<Token, 'priceUSDOracle' | 'borrowingRate'>
 >(([symbol, address]) => ({
   id: faker.string.uuid(),
   __typename: 'Token',
@@ -123,7 +123,12 @@ const userCollateralTokenMeta = [
 const debtTokenMeta = tokens.map<
   Omit<
     DebtTokenMeta,
-    'troveMintedAmount' | 'compoundedDeposit' | 'walletAmount' | 'providedStability' | 'troveRepableDebtAmount' | 'troveDebtAmount'
+    | 'troveMintedAmount'
+    | 'compoundedDeposit'
+    | 'walletAmount'
+    | 'providedStability'
+    | 'troveRepableDebtAmount'
+    | 'troveDebtAmount'
   >
 >((token, index) => {
   const isGovOrStableDebtToken = index === tokens.length - 1 || index === tokens.length - 2;

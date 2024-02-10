@@ -1,7 +1,7 @@
 import { Address, BigInt, ethereum } from '@graphprotocol/graph-ts';
-import { DebtToken } from '../../generated/DebtToken_STABLE/DebtToken';
-import { SwapPair } from '../../generated/SwapPair/SwapPair';
 import { SystemInfo, TokenCandle, TokenCandleSingleton } from '../../generated/schema';
+import { DebtToken } from '../../generated/templates/DebtTokenTemplate/DebtToken';
+import { SwapPair } from '../../generated/templates/SwapPairTemplate/SwapPair';
 
 // 1min, 10min, 1hour, 6hour, 1day, 1week
 const CandleSizes = [1, 10, 60, 360, 1440, 10080];

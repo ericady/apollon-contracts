@@ -1,7 +1,7 @@
 import { Address, BigInt, ethereum } from '@graphprotocol/graph-ts';
 import { Address as EventAddress } from '@graphprotocol/graph-ts/common/numbers';
 import { newMockEvent } from 'matchstick-as';
-import { Approval, Transfer } from '../generated/DebtToken_STABLE/DebtToken';
+import { Approval, Transfer } from '../generated/templates/DebtTokenTemplate/DebtToken';
 
 export const MockDebtTokenAddress = EventAddress.fromString('0x0000000000000000000000000000000000000100');
 export const MockStabilityPoolManagerAddress = EventAddress.fromString('0x0000000000000000000000000000000000000200');

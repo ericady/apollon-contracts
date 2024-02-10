@@ -17,7 +17,6 @@ import Tabs from '@mui/material/Tabs';
 import Typography from '@mui/material/Typography';
 import { SyntheticEvent, useCallback, useState } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
-import { ERC20 } from '../../../../generated/types';
 import { IBase } from '../../../../generated/types/BorrowerOperations';
 import { Contracts, isCollateralTokenAddress, useEthers } from '../../../context/EthersProvider';
 import { useTransactionDialog } from '../../../context/TransactionDialogProvider';

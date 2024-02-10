@@ -1,6 +1,6 @@
 import { Address, BigInt, ethereum } from '@graphprotocol/graph-ts';
-import { SwapPair } from '../../generated/SwapPair/SwapPair';
 import { Pool, PoolLiquidity, PoolVolume30d, PoolVolumeChunk } from '../../generated/schema';
+import { SwapPair } from '../../generated/templates/SwapPairTemplate/SwapPair';
 // import { log } from '@graphprotocol/graph-ts';
 
 // 15 minutes

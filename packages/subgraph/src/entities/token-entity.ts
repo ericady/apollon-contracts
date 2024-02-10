@@ -1,8 +1,8 @@
 import { Address, BigInt, ethereum } from '@graphprotocol/graph-ts';
-import { ERC20 } from '../../generated/CollTokenManager/ERC20';
-import { DebtToken } from '../../generated/DebtToken_STABLE/DebtToken';
 import { PriceFeed } from '../../generated/PriceFeed/PriceFeed';
 import { SystemInfo, Token } from '../../generated/schema';
+import { DebtToken } from '../../generated/templates/DebtTokenTemplate/DebtToken';
+import { ERC20 } from '../../generated/templates/ERC20Template/ERC20';
 // import { log } from '@graphprotocol/graph-ts';
 
 export function handleCreateToken(event: ethereum.Event, tokenAddress: Address, isDebtToken: boolean): void {
