@@ -47,7 +47,7 @@ export function handleCreateUpdateDebtTokenMeta(
 
   const totalSupply = tokenContract.totalSupply();
   const tokenPrice = Token.load(tokenAddress)!.priceUSD;
-  debtTokenMeta.totalSupplyUSD = totalSupply.times(tokenPrice);
+  debtTokenMeta.totalSupplyUSD = totalSupply.times(tokenPrice).div(BigInt.fromI32(10).pow(18));
 
   if (tokenAddress === stableDebtToken || tokenAddress === govToken) {
     const borrowerOperationsAddress = tokenContract.borrowerOperationsAddress();
@@ -60,7 +60,9 @@ export function handleCreateUpdateDebtTokenMeta(
       debtTokenMeta.totalReserve = tokenContract.balanceOf(reservePoolAddress);
     } else if (tokenAddress === govToken) {
       debtTokenMeta.totalReserve = govReserveCap ? govReserveCap : reservePoolContract.govReserveCap();
-    }
+    } 
+  } else {
+      debtTokenMeta.totalReserve = BigInt.fromI32(0);
   }
 
   debtTokenMeta.totalDepositedStability = debtTokenStabilityPoolContract.getTotalDeposit();

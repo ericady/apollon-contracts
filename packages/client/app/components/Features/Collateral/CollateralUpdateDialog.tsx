@@ -19,7 +19,7 @@ import { SyntheticEvent, useCallback, useState } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
 import { ERC20 } from '../../../../generated/types';
 import { IBase } from '../../../../generated/types/BorrowerOperations';
-import { Contracts, useEthers } from '../../../context/EthersProvider';
+import { Contracts, isCollateralTokenAddress, useEthers } from '../../../context/EthersProvider';
 import { useTransactionDialog } from '../../../context/TransactionDialogProvider';
 import {
   GetBorrowerCollateralTokensQuery,
@@ -159,8 +159,12 @@ const CollateralUpdateDialog = ({ buttonVariant, buttonSx = {} }: Props) => {
           transaction: {
             methodCall: async () => {
               // @ts-ignore
-              const collContract = collateralTokenContracts[tokenAddress] as ERC20;
-              return collContract.approve(Contracts.BorrowerOperations, amount);
+              if (isCollateralTokenAddress(tokenAddress)) {
+                const collContract = collateralTokenContracts[tokenAddress];
+                return collContract.approve(Contracts.BorrowerOperations, amount);
+              }
+
+              return null as any;
             },
             waitForResponseOf: [],
           },

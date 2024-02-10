@@ -10,7 +10,7 @@ import { SyntheticEvent, useEffect, useState } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
 import { DebtToken } from '../../../../generated/types';
 import { IBase } from '../../../../generated/types/StabilityPoolManager';
-import { Contracts, useEthers } from '../../../context/EthersProvider';
+import { Contracts, isDebtTokenAddress, useEthers } from '../../../context/EthersProvider';
 import { GetBorrowerDebtTokensQuery, GetBorrowerDebtTokensQueryVariables } from '../../../generated/gql-types';
 import { GET_BORROWER_DEBT_TOKENS } from '../../../queries';
 import { dangerouslyConvertBigIntToNumber, floatToBigInt, roundCurrency } from '../../../utils/math';
@@ -18,10 +18,13 @@ import NumberInput from '../../FormControls/NumberInput';
 import CrossIcon from '../../Icons/CrossIcon';
 import DiamondIcon from '../../Icons/DiamondIcon';
 import Label from '../../Label/Label';
+import { useTransactionDialog } from '../../../context/TransactionDialogProvider';
 
 type FieldValues = Record<string, string>;
 
 const StabilityUpdateDialog = () => {
+  const { setSteps } = useTransactionDialog();
+
   const [isOpen, setIsOpen] = useState(false);
   const [tabValue, setTabValue] = useState<'DEPOSIT' | 'WITHDRAW'>('DEPOSIT');
 
@@ -75,15 +78,53 @@ const StabilityUpdateDialog = () => {
       }));
 
     if (tabValue === 'DEPOSIT') {
-      tokenAmounts.forEach(async ({ tokenAddress, amount }) => {
-        // @ts-ignore
-        const debtTokenContract = debtTokenContracts[tokenAddress] as DebtToken;
-        await debtTokenContract.approve(Contracts.StoragePool, amount);
-      });
+      setSteps([
+        ...tokenAmounts.map(({ tokenAddress, amount }) => ({
+          title: `Approve ${
+            Object.entries(Contracts.DebtToken).find(([_, value]) => value === tokenAddress)![0]
+          } spending.`,
+          transaction: {
+            methodCall: async () => {
+              // @ts-ignore
+              if (isDebtTokenAddress(tokenAddress)) {
+                const debtTokenContract = debtTokenContracts[tokenAddress];
+                return debtTokenContract.approve(Contracts.StoragePool, amount);
+              }
 
-      await stabilityPoolManagerContract.provideStability(tokenAmounts);
+              return null as any;
+            },
+            waitForResponseOf: [],
+          },
+        })),
+        {
+          title: 'Provide Stability to the Stability Pool.',
+          transaction: {
+            methodCall: () => {
+              return  stabilityPoolManagerContract.provideStability(tokenAmounts);
+            },
+            // wait for all approvals
+            waitForResponseOf: Array.of(tokenAmounts.length).map((_, index) => index),
+          },
+        },
+      ]);
+
+
+
+
     } else {
-      await stabilityPoolManagerContract.withdrawStability(tokenAmounts);
+      setSteps([
+        {
+          title: 'Provide Stability to the Stability Pool.',
+          transaction: {
+            methodCall: () => {
+              return stabilityPoolManagerContract.withdrawStability(tokenAmounts);
+
+            },
+          waitForResponseOf: [],
+          },
+      
+        },
+      ]);
     }
 
     reset();

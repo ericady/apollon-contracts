@@ -150,7 +150,7 @@ const Swap = () => {
           title: 'Approve jUSD spending.',
           transaction: {
             methodCall: async () => {
-              return debtTokenContracts[Contracts.DebtToken.STABLE]!.approve(
+              return debtTokenContracts[Contracts.DebtToken.STABLE].approve(
                 selectedToken!.pool.address,
                 floatToBigInt(jUSDAmount),
               );
@@ -162,10 +162,10 @@ const Swap = () => {
           title: `Swap jUSD for ${selectedToken?.symbol}.`,
           transaction: {
             methodCall: async () => {
-              return swapOperationsContract.swapTokensForExactTokens(
-                floatToBigInt(tokenAmount),
-                floatToBigInt(jUSDAmount * (1 + maxSlippage)),
-                [selectedToken!.address, JUSDToken!.address],
+              return swapOperationsContract.swapExactTokensForTokens(
+                floatToBigInt(jUSDAmount),
+                floatToBigInt(tokenAmount * (1 - maxSlippage)),
+                [JUSDToken!.address, selectedToken!.address],
                 address,
                 deadline,
               );
