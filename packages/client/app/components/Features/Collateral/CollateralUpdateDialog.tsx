@@ -24,7 +24,7 @@ import {
   GetBorrowerCollateralTokensQuery,
   GetBorrowerCollateralTokensQueryVariables,
 } from '../../../generated/gql-types';
-import { GET_BORROWER_COLLATERAL_TOKENS } from '../../../queries';
+import { GET_BORROWER_COLLATERAL_TOKENS, GET_BORROWER_DEBT_TOKENS } from '../../../queries';
 import { getHints } from '../../../utils/crypto';
 import {
   bigIntStringToFloat,
@@ -191,6 +191,9 @@ const CollateralUpdateDialog = ({ buttonVariant, buttonSx = {} }: Props) => {
                 return borrowerOperationsContract.addColl(tokenAmounts, upperHint, lowerHint);
               }
             },
+            reloadQueriesAferMined: hasNoOpenTrove
+              ? [GET_BORROWER_COLLATERAL_TOKENS, GET_BORROWER_DEBT_TOKENS]
+              : [GET_BORROWER_COLLATERAL_TOKENS],
             // wait for all approvals
             waitForResponseOf: Array.of(tokenAmounts.length).map((_, index) => index),
           },
@@ -217,6 +220,7 @@ const CollateralUpdateDialog = ({ buttonVariant, buttonSx = {} }: Props) => {
 
               return borrowerOperationsContract.withdrawColl(tokenAmounts, upperHint, lowerHint);
             },
+            reloadQueriesAferMined: [GET_BORROWER_COLLATERAL_TOKENS],
             waitForResponseOf: [],
           },
         },

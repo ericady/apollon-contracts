@@ -11,7 +11,7 @@ import {
   GetBorrowerCollateralTokensQuery,
   GetBorrowerCollateralTokensQueryVariables,
 } from '../../../generated/gql-types';
-import { GET_BORROWER_COLLATERAL_TOKENS } from '../../../queries';
+import { GET_BORROWER_COLLATERAL_TOKENS, GET_BORROWER_DEBT_TOKENS } from '../../../queries';
 import CrossIcon from '../../Icons/CrossIcon';
 import DiamondIcon from '../../Icons/DiamondIcon';
 
@@ -68,6 +68,7 @@ const CloseTroveDialog = ({ buttonVariant, buttonSx = {} }: Props) => {
             return borrowerOperationsContract.closeTrove();
           },
           waitForResponseOf: [],
+          reloadQueriesAferMined: [GET_BORROWER_COLLATERAL_TOKENS, GET_BORROWER_DEBT_TOKENS],
         },
       },
     ]);

@@ -1,4 +1,5 @@
 'use client';
+import { ApolloClient, useApolloClient } from '@apollo/client';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import ErrorIcon from '@mui/icons-material/Error';
 import {
@@ -28,6 +29,8 @@ export type TransactionStep = {
   transaction: {
     methodCall: () => Promise<ContractTransactionResponse>;
     waitForResponseOf: number[];
+    reloadQueriesAferMined?: Parameters<ApolloClient<object>['refetchQueries']>[0]['include'];
+    actionAfterMined?: (client: ApolloClient<object>) => void;
   };
 };
 
@@ -80,6 +83,7 @@ export const TransactionDialogContext = createContext<{
 
 export default function TransactionDialogProvider({ children }: { children: React.ReactNode }): JSX.Element {
   const { enqueueSnackbar } = useSnackbar();
+  const client = useApolloClient();
 
   const [showConfirmation, setShowConfirmation] = useState(false);
   const [steps, setSteps] = useState<TransactionStep[]>([]);
@@ -99,7 +103,7 @@ export default function TransactionDialogProvider({ children }: { children: Reac
   useEffect(() => {
     if (activeStep !== undefined) {
       const {
-        transaction: { methodCall, waitForResponseOf },
+        transaction: { methodCall, waitForResponseOf, reloadQueriesAferMined = [], actionAfterMined },
       } = steps[activeStep];
       // First wait if previous necessary steps have been mined
       Promise.all(waitForResponseOf.map((stepIndex) => stepsState[stepIndex].resultPromise?.wait())).then(async () => {
@@ -116,6 +120,13 @@ export default function TransactionDialogProvider({ children }: { children: Reac
                   newStepsState[activeStepSaved] = { status: 'success', transactionReceipt };
                   return newStepsState;
                 });
+
+                if (actionAfterMined) {
+                  actionAfterMined(client);
+                }
+                if (reloadQueriesAferMined.length > 0) {
+                  client.refetchQueries({ include: reloadQueriesAferMined });
+                }
               })
               .catch((error) => {
                 setStepsState((stepsState) => {

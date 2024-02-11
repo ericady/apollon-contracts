@@ -12,6 +12,7 @@ import { FormProvider, useForm } from 'react-hook-form';
 import { isCollateralTokenAddress, useEthers } from '../../../context/EthersProvider';
 import { useSelectedToken } from '../../../context/SelectedTokenProvider';
 import { useTransactionDialog } from '../../../context/TransactionDialogProvider';
+import { GET_BORROWER_COLLATERAL_TOKENS, GET_BORROWER_DEBT_TOKENS } from '../../../queries';
 import { WIDGET_HEIGHTS } from '../../../utils/contants';
 import { getHints } from '../../../utils/crypto';
 import {
@@ -108,6 +109,10 @@ const Farm = () => {
               );
             },
             waitForResponseOf: [],
+            // Only refetch coll tokens if they were part of the swap
+            reloadQueriesAferMined: isCollateralTokenAddress(selectedToken!.address)
+              ? [GET_BORROWER_COLLATERAL_TOKENS, GET_BORROWER_DEBT_TOKENS]
+              : [GET_BORROWER_DEBT_TOKENS],
           },
         },
       ]);
@@ -132,6 +137,10 @@ const Farm = () => {
               );
             },
             waitForResponseOf: [],
+            // Only refetch coll tokens if they were part of the swap
+            reloadQueriesAferMined: isCollateralTokenAddress(selectedToken!.address)
+              ? [GET_BORROWER_COLLATERAL_TOKENS, GET_BORROWER_DEBT_TOKENS]
+              : [GET_BORROWER_DEBT_TOKENS],
           },
         },
       ]);

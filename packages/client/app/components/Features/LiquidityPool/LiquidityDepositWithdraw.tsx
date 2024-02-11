@@ -12,13 +12,19 @@ import { IBase } from '../../../../generated/types/TroveManager';
 import { isCollateralTokenAddress, isDebtTokenAddress, useEthers } from '../../../context/EthersProvider';
 import { useTransactionDialog } from '../../../context/TransactionDialogProvider';
 import {
+  CollateralTokenMeta,
+  DebtTokenMeta,
   GetBorrowerCollateralTokensQuery,
   GetBorrowerCollateralTokensQueryVariables,
   GetBorrowerDebtTokensQuery,
   GetBorrowerDebtTokensQueryVariables,
   GetBorrowerLiquidityPoolsQuery,
 } from '../../../generated/gql-types';
-import { GET_BORROWER_COLLATERAL_TOKENS, GET_BORROWER_DEBT_TOKENS } from '../../../queries';
+import {
+  GET_BORROWER_COLLATERAL_TOKENS,
+  GET_BORROWER_DEBT_TOKENS,
+  GET_BORROWER_LIQUIDITY_POOLS,
+} from '../../../queries';
 import { getHints } from '../../../utils/crypto';
 import {
   bigIntStringToFloat,
@@ -96,7 +102,7 @@ function LiquidityDepositWithdraw({ selectedPool }: Props) {
     ...foundTokenA,
     // @ts-ignore
     investedAmount: foundTokenA.troveRepableDebtAmount ?? foundTokenA.troveLockedAmount ?? BigInt(0),
-  };
+  } as (DebtTokenMeta | CollateralTokenMeta) & { investedAmount: bigint };
 
   const foundTokenB = debtTokenData?.debtTokenMetas.find(({ token }) => token.id === tokenB.token.id) ??
     collTokenData?.collateralTokenMetas.find(({ token }) => token.id === tokenA.token.id) ?? {
@@ -107,7 +113,7 @@ function LiquidityDepositWithdraw({ selectedPool }: Props) {
     ...foundTokenA,
     // @ts-ignore
     investedAmount: foundTokenB.troveRepableDebtAmount ?? foundTokenB.troveLockedAmount ?? BigInt(0),
-  };
+  } as (DebtTokenMeta | CollateralTokenMeta) & { investedAmount: bigint };
 
   const handleChange = (_: SyntheticEvent, newValue: 'DEPOSIT' | 'WITHDRAW') => {
     setTabValue(newValue);
@@ -217,6 +223,11 @@ function LiquidityDepositWithdraw({ selectedPool }: Props) {
               );
             },
             waitForResponseOf: [0, 1],
+            reloadQueriesAferMined: [
+              GET_BORROWER_COLLATERAL_TOKENS,
+              GET_BORROWER_DEBT_TOKENS,
+              GET_BORROWER_LIQUIDITY_POOLS,
+            ],
           },
         },
       ]);
@@ -255,6 +266,11 @@ function LiquidityDepositWithdraw({ selectedPool }: Props) {
               );
             },
             waitForResponseOf: [],
+            reloadQueriesAferMined: [
+              GET_BORROWER_COLLATERAL_TOKENS,
+              GET_BORROWER_DEBT_TOKENS,
+              GET_BORROWER_LIQUIDITY_POOLS,
+            ],
           },
         },
       ]);

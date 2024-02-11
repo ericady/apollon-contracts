@@ -12,7 +12,7 @@ import { IBase } from '../../../../generated/types/StabilityPoolManager';
 import { Contracts, isDebtTokenAddress, useEthers } from '../../../context/EthersProvider';
 import { useTransactionDialog } from '../../../context/TransactionDialogProvider';
 import { GetBorrowerDebtTokensQuery, GetBorrowerDebtTokensQueryVariables } from '../../../generated/gql-types';
-import { GET_BORROWER_DEBT_TOKENS } from '../../../queries';
+import { GET_BORROWER_DEBT_TOKENS, GET_BORROWER_STABILITY_HISTORY } from '../../../queries';
 import { dangerouslyConvertBigIntToNumber, floatToBigInt, roundCurrency } from '../../../utils/math';
 import NumberInput from '../../FormControls/NumberInput';
 import CrossIcon from '../../Icons/CrossIcon';
@@ -103,18 +103,31 @@ const StabilityUpdateDialog = () => {
             },
             // wait for all approvals
             waitForResponseOf: Array.of(tokenAmounts.length).map((_, index) => index),
+            reloadQueriesAferMined: [GET_BORROWER_DEBT_TOKENS, GET_BORROWER_STABILITY_HISTORY],
+            actionAfterMined: (client) => {
+              // console.log(client.cache.extract().ROOT_QUERY);
+              // FIXME: WHY DOESNT IT EVICT WHY DOESNT IT REFETCH????
+              client.cache.evict({ id: 'ROOT_QUERY', fieldName: 'borrowerHistories:{}' });
+              client.cache.gc();
+            },
           },
         },
       ]);
     } else {
       setSteps([
         {
-          title: 'Provide Stability to the Stability Pool.',
+          title: 'Withdraw Stability from the Stability Pool.',
           transaction: {
             methodCall: () => {
               return stabilityPoolManagerContract.withdrawStability(tokenAmounts);
             },
             waitForResponseOf: [],
+            reloadQueriesAferMined: [GET_BORROWER_DEBT_TOKENS, GET_BORROWER_STABILITY_HISTORY],
+            actionAfterMined: (client) => {
+              console.log(client.cache.extract());
+              client.cache.evict({ id: 'ROOT_QUERY', fieldName: 'borrowerHistories:{}' });
+              client.cache.gc();
+            },
           },
         },
       ]);
@@ -174,7 +187,11 @@ const StabilityUpdateDialog = () => {
             >
               <Tabs value={tabValue} onChange={handleChange} variant="fullWidth" sx={{ mt: 2 }}>
                 <Tab label="DEPOSIT" value="DEPOSIT" />
-                <Tab label="WITHDRAW" value="WITHDRAW" />
+                <Tab
+                  label="WITHDRAW"
+                  value="WITHDRAW"
+                  disabled={!data?.debtTokenMetas.some(({ providedStability }) => providedStability > 0)}
+                />
               </Tabs>
 
               <div style={{ overflowY: 'scroll', maxHeight: '60vh' }}>

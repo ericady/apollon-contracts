@@ -10,7 +10,7 @@ import { IBase } from '../../../../generated/types/TroveManager';
 import { Contracts, useEthers } from '../../../context/EthersProvider';
 import { useTransactionDialog } from '../../../context/TransactionDialogProvider';
 import { GetBorrowerDebtTokensQuery, GetBorrowerDebtTokensQueryVariables } from '../../../generated/gql-types';
-import { GET_BORROWER_DEBT_TOKENS } from '../../../queries';
+import { GET_BORROWER_COLLATERAL_TOKENS, GET_BORROWER_DEBT_TOKENS } from '../../../queries';
 import { dangerouslyConvertBigIntToNumber, floatToBigInt, roundCurrency } from '../../../utils/math';
 import NumberInput from '../../FormControls/NumberInput';
 import CrossIcon from '../../Icons/CrossIcon';
@@ -88,6 +88,7 @@ const RepayDebtDialog = () => {
           },
           // wait for all approvals
           waitForResponseOf: Array.of(tokenAmounts.length).map((_, index) => index),
+          reloadQueriesAferMined: [GET_BORROWER_DEBT_TOKENS, GET_BORROWER_COLLATERAL_TOKENS],
         },
       },
     ]);

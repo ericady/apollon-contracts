@@ -17,7 +17,7 @@ import {
   GetBorrowerDebtTokensQuery,
   GetBorrowerDebtTokensQueryVariables,
 } from '../../../generated/gql-types';
-import { GET_BORROWER_COLLATERAL_TOKENS, GET_BORROWER_DEBT_TOKENS } from '../../../queries';
+import { GET_BORROWER_COLLATERAL_TOKENS, GET_BORROWER_DEBT_TOKENS, GET_BORROWER_SWAPS } from '../../../queries';
 import { WIDGET_HEIGHTS } from '../../../utils/contants';
 import {
   dangerouslyConvertBigIntToNumber,
@@ -171,6 +171,7 @@ const Swap = () => {
               );
             },
             waitForResponseOf: [0],
+            reloadQueriesAferMined: [GET_BORROWER_COLLATERAL_TOKENS, GET_BORROWER_DEBT_TOKENS, GET_BORROWER_SWAPS],
           },
         },
       ]);
@@ -212,6 +213,7 @@ const Swap = () => {
               );
             },
             waitForResponseOf: [0],
+            reloadQueriesAferMined: [GET_BORROWER_COLLATERAL_TOKENS, GET_BORROWER_DEBT_TOKENS, GET_BORROWER_SWAPS],
           },
         },
       ]);
