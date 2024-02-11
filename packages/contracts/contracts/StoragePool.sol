@@ -34,8 +34,6 @@ contract StoragePool is LiquityBase, Ownable(msg.sender), CheckContract, IStorag
     bool exists;
   }
   mapping(address => mapping(bool => PoolEntry)) internal poolEntries; // [tokenAddress][isColl] => PoolEntry
-  address[] public collTokenAddresses;
-  address[] public debtTokenAddresses;
 
   // --- Contract setters ---
 
@@ -88,9 +86,6 @@ contract StoragePool is LiquityBase, Ownable(msg.sender), CheckContract, IStorag
     if (!entry.exists) {
       poolEntries[_tokenAddress][_isColl].exists = true;
       poolEntries[_tokenAddress][_isColl].tokenAddress = _tokenAddress;
-
-      if (_isColl) collTokenAddresses.push(_tokenAddress);
-      else debtTokenAddresses.push(_tokenAddress);
     }
 
     entry.poolTypes[_poolType] += _amount;
@@ -143,24 +138,29 @@ contract StoragePool is LiquityBase, Ownable(msg.sender), CheckContract, IStorag
     emit StoragePoolValueUpdated(_tokenAddress, _isColl, _toType, entry.poolTypes[_toType]);
   }
 
-  function getEntireSystemColl() public view returns (uint entireSystemColl) {
+  function getEntireSystemColl(PriceCache memory _priceCache) public view returns (uint entireSystemColl) {
     IPriceFeed priceFeedCached = priceFeed;
-    for (uint i = 0; i < collTokenAddresses.length; i++)
+    for (uint i = 0; i < _priceCache.collPrices.length; i++) {
+      TokenPrice memory tokenPrice = _priceCache.collPrices[i];
+
       entireSystemColl += priceFeedCached.getUSDValue(
-        collTokenAddresses[i],
-        poolEntries[collTokenAddresses[i]][true].totalAmount
+        tokenPrice,
+        poolEntries[tokenPrice.tokenAddress][true].totalAmount
       );
+    }
 
     return entireSystemColl;
   }
 
-  function getEntireSystemDebt() public view returns (uint entireSystemDebt) {
+  function getEntireSystemDebt(PriceCache memory _priceCache) public view returns (uint entireSystemDebt) {
     IPriceFeed priceFeedCached = priceFeed;
-    for (uint i = 0; i < debtTokenAddresses.length; i++)
+    for (uint i = 0; i < _priceCache.debtPrices.length; i++) {
+      TokenPrice memory tokenPrice = _priceCache.debtPrices[i];
       entireSystemDebt += priceFeedCached.getUSDValue(
-        debtTokenAddresses[i],
-        poolEntries[debtTokenAddresses[i]][false].totalAmount
+        tokenPrice,
+        poolEntries[tokenPrice.tokenAddress][false].totalAmount
       );
+    }
 
     return entireSystemDebt;
   }
@@ -174,8 +174,21 @@ contract StoragePool is LiquityBase, Ownable(msg.sender), CheckContract, IStorag
     view
     returns (bool isInRecoveryMode, uint TCR, uint entireSystemColl, uint entireSystemDebt)
   {
-    entireSystemColl = getEntireSystemColl();
-    entireSystemDebt = getEntireSystemDebt();
+    PriceCache memory priceCache = priceFeed.buildPriceCache();
+    return _checkRecoveryMode(priceCache);
+  }
+
+  function checkRecoveryMode(
+    PriceCache memory _priceCache
+  ) external view returns (bool isInRecoveryMode, uint TCR, uint entireSystemColl, uint entireSystemDebt) {
+    return _checkRecoveryMode(_priceCache);
+  }
+
+  function _checkRecoveryMode(
+    PriceCache memory _priceCache
+  ) internal view returns (bool isInRecoveryMode, uint TCR, uint entireSystemColl, uint entireSystemDebt) {
+    entireSystemColl = getEntireSystemColl(_priceCache);
+    entireSystemDebt = getEntireSystemDebt(_priceCache);
     TCR = LiquityMath._computeCR(entireSystemColl, entireSystemDebt);
     isInRecoveryMode = TCR < CCR;
   }

@@ -134,7 +134,7 @@
             {
                 "indexed": false,
                 "internalType": "address",
-                "name": "debtTokenManager",
+                "name": "tokenManager",
                 "type": "address"
             }
         ],

@@ -54,13 +54,15 @@ describe('BorrowerOperations', () => {
   let BTC: MockERC20;
 
   const open = async (user: SignerWithAddress, collAmount: bigint, debtAmount: bigint) => {
-    return await openTrove({
+    const openTx = await openTrove({
       from: user,
       contracts,
       collToken: BTC,
       collAmount: collAmount,
       debts: [{ tokenAddress: STABLE, amount: debtAmount }],
     });
+
+    return { openTx, debtInUSD: await getTroveEntireDebt(contracts, user) };
   };
 
   before(async () => {
@@ -197,7 +199,7 @@ describe('BorrowerOperations', () => {
       const aliceColl = parseUnits('0.05', 9);
       await open(alice, aliceColl, parseUnits('150'));
 
-      const BTC_Price = await priceFeed.getPrice(BTC);
+      const [BTC_Price] = await priceFeed.getPrice(BTC);
 
       const alice_Stake_Before = await troveManager.getTroveStakeValue(alice);
       const totalStakes_Before = await troveManager.totalStakes(BTC);

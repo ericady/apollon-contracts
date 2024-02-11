@@ -5,23 +5,26 @@ pragma solidity ^0.8.9;
 import '@openzeppelin/contracts/access/Ownable.sol';
 import './Interfaces/IDebtToken.sol';
 import './Dependencies/CheckContract.sol';
-import './Interfaces/IDebtTokenManager.sol';
+import './Interfaces/ITokenManager.sol';
 import './Dependencies/LiquityBase.sol';
 import './DebtToken.sol';
 import './Interfaces/IStabilityPoolManager.sol';
+import './Interfaces/IPriceFeed.sol';
 
-contract DebtTokenManager is Ownable(msg.sender), CheckContract, IDebtTokenManager {
-  string public constant NAME = 'DTokenManager';
+contract TokenManager is Ownable(msg.sender), CheckContract, ITokenManager {
+  string public constant NAME = 'TokenManager';
 
   IPriceFeed public priceFeed;
   IStabilityPoolManager public stabilityPoolManager;
 
   // --- Data structures ---
 
-  mapping(address => IDebtToken) public debtTokens;
+  mapping(address => IDebtToken) public debtTokens; // todo does it make sense to store them as IDebtToken instaed of address?
   IDebtToken[] public debtTokensArray;
-  address[] public debtTokenAddresses;
   IDebtToken public stableCoin;
+
+  address[] public debtTokenAddresses;
+  address[] public collTokenAddresses;
 
   // --- Dependency setter ---
 
@@ -32,7 +35,7 @@ contract DebtTokenManager is Ownable(msg.sender), CheckContract, IDebtTokenManag
     stabilityPoolManager = IStabilityPoolManager(_stabilityPoolManagerAddress);
     priceFeed = IPriceFeed(_priceFeedAddress);
 
-    emit DebtTokenManagerInitialized(_stabilityPoolManagerAddress, _priceFeedAddress);
+    emit TokenManagerInitialized(_stabilityPoolManagerAddress, _priceFeedAddress);
   }
 
   // --- Getters ---
@@ -53,6 +56,10 @@ contract DebtTokenManager is Ownable(msg.sender), CheckContract, IDebtTokenManag
 
   function getDebtTokenAddresses() external view override returns (address[] memory) {
     return debtTokenAddresses;
+  }
+
+  function getCollTokenAddresses() external view override returns (address[] memory) {
+    return collTokenAddresses;
   }
 
   // --- Setters ---
@@ -77,5 +84,14 @@ contract DebtTokenManager is Ownable(msg.sender), CheckContract, IDebtTokenManag
     stabilityPoolManager.addStabilityPool(debtToken);
     priceFeed.initiateNewOracleId(_debtTokenAddress, _tellorOracleId);
     emit DebtTokenAdded(_debtTokenAddress);
+  }
+
+  function addCollToken(address _tokenAddress, uint _tellorOracleId) external override onlyOwner {
+    for (uint i = 0; i < collTokenAddresses.length; i++)
+      if (collTokenAddresses[i] == _tokenAddress) revert SymbolAlreadyExists();
+
+    collTokenAddresses.push(_tokenAddress);
+    priceFeed.initiateNewOracleId(_tokenAddress, _tellorOracleId);
+    emit CollTokenAdded(_tokenAddress);
   }
 }

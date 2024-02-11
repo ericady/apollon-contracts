@@ -7,11 +7,10 @@ import '@openzeppelin/contracts/token/ERC20/extensions/IERC20Metadata.sol';
 import './Dependencies/LiquityBase.sol';
 import './Dependencies/CheckContract.sol';
 import './Interfaces/IDebtToken.sol';
-import './Interfaces/IDebtTokenManager.sol';
+import './Interfaces/ITokenManager.sol';
 import './Interfaces/IPriceFeed.sol';
 import './Interfaces/IStoragePool.sol';
 import './Interfaces/IBBase.sol';
-import './Interfaces/ICollTokenManager.sol';
 import './Interfaces/IRedemptionOperations.sol';
 import './Interfaces/ITroveManager.sol';
 import './Interfaces/ILiquidationOperations.sol';
@@ -26,15 +25,14 @@ contract LiquidationOperations is LiquityBase, Ownable(msg.sender), CheckContrac
   ITroveManager public troveManager;
   IStoragePool public storagePool;
   IPriceFeed public priceFeed;
-  IDebtTokenManager public debtTokenManager;
-  ICollTokenManager public collTokenManager;
+  ITokenManager public tokenManager;
   IStabilityPoolManager public stabilityPoolManager;
   ICollSurplusPool public collSurplusPool;
 
   // --- Data structures ---
 
   struct LocalVariables_OuterLiquidationFunction {
-    address[] collTokenAddresses;
+    PriceCache priceCache;
     //
     RemainingStability[] remainingStabilities;
     CAmount[] tokensToRedistribute;
@@ -64,24 +62,21 @@ contract LiquidationOperations is LiquityBase, Ownable(msg.sender), CheckContrac
     address _troveManagerAddress,
     address _storagePoolAddress,
     address _priceFeedAddress,
-    address _debtTokenManagerAddress,
-    address _collTokenManagerAddress,
+    address _tokenManagerAddress,
     address _stabilityPoolManagerAddress,
     address _collSurplusPoolAddress
   ) external onlyOwner {
     checkContract(_troveManagerAddress);
     checkContract(_storagePoolAddress);
     checkContract(_priceFeedAddress);
-    checkContract(_debtTokenManagerAddress);
-    checkContract(_collTokenManagerAddress);
+    checkContract(_tokenManagerAddress);
     checkContract(_stabilityPoolManagerAddress);
     checkContract(_collSurplusPoolAddress);
 
     troveManager = ITroveManager(_troveManagerAddress);
     storagePool = IStoragePool(_storagePoolAddress);
     priceFeed = IPriceFeed(_priceFeedAddress);
-    debtTokenManager = IDebtTokenManager(_debtTokenManagerAddress);
-    collTokenManager = ICollTokenManager(_collTokenManagerAddress);
+    tokenManager = ITokenManager(_tokenManagerAddress);
     stabilityPoolManager = IStabilityPoolManager(_stabilityPoolManagerAddress);
     collSurplusPool = ICollSurplusPool(_collSurplusPoolAddress);
 
@@ -89,8 +84,7 @@ contract LiquidationOperations is LiquityBase, Ownable(msg.sender), CheckContrac
       _troveManagerAddress,
       _storagePoolAddress,
       _priceFeedAddress,
-      _debtTokenManagerAddress,
-      _collTokenManagerAddress,
+      _tokenManagerAddress,
       _stabilityPoolManagerAddress,
       _collSurplusPoolAddress
     );
@@ -112,11 +106,11 @@ contract LiquidationOperations is LiquityBase, Ownable(msg.sender), CheckContrac
     if (_troveArray.length == 0) revert EmptyArray();
 
     LocalVariables_OuterLiquidationFunction memory vars;
-    vars.collTokenAddresses = collTokenManager.getCollTokenAddresses();
+    vars.priceCache = priceFeed.buildPriceCache();
 
     (vars.isRecoveryMode, vars.TCR, vars.entireSystemCollInUSD, vars.entireSystemDebtInUSD) = storagePool
-      .checkRecoveryMode();
-    vars.remainingStabilities = stabilityPoolManager.getRemainingStability(vars.collTokenAddresses);
+      .checkRecoveryMode(vars.priceCache);
+    vars.remainingStabilities = stabilityPoolManager.getRemainingStability(vars.priceCache);
     _initializeEmptyTokensToRedistribute(vars); // all set to 0 (nothing to redistribute)
 
     bool atLeastOneTroveLiquidated = false;
@@ -131,10 +125,10 @@ contract LiquidationOperations is LiquityBase, Ownable(msg.sender), CheckContrac
     if (!atLeastOneTroveLiquidated) revert NoLiquidatableTrove();
 
     // move tokens into the stability pools
-    stabilityPoolManager.offset(vars.remainingStabilities);
+    stabilityPoolManager.offset(vars.priceCache, vars.remainingStabilities);
 
     // and redistribute the rest (which could not be handled by the stability pool)
-    troveManager.redistributeDebtAndColl(vars.collTokenAddresses, vars.tokensToRedistribute);
+    troveManager.redistributeDebtAndColl(vars.priceCache, vars.tokensToRedistribute);
 
     // move tokens from active pool into the collSurplus, in case there was a capped liquidation
     for (uint i = 0; i < vars.collSurplus.length; i++) {
@@ -158,19 +152,22 @@ contract LiquidationOperations is LiquityBase, Ownable(msg.sender), CheckContrac
     _emitLiquidationSummaryEvent(vars);
   }
 
-  function _initializeEmptyTokensToRedistribute(LocalVariables_OuterLiquidationFunction memory vars) internal view {
-    address[] memory debtTokenAddresses = debtTokenManager.getDebtTokenAddresses();
-
-    vars.tokensToRedistribute = new CAmount[](debtTokenAddresses.length + vars.collTokenAddresses.length);
-    vars.totalCollGasCompensation = new TokenAmount[](vars.collTokenAddresses.length);
-    vars.collSurplus = new TokenAmount[](vars.collTokenAddresses.length);
-    for (uint i = 0; i < vars.collTokenAddresses.length; i++) {
-      vars.tokensToRedistribute[i] = CAmount(vars.collTokenAddresses[i], true, 0);
-      vars.totalCollGasCompensation[i] = TokenAmount(vars.collTokenAddresses[i], 0);
-      vars.collSurplus[i] = TokenAmount(vars.collTokenAddresses[i], 0);
+  function _initializeEmptyTokensToRedistribute(LocalVariables_OuterLiquidationFunction memory vars) internal pure {
+    vars.tokensToRedistribute = new CAmount[](vars.priceCache.collPrices.length + vars.priceCache.debtPrices.length);
+    vars.totalCollGasCompensation = new TokenAmount[](vars.priceCache.collPrices.length);
+    vars.collSurplus = new TokenAmount[](vars.priceCache.collPrices.length);
+    for (uint i = 0; i < vars.priceCache.collPrices.length; i++) {
+      address collTokenAddress = vars.priceCache.collPrices[i].tokenAddress;
+      vars.tokensToRedistribute[i] = CAmount(collTokenAddress, true, 0);
+      vars.totalCollGasCompensation[i] = TokenAmount(collTokenAddress, 0);
+      vars.collSurplus[i] = TokenAmount(collTokenAddress, 0);
     }
-    for (uint i = 0; i < debtTokenAddresses.length; i++)
-      vars.tokensToRedistribute[vars.collTokenAddresses.length + i] = CAmount(debtTokenAddresses[i], false, 0);
+    for (uint i = 0; i < vars.priceCache.debtPrices.length; i++)
+      vars.tokensToRedistribute[vars.priceCache.collPrices.length + i] = CAmount(
+        vars.priceCache.debtPrices[i].tokenAddress,
+        false,
+        0
+      );
   }
 
   function _executeTroveLiquidation(
@@ -183,7 +180,7 @@ contract LiquidationOperations is LiquityBase, Ownable(msg.sender), CheckContrac
       vars.troveCollInUSD,
       vars.troveDebtInUSD,
       vars.troveDebtInUSDWithoutGasCompensation
-    ) = troveManager.getEntireDebtAndColl(trove);
+    ) = troveManager.getEntireDebtAndColl(outerVars.priceCache, trove);
     vars.ICR = LiquityMath._computeCR(vars.troveCollInUSD, vars.troveDebtInUSD);
 
     // ICR > TCR, skipping liquidation, no matter what mode
@@ -193,12 +190,13 @@ contract LiquidationOperations is LiquityBase, Ownable(msg.sender), CheckContrac
     if (vars.ICR >= MCR && !outerVars.isRecoveryMode) return false;
 
     _movePendingTroveRewardsToActivePool(vars.troveAmountsIncludingRewards);
-    troveManager.removeStake(outerVars.collTokenAddresses, trove);
+    troveManager.removeStake(outerVars.priceCache, trove);
 
     if (vars.ICR >= MCR) {
       // capped trove liquidation (at 1.1 * the total debts value)
       // remaining collateral will stay in the trove
       _getCappedOffsetVals(
+        outerVars.priceCache,
         vars.troveCollInUSD,
         vars.troveDebtInUSDWithoutGasCompensation,
         vars.troveAmountsIncludingRewards,
@@ -210,6 +208,7 @@ contract LiquidationOperations is LiquityBase, Ownable(msg.sender), CheckContrac
     } else {
       // full trove liquidation
       _getOffsetAndRedistributionVals(
+        outerVars.priceCache,
         vars.troveDebtInUSDWithoutGasCompensation,
         vars.troveAmountsIncludingRewards,
         outerVars.remainingStabilities
@@ -217,7 +216,7 @@ contract LiquidationOperations is LiquityBase, Ownable(msg.sender), CheckContrac
     }
 
     troveManager.closeTroveByProtocol(
-      outerVars.collTokenAddresses,
+      outerVars.priceCache,
       trove,
       outerVars.isRecoveryMode ? Status.closedByLiquidationInRecoveryMode : Status.closedByLiquidationInNormalMode
     );
@@ -232,10 +231,23 @@ contract LiquidationOperations is LiquityBase, Ownable(msg.sender), CheckContrac
     // updating TCR
     for (uint a = 0; a < vars.troveAmountsIncludingRewards.length; a++) {
       RAmount memory rAmount = vars.troveAmountsIncludingRewards[a];
-      outerVars.entireSystemCollInUSD -= priceFeed.getUSDValue(rAmount.tokenAddress, rAmount.gasCompensation);
+      outerVars.entireSystemCollInUSD -= priceFeed.getUSDValue(
+        outerVars.priceCache,
+        rAmount.tokenAddress,
+        rAmount.gasCompensation
+      );
       if (rAmount.isColl)
-        outerVars.entireSystemCollInUSD -= priceFeed.getUSDValue(rAmount.tokenAddress, rAmount.toOffset);
-      else outerVars.entireSystemDebtInUSD -= priceFeed.getUSDValue(rAmount.tokenAddress, rAmount.toOffset);
+        outerVars.entireSystemCollInUSD -= priceFeed.getUSDValue(
+          outerVars.priceCache,
+          rAmount.tokenAddress,
+          rAmount.toOffset
+        );
+      else
+        outerVars.entireSystemDebtInUSD -= priceFeed.getUSDValue(
+          outerVars.priceCache,
+          rAmount.tokenAddress,
+          rAmount.toOffset
+        );
     }
     outerVars.TCR = LiquityMath._computeCR(outerVars.entireSystemCollInUSD, outerVars.entireSystemDebtInUSD);
     outerVars.isRecoveryMode = outerVars.TCR < CCR;
@@ -310,6 +322,7 @@ contract LiquidationOperations is LiquityBase, Ownable(msg.sender), CheckContrac
    * redistributed to active troves.
    */
   function _getOffsetAndRedistributionVals(
+    PriceCache memory priceCache,
     uint troveDebtInUSDWithoutGasCompensation,
     RAmount[] memory troveAmountsIncludingRewards,
     RemainingStability[] memory remainingStabilities
@@ -331,11 +344,12 @@ contract LiquidationOperations is LiquityBase, Ownable(msg.sender), CheckContrac
       if (rAmount.isColl) rAmount.toRedistribute = rAmount.toLiquidate;
     }
 
-    _debtOffset(troveDebtInUSDWithoutGasCompensation, troveAmountsIncludingRewards, remainingStabilities);
+    _debtOffset(priceCache, troveDebtInUSDWithoutGasCompensation, troveAmountsIncludingRewards, remainingStabilities);
   }
 
   // Get its offset coll/debt and gas comp.
   function _getCappedOffsetVals(
+    PriceCache memory priceCache,
     uint troveCollInUSD,
     uint troveDebtInUSDWithoutGasCompensation,
     RAmount[] memory troveAmountsIncludingRewards,
@@ -347,15 +361,20 @@ contract LiquidationOperations is LiquityBase, Ownable(msg.sender), CheckContrac
       RAmount memory rAmount = troveAmountsIncludingRewards[i];
       if (!rAmount.isColl) continue; // coll will be handled later in the debts loop
 
-      uint collToLiquidateInUSD = priceFeed.getUSDValue(rAmount.tokenAddress, rAmount.toLiquidate);
+      uint collToLiquidateInUSD = priceFeed.getUSDValue(priceCache, rAmount.tokenAddress, rAmount.toLiquidate);
       uint collToLiquidateInUSDCapped = (cappedLimit * collToLiquidateInUSD) / troveCollInUSD;
-      rAmount.toLiquidate = priceFeed.getAmountFromUSDValue(rAmount.tokenAddress, collToLiquidateInUSDCapped);
+      rAmount.toLiquidate = priceFeed.getAmountFromUSDValue(
+        priceCache,
+        rAmount.tokenAddress,
+        collToLiquidateInUSDCapped
+      );
     }
 
-    _debtOffset(troveDebtInUSDWithoutGasCompensation, troveAmountsIncludingRewards, remainingStabilities);
+    _debtOffset(priceCache, troveDebtInUSDWithoutGasCompensation, troveAmountsIncludingRewards, remainingStabilities);
   }
 
   function _debtOffset(
+    PriceCache memory priceCache,
     uint troveDebtInUSDWithoutGasCompensation,
     RAmount[] memory troveAmountsIncludingRewards,
     RemainingStability[] memory remainingStabilities
@@ -380,7 +399,7 @@ contract LiquidationOperations is LiquityBase, Ownable(msg.sender), CheckContrac
         remainingStability.debtToOffset += rAmountDebt.toOffset;
         remainingStability.remaining -= rAmountDebt.toOffset;
 
-        uint offsetPercentage = (priceFeed.getUSDValue(rAmountDebt.tokenAddress, rAmountDebt.toOffset) *
+        uint offsetPercentage = (priceFeed.getUSDValue(priceCache, rAmountDebt.tokenAddress, rAmountDebt.toOffset) *
           DECIMAL_PRECISION) / troveDebtInUSDWithoutGasCompensation; // relative to the troves total debt
 
         // moving the offsetPercentage of each coll into the stable pool
@@ -413,7 +432,7 @@ contract LiquidationOperations is LiquityBase, Ownable(msg.sender), CheckContrac
   ) internal {
     // stable payout
     if (_stableCoinGasCompensation != 0) {
-      IDebtToken stableCoin = debtTokenManager.getStableCoin();
+      IDebtToken stableCoin = tokenManager.getStableCoin();
       storagePool.withdrawalValue(
         _liquidator,
         address(stableCoin),
@@ -437,10 +456,10 @@ contract LiquidationOperations is LiquityBase, Ownable(msg.sender), CheckContrac
   }
 
   function _emitLiquidationSummaryEvent(LocalVariables_OuterLiquidationFunction memory vars) internal {
-    TokenAmount[] memory liquidatedColl = new TokenAmount[](vars.collTokenAddresses.length);
-    for (uint i = 0; i < vars.collTokenAddresses.length; i++) {
+    TokenAmount[] memory liquidatedColl = new TokenAmount[](vars.priceCache.collPrices.length);
+    for (uint i = 0; i < vars.priceCache.collPrices.length; i++) {
       liquidatedColl[i] = TokenAmount(
-        vars.collTokenAddresses[i],
+        vars.priceCache.collPrices[i].tokenAddress,
         vars.tokensToRedistribute[i].amount // works because of the initialisation of the array (first debts, then colls)
       );
     }
@@ -449,12 +468,11 @@ contract LiquidationOperations is LiquityBase, Ownable(msg.sender), CheckContrac
     for (uint i = 0; i < vars.remainingStabilities.length; i++) {
       RemainingStability memory remainingStability = vars.remainingStabilities[i];
 
-      uint redistributed = vars.tokensToRedistribute[vars.collTokenAddresses.length + i].amount; // has the same token order in the array
+      uint redistributed = vars.tokensToRedistribute[vars.priceCache.collPrices.length + i].amount; // has the same token order in the array
       liquidatedDebt[i] = TokenAmount(remainingStability.tokenAddress, remainingStability.debtToOffset + redistributed);
 
-      for (uint ii = 0; ii < vars.collTokenAddresses.length; ii++) {
+      for (uint ii = 0; ii < vars.priceCache.collPrices.length; ii++)
         liquidatedColl[ii].amount += remainingStability.collGained[ii].amount;
-      }
     }
 
     emit LiquidationSummary(

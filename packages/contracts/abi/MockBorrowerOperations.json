@@ -167,13 +167,7 @@
             {
                 "indexed": false,
                 "internalType": "address",
-                "name": "_debtTokenManagerAddress",
-                "type": "address"
-            },
-            {
-                "indexed": false,
-                "internalType": "address",
-                "name": "_collTokenManagerAddress",
+                "name": "_tokenManagerAddress",
                 "type": "address"
             },
             {
@@ -542,68 +536,6 @@
         "type": "function"
     },
     {
-        "inputs": [],
-        "name": "collTokenManager",
-        "outputs": [
-            {
-                "internalType": "contract ICollTokenManager",
-                "name": "",
-                "type": "address"
-            }
-        ],
-        "stateMutability": "view",
-        "type": "function"
-    },
-    {
-        "inputs": [],
-        "name": "debtTokenManager",
-        "outputs": [
-            {
-                "internalType": "contract IDebtTokenManager",
-                "name": "",
-                "type": "address"
-            }
-        ],
-        "stateMutability": "view",
-        "type": "function"
-    },
-    {
-        "inputs": [
-            {
-                "components": [
-                    {
-                        "internalType": "contract IDebtToken",
-                        "name": "debtToken",
-                        "type": "address"
-                    },
-                    {
-                        "internalType": "uint256",
-                        "name": "netDebt",
-                        "type": "uint256"
-                    },
-                    {
-                        "internalType": "uint256",
-                        "name": "borrowingFee",
-                        "type": "uint256"
-                    }
-                ],
-                "internalType": "struct IBBase.DebtTokenAmount[]",
-                "name": "_debts",
-                "type": "tuple[]"
-            }
-        ],
-        "name": "getCompositeDebt",
-        "outputs": [
-            {
-                "internalType": "uint256",
-                "name": "",
-                "type": "uint256"
-            }
-        ],
-        "stateMutability": "view",
-        "type": "function"
-    },
-    {
         "inputs": [
             {
                 "internalType": "address",
@@ -927,12 +859,7 @@
             },
             {
                 "internalType": "address",
-                "name": "_debtTokenManagerAddress",
-                "type": "address"
-            },
-            {
-                "internalType": "address",
-                "name": "_collTokenManagerAddress",
+                "name": "_tokenManagerAddress",
                 "type": "address"
             },
             {
@@ -1153,9 +1080,65 @@
     {
         "inputs": [
             {
-                "internalType": "address[]",
-                "name": "collTokenAddresses",
-                "type": "address[]"
+                "components": [
+                    {
+                        "components": [
+                            {
+                                "internalType": "address",
+                                "name": "tokenAddress",
+                                "type": "address"
+                            },
+                            {
+                                "internalType": "uint256",
+                                "name": "tokenDecimals",
+                                "type": "uint256"
+                            },
+                            {
+                                "internalType": "uint256",
+                                "name": "price",
+                                "type": "uint256"
+                            },
+                            {
+                                "internalType": "bool",
+                                "name": "isPriceTrusted",
+                                "type": "bool"
+                            }
+                        ],
+                        "internalType": "struct IBase.TokenPrice[]",
+                        "name": "collPrices",
+                        "type": "tuple[]"
+                    },
+                    {
+                        "components": [
+                            {
+                                "internalType": "address",
+                                "name": "tokenAddress",
+                                "type": "address"
+                            },
+                            {
+                                "internalType": "uint256",
+                                "name": "tokenDecimals",
+                                "type": "uint256"
+                            },
+                            {
+                                "internalType": "uint256",
+                                "name": "price",
+                                "type": "uint256"
+                            },
+                            {
+                                "internalType": "bool",
+                                "name": "isPriceTrusted",
+                                "type": "bool"
+                            }
+                        ],
+                        "internalType": "struct IBase.TokenPrice[]",
+                        "name": "debtPrices",
+                        "type": "tuple[]"
+                    }
+                ],
+                "internalType": "struct IBase.PriceCache",
+                "name": "_priceCache",
+                "type": "tuple"
             },
             {
                 "internalType": "address",
@@ -1219,6 +1202,19 @@
         "name": "testTroveManager_setTroveStatus",
         "outputs": [],
         "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [],
+        "name": "tokenManager",
+        "outputs": [
+            {
+                "internalType": "contract ITokenManager",
+                "name": "",
+                "type": "address"
+            }
+        ],
+        "stateMutability": "view",
         "type": "function"
     },
     {

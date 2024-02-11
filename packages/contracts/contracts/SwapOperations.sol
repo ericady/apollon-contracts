@@ -9,8 +9,9 @@ import './SwapPair.sol';
 import './Dependencies/LiquityBase.sol';
 import './Interfaces/ISwapOperations.sol';
 import './Interfaces/IBorrowerOperations.sol';
-import './Interfaces/IDebtTokenManager.sol';
+import './Interfaces/ITokenManager.sol';
 import './Dependencies/CheckContract.sol';
+import './Interfaces/IPriceFeed.sol';
 import './Interfaces/ITroveManager.sol';
 
 contract SwapOperations is ISwapOperations, Ownable(msg.sender), CheckContract, LiquityBase {
@@ -18,8 +19,8 @@ contract SwapOperations is ISwapOperations, Ownable(msg.sender), CheckContract, 
 
   ITroveManager public troveManager;
   IBorrowerOperations public borrowerOperations;
-  address public priceFeedAddress;
-  IDebtTokenManager public debtTokenManager;
+  IPriceFeed public priceFeed;
+  ITokenManager public tokenManager;
 
   // --- Data structures ---
 
@@ -33,24 +34,19 @@ contract SwapOperations is ISwapOperations, Ownable(msg.sender), CheckContract, 
     address _borrowerOperationsAddress,
     address _troveManagerAddress,
     address _priceFeedAddress,
-    address _debtTokenManager
+    address _tokenManager
   ) external onlyOwner {
     checkContract(_borrowerOperationsAddress);
     checkContract(_troveManagerAddress);
     checkContract(_priceFeedAddress);
-    checkContract(_debtTokenManager);
+    checkContract(_tokenManager);
 
     borrowerOperations = IBorrowerOperations(_borrowerOperationsAddress);
     troveManager = ITroveManager(_troveManagerAddress);
-    priceFeedAddress = _priceFeedAddress;
-    debtTokenManager = IDebtTokenManager(_debtTokenManager);
+    priceFeed = IPriceFeed(_priceFeedAddress);
+    tokenManager = ITokenManager(_tokenManager);
 
-    emit SwapOperationsInitialized(
-      _borrowerOperationsAddress,
-      _troveManagerAddress,
-      _priceFeedAddress,
-      _debtTokenManager
-    );
+    emit SwapOperationsInitialized(_borrowerOperationsAddress, _troveManagerAddress, _priceFeedAddress, _tokenManager);
   }
 
   modifier ensure(uint deadline) {
@@ -66,7 +62,7 @@ contract SwapOperations is ISwapOperations, Ownable(msg.sender), CheckContract, 
 
   function createPair(address tokenA, address tokenB) external onlyOwner returns (address pair) {
     if (tokenA == tokenB) revert IdenticalAddresses();
-    if (tokenA != address(debtTokenManager.getStableCoin()) && tokenB != address(debtTokenManager.getStableCoin()))
+    if (tokenA != address(tokenManager.getStableCoin()) && tokenB != address(tokenManager.getStableCoin()))
       revert PairRequiresStable();
 
     (address token0, address token1) = sortTokens(tokenA, tokenB);
@@ -79,7 +75,7 @@ contract SwapOperations is ISwapOperations, Ownable(msg.sender), CheckContract, 
       pair := create2(0, add(bytecode, 32), mload(bytecode), salt)
     }
 
-    ISwapPair(pair).initialize(token0, token1, address(debtTokenManager), priceFeedAddress);
+    ISwapPair(pair).initialize(token0, token1, address(tokenManager), address(priceFeed));
     getPair[token0][token1] = pair;
     getPair[token1][token0] = pair; // populate mapping in the reverse direction
     allPairs.push(pair);
@@ -276,12 +272,13 @@ contract SwapOperations is ISwapOperations, Ownable(msg.sender), CheckContract, 
 
     // receive tokens from pair
     address pair = getPair[tokenA][tokenB];
+    PriceCache memory priceCache = priceFeed.buildPriceCache();
     (vars.amount0, vars.amount1, vars.burned0, vars.burned1) = ISwapPair(pair).burn(
       msg.sender,
       liquidity,
       // check if there are some debts which has to be repaid first
-      troveManager.getTroveRepayableDebt(msg.sender, vars.token0, false),
-      troveManager.getTroveRepayableDebt(msg.sender, vars.token1, false)
+      troveManager.getTroveRepayableDebt(priceCache, msg.sender, vars.token0, false),
+      troveManager.getTroveRepayableDebt(priceCache, msg.sender, vars.token1, false)
     );
 
     // handle trove debt repayment
@@ -376,7 +373,7 @@ contract SwapOperations is ISwapOperations, Ownable(msg.sender), CheckContract, 
     uint deadline
   ) external override ensure(deadline) returns (uint[] memory amounts) {
     address[] memory path = new address[](2);
-    path[0] = address(debtTokenManager.getStableCoin());
+    path[0] = address(tokenManager.getStableCoin());
     path[1] = debtTokenAddress;
 
     return _openPosition(stableToMintIn, debtOutMin, path, to, _mintMeta);
@@ -392,7 +389,7 @@ contract SwapOperations is ISwapOperations, Ownable(msg.sender), CheckContract, 
   ) external override ensure(deadline) returns (uint[] memory amounts) {
     address[] memory path = new address[](2);
     path[0] = debtTokenAddress;
-    path[1] = address(debtTokenManager.getStableCoin());
+    path[1] = address(tokenManager.getStableCoin());
 
     return _openPosition(debtToMintIn, stableOutMin, path, to, _mintMeta);
   }
@@ -410,7 +407,7 @@ contract SwapOperations is ISwapOperations, Ownable(msg.sender), CheckContract, 
     amounts = getAmountsOut(amountIn, path);
     if (amounts[amounts.length - 1] < amountOutMin) revert InsufficientOutputAmount();
 
-    debtTokenManager.getDebtToken(path[0]); //check if debt token
+    tokenManager.getDebtToken(path[0]); //check if debt token
 
     // mint the debt token and transfer it to the pair
     TokenAmount[] memory debtsToMint = new TokenAmount[](1);
@@ -441,7 +438,7 @@ contract SwapOperations is ISwapOperations, Ownable(msg.sender), CheckContract, 
     if (tokenA == tokenB) revert IdenticalAddresses();
     if (tokenA == address(0) || tokenB == address(0)) revert ZeroAddress();
 
-    address stableCoin = address(debtTokenManager.getStableCoin());
+    address stableCoin = address(tokenManager.getStableCoin());
     if (tokenA == stableCoin) return (tokenA, tokenB);
     if (tokenB == stableCoin) return (tokenB, tokenA);
     return tokenA < tokenB ? (tokenA, tokenB) : (tokenB, tokenA);

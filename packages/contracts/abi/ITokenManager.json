@@ -1,39 +1,22 @@
 [
     {
         "inputs": [],
-        "name": "NotContract",
-        "type": "error"
-    },
-    {
-        "inputs": [
-            {
-                "internalType": "address",
-                "name": "owner",
-                "type": "address"
-            }
-        ],
-        "name": "OwnableInvalidOwner",
-        "type": "error"
-    },
-    {
-        "inputs": [
-            {
-                "internalType": "address",
-                "name": "account",
-                "type": "address"
-            }
-        ],
-        "name": "OwnableUnauthorizedAccount",
+        "name": "FeeExceedMaxPercentage",
         "type": "error"
     },
     {
         "inputs": [],
-        "name": "TokenAlreadyAdded",
+        "name": "InvalidDebtToken",
         "type": "error"
     },
     {
         "inputs": [],
-        "name": "ZeroAddress",
+        "name": "StableCoinAlreadyExists",
+        "type": "error"
+    },
+    {
+        "inputs": [],
+        "name": "SymbolAlreadyExists",
         "type": "error"
     },
     {
@@ -42,7 +25,7 @@
             {
                 "indexed": false,
                 "internalType": "address",
-                "name": "_collTokenAddress",
+                "name": "_tokenAddress",
                 "type": "address"
             }
         ],
@@ -55,44 +38,31 @@
             {
                 "indexed": false,
                 "internalType": "address",
-                "name": "_priceFeedAddress",
+                "name": "_debtTokenAddress",
                 "type": "address"
             }
         ],
-        "name": "CollTokenManagerInitialized",
+        "name": "DebtTokenAdded",
         "type": "event"
     },
     {
         "anonymous": false,
         "inputs": [
             {
-                "indexed": true,
+                "indexed": false,
                 "internalType": "address",
-                "name": "previousOwner",
+                "name": "_stabilityPoolManagerAddress",
                 "type": "address"
             },
             {
-                "indexed": true,
+                "indexed": false,
                 "internalType": "address",
-                "name": "newOwner",
+                "name": "_priceFeedAddress",
                 "type": "address"
             }
         ],
-        "name": "OwnershipTransferred",
+        "name": "TokenManagerInitialized",
         "type": "event"
-    },
-    {
-        "inputs": [],
-        "name": "NAME",
-        "outputs": [
-            {
-                "internalType": "string",
-                "name": "",
-                "type": "string"
-            }
-        ],
-        "stateMutability": "view",
-        "type": "function"
     },
     {
         "inputs": [
@@ -115,20 +85,19 @@
     {
         "inputs": [
             {
+                "internalType": "address",
+                "name": "_debtTokenAddress",
+                "type": "address"
+            },
+            {
                 "internalType": "uint256",
-                "name": "",
+                "name": "_tellorOracleId",
                 "type": "uint256"
             }
         ],
-        "name": "collTokenAddresses",
-        "outputs": [
-            {
-                "internalType": "address",
-                "name": "",
-                "type": "address"
-            }
-        ],
-        "stateMutability": "view",
+        "name": "addDebtToken",
+        "outputs": [],
+        "stateMutability": "nonpayable",
         "type": "function"
     },
     {
@@ -145,11 +114,17 @@
         "type": "function"
     },
     {
-        "inputs": [],
-        "name": "owner",
-        "outputs": [
+        "inputs": [
             {
                 "internalType": "address",
+                "name": "_address",
+                "type": "address"
+            }
+        ],
+        "name": "getDebtToken",
+        "outputs": [
+            {
+                "internalType": "contract IDebtToken",
                 "name": "",
                 "type": "address"
             }
@@ -159,10 +134,23 @@
     },
     {
         "inputs": [],
-        "name": "priceFeed",
+        "name": "getDebtTokenAddresses",
         "outputs": [
             {
-                "internalType": "contract IPriceFeed",
+                "internalType": "address[]",
+                "name": "",
+                "type": "address[]"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [],
+        "name": "getStableCoin",
+        "outputs": [
+            {
+                "internalType": "contract IDebtToken",
                 "name": "",
                 "type": "address"
             }
@@ -171,36 +159,22 @@
         "type": "function"
     },
     {
-        "inputs": [],
-        "name": "renounceOwnership",
-        "outputs": [],
-        "stateMutability": "nonpayable",
-        "type": "function"
-    },
-    {
         "inputs": [
             {
                 "internalType": "address",
-                "name": "_priceFeedAddress",
+                "name": "_address",
                 "type": "address"
             }
         ],
-        "name": "setAddresses",
-        "outputs": [],
-        "stateMutability": "nonpayable",
-        "type": "function"
-    },
-    {
-        "inputs": [
+        "name": "isDebtToken",
+        "outputs": [
             {
-                "internalType": "address",
-                "name": "newOwner",
-                "type": "address"
+                "internalType": "bool",
+                "name": "",
+                "type": "bool"
             }
         ],
-        "name": "transferOwnership",
-        "outputs": [],
-        "stateMutability": "nonpayable",
+        "stateMutability": "view",
         "type": "function"
     }
 ]

@@ -20,6 +20,7 @@ import {
   whaleShrimpTroveInit,
   repayDebt,
   setPrice,
+  buildPriceCache,
 } from '../utils/testHelper';
 import { assert, expect } from 'chai';
 import { parseUnits } from 'ethers';
@@ -253,7 +254,7 @@ describe('LiquidationOperations', () => {
         const defaulterBTC = parseUnits('0.02', 9);
         const defaulterBTCWithoutFee = defaulterBTC - (await troveManager.getCollGasCompensation(defaulterBTC));
         let remainingActiveBTC = parseUnits('5.04', 9) - defaulterBTC;
-        const totalStake = await priceFeed.getUSDValue(BTC, remainingActiveBTC);
+        const totalStake = await priceFeed['getUSDValue(address,uint256)'](BTC, remainingActiveBTC);
 
         // checking liquidated snapshots
         const L_BTC_A = await troveManager.getLiquidatedTokens(BTC, true);
@@ -273,7 +274,7 @@ describe('LiquidationOperations', () => {
         await liquidationOperations.liquidate(defaulter_2);
 
         remainingActiveBTC -= defaulterBTC;
-        const totalStakeB = await priceFeed.getUSDValue(BTC, remainingActiveBTC);
+        const totalStakeB = await priceFeed['getUSDValue(address,uint256)'](BTC, remainingActiveBTC);
 
         // checking liquidated snapshots
         const L_BTC_B = await troveManager.getLiquidatedTokens(BTC, true);
@@ -551,8 +552,9 @@ describe('LiquidationOperations', () => {
         await setPrice('BTC', '10000', contracts);
 
         //get entire system coll & debt
-        const entireSystemColl_Before = await storagePool.getEntireSystemColl();
-        const entireSystemDebt_Before = await storagePool.getEntireSystemDebt();
+        const priceCache = await buildPriceCache(contracts);
+        const entireSystemColl_Before = await storagePool.getEntireSystemColl(priceCache);
+        const entireSystemDebt_Before = await storagePool.getEntireSystemDebt(priceCache);
 
         const TCR_0 = await getTCR(contracts);
         const expectedTCR_0 = (entireSystemColl_Before * parseUnits('1')) / entireSystemDebt_Before;
@@ -567,7 +569,7 @@ describe('LiquidationOperations', () => {
         assert.isFalse(await troveManager.isTroveActive(carol));
         const [, , stableGasComp_1, collGasComp_1] = await getEmittedLiquidationValues(carolLiquidate, contracts);
         const btcGasComp_1 = collGasComp_1.find((e: MockERC20[]) => e[0] === BTC.target)[1];
-        const btcGasComp_1_USD = await priceFeed.getUSDValue(BTC, btcGasComp_1);
+        const btcGasComp_1_USD = await priceFeed['getUSDValue(address,uint256)'](BTC, btcGasComp_1);
 
         // Expect only change to TCR to be due to the issued gas compensation
         const TCR_1 = await getTCR(contracts);
@@ -580,7 +582,7 @@ describe('LiquidationOperations', () => {
         const denisLiquidate = await liquidationOperations.liquidate(dennis);
         const [, , stableGasComp_2, collGasComp_2] = await getEmittedLiquidationValues(denisLiquidate, contracts);
         const btcGasComp_2 = collGasComp_2.find((e: MockERC20[]) => e[0] === BTC.target)[1];
-        const btcGasComp_2_USD = await priceFeed.getUSDValue(BTC, btcGasComp_2);
+        const btcGasComp_2_USD = await priceFeed['getUSDValue(address,uint256)'](BTC, btcGasComp_2);
 
         // Expect only change to TCR to be due to the issued gas compensation
         const TCR_2 = await getTCR(contracts);
@@ -1175,10 +1177,14 @@ describe('LiquidationOperations', () => {
       assert.isFalse(bobPendingReward > 0);
 
       // Check alice's pending coll and debt rewards are <= the coll and debt in the DefaultPool
+      const priceCache = await buildPriceCache(contracts);
       const PendingDebtSTABLE_A = await troveManager.getPendingReward(alice, STABLE, false);
-      const entireSystemCollUsd = await storagePool.getEntireSystemColl();
-      const entireSystemCollAmount = await priceFeed.getAmountFromUSDValue(BTC, entireSystemCollUsd);
-      const entireSystemDebt = await storagePool.getEntireSystemDebt();
+      const entireSystemCollUsd = await storagePool.getEntireSystemColl(priceCache);
+      const entireSystemCollAmount = await priceFeed['getAmountFromUSDValue(address,uint256)'](
+        BTC,
+        entireSystemCollUsd
+      );
+      const entireSystemDebt = await storagePool.getEntireSystemDebt(priceCache);
       expect(PendingDebtSTABLE_A).to.be.lte(entireSystemDebt);
       expect(alicePendingBTCReward).to.be.lte(entireSystemCollUsd);
 

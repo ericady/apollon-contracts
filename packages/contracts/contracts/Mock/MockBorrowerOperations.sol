@@ -71,7 +71,7 @@ contract MockBorrowerOperations is BorrowerOperations {
     troveManager.setTroveStatus(_borrower, _num);
   }
 
-  function testTroveManager_closeTrove(address[] memory collTokenAddresses, address _borrower) external {
-    troveManager.closeTroveByProtocol(collTokenAddresses, _borrower, Status.closedByOwner);
+  function testTroveManager_closeTrove(PriceCache memory _priceCache, address _borrower) external {
+    troveManager.closeTroveByProtocol(_priceCache, _borrower, Status.closedByOwner);
   }
 }

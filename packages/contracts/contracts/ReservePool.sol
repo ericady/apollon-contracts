@@ -81,13 +81,14 @@ contract ReservePool is LiquityBase, Ownable(msg.sender), CheckContract, IReserv
   ) external returns (uint usedGov, uint usedStable) {
     _requireCallerIsStabilityPoolManager();
 
-    uint govDecimal = IERC20Metadata(address(govToken)).decimals();
-    (uint govTokenPrice, ) = priceFeed.getPrice(address(govToken));
-    usedGov = (withdrawAmountInUSD * 10 ** govDecimal) / govTokenPrice;
-    usedGov = Math.min(usedGov, govToken.balanceOf(address(this)));
-    govToken.transfer(stabilityPool, usedGov);
-
-    usedStable = withdrawAmountInUSD - (usedGov * govTokenPrice) / 10 ** govDecimal;
+    //  todo...
+    //    uint govDecimal = IERC20Metadata(address(govToken)).decimals();
+    //    (uint govTokenPrice, ) = priceFeed.getPrice(address(govToken));
+    //    usedGov = (withdrawAmountInUSD * 10 ** govDecimal) / govTokenPrice;
+    //    usedGov = Math.min(usedGov, govToken.balanceOf(address(this)));
+    //    govToken.transfer(stabilityPool, usedGov);
+    //
+    //    usedStable = withdrawAmountInUSD - (usedGov * govTokenPrice) / 10 ** govDecimal;
     usedStable = Math.min(usedStable, stableDebtToken.balanceOf(address(this)));
     stableDebtToken.transfer(stabilityPool, usedStable);
 

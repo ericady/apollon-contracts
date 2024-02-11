@@ -2,14 +2,16 @@
 
 pragma solidity ^0.8.9;
 
+import './IBase.sol';
 import './IDebtToken.sol';
 
 // Common interface for the dToken Manager.
-interface IDebtTokenManager {
+interface ITokenManager is IBase {
   // --- Events ---
 
-  event DebtTokenManagerInitialized(address _stabilityPoolManagerAddress, address _priceFeedAddress);
+  event TokenManagerInitialized(address _stabilityPoolManagerAddress, address _priceFeedAddress);
   event DebtTokenAdded(address _debtTokenAddress);
+  event CollTokenAdded(address _tokenAddress);
 
   // --- Custom Errors ---
 
@@ -28,4 +30,8 @@ interface IDebtTokenManager {
   function getDebtTokenAddresses() external view returns (address[] memory);
 
   function addDebtToken(address _debtTokenAddress, uint _tellorOracleId) external;
+
+  function getCollTokenAddresses() external view returns (address[] memory);
+
+  function addCollToken(address _tokenAddress, uint _tellorOracleId) external;
 }

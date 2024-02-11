@@ -4,12 +4,10 @@ import {
   MockBorrowerOperations,
   MockDebtToken,
   MockERC20,
-  PriceFeed,
   TroveManager,
   SwapPair,
   SwapOperations,
-  DebtTokenManager,
-  IBase,
+  TokenManager,
 } from '../typechain';
 import { expect } from 'chai';
 import { openTrove, getLatestBlockTimestamp, setPrice } from '../utils/testHelper';
@@ -28,11 +26,10 @@ describe('SwapOperations', () => {
   let ETH: MockERC20;
 
   let contracts: any;
-  let priceFeed: PriceFeed;
   let troveManager: TroveManager;
   let borrowerOperations: MockBorrowerOperations;
   let swapOperations: SwapOperations;
-  let debtTokenManager: DebtTokenManager;
+  let tokenManager: TokenManager;
 
   const open = async (user: SignerWithAddress, collAmount: bigint, debtAmount: bigint) => {
     return await openTrove({
@@ -123,11 +120,10 @@ describe('SwapOperations', () => {
     // @ts-ignore
     contracts = await ignition.deploy(apollonTesting);
 
-    priceFeed = contracts.priceFeed;
     troveManager = contracts.troveManager;
     borrowerOperations = contracts.borrowerOperations;
     swapOperations = contracts.swapOperations;
-    debtTokenManager = contracts.debtTokenManager;
+    tokenManager = contracts.tokenManager;
 
     STABLE = contracts.STABLE;
     STOCK = contracts.STOCK;
@@ -455,7 +451,7 @@ describe('SwapOperations', () => {
           swapOperations
             .connect(alice)
             .openShortPosition(parseUnits('1'), 0, BTC, alice, await mintMeta(), await deadline())
-        ).to.be.revertedWithCustomError(debtTokenManager, 'InvalidDebtToken');
+        ).to.be.revertedWithCustomError(tokenManager, 'InvalidDebtToken');
       });
 
       it('open with no enough collateral, should fail', async () => {

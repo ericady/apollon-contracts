@@ -11,7 +11,7 @@ interface IStabilityPoolManager is IBBase {
     address liquidationOperationsAddress,
     address storgePoolAddress,
     address reservePoolAddress,
-    address debtTokenManagerAddress,
+    address tokenManagerAddress,
     address priceFeedAddress
   );
   event StabilityPoolAdded(address stabilityPoolAddress);
@@ -26,9 +26,7 @@ interface IStabilityPoolManager is IBBase {
   // --- Functions ---
   function getStabilityPool(IDebtToken _debtToken) external view returns (IStabilityPool);
 
-  function getRemainingStability(
-    address[] memory collTokenAddresses
-  ) external view returns (RemainingStability[] memory);
+  function getRemainingStability(PriceCache memory _priceCache) external view returns (RemainingStability[] memory);
 
   function getTotalDeposits() external view returns (TokenAmount[] memory deposits);
 
@@ -47,10 +45,7 @@ interface IStabilityPoolManager is IBBase {
 
   function getDepositorCompoundedDeposits(address _depositor) external view returns (TokenAmount[] memory deposits);
 
-  function getDepositorCollGains(
-    address _depositor,
-    address[] memory collTokenAddresses
-  ) external view returns (TokenAmount[] memory collGains);
+  function getDepositorCollGains(address _depositor) external view returns (TokenAmount[] memory collGains);
 
   function provideStability(TokenAmount[] memory _debts) external;
 
@@ -58,7 +53,7 @@ interface IStabilityPoolManager is IBBase {
 
   function withdrawGains() external;
 
-  function offset(RemainingStability[] memory _toOffset) external;
+  function offset(PriceCache memory _priceCache, RemainingStability[] memory _toOffset) external;
 
   function addStabilityPool(IDebtToken _debtToken) external;
 }

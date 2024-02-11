@@ -1,6 +1,11 @@
 [
     {
         "inputs": [],
+        "name": "FeeExceedMaxPercentage",
+        "type": "error"
+    },
+    {
+        "inputs": [],
         "name": "InvalidDebtToken",
         "type": "error"
     },
@@ -52,11 +57,11 @@
             {
                 "indexed": false,
                 "internalType": "address",
-                "name": "_debtTokenAddress",
+                "name": "_tokenAddress",
                 "type": "address"
             }
         ],
-        "name": "DebtTokenAdded",
+        "name": "CollTokenAdded",
         "type": "event"
     },
     {
@@ -65,17 +70,11 @@
             {
                 "indexed": false,
                 "internalType": "address",
-                "name": "_stabilityPoolManagerAddress",
-                "type": "address"
-            },
-            {
-                "indexed": false,
-                "internalType": "address",
-                "name": "_priceFeedAddress",
+                "name": "_debtTokenAddress",
                 "type": "address"
             }
         ],
-        "name": "DebtTokenManagerInitialized",
+        "name": "DebtTokenAdded",
         "type": "event"
     },
     {
@@ -98,6 +97,25 @@
         "type": "event"
     },
     {
+        "anonymous": false,
+        "inputs": [
+            {
+                "indexed": false,
+                "internalType": "address",
+                "name": "_stabilityPoolManagerAddress",
+                "type": "address"
+            },
+            {
+                "indexed": false,
+                "internalType": "address",
+                "name": "_priceFeedAddress",
+                "type": "address"
+            }
+        ],
+        "name": "TokenManagerInitialized",
+        "type": "event"
+    },
+    {
         "inputs": [],
         "name": "NAME",
         "outputs": [
@@ -108,6 +126,24 @@
             }
         ],
         "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "address",
+                "name": "_tokenAddress",
+                "type": "address"
+            },
+            {
+                "internalType": "uint256",
+                "name": "_tellorOracleId",
+                "type": "uint256"
+            }
+        ],
+        "name": "addCollToken",
+        "outputs": [],
+        "stateMutability": "nonpayable",
         "type": "function"
     },
     {
@@ -126,6 +162,25 @@
         "name": "addDebtToken",
         "outputs": [],
         "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "uint256",
+                "name": "",
+                "type": "uint256"
+            }
+        ],
+        "name": "collTokenAddresses",
+        "outputs": [
+            {
+                "internalType": "address",
+                "name": "",
+                "type": "address"
+            }
+        ],
+        "stateMutability": "view",
         "type": "function"
     },
     {
@@ -180,6 +235,19 @@
                 "internalType": "contract IDebtToken",
                 "name": "",
                 "type": "address"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [],
+        "name": "getCollTokenAddresses",
+        "outputs": [
+            {
+                "internalType": "address[]",
+                "name": "",
+                "type": "address[]"
             }
         ],
         "stateMutability": "view",

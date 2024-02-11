@@ -14,8 +14,7 @@ export default buildModule('ApollonTesting', m => {
     storagePool: m.contract('StoragePool', []),
     collSurplusPool: m.contract('CollSurplusPool', []),
     reservePool: m.contract('ReservePool', []),
-    collTokenManager: m.contract('CollTokenManager', []),
-    debtTokenManager: m.contract('DebtTokenManager', []),
+    tokenManager: m.contract('TokenManager', []),
     priceFeed: m.contract('PriceFeed', []),
     swapOperations: m.contract('SwapOperations', []),
   };
@@ -43,8 +42,7 @@ export default buildModule('ApollonTesting', m => {
     contracts.stabilityPoolManager,
     contracts.reservePool,
     contracts.priceFeed,
-    contracts.debtTokenManager,
-    contracts.collTokenManager,
+    contracts.tokenManager,
     contracts.swapOperations,
     contracts.sortedTroves,
     contracts.collSurplusPool,
@@ -55,8 +53,7 @@ export default buildModule('ApollonTesting', m => {
     contracts.troveManager,
     contracts.storagePool,
     contracts.priceFeed,
-    contracts.debtTokenManager,
-    contracts.collTokenManager,
+    contracts.tokenManager,
     contracts.sortedTroves,
   ];
   m.call(contracts.redemptionOperations, 'setAddresses', redemptionOperationsLinks, {
@@ -67,8 +64,7 @@ export default buildModule('ApollonTesting', m => {
     contracts.troveManager,
     contracts.storagePool,
     contracts.priceFeed,
-    contracts.debtTokenManager,
-    contracts.collTokenManager,
+    contracts.tokenManager,
     contracts.stabilityPoolManager,
     contracts.collSurplusPool,
   ];
@@ -86,14 +82,9 @@ export default buildModule('ApollonTesting', m => {
   ];
   m.call(contracts.storagePool, 'setAddresses', storagePoolLinks, { after: storagePoolLinks });
 
-  const debtTokenManagerLinks = [contracts.stabilityPoolManager, contracts.priceFeed];
-  const debtTokenLink = m.call(contracts.debtTokenManager, 'setAddresses', debtTokenManagerLinks, {
-    after: debtTokenManagerLinks,
-  });
-
-  const collTokenManagerLinks = [contracts.priceFeed];
-  const collTokenLink = m.call(contracts.collTokenManager, 'setAddresses', collTokenManagerLinks, {
-    after: collTokenManagerLinks,
+  const tokenManagerLinks = [contracts.stabilityPoolManager, contracts.priceFeed];
+  const tokenLink = m.call(contracts.tokenManager, 'setAddresses', tokenManagerLinks, {
+    after: tokenManagerLinks,
   });
 
   const stabilityPoolManagerLinks = [
@@ -101,7 +92,7 @@ export default buildModule('ApollonTesting', m => {
     contracts.priceFeed,
     contracts.storagePool,
     contracts.reservePool,
-    contracts.debtTokenManager,
+    contracts.tokenManager,
   ];
   m.call(contracts.stabilityPoolManager, 'setAddresses', stabilityPoolManagerLinks, {
     after: stabilityPoolManagerLinks,
@@ -111,7 +102,7 @@ export default buildModule('ApollonTesting', m => {
     contracts.borrowerOperations,
     contracts.troveManager,
     contracts.priceFeed,
-    contracts.debtTokenManager,
+    contracts.tokenManager,
   ];
   m.call(contracts.swapOperations, 'setAddresses', swapOperationsLinks, { after: swapOperationsLinks });
 
@@ -142,7 +133,7 @@ export default buildModule('ApollonTesting', m => {
   });
 
   // price feed setup / linking
-  const priceFeedLinks = [contracts.tellorCaller, contracts.debtTokenManager, contracts.collTokenManager];
+  const priceFeedLinks = [contracts.tellorCaller, contracts.tokenManager];
   m.call(contracts.priceFeed, 'setAddresses', priceFeedLinks, { after: priceFeedLinks });
 
   // testing setup
@@ -155,8 +146,7 @@ export default buildModule('ApollonTesting', m => {
       contracts.redemptionOperations,
       contracts.borrowerOperations,
       contracts.stabilityPoolManager,
-      contracts.debtTokenManager,
-      contracts.priceFeed,
+      contracts.tokenManager,
       contracts.swapOperations,
       'STABLE',
       'STABLE',
@@ -172,8 +162,7 @@ export default buildModule('ApollonTesting', m => {
       contracts.redemptionOperations,
       contracts.borrowerOperations,
       contracts.stabilityPoolManager,
-      contracts.debtTokenManager,
-      contracts.priceFeed,
+      contracts.tokenManager,
       contracts.swapOperations,
       'STOCK',
       'STOCK',
@@ -183,21 +172,21 @@ export default buildModule('ApollonTesting', m => {
     { id: 'mockSTOCK' }
   );
 
-  m.call(contracts.collTokenManager, 'addCollToken', [contracts.BTC, 1], {
+  m.call(contracts.tokenManager, 'addCollToken', [contracts.BTC, 1], {
     id: 'addBtc',
-    after: [contracts.BTC, collTokenLink],
+    after: [contracts.BTC, tokenLink],
   });
-  m.call(contracts.collTokenManager, 'addCollToken', [contracts.USDT, 2], {
+  m.call(contracts.tokenManager, 'addCollToken', [contracts.USDT, 2], {
     id: 'addUsdt',
-    after: [contracts.USDT, collTokenLink],
+    after: [contracts.USDT, tokenLink],
   });
-  m.call(contracts.debtTokenManager, 'addDebtToken', [contracts.STABLE, 3], {
+  m.call(contracts.tokenManager, 'addDebtToken', [contracts.STABLE, 3], {
     id: 'addStable',
-    after: [contracts.STABLE, debtTokenLink],
+    after: [contracts.STABLE, tokenLink],
   });
-  m.call(contracts.debtTokenManager, 'addDebtToken', [contracts.STOCK, 4], {
+  m.call(contracts.tokenManager, 'addDebtToken', [contracts.STOCK, 4], {
     id: 'addStock',
-    after: [contracts.STOCK, debtTokenLink],
+    after: [contracts.STOCK, tokenLink],
   });
 
   // reserve pool contract linking

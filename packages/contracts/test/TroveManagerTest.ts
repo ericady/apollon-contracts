@@ -9,7 +9,15 @@ import {
   LiquidationOperations,
 } from '../typechain';
 import { SignerWithAddress } from '@nomicfoundation/hardhat-ethers/signers';
-import { openTrove, whaleShrimpTroveInit, getTCR, TroveStatus, repayDebt, setPrice } from '../utils/testHelper';
+import {
+  openTrove,
+  whaleShrimpTroveInit,
+  getTCR,
+  TroveStatus,
+  repayDebt,
+  setPrice,
+  buildPriceCache,
+} from '../utils/testHelper';
 import { assert, expect } from 'chai';
 import { parseUnits } from 'ethers';
 import apollonTesting from '../ignition/modules/apollonTesting';
@@ -151,10 +159,14 @@ describe('TroveManager', () => {
       assert.isFalse(bobPendingReward > 0);
 
       // Check alice's pending coll and debt rewards are <= the coll and debt in the DefaultPool
+      const priceCache = await buildPriceCache(contracts);
       const PendingDebtSTABLE_A = await troveManager.getPendingReward(alice, STABLE, false);
-      const entireSystemCollUsd = await storagePool.getEntireSystemColl();
-      const entireSystemCollAmount = await priceFeed.getAmountFromUSDValue(BTC, entireSystemCollUsd);
-      const entireSystemDebt = await storagePool.getEntireSystemDebt();
+      const entireSystemCollUsd = await storagePool.getEntireSystemColl(priceCache);
+      const entireSystemCollAmount = await priceFeed['getAmountFromUSDValue(address,uint256)'](
+        BTC,
+        entireSystemCollUsd
+      );
+      const entireSystemDebt = await storagePool.getEntireSystemDebt(priceCache);
       expect(PendingDebtSTABLE_A).to.be.lte(entireSystemDebt);
       expect(alicePendingBTCReward).to.be.lte(entireSystemCollUsd);
 
@@ -199,7 +211,10 @@ describe('TroveManager', () => {
       const defaulter_1TroveStatus = await troveManager.getTroveStatus(defaulter_1);
       assert.equal(defaulter_1TroveStatus.toString(), TroveStatus.CLOSED_BY_LIQUIDATION_IN_NORMAL_MODE.toString());
       const carolBtcRewardBefore = await troveManager.getPendingReward(carol, BTC, true);
-      const amountBeforePriceChange = await priceFeed.getAmountFromUSDValue(BTC, carolBtcRewardBefore);
+      const amountBeforePriceChange = await priceFeed['getAmountFromUSDValue(address,uint256)'](
+        BTC,
+        carolBtcRewardBefore
+      );
 
       //drop price again
       await setPrice('BTC', '3000', contracts);
@@ -207,7 +222,10 @@ describe('TroveManager', () => {
       assert.isFalse(isRecoveryModeAfterPriceChange[0]);
 
       const carolBtcRewardAfter = await troveManager.getPendingReward(carol, BTC, true);
-      const amountAfterPriceChange = await priceFeed.getAmountFromUSDValue(BTC, carolBtcRewardAfter);
+      const amountAfterPriceChange = await priceFeed['getAmountFromUSDValue(address,uint256)'](
+        BTC,
+        carolBtcRewardAfter
+      );
       assert.equal(amountBeforePriceChange, amountAfterPriceChange);
     });
 

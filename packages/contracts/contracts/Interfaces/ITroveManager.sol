@@ -6,7 +6,7 @@ import './IStabilityPool.sol';
 import './IDebtToken.sol';
 import './IBBase.sol';
 import './IPriceFeed.sol';
-import './IDebtTokenManager.sol';
+import './ITokenManager.sol';
 
 // Common interface for the Trove Manager.
 interface ITroveManager is IBBase {
@@ -53,6 +53,11 @@ interface ITroveManager is IBBase {
 
   function getCurrentICR(address _borrower) external view returns (uint ICR, uint currentDebtInUSD);
 
+  function getCurrentICR(
+    PriceCache memory _priceCache,
+    address _borrower
+  ) external view returns (uint ICR, uint currentDebtInUSD);
+
   function getICRIncludingPatch(
     address _borrower,
     TokenAmount[] memory addedColl,
@@ -63,9 +68,9 @@ interface ITroveManager is IBBase {
 
   //
 
-  function updateStakeAndTotalStakes(address[] memory collTokenAddresses, address _borrower) external;
+  function updateStakeAndTotalStakes(PriceCache memory _priceCache, address _borrower) external;
 
-  function removeStake(address[] memory collTokenAddresses, address _borrower) external;
+  function removeStake(PriceCache memory _priceCache, address _borrower) external;
 
   function updateSystemSnapshots_excludeCollRemainder(TokenAmount[] memory totalCollGasCompensation) external;
 
@@ -75,7 +80,7 @@ interface ITroveManager is IBBase {
 
   //
 
-  function redistributeDebtAndColl(address[] memory collTokenAddresses, CAmount[] memory toRedistribute) external;
+  function redistributeDebtAndColl(PriceCache memory _priceCache, CAmount[] memory toRedistribute) external;
 
   function getPendingReward(
     address _borrower,
@@ -84,6 +89,8 @@ interface ITroveManager is IBBase {
   ) external view returns (uint pendingReward);
 
   function applyPendingRewards(address _borrower) external;
+
+  function applyPendingRewards(PriceCache memory _priceCache, address _borrower) external;
 
   function updateTroveRewardSnapshots(address _borrower) external;
 
@@ -100,6 +107,7 @@ interface ITroveManager is IBBase {
   //
 
   function getEntireDebtAndColl(
+    PriceCache memory _priceCache,
     address _borrower
   )
     external
@@ -113,21 +121,46 @@ interface ITroveManager is IBBase {
 
   function getTroveDebt(address _borrower) external view returns (TokenAmount[] memory);
 
-  function getTroveRepayableDebt(address _borrower, address _debtTokenAddress, bool _includingStableCoinGasCompensation) external view returns (uint amount);
+  function getTroveRepayableDebt(
+    PriceCache memory _priceCache,
+    address _borrower,
+    address _debtTokenAddress,
+    bool _includingStableCoinGasCompensation
+  ) external view returns (uint amount);
 
-  function getTroveRepayableDebts(address _borrower, bool _includingStableCoinGasCompensation) external view returns (TokenAmount[] memory);
+  function getTroveRepayableDebts(
+    address _borrower,
+    bool _includingStableCoinGasCompensation
+  ) external view returns (TokenAmount[] memory);
+
+  function getTroveRepayableDebts(
+    PriceCache memory _priceCache,
+    address _borrower,
+    bool _includingStableCoinGasCompensation
+  ) external view returns (TokenAmount[] memory debts);
 
   function getTroveColl(address _borrower) external view returns (TokenAmount[] memory);
 
   function getTroveWithdrawableColl(address _borrower, address _collTokenAddress) external view returns (uint amount);
 
+  function getTroveWithdrawableColl(
+    PriceCache memory _priceCache,
+    address _borrower,
+    address _collTokenAddress
+  ) external view returns (uint amount);
+
   function getTroveWithdrawableColls(address _borrower) external view returns (TokenAmount[] memory colls);
+
+  function getTroveWithdrawableColls(
+    PriceCache memory _priceCache,
+    address _borrower
+  ) external view returns (TokenAmount[] memory colls);
 
   //
 
   function addTroveOwnerToArray(address _borrower) external returns (uint128 index);
 
-  function closeTroveByProtocol(address[] memory collTokenAddresses, address _borrower, Status closedStatus) external;
+  function closeTroveByProtocol(PriceCache memory _priceCache, address _borrower, Status closedStatus) external;
 
   //
 

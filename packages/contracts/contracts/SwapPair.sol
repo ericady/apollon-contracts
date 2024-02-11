@@ -11,7 +11,7 @@ import './Interfaces/ISwapOperations.sol';
 import './Interfaces/ISwapCallee.sol';
 import './SwapERC20.sol';
 import './Interfaces/IPriceFeed.sol';
-import './Interfaces/IDebtTokenManager.sol';
+import './Interfaces/ITokenManager.sol';
 
 contract SwapPair is ISwapPair, SwapERC20, LiquityBase {
   using UQ112x112 for uint224;
@@ -21,7 +21,7 @@ contract SwapPair is ISwapPair, SwapERC20, LiquityBase {
 
   address public operations;
   IPriceFeed public priceFeed;
-  IDebtTokenManager public debtTokenManager;
+  ITokenManager public tokenManager;
 
   address public token0;
   address public token1;
@@ -38,12 +38,12 @@ contract SwapPair is ISwapPair, SwapERC20, LiquityBase {
   }
 
   // called once by the operations at time of deployment
-  function initialize(address _token0, address _token1, address _debtTokenManager, address _priceFeedAddress) external {
+  function initialize(address _token0, address _token1, address _tokenManager, address _priceFeedAddress) external {
     if (msg.sender != operations) revert Forbidden();
 
     token0 = _token0;
     token1 = _token1;
-    debtTokenManager = IDebtTokenManager(_debtTokenManager);
+    tokenManager = ITokenManager(_tokenManager);
     priceFeed = IPriceFeed(_priceFeedAddress);
   }
 
@@ -156,7 +156,7 @@ contract SwapPair is ISwapPair, SwapERC20, LiquityBase {
   function getSwapFee() public view override returns (uint32 swapFee) {
     // find stable coin
     address nonStableCoin = token1;
-    if (!debtTokenManager.isDebtToken(nonStableCoin)) return SWAP_BASE_FEE; // no dynamic fee if the pool is not an stable/stock pool
+    if (!tokenManager.isDebtToken(nonStableCoin)) return SWAP_BASE_FEE; // no dynamic fee if the pool is not an stable/stock pool
     if (totalSupply == 0) return SWAP_BASE_FEE; //inital mint
 
     // query prices

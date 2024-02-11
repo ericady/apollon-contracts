@@ -60,11 +60,7 @@ export const openTrove = async ({
     .openTrove([{ tokenAddress: collToken, amount: collAmount }]);
 
   if (debts) await increaseDebt(from, contracts, debts);
-  return {
-    openTx,
-    collateral: await contracts.troveManager.getTroveColl(from),
-    debtInUSD: await getTroveEntireDebt(contracts, from),
-  };
+  return openTx;
 };
 
 export const addColl = async (from: SignerWithAddress, contracts: Contracts, colls: any[], approve = false) => {
@@ -251,12 +247,32 @@ export const whaleShrimpTroveInit = async (
   });
 };
 
+export const buildPriceCache = async (contracts: Contracts) => {
+  const priceCache = await contracts.priceFeed.buildPriceCache();
+  return {
+    collPrices: priceCache[0].map(a => ({
+      tokenAddress: a[0],
+      tokenDecimals: a[1],
+      price: a[2],
+      isPriceTrusted: a[3],
+    })),
+    debtPrices: priceCache[1].map(a => ({
+      tokenAddress: a[0],
+      tokenDecimals: a[1],
+      price: a[2],
+      isPriceTrusted: a[3],
+    })),
+  };
+};
+
 export const getTroveEntireColl = async (contracts: Contracts, trove: SignerWithAddress) => {
-  return (await contracts.troveManager.getEntireDebtAndColl(trove)).troveCollInUSD;
+  const priceCache = await buildPriceCache(contracts);
+  return (await contracts.troveManager.getEntireDebtAndColl(priceCache, trove)).troveCollInUSD;
 };
 
 export const getTroveEntireDebt = async (contracts: Contracts, trove: SignerWithAddress) => {
-  return (await contracts.troveManager.getEntireDebtAndColl(trove)).troveDebtInUSD;
+  const priceCache = await buildPriceCache(contracts);
+  return (await contracts.troveManager.getEntireDebtAndColl(priceCache, trove)).troveDebtInUSD;
 };
 
 export const getTroveStakeValue = async (contracts: Contracts, trove: SignerWithAddress) => {

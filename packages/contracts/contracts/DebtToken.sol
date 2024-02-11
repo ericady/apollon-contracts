@@ -6,8 +6,7 @@ import '@openzeppelin/contracts/utils/cryptography/ECDSA.sol';
 import '@openzeppelin/contracts/utils/cryptography/MessageHashUtils.sol';
 import './Dependencies/CheckContract.sol';
 import './Interfaces/IDebtToken.sol';
-import './Interfaces/IPriceFeed.sol';
-import './Interfaces/IDebtTokenManager.sol';
+import './Interfaces/ITokenManager.sol';
 import './Interfaces/ISwapOperations.sol';
 
 /*
@@ -63,17 +62,15 @@ contract DebtToken is CheckContract, IDebtToken {
   address public immutable redemptionOperationsAddress;
   address public immutable borrowerOperationsAddress;
   address public immutable stabilityPoolManagerAddress;
-  address public immutable debtTokenManagerAddress;
+  address public immutable tokenManagerAddress;
   ISwapOperations public immutable swapOperations;
-  IPriceFeed public immutable priceFeed;
 
   constructor(
     address _troveManagerAddress,
     address _redemptionOperationsAddress,
     address _borrowerOperationsAddress,
     address _stabilityPoolManagerAddress,
-    address _debtTokenManagerAddress,
-    address _priceFeedAddress,
+    address _tokenManagerAddress,
     address _swapOperationsAddress,
     string memory _symbol,
     string memory _name,
@@ -84,16 +81,14 @@ contract DebtToken is CheckContract, IDebtToken {
     checkContract(_redemptionOperationsAddress);
     checkContract(_borrowerOperationsAddress);
     checkContract(_stabilityPoolManagerAddress);
-    checkContract(_priceFeedAddress);
-    checkContract(_debtTokenManagerAddress);
+    checkContract(_tokenManagerAddress);
     checkContract(_swapOperationsAddress);
 
     troveManagerAddress = _troveManagerAddress;
     redemptionOperationsAddress = _redemptionOperationsAddress;
     borrowerOperationsAddress = _borrowerOperationsAddress;
     stabilityPoolManagerAddress = _stabilityPoolManagerAddress;
-    debtTokenManagerAddress = _debtTokenManagerAddress;
-    priceFeed = IPriceFeed(_priceFeedAddress);
+    tokenManagerAddress = _tokenManagerAddress;
     swapOperations = ISwapOperations(_swapOperationsAddress);
 
     _NAME = _name;
@@ -114,10 +109,6 @@ contract DebtToken is CheckContract, IDebtToken {
 
   function isStableCoin() external view override returns (bool) {
     return _IS_STABLE_COIN;
-  }
-
-  function getPrice() external view override returns (uint, bool) {
-    return priceFeed.getPrice(address(this));
   }
 
   function mint(address _account, uint256 _amount) external override {

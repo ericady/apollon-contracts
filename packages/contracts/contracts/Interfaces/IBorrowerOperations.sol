@@ -14,8 +14,7 @@ interface IBorrowerOperations is IBBase {
     address _stabilityPoolAddress,
     address _reservePoolAddress,
     address _priceFeedAddress,
-    address _debtTokenManagerAddress,
-    address _collTokenManagerAddress,
+    address _tokenManagerAddress,
     address _swapOperationsAddress,
     address _sortedTrovesAddress,
     address _collSurplusPoolAddress
@@ -85,6 +84,4 @@ interface IBorrowerOperations is IBBase {
   function closeTrove() external;
 
   function claimCollateral() external;
-
-  function getCompositeDebt(DebtTokenAmount[] memory _debts) external view returns (uint);
 }

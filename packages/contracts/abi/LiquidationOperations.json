@@ -70,13 +70,7 @@
             {
                 "indexed": false,
                 "internalType": "address",
-                "name": "_debtTokenManager",
-                "type": "address"
-            },
-            {
-                "indexed": false,
-                "internalType": "address",
-                "name": "_collTokenManager",
+                "name": "_tokenManager",
                 "type": "address"
             },
             {
@@ -377,32 +371,6 @@
         "type": "function"
     },
     {
-        "inputs": [],
-        "name": "collTokenManager",
-        "outputs": [
-            {
-                "internalType": "contract ICollTokenManager",
-                "name": "",
-                "type": "address"
-            }
-        ],
-        "stateMutability": "view",
-        "type": "function"
-    },
-    {
-        "inputs": [],
-        "name": "debtTokenManager",
-        "outputs": [
-            {
-                "internalType": "contract IDebtTokenManager",
-                "name": "",
-                "type": "address"
-            }
-        ],
-        "stateMutability": "view",
-        "type": "function"
-    },
-    {
         "inputs": [
             {
                 "internalType": "address",
@@ -467,12 +435,7 @@
             },
             {
                 "internalType": "address",
-                "name": "_debtTokenManagerAddress",
-                "type": "address"
-            },
-            {
-                "internalType": "address",
-                "name": "_collTokenManagerAddress",
+                "name": "_tokenManagerAddress",
                 "type": "address"
             },
             {
@@ -510,6 +473,19 @@
         "outputs": [
             {
                 "internalType": "contract IStoragePool",
+                "name": "",
+                "type": "address"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [],
+        "name": "tokenManager",
+        "outputs": [
+            {
+                "internalType": "contract ITokenManager",
                 "name": "",
                 "type": "address"
             }

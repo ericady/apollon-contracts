@@ -8,11 +8,10 @@ import './Dependencies/LiquityBase.sol';
 import './Dependencies/CheckContract.sol';
 import './Interfaces/IStabilityPool.sol';
 import './Interfaces/IDebtToken.sol';
-import './Interfaces/IDebtTokenManager.sol';
+import './Interfaces/ITokenManager.sol';
 import './Interfaces/IPriceFeed.sol';
 import './Interfaces/IStoragePool.sol';
 import './Interfaces/IBBase.sol';
-import './Interfaces/ICollTokenManager.sol';
 import './Interfaces/IRedemptionOperations.sol';
 import './Interfaces/ITroveManager.sol';
 import './Interfaces/ISortedTroves.sol';
@@ -23,8 +22,7 @@ contract RedemptionOperations is LiquityBase, Ownable(msg.sender), CheckContract
   // --- Connected contract declarations ---
 
   ITroveManager public troveManager;
-  IDebtTokenManager public debtTokenManager;
-  ICollTokenManager public collTokenManager;
+  ITokenManager public tokenManager;
   IStoragePool public storagePool;
   IPriceFeed public priceFeed;
   ISortedTroves public sortedTroves;
@@ -32,7 +30,8 @@ contract RedemptionOperations is LiquityBase, Ownable(msg.sender), CheckContract
   // --- Data structures ---
 
   struct RedemptionVariables {
-    address[] collTokenAddresses;
+    PriceCache priceCache;
+    //
     RedemptionCollAmount[] totalCollDrawn;
     //
     uint totalStableSupplyAtStart;
@@ -45,30 +44,26 @@ contract RedemptionOperations is LiquityBase, Ownable(msg.sender), CheckContract
     address _troveManagerAddress,
     address _storagePoolAddress,
     address _priceFeedAddress,
-    address _debtTokenManagerAddress,
-    address _collTokenManagerAddress,
+    address _tokenManagerAddress,
     address _sortedTrovesAddress
   ) external onlyOwner {
     checkContract(_troveManagerAddress);
     checkContract(_storagePoolAddress);
     checkContract(_priceFeedAddress);
-    checkContract(_debtTokenManagerAddress);
-    checkContract(_collTokenManagerAddress);
+    checkContract(_tokenManagerAddress);
     checkContract(_sortedTrovesAddress);
 
     troveManager = ITroveManager(_troveManagerAddress);
     storagePool = IStoragePool(_storagePoolAddress);
     priceFeed = IPriceFeed(_priceFeedAddress);
-    debtTokenManager = IDebtTokenManager(_debtTokenManagerAddress);
-    collTokenManager = ICollTokenManager(_collTokenManagerAddress);
+    tokenManager = ITokenManager(_tokenManagerAddress);
     sortedTroves = ISortedTroves(_sortedTrovesAddress);
 
     emit RedemptionOperationsInitialized(
       _troveManagerAddress,
       _storagePoolAddress,
       _priceFeedAddress,
-      _debtTokenManagerAddress,
-      _collTokenManagerAddress,
+      _tokenManagerAddress,
       _sortedTrovesAddress
     );
 
@@ -80,9 +75,10 @@ contract RedemptionOperations is LiquityBase, Ownable(msg.sender), CheckContract
     RedeemIteration[] memory _iterations,
     uint _maxFeePercentage
   ) external override {
-    IDebtToken stableCoin = debtTokenManager.getStableCoin();
+    IDebtToken stableCoin = tokenManager.getStableCoin();
+
     RedemptionVariables memory vars;
-    vars.collTokenAddresses = collTokenManager.getCollTokenAddresses();
+    vars.priceCache = priceFeed.buildPriceCache();
     vars.totalStableSupplyAtStart =
       storagePool.getValue(address(stableCoin), false, PoolType.Active) +
       storagePool.getValue(address(stableCoin), false, PoolType.Default);
@@ -92,22 +88,24 @@ contract RedemptionOperations is LiquityBase, Ownable(msg.sender), CheckContract
       revert InvalidMaxFeePercent();
     if (_stableCoinAmount > stableCoin.balanceOf(msg.sender)) revert ExceedDebtBalance();
 
-    (, uint TCR, , ) = storagePool.checkRecoveryMode();
+    (, uint TCR, , ) = storagePool.checkRecoveryMode(vars.priceCache);
     if (TCR < MCR) revert LessThanMCR();
 
     // Confirm redeemer's balance is less than total stable coin supply
     assert(stableCoin.balanceOf(msg.sender) <= vars.totalStableSupplyAtStart);
 
     // seed drawn coll
-    vars.totalCollDrawn = new RedemptionCollAmount[](vars.collTokenAddresses.length);
-    for (uint i = 0; i < vars.totalCollDrawn.length; i++) vars.totalCollDrawn[i].collToken = vars.collTokenAddresses[i];
+    vars.totalCollDrawn = new RedemptionCollAmount[](vars.priceCache.collPrices.length);
+    for (uint i = 0; i < vars.totalCollDrawn.length; i++)
+      vars.totalCollDrawn[i].collToken = vars.priceCache.collPrices[i].tokenAddress;
 
     for (uint i = 0; i < _iterations.length; i++) {
       RedeemIteration memory iteration = _iterations[i];
-      checkValidRedemptionHint(iteration.trove);
+      checkValidRedemptionHint(vars.priceCache, iteration.trove);
 
-      troveManager.applyPendingRewards(iteration.trove);
-      SingleRedemptionVariables memory troveRedemption = calculateTroveRedemption(
+      troveManager.applyPendingRewards(vars.priceCache, iteration.trove);
+      SingleRedemptionVariables memory troveRedemption = _calculateTroveRedemption(
+        vars.priceCache,
         iteration.trove,
         _stableCoinAmount - vars.totalRedeemedStable,
         false
@@ -118,12 +116,12 @@ contract RedemptionOperations is LiquityBase, Ownable(msg.sender), CheckContract
 
       // updating the troves stable debt
       DebtTokenAmount[] memory debtDecrease = new DebtTokenAmount[](1);
-      debtDecrease[0] = DebtTokenAmount(debtTokenManager.getStableCoin(), troveRedemption.stableCoinLot, 0);
+      debtDecrease[0] = DebtTokenAmount(tokenManager.getStableCoin(), troveRedemption.stableCoinLot, 0);
       troveManager.decreaseTroveDebt(iteration.trove, debtDecrease);
 
       // updating the troves stable coll
       troveManager.decreaseTroveColl(iteration.trove, troveRedemption.collLots);
-      troveManager.updateStakeAndTotalStakes(vars.collTokenAddresses, iteration.trove);
+      troveManager.updateStakeAndTotalStakes(vars.priceCache, iteration.trove);
 
       // update the troves position in the sorted list
       // in case the trove was fully redeemed, it will be removed from the list
@@ -140,7 +138,7 @@ contract RedemptionOperations is LiquityBase, Ownable(msg.sender), CheckContract
       vars.totalRedeemedStable += troveRedemption.stableCoinLot;
       for (uint a = 0; a < troveRedemption.collLots.length; a++) {
         for (uint b = 0; b < vars.totalCollDrawn.length; b++) {
-          if (troveRedemption.collLots[a].tokenAddress != vars.collTokenAddresses[b]) continue;
+          if (troveRedemption.collLots[a].tokenAddress != vars.totalCollDrawn[b].collToken) continue;
 
           vars.totalCollDrawn[b].drawn += troveRedemption.collLots[a].amount;
           break;
@@ -176,16 +174,10 @@ contract RedemptionOperations is LiquityBase, Ownable(msg.sender), CheckContract
       RedemptionCollAmount memory collEntry = vars.totalCollDrawn[i];
       if (collEntry.sendToRedeemer == 0) continue;
 
-      storagePool.withdrawalValue(
-        msg.sender,
-        vars.collTokenAddresses[i],
-        true,
-        PoolType.Active,
-        collEntry.sendToRedeemer
-      );
+      storagePool.withdrawalValue(msg.sender, collEntry.collToken, true, PoolType.Active, collEntry.sendToRedeemer);
       storagePool.withdrawalValue(
         GOV_STAKING_ADDRESS,
-        vars.collTokenAddresses[i],
+        collEntry.collToken,
         true,
         PoolType.Active,
         collEntry.redemptionFee
@@ -195,19 +187,19 @@ contract RedemptionOperations is LiquityBase, Ownable(msg.sender), CheckContract
     emit SuccessfulRedemption(_stableCoinAmount, vars.totalRedeemedStable, vars.totalCollDrawn);
   }
 
-  function checkValidRedemptionHint(address _redemptionHint) internal view {
+  function checkValidRedemptionHint(PriceCache memory _priceCache, address _redemptionHint) internal view {
     if (!troveManager.isTroveActive(_redemptionHint)) revert HintUnknown();
 
     // is case the sorted troves list is empty, all troves which minted stable are either redeemed or liquidated
     // the remaining stable is now in "pending rewards" of non listed troves
     if (sortedTroves.isEmpty()) return;
 
-    (uint hintCR, ) = troveManager.getCurrentICR(_redemptionHint);
+    (uint hintCR, ) = troveManager.getCurrentICR(_priceCache, _redemptionHint);
     if (hintCR < MCR) revert HintBelowMCR(); // should be liquidated, not redeemed from
     if (!sortedTroves.contains(_redemptionHint)) revert InvalidRedemptionHint();
 
     address nextTrove = sortedTroves.getNext(_redemptionHint);
-    (uint nextTroveCR, ) = troveManager.getCurrentICR(nextTrove);
+    (uint nextTroveCR, ) = troveManager.getCurrentICR(_priceCache, nextTrove);
     if (nextTrove != address(0) && nextTroveCR > MCR) revert InvalidHintLowerCRExists();
   }
 
@@ -215,26 +207,36 @@ contract RedemptionOperations is LiquityBase, Ownable(msg.sender), CheckContract
     address _borrower,
     uint _redeemMaxAmount,
     bool _includePendingRewards
-  ) public view override returns (SingleRedemptionVariables memory vars) {
-    address stableCoinAddress = address(debtTokenManager.getStableCoin());
+  ) external view override returns (SingleRedemptionVariables memory vars) {
+    PriceCache memory priceCache = priceFeed.buildPriceCache();
+    return _calculateTroveRedemption(priceCache, _borrower, _redeemMaxAmount, _includePendingRewards);
+  }
+
+  function _calculateTroveRedemption(
+    PriceCache memory _priceCache,
+    address _borrower,
+    uint _redeemMaxAmount,
+    bool _includePendingRewards
+  ) internal view returns (SingleRedemptionVariables memory vars) {
+    address stableCoinAddress = address(tokenManager.getStableCoin());
 
     // stable coin debt should always exists because of the gas comp
     TokenAmount[] memory troveDebt = _includePendingRewards
-      ? troveManager.getTroveRepayableDebts(_borrower, true) // with pending rewards
+      ? troveManager.getTroveRepayableDebts(_priceCache, _borrower, true) // with pending rewards
       : troveManager.getTroveDebt(_borrower); // without pending rewards
     if (troveDebt.length == 0) revert InvalidRedemptionHint();
     for (uint i = 0; i < troveDebt.length; i++) {
       TokenAmount memory debtEntry = troveDebt[i];
 
       if (debtEntry.tokenAddress == stableCoinAddress) vars.stableCoinEntry = debtEntry;
-      vars.troveDebtInUSD += priceFeed.getUSDValue(debtEntry.tokenAddress, debtEntry.amount);
+      vars.troveDebtInUSD += priceFeed.getUSDValue(_priceCache, debtEntry.tokenAddress, debtEntry.amount);
     }
 
     vars.collLots = _includePendingRewards
-      ? troveManager.getTroveWithdrawableColls(_borrower)
+      ? troveManager.getTroveWithdrawableColls(_priceCache, _borrower)
       : troveManager.getTroveColl(_borrower);
     for (uint i = 0; i < vars.collLots.length; i++)
-      vars.troveCollInUSD += priceFeed.getUSDValue(vars.collLots[i].tokenAddress, vars.collLots[i].amount);
+      vars.troveCollInUSD += priceFeed.getUSDValue(_priceCache, vars.collLots[i].tokenAddress, vars.collLots[i].amount);
 
     // Determine the remaining amount (lot) to be redeemed, capped by the entire debt of the Trove minus the liquidation reserve
     vars.stableCoinLot = LiquityMath._min(_redeemMaxAmount, vars.stableCoinEntry.amount - STABLE_COIN_GAS_COMPENSATION);
@@ -244,9 +246,9 @@ contract RedemptionOperations is LiquityBase, Ownable(msg.sender), CheckContract
     for (uint i = 0; i < vars.collLots.length; i++) {
       TokenAmount memory collEntry = vars.collLots[i];
 
-      uint collEntryInUSD = priceFeed.getUSDValue(collEntry.tokenAddress, collEntry.amount);
+      uint collEntryInUSD = priceFeed.getUSDValue(_priceCache, collEntry.tokenAddress, collEntry.amount); // todo optimize, coll price should be only fetched once
       uint collToRedeemInUSD = (vars.stableCoinLot * collEntryInUSD) / vars.troveCollInUSD;
-      collEntry.amount = priceFeed.getAmountFromUSDValue(collEntry.tokenAddress, collToRedeemInUSD);
+      collEntry.amount = priceFeed.getAmountFromUSDValue(_priceCache, collEntry.tokenAddress, collToRedeemInUSD);
       newCollInUSD -= collToRedeemInUSD;
     }
 

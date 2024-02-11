@@ -120,13 +120,7 @@
             {
                 "indexed": false,
                 "internalType": "address",
-                "name": "_debtTokenManager",
-                "type": "address"
-            },
-            {
-                "indexed": false,
-                "internalType": "address",
-                "name": "_collTokenManager",
+                "name": "_tokenManager",
                 "type": "address"
             },
             {

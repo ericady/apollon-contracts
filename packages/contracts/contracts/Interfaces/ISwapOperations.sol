@@ -25,7 +25,7 @@ interface ISwapOperations is IBBase {
     address borrowerOperations,
     address troveManager,
     address priceFeed,
-    address debtTokenManager
+    address tokenManager
   );
   event PairCreated(address indexed token0, address indexed token1, address pair, uint);
 

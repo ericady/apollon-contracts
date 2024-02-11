@@ -45,7 +45,7 @@ describe('Access Control: Apollon functions with the caller restricted to Apollo
 
     // removeStake
     it('removeStake(): reverts when called by an account that is not BorrowerOperations', async () => {
-      await expect(troveManager.removeStake([], bob)).to.be.revertedWithCustomError(
+      await expect(troveManager.removeStake([[], []], bob)).to.be.revertedWithCustomError(
         troveManager,
         'NotFromBorrowerOrRedemptionOps'
       );
@@ -53,7 +53,7 @@ describe('Access Control: Apollon functions with the caller restricted to Apollo
 
     // updateStakeAndTotalStakes
     it('updateStakeAndTotalStakes(): reverts when called by an account that is not BorrowerOperations', async () => {
-      await expect(troveManager.updateStakeAndTotalStakes([], bob)).to.be.revertedWithCustomError(
+      await expect(troveManager.updateStakeAndTotalStakes([[], []], bob)).to.be.revertedWithCustomError(
         troveManager,
         'NotFromBorrowerOrRedemptionOps'
       );
@@ -61,7 +61,7 @@ describe('Access Control: Apollon functions with the caller restricted to Apollo
 
     // closeTrove
     it('closeTrove(): reverts when called by an account that is not BorrowerOperations', async () => {
-      await expect(troveManager.closeTroveByProtocol([], bob, 0)).to.be.revertedWithCustomError(
+      await expect(troveManager.closeTroveByProtocol([[], []], bob, 0)).to.be.revertedWithCustomError(
         troveManager,
         'NotFromBorrowerOrRedemptionOps'
       );
@@ -158,7 +158,7 @@ describe('Access Control: Apollon functions with the caller restricted to Apollo
 
     // offset
     it('offset(): reverts when called by an account that is not LiquidationOps', async () => {
-      await expect(stabilityPoolManager.offset([])).to.be.revertedWithCustomError(
+      await expect(stabilityPoolManager.offset([[], []], [])).to.be.revertedWithCustomError(
         stabilityPoolManager,
         'NotFromLiquidationOps'
       );

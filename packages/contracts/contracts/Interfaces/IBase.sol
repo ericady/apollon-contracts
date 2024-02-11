@@ -35,6 +35,18 @@ interface IBase {
     uint amount;
   }
 
+  struct TokenPrice {
+    address tokenAddress;
+    uint tokenDecimals;
+    uint price;
+    bool isPriceTrusted;
+  }
+
+  struct PriceCache {
+    TokenPrice[] collPrices;
+    TokenPrice[] debtPrices;
+  }
+
   struct TokenAmount {
     address tokenAddress;
     uint amount;

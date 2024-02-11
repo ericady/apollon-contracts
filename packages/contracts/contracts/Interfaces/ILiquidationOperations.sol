@@ -5,7 +5,7 @@ pragma solidity ^0.8.9;
 import './IDebtToken.sol';
 import './IBBase.sol';
 import './IPriceFeed.sol';
-import './IDebtTokenManager.sol';
+import './ITokenManager.sol';
 
 interface ILiquidationOperations is IBBase {
   // --- Events ---
@@ -14,8 +14,7 @@ interface ILiquidationOperations is IBBase {
     address _troveManager,
     address _storgePool,
     address _priceFeed,
-    address _debtTokenManager,
-    address _collTokenManager,
+    address _tokenManager,
     address _stabilityPoolManager,
     address _collSurplusPool
   );

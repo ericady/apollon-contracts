@@ -5,7 +5,7 @@ pragma solidity ^0.8.9;
 import '@openzeppelin/contracts/access/Ownable.sol';
 import './Interfaces/IDebtToken.sol';
 import './Dependencies/CheckContract.sol';
-import './Interfaces/IDebtTokenManager.sol';
+import './Interfaces/ITokenManager.sol';
 import './Dependencies/LiquityBase.sol';
 import './Interfaces/IStabilityPool.sol';
 import './Interfaces/IStabilityPoolManager.sol';
@@ -22,7 +22,7 @@ contract StabilityPoolManager is Ownable(msg.sender), CheckContract, IStabilityP
   IStoragePool public storagePool;
   IReservePool public reservePool;
   IPriceFeed public priceFeed;
-  address public debtTokenManagerAddress;
+  ITokenManager public tokenManager;
 
   // --- Data structures ---
 
@@ -36,25 +36,25 @@ contract StabilityPoolManager is Ownable(msg.sender), CheckContract, IStabilityP
     address _priceFeedAddress,
     address _storagePoolAddress,
     address _reservePoolAddress,
-    address _debtTokenManagerAddress
+    address _tokenManagerAddress
   ) external onlyOwner {
     checkContract(_liquidationOperationsAddress);
     checkContract(_priceFeedAddress);
     checkContract(_storagePoolAddress);
     checkContract(_reservePoolAddress);
-    checkContract(_debtTokenManagerAddress);
+    checkContract(_tokenManagerAddress);
 
     liquidationOperationsAddress = _liquidationOperationsAddress;
     priceFeed = IPriceFeed(_priceFeedAddress);
     storagePool = IStoragePool(_storagePoolAddress);
     reservePool = IReservePool(_reservePoolAddress);
-    debtTokenManagerAddress = _debtTokenManagerAddress;
+    tokenManager = ITokenManager(_tokenManagerAddress);
 
     emit StabilityPoolManagerInitiated(
       _liquidationOperationsAddress,
       _storagePoolAddress,
       _reservePoolAddress,
-      _debtTokenManagerAddress,
+      _tokenManagerAddress,
       _priceFeedAddress
     );
 
@@ -74,13 +74,14 @@ contract StabilityPoolManager is Ownable(msg.sender), CheckContract, IStabilityP
   }
 
   function getRemainingStability(
-    address[] memory collTokenAddresses
+    PriceCache memory _priceCache
   ) external view override returns (RemainingStability[] memory) {
     RemainingStability[] memory remainingStability = new RemainingStability[](stabilityPoolsArray.length);
 
     for (uint i = 0; i < stabilityPoolsArray.length; i++) {
-      TokenAmount[] memory collGained = new TokenAmount[](collTokenAddresses.length);
-      for (uint a = 0; a < collTokenAddresses.length; a++) collGained[a] = TokenAmount(collTokenAddresses[a], 0);
+      TokenAmount[] memory collGained = new TokenAmount[](_priceCache.collPrices.length);
+      for (uint a = 0; a < _priceCache.collPrices.length; a++)
+        collGained[a] = TokenAmount(_priceCache.collPrices[a].tokenAddress, 0);
 
       remainingStability[i] = RemainingStability({
         stabilityPool: stabilityPoolsArray[i],
@@ -168,19 +169,16 @@ contract StabilityPoolManager is Ownable(msg.sender), CheckContract, IStabilityP
     return deposits;
   }
 
-  function getDepositorCollGains(
-    address _depositor,
-    address[] memory collTokenAddresses
-  ) external view override returns (TokenAmount[] memory collGains) {
+  function getDepositorCollGains(address _depositor) external view override returns (TokenAmount[] memory collGains) {
+    address[] memory collTokenAddresses = tokenManager.getCollTokenAddresses();
+
     collGains = new TokenAmount[](collTokenAddresses.length);
-    for (uint i = 0; i < collTokenAddresses.length; i++) {
-      for (uint ii = 0; ii < stabilityPoolsArray.length; ii++) {
+    for (uint i = 0; i < collTokenAddresses.length; i++)
+      for (uint ii = 0; ii < stabilityPoolsArray.length; ii++)
         collGains[i] = TokenAmount(
           address(stabilityPoolsArray[ii].getDepositToken()),
           stabilityPoolsArray[ii].getDepositorCollGain(_depositor, collTokenAddresses[i])
         );
-      }
-    }
 
     return collGains;
   }
@@ -221,7 +219,7 @@ contract StabilityPoolManager is Ownable(msg.sender), CheckContract, IStabilityP
     }
   }
 
-  function offset(RemainingStability[] memory _toOffset) external override {
+  function offset(PriceCache memory _priceCache, RemainingStability[] memory _toOffset) external override {
     _requireCallerIsLiquidationOps();
 
     IStoragePool storagePoolCached = storagePool;
@@ -254,8 +252,12 @@ contract StabilityPoolManager is Ownable(msg.sender), CheckContract, IStabilityP
       }
 
       // check possible loss
-      uint gainedCollValue = _getGainedCollValue(remainingStability.collGained);
-      uint offsetValue = priceFeed.getUSDValue(remainingStability.tokenAddress, remainingStability.debtToOffset);
+      uint gainedCollValue = _getGainedCollValue(_priceCache, remainingStability.collGained);
+      uint offsetValue = priceFeed.getUSDValue(
+        _priceCache,
+        remainingStability.tokenAddress,
+        remainingStability.debtToOffset
+      );
       if (offsetValue > gainedCollValue) {
         // Repay loss from reserve pool
         (uint repaidGov, uint repaidStable) = reservePool.withdrawValue(
@@ -313,7 +315,7 @@ contract StabilityPoolManager is Ownable(msg.sender), CheckContract, IStabilityP
   }
 
   function addStabilityPool(IDebtToken _debtToken) external override {
-    if (msg.sender != debtTokenManagerAddress) revert Unauthorized();
+    if (msg.sender != address(tokenManager)) revert Unauthorized();
     if (address(stabilityPools[_debtToken]) != address(0)) revert PoolExist();
 
     IStabilityPool stabilityPool = new StabilityPool(address(this), address(_debtToken));
@@ -323,10 +325,12 @@ contract StabilityPoolManager is Ownable(msg.sender), CheckContract, IStabilityP
     emit StabilityPoolAdded(address(stabilityPool));
   }
 
-  function _getGainedCollValue(TokenAmount[] memory collGained) internal view returns (uint gainedValue) {
-    for (uint i = 0; i < collGained.length; i++) {
-      gainedValue += priceFeed.getUSDValue(collGained[i].tokenAddress, collGained[i].amount);
-    }
+  function _getGainedCollValue(
+    PriceCache memory _priceCache,
+    TokenAmount[] memory collGained
+  ) internal view returns (uint gainedValue) {
+    for (uint i = 0; i < collGained.length; i++)
+      gainedValue += priceFeed.getUSDValue(_priceCache, collGained[i].tokenAddress, collGained[i].amount);
   }
 
   function _requireCallerIsLiquidationOps() internal view {

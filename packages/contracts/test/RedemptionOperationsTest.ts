@@ -1,7 +1,14 @@
 import { ethers } from 'hardhat';
 import { MockDebtToken, MockERC20, PriceFeed, MockTroveManager, StoragePool, RedemptionOperations } from '../typechain';
 import { SignerWithAddress } from '@nomicfoundation/hardhat-ethers/signers';
-import { getRedemptionMeta, MAX_BORROWING_FEE, openTrove, redeem, whaleShrimpTroveInit } from '../utils/testHelper';
+import {
+  buildPriceCache,
+  getRedemptionMeta,
+  MAX_BORROWING_FEE,
+  openTrove,
+  redeem,
+  whaleShrimpTroveInit,
+} from '../utils/testHelper';
 import { assert, expect } from 'chai';
 import { parseUnits, ZeroAddress } from 'ethers';
 import apollonTesting from '../ignition/modules/apollonTesting';
@@ -55,10 +62,21 @@ describe('RedemptionOperations', () => {
         bobStableBalanceBefore = await STABLE.balanceOf(bob);
         btcStableBalanceBefore = await storagePool.getValue(BTC, true, 0);
 
-        defaulterTroveStableDebtBefore = await troveManager.getTroveRepayableDebt(defaulter_1, STABLE, true);
+        const priceCache = await buildPriceCache(contracts);
+        defaulterTroveStableDebtBefore = await troveManager.getTroveRepayableDebt(
+          priceCache,
+          defaulter_1,
+          STABLE,
+          true
+        );
         defaulterTroveBTCBefore = await troveManager.getTroveWithdrawableColl(defaulter_1, BTC);
 
-        defaulter2TroveStableDebtBefore = await troveManager.getTroveRepayableDebt(defaulter_2, STABLE, true);
+        defaulter2TroveStableDebtBefore = await troveManager.getTroveRepayableDebt(
+          priceCache,
+          defaulter_2,
+          STABLE,
+          true
+        );
         defaulter2TroveBTCBefore = await troveManager.getTroveWithdrawableColl(defaulter_2, BTC);
       });
 
@@ -80,6 +98,7 @@ describe('RedemptionOperations', () => {
 
       afterEach(async () => {
         redemptionMeta = await getRedemptionMeta(await redeem(bob, toRedeem, contracts), contracts);
+        const priceCache = await buildPriceCache(contracts);
 
         const bobStableBalanceAfter = await STABLE.balanceOf(bob);
         expect(bobStableBalanceAfter).to.be.equal(bobStableBalanceBefore - toRedeem);
@@ -87,7 +106,8 @@ describe('RedemptionOperations', () => {
         const [, btcDrawn, , btcPayout] = redemptionMeta.totals[2].find((f: any) => f[0] === BTC.target);
         assert.equal(await BTC.balanceOf(bob), btcPayout);
         assert.isAtMost(
-          (toRedeem * parseUnits('1', 9)) / (await priceFeed.getUSDValue(BTC, parseUnits('1', 9))) - btcDrawn,
+          (toRedeem * parseUnits('1', 9)) / (await priceFeed['getUSDValue(address,uint256)'](BTC, parseUnits('1', 9))) -
+            btcDrawn,
           10n
         );
 
@@ -97,7 +117,12 @@ describe('RedemptionOperations', () => {
 
         // checking defaulter 1
         const [, stableDrawn, collDrawn] = redemptionMeta.redemptions.find((f: any) => f[0] === defaulter_1.address);
-        const defaulterTroveStableDebtAfter = await troveManager.getTroveRepayableDebt(defaulter_1, STABLE, true);
+        const defaulterTroveStableDebtAfter = await troveManager.getTroveRepayableDebt(
+          priceCache,
+          defaulter_1,
+          STABLE,
+          true
+        );
         expect(defaulterTroveStableDebtAfter).to.be.equal(defaulterTroveStableDebtBefore - stableDrawn);
 
         const defaulterTroveBTCAfter = await troveManager.getTroveWithdrawableColl(defaulter_1, BTC);
@@ -110,7 +135,12 @@ describe('RedemptionOperations', () => {
           const [, stableDrawn2, collDrawn2] = redemptionMeta.redemptions.find(
             (f: any) => f[0] === defaulter_2.address
           );
-          const defaulter2TroveStableDebtAfter = await troveManager.getTroveRepayableDebt(defaulter_2, STABLE, true);
+          const defaulter2TroveStableDebtAfter = await troveManager.getTroveRepayableDebt(
+            priceCache,
+            defaulter_2,
+            STABLE,
+            true
+          );
           expect(defaulter2TroveStableDebtAfter).to.be.equal(defaulter2TroveStableDebtBefore - stableDrawn2);
 
           const defaulter2TroveBTCAfter = await troveManager.getTroveWithdrawableColl(defaulter_2, BTC);
