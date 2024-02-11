@@ -182,7 +182,7 @@ describe('SwapOperations', () => {
   });
 
   describe('remove liquidity', () => {
-    it('default uniswap tests', async () => {
+    it('default uniswap tests STABLE/STOCK', async () => {
       const amount = parseUnits('1000');
 
       //create pair & add liquidity (alice)
@@ -193,6 +193,30 @@ describe('SwapOperations', () => {
       expect(await pair.balanceOf(alice)).to.be.equal(0);
       expect(await STABLE.balanceOf(alice)).to.be.greaterThan(0);
       expect(await STOCK.balanceOf(alice)).to.be.greaterThan(0);
+    });
+
+    it('default uniswap tests STABLE/BTC', async () => {
+      const amount = parseUnits('1000');
+
+      //create pair & add liquidity STABLE/BTC
+      const pair2 = await add(
+        alice,
+        BTC,
+        amount,
+        amount,
+        true,
+        true
+      );
+
+      //remove liquidity
+      await remove(
+        alice,
+        BTC,
+        await pair2.balanceOf(alice)
+      );
+      expect(await pair2.balanceOf(alice)).to.be.equal(0);
+      expect(await STABLE.balanceOf(alice)).to.be.greaterThan(0);
+      expect(await BTC.balanceOf(alice)).to.be.greaterThan(0);
     });
 
     it('zero borrower debts (no active trove), default uniswap behavior', async () => {
@@ -253,7 +277,7 @@ describe('SwapOperations', () => {
   });
 
   describe('add liquidity', () => {
-    it('default uniswap tests', async () => {
+    it('default uniswap tests STABLE/STOCK', async () => {
       const amount = parseUnits('1000');
 
       //create pair & add liquidity
@@ -264,6 +288,38 @@ describe('SwapOperations', () => {
       //check reserves
       const res = await pair.getReserves();
       expect(res._reserve0).to.be.equal(res._reserve1);
+    });
+
+    it('default uniswap tests STABLE/BTC', async () => {
+      const amount = parseUnits('1000');
+
+      //create pair & add liquidity STABLE/BTC
+      const pair2 = await add(
+        alice,
+        BTC,
+        amount,
+        amount,
+        true,
+        true
+      );
+      expect(await STABLE.balanceOf(alice)).to.be.equal(0);
+      expect(await BTC.balanceOf(alice)).to.be.equal(0);
+
+      //check reserves
+      const res2 = await pair2.getReserves();
+      expect(
+        res2._reserve0
+      ).to.be.equal(res2._reserve1);
+    });
+
+    it('create Pair without STABLE (should fail)', async () => {
+      //create pair
+      await expect(
+        swapOperations.connect(owner).createPair(
+          BTC,
+          STOCK
+        )
+      ).to.be.revertedWithCustomError(swapOperations, 'PairRequiresStable');
     });
 
     it('borrower has enough funds for the op, no trove needed', async () => {
@@ -309,10 +365,101 @@ describe('SwapOperations', () => {
   });
 
   describe('swaps', () => {
-    it('test dynamic swap fee based on oracle/dex price diff', async () => {
-      //open troves
-      await open(alice, parseUnits('1', 9), parseUnits('150'));
+    it('swap STABLE/STOCK', async () => {
+      //create pair & add liquidity
+      await add(
+        alice,
+        STOCK,
+        parseUnits('100'),
+        parseUnits('1'),
+        true,
+        true
+      );
 
+      //mint
+      STABLE.unprotectedMint(alice, parseUnits('1'));
+
+      //swap      
+      STABLE.connect(alice).approve(swapOperations, parseUnits('1'));
+      await swapOperations.connect(alice).swapExactTokensForTokens(
+        parseUnits('1'),
+        0,
+        [STABLE, STOCK],
+        alice,
+        await deadline()
+      );
+      expect(
+        await STOCK.balanceOf(alice)
+      ).to.be.greaterThan(0);
+    });
+
+    it('swap STABLE/BTC', async () => {
+      //create pair & add liquidity
+      await add(
+        alice,
+        BTC,
+        parseUnits('100'),
+        parseUnits('1', 8),
+        true,
+        true
+      );
+
+      //mint
+      STABLE.unprotectedMint(alice, parseUnits('1'));
+
+      //swap      
+      STABLE.connect(alice).approve(swapOperations, parseUnits('1'));
+      await swapOperations.connect(alice).swapExactTokensForTokens(
+        parseUnits('1'),
+        0,
+        [STABLE, BTC],
+        alice,
+        await deadline()
+      );
+      expect(
+        await BTC.balanceOf(alice)
+      ).to.be.greaterThan(0);
+    });
+
+    it('swap multihop BTC/STABLE/STOCK', async () => {
+      //create pair & add liquidity (STABLE/BTC)
+      await add(
+        alice,
+        BTC,
+        parseUnits('100'),
+        parseUnits('1', 8),
+        true,
+        true
+      );
+
+      //create pair & add liquidity (STABLE/STOCK)
+      await add(
+        alice,
+        STOCK,
+        parseUnits('100'),
+        parseUnits('100'),
+        true,
+        true
+      );
+
+      //mint
+      BTC.unprotectedMint(alice, parseUnits('0.01', 8));
+
+      //swap      
+      BTC.connect(alice).approve(swapOperations, parseUnits('0.01', 8));
+      await swapOperations.connect(alice).swapExactTokensForTokens(
+        parseUnits('0.01', 8),
+        0,
+        [BTC, STABLE, STOCK],
+        alice,
+        await deadline()
+      );
+      expect(
+        await STOCK.balanceOf(alice)
+      ).to.be.greaterThan(0);
+    });
+
+    it('test dynamic swap fee based on oracle/dex price diff', async () => {
       //create pair & add liquidity
       const pair = await add(
         alice,
