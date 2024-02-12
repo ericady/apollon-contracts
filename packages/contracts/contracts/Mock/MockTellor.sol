@@ -36,10 +36,14 @@ contract MockTellor {
 
   function getNewValueCountbyRequestId(uint) external view returns (uint) {
     if (revertRequest) require(1 == 0, 'Tellor request reverted');
-    return 1;
+    return 2;
   }
 
   function retrieveData(uint256 _requestId, uint256) external view returns (uint256) {
     return prices[_requestId];
+  }
+
+  function getBlockTimestamp() external view returns (uint) {
+    return block.timestamp;
   }
 }

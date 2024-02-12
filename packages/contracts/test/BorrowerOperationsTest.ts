@@ -52,6 +52,7 @@ describe('BorrowerOperations', () => {
   let liquidationOperations: LiquidationOperations;
   let STABLE: MockDebtToken;
   let BTC: MockERC20;
+  let STOCK: MockDebtToken;
 
   const open = async (user: SignerWithAddress, collAmount: bigint, debtAmount: bigint) => {
     const openTx = await openTrove({
@@ -76,6 +77,7 @@ describe('BorrowerOperations', () => {
     storagePool = contracts.storagePool;
     BTC = contracts.BTC;
     STABLE = contracts.STABLE;
+    STOCK = contracts.STOCK;
     borrowerOperations = contracts.borrowerOperations;
     liquidationOperations = contracts.liquidationOperations;
     priceFeed = contracts.priceFeed;
@@ -662,6 +664,20 @@ describe('BorrowerOperations', () => {
   });
 
   describe('increaseDebts()', () => {
+    it.only('reverts on unstable price feed', async () => {
+      await openTrove({ from: alice, contracts, collToken: BTC, collAmount: parseUnits('1', 9) });
+
+      // last price update is older than 35min, price should become untrusted
+      const blockTime = await contracts.mockTellor.getBlockTimestamp();
+      await contracts.mockTellor.setUpdateTime(blockTime - 60n * 35n); // - 35min
+
+      const priceResp = await contracts.priceFeed.getPrice(STOCK);
+      expect(priceResp[1]).to.be.equal(false); // check if price is untrusted
+
+      await expect(
+        increaseDebt(alice, contracts, [{ tokenAddress: STOCK, amount: parseUnits('1') }])
+      ).to.be.revertedWithCustomError(borrowerOperations, 'UntrustedOraclesMintingIsFrozen');
+    });
     it('reverts when withdrawal would leave trove with ICR < MCR', async () => {
       // alice creates a Trove and adds first collateral
       const aliceColl = parseUnits('1.5', 9);

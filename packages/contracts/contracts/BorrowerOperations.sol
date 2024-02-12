@@ -335,7 +335,13 @@ contract BorrowerOperations is LiquityBase, Ownable(msg.sender), CheckContract, 
     (ContractsCache memory contractsCache, LocalVariables_adjustTrove memory vars) = _prepareTroveAdjustment(_borrower);
 
     _requireValidMaxFeePercentage(_meta.maxFeePercentage, vars.isInRecoveryMode);
-    for (uint i = 0; i < _debts.length; i++) _requireNonZeroDebtChange(_debts[i].amount);
+    for (uint i = 0; i < _debts.length; i++) {
+      _requireNonZeroDebtChange(_debts[i].amount);
+
+      // revert minting if one of the oracles is not trusted
+      TokenPrice memory tokenPrice = contractsCache.priceFeed.getTokenPrice(vars.priceCache, _debts[i].tokenAddress);
+      if (!tokenPrice.isPriceTrusted) revert UntrustedOraclesMintingIsFrozen();
+    }
 
     (DebtTokenAmount[] memory debtsToAdd, DebtTokenAmount memory stableCoinAmount) = _getDebtTokenAmounts(
       contractsCache.tokenManager,

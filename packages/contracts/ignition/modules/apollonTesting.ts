@@ -111,7 +111,13 @@ export default buildModule('ApollonTesting', m => {
 
   // setup mock tellor for testing
   contracts.mockTellor = m.contract('MockTellor', []);
-  m.call(contracts.mockTellor, 'setUpdateTime', [1], { after: [contracts.mockTellor] }); // todo get current blocktime
+  const blockTimestamp = m.staticCall(contracts.mockTellor, 'getBlockTimestamp', []);
+  m.call(contracts.mockTellor, 'setUpdateTime', [blockTimestamp], { after: [blockTimestamp] });
+  contracts.tellorCaller = m.contract('TellorCaller', [contracts.mockTellor], {
+    after: [contracts.mockTellor],
+  });
+
+  // setting prices, two per token, important to become trusted
   m.call(contracts.mockTellor, 'setPrice', [1, parseUnits('21000', 6)], {
     id: 'btcPriceSet',
     after: [contracts.mockTellor],
@@ -128,9 +134,6 @@ export default buildModule('ApollonTesting', m => {
     id: 'stockPriceSet',
     after: [contracts.mockTellor],
   }); // STOCK
-  contracts.tellorCaller = m.contract('TellorCaller', [contracts.mockTellor], {
-    after: [contracts.mockTellor],
-  });
 
   // price feed setup / linking
   const priceFeedLinks = [contracts.tellorCaller, contracts.tokenManager];
