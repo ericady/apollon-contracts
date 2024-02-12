@@ -509,29 +509,18 @@ type TokenAmount = {
  * This manages the data fetching from the contracts if the data is reused. E.g.: get many debts from the trovemanager isntead of making individual calls.
  */
 export const ContractDataFreshnessManager: {
-  TroveManager: Pick<
-    {
-      [K in keyof TroveManager]: ContractValue<TokenAmount[]>;
-    },
-    'getTroveDebt' | 'getTroveRepayableDebts' | 'getTroveWithdrawableColls'
-  >;
-  StabilityPoolManager: Pick<
-    {
-      [K in keyof StabilityPoolManager]: ContractValue<TokenAmount[]>;
-    },
-    'getDepositorDeposits' | 'getDepositorCollGains' | 'getDepositorCompoundedDeposits'
-  >;
-  StoragePool: Pick<
-    {
-      [K in keyof StoragePool]: ContractValue<{
-        isInRecoveryMode: boolean;
-        TCR: bigint;
-        entireSystemColl: bigint;
-        entireSystemDebt: bigint;
-      }>;
-    },
-    'checkRecoveryMode'
-  >;
+  TroveManager:
+   
+     Record<string, ContractValue<TokenAmount[]>>,
+   
+
+  StabilityPoolManager:  Record<string, ContractValue<TokenAmount[]>>,
+  StoragePool: Record<string,  ContractValue<{
+    isInRecoveryMode: boolean;
+    TCR: bigint;
+    entireSystemColl: bigint;
+    entireSystemDebt: bigint;
+  }>>,
 } = {
   TroveManager: {
     getTroveDebt: {
@@ -561,7 +550,7 @@ export const ContractDataFreshnessManager: {
       fetch: async (troveManagerContract: TroveManager, borrower: AddressLike) => {
         ContractDataFreshnessManager.TroveManager.getTroveRepayableDebts.lastFetched = Date.now();
         // FIXME: Call so that we can dinstiguish to real repayable
-        const troveRepayableDebts = await troveManagerContract.getTroveRepayableDebts(borrower, false);
+        const troveRepayableDebts = await troveManagerContract['getTroveRepayableDebts(address,bool)'](borrower, false);
 
         const tokenAmounts = troveRepayableDebts.map(([tokenAddress, amount]) => ({
           tokenAddress,
@@ -584,7 +573,7 @@ export const ContractDataFreshnessManager: {
     getTroveWithdrawableColls: {
       fetch: async (troveManagerContract: TroveManager, borrower: AddressLike) => {
         ContractDataFreshnessManager.TroveManager.getTroveWithdrawableColls.lastFetched = Date.now();
-        const troveColl = await troveManagerContract.getTroveWithdrawableColls(borrower);
+        const troveColl = await troveManagerContract['getTroveWithdrawableColls(address)'](borrower);
 
         const tokenAmounts = troveColl.map(([tokenAddress, amount]) => ({
           tokenAddress,
@@ -636,7 +625,6 @@ export const ContractDataFreshnessManager: {
         ContractDataFreshnessManager.StabilityPoolManager.getDepositorCollGains.lastFetched = Date.now();
         const depositorCollGains = await stabilityPoolManagerContract.getDepositorCollGains(
           depositor,
-          Object.values(Contracts.ERC20),
         );
 
         const tokenAmounts = depositorCollGains.map(([tokenAddress, amount]) => ({
@@ -689,7 +677,7 @@ export const ContractDataFreshnessManager: {
       fetch: async (storagePoolContract: StoragePool) => {
         ContractDataFreshnessManager.StoragePool.checkRecoveryMode.lastFetched = Date.now();
         const [isInRecoveryMode, systemTCR, entireSystemColl, entireSystemDebt] =
-          await storagePoolContract.checkRecoveryMode();
+          await storagePoolContract['checkRecoveryMode()']();
 
         ContractDataFreshnessManager.StoragePool.checkRecoveryMode.value = {
           isInRecoveryMode,
@@ -987,7 +975,9 @@ export const SchemaDataFreshnessManager: ContractDataFreshnessManager<typeof Con
       priceUSDOracle: {
         fetch: async (debtTokenContract: DebtToken) => {
           SchemaDataFreshnessManager.DebtToken[Contracts.DebtToken.STABLE].priceUSDOracle.lastFetched = Date.now();
-          const oraclePrice = await debtTokenContract.getPrice();
+          // FIXME:
+          // const oraclePrice = await debtTokenContract.getPrice();
+          const oraclePrice = BigInt(Math.pow(10, 18));
 
           SchemaDataFreshnessManager.DebtToken[Contracts.DebtToken.STABLE].priceUSDOracle.value(oraclePrice);
         },
@@ -1051,7 +1041,7 @@ export const SchemaDataFreshnessManager: ContractDataFreshnessManager<typeof Con
             SchemaDataFreshnessManager.DebtToken[Contracts.DebtToken.STABLE].troveDebtAmount.lastFetched = Date.now();
 
             // Here we get the debt without the non-repayable debts, only applies to STABLE for now
-            const troveRepayableDebts = await fetchSource.troveManagerContract.getTroveRepayableDebts(
+            const troveRepayableDebts = await fetchSource.troveManagerContract['getTroveRepayableDebts(address,bool)'](
               fetchSource.borrower,
               true,
             );
@@ -1154,7 +1144,8 @@ export const SchemaDataFreshnessManager: ContractDataFreshnessManager<typeof Con
       priceUSDOracle: {
         fetch: async (debtTokenContract: DebtToken) => {
           SchemaDataFreshnessManager.DebtToken[Contracts.DebtToken.STOCK_1].priceUSDOracle.lastFetched = Date.now();
-          const oraclePrice = await debtTokenContract.getPrice();
+          // const oraclePrice = await debtTokenContract.getPrice();
+          const oraclePrice = BigInt(Math.pow(10, 18));
 
           SchemaDataFreshnessManager.DebtToken[Contracts.DebtToken.STOCK_1].priceUSDOracle.value(oraclePrice);
         },

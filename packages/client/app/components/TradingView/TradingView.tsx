@@ -55,7 +55,7 @@ function TradingViewComponent() {
         tokenCandleSingleton: { close, high, low, open, timestamp, volume },
       } = data;
       updateLatestCandleCallback.current({
-        time: timestamp,
+        time: Number(timestamp),
         open: bigIntStringToFloat(open),
         high: bigIntStringToFloat(high),
         low: bigIntStringToFloat(low),
@@ -173,7 +173,7 @@ function TradingViewComponent() {
                       high: bigIntStringToFloat(high),
                       low: bigIntStringToFloat(low),
                       open: bigIntStringToFloat(open),
-                      time: timestamp,
+                      time: Number(timestamp),
                       volume: bigIntStringToFloat(volume),
                     }));
                     onHistoryCallback(bars, { noData: false });

@@ -542,19 +542,6 @@
   },
   {
     "inputs": [],
-    "name": "debtTokenManager",
-    "outputs": [
-      {
-        "internalType": "contract IDebtTokenManager",
-        "name": "",
-        "type": "address"
-      }
-    ],
-    "stateMutability": "view",
-    "type": "function"
-  },
-  {
-    "inputs": [],
     "name": "decimals",
     "outputs": [
       {
@@ -616,7 +603,7 @@
       },
       {
         "internalType": "address",
-        "name": "_debtTokenManager",
+        "name": "_tokenManager",
         "type": "address"
       },
       {
@@ -808,6 +795,19 @@
     "outputs": [
       {
         "internalType": "address",
+        "name": "",
+        "type": "address"
+      }
+    ],
+    "stateMutability": "view",
+    "type": "function"
+  },
+  {
+    "inputs": [],
+    "name": "tokenManager",
+    "outputs": [
+      {
+        "internalType": "contract ITokenManager",
         "name": "",
         "type": "address"
       }

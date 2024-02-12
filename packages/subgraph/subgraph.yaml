@@ -112,22 +112,16 @@ dataSources:
       apiVersion: 0.0.7
       language: wasm/assemblyscript
       entities:
-        - LastGoodPriceUpdated
         - PriceFeedOwnershipTransferred
-        - PriceFeedStatusChanged
         - TokenPriceChanged
       abis:
         - name: PriceFeed
           file: ./abis/PriceFeed.json
       eventHandlers:
-        - event: LastGoodPriceUpdated(address,uint256)
-          handler: handleLastGoodPriceUpdated
         - event: OwnershipTransferred(indexed address,indexed address)
           handler: handleOwnershipTransferred
-        - event: PriceFeedStatusChanged(address,uint8)
-          handler: handlePriceFeedStatusChanged
-        - event: TokenPriceChanged(address)
-          handler: handleTokenPriceChanged
+        - event: PriceFeedInitialized(address,address)
+          handler: handlePriceFeedInitialized
       file: ./src/price-feed.ts
   - kind: ethereum
     name: BorrowerOperations

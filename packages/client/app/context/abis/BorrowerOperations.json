@@ -108,6 +108,11 @@
     },
     {
         "inputs": [],
+        "name": "UntrustedOraclesMintingIsFrozen",
+        "type": "error"
+    },
+    {
+        "inputs": [],
         "name": "WithdrawAmount_gt_Coll",
         "type": "error"
     },
@@ -162,13 +167,7 @@
             {
                 "indexed": false,
                 "internalType": "address",
-                "name": "_debtTokenManagerAddress",
-                "type": "address"
-            },
-            {
-                "indexed": false,
-                "internalType": "address",
-                "name": "_collTokenManagerAddress",
+                "name": "_tokenManagerAddress",
                 "type": "address"
             },
             {
@@ -549,68 +548,6 @@
         "type": "function"
     },
     {
-        "inputs": [],
-        "name": "collTokenManager",
-        "outputs": [
-            {
-                "internalType": "contract ICollTokenManager",
-                "name": "",
-                "type": "address"
-            }
-        ],
-        "stateMutability": "view",
-        "type": "function"
-    },
-    {
-        "inputs": [],
-        "name": "debtTokenManager",
-        "outputs": [
-            {
-                "internalType": "contract IDebtTokenManager",
-                "name": "",
-                "type": "address"
-            }
-        ],
-        "stateMutability": "view",
-        "type": "function"
-    },
-    {
-        "inputs": [
-            {
-                "components": [
-                    {
-                        "internalType": "contract IDebtToken",
-                        "name": "debtToken",
-                        "type": "address"
-                    },
-                    {
-                        "internalType": "uint256",
-                        "name": "netDebt",
-                        "type": "uint256"
-                    },
-                    {
-                        "internalType": "uint256",
-                        "name": "borrowingFee",
-                        "type": "uint256"
-                    }
-                ],
-                "internalType": "struct IBBase.DebtTokenAmount[]",
-                "name": "_debts",
-                "type": "tuple[]"
-            }
-        ],
-        "name": "getCompositeDebt",
-        "outputs": [
-            {
-                "internalType": "uint256",
-                "name": "",
-                "type": "uint256"
-            }
-        ],
-        "stateMutability": "view",
-        "type": "function"
-    },
-    {
         "inputs": [
             {
                 "internalType": "address",
@@ -887,12 +824,7 @@
             },
             {
                 "internalType": "address",
-                "name": "_debtTokenManagerAddress",
-                "type": "address"
-            },
-            {
-                "internalType": "address",
-                "name": "_collTokenManagerAddress",
+                "name": "_tokenManagerAddress",
                 "type": "address"
             },
             {
@@ -935,6 +867,19 @@
         "outputs": [
             {
                 "internalType": "contract IStoragePool",
+                "name": "",
+                "type": "address"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [],
+        "name": "tokenManager",
+        "outputs": [
+            {
+                "internalType": "contract ITokenManager",
                 "name": "",
                 "type": "address"
             }

@@ -50,7 +50,10 @@ export function handleUpdateTokenCandle_low_high(
   // calculate price from ratio to stable and oraclePrice
   const systemInfo = SystemInfo.load(`SystemInfo`)!;
   const stableCoinContract = DebtToken.bind(systemInfo.stableCoin as Address);
-  const stablePrice = stableCoinContract.getPrice();
+  // FIXME:
+  // const stablePrice = stableCoinContract.getPrice();
+  const stablePrice = BigInt.fromI32(1);
+  
   const swapPairReserves = SwapPair.bind(swapPair).getReserves();
   const tokenPriceInStable =
     pairPosition === 0
@@ -92,7 +95,9 @@ export function handleUpdateTokenCandle_volume(
   // calculate price from ratio to stable and oraclePrice
   const systemInfo = SystemInfo.load(`SystemInfo`)!;
   const stableCoinContract = DebtToken.bind(systemInfo.stableCoin as Address);
-  const stablePrice = stableCoinContract.getPrice();
+  // FIXME:
+  // const stablePrice = stableCoinContract.getPrice();
+  const stablePrice = BigInt.fromI32(1);
   const swapPairReserves = SwapPair.bind(swapPair).getReserves();
   const tokenPriceInStable =
     pairPosition === 0

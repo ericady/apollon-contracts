@@ -24,7 +24,7 @@ export function handleCreateToken(event: ethereum.Event, tokenAddress: Address, 
 
   const systemInfo = SystemInfo.load(`SystemInfo`)!;
   const priceFeedContract = PriceFeed.bind(Address.fromBytes(systemInfo.priceFeed));
-  newToken.priceUSD = priceFeedContract.getPrice(tokenAddress);
+  newToken.priceUSD = priceFeedContract.getPrice(tokenAddress).getPrice();
 
   // FIXME: Is this correct?
   newToken.isPoolToken = isDebtToken;

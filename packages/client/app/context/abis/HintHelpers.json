@@ -50,6 +50,12 @@
                 "internalType": "address",
                 "name": "_troveManagerAddress",
                 "type": "address"
+            },
+            {
+                "indexed": false,
+                "internalType": "address",
+                "name": "_redemptionOperations",
+                "type": "address"
             }
         ],
         "name": "HintHelpersInitialized",
@@ -283,11 +289,75 @@
         "type": "function"
     },
     {
+        "inputs": [
+            {
+                "internalType": "uint256",
+                "name": "_amountToRedeem",
+                "type": "uint256"
+            },
+            {
+                "internalType": "uint256",
+                "name": "_numTrails",
+                "type": "uint256"
+            },
+            {
+                "internalType": "uint256",
+                "name": "_inputRandomSeed",
+                "type": "uint256"
+            }
+        ],
+        "name": "getRedemptionIterationHints",
+        "outputs": [
+            {
+                "components": [
+                    {
+                        "internalType": "address",
+                        "name": "trove",
+                        "type": "address"
+                    },
+                    {
+                        "internalType": "address",
+                        "name": "upperHint",
+                        "type": "address"
+                    },
+                    {
+                        "internalType": "address",
+                        "name": "lowerHint",
+                        "type": "address"
+                    },
+                    {
+                        "internalType": "uint256",
+                        "name": "expectedCR",
+                        "type": "uint256"
+                    }
+                ],
+                "internalType": "struct IBase.RedeemIteration[]",
+                "name": "",
+                "type": "tuple[]"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
         "inputs": [],
         "name": "owner",
         "outputs": [
             {
                 "internalType": "address",
+                "name": "",
+                "type": "address"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [],
+        "name": "redemptionOperations",
+        "outputs": [
+            {
+                "internalType": "contract IRedemptionOperations",
                 "name": "",
                 "type": "address"
             }
@@ -312,6 +382,11 @@
             {
                 "internalType": "address",
                 "name": "_troveManagerAddress",
+                "type": "address"
+            },
+            {
+                "internalType": "address",
+                "name": "_redemptionOperations",
                 "type": "address"
             }
         ],

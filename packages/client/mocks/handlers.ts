@@ -98,7 +98,7 @@ const collateralTokenMeta: Omit<CollateralTokenMeta, 'walletAmount' | 'troveLock
       return {
         __typename: 'CollateralTokenMeta',
         id: faker.string.uuid(),
-        timestamp: now,
+        timestamp: now.toString(),
         token: collToken as Token,
         totalValueLockedUSD: floatToBigInt(faker.number.float({ min: 10000, max: 50000, precision: 0.01 })).toString(),
         totalValueLockedUSD30dAverage: {
@@ -136,7 +136,7 @@ const debtTokenMeta = tokens.map<
   return {
     __typename: 'DebtTokenMeta',
     id: faker.string.uuid(),
-    timestamp: now,
+    timestamp: now.toString(),
     token: token as Token,
 
     totalDepositedStability: floatToBigInt(faker.number.float({ min: 1000, max: 5000, precision: 0.0001 })).toString(),
@@ -224,7 +224,7 @@ const pastSwapEventsLength = faker.number.int({ min: 5, max: 90 });
 const pastSwapEvents = Array(pastSwapEventsLength)
   .fill(null)
   .map<SwapEvent>(() => {
-    const timestamp = Math.round(faker.date.past({ years: 1 }).getTime() / 1000);
+    const timestamp = Math.round(faker.date.past({ years: 1 }).getTime() / 1000).toString();
     const size = floatToBigInt(faker.number.float({ min: 1, max: 1000, precision: 0.0001 })).toString();
     const token = faker.helpers.arrayElement(tokens);
 
@@ -242,7 +242,7 @@ const pastSwapEvents = Array(pastSwapEventsLength)
       token: token as Token,
     };
   })
-  .sort((a, b) => b.timestamp - a.timestamp);
+  .sort((a, b) => Number(b.timestamp) - Number(a.timestamp));
 
 // Define a helper function to generate pool price history data
 const generatePoolPriceHistory = (): number[][] => {
@@ -309,14 +309,14 @@ const borrowerHistory: BorrowerHistory[] = Array(faker.number.int({ min: 5, max:
       id: faker.string.uuid(),
       borrower: faker.finance.ethereumAddress(),
       pool: faker.finance.ethereumAddress(),
-      timestamp: now - faker.number.int({ min: 0, max: 29 }) * oneDayInSeconds,
+      timestamp: (now - faker.number.int({ min: 0, max: 29 }) * oneDayInSeconds).toString(),
       type,
       values: [...lostToken, ...gainedToken],
       claimInUSD: type === BorrowerHistoryType.ClaimedRewards ? floatToBigInt(gainedAmount).toString() : null,
       lostDepositInUSD: type === BorrowerHistoryType.ClaimedRewards ? floatToBigInt(lostAmount).toString() : null,
     };
   })
-  .sort((a, b) => b.timestamp - a.timestamp);
+  .sort((a, b) => Number(b.timestamp) - Number(a.timestamp));
 
 // --------------- HANDLER ----------------
 
@@ -485,7 +485,7 @@ export const handlers = [
 
         // Add the bar to the array
         bars.push({
-          timestamp,
+          timestamp: timestamp.toString(),
           open: ethers.parseEther(open.toString()).toString(),
           high: ethers.parseEther(high.toString()).toString(),
           low: ethers.parseEther(low.toString()).toString(),
@@ -527,7 +527,7 @@ export const handlers = [
       const randomCandle: TokenCandleSingleton = {
         id,
         __typename: 'TokenCandleSingleton',
-        timestamp: Date.now(),
+        timestamp: Date.now().toString(),
         token: tokens[0].address,
         candleSize: 60,
         open: ethers.parseEther(open.toString()).toString(),
@@ -559,7 +559,7 @@ export const handlers = [
         const randomCandle: TokenCandle = {
           id: faker.string.uuid(),
           __typename: 'TokenCandle',
-          timestamp: Date.now(),
+          timestamp: Date.now().toString(),
           token: token as Token,
           candleSize: 60,
           open: ethers.parseEther(open.toString()).toString(),

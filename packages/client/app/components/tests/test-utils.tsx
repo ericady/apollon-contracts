@@ -4,7 +4,7 @@ import { SnackbarProvider } from 'notistack';
 import { PropsWithChildren, useEffect, useMemo, useState } from 'react';
 import 'whatwg-fetch';
 import { CustomApolloProvider_DevMode } from '../../context/CustomApolloProvider_dev';
-import { EthersContext, useEthers } from '../../context/EthersProvider';
+import { Contracts, EthersContext, useEthers } from '../../context/EthersProvider';
 import SelectedTokenProvider, { useSelectedToken } from '../../context/SelectedTokenProvider';
 import TransactionDialogProvider from '../../context/TransactionDialogProvider';
 import buildTheme from '../../theme';
@@ -77,8 +77,10 @@ function SetupState({
         symbol,
         priceUSD24hAgo: BigInt(10000000000000000000),
         volume30dUSD: BigInt(100000000000000000000000),
+        borrowingRate: BigInt(3000),
         pool: {
           id: '0xbE8F15C2db5Fc2AFc4e17B4Dd578Fbc6e5aA9592',
+          address: Contracts.SwapPairs["BTC"],
           liqudityPair: [BigInt(10000000000000000000000), BigInt(10000000000000000000000)],
         },
       });

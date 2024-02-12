@@ -136,7 +136,9 @@ export function handleUpdateDebtTokenMeta_stabilityDepositAPY(
 
   // Calculate Profit from gained colls and lost debts
   const tokenContract = DebtToken.bind(tokenAddress);
-  const tokenPrice = tokenContract.getPrice();
+  // FIXME:
+  // const tokenPrice = tokenContract.getPrice();
+  const tokenPrice = BigInt.fromI32(1);
   const loss = lostDeposit.times(tokenPrice);
 
   let allGains = BigInt.fromI32(0);
@@ -145,7 +147,9 @@ export function handleUpdateDebtTokenMeta_stabilityDepositAPY(
     const tokenAddress = collGain[i].tokenAddress;
     const amount = collGain[i].amount;
     const tokenContract = DebtToken.bind(tokenAddress);
-    const tokenPrice = tokenContract.getPrice();
+    // FIXME: 
+    // const tokenPrice = tokenContract.getPrice();
+    const tokenPrice = BigInt.fromI32(1);
 
     allGains.plus(tokenPrice.times(amount));
   }
@@ -252,7 +256,9 @@ export const handleUpdateDebtTokenMeta_totalReserve30dAverage = (
 export const handleUpdateDebtTokenMeta_totalSupply30dAverage = (event: ethereum.Event, tokenAddress: Address): void => {
   const debtTokenContract = DebtToken.bind(tokenAddress);
   const totalSupply = debtTokenContract.totalSupply();
-  const tokenPrice = debtTokenContract.getPrice();
+  // FIXME:
+  // const tokenPrice = debtTokenContract.getPrice();
+  const tokenPrice = BigInt.fromI32(1);
   const totalSupplyUSD = totalSupply.times(tokenPrice);
 
   // Load Avergae or intialise it
