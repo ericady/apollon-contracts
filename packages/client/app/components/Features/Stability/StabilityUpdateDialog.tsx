@@ -103,13 +103,7 @@ const StabilityUpdateDialog = () => {
             },
             // wait for all approvals
             waitForResponseOf: Array.of(tokenAmounts.length).map((_, index) => index),
-            reloadQueriesAferMined: [GET_BORROWER_DEBT_TOKENS, GET_BORROWER_STABILITY_HISTORY],
-            actionAfterMined: (client) => {
-              // console.log(client.cache.extract().ROOT_QUERY);
-              // FIXME: WHY DOESNT IT EVICT WHY DOESNT IT REFETCH????
-              client.cache.evict({ id: 'ROOT_QUERY', fieldName: 'borrowerHistories:{}' });
-              client.cache.gc();
-            },
+            reloadQueriesAferMined: [GET_BORROWER_DEBT_TOKENS],
           },
         },
       ]);
@@ -122,12 +116,7 @@ const StabilityUpdateDialog = () => {
               return stabilityPoolManagerContract.withdrawStability(tokenAmounts);
             },
             waitForResponseOf: [],
-            reloadQueriesAferMined: [GET_BORROWER_DEBT_TOKENS, GET_BORROWER_STABILITY_HISTORY],
-            actionAfterMined: (client) => {
-              console.log(client.cache.extract());
-              client.cache.evict({ id: 'ROOT_QUERY', fieldName: 'borrowerHistories:{}' });
-              client.cache.gc();
-            },
+            reloadQueriesAferMined: [GET_BORROWER_DEBT_TOKENS],
           },
         },
       ]);
