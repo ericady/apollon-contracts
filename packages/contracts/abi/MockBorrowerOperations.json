@@ -654,36 +654,6 @@
     {
         "inputs": [
             {
-                "internalType": "address",
-                "name": "_borrower",
-                "type": "address"
-            },
-            {
-                "components": [
-                    {
-                        "internalType": "address",
-                        "name": "tokenAddress",
-                        "type": "address"
-                    },
-                    {
-                        "internalType": "uint256",
-                        "name": "amount",
-                        "type": "uint256"
-                    }
-                ],
-                "internalType": "struct IBase.TokenAmount[]",
-                "name": "_collTokenAmounts",
-                "type": "tuple[]"
-            }
-        ],
-        "name": "mock_increaseTroveColl",
-        "outputs": [],
-        "stateMutability": "nonpayable",
-        "type": "function"
-    },
-    {
-        "inputs": [
-            {
                 "components": [
                     {
                         "internalType": "address",

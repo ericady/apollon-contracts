@@ -353,10 +353,6 @@ const deployProtocol: DeployFunction = async (hre: HardhatRuntimeEnvironment) =>
 
   await BTC.connect(anotherUserSigner).approve(pair1, MaxUint256);
   await STABLE.connect(anotherUserSigner).approve(pair1, MaxUint256);
-
-  await borrowerOperations.mock_increaseTroveColl(anotherUser, [{ amount: parseUnits('1000'), tokenAddress: BTC.target  }, 
-  { amount: parseUnits('1000'), tokenAddress: USDT.target  }, 
-  { amount: parseUnits('1000'), tokenAddress: DFI.target  }])
   
   // TODO: Can go the defined way to open a trove
 
