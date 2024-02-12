@@ -514,6 +514,7 @@ contract StabilityPool is LiquityBase, CheckContract, IStabilityPool {
   // --- Reward calculator functions ---
 
   function _payoutCollGains(address _depositor, uint remainingDeposit) internal {
+    bool hasAnyCollGain = false;
     TokenAmount[] memory collGains = new TokenAmount[](usedCollTokens.length);
     for (uint i = 0; i < usedCollTokens.length; i++) {
       address collTokenAddress = usedCollTokens[i];
@@ -523,11 +524,13 @@ contract StabilityPool is LiquityBase, CheckContract, IStabilityPool {
       totalGainedColl[collTokenAddress] -= collGain;
       IERC20(collTokenAddress).transfer(_depositor, collGain);
       collGains[i] = TokenAmount(collTokenAddress, collGain);
+      if (!hasAnyCollGain) hasAnyCollGain = true;
     }
 
     uint initialDeposit = deposits[_depositor];
     uint depositLoss = initialDeposit - remainingDeposit;
-    emit StabilityGainsWithdrawn(_depositor, depositLoss, collGains);
+
+    if (hasAnyCollGain || depositLoss > 0) emit StabilityGainsWithdrawn(_depositor, depositLoss, collGains);
   }
 
   /* Calculates the gains earned by the deposit since its last snapshots were taken.
