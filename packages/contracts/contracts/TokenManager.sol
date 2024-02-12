@@ -25,6 +25,7 @@ contract TokenManager is Ownable(msg.sender), CheckContract, ITokenManager {
 
   address[] public debtTokenAddresses;
   address[] public collTokenAddresses;
+  address govTokenAddress;
 
   // --- Dependency setter ---
 
@@ -62,6 +63,10 @@ contract TokenManager is Ownable(msg.sender), CheckContract, ITokenManager {
     return collTokenAddresses;
   }
 
+  function getGovTokenAddress() external view override returns (address) {
+    return govTokenAddress;
+  }
+
   // --- Setters ---
 
   function addDebtToken(address _debtTokenAddress, uint _tellorOracleId) external override onlyOwner {
@@ -86,12 +91,16 @@ contract TokenManager is Ownable(msg.sender), CheckContract, ITokenManager {
     emit DebtTokenAdded(_debtTokenAddress);
   }
 
-  function addCollToken(address _tokenAddress, uint _tellorOracleId) external override onlyOwner {
+  function addCollToken(address _tokenAddress, uint _tellorOracleId, bool _isGovToken) external override onlyOwner {
+    if (_isGovToken && govTokenAddress != address(0)) revert GovTokenAlreadyDefined();
+
     for (uint i = 0; i < collTokenAddresses.length; i++)
       if (collTokenAddresses[i] == _tokenAddress) revert SymbolAlreadyExists();
 
     collTokenAddresses.push(_tokenAddress);
+    if (_isGovToken) govTokenAddress = _tokenAddress;
+
     priceFeed.initiateNewOracleId(_tokenAddress, _tellorOracleId);
-    emit CollTokenAdded(_tokenAddress);
+    emit CollTokenAdded(_tokenAddress, _isGovToken);
   }
 }

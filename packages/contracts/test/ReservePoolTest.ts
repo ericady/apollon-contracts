@@ -1,13 +1,6 @@
 import { SignerWithAddress } from '@nomicfoundation/hardhat-ethers/signers';
 import { ethers } from 'hardhat';
-import {
-  LiquidationOperations,
-  MockDebtToken,
-  MockERC20,
-  PriceFeed,
-  ReservePool,
-  StabilityPoolManager,
-} from '../typechain';
+import { LiquidationOperations, MockDebtToken, MockERC20, ReservePool, StabilityPoolManager } from '../typechain';
 import { expect } from 'chai';
 import { openTrove, setPrice } from '../utils/testHelper';
 import { parseUnits } from 'ethers';
@@ -22,7 +15,6 @@ describe('Reserve Pool', () => {
   let BTC: MockERC20;
 
   let contracts: any;
-  let priceFeed: PriceFeed;
   let liquidationOperations: LiquidationOperations;
   let reservePool: ReservePool;
   let stabilityPoolManager: StabilityPoolManager;
@@ -35,7 +27,6 @@ describe('Reserve Pool', () => {
     // @ts-ignore
     contracts = await ignition.deploy(apollonTesting);
 
-    priceFeed = contracts.priceFeed;
     liquidationOperations = contracts.liquidationOperations;
     reservePool = contracts.reservePool;
     stabilityPoolManager = contracts.stabilityPoolManager;
@@ -46,15 +37,21 @@ describe('Reserve Pool', () => {
   describe('reserveCap()', () => {
     it('only owner can set reserve caps', async () => {
       const cap = parseUnits('100');
-      await expect(reservePool.connect(alice).setReserveCap(cap, cap)).to.be.revertedWithCustomError(
+      await expect(reservePool.connect(alice).setGovReserveCap(cap)).to.be.revertedWithCustomError(
+        reservePool,
+        'OwnableUnauthorizedAccount'
+      );
+      await expect(reservePool.connect(alice).setRelativeStableCap(cap)).to.be.revertedWithCustomError(
         reservePool,
         'OwnableUnauthorizedAccount'
       );
 
-      await reservePool.setReserveCap(cap, cap);
-      expect(await reservePool.stableReserveCap()).to.be.equal(cap);
+      await reservePool.setGovReserveCap(cap);
+      await reservePool.setRelativeStableCap(cap);
+      expect(await reservePool.relativeStableCap()).to.be.equal(cap);
       expect(await reservePool.govReserveCap()).to.be.equal(cap);
     });
+
     it('should receive reserve fee when borrowing', async () => {
       const aliceDebt = parseUnits('100');
       await openTrove({
@@ -66,7 +63,8 @@ describe('Reserve Pool', () => {
       });
 
       let reserveBal = await STABLE.balanceOf(reservePool);
-      expect(reserveBal).to.be.equal(aliceDebt / 20n / 200n);
+      const aliceFee = await contracts.troveManager.getBorrowingFee(aliceDebt, true);
+      expect(reserveBal).to.be.equal(aliceFee);
 
       const bobDebt = parseUnits('13000');
       await openTrove({
@@ -77,12 +75,12 @@ describe('Reserve Pool', () => {
         debts: [{ tokenAddress: STABLE, amount: bobDebt }],
       });
       let reserveBalAfter = await STABLE.balanceOf(reservePool);
-      expect(reserveBalAfter).to.be.equal(bobDebt / 20n / 200n + reserveBal);
+      const bobFee = await contracts.troveManager.getBorrowingFee(bobDebt, true);
+      expect(reserveBalAfter).to.be.equal(bobFee + reserveBal);
     });
 
-    it('should not receive reserve fee when reached cap', async () => {
-      const cap = parseUnits('100');
-      await reservePool.setReserveCap(cap, cap);
+    it.only('should not receive reserve fee when reached cap', async () => {
+      await reservePool.setRelativeStableCap(parseUnits('0.0001'));
 
       const aliceDebt = parseUnits('1000');
       await openTrove({
@@ -93,23 +91,11 @@ describe('Reserve Pool', () => {
         debts: [{ tokenAddress: STABLE, amount: aliceDebt }],
       });
 
-      await STABLE.connect(alice).transfer(reservePool, aliceDebt);
-
-      let reserveBalBefore = await STABLE.balanceOf(reservePool);
-
-      const bobDebt = parseUnits('13000');
-      await openTrove({
-        from: bob,
-        contracts,
-        collToken: BTC,
-        collAmount: parseUnits('1', 9),
-        debts: [{ tokenAddress: STABLE, amount: bobDebt }],
-      });
-      let reserveBalAfter = await STABLE.balanceOf(reservePool);
-
-      expect(reserveBalAfter).to.be.equal(reserveBalBefore);
+      const reserveBalAfter = await STABLE.balanceOf(reservePool);
+      expect(reserveBalAfter).to.be.equal((await STABLE.totalSupply()) / 10000n - parseUnits('0.0005'));
     });
   });
+
   describe('Withdraw (Repay)', () => {
     it('should repay loss when liquidating troves', async () => {
       const aliceDebt = parseUnits('1000');

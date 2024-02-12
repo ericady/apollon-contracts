@@ -5,47 +5,43 @@ pragma solidity ^0.8.9;
 import '@openzeppelin/contracts/access/Ownable.sol';
 import '@openzeppelin/contracts/utils/math/Math.sol';
 import '@openzeppelin/contracts/token/ERC20/extensions/IERC20Metadata.sol';
-
 import './Dependencies/LiquityBase.sol';
 import './Dependencies/CheckContract.sol';
-
 import './Interfaces/IReservePool.sol';
 import './Interfaces/IStabilityPool.sol';
 import './Interfaces/IStabilityPoolManager.sol';
 import './Interfaces/IPriceFeed.sol';
+import './Interfaces/ITokenManager.sol';
 
 contract ReservePool is LiquityBase, Ownable(msg.sender), CheckContract, IReservePool {
   string public constant NAME = 'ReservePool';
 
-  address public stabilityPoolManagerAddress;
+  ITokenManager public tokenManager;
   IPriceFeed public priceFeed;
+  address public stabilityPoolManagerAddress;
 
-  IDebtToken public stableDebtToken;
   uint public relativeStableCap; // percentage of total issued stable coins
-
-  IERC20 public govToken;
   uint public govReserveCap;
 
   function setAddresses(
+    address _tokenManager,
     address _stabilityPoolManager,
     address _priceFeed,
-    address _stableDebtTokenAddress,
-    address _govTokenAddress,
     uint _relativeStableCap,
     uint _govReserveCap
   ) external onlyOwner {
+    checkContract(_tokenManager);
     checkContract(_stabilityPoolManager);
-    checkContract(_stableDebtTokenAddress);
+    checkContract(_priceFeed);
 
     stabilityPoolManagerAddress = _stabilityPoolManager;
     priceFeed = IPriceFeed(_priceFeed);
-    stableDebtToken = IDebtToken(_stableDebtTokenAddress);
-    govToken = IERC20(_govTokenAddress);
+    tokenManager = ITokenManager(_tokenManager);
 
     relativeStableCap = _relativeStableCap;
     govReserveCap = _govReserveCap;
 
-    emit ReservePoolInitialized(_stabilityPoolManager, _priceFeed, _stableDebtTokenAddress, _govTokenAddress);
+    emit ReservePoolInitialized(_tokenManager, _stabilityPoolManager, _priceFeed);
     emit ReserveCapChanged(_relativeStableCap, govReserveCap);
   }
 
@@ -54,7 +50,14 @@ contract ReservePool is LiquityBase, Ownable(msg.sender), CheckContract, IReserv
     emit ReserveCapChanged(relativeStableCap, govReserveCap);
   }
 
+  function setGovReserveCap(uint _govReserveCap) external onlyOwner {
+    govReserveCap = _govReserveCap;
+    emit ReserveCapChanged(relativeStableCap, govReserveCap);
+  }
+
   function stableAmountUntilCap() external view returns (uint) {
+    IDebtToken stableDebtToken = tokenManager.getStableCoin();
+
     uint totalStableSupply = stableDebtToken.totalSupply();
     uint capTarget = (totalStableSupply * relativeStableCap) / DECIMAL_PRECISION;
     uint stableBalance = stableDebtToken.balanceOf(address(this));
@@ -64,6 +67,7 @@ contract ReservePool is LiquityBase, Ownable(msg.sender), CheckContract, IReserv
   }
 
   function isGovReserveCapReached() external view returns (bool) {
+    IERC20 govToken = IERC20(tokenManager.getGovTokenAddress());
     return govToken.balanceOf(address(this)) >= govReserveCap;
   }
 
@@ -76,20 +80,22 @@ contract ReservePool is LiquityBase, Ownable(msg.sender), CheckContract, IReserv
    * @return usedStable Stable token amount of withdrawn
    */
   function withdrawValue(
+    PriceCache memory priceCache,
     address stabilityPool,
     uint withdrawAmountInUSD
   ) external returns (uint usedGov, uint usedStable) {
     _requireCallerIsStabilityPoolManager();
 
-    //  todo...
-    //    uint govDecimal = IERC20Metadata(address(govToken)).decimals();
-    //    (uint govTokenPrice, ) = priceFeed.getPrice(address(govToken));
-    //    usedGov = (withdrawAmountInUSD * 10 ** govDecimal) / govTokenPrice;
-    //    usedGov = Math.min(usedGov, govToken.balanceOf(address(this)));
-    //    govToken.transfer(stabilityPool, usedGov);
-    //
-    //    usedStable = withdrawAmountInUSD - (usedGov * govTokenPrice) / 10 ** govDecimal;
-    usedStable = Math.min(usedStable, stableDebtToken.balanceOf(address(this)));
+    IDebtToken stableDebtToken = tokenManager.getStableCoin();
+    IERC20 govToken = IERC20(tokenManager.getGovTokenAddress());
+    TokenPrice memory govTokenPrice = priceFeed.getTokenPrice(priceCache, address(govToken));
+
+    usedGov = priceFeed.getAmountFromUSDValue(govTokenPrice, withdrawAmountInUSD);
+    usedGov = Math.min(usedGov, govToken.balanceOf(address(this)));
+    govToken.transfer(stabilityPool, usedGov);
+
+    usedStable = withdrawAmountInUSD - priceFeed.getUSDValue(govTokenPrice, usedGov);
+    if (usedStable > 0) usedStable = Math.min(usedStable, stableDebtToken.balanceOf(address(this)));
     stableDebtToken.transfer(stabilityPool, usedStable);
 
     emit WithdrewReserves(usedGov, usedStable);

@@ -109,6 +109,20 @@ export default buildModule('ApollonTesting', m => {
   const collSurplusPoolLinks = [contracts.liquidationOperations, contracts.borrowerOperations];
   m.call(contracts.collSurplusPool, 'setAddresses', collSurplusPoolLinks, { after: collSurplusPoolLinks });
 
+  const reservePoolLinks = [contracts.tokenManager, contracts.stabilityPoolManager, contracts.priceFeed];
+  m.call(
+    contracts.reservePool,
+    'setAddresses',
+    [
+      ...reservePoolLinks,
+      parseUnits('0.2'), // 20 %
+      parseUnits('1000'),
+    ],
+    {
+      after: reservePoolLinks,
+    }
+  );
+
   // setup mock tellor for testing
   contracts.mockTellor = m.contract('MockTellor', []);
   const blockTimestamp = m.staticCall(contracts.mockTellor, 'getBlockTimestamp', []);
@@ -134,6 +148,10 @@ export default buildModule('ApollonTesting', m => {
     id: 'stockPriceSet',
     after: [contracts.mockTellor],
   }); // STOCK
+  m.call(contracts.mockTellor, 'setPrice', [5, parseUnits('5', 6)], {
+    id: 'govPriceSet',
+    after: [contracts.mockTellor],
+  }); // GOV
 
   // price feed setup / linking
   const priceFeedLinks = [contracts.tellorCaller, contracts.tokenManager];
@@ -174,12 +192,13 @@ export default buildModule('ApollonTesting', m => {
     ],
     { id: 'mockSTOCK' }
   );
+  contracts.GOV = m.contract('MockERC20', ['GovToken', 'GOV', 18n], { id: 'mockGOV' });
 
-  m.call(contracts.tokenManager, 'addCollToken', [contracts.BTC, 1], {
+  m.call(contracts.tokenManager, 'addCollToken', [contracts.BTC, 1, false], {
     id: 'addBtc',
     after: [contracts.BTC, tokenLink],
   });
-  m.call(contracts.tokenManager, 'addCollToken', [contracts.USDT, 2], {
+  m.call(contracts.tokenManager, 'addCollToken', [contracts.USDT, 2, false], {
     id: 'addUsdt',
     after: [contracts.USDT, tokenLink],
   });
@@ -191,21 +210,10 @@ export default buildModule('ApollonTesting', m => {
     id: 'addStock',
     after: [contracts.STOCK, tokenLink],
   });
-
-  // reserve pool contract linking
-  m.call(
-    contracts.reservePool,
-    'setAddresses',
-    [
-      contracts.stabilityPoolManager,
-      contracts.priceFeed,
-      contracts.STABLE,
-      contracts.STABLE, // todo change to gov token
-      1000000, // todo real values
-      1000000,
-    ],
-    { after: [contracts.stabilityPoolManager, contracts.priceFeed, contracts.STABLE] }
-  );
+  m.call(contracts.tokenManager, 'addCollToken', [contracts.GOV, 5, true], {
+    id: 'addGov',
+    after: [contracts.GOV, tokenLink],
+  });
 
   // todo
   // // setup swap pools

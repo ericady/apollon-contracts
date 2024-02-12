@@ -6,6 +6,11 @@
     },
     {
         "inputs": [],
+        "name": "GovTokenAlreadyDefined",
+        "type": "error"
+    },
+    {
+        "inputs": [],
         "name": "InvalidDebtToken",
         "type": "error"
     },
@@ -59,6 +64,12 @@
                 "internalType": "address",
                 "name": "_tokenAddress",
                 "type": "address"
+            },
+            {
+                "indexed": false,
+                "internalType": "bool",
+                "name": "_isGovToken",
+                "type": "bool"
             }
         ],
         "name": "CollTokenAdded",
@@ -139,6 +150,11 @@
                 "internalType": "uint256",
                 "name": "_tellorOracleId",
                 "type": "uint256"
+            },
+            {
+                "internalType": "bool",
+                "name": "_isGovToken",
+                "type": "bool"
             }
         ],
         "name": "addCollToken",
@@ -280,6 +296,19 @@
                 "internalType": "address[]",
                 "name": "",
                 "type": "address[]"
+            }
+        ],
+        "stateMutability": "view",
+        "type": "function"
+    },
+    {
+        "inputs": [],
+        "name": "getGovTokenAddress",
+        "outputs": [
+            {
+                "internalType": "address",
+                "name": "",
+                "type": "address"
             }
         ],
         "stateMutability": "view",

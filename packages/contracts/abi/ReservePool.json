@@ -85,6 +85,12 @@
             {
                 "indexed": false,
                 "internalType": "address",
+                "name": "_tokenManager",
+                "type": "address"
+            },
+            {
+                "indexed": false,
+                "internalType": "address",
                 "name": "_stabilityPoolManager",
                 "type": "address"
             },
@@ -92,18 +98,6 @@
                 "indexed": false,
                 "internalType": "address",
                 "name": "_priceFeed",
-                "type": "address"
-            },
-            {
-                "indexed": false,
-                "internalType": "address",
-                "name": "_stableDebtTokenAddress",
-                "type": "address"
-            },
-            {
-                "indexed": false,
-                "internalType": "address",
-                "name": "_govTokenAddress",
                 "type": "address"
             }
         ],
@@ -313,19 +307,6 @@
     },
     {
         "inputs": [],
-        "name": "govToken",
-        "outputs": [
-            {
-                "internalType": "contract IERC20",
-                "name": "",
-                "type": "address"
-            }
-        ],
-        "stateMutability": "view",
-        "type": "function"
-    },
-    {
-        "inputs": [],
         "name": "isGovReserveCapReached",
         "outputs": [
             {
@@ -387,22 +368,17 @@
         "inputs": [
             {
                 "internalType": "address",
+                "name": "_tokenManager",
+                "type": "address"
+            },
+            {
+                "internalType": "address",
                 "name": "_stabilityPoolManager",
                 "type": "address"
             },
             {
                 "internalType": "address",
                 "name": "_priceFeed",
-                "type": "address"
-            },
-            {
-                "internalType": "address",
-                "name": "_stableDebtTokenAddress",
-                "type": "address"
-            },
-            {
-                "internalType": "address",
-                "name": "_govTokenAddress",
                 "type": "address"
             },
             {
@@ -417,6 +393,19 @@
             }
         ],
         "name": "setAddresses",
+        "outputs": [],
+        "stateMutability": "nonpayable",
+        "type": "function"
+    },
+    {
+        "inputs": [
+            {
+                "internalType": "uint256",
+                "name": "_govReserveCap",
+                "type": "uint256"
+            }
+        ],
+        "name": "setGovReserveCap",
         "outputs": [],
         "stateMutability": "nonpayable",
         "type": "function"
@@ -462,10 +451,10 @@
     },
     {
         "inputs": [],
-        "name": "stableDebtToken",
+        "name": "tokenManager",
         "outputs": [
             {
-                "internalType": "contract IDebtToken",
+                "internalType": "contract ITokenManager",
                 "name": "",
                 "type": "address"
             }
@@ -488,6 +477,67 @@
     },
     {
         "inputs": [
+            {
+                "components": [
+                    {
+                        "components": [
+                            {
+                                "internalType": "address",
+                                "name": "tokenAddress",
+                                "type": "address"
+                            },
+                            {
+                                "internalType": "uint256",
+                                "name": "tokenDecimals",
+                                "type": "uint256"
+                            },
+                            {
+                                "internalType": "uint256",
+                                "name": "price",
+                                "type": "uint256"
+                            },
+                            {
+                                "internalType": "bool",
+                                "name": "isPriceTrusted",
+                                "type": "bool"
+                            }
+                        ],
+                        "internalType": "struct IBase.TokenPrice[]",
+                        "name": "collPrices",
+                        "type": "tuple[]"
+                    },
+                    {
+                        "components": [
+                            {
+                                "internalType": "address",
+                                "name": "tokenAddress",
+                                "type": "address"
+                            },
+                            {
+                                "internalType": "uint256",
+                                "name": "tokenDecimals",
+                                "type": "uint256"
+                            },
+                            {
+                                "internalType": "uint256",
+                                "name": "price",
+                                "type": "uint256"
+                            },
+                            {
+                                "internalType": "bool",
+                                "name": "isPriceTrusted",
+                                "type": "bool"
+                            }
+                        ],
+                        "internalType": "struct IBase.TokenPrice[]",
+                        "name": "debtPrices",
+                        "type": "tuple[]"
+                    }
+                ],
+                "internalType": "struct IBase.PriceCache",
+                "name": "priceCache",
+                "type": "tuple"
+            },
             {
                 "internalType": "address",
                 "name": "stabilityPool",

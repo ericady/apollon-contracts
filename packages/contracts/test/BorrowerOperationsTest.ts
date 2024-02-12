@@ -664,7 +664,7 @@ describe('BorrowerOperations', () => {
   });
 
   describe('increaseDebts()', () => {
-    it.only('reverts on unstable price feed', async () => {
+    it('reverts on unstable price feed', async () => {
       await openTrove({ from: alice, contracts, collToken: BTC, collAmount: parseUnits('1', 9) });
 
       // last price update is older than 35min, price should become untrusted

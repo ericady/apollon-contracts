@@ -35,6 +35,7 @@ export const setPrice = async (tokenLabel: string, price: string, contracts: any
     USDT: 2,
     STABLE: 3,
     STOCK: 4,
+    GOV: 5,
   };
   await contracts.mockTellor.setPrice(requestId[tokenLabel], parseUnits(price, 6));
 };

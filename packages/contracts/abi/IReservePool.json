@@ -34,6 +34,12 @@
             {
                 "indexed": false,
                 "internalType": "address",
+                "name": "_tokenManager",
+                "type": "address"
+            },
+            {
+                "indexed": false,
+                "internalType": "address",
                 "name": "_stabilityPoolManager",
                 "type": "address"
             },
@@ -41,18 +47,6 @@
                 "indexed": false,
                 "internalType": "address",
                 "name": "_priceFeed",
-                "type": "address"
-            },
-            {
-                "indexed": false,
-                "internalType": "address",
-                "name": "_stableDebtTokenAddress",
-                "type": "address"
-            },
-            {
-                "indexed": false,
-                "internalType": "address",
-                "name": "_govTokenAddress",
                 "type": "address"
             }
         ],
@@ -77,19 +71,6 @@
         ],
         "name": "WithdrewReserves",
         "type": "event"
-    },
-    {
-        "inputs": [],
-        "name": "govToken",
-        "outputs": [
-            {
-                "internalType": "contract IERC20",
-                "name": "",
-                "type": "address"
-            }
-        ],
-        "stateMutability": "view",
-        "type": "function"
     },
     {
         "inputs": [],
@@ -131,20 +112,68 @@
         "type": "function"
     },
     {
-        "inputs": [],
-        "name": "stableDebtToken",
-        "outputs": [
-            {
-                "internalType": "contract IDebtToken",
-                "name": "",
-                "type": "address"
-            }
-        ],
-        "stateMutability": "view",
-        "type": "function"
-    },
-    {
         "inputs": [
+            {
+                "components": [
+                    {
+                        "components": [
+                            {
+                                "internalType": "address",
+                                "name": "tokenAddress",
+                                "type": "address"
+                            },
+                            {
+                                "internalType": "uint256",
+                                "name": "tokenDecimals",
+                                "type": "uint256"
+                            },
+                            {
+                                "internalType": "uint256",
+                                "name": "price",
+                                "type": "uint256"
+                            },
+                            {
+                                "internalType": "bool",
+                                "name": "isPriceTrusted",
+                                "type": "bool"
+                            }
+                        ],
+                        "internalType": "struct IBase.TokenPrice[]",
+                        "name": "collPrices",
+                        "type": "tuple[]"
+                    },
+                    {
+                        "components": [
+                            {
+                                "internalType": "address",
+                                "name": "tokenAddress",
+                                "type": "address"
+                            },
+                            {
+                                "internalType": "uint256",
+                                "name": "tokenDecimals",
+                                "type": "uint256"
+                            },
+                            {
+                                "internalType": "uint256",
+                                "name": "price",
+                                "type": "uint256"
+                            },
+                            {
+                                "internalType": "bool",
+                                "name": "isPriceTrusted",
+                                "type": "bool"
+                            }
+                        ],
+                        "internalType": "struct IBase.TokenPrice[]",
+                        "name": "debtPrices",
+                        "type": "tuple[]"
+                    }
+                ],
+                "internalType": "struct IBase.PriceCache",
+                "name": "priceCache",
+                "type": "tuple"
+            },
             {
                 "internalType": "address",
                 "name": "stabilityPool",
@@ -152,7 +181,7 @@
             },
             {
                 "internalType": "uint256",
-                "name": "withdrawAmount",
+                "name": "withdrawAmountInUSD",
                 "type": "uint256"
             }
         ],

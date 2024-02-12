@@ -11,13 +11,14 @@ interface ITokenManager is IBase {
 
   event TokenManagerInitialized(address _stabilityPoolManagerAddress, address _priceFeedAddress);
   event DebtTokenAdded(address _debtTokenAddress);
-  event CollTokenAdded(address _tokenAddress);
+  event CollTokenAdded(address _tokenAddress, bool _isGovToken);
 
   // --- Custom Errors ---
 
   error InvalidDebtToken();
   error SymbolAlreadyExists();
   error StableCoinAlreadyExists();
+  error GovTokenAlreadyDefined();
 
   // --- Functions ---
 
@@ -33,5 +34,7 @@ interface ITokenManager is IBase {
 
   function getCollTokenAddresses() external view returns (address[] memory);
 
-  function addCollToken(address _tokenAddress, uint _tellorOracleId) external;
+  function getGovTokenAddress() external view returns (address);
+
+  function addCollToken(address _tokenAddress, uint _tellorOracleId, bool _isGovToken) external;
 }
