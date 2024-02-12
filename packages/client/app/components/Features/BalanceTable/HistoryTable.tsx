@@ -6,6 +6,7 @@ import TableContainer, { TableContainerProps } from '@mui/material/TableContaine
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import Typography from '@mui/material/Typography';
+import { useEffect } from 'react';
 import { useEthers } from '../../../context/EthersProvider';
 import {
   GetBorrowerSwapEventsQuery,
@@ -27,7 +28,7 @@ import HistoryTableLoader from './HistoryTableLoader';
 function HistoryTable() {
   const { address } = useEthers();
 
-  const { data, fetchMore } = useQuery<GetBorrowerSwapEventsQuery, GetBorrowerSwapEventsQueryVariables>(
+  const { data, fetchMore, refetch } = useQuery<GetBorrowerSwapEventsQuery, GetBorrowerSwapEventsQueryVariables>(
     GET_BORROWER_SWAPS,
     {
       variables: {
@@ -60,6 +61,14 @@ function HistoryTable() {
       },
     });
   };
+
+  useEffect(() => {
+    // Refetch when accessing the component.
+    // We can not poll because of pagination and the cache
+    // We can not refetch after transaction has been mined because subgraph didnt index yet
+    // easiest solution is to just refetch for now.
+    refetch();
+  }, [refetch]);
 
   if (!data) return <HistoryTableLoader />;
 

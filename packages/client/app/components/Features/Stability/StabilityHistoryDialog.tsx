@@ -23,19 +23,19 @@ const StabilityHistoryDialog = () => {
 
   const { address } = useEthers();
 
-  const { data, fetchMore } = useQuery<GetBorrowerStabilityHistoryQuery, GetBorrowerStabilityHistoryQueryVariables>(
-    GET_BORROWER_STABILITY_HISTORY,
-    {
-      variables: {
-        first: 30,
-        skip: 0,
-        where: {
-          borrower: address,
-        },
+  const { data, fetchMore, refetch } = useQuery<
+    GetBorrowerStabilityHistoryQuery,
+    GetBorrowerStabilityHistoryQueryVariables
+  >(GET_BORROWER_STABILITY_HISTORY, {
+    variables: {
+      first: 30,
+      skip: 0,
+      where: {
+        borrower: address,
       },
-      skip: !address,
     },
-  );
+    skip: !address,
+  });
 
   const getComponentForBorrowerHistoryType = (
     history: GetBorrowerStabilityHistoryQuery['borrowerHistories'][number],
@@ -79,7 +79,14 @@ const StabilityHistoryDialog = () => {
   return (
     <>
       <Button
-        onClick={() => setOpen(true)}
+        onClick={() => {
+          // Refetch when accessing the component.
+          // We can not poll because of pagination and the cache
+          // We can not refetch after transaction has been mined because subgraph didnt index yet
+          // easiest solution is to just refetch for now.
+          refetch();
+          setOpen(true);
+        }}
         variant="contained"
         disabled={!address || !data || data.borrowerHistories.length === 0}
       >
