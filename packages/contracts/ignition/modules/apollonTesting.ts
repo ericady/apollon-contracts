@@ -2,6 +2,8 @@ import { buildModule } from '@nomicfoundation/hardhat-ignition/modules';
 import { parseUnits } from 'ethers';
 
 export default buildModule('ApollonTesting', m => {
+  const deadline = m.getParameter('deadline');
+
   // initial contract deployments
   const contracts = {
     borrowerOperations: m.contract('MockBorrowerOperations', []),
@@ -125,8 +127,7 @@ export default buildModule('ApollonTesting', m => {
 
   // setup mock tellor for testing
   contracts.mockTellor = m.contract('MockTellor', []);
-  const blockTimestamp = m.staticCall(contracts.mockTellor, 'getBlockTimestamp', []);
-  m.call(contracts.mockTellor, 'setUpdateTime', [blockTimestamp], { after: [blockTimestamp] });
+  m.call(contracts.mockTellor, 'setUpdateTime', [deadline]);
   contracts.tellorCaller = m.contract('TellorCaller', [contracts.mockTellor], {
     after: [contracts.mockTellor],
   });

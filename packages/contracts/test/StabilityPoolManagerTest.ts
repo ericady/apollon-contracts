@@ -11,10 +11,9 @@ import {
   RedemptionOperations,
 } from '../typechain';
 import { SignerWithAddress } from '@nomicfoundation/hardhat-ethers/signers';
-import { whaleShrimpTroveInit } from '../utils/testHelper';
+import { whaleShrimpTroveInit, deployTesting } from '../utils/testHelper';
 import { assert, expect } from 'chai';
 import { parseUnits } from 'ethers';
-import apollonTesting from '../ignition/modules/apollonTesting';
 
 describe('StabilityPoolManager', () => {
   let signers: SignerWithAddress[];
@@ -53,8 +52,7 @@ describe('StabilityPoolManager', () => {
   });
 
   beforeEach(async () => {
-    // @ts-ignore
-    contracts = await ignition.deploy(apollonTesting);
+    contracts = await deployTesting();
 
     priceFeed = contracts.priceFeed;
     troveManager = contracts.troveManager;

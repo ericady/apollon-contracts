@@ -1,10 +1,9 @@
 import { ethers } from 'hardhat';
 import { MockDebtToken, MockERC20, StoragePool, MockBorrowerOperations } from '../typechain';
 import { SignerWithAddress } from '@nomicfoundation/hardhat-ethers/signers';
-import { assertRevert, buildPriceCache } from '../utils/testHelper';
+import { assertRevert, buildPriceCache, deployTesting } from '../utils/testHelper';
 import { assert, expect } from 'chai';
 import { parseUnits } from 'ethers';
-import apollonTesting from '../ignition/modules/apollonTesting';
 
 describe('StoragePool', () => {
   const oneBTC = parseUnits('1', 9);
@@ -28,8 +27,7 @@ describe('StoragePool', () => {
   });
 
   beforeEach(async () => {
-    // @ts-ignore
-    contracts = await ignition.deploy(apollonTesting);
+    contracts = await deployTesting();
 
     borrowerOperations = contracts.borrowerOperations;
     storagePool = contracts.storagePool;

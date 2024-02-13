@@ -42,8 +42,4 @@ contract MockTellor {
   function retrieveData(uint256 _requestId, uint256) external view returns (uint256) {
     return prices[_requestId];
   }
-
-  function getBlockTimestamp() external view returns (uint) {
-    return block.timestamp;
-  }
 }

@@ -2,7 +2,7 @@ import { SignerWithAddress } from '@nomicfoundation/hardhat-ethers/signers';
 import { expect } from 'chai';
 import { ethers } from 'hardhat';
 import { MockDebtToken, MockERC20, StabilityPoolManager, StoragePool, TroveManager } from '../typechain';
-import apollonTesting from '../ignition/modules/apollonTesting';
+import { deployTesting } from '../utils/testHelper';
 
 describe('Access Control: Apollon functions with the caller restricted to Apollon contract(s)', () => {
   let alice: SignerWithAddress;
@@ -18,7 +18,7 @@ describe('Access Control: Apollon functions with the caller restricted to Apollo
     [, alice, bob] = await ethers.getSigners();
 
     // @ts-ignore
-    const contracts = await ignition.deploy(apollonTesting);
+    const contracts = await deployTesting();
     troveManager = contracts.troveManager;
     storagePool = contracts.storagePool;
     stabilityPoolManager = contracts.stabilityPoolManager;

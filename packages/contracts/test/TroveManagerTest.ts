@@ -17,10 +17,10 @@ import {
   repayDebt,
   setPrice,
   buildPriceCache,
+  deployTesting,
 } from '../utils/testHelper';
 import { assert, expect } from 'chai';
 import { parseUnits } from 'ethers';
-import apollonTesting from '../ignition/modules/apollonTesting';
 
 describe('TroveManager', () => {
   let signers: SignerWithAddress[];
@@ -51,8 +51,7 @@ describe('TroveManager', () => {
   });
 
   beforeEach(async () => {
-    // @ts-ignore
-    contracts = await ignition.deploy(apollonTesting);
+    contracts = await deployTesting();
 
     priceFeed = contracts.priceFeed;
     troveManager = contracts.troveManager;

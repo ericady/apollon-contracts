@@ -1,11 +1,12 @@
 import { SignerWithAddress } from '@nomicfoundation/hardhat-ethers/signers';
 import { time } from '@nomicfoundation/hardhat-network-helpers';
 import { EIP712, MockDebtToken, MockERC20, StabilityPoolManager } from '../typechain';
-import { ethers } from 'hardhat';
+import hre, { ethers } from 'hardhat';
 import { expect } from 'chai';
 import { AddressLike, ContractTransactionResponse } from 'ethers';
 import { parseUnits } from 'ethers';
 import { AddressZero } from '@ethersproject/constants';
+import apollonTesting from '../ignition/modules/apollonTesting';
 
 export const MAX_BORROWING_FEE = parseUnits('0.05');
 
@@ -18,6 +19,17 @@ export const PermitTypes = {
     { name: 'deadline', type: 'uint256' },
   ],
 };
+
+export async function deployTesting() {
+  const blockTimestamp = (await ethers.provider.getBlock('latest'))?.timestamp ?? 0;
+  const deadline = blockTimestamp + 60 * 5;
+
+  return hre.ignition.deploy(apollonTesting, {
+    parameters: {
+      ApollonTesting: { deadline },
+    },
+  });
+}
 
 export const getDomain = async (token: EIP712) => {
   const domain = await token.eip712Domain();

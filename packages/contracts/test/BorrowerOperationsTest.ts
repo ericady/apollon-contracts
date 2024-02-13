@@ -31,10 +31,10 @@ import {
   PermitTypes,
   getHints,
   setPrice,
+  deployTesting,
 } from '../utils/testHelper';
-import { AbiCoder, Signature, keccak256, parseUnits, solidityPacked, toUtf8Bytes } from 'ethers';
+import { Signature, parseUnits } from 'ethers';
 import { time } from '@nomicfoundation/hardhat-network-helpers';
-import apollonTesting from '../ignition/modules/apollonTesting';
 
 describe('BorrowerOperations', () => {
   let alice: SignerWithAddress;
@@ -72,7 +72,7 @@ describe('BorrowerOperations', () => {
 
   beforeEach(async () => {
     // @ts-ignore
-    contracts = await ignition.deploy(apollonTesting);
+    contracts = await deployTesting();
     troveManager = contracts.troveManager;
     storagePool = contracts.storagePool;
     BTC = contracts.BTC;
@@ -668,7 +668,7 @@ describe('BorrowerOperations', () => {
       await openTrove({ from: alice, contracts, collToken: BTC, collAmount: parseUnits('1', 9) });
 
       // last price update is older than 35min, price should become untrusted
-      const blockTime = await contracts.mockTellor.getBlockTimestamp();
+      const blockTime = BigInt((await ethers.provider.getBlock('latest'))?.timestamp ?? 0n);
       await contracts.mockTellor.setUpdateTime(blockTime - 60n * 35n); // - 35min
 
       const priceResp = await contracts.priceFeed.getPrice(STOCK);

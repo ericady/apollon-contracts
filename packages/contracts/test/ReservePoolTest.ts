@@ -2,9 +2,8 @@ import { SignerWithAddress } from '@nomicfoundation/hardhat-ethers/signers';
 import { ethers } from 'hardhat';
 import { LiquidationOperations, MockDebtToken, MockERC20, ReservePool, StabilityPoolManager } from '../typechain';
 import { expect } from 'chai';
-import { openTrove, setPrice } from '../utils/testHelper';
+import { openTrove, setPrice, deployTesting } from '../utils/testHelper';
 import { parseUnits } from 'ethers';
-import apollonTesting from '../ignition/modules/apollonTesting';
 
 describe('Reserve Pool', () => {
   let alice: SignerWithAddress;
@@ -24,9 +23,7 @@ describe('Reserve Pool', () => {
   });
 
   beforeEach(async () => {
-    // @ts-ignore
-    contracts = await ignition.deploy(apollonTesting);
-
+    contracts = await deployTesting();
     liquidationOperations = contracts.liquidationOperations;
     reservePool = contracts.reservePool;
     stabilityPoolManager = contracts.stabilityPoolManager;
@@ -79,7 +76,7 @@ describe('Reserve Pool', () => {
       expect(reserveBalAfter).to.be.equal(bobFee + reserveBal);
     });
 
-    it.only('should not receive reserve fee when reached cap', async () => {
+    it('should not receive reserve fee when reached cap', async () => {
       await reservePool.setRelativeStableCap(parseUnits('0.0001'));
 
       const aliceDebt = parseUnits('1000');

@@ -20,11 +20,11 @@ import {
   whaleShrimpTroveInit,
   repayDebt,
   setPrice,
+  deployTesting,
   buildPriceCache,
 } from '../utils/testHelper';
 import { assert, expect } from 'chai';
 import { parseUnits } from 'ethers';
-import apollonTesting from '../ignition/modules/apollonTesting';
 
 describe('LiquidationOperations', () => {
   let signers: SignerWithAddress[];
@@ -58,9 +58,7 @@ describe('LiquidationOperations', () => {
   });
 
   beforeEach(async () => {
-    // @ts-ignore
-    contracts = await ignition.deploy(apollonTesting);
-
+    contracts = await deployTesting();
     priceFeed = contracts.priceFeed;
     troveManager = contracts.troveManager;
     liquidationOperations = contracts.liquidationOperations;

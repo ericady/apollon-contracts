@@ -19,11 +19,10 @@ import {
   TimeValues,
   getEmittedLiquidationValues,
   increaseDebt,
-  TroveStatus,
+  deployTesting,
   setPrice,
 } from '../utils/testHelper';
 import { Addressable, parseUnits } from 'ethers';
-import apollonTesting from '../ignition/modules/apollonTesting';
 
 describe('StabilityPool', () => {
   let signers: SignerWithAddress[];
@@ -57,8 +56,7 @@ describe('StabilityPool', () => {
 
   describe('Stability Pool Mechanisms', async () => {
     beforeEach(async () => {
-      // @ts-ignore
-      contracts = await ignition.deploy(apollonTesting);
+      contracts = await deployTesting();
 
       priceFeed = contracts.priceFeed;
       troveManager = contracts.troveManager;

@@ -7,11 +7,11 @@ import {
   MAX_BORROWING_FEE,
   openTrove,
   redeem,
+  deployTesting,
   whaleShrimpTroveInit,
 } from '../utils/testHelper';
 import { assert, expect } from 'chai';
 import { parseUnits, ZeroAddress } from 'ethers';
-import apollonTesting from '../ignition/modules/apollonTesting';
 
 describe('RedemptionOperations', () => {
   let signers: SignerWithAddress[];
@@ -35,8 +35,7 @@ describe('RedemptionOperations', () => {
   });
 
   beforeEach(async () => {
-    // @ts-ignore
-    contracts = await ignition.deploy(apollonTesting);
+    contracts = await deployTesting();
     priceFeed = contracts.priceFeed;
     troveManager = contracts.troveManager;
     redemptionOperations = contracts.redemptionOperations;
