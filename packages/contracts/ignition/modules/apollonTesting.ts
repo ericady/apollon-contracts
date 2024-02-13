@@ -126,42 +126,42 @@ export default buildModule('ApollonTesting', m => {
   );
 
   // setup mock tellor for testing
-  contracts.mockTellor = m.contract('MockTellor', []);
-  m.call(contracts.mockTellor, 'setUpdateTime', [deadline]);
-  contracts.tellorCaller = m.contract('TellorCaller', [contracts.mockTellor], {
-    after: [contracts.mockTellor],
+  const mockTellor = m.contract('MockTellor', []);
+  m.call(mockTellor, 'setUpdateTime', [deadline]);
+  const tellorCaller = m.contract('TellorCaller', [mockTellor], {
+    after: [mockTellor],
   });
 
   // setting prices, two per token, important to become trusted
-  m.call(contracts.mockTellor, 'setPrice', [1, parseUnits('21000', 6)], {
+  m.call(mockTellor, 'setPrice', [1, parseUnits('21000', 6)], {
     id: 'btcPriceSet',
-    after: [contracts.mockTellor],
+    after: [mockTellor],
   }); // BTC
-  m.call(contracts.mockTellor, 'setPrice', [2, parseUnits('1', 6)], {
+  m.call(mockTellor, 'setPrice', [2, parseUnits('1', 6)], {
     id: 'usdtPriceSet',
-    after: [contracts.mockTellor],
+    after: [mockTellor],
   }); // USDT
-  m.call(contracts.mockTellor, 'setPrice', [3, parseUnits('1', 6)], {
+  m.call(mockTellor, 'setPrice', [3, parseUnits('1', 6)], {
     id: 'stablePriceSet',
-    after: [contracts.mockTellor],
+    after: [mockTellor],
   }); // STABLE
-  m.call(contracts.mockTellor, 'setPrice', [4, parseUnits('150', 6)], {
+  m.call(mockTellor, 'setPrice', [4, parseUnits('150', 6)], {
     id: 'stockPriceSet',
-    after: [contracts.mockTellor],
+    after: [mockTellor],
   }); // STOCK
-  m.call(contracts.mockTellor, 'setPrice', [5, parseUnits('5', 6)], {
+  m.call(mockTellor, 'setPrice', [5, parseUnits('5', 6)], {
     id: 'govPriceSet',
-    after: [contracts.mockTellor],
+    after: [mockTellor],
   }); // GOV
 
   // price feed setup / linking
-  const priceFeedLinks = [contracts.tellorCaller, contracts.tokenManager];
+  const priceFeedLinks = [tellorCaller, contracts.tokenManager];
   m.call(contracts.priceFeed, 'setAddresses', priceFeedLinks, { after: priceFeedLinks });
 
   // testing setup
-  contracts.BTC = m.contract('MockERC20', ['Bitcoin', 'BTC', 9n], { id: 'mockBTC' });
-  contracts.USDT = m.contract('MockERC20', ['USDT', 'USDT', 18n], { id: 'mockUSDT' });
-  contracts.STABLE = m.contract(
+  const BTC = m.contract('MockERC20', ['Bitcoin', 'BTC', 9n], { id: 'mockBTC' });
+  const USDT = m.contract('MockERC20', ['USDT', 'USDT', 18n], { id: 'mockUSDT' });
+  const STABLE = m.contract(
     'MockDebtToken',
     [
       contracts.troveManager,
@@ -177,7 +177,7 @@ export default buildModule('ApollonTesting', m => {
     ],
     { id: 'mockSTABLE' }
   );
-  contracts.STOCK = m.contract(
+  const STOCK = m.contract(
     'MockDebtToken',
     [
       contracts.troveManager,
@@ -193,68 +193,68 @@ export default buildModule('ApollonTesting', m => {
     ],
     { id: 'mockSTOCK' }
   );
-  contracts.GOV = m.contract('MockERC20', ['GovToken', 'GOV', 18n], { id: 'mockGOV' });
+  const GOV = m.contract('MockERC20', ['GovToken', 'GOV', 18n], { id: 'mockGOV' });
 
-  m.call(contracts.tokenManager, 'addCollToken', [contracts.BTC, 1, false], {
+  m.call(contracts.tokenManager, 'addCollToken', [BTC, 1, false], {
     id: 'addBtc',
-    after: [contracts.BTC, tokenLink],
+    after: [BTC, tokenLink],
   });
-  m.call(contracts.tokenManager, 'addCollToken', [contracts.USDT, 2, false], {
+  m.call(contracts.tokenManager, 'addCollToken', [USDT, 2, false], {
     id: 'addUsdt',
-    after: [contracts.USDT, tokenLink],
+    after: [USDT, tokenLink],
   });
-  m.call(contracts.tokenManager, 'addDebtToken', [contracts.STABLE, 3], {
+  m.call(contracts.tokenManager, 'addDebtToken', [STABLE, 3], {
     id: 'addStable',
-    after: [contracts.STABLE, tokenLink],
+    after: [STABLE, tokenLink],
   });
-  m.call(contracts.tokenManager, 'addDebtToken', [contracts.STOCK, 4], {
+  m.call(contracts.tokenManager, 'addDebtToken', [STOCK, 4], {
     id: 'addStock',
-    after: [contracts.STOCK, tokenLink],
+    after: [STOCK, tokenLink],
   });
-  m.call(contracts.tokenManager, 'addCollToken', [contracts.GOV, 5, true], {
+  m.call(contracts.tokenManager, 'addCollToken', [GOV, 5, true], {
     id: 'addGov',
-    after: [contracts.GOV, tokenLink],
+    after: [GOV, tokenLink],
   });
 
   // setup swap pools
-  const stableMint = m.call(contracts.STABLE, 'unprotectedMint', [m.getAccount(0), parseUnits('40000')], {
+  const stableMint = m.call(STABLE, 'unprotectedMint', [m.getAccount(0), parseUnits('40000')], {
     id: 'mintStable',
   });
-  const stockMint = m.call(contracts.STOCK, 'unprotectedMint', [m.getAccount(0), parseUnits('65')], {
+  const stockMint = m.call(STOCK, 'unprotectedMint', [m.getAccount(0), parseUnits('65')], {
     id: 'mintStock',
   });
-  const btcMint = m.call(contracts.BTC, 'unprotectedMint', [m.getAccount(0), parseUnits('1', 9)], { id: 'mintBTC' });
-  const usdtMint = m.call(contracts.USDT, 'unprotectedMint', [m.getAccount(0), parseUnits('10000')], {
+  const btcMint = m.call(BTC, 'unprotectedMint', [m.getAccount(0), parseUnits('1', 9)], { id: 'mintBTC' });
+  const usdtMint = m.call(USDT, 'unprotectedMint', [m.getAccount(0), parseUnits('10000')], {
     id: 'mintUSDT',
   });
 
-  const stableApprove = m.call(contracts.STABLE, 'approve', [contracts.swapOperations, MaxUint256], {
+  const stableApprove = m.call(STABLE, 'approve', [contracts.swapOperations, MaxUint256], {
     id: 'approveStable',
     after: [stableMint],
   });
-  const stockApprove = m.call(contracts.STOCK, 'approve', [contracts.swapOperations, MaxUint256], {
+  const stockApprove = m.call(STOCK, 'approve', [contracts.swapOperations, MaxUint256], {
     id: 'approveStock',
     after: [stockMint],
   });
-  const btcApprove = m.call(contracts.BTC, 'approve', [contracts.swapOperations, MaxUint256], {
+  const btcApprove = m.call(BTC, 'approve', [contracts.swapOperations, MaxUint256], {
     id: 'approveBTC',
     after: [btcMint],
   });
-  const usdtApprove = m.call(contracts.USDT, 'approve', [contracts.swapOperations, MaxUint256], {
+  const usdtApprove = m.call(USDT, 'approve', [contracts.swapOperations, MaxUint256], {
     id: 'approveUSDT',
     after: [usdtMint],
   });
 
   // STABLE - BTC
-  const stableBTCPair = m.call(contracts.swapOperations, 'createPair', [contracts.BTC, contracts.STABLE], {
+  const stableBTCPair = m.call(contracts.swapOperations, 'createPair', [BTC, STABLE], {
     id: 'createPairBTC',
   });
   m.call(
     contracts.swapOperations,
     'addLiquidity',
     [
-      contracts.BTC,
-      contracts.STABLE,
+      BTC,
+      STABLE,
       parseUnits('1', 9),
       parseUnits('20000'),
       0,
@@ -266,15 +266,15 @@ export default buildModule('ApollonTesting', m => {
   );
 
   // STABLE - USDT
-  const stableUSDTPair = m.call(contracts.swapOperations, 'createPair', [contracts.USDT, contracts.STABLE], {
+  const stableUSDTPair = m.call(contracts.swapOperations, 'createPair', [USDT, STABLE], {
     id: 'createPairUSDT',
   });
   m.call(
     contracts.swapOperations,
     'addLiquidity',
     [
-      contracts.USDT,
-      contracts.STABLE,
+      USDT,
+      STABLE,
       parseUnits('10000'),
       parseUnits('10000'),
       0,
@@ -286,15 +286,15 @@ export default buildModule('ApollonTesting', m => {
   );
 
   // STABLE - STOCK
-  const stableStockPair = m.call(contracts.swapOperations, 'createPair', [contracts.STOCK, contracts.STABLE], {
+  const stableStockPair = m.call(contracts.swapOperations, 'createPair', [STOCK, STABLE], {
     id: 'createPairSTOCK',
   });
   m.call(
     contracts.swapOperations,
     'addLiquidity',
     [
-      contracts.STOCK,
-      contracts.STABLE,
+      STOCK,
+      STABLE,
       parseUnits('65'),
       parseUnits('10000'),
       0,
@@ -305,5 +305,13 @@ export default buildModule('ApollonTesting', m => {
     { id: 'addLiquiditySTOCK', after: [stableStockPair, stockApprove, stableApprove] }
   );
 
-  return contracts;
+  return {
+    ...contracts,
+    mockTellor,
+    BTC,
+    USDT,
+    STABLE,
+    STOCK,
+    GOV,
+  };
 });
