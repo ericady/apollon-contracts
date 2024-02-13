@@ -147,7 +147,7 @@ export function handleUpdateDebtTokenMeta_stabilityDepositAPY(
     const tokenAddress = collGain[i].tokenAddress;
     const amount = collGain[i].amount;
     const tokenContract = DebtToken.bind(tokenAddress);
-    // FIXME: 
+    // FIXME:
     // const tokenPrice = tokenContract.getPrice();
     const tokenPrice = BigInt.fromI32(1);
 

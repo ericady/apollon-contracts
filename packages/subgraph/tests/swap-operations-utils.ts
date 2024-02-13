@@ -27,7 +27,7 @@ export function createPairCreatedEvent(token0: Address, token1: Address, pair: A
   pairCreatedEvent.parameters.push(new ethereum.EventParam('token0', ethereum.Value.fromAddress(token0)));
   pairCreatedEvent.parameters.push(new ethereum.EventParam('token1', ethereum.Value.fromAddress(token1)));
   pairCreatedEvent.parameters.push(new ethereum.EventParam('pair', ethereum.Value.fromAddress(pair)));
-  pairCreatedEvent.parameters.push(new ethereum.EventParam('param3', ethereum.Value.fromUnsignedBigInt(param3)));
+  pairCreatedEvent.parameters.push(new ethereum.EventParam('param3', ethereum.Value.fromSignedBigInt(param3)));
 
   return pairCreatedEvent;
 }

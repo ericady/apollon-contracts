@@ -9,7 +9,7 @@ export function createApprovalEvent(owner: Address, spender: Address, value: Big
 
   approvalEvent.parameters.push(new ethereum.EventParam('owner', ethereum.Value.fromAddress(owner)));
   approvalEvent.parameters.push(new ethereum.EventParam('spender', ethereum.Value.fromAddress(spender)));
-  approvalEvent.parameters.push(new ethereum.EventParam('value', ethereum.Value.fromUnsignedBigInt(value)));
+  approvalEvent.parameters.push(new ethereum.EventParam('value', ethereum.Value.fromSignedBigInt(value)));
 
   return approvalEvent;
 }
@@ -21,7 +21,7 @@ export function createTransferEvent(from: Address, to: Address, value: BigInt): 
 
   transferEvent.parameters.push(new ethereum.EventParam('from', ethereum.Value.fromAddress(from)));
   transferEvent.parameters.push(new ethereum.EventParam('to', ethereum.Value.fromAddress(to)));
-  transferEvent.parameters.push(new ethereum.EventParam('value', ethereum.Value.fromUnsignedBigInt(value)));
+  transferEvent.parameters.push(new ethereum.EventParam('value', ethereum.Value.fromSignedBigInt(value)));
 
   return transferEvent;
 }

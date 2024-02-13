@@ -1,10 +1,8 @@
 import { Address, BigInt, ethereum } from '@graphprotocol/graph-ts';
 import { newMockEvent } from 'matchstick-as';
 import {
-  BaseRateUpdated,
   LTermsUpdated,
   LastFeeOpTimeUpdated,
-  LiquidationSummary,
   OwnershipTransferred,
   SystemSnapshotsUpdated,
   TotalStakesUpdated,
@@ -15,17 +13,17 @@ import {
   TroveSnapshotsUpdated,
 } from '../generated/TroveManager/TroveManager';
 
-export function createBaseRateUpdatedEvent(_baseRate: BigInt): BaseRateUpdated {
-  let baseRateUpdatedEvent = changetype<BaseRateUpdated>(newMockEvent());
+// export function createBaseRateUpdatedEvent(_baseRate: BigInt): BaseRateUpdated {
+//   let baseRateUpdatedEvent = changetype<BaseRateUpdated>(newMockEvent());
 
-  baseRateUpdatedEvent.parameters = new Array();
+//   baseRateUpdatedEvent.parameters = new Array();
 
-  baseRateUpdatedEvent.parameters.push(
-    new ethereum.EventParam('_baseRate', ethereum.Value.fromUnsignedBigInt(_baseRate)),
-  );
+//   baseRateUpdatedEvent.parameters.push(
+//     new ethereum.EventParam('_baseRate', ethereum.Value.fromSignedBigInt(_baseRate)),
+//   );
 
-  return baseRateUpdatedEvent;
-}
+//   return baseRateUpdatedEvent;
+// }
 
 export function createLTermsUpdatedEvent(_liquidatedTokens: Array<ethereum.Tuple>): LTermsUpdated {
   let lTermsUpdatedEvent = changetype<LTermsUpdated>(newMockEvent());
@@ -45,40 +43,40 @@ export function createLastFeeOpTimeUpdatedEvent(_lastFeeOpTime: BigInt): LastFee
   lastFeeOpTimeUpdatedEvent.parameters = new Array();
 
   lastFeeOpTimeUpdatedEvent.parameters.push(
-    new ethereum.EventParam('_lastFeeOpTime', ethereum.Value.fromUnsignedBigInt(_lastFeeOpTime)),
+    new ethereum.EventParam('_lastFeeOpTime', ethereum.Value.fromSignedBigInt(_lastFeeOpTime)),
   );
 
   return lastFeeOpTimeUpdatedEvent;
 }
 
-export function createLiquidationSummaryEvent(
-  liquidatedDebt: Array<ethereum.Tuple>,
-  liquidatedColl: Array<ethereum.Tuple>,
-  totalStableCoinGasCompensation: BigInt,
-  totalCollGasCompensation: Array<ethereum.Tuple>,
-): LiquidationSummary {
-  let liquidationSummaryEvent = changetype<LiquidationSummary>(newMockEvent());
+// export function createLiquidationSummaryEvent(
+//   liquidatedDebt: Array<ethereum.Tuple>,
+//   liquidatedColl: Array<ethereum.Tuple>,
+//   totalStableCoinGasCompensation: BigInt,
+//   totalCollGasCompensation: Array<ethereum.Tuple>,
+// ): LiquidationSummary {
+//   let liquidationSummaryEvent = changetype<LiquidationSummary>(newMockEvent());
 
-  liquidationSummaryEvent.parameters = new Array();
+//   liquidationSummaryEvent.parameters = new Array();
 
-  liquidationSummaryEvent.parameters.push(
-    new ethereum.EventParam('liquidatedDebt', ethereum.Value.fromTupleArray(liquidatedDebt)),
-  );
-  liquidationSummaryEvent.parameters.push(
-    new ethereum.EventParam('liquidatedColl', ethereum.Value.fromTupleArray(liquidatedColl)),
-  );
-  liquidationSummaryEvent.parameters.push(
-    new ethereum.EventParam(
-      'totalStableCoinGasCompensation',
-      ethereum.Value.fromUnsignedBigInt(totalStableCoinGasCompensation),
-    ),
-  );
-  liquidationSummaryEvent.parameters.push(
-    new ethereum.EventParam('totalCollGasCompensation', ethereum.Value.fromTupleArray(totalCollGasCompensation)),
-  );
+//   liquidationSummaryEvent.parameters.push(
+//     new ethereum.EventParam('liquidatedDebt', ethereum.Value.fromTupleArray(liquidatedDebt)),
+//   );
+//   liquidationSummaryEvent.parameters.push(
+//     new ethereum.EventParam('liquidatedColl', ethereum.Value.fromTupleArray(liquidatedColl)),
+//   );
+//   liquidationSummaryEvent.parameters.push(
+//     new ethereum.EventParam(
+//       'totalStableCoinGasCompensation',
+//       ethereum.Value.fromSignedBigInt(totalStableCoinGasCompensation),
+//     ),
+//   );
+//   liquidationSummaryEvent.parameters.push(
+//     new ethereum.EventParam('totalCollGasCompensation', ethereum.Value.fromTupleArray(totalCollGasCompensation)),
+//   );
 
-  return liquidationSummaryEvent;
-}
+//   return liquidationSummaryEvent;
+// }
 
 export function createOwnershipTransferredEvent(previousOwner: Address, newOwner: Address): OwnershipTransferred {
   let ownershipTransferredEvent = changetype<OwnershipTransferred>(newMockEvent());
@@ -146,7 +144,7 @@ export function createTroveClosedEvent(_borrower: Address, _closingState: i32): 
 
   troveClosedEvent.parameters.push(new ethereum.EventParam('_borrower', ethereum.Value.fromAddress(_borrower)));
   troveClosedEvent.parameters.push(
-    new ethereum.EventParam('_closingState', ethereum.Value.fromUnsignedBigInt(BigInt.fromI32(_closingState))),
+    new ethereum.EventParam('_closingState', ethereum.Value.fromSignedBigInt(BigInt.fromI32(_closingState))),
   );
 
   return troveClosedEvent;
@@ -159,7 +157,7 @@ export function createTroveIndexUpdatedEvent(_borrower: Address, _newIndex: BigI
 
   troveIndexUpdatedEvent.parameters.push(new ethereum.EventParam('_borrower', ethereum.Value.fromAddress(_borrower)));
   troveIndexUpdatedEvent.parameters.push(
-    new ethereum.EventParam('_newIndex', ethereum.Value.fromUnsignedBigInt(_newIndex)),
+    new ethereum.EventParam('_newIndex', ethereum.Value.fromSignedBigInt(_newIndex)),
   );
 
   return troveIndexUpdatedEvent;

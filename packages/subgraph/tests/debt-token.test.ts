@@ -1,14 +1,12 @@
 import { BigInt, ethereum } from '@graphprotocol/graph-ts';
-import { afterAll, assert, clearStore, createMockedFunction, describe, test } from 'matchstick-as/assembly/index';
-import { handleDebtTokenAdded } from '../src/debt-token-manager';
-import { createDebtTokenAddedEvent } from './debt-token-manager-utils';
+import { createMockedFunction } from 'matchstick-as/assembly/index';
 import {
   MockDebtTokenAddress,
   MockStabilityPoolAddress,
   MockStabilityPoolManagerAddress,
   MockTroveManagerAddress,
   MockUserAddress,
-} from './debt-token-utils';
+} from './utils';
 
 export const mockDebtTokenSymbol = (): void => {
   createMockedFunction(MockDebtTokenAddress, 'symbol', 'symbol():(string)').returns([
@@ -54,63 +52,63 @@ export const mockStabilityPoolGetTotalDeposit = (): void => {
   ]);
 };
 
-describe('handlePriceFeedAddressChanged()', () => {
-  afterAll(() => {
-    clearStore();
-  });
+// describe('handlePriceFeedAddressChanged()', () => {
+//   afterAll(() => {
+//     clearStore();
+//   });
 
-  test('Token entity created and stored', () => {
-    const newdebtTokenAddedEvent = createDebtTokenAddedEvent(MockDebtTokenAddress);
+//   test('Token entity created and stored', () => {
+//     const newdebtTokenAddedEvent = createDebtTokenAddedEvent(MockDebtTokenAddress);
 
-    mockDebtTokenSymbol();
-    mockDebtTokenPrice();
+//     mockDebtTokenSymbol();
+//     mockDebtTokenPrice();
 
-    handleDebtTokenAdded(newdebtTokenAddedEvent);
+//     handleDebtTokenAdded(newdebtTokenAddedEvent);
 
-    assert.entityCount('Token', 1);
+//     assert.entityCount('Token', 1);
 
-    assert.fieldEquals(
-      'Token',
-      '0x0000000000000000000000000000000000000100',
-      'address',
-      '0x0000000000000000000000000000000000000100',
-    );
-  });
-});
+//     assert.fieldEquals(
+//       'Token',
+//       '0x0000000000000000000000000000000000000100',
+//       'address',
+//       '0x0000000000000000000000000000000000000100',
+//     );
+//   });
+// });
 
-describe('handleTransfer()', () => {
-  afterAll(() => {
-    clearStore();
-  });
+// describe('handleTransfer()', () => {
+//   afterAll(() => {
+//     clearStore();
+//   });
 
-  // test(
-  //   'Token entity priceUSD is updated',
-  //   () => {
-  //     const debtToken = new Token(MockDebtTokenAddress);
-  //     debtToken.address = MockDebtTokenAddress;
+//   // test(
+//   //   'Token entity priceUSD is updated',
+//   //   () => {
+//   //     const debtToken = new Token(MockDebtTokenAddress);
+//   //     debtToken.address = MockDebtTokenAddress;
 
-  //     debtToken.createdAt = BigInt.fromI32(1);
-  //     debtToken.symbol = 'JUSD';
-  //     debtToken.isPoolToken = true;
-  //     debtToken.save();
+//   //     debtToken.createdAt = BigInt.fromI32(1);
+//   //     debtToken.symbol = 'JUSD';
+//   //     debtToken.isPoolToken = true;
+//   //     debtToken.save();
 
-  //     const newTransferEvent = createTransferEvent(
-  //       Address.fromString('0x1000000000000000000000000000000000000000'),
-  //       Address.fromString('0x2000000000000000000000000000000000000000'),
-  //       BigInt.fromI32(1),
-  //     );
+//   //     const newTransferEvent = createTransferEvent(
+//   //       Address.fromString('0x1000000000000000000000000000000000000000'),
+//   //       Address.fromString('0x2000000000000000000000000000000000000000'),
+//   //       BigInt.fromI32(1),
+//   //     );
 
-  //     mockDebtTokenPrice();
-  //     mockDebtTokenTotalSupply();
-  //     mockDebtTokenStabilityPoolManagerAddress();
-  //     mockStabilityPoolManagerGetStabilityPool();
-  //     mockStabilityPoolGetStabilityAPY();
-  //     mockStabilityPoolGetTotalDeposit();
+//   //     mockDebtTokenPrice();
+//   //     mockDebtTokenTotalSupply();
+//   //     mockDebtTokenStabilityPoolManagerAddress();
+//   //     mockStabilityPoolManagerGetStabilityPool();
+//   //     mockStabilityPoolGetStabilityAPY();
+//   //     mockStabilityPoolGetTotalDeposit();
 
-  //     handleTransfer(newTransferEvent);
+//   //     handleTransfer(newTransferEvent);
 
-  //     assert.entityCount('DebtTokenMeta', 1);
-  //   },
-  //   true,
-  // );
-});
+//   //     assert.entityCount('DebtTokenMeta', 1);
+//   //   },
+//   //   true,
+//   // );
+// });

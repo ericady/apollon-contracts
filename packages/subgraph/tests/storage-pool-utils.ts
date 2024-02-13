@@ -64,10 +64,10 @@ export function createStoragePoolValueUpdatedEvent(
   );
   storagePoolValueUpdatedEvent.parameters.push(new ethereum.EventParam('_isColl', ethereum.Value.fromBoolean(_isColl)));
   storagePoolValueUpdatedEvent.parameters.push(
-    new ethereum.EventParam('_poolType', ethereum.Value.fromUnsignedBigInt(BigInt.fromI32(_poolType))),
+    new ethereum.EventParam('_poolType', ethereum.Value.fromSignedBigInt(BigInt.fromI32(_poolType))),
   );
   storagePoolValueUpdatedEvent.parameters.push(
-    new ethereum.EventParam('_updatedAmount', ethereum.Value.fromUnsignedBigInt(_updatedAmount)),
+    new ethereum.EventParam('_updatedAmount', ethereum.Value.fromSignedBigInt(_updatedAmount)),
   );
 
   return storagePoolValueUpdatedEvent;

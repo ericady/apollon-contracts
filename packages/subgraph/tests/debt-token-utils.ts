@@ -1,19 +1,24 @@
 import { Address, BigInt, ethereum } from '@graphprotocol/graph-ts';
-import { Address as EventAddress } from '@graphprotocol/graph-ts/common/numbers';
-import { newMockEvent } from 'matchstick-as';
+import { createMockedFunction, newMockEvent } from 'matchstick-as';
 import { Approval, Transfer } from '../generated/templates/DebtTokenTemplate/DebtToken';
-
-export const MockDebtTokenAddress = EventAddress.fromString('0x0000000000000000000000000000000000000100');
-export const MockStabilityPoolManagerAddress = EventAddress.fromString('0x0000000000000000000000000000000000000200');
-export const MockStabilityPoolAddress = EventAddress.fromString('0x0000000000000000000000000000000000000300');
-export const MockTroveManagerAddress = EventAddress.fromString('0x0000000000000000000000000000000000000400');
-export const MockCollateralToken1Address = EventAddress.fromString('0x0000000000000000000000000000000000000500');
-export const MockCollateralToken2Address = EventAddress.fromString('0x0000000000000000000000000000000000000501');
-export const MockUserAddress = EventAddress.fromString('0x1000000000000000000000000000000000000000');
+import { MockDebtTokenAddress, MockStabilityPoolManagerAddress, oneEther } from './utils';
 
 // TODO: Remove me later. This is how to log in AssemblyScript
 // import { Address, BigInt, Bytes, ethereum, log } from '@graphprotocol/graph-ts';
 // log.info('My value is: {}', [newProvidedStablitySinceLastCollClaim!.toString()]);
+
+export const mockDebtToken_stabilityPoolManagerAddress = (): void => {
+  createMockedFunction(
+    MockDebtTokenAddress,
+    'stabilityPoolManagerAddress',
+    'stabilityPoolManagerAddress():(address)',
+  ).returns([ethereum.Value.fromAddress(MockStabilityPoolManagerAddress)]);
+};
+export const mockDebtToken_totalSupply = (): void => {
+  createMockedFunction(MockDebtTokenAddress, 'totalSupply', 'totalSupply():(uint256)').returns([
+    ethereum.Value.fromSignedBigInt(oneEther.times(BigInt.fromI32(100))),
+  ]);
+};
 
 export function createApprovalEvent(owner: Address, spender: Address, value: BigInt): Approval {
   let approvalEvent = changetype<Approval>(newMockEvent());
@@ -23,7 +28,7 @@ export function createApprovalEvent(owner: Address, spender: Address, value: Big
 
   approvalEvent.parameters.push(new ethereum.EventParam('owner', ethereum.Value.fromAddress(owner)));
   approvalEvent.parameters.push(new ethereum.EventParam('spender', ethereum.Value.fromAddress(spender)));
-  approvalEvent.parameters.push(new ethereum.EventParam('value', ethereum.Value.fromUnsignedBigInt(value)));
+  approvalEvent.parameters.push(new ethereum.EventParam('value', ethereum.Value.fromSignedBigInt(value)));
 
   return approvalEvent;
 }
@@ -36,7 +41,7 @@ export function createTransferEvent(from: Address, to: Address, value: BigInt): 
 
   transferEvent.parameters.push(new ethereum.EventParam('from', ethereum.Value.fromAddress(from)));
   transferEvent.parameters.push(new ethereum.EventParam('to', ethereum.Value.fromAddress(to)));
-  transferEvent.parameters.push(new ethereum.EventParam('value', ethereum.Value.fromUnsignedBigInt(value)));
+  transferEvent.parameters.push(new ethereum.EventParam('value', ethereum.Value.fromSignedBigInt(value)));
 
   return transferEvent;
 }

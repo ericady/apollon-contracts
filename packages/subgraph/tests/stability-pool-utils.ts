@@ -1,9 +1,8 @@
 import { Address, BigInt, ethereum } from '@graphprotocol/graph-ts';
-import { newMockEvent } from 'matchstick-as';
+import { createMockedFunction, newMockEvent } from 'matchstick-as';
 import {
   DepositSnapshotUpdated,
   EpochUpdated,
-  OwnershipTransferred,
   P_Updated,
   S_Updated,
   ScaleUpdated,
@@ -13,7 +12,47 @@ import {
   StabilityProvided,
   StabilityWithdrawn,
 } from '../generated/templates/StabilityPoolTemplate/StabilityPool';
-import { MockStabilityPoolAddress } from './debt-token-utils';
+import {
+  MockDebtTokenAddress,
+  MockStabilityPoolAddress,
+  MockStabilityPoolManagerAddress,
+  MockUserAddress,
+  oneEther,
+} from './utils';
+
+export const mockStabilityPool_depositToken = (): void => {
+  createMockedFunction(MockStabilityPoolAddress, 'depositToken', 'depositToken():(address)').returns([
+    ethereum.Value.fromAddress(MockDebtTokenAddress),
+  ]);
+};
+export const mockStabilityPool_getTotalDeposit = (): void => {
+  createMockedFunction(MockStabilityPoolAddress, 'getTotalDeposit', 'getTotalDeposit():(uint256)').returns([
+    ethereum.Value.fromSignedBigInt(oneEther.times(BigInt.fromI32(10))),
+  ]);
+};
+export const mockStabilityPool_stabilityPoolManagerAddress = (): void => {
+  createMockedFunction(
+    MockStabilityPoolAddress,
+    'stabilityPoolManagerAddress',
+    'stabilityPoolManagerAddress():(address)',
+  ).returns([ethereum.Value.fromAddress(MockStabilityPoolManagerAddress)]);
+};
+export const mockStabilityPool_deposits = (): void => {
+  createMockedFunction(MockStabilityPoolAddress, 'deposits', 'deposits(address):(uint256)')
+    .withArgs([ethereum.Value.fromAddress(MockUserAddress)])
+    .returns([ethereum.Value.fromSignedBigInt(oneEther.times(BigInt.fromI32(10)))]);
+};
+export const mockStabilityPool_getCompoundedDebtDeposit = (): void => {
+  createMockedFunction(
+    MockStabilityPoolAddress,
+    'getCompoundedDebtDeposit',
+    'getCompoundedDebtDeposit(address):(uint256)',
+  )
+    .withArgs([ethereum.Value.fromAddress(MockUserAddress)])
+    .returns([ethereum.Value.fromSignedBigInt(oneEther)]);
+};
+
+// EVENTS
 
 export function createDepositSnapshotUpdatedEvent(_depositor: Address): DepositSnapshotUpdated {
   let depositSnapshotUpdatedEvent = changetype<DepositSnapshotUpdated>(newMockEvent());
@@ -33,31 +72,31 @@ export function createEpochUpdatedEvent(_currentEpoch: BigInt): EpochUpdated {
   epochUpdatedEvent.parameters = new Array();
 
   epochUpdatedEvent.parameters.push(
-    new ethereum.EventParam('_currentEpoch', ethereum.Value.fromUnsignedBigInt(_currentEpoch)),
+    new ethereum.EventParam('_currentEpoch', ethereum.Value.fromSignedBigInt(_currentEpoch)),
   );
 
   return epochUpdatedEvent;
 }
 
-export function createOwnershipTransferredEvent(previousOwner: Address, newOwner: Address): OwnershipTransferred {
-  let ownershipTransferredEvent = changetype<OwnershipTransferred>(newMockEvent());
+// export function createOwnershipTransferredEvent(previousOwner: Address, newOwner: Address): OwnershipTransferred {
+//   let ownershipTransferredEvent = changetype<OwnershipTransferred>(newMockEvent());
 
-  ownershipTransferredEvent.parameters = new Array();
+//   ownershipTransferredEvent.parameters = new Array();
 
-  ownershipTransferredEvent.parameters.push(
-    new ethereum.EventParam('previousOwner', ethereum.Value.fromAddress(previousOwner)),
-  );
-  ownershipTransferredEvent.parameters.push(new ethereum.EventParam('newOwner', ethereum.Value.fromAddress(newOwner)));
+//   ownershipTransferredEvent.parameters.push(
+//     new ethereum.EventParam('previousOwner', ethereum.Value.fromAddress(previousOwner)),
+//   );
+//   ownershipTransferredEvent.parameters.push(new ethereum.EventParam('newOwner', ethereum.Value.fromAddress(newOwner)));
 
-  return ownershipTransferredEvent;
-}
+//   return ownershipTransferredEvent;
+// }
 
 export function createP_UpdatedEvent(_P: BigInt): P_Updated {
   let pUpdatedEvent = changetype<P_Updated>(newMockEvent());
 
   pUpdatedEvent.parameters = new Array();
 
-  pUpdatedEvent.parameters.push(new ethereum.EventParam('_P', ethereum.Value.fromUnsignedBigInt(_P)));
+  pUpdatedEvent.parameters.push(new ethereum.EventParam('_P', ethereum.Value.fromSignedBigInt(_P)));
 
   return pUpdatedEvent;
 }
@@ -68,9 +107,9 @@ export function createS_UpdatedEvent(_tokenAddress: Address, _S: BigInt, _epoch:
   sUpdatedEvent.parameters = new Array();
 
   sUpdatedEvent.parameters.push(new ethereum.EventParam('_tokenAddress', ethereum.Value.fromAddress(_tokenAddress)));
-  sUpdatedEvent.parameters.push(new ethereum.EventParam('_S', ethereum.Value.fromUnsignedBigInt(_S)));
-  sUpdatedEvent.parameters.push(new ethereum.EventParam('_epoch', ethereum.Value.fromUnsignedBigInt(_epoch)));
-  sUpdatedEvent.parameters.push(new ethereum.EventParam('_scale', ethereum.Value.fromUnsignedBigInt(_scale)));
+  sUpdatedEvent.parameters.push(new ethereum.EventParam('_S', ethereum.Value.fromSignedBigInt(_S)));
+  sUpdatedEvent.parameters.push(new ethereum.EventParam('_epoch', ethereum.Value.fromSignedBigInt(_epoch)));
+  sUpdatedEvent.parameters.push(new ethereum.EventParam('_scale', ethereum.Value.fromSignedBigInt(_scale)));
 
   return sUpdatedEvent;
 }
@@ -81,7 +120,7 @@ export function createScaleUpdatedEvent(_currentScale: BigInt): ScaleUpdated {
   scaleUpdatedEvent.parameters = new Array();
 
   scaleUpdatedEvent.parameters.push(
-    new ethereum.EventParam('_currentScale', ethereum.Value.fromUnsignedBigInt(_currentScale)),
+    new ethereum.EventParam('_currentScale', ethereum.Value.fromSignedBigInt(_currentScale)),
   );
 
   return scaleUpdatedEvent;
@@ -99,7 +138,7 @@ export function createStabilityGainsWithdrawnEvent(
 
   stabilityGainsWithdrawnEvent.parameters.push(new ethereum.EventParam('user', ethereum.Value.fromAddress(user)));
   stabilityGainsWithdrawnEvent.parameters.push(
-    new ethereum.EventParam('depositLost', ethereum.Value.fromUnsignedBigInt(depositLost)),
+    new ethereum.EventParam('depositLost', ethereum.Value.fromSignedBigInt(depositLost)),
   );
   stabilityGainsWithdrawnEvent.parameters.push(
     new ethereum.EventParam('gainsWithdrawn', ethereum.Value.fromTupleArray(gainsWithdrawn)),
@@ -114,7 +153,7 @@ export function createStabilityOffsetEvent(removedDeposit: BigInt, addedGains: A
   stabilityOffsetEvent.parameters = new Array();
 
   stabilityOffsetEvent.parameters.push(
-    new ethereum.EventParam('removedDeposit', ethereum.Value.fromUnsignedBigInt(removedDeposit)),
+    new ethereum.EventParam('removedDeposit', ethereum.Value.fromSignedBigInt(removedDeposit)),
   );
   stabilityOffsetEvent.parameters.push(
     new ethereum.EventParam('addedGains', ethereum.Value.fromTupleArray(addedGains)),
@@ -156,10 +195,11 @@ export function createStabilityPoolInitializedEvent(
 export function createStabilityProvidedEvent(user: Address, amount: BigInt): StabilityProvided {
   let stabilityProvidedEvent = changetype<StabilityProvided>(newMockEvent());
 
+  stabilityProvidedEvent.address = MockStabilityPoolAddress;
   stabilityProvidedEvent.parameters = new Array();
 
   stabilityProvidedEvent.parameters.push(new ethereum.EventParam('user', ethereum.Value.fromAddress(user)));
-  stabilityProvidedEvent.parameters.push(new ethereum.EventParam('amount', ethereum.Value.fromUnsignedBigInt(amount)));
+  stabilityProvidedEvent.parameters.push(new ethereum.EventParam('amount', ethereum.Value.fromSignedBigInt(amount)));
 
   return stabilityProvidedEvent;
 }
@@ -170,7 +210,7 @@ export function createStabilityWithdrawnEvent(user: Address, amount: BigInt): St
   stabilityWithdrawnEvent.parameters = new Array();
 
   stabilityWithdrawnEvent.parameters.push(new ethereum.EventParam('user', ethereum.Value.fromAddress(user)));
-  stabilityWithdrawnEvent.parameters.push(new ethereum.EventParam('amount', ethereum.Value.fromUnsignedBigInt(amount)));
+  stabilityWithdrawnEvent.parameters.push(new ethereum.EventParam('amount', ethereum.Value.fromSignedBigInt(amount)));
 
   return stabilityWithdrawnEvent;
 }

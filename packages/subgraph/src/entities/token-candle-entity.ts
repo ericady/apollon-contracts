@@ -53,7 +53,7 @@ export function handleUpdateTokenCandle_low_high(
   // FIXME:
   // const stablePrice = stableCoinContract.getPrice();
   const stablePrice = BigInt.fromI32(1);
-  
+
   const swapPairReserves = SwapPair.bind(swapPair).getReserves();
   const tokenPriceInStable =
     pairPosition === 0

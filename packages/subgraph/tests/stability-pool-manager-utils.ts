@@ -1,10 +1,17 @@
 import { Address, ethereum } from '@graphprotocol/graph-ts';
-import { newMockEvent } from 'matchstick-as';
+import { createMockedFunction, newMockEvent } from 'matchstick-as';
 import {
   OwnershipTransferred,
   StabilityPoolAdded,
   StabilityPoolManagerInitiated,
 } from '../generated/StabilityPoolManager/StabilityPoolManager';
+import { MockDebtTokenAddress, MockStabilityPoolAddress, MockStabilityPoolManagerAddress } from './utils';
+
+export const mockStabilityPoolManager_getStabilityPool = (): void => {
+  createMockedFunction(MockStabilityPoolManagerAddress, 'getStabilityPool', 'getStabilityPool(address):(address)')
+    .withArgs([ethereum.Value.fromAddress(MockDebtTokenAddress)])
+    .returns([ethereum.Value.fromAddress(MockStabilityPoolAddress)]);
+};
 
 export function createOwnershipTransferredEvent(previousOwner: Address, newOwner: Address): OwnershipTransferred {
   let ownershipTransferredEvent = changetype<OwnershipTransferred>(newMockEvent());

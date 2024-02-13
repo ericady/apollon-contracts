@@ -65,12 +65,11 @@ export function handleStabilityOffset(event: StabilityOffsetEvent): void {
 
 export function handleStabilityProvided(event: StabilityProvidedEvent): void {
   // totalDepositedStability changed
-  // FIXME: re-add me!
-  // handleCreateUpdateDebtTokenMeta(event, event.address);
 
   const stabilityPoolContract = StabilityPool.bind(event.address);
   const depositToken = stabilityPoolContract.depositToken();
 
+  handleCreateUpdateDebtTokenMeta(event, depositToken);
   handleCreateBorrowerHistory(
     event,
     event.address,

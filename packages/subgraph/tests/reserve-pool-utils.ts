@@ -26,10 +26,10 @@ export function createReserveCapChangedEvent(newReserveCap: BigInt, newGovReserv
   reserveCapChangedEvent.parameters = new Array();
 
   reserveCapChangedEvent.parameters.push(
-    new ethereum.EventParam('newReserveCap', ethereum.Value.fromUnsignedBigInt(newReserveCap)),
+    new ethereum.EventParam('newReserveCap', ethereum.Value.fromSignedBigInt(newReserveCap)),
   );
   reserveCapChangedEvent.parameters.push(
-    new ethereum.EventParam('newGovReserveCap', ethereum.Value.fromUnsignedBigInt(newGovReserveCap)),
+    new ethereum.EventParam('newGovReserveCap', ethereum.Value.fromSignedBigInt(newGovReserveCap)),
   );
 
   return reserveCapChangedEvent;
@@ -67,10 +67,10 @@ export function createWithdrewReservesEvent(govAmount: BigInt, stableAmount: Big
   withdrewReservesEvent.parameters = new Array();
 
   withdrewReservesEvent.parameters.push(
-    new ethereum.EventParam('govAmount', ethereum.Value.fromUnsignedBigInt(govAmount)),
+    new ethereum.EventParam('govAmount', ethereum.Value.fromSignedBigInt(govAmount)),
   );
   withdrewReservesEvent.parameters.push(
-    new ethereum.EventParam('stableAmount', ethereum.Value.fromUnsignedBigInt(stableAmount)),
+    new ethereum.EventParam('stableAmount', ethereum.Value.fromSignedBigInt(stableAmount)),
   );
 
   return withdrewReservesEvent;

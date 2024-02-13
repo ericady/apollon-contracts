@@ -1,115 +1,99 @@
-import { BigInt, ethereum } from '@graphprotocol/graph-ts';
-import { afterAll, clearStore, createMockedFunction, describe } from 'matchstick-as/assembly/index';
-import { MockDebtTokenAddress, MockStabilityPoolAddress, MockUserAddress } from './debt-token-utils';
+import { BigInt } from '@graphprotocol/graph-ts';
+import { assert, beforeAll, test } from 'matchstick-as';
+import { afterAll, clearStore, describe } from 'matchstick-as/assembly/index';
+import { handleStabilityProvided } from '../src/stability-pool';
+import { handleStabilityPoolAdded } from '../src/stability-pool-manager';
+import { mockDebtToken_stabilityPoolManagerAddress, mockDebtToken_totalSupply } from './debt-token-utils';
+import {
+  createStabilityPoolAddedEvent,
+  mockStabilityPoolManager_getStabilityPool,
+} from './stability-pool-manager-utils';
+import {
+  createStabilityProvidedEvent,
+  mockStabilityPool_depositToken,
+  mockStabilityPool_getTotalDeposit,
+  mockStabilityPool_stabilityPoolManagerAddress,
+} from './stability-pool-utils';
+import { MockDebtTokenAddress, MockUserAddress, initSystemInfo, initToken } from './utils';
 
-export const mockStabilityPoolGetDepositToken = (): void => {
-  createMockedFunction(MockStabilityPoolAddress, 'getDepositToken', 'getDepositToken():(address)').returns([
-    ethereum.Value.fromAddress(MockDebtTokenAddress),
-  ]);
-};
-export const mockStabilityPoolDeposits = (): void => {
-  createMockedFunction(MockStabilityPoolAddress, 'deposits', 'deposits(address):(uint256)')
-    .withArgs([ethereum.Value.fromAddress(MockUserAddress)])
-    .returns([ethereum.Value.fromSignedBigInt(BigInt.fromI32(10))]);
-};
-export const mockStabilityPoolGetCompoundedDebtDeposit = (): void => {
-  createMockedFunction(
-    MockStabilityPoolAddress,
-    'getCompoundedDebtDeposit',
-    'getCompoundedDebtDeposit(address):(uint256)',
-  )
-    .withArgs([ethereum.Value.fromAddress(MockUserAddress)])
-    .returns([ethereum.Value.fromSignedBigInt(BigInt.fromI32(1))]);
-};
+describe('handleStabilityProvided()', () => {
+  beforeAll(() => {
+    initSystemInfo();
+  });
 
-describe('handleUserClaimedRewards()', () => {
   afterAll(() => {
     clearStore();
   });
 
-  // test(
-  //   'UserDebtTokenMeta entity is created',
-  //   () => {
-  //     const newStabilityGainsWithdrawnEvent = createStabilityGainsWithdrawnEvent(
-  //       Address.fromString('0x1000000000000000000000000000000000000000'),
-  //       BigInt.fromI32(10),
-  //       [],
-  //     );
+  test('handleCreateUpdateDebtTokenMeta is called successfully', () => {
+    initToken();
 
-  //     mockStabilityPoolGetDepositToken();
-  //     mockStabilityPoolDeposits();
-  //     mockDebtTokenBalanceOf();
-  //     mockDebtTokenTroveManagerAddress();
-  //     mockTroveManagerGetTroveDebt();
-  //     mockDebtTokenStabilityPoolManagerAddress();
-  //     mockStabilityPoolManagerGetStabilityPool();
-  //     mockStabilityPoolGetCompoundedDebtDeposit();
+    const event = createStabilityProvidedEvent(MockUserAddress, BigInt.fromI32(10));
 
-  //     handleStabilityGainsWithdrawn(newStabilityGainsWithdrawnEvent);
+    // create Stability pool first
+    const addStabilityPoolEvent = createStabilityPoolAddedEvent(event.address);
+    handleStabilityPoolAdded(addStabilityPoolEvent);
 
-  //     assert.entityCount('UserDebtTokenMeta', 1);
-  //     const entityId = `UserDebtTokenMeta-${MockDebtTokenAddress.toHexString()}-${MockUserAddress.toHexString()}`;
+    mockStabilityPool_depositToken();
+    mockStabilityPool_stabilityPoolManagerAddress();
+    mockStabilityPool_getTotalDeposit();
+    mockStabilityPoolManager_getStabilityPool();
+    mockDebtToken_stabilityPoolManagerAddress();
+    mockDebtToken_totalSupply();
 
-  //     assert.fieldEquals('UserDebtTokenMeta', entityId, 'borrower', MockUserAddress.toHexString());
-  //     assert.fieldEquals('UserDebtTokenMeta', entityId, 'token', MockDebtTokenAddress.toHexString());
-  //     assert.fieldEquals('UserDebtTokenMeta', entityId, 'walletAmount', BigInt.fromI32(10).toString());
-  //     assert.fieldEquals('UserDebtTokenMeta', entityId, 'troveMintedAmount', BigInt.fromI32(1234).toString());
-  //     assert.fieldEquals(
-  //       'UserDebtTokenMeta',
-  //       entityId,
-  //       'providedStablitySinceLastCollClaim',
-  //       BigInt.fromI32(10).toString(),
-  //     );
-  //     assert.fieldEquals('UserDebtTokenMeta', entityId, 'stabilityCompoundAmount', BigInt.fromI32(1).toString());
-  //   },
-  //   true,
-  // );
+    handleStabilityProvided(event);
 
-  // test(
-  //   'existing UserDebtTokenMeta entity is updated',
-  //   () => {
-  //     // save a dummy entity and make sure that its updating all fields of this existing entity
-  //     const entityId = `UserDebtTokenMeta-${MockDebtTokenAddress.toHexString()}-${MockUserAddress.toHexString()}`;
-  //     const userDebtTokenMeta = new UserDebtTokenMeta(entityId);
-  //     userDebtTokenMeta.token = MockDebtTokenAddress;
-  //     userDebtTokenMeta.borrower = MockUserAddress;
-  //     userDebtTokenMeta.walletAmount = BigInt.fromI32(1000);
-  //     userDebtTokenMeta.troveMintedAmount = BigInt.fromI32(1000);
-  //     userDebtTokenMeta.providedStablitySinceLastCollClaim = BigInt.fromI32(1000);
-  //     userDebtTokenMeta.stabilityCompoundAmount = BigInt.fromI32(1000);
-  //     userDebtTokenMeta.save();
+    const entityId = `DebtTokenMeta-${MockDebtTokenAddress.toHexString()}`;
+    assert.entityCount('DebtTokenMeta', 1);
+    assert.fieldEquals('DebtTokenMeta', entityId, 'token', MockDebtTokenAddress.toHexString());
+    assert.fieldEquals('DebtTokenMeta', entityId, 'totalDepositedStability', '10000000000000000000');
+    assert.fieldEquals('DebtTokenMeta', entityId, 'totalReserve', '0');
+    assert.fieldEquals('DebtTokenMeta', entityId, 'totalSupplyUSD', '200000000000000000000');
+  });
 
-  //     const newStabilityGainsWithdrawnEvent = createStabilityGainsWithdrawnEvent(
-  //       Address.fromString('0x1000000000000000000000000000000000000000'),
-  //       BigInt.fromI32(10),
-  //       [],
-  //     );
+  test('borrower history event entity is created', () => {
+    const event = createStabilityProvidedEvent(MockUserAddress, BigInt.fromI32(10));
 
-  //     mockStabilityPoolGetDepositToken();
-  //     mockStabilityPoolDeposits();
-  //     mockDebtTokenBalanceOf();
-  //     mockDebtTokenTroveManagerAddress();
-  //     mockTroveManagerGetTroveDebt();
-  //     mockDebtTokenStabilityPoolManagerAddress();
-  //     mockStabilityPoolManagerGetStabilityPool();
-  //     mockStabilityPoolGetCompoundedDebtDeposit();
+    // create Stability pool first
+    const addStabilityPoolEvent = createStabilityPoolAddedEvent(event.address);
+    handleStabilityPoolAdded(addStabilityPoolEvent);
 
-  //     handleStabilityGainsWithdrawn(newStabilityGainsWithdrawnEvent);
+    mockStabilityPool_depositToken();
 
-  //     assert.entityCount('UserDebtTokenMeta', 1);
+    handleStabilityProvided(event);
 
-  //     assert.fieldEquals('UserDebtTokenMeta', entityId, 'borrower', MockUserAddress.toHexString());
-  //     assert.fieldEquals('UserDebtTokenMeta', entityId, 'token', MockDebtTokenAddress.toHexString());
-  //     assert.fieldEquals('UserDebtTokenMeta', entityId, 'walletAmount', BigInt.fromI32(10).toString());
-  //     assert.fieldEquals('UserDebtTokenMeta', entityId, 'troveMintedAmount', BigInt.fromI32(1234).toString());
-  //     assert.fieldEquals(
-  //       'UserDebtTokenMeta',
-  //       entityId,
-  //       'providedStablitySinceLastCollClaim',
-  //       BigInt.fromI32(10).toString(),
-  //     );
-  //     assert.fieldEquals('UserDebtTokenMeta', entityId, 'stabilityCompoundAmount', BigInt.fromI32(1).toString());
-  //   },
-  //   true,
-  // );
+    assert.entityCount('BorrowerHistory', 1);
+    assert.fieldEquals(
+      'BorrowerHistory',
+      event.transaction.hash.concatI32(event.logIndex.toI32()).toHexString(),
+      'pool',
+      event.address.toHexString(),
+    );
+    assert.fieldEquals(
+      'BorrowerHistory',
+      event.transaction.hash.concatI32(event.logIndex.toI32()).toHexString(),
+      'borrower',
+      MockUserAddress.toHexString(),
+    );
+    assert.fieldEquals(
+      'BorrowerHistory',
+      event.transaction.hash.concatI32(event.logIndex.toI32()).toHexString(),
+      'type',
+      'DEPOSITED',
+    );
+    const linkedTokenAmount = event.transaction.hash
+      .concatI32(event.logIndex.toI32())
+      .concat(MockDebtTokenAddress)
+      .toHexString();
+    assert.fieldEquals(
+      'BorrowerHistory',
+      event.transaction.hash.concatI32(event.logIndex.toI32()).toHexString(),
+      'values',
+      `[${linkedTokenAmount}]`,
+    );
+
+    assert.entityCount('TokenAmount', 1);
+    assert.fieldEquals('TokenAmount', linkedTokenAmount, 'token', MockDebtTokenAddress.toHexString());
+    assert.fieldEquals('TokenAmount', linkedTokenAmount, 'amount', BigInt.fromI32(10).toString());
+  });
 });

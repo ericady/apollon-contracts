@@ -2,7 +2,6 @@ import { Address, BigInt, ethereum } from '@graphprotocol/graph-ts';
 import { newMockEvent } from 'matchstick-as';
 import {
   BorrowerOperationsInitialized,
-  CollateralTokenUpdated,
   OwnershipTransferred,
   TroveCreated,
 } from '../generated/BorrowerOperations/BorrowerOperations';
@@ -41,25 +40,25 @@ export function createBorrowerOperationsInitializedEvent(
   return borrowerOperationsInitializedEvent;
 }
 
-export function createCollateralTokenUpdatedEvent(
-  _collateralTokenAddress: Address,
-  _owner: Address,
-  _receiver: Address,
-): CollateralTokenUpdated {
-  let collateralTokenUpdatedEvent = changetype<CollateralTokenUpdated>(newMockEvent());
+// export function createCollateralTokenUpdatedEvent(
+//   _collateralTokenAddress: Address,
+//   _owner: Address,
+//   _receiver: Address,
+// ): CollateralTokenUpdated {
+//   let collateralTokenUpdatedEvent = changetype<CollateralTokenUpdated>(newMockEvent());
 
-  collateralTokenUpdatedEvent.parameters = new Array();
+//   collateralTokenUpdatedEvent.parameters = new Array();
 
-  collateralTokenUpdatedEvent.parameters.push(
-    new ethereum.EventParam('_collateralTokenAddress', ethereum.Value.fromAddress(_collateralTokenAddress)),
-  );
-  collateralTokenUpdatedEvent.parameters.push(new ethereum.EventParam('_owner', ethereum.Value.fromAddress(_owner)));
-  collateralTokenUpdatedEvent.parameters.push(
-    new ethereum.EventParam('_receiver', ethereum.Value.fromAddress(_receiver)),
-  );
+//   collateralTokenUpdatedEvent.parameters.push(
+//     new ethereum.EventParam('_collateralTokenAddress', ethereum.Value.fromAddress(_collateralTokenAddress)),
+//   );
+//   collateralTokenUpdatedEvent.parameters.push(new ethereum.EventParam('_owner', ethereum.Value.fromAddress(_owner)));
+//   collateralTokenUpdatedEvent.parameters.push(
+//     new ethereum.EventParam('_receiver', ethereum.Value.fromAddress(_receiver)),
+//   );
 
-  return collateralTokenUpdatedEvent;
-}
+//   return collateralTokenUpdatedEvent;
+// }
 
 export function createOwnershipTransferredEvent(previousOwner: Address, newOwner: Address): OwnershipTransferred {
   let ownershipTransferredEvent = changetype<OwnershipTransferred>(newMockEvent());
@@ -80,9 +79,7 @@ export function createTroveCreatedEvent(_borrower: Address, arrayIndex: BigInt):
   troveCreatedEvent.parameters = new Array();
 
   troveCreatedEvent.parameters.push(new ethereum.EventParam('_borrower', ethereum.Value.fromAddress(_borrower)));
-  troveCreatedEvent.parameters.push(
-    new ethereum.EventParam('arrayIndex', ethereum.Value.fromUnsignedBigInt(arrayIndex)),
-  );
+  troveCreatedEvent.parameters.push(new ethereum.EventParam('arrayIndex', ethereum.Value.fromSignedBigInt(arrayIndex)));
 
   return troveCreatedEvent;
 }
