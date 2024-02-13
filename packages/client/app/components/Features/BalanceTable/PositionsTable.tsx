@@ -7,7 +7,6 @@
 // import TableHead from '@mui/material/TableHead';
 // import TableRow from '@mui/material/TableRow';
 // import Typography from '@mui/material/Typography';
-// import { useEthers } from '../../../context/EthersProvider';
 // import { useSelectedToken } from '../../../context/SelectedTokenProvider';
 // import {
 //   GetBorrowerSwapEventsQuery,

@@ -4,7 +4,6 @@ import { useQuery } from '@apollo/client';
 import { Table, TableBody, TableCell, TableContainer, TableHead, TableRow } from '@mui/material';
 import Typography from '@mui/material/Typography';
 import { useEffect, useMemo } from 'react';
-import { useEthers } from '../../../context/EthersProvider';
 import { GetBorrowerLiquidityPoolsQuery, GetBorrowerLiquidityPoolsQueryVariables } from '../../../generated/gql-types';
 import { GET_BORROWER_LIQUIDITY_POOLS } from '../../../queries';
 import {
@@ -21,6 +20,7 @@ import ExchangeIcon from '../../Icons/ExchangeIcon';
 import Label from '../../Label/Label';
 import HeaderCell from '../../Table/HeaderCell';
 import LiquidityPoolsTableLoader from './LiquidityPoolsTableLoader';
+import { useEthers } from '../../../context/EthersProvider';
 
 type Props = {
   selectedPool: GetBorrowerLiquidityPoolsQuery['pools'][number] | null;

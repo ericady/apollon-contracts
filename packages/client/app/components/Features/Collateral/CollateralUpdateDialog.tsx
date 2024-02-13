@@ -18,7 +18,6 @@ import Typography from '@mui/material/Typography';
 import { SyntheticEvent, useCallback, useState } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
 import { IBase } from '../../../../generated/types/BorrowerOperations';
-import { Contracts, isCollateralTokenAddress, useEthers } from '../../../context/EthersProvider';
 import { useTransactionDialog } from '../../../context/TransactionDialogProvider';
 import {
   GetBorrowerCollateralTokensQuery,
@@ -39,6 +38,8 @@ import DiamondIcon from '../../Icons/DiamondIcon';
 import ForwardIcon from '../../Icons/ForwardIcon';
 import Label from '../../Label/Label';
 import CollateralRatioVisualization, { CRIT_RATIO } from '../../Visualizations/CollateralRatioVisualization';
+import { Contracts } from '../../../context/contracts.config';
+import { useEthers } from '../../../context/EthersProvider';
 
 type Props = {
   buttonVariant: ButtonProps['variant'];
@@ -46,7 +47,7 @@ type Props = {
 };
 
 type FieldValues = {
-  [Contracts.ERC20.DFI]: string;
+  [Contracts.ERC20.GOV]: string;
   [Contracts.ERC20.BTC]: string;
   [Contracts.ERC20.USDT]: string;
 };
@@ -81,7 +82,7 @@ const CollateralUpdateDialog = ({ buttonVariant, buttonSx = {} }: Props) => {
 
   const methods = useForm<FieldValues>({
     defaultValues: {
-      [Contracts.ERC20.DFI]: '',
+      [Contracts.ERC20.GOV]: '',
       [Contracts.ERC20.BTC]: '',
       [Contracts.ERC20.USDT]: '',
     },
@@ -231,10 +232,10 @@ const CollateralUpdateDialog = ({ buttonVariant, buttonSx = {} }: Props) => {
     setIsOpen(false);
   };
 
-  const allTokenAmount = watch([Contracts.ERC20.DFI, Contracts.ERC20.BTC, Contracts.ERC20.USDT]);
+  const allTokenAmount = watch([Contracts.ERC20.GOV, Contracts.ERC20.BTC, Contracts.ERC20.USDT]);
   const allTokenAmountUSD =
     allTokenAmount.reduce((acc, curr, index) => {
-      const address = [Contracts.ERC20.DFI, Contracts.ERC20.BTC, Contracts.ERC20.USDT][index];
+      const address = [Contracts.ERC20.GOV, Contracts.ERC20.BTC, Contracts.ERC20.USDT][index];
       const { token } = collateralToDeposit.find(({ token }) => token.address === address)!;
 
       return acc + (isNaN(parseFloat(curr)) ? 0 : parseFloat(curr) * bigIntStringToFloat(token.priceUSD));

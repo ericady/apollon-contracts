@@ -5,7 +5,6 @@ import { Alert, Dialog, DialogActions, DialogContent, DialogTitle, IconButton } 
 import Button, { ButtonProps } from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
 import { useState } from 'react';
-import { useEthers } from '../../../context/EthersProvider';
 import { useTransactionDialog } from '../../../context/TransactionDialogProvider';
 import {
   GetBorrowerCollateralTokensQuery,
@@ -14,6 +13,7 @@ import {
 import { GET_BORROWER_COLLATERAL_TOKENS, GET_BORROWER_DEBT_TOKENS } from '../../../queries';
 import CrossIcon from '../../Icons/CrossIcon';
 import DiamondIcon from '../../Icons/DiamondIcon';
+import { useEthers } from '../../../context/EthersProvider';
 
 type Props = {
   buttonVariant: ButtonProps['variant'];

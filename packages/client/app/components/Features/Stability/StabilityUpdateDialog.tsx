@@ -9,7 +9,6 @@ import Typography from '@mui/material/Typography';
 import { SyntheticEvent, useEffect, useState } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
 import { IBase } from '../../../../generated/types/StabilityPoolManager';
-import { Contracts, isDebtTokenAddress, useEthers } from '../../../context/EthersProvider';
 import { useTransactionDialog } from '../../../context/TransactionDialogProvider';
 import { GetBorrowerDebtTokensQuery, GetBorrowerDebtTokensQueryVariables } from '../../../generated/gql-types';
 import { GET_BORROWER_DEBT_TOKENS, GET_BORROWER_STABILITY_HISTORY } from '../../../queries';
@@ -18,6 +17,8 @@ import NumberInput from '../../FormControls/NumberInput';
 import CrossIcon from '../../Icons/CrossIcon';
 import DiamondIcon from '../../Icons/DiamondIcon';
 import Label from '../../Label/Label';
+import { useEthers } from '../../../context/EthersProvider';
+import { Contracts } from '../../../context/contracts.config';
 
 type FieldValues = Record<string, string>;
 

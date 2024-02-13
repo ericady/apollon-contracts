@@ -4,11 +4,12 @@ import { SnackbarProvider } from 'notistack';
 import { PropsWithChildren, useEffect, useMemo, useState } from 'react';
 import 'whatwg-fetch';
 import { CustomApolloProvider_DevMode } from '../../context/CustomApolloProvider_dev';
-import { Contracts, EthersContext, useEthers } from '../../context/EthersProvider';
 import SelectedTokenProvider, { useSelectedToken } from '../../context/SelectedTokenProvider';
 import TransactionDialogProvider from '../../context/TransactionDialogProvider';
 import buildTheme from '../../theme';
 import MockedPositionsWithoutBorrower from './mockedResponses/GetDebtTokens.mocked.json';
+import { useEthers, EthersContext } from '../../context/EthersProvider';
+import { Contracts } from '../../context/contracts.config';
 
 // This is just the default client config when testing against the dev server
 export const client = new ApolloClient({

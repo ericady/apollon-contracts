@@ -5,13 +5,13 @@ import { Box, Typography } from '@mui/material';
 import Tab from '@mui/material/Tab';
 import Tabs from '@mui/material/Tabs';
 import { SyntheticEvent, useState } from 'react';
-import { useEthers } from '../../../context/EthersProvider';
 import { GetBorrowerSwapEventsQuery, GetBorrowerSwapEventsQueryVariables } from '../../../generated/gql-types';
 import { GET_BORROWER_SWAPS } from '../../../queries';
 import Label from '../../Label/Label';
 import CollateralTable from '../Collateral/CollateralTable';
 import DebtTable from '../Debt/DebtTable';
 import HistoryTable from './HistoryTable';
+import { useEthers } from '../../../context/EthersProvider';
 
 const BalanceTable = () => {
   const [tabValue, setTabValue] = useState<'DEBT' | 'COLLATERAL' | 'HISTORY'>('DEBT');

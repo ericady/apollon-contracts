@@ -8,7 +8,6 @@ import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import Typography from '@mui/material/Typography';
 import { useCallback, useMemo, useState } from 'react';
-import { useEthers } from '../../../context/EthersProvider';
 import {
   GetBorrowerCollateralTokensQuery,
   GetBorrowerCollateralTokensQueryVariables,
@@ -22,6 +21,7 @@ import CollateralPieVisualization from '../../Visualizations/CollateralPieVisual
 import CollateralRatioVisualization from '../../Visualizations/CollateralRatioVisualization';
 import CollateralTableLoader from './CollateralTableLoader';
 import CollateralUpdateDialog from './CollateralUpdateDialog';
+import { useEthers } from '../../../context/EthersProvider';
 
 const generateColorPalette = (paletteLength: number) => {
   // Initialize an array with the first 3 fixed colors

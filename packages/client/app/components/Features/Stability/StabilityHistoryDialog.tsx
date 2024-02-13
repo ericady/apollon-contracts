@@ -5,7 +5,6 @@ import ExpandLessSharpIcon from '@mui/icons-material/ExpandLessSharp';
 import { Box, Button, Dialog, DialogContent, DialogContentProps, DialogTitle, IconButton } from '@mui/material';
 import Typography from '@mui/material/Typography';
 import { useState } from 'react';
-import { useEthers } from '../../../context/EthersProvider';
 import {
   BorrowerHistoryType,
   GetBorrowerStabilityHistoryQuery,
@@ -17,6 +16,7 @@ import { bigIntStringToFloat, roundCurrency } from '../../../utils/math';
 import CrossIcon from '../../Icons/CrossIcon';
 import DiamondIcon from '../../Icons/DiamondIcon';
 import Label from '../../Label/Label';
+import { useEthers } from '../../../context/EthersProvider';
 
 const StabilityHistoryDialog = () => {
   const [open, setOpen] = useState(false);

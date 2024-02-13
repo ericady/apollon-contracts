@@ -9,7 +9,6 @@ import Typography from '@mui/material/Typography';
 import { SyntheticEvent, useCallback, useEffect, useState } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
 import { IBase } from '../../../../generated/types/TroveManager';
-import { isCollateralTokenAddress, isDebtTokenAddress, useEthers } from '../../../context/EthersProvider';
 import { useTransactionDialog } from '../../../context/TransactionDialogProvider';
 import {
   CollateralTokenMeta,
@@ -39,6 +38,7 @@ import NumberInput from '../../FormControls/NumberInput';
 import ForwardIcon from '../../Icons/ForwardIcon';
 import Label from '../../Label/Label';
 import CollateralRatioVisualization, { CRIT_RATIO } from '../../Visualizations/CollateralRatioVisualization';
+import { useEthers, isCollateralTokenAddress, isDebtTokenAddress } from '../../../context/EthersProvider';
 
 const SLIPPAGE = 0.02;
 

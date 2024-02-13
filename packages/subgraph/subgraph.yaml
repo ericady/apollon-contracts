@@ -6,7 +6,7 @@ dataSources:
     name: TroveManager
     network: localhost
     source:
-      address: '0xCf7Ed3AccA5a467e9e704C703E8D87F634fB0Fc9'
+      address: "0x0165878a594ca255338adfa4d48449f69242eb8f"
       abi: TroveManager
       startBlock: 0
     mapping:
@@ -56,7 +56,7 @@ dataSources:
     name: StoragePool
     network: localhost
     source:
-      address: '0x5FC8d32690cc91D4c39d9d3abcBD16989F875707'
+      address: "0xb7f8bc63bbcad18155201308c8f3540b07f84f5e"
       abi: StoragePool
       startBlock: 0
     mapping:
@@ -80,7 +80,7 @@ dataSources:
     name: StabilityPoolManager
     network: localhost
     source:
-      address: '0xDc64a140Aa3E981100a9becA4E685f962f0cF6C9'
+      address: "0xdc64a140aa3e981100a9beca4e685f962f0cf6c9"
       abi: StabilityPoolManager
       startBlock: 0
     mapping:
@@ -104,7 +104,7 @@ dataSources:
     name: PriceFeed
     network: localhost
     source:
-      address: '0x8A791620dd6260079BF849Dc5567aDC3F2FdC318'
+      address: "0xa513e6e4b8f2a923d98304ec87f64353c4d5c853"
       abi: PriceFeed
       startBlock: 0
     mapping:
@@ -127,7 +127,7 @@ dataSources:
     name: BorrowerOperations
     network: localhost
     source:
-      address: '0x5FbDB2315678afecb367f032d93F642f64180aa3'
+      address: "0xcf7ed3acca5a467e9e704c703e8d87f634fb0fc9"
       abi: BorrowerOperations
       startBlock: 0
     mapping:
@@ -150,84 +150,10 @@ dataSources:
           handler: handleTroveCreated
       file: ./src/borrower-operations.ts
   - kind: ethereum
-    name: DebtTokenManager
-    network: localhost
-    source:
-      address: '0x2279B7A0a67DB372996a5FaB50D91eAA73d2eBe6'
-      abi: DebtTokenManager
-      startBlock: 6
-    mapping:
-      kind: ethereum/events
-      apiVersion: 0.0.7
-      language: wasm/assemblyscript
-      entities:
-        - DebtTokenAdded
-        - DebtTokenManagerInitialized
-        - DebtTokenManagerOwnershipTransferred
-      abis:
-        - name: DebtTokenManager
-          file: ./abis/DebtTokenManager.json
-        - name: DebtToken
-          file: ./abis/DebtToken.json
-        - name: ERC20
-          file: ./abis/ERC20.json
-        - name: PriceFeed
-          file: ./abis/PriceFeed.json
-        - name: StabilityPoolManager
-          file: ./abis/StabilityPoolManager.json
-        - name: StabilityPool
-          file: ./abis/StabilityPool.json
-        - name: BorrowerOperations
-          file: ./abis/BorrowerOperations.json
-        - name: ReservePool
-          file: ./abis/ReservePool.json
-      eventHandlers:
-        - event: DebtTokenAdded(address)
-          handler: handleDebtTokenAdded
-        - event: DebtTokenManagerInitialized(address)
-          handler: handleDebtTokenManagerInitialized
-        - event: OwnershipTransferred(indexed address,indexed address)
-          handler: handleOwnershipTransferred
-      file: ./src/debt-token-manager.ts
-  - kind: ethereum
-    name: CollTokenManager
-    network: localhost
-    source:
-      address: '0xa513E6E4b8f2a923D98304ec87F64353C4D5C853'
-      abi: CollTokenManager
-      startBlock: 0
-    mapping:
-      kind: ethereum/events
-      apiVersion: 0.0.7
-      language: wasm/assemblyscript
-      entities:
-        - CollTokenAdded
-        - CollTokenManagerInitialized
-        - CollTokenManagerOwnershipTransferred
-      abis:
-        - name: CollTokenManager
-          file: ./abis/CollTokenManager.json
-        - name: DebtToken
-          file: ./abis/DebtToken.json
-        - name: ERC20
-          file: ./abis/ERC20.json
-        - name: PriceFeed
-          file: ./abis/PriceFeed.json
-        - name: StoragePool
-          file: ./abis/StoragePool.json
-      eventHandlers:
-        - event: CollTokenAdded(address)
-          handler: handleCollTokenAdded
-        - event: CollTokenManagerInitialized(address)
-          handler: handleCollTokenManagerInitialized
-        - event: OwnershipTransferred(indexed address,indexed address)
-          handler: handleOwnershipTransferred
-      file: ./src/coll-token-manager.ts
-  - kind: ethereum
     name: SwapOperations
     network: localhost
     source:
-      address: '0x610178dA211FEF7D417bC0e6FeD39F05609AD788'
+      address: "0xa51c1fc2f0d1a1b8494ed1fe312d7c3a78ed91c0"
       abi: SwapOperations
       startBlock: 0
     mapping:
@@ -255,7 +181,7 @@ dataSources:
     name: ReservePool
     network: localhost
     source:
-      address: '0x0165878A594ca255338adfa4d48449f69242Eb8F'
+      address: "0x8a791620dd6260079bf849dc5567adc3f2fdc318"
       abi: ReservePool
       startBlock: 0
     mapping:
@@ -285,14 +211,56 @@ dataSources:
           handler: handleOwnershipTransferred
         - event: ReserveCapChanged(uint256,uint256)
           handler: handleReserveCapChanged
-        - event: ReservePoolInitialized(address,address,address,address)
+        - event: ReservePoolInitialized(address,address,address)
           handler: handleReservePoolInitialized
         - event: WithdrewReserves(uint256,uint256)
           handler: handleWithdrewReserves
       file: ./src/reserve-pool.ts
-
-# TEMPLATES
-
+  - kind: ethereum
+    name: TokenManager
+    network: localhost
+    source:
+      address: "0x0dcd1bf9a1b36ce34237eeafef220932846bcd82"
+      abi: TokenManager
+      startBlock: 0
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.7
+      language: wasm/assemblyscript
+      entities:
+        - TokenManagerCollTokenAdded
+        - DebtTokenAdded
+        - TokenManagerOwnershipTransferred
+        - TokenManagerInitialized
+      abis:
+        - name: TokenManager
+          file: ./abis/TokenManager.json
+        - name: DebtToken
+          file: ./abis/DebtToken.json
+        - name: ERC20
+          file: ./abis/ERC20.json
+        - name: PriceFeed
+          file: ./abis/PriceFeed.json
+        - name: StabilityPoolManager
+          file: ./abis/StabilityPoolManager.json
+        - name: StabilityPool
+          file: ./abis/StabilityPool.json
+        - name: BorrowerOperations
+          file: ./abis/BorrowerOperations.json
+        - name: ReservePool
+          file: ./abis/ReservePool.json
+        - name: StoragePool
+          file: ./abis/StoragePool.json
+      eventHandlers:
+        - event: CollTokenAdded(address,bool)
+          handler: handleCollTokenAdded
+        - event: DebtTokenAdded(address)
+          handler: handleDebtTokenAdded
+        - event: OwnershipTransferred(indexed address,indexed address)
+          handler: handleOwnershipTransferred
+        - event: TokenManagerInitialized(address,address)
+          handler: handleTokenManagerInitialized
+      file: ./src/token-manager.ts
 templates:
   - kind: ethereum/contract
     name: SwapPairTemplate

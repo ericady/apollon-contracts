@@ -4,6 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
+    "dev:integration": "yarn codegen:syncDevContracts && next dev",
     "build": "yarn codegen:types && next build",
     "start": "next start",
     "lint": "next lint",
@@ -15,7 +16,8 @@
     "test:component:integration:watch": "PWTEST_WATCH=1 playwright test -c playwright-ct.config.ts",
     "test:e2e": "NEXT_PUBLIC_API_MOCKING=e2e playwright test",
     "codegen:types": "node scripts/syncAbis.js && graphql-codegen && typechain --target=ethers-v6 --out-dir=generated/types app/context/abis/*.json",
-    "codegen:schema": "graphql-codegen -c codegen-get-schema.yml"
+    "codegen:schema": "graphql-codegen -c codegen-get-schema.yml",
+    "codegen:syncDevContracts": "node scripts/syncDevContracts.js && prettier --write app/context/contracts.config.ts"
   },
   "dependencies": {
     "@apollo/client": "3.8.1",

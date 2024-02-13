@@ -8,7 +8,6 @@ import TableCell from '@mui/material/TableCell';
 import TableContainer from '@mui/material/TableContainer';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
-import { useEthers } from '../../../../context/EthersProvider';
 import {
   GetBorrowerCollateralTokensQuery,
   GetBorrowerCollateralTokensQueryVariables,
@@ -29,6 +28,7 @@ import HeaderCell from '../../../Table/HeaderCell';
 import CloseTroveDialog from '../CloseTroveDialog';
 import CollateralUpdateDialog from '../CollateralUpdateDialog';
 import CollateralTokenTableLoader from './CollateralTokenTableLoader';
+import { useEthers } from '../../../../context/EthersProvider';
 
 const CollateralTokenTable = () => {
   const { address } = useEthers();

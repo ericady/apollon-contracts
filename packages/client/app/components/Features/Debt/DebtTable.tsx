@@ -8,7 +8,6 @@ import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import Typography from '@mui/material/Typography';
 import { useMemo } from 'react';
-import { useEthers } from '../../../context/EthersProvider';
 import { GetBorrowerDebtTokensQuery, GetBorrowerDebtTokensQueryVariables } from '../../../generated/gql-types';
 import { GET_BORROWER_DEBT_TOKENS } from '../../../queries';
 import { dangerouslyConvertBigIntToNumber, roundCurrency, roundNumber } from '../../../utils/math';
@@ -17,6 +16,7 @@ import HeaderCell from '../../Table/HeaderCell';
 import DebtPieVisualization from '../../Visualizations/DebtPieVisualization';
 import DebtTableLoader from './DebtTableLoader';
 import RepayDebtDialog from './RepayDebtDialog';
+import { useEthers } from '../../../context/EthersProvider';
 
 const generateColorPalette = (paletteLength: number) => {
   // Initialize an array with the first 3 fixed colors

@@ -16,13 +16,12 @@ import { TOKEN_FRAGMENT } from '../queries';
 import { getCheckSum } from '../utils/crypto';
 import { CustomApolloProvider_DevMode } from './CustomApolloProvider_dev';
 import {
-  Contracts,
   isCollateralTokenAddress,
   isDebtTokenAddress,
-  isPoolAddress,
   isStableCoinAddress,
   useEthers,
 } from './EthersProvider';
+import {Contracts, isPoolAddress} from './contracts.config';
 
 const defaultFieldValue = BigInt(0);
 
@@ -797,13 +796,13 @@ export const SchemaDataFreshnessManager: ContractDataFreshnessManager<typeof Con
       },
     },
 
-    [Contracts.ERC20.DFI]: {
+    [Contracts.ERC20.GOV]: {
       priceUSDOracle: {
         fetch: async (collTokenContract: ERC20) => {
-          SchemaDataFreshnessManager.ERC20[Contracts.ERC20.DFI].priceUSDOracle.lastFetched = Date.now();
+          SchemaDataFreshnessManager.ERC20[Contracts.ERC20.GOV].priceUSDOracle.lastFetched = Date.now();
 
           // FIXME: Implement Coll Oracle Prices
-          SchemaDataFreshnessManager.ERC20[Contracts.ERC20.DFI].priceUSDOracle.value(defaultFieldValue);
+          SchemaDataFreshnessManager.ERC20[Contracts.ERC20.GOV].priceUSDOracle.value(defaultFieldValue);
         },
         value: makeVar(defaultFieldValue),
         lastFetched: 0,
@@ -812,11 +811,11 @@ export const SchemaDataFreshnessManager: ContractDataFreshnessManager<typeof Con
 
       borrowingRate: {
         fetch: async (troveManagerContract: TroveManager) => {
-          SchemaDataFreshnessManager.ERC20[Contracts.ERC20.DFI].borrowingRate.lastFetched = Date.now();
+          SchemaDataFreshnessManager.ERC20[Contracts.ERC20.GOV].borrowingRate.lastFetched = Date.now();
 
-          const borrowingRate = await troveManagerContract.getBorrowingRate(isStableCoinAddress(Contracts.ERC20.DFI));
+          const borrowingRate = await troveManagerContract.getBorrowingRate(isStableCoinAddress(Contracts.ERC20.GOV));
 
-          SchemaDataFreshnessManager.ERC20[Contracts.ERC20.DFI].borrowingRate.value(borrowingRate);
+          SchemaDataFreshnessManager.ERC20[Contracts.ERC20.GOV].borrowingRate.value(borrowingRate);
         },
         value: makeVar(defaultFieldValue),
         lastFetched: 0,
@@ -825,11 +824,11 @@ export const SchemaDataFreshnessManager: ContractDataFreshnessManager<typeof Con
 
       walletAmount: {
         fetch: async (collTokenContract: ERC20, depositor: AddressLike) => {
-          SchemaDataFreshnessManager.ERC20[Contracts.ERC20.DFI].walletAmount.lastFetched = Date.now();
+          SchemaDataFreshnessManager.ERC20[Contracts.ERC20.GOV].walletAmount.lastFetched = Date.now();
 
           const walletAmount = await collTokenContract.balanceOf(depositor);
 
-          SchemaDataFreshnessManager.ERC20[Contracts.ERC20.DFI].walletAmount.value(walletAmount);
+          SchemaDataFreshnessManager.ERC20[Contracts.ERC20.GOV].walletAmount.value(walletAmount);
         },
         value: makeVar(defaultFieldValue),
         lastFetched: 0,
@@ -845,13 +844,13 @@ export const SchemaDataFreshnessManager: ContractDataFreshnessManager<typeof Con
             );
           }
 
-          SchemaDataFreshnessManager.ERC20[Contracts.ERC20.DFI].troveLockedAmount.lastFetched = Date.now();
+          SchemaDataFreshnessManager.ERC20[Contracts.ERC20.GOV].troveLockedAmount.lastFetched = Date.now();
 
           const tokenAmount = ContractDataFreshnessManager.TroveManager.getTroveWithdrawableColls.value.find(
-            ({ tokenAddress }) => getCheckSum(tokenAddress) === getCheckSum(Contracts.ERC20.DFI),
+            ({ tokenAddress }) => getCheckSum(tokenAddress) === getCheckSum(Contracts.ERC20.GOV),
           )?.amount;
           if (tokenAmount) {
-            SchemaDataFreshnessManager.ERC20[Contracts.ERC20.DFI].troveLockedAmount.value(tokenAmount);
+            SchemaDataFreshnessManager.ERC20[Contracts.ERC20.GOV].troveLockedAmount.value(tokenAmount);
           }
         },
         value: makeVar(defaultFieldValue),
@@ -868,13 +867,13 @@ export const SchemaDataFreshnessManager: ContractDataFreshnessManager<typeof Con
             );
           }
 
-          SchemaDataFreshnessManager.ERC20[Contracts.ERC20.DFI].stabilityGainedAmount.lastFetched = Date.now();
+          SchemaDataFreshnessManager.ERC20[Contracts.ERC20.GOV].stabilityGainedAmount.lastFetched = Date.now();
 
           const tokenAmount = ContractDataFreshnessManager.StabilityPoolManager.getDepositorCollGains.value.find(
-            ({ tokenAddress }) => getCheckSum(tokenAddress) === getCheckSum(Contracts.ERC20.DFI),
+            ({ tokenAddress }) => getCheckSum(tokenAddress) === getCheckSum(Contracts.ERC20.GOV),
           )?.amount;
           if (tokenAmount) {
-            SchemaDataFreshnessManager.ERC20[Contracts.ERC20.DFI].stabilityGainedAmount.value(tokenAmount);
+            SchemaDataFreshnessManager.ERC20[Contracts.ERC20.GOV].stabilityGainedAmount.value(tokenAmount);
           }
         },
         value: makeVar(defaultFieldValue),
@@ -1356,13 +1355,13 @@ export const SchemaDataFreshnessManager: ContractDataFreshnessManager<typeof Con
         timeout: 1000 * 5,
       },
     },
-    [Contracts.SwapPairs.DFI]: {
+    [Contracts.SwapPairs.STOCK_1]: {
       borrowerAmount: {
         fetch: async (swapPairContract: SwapPair, borrower: AddressLike) => {
-          SchemaDataFreshnessManager.SwapPairs[Contracts.SwapPairs.DFI].borrowerAmount.lastFetched = Date.now();
+          SchemaDataFreshnessManager.SwapPairs[Contracts.SwapPairs.STOCK_1].borrowerAmount.lastFetched = Date.now();
           const userPoolBalance = await swapPairContract.balanceOf(borrower);
 
-          SchemaDataFreshnessManager.SwapPairs[Contracts.SwapPairs.DFI].borrowerAmount.value(userPoolBalance);
+          SchemaDataFreshnessManager.SwapPairs[Contracts.SwapPairs.STOCK_1].borrowerAmount.value(userPoolBalance);
         },
         value: makeVar(defaultFieldValue),
         lastFetched: 0,
@@ -1370,10 +1369,10 @@ export const SchemaDataFreshnessManager: ContractDataFreshnessManager<typeof Con
       },
       swapFee: {
         fetch: async (swapPairContract: SwapPair) => {
-          SchemaDataFreshnessManager.SwapPairs[Contracts.SwapPairs.DFI].swapFee.lastFetched = Date.now();
+          SchemaDataFreshnessManager.SwapPairs[Contracts.SwapPairs.STOCK_1].swapFee.lastFetched = Date.now();
           const swapFee = await swapPairContract.getSwapFee();
 
-          SchemaDataFreshnessManager.SwapPairs[Contracts.SwapPairs.DFI].swapFee.value(swapFee);
+          SchemaDataFreshnessManager.SwapPairs[Contracts.SwapPairs.STOCK_1].swapFee.value(swapFee);
         },
         value: makeVar(defaultFieldValue),
         lastFetched: 0,
