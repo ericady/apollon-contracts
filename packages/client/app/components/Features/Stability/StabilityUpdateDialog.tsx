@@ -9,7 +9,7 @@ import Typography from '@mui/material/Typography';
 import { SyntheticEvent, useEffect, useState } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
 import { IBase } from '../../../../generated/types/StabilityPoolManager';
-import { useEthers } from '../../../context/EthersProvider';
+import { isDebtTokenAddress, useEthers } from '../../../context/EthersProvider';
 import { useTransactionDialog } from '../../../context/TransactionDialogProvider';
 import { Contracts } from '../../../context/contracts.config';
 import { GetBorrowerDebtTokensQuery, GetBorrowerDebtTokensQueryVariables } from '../../../generated/gql-types';

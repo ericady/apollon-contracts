@@ -18,7 +18,7 @@ import Typography from '@mui/material/Typography';
 import { SyntheticEvent, useCallback, useState } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
 import { IBase } from '../../../../generated/types/BorrowerOperations';
-import { useEthers } from '../../../context/EthersProvider';
+import { isCollateralTokenAddress, useEthers } from '../../../context/EthersProvider';
 import { useTransactionDialog } from '../../../context/TransactionDialogProvider';
 import { Contracts } from '../../../context/contracts.config';
 import {
