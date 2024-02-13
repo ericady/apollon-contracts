@@ -8,8 +8,10 @@ import Typography from '@mui/material/Typography';
 import { ethers } from 'ethers';
 import { ChangeEvent, useEffect, useState } from 'react';
 import { FormProvider, useController, useForm } from 'react-hook-form';
+import { isCollateralTokenAddress, isDebtTokenAddress, useEthers } from '../../../context/EthersProvider';
 import { useSelectedToken } from '../../../context/SelectedTokenProvider';
 import { useTransactionDialog } from '../../../context/TransactionDialogProvider';
+import { Contracts } from '../../../context/contracts.config';
 import {
   GetBorrowerCollateralTokensQuery,
   GetBorrowerCollateralTokensQueryVariables,
@@ -30,8 +32,6 @@ import FeatureBox from '../../FeatureBox/FeatureBox';
 import NumberInput from '../../FormControls/NumberInput';
 import ExchangeIcon from '../../Icons/ExchangeIcon';
 import Label from '../../Label/Label';
-import { useEthers, isCollateralTokenAddress, isDebtTokenAddress } from '../../../context/EthersProvider';
-import { Contracts } from '../../../context/contracts.config';
 
 export const RESULTING_POOL_SLIPPAGE = 0.02;
 

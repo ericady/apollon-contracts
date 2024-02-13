@@ -18,7 +18,9 @@ import Typography from '@mui/material/Typography';
 import { SyntheticEvent, useCallback, useState } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
 import { IBase } from '../../../../generated/types/BorrowerOperations';
+import { useEthers } from '../../../context/EthersProvider';
 import { useTransactionDialog } from '../../../context/TransactionDialogProvider';
+import { Contracts } from '../../../context/contracts.config';
 import {
   GetBorrowerCollateralTokensQuery,
   GetBorrowerCollateralTokensQueryVariables,
@@ -38,8 +40,6 @@ import DiamondIcon from '../../Icons/DiamondIcon';
 import ForwardIcon from '../../Icons/ForwardIcon';
 import Label from '../../Label/Label';
 import CollateralRatioVisualization, { CRIT_RATIO } from '../../Visualizations/CollateralRatioVisualization';
-import { Contracts } from '../../../context/contracts.config';
-import { useEthers } from '../../../context/EthersProvider';
 
 type Props = {
   buttonVariant: ButtonProps['variant'];

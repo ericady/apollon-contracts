@@ -6,6 +6,7 @@ import TableCell from '@mui/material/TableCell';
 import TableContainer from '@mui/material/TableContainer';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
+import { useEthers } from '../../../../context/EthersProvider';
 import { GetBorrowerDebtTokensQuery, GetBorrowerDebtTokensQueryVariables } from '../../../../generated/gql-types';
 import { GET_BORROWER_DEBT_TOKENS } from '../../../../queries';
 import {
@@ -21,7 +22,6 @@ import DirectionIcon from '../../../Icons/DirectionIcon';
 import Label from '../../../Label/Label';
 import HeaderCell from '../../../Table/HeaderCell';
 import DebtTokenTableLoader from './DebtTokenTableLoader';
-import { useEthers } from '../../../../context/EthersProvider';
 
 function DebtTokenTable() {
   const { address } = useEthers();

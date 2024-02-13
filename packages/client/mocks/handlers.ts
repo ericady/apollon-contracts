@@ -2,6 +2,7 @@ import { faker } from '@faker-js/faker';
 import { ethers } from 'ethers';
 import { graphql } from 'msw';
 import { FAVORITE_ASSETS_LOCALSTORAGE_KEY } from '../app/components/Features/Assets/Assets';
+import { Contracts } from '../app/context/contracts.config';
 import {
   BorrowerHistory,
   BorrowerHistoryType,
@@ -43,7 +44,6 @@ import {
   GET_TRADING_VIEW_LATEST_CANDLE,
 } from '../app/queries';
 import { bigIntStringToFloat, floatToBigInt } from '../app/utils/math';
-import { Contracts } from '../app/context/contracts.config';
 
 const getFavoritedAssetsFromLS = () => {
   return typeof window !== 'undefined'

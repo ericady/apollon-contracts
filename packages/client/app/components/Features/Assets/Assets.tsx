@@ -10,6 +10,7 @@ import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import { useEffect, useMemo, useState } from 'react';
 import { SelectedToken, useSelectedToken } from '../../../context/SelectedTokenProvider';
+import { Contracts } from '../../../context/contracts.config';
 import {
   GetAllPoolsQuery,
   GetAllPoolsQueryVariables,
@@ -31,7 +32,6 @@ import DirectionIcon from '../../Icons/DirectionIcon';
 import PinnedIcon from '../../Icons/PinnedIcon';
 import HeaderCell from '../../Table/HeaderCell';
 import AssetsLoader from './AssetsLoader';
-import { Contracts } from '../../../context/contracts.config';
 
 export const FAVORITE_ASSETS_LOCALSTORAGE_KEY = 'favoriteAssets';
 // FIXME: Hardcode address for stability once its there.

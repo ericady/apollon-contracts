@@ -7,7 +7,9 @@ import Typography from '@mui/material/Typography';
 import { useEffect, useState } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
 import { IBase } from '../../../../generated/types/TroveManager';
+import { useEthers } from '../../../context/EthersProvider';
 import { useTransactionDialog } from '../../../context/TransactionDialogProvider';
+import { Contracts } from '../../../context/contracts.config';
 import { GetBorrowerDebtTokensQuery, GetBorrowerDebtTokensQueryVariables } from '../../../generated/gql-types';
 import { GET_BORROWER_COLLATERAL_TOKENS, GET_BORROWER_DEBT_TOKENS } from '../../../queries';
 import { dangerouslyConvertBigIntToNumber, floatToBigInt, roundCurrency } from '../../../utils/math';
@@ -15,8 +17,6 @@ import NumberInput from '../../FormControls/NumberInput';
 import CrossIcon from '../../Icons/CrossIcon';
 import DiamondIcon from '../../Icons/DiamondIcon';
 import Label from '../../Label/Label';
-import { useEthers } from '../../../context/EthersProvider';
-import { Contracts } from '../../../context/contracts.config';
 
 type FieldValues = Record<string, string>;
 

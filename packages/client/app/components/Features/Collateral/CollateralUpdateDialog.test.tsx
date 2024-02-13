@@ -1,13 +1,13 @@
 import { render, waitFor } from '@testing-library/react';
 import { userEvent } from '@testing-library/user-event';
 import { graphql } from 'msw';
+import { Contracts } from '../../../context/contracts.config';
 import { GET_BORROWER_COLLATERAL_TOKENS, GET_BORROWER_DEBT_TOKENS } from '../../../queries';
 import MockedGetCollateralTokens from '../../tests/mockedResponses/GetBorrowerCollateralTokens.mocked.json';
 import MockedGetBorrowerDebtTokens from '../../tests/mockedResponses/GetBorrowerDebtTokens.mocked.json';
 import { server } from '../../tests/setupMSW';
 import { IntegrationWrapper } from '../../tests/test-utils';
 import CollateralUpdateDialog from './CollateralUpdateDialog';
-import { Contracts } from '../../../context/contracts.config';
 
 describe('CollateralUpdateDialog', () => {
   it('DEPOSIT: should call function of mocked contract', async () => {

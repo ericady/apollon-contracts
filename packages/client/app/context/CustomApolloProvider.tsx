@@ -15,13 +15,8 @@ import { SystemInfo, TokenFragmentFragment } from '../generated/gql-types';
 import { TOKEN_FRAGMENT } from '../queries';
 import { getCheckSum } from '../utils/crypto';
 import { CustomApolloProvider_DevMode } from './CustomApolloProvider_dev';
-import {
-  isCollateralTokenAddress,
-  isDebtTokenAddress,
-  isStableCoinAddress,
-  useEthers,
-} from './EthersProvider';
-import {Contracts, isPoolAddress} from './contracts.config';
+import { isCollateralTokenAddress, isDebtTokenAddress, isStableCoinAddress, useEthers } from './EthersProvider';
+import { Contracts, isPoolAddress } from './contracts.config';
 
 const defaultFieldValue = BigInt(0);
 
@@ -508,18 +503,18 @@ type TokenAmount = {
  * This manages the data fetching from the contracts if the data is reused. E.g.: get many debts from the trovemanager isntead of making individual calls.
  */
 export const ContractDataFreshnessManager: {
-  TroveManager:
-   
-     Record<string, ContractValue<TokenAmount[]>>,
-   
+  TroveManager: Record<string, ContractValue<TokenAmount[]>>;
 
-  StabilityPoolManager:  Record<string, ContractValue<TokenAmount[]>>,
-  StoragePool: Record<string,  ContractValue<{
-    isInRecoveryMode: boolean;
-    TCR: bigint;
-    entireSystemColl: bigint;
-    entireSystemDebt: bigint;
-  }>>,
+  StabilityPoolManager: Record<string, ContractValue<TokenAmount[]>>;
+  StoragePool: Record<
+    string,
+    ContractValue<{
+      isInRecoveryMode: boolean;
+      TCR: bigint;
+      entireSystemColl: bigint;
+      entireSystemDebt: bigint;
+    }>
+  >;
 } = {
   TroveManager: {
     getTroveDebt: {
@@ -622,9 +617,7 @@ export const ContractDataFreshnessManager: {
     getDepositorCollGains: {
       fetch: async (stabilityPoolManagerContract: StabilityPoolManager, depositor: AddressLike) => {
         ContractDataFreshnessManager.StabilityPoolManager.getDepositorCollGains.lastFetched = Date.now();
-        const depositorCollGains = await stabilityPoolManagerContract.getDepositorCollGains(
-          depositor,
-        );
+        const depositorCollGains = await stabilityPoolManagerContract.getDepositorCollGains(depositor);
 
         const tokenAmounts = depositorCollGains.map(([tokenAddress, amount]) => ({
           tokenAddress,

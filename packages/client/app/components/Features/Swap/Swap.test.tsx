@@ -1,8 +1,8 @@
 import { render, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+import { Contracts } from '../../../context/contracts.config';
 import { IntegrationWrapper, PreselectedTestToken } from '../../tests/test-utils';
 import Swap from './Swap';
-import { Contracts } from '../../../context/contracts.config';
 
 describe('Swap', () => {
   it('should call "swapTokensForExactTokens" function and "approve" function of collateral Token of mocked contract', async () => {

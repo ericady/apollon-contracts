@@ -308,3 +308,5 @@ type TokenCandle @entity(immutable: true) {
   volume: BigInt!
   candleSize: Int!
 }
+
+#  SMALL BALANCE CHARTS

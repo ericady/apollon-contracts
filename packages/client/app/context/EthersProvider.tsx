@@ -30,7 +30,7 @@ import storagePoolAbi from './abis/StoragePool.json';
 import swapOperationsAbi from './abis/SwapOperations.json';
 import swapPairAbi from './abis/SwapPair.json';
 import troveManagerAbi from './abis/TroveManager.json';
-import  { Contracts } from './contracts.config';
+import { Contracts } from './contracts.config';
 
 // TODO: This is just dummy data and will be exchanged with the real implementation later.
 // https://goerli.etherscan.io/token/0x509ee0d083ddf8ac028f2a56731412edd63223b9#writeContract
@@ -109,7 +109,6 @@ export const EthersContext = createContext<{
   connectWallet: () => {},
 });
 
-
 // Connetion to local node
 // TODO: Implement testnet once deployed
 const provider =
@@ -138,8 +137,6 @@ export default function EthersProvider({ children }: { children: React.ReactNode
   const [storagePoolContract, setStoragePoolContract] = useState<StoragePool>();
   const [sortedTrovesContract, setSortedTrovesContract] = useState<SortedTroves>();
   const [hintHelpersContract, setHintHelpersContract] = useState<HintHelpers>();
-
-  
 
   const connectWallet = async () => {
     try {
@@ -305,7 +302,11 @@ export default function EthersProvider({ children }: { children: React.ReactNode
           swapPairAbi,
           provider,
         ) as unknown as SwapPair;
-        const swapPairContractDFI = new Contract(Contracts.SwapPairs.STOCK_1, swapPairAbi, provider) as unknown as SwapPair;
+        const swapPairContractDFI = new Contract(
+          Contracts.SwapPairs.STOCK_1,
+          swapPairAbi,
+          provider,
+        ) as unknown as SwapPair;
         setSwapPairContracts({
           [Contracts.SwapPairs.BTC]: swapPairContractBTC,
           [Contracts.SwapPairs.USDT]: swapPairContractUSDT,

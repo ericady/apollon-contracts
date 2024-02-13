@@ -4,12 +4,12 @@ import { SnackbarProvider } from 'notistack';
 import { PropsWithChildren, useEffect, useMemo, useState } from 'react';
 import 'whatwg-fetch';
 import { CustomApolloProvider_DevMode } from '../../context/CustomApolloProvider_dev';
+import { EthersContext, useEthers } from '../../context/EthersProvider';
 import SelectedTokenProvider, { useSelectedToken } from '../../context/SelectedTokenProvider';
 import TransactionDialogProvider from '../../context/TransactionDialogProvider';
+import { Contracts } from '../../context/contracts.config';
 import buildTheme from '../../theme';
 import MockedPositionsWithoutBorrower from './mockedResponses/GetDebtTokens.mocked.json';
-import { useEthers, EthersContext } from '../../context/EthersProvider';
-import { Contracts } from '../../context/contracts.config';
 
 // This is just the default client config when testing against the dev server
 export const client = new ApolloClient({
@@ -81,7 +81,7 @@ function SetupState({
         borrowingRate: BigInt(3000),
         pool: {
           id: '0xbE8F15C2db5Fc2AFc4e17B4Dd578Fbc6e5aA9592',
-          address: Contracts.SwapPairs["BTC"],
+          address: Contracts.SwapPairs['BTC'],
           liqudityPair: [BigInt(10000000000000000000000), BigInt(10000000000000000000000)],
         },
       });

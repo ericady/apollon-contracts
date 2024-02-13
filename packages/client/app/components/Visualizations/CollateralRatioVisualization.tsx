@@ -2,6 +2,7 @@ import { useQuery } from '@apollo/client';
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 import { Box, Typography, useTheme } from '@mui/material';
 import { useCallback, useEffect } from 'react';
+import { useEthers } from '../../context/EthersProvider';
 import {
   GetBorrowerCollateralTokensQuery,
   GetBorrowerCollateralTokensQueryVariables,
@@ -10,7 +11,6 @@ import {
 } from '../../generated/gql-types';
 import { GET_BORROWER_COLLATERAL_TOKENS, GET_BORROWER_DEBT_TOKENS } from '../../queries';
 import { bigIntStringToFloat, dangerouslyConvertBigIntToNumber, displayPercentage } from '../../utils/math';
-import { useEthers } from '../../context/EthersProvider';
 
 export const CRIT_RATIO = 1.1;
 

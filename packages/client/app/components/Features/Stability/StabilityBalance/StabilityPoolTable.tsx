@@ -6,6 +6,7 @@ import TableCell from '@mui/material/TableCell';
 import TableContainer from '@mui/material/TableContainer';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
+import { useEthers } from '../../../../context/EthersProvider';
 import {
   GetBorrowerCollateralTokensQuery,
   GetBorrowerCollateralTokensQueryVariables,
@@ -27,7 +28,6 @@ import HeaderCell from '../../../Table/HeaderCell';
 import StabilityHistoryDialog from '../StabilityHistoryDialog';
 import StabilityUpdateDialog from '../StabilityUpdateDialog';
 import StabilityPoolTableLoader from './StabilityPoolTableLoader';
-import { useEthers } from '../../../../context/EthersProvider';
 
 function StabilityPoolTable() {
   const {

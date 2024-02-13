@@ -7,6 +7,7 @@ import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import Typography from '@mui/material/Typography';
 import { useEffect } from 'react';
+import { useEthers } from '../../../context/EthersProvider';
 import {
   GetBorrowerSwapEventsQuery,
   GetBorrowerSwapEventsQueryVariables,
@@ -23,7 +24,6 @@ import {
 import Label from '../../Label/Label';
 import HeaderCell from '../../Table/HeaderCell';
 import HistoryTableLoader from './HistoryTableLoader';
-import { useEthers } from '../../../context/EthersProvider';
 
 function HistoryTable() {
   const { address } = useEthers();
