@@ -538,7 +538,7 @@ export const ContractDataFreshnessManager: {
       },
       value: [],
       lastFetched: 0,
-      timeout: 1000 * 5,
+      timeout: 1000 * 2,
     },
     getTroveRepayableDebts: {
       fetch: async (troveManagerContract: TroveManager, borrower: AddressLike) => {
@@ -562,7 +562,7 @@ export const ContractDataFreshnessManager: {
       },
       value: [],
       lastFetched: 0,
-      timeout: 1000 * 5,
+      timeout: 1000 * 2,
     },
     getTroveWithdrawableColls: {
       fetch: async (troveManagerContract: TroveManager, borrower: AddressLike) => {
@@ -585,7 +585,7 @@ export const ContractDataFreshnessManager: {
       },
       value: [],
       lastFetched: 0,
-      timeout: 1000 * 5,
+      timeout: 1000 * 2,
     },
   },
 
@@ -611,7 +611,7 @@ export const ContractDataFreshnessManager: {
       },
       value: [],
       lastFetched: 0,
-      timeout: 1000 * 5,
+      timeout: 1000 * 2,
     },
 
     getDepositorCollGains: {
@@ -635,7 +635,7 @@ export const ContractDataFreshnessManager: {
       },
       value: [],
       lastFetched: 0,
-      timeout: 1000 * 5,
+      timeout: 1000 * 2,
     },
 
     getDepositorCompoundedDeposits: {
@@ -660,7 +660,7 @@ export const ContractDataFreshnessManager: {
       },
       value: [],
       lastFetched: 0,
-      timeout: 1000 * 5,
+      timeout: 1000 * 2,
     },
   },
 
@@ -689,7 +689,7 @@ export const ContractDataFreshnessManager: {
         entireSystemDebt: BigInt(0),
       } as any,
       lastFetched: 0,
-      timeout: 1000 * 5,
+      timeout: 1000 * 2,
     },
   },
 };
@@ -711,7 +711,7 @@ export const SchemaDataFreshnessManager: ContractDataFreshnessManager<typeof Con
         },
         value: makeVar(defaultFieldValue),
         lastFetched: 0,
-        timeout: 1000 * 5,
+        timeout: 1000 * 2,
       },
 
       borrowingRate: {
@@ -724,7 +724,7 @@ export const SchemaDataFreshnessManager: ContractDataFreshnessManager<typeof Con
         },
         value: makeVar(defaultFieldValue),
         lastFetched: 0,
-        timeout: 1000 * 5,
+        timeout: 1000 * 2,
       },
 
       walletAmount: {
@@ -739,7 +739,7 @@ export const SchemaDataFreshnessManager: ContractDataFreshnessManager<typeof Con
         },
         value: makeVar(defaultFieldValue),
         lastFetched: 0,
-        timeout: 1000 * 5,
+        timeout: 1000 * 2,
       },
 
       troveLockedAmount: {
@@ -762,7 +762,7 @@ export const SchemaDataFreshnessManager: ContractDataFreshnessManager<typeof Con
         },
         value: makeVar(defaultFieldValue),
         lastFetched: 0,
-        timeout: 1000 * 5,
+        timeout: 1000 * 2,
       },
 
       stabilityGainedAmount: {
@@ -785,7 +785,7 @@ export const SchemaDataFreshnessManager: ContractDataFreshnessManager<typeof Con
         },
         value: makeVar(defaultFieldValue),
         lastFetched: 0,
-        timeout: 1000 * 5,
+        timeout: 1000 * 2,
       },
     },
 
@@ -799,7 +799,7 @@ export const SchemaDataFreshnessManager: ContractDataFreshnessManager<typeof Con
         },
         value: makeVar(defaultFieldValue),
         lastFetched: 0,
-        timeout: 1000 * 5,
+        timeout: 1000 * 2,
       },
 
       borrowingRate: {
@@ -812,7 +812,7 @@ export const SchemaDataFreshnessManager: ContractDataFreshnessManager<typeof Con
         },
         value: makeVar(defaultFieldValue),
         lastFetched: 0,
-        timeout: 1000 * 5,
+        timeout: 1000 * 2,
       },
 
       walletAmount: {
@@ -825,7 +825,7 @@ export const SchemaDataFreshnessManager: ContractDataFreshnessManager<typeof Con
         },
         value: makeVar(defaultFieldValue),
         lastFetched: 0,
-        timeout: 1000 * 5,
+        timeout: 1000 * 2,
       },
 
       troveLockedAmount: {
@@ -848,7 +848,7 @@ export const SchemaDataFreshnessManager: ContractDataFreshnessManager<typeof Con
         },
         value: makeVar(defaultFieldValue),
         lastFetched: 0,
-        timeout: 1000 * 5,
+        timeout: 1000 * 2,
       },
 
       stabilityGainedAmount: {
@@ -871,7 +871,7 @@ export const SchemaDataFreshnessManager: ContractDataFreshnessManager<typeof Con
         },
         value: makeVar(defaultFieldValue),
         lastFetched: 0,
-        timeout: 1000 * 5,
+        timeout: 1000 * 2,
       },
     },
 
@@ -885,7 +885,7 @@ export const SchemaDataFreshnessManager: ContractDataFreshnessManager<typeof Con
         },
         value: makeVar(defaultFieldValue),
         lastFetched: 0,
-        timeout: 1000 * 5,
+        timeout: 1000 * 2,
       },
 
       borrowingRate: {
@@ -898,7 +898,7 @@ export const SchemaDataFreshnessManager: ContractDataFreshnessManager<typeof Con
         },
         value: makeVar(defaultFieldValue),
         lastFetched: 0,
-        timeout: 1000 * 5,
+        timeout: 1000 * 2,
       },
 
       walletAmount: {
@@ -911,7 +911,7 @@ export const SchemaDataFreshnessManager: ContractDataFreshnessManager<typeof Con
         },
         value: makeVar(defaultFieldValue),
         lastFetched: 0,
-        timeout: 1000 * 5,
+        timeout: 1000 * 2,
       },
 
       troveLockedAmount: {
@@ -934,7 +934,7 @@ export const SchemaDataFreshnessManager: ContractDataFreshnessManager<typeof Con
         },
         value: makeVar(defaultFieldValue),
         lastFetched: 0,
-        timeout: 1000 * 5,
+        timeout: 1000 * 2,
       },
 
       stabilityGainedAmount: {
@@ -957,7 +957,7 @@ export const SchemaDataFreshnessManager: ContractDataFreshnessManager<typeof Con
         },
         value: makeVar(defaultFieldValue),
         lastFetched: 0,
-        timeout: 1000 * 5,
+        timeout: 1000 * 2,
       },
     },
   },
@@ -975,7 +975,7 @@ export const SchemaDataFreshnessManager: ContractDataFreshnessManager<typeof Con
         },
         value: makeVar(defaultFieldValue),
         lastFetched: 0,
-        timeout: 1000 * 5,
+        timeout: 1000 * 2,
       },
 
       borrowingRate: {
@@ -990,7 +990,7 @@ export const SchemaDataFreshnessManager: ContractDataFreshnessManager<typeof Con
         },
         value: makeVar(defaultFieldValue),
         lastFetched: 0,
-        timeout: 1000 * 5,
+        timeout: 1000 * 2,
       },
 
       walletAmount: {
@@ -1001,7 +1001,7 @@ export const SchemaDataFreshnessManager: ContractDataFreshnessManager<typeof Con
         },
         value: makeVar(defaultFieldValue),
         lastFetched: 0,
-        timeout: 1000 * 5,
+        timeout: 1000 * 2,
       },
 
       troveMintedAmount: {
@@ -1024,7 +1024,7 @@ export const SchemaDataFreshnessManager: ContractDataFreshnessManager<typeof Con
         },
         value: makeVar(defaultFieldValue),
         lastFetched: 0,
-        timeout: 1000 * 5,
+        timeout: 1000 * 2,
       },
 
       troveDebtAmount: {
@@ -1054,7 +1054,7 @@ export const SchemaDataFreshnessManager: ContractDataFreshnessManager<typeof Con
         },
         value: makeVar(defaultFieldValue),
         lastFetched: 0,
-        timeout: 1000 * 5,
+        timeout: 1000 * 2,
       },
 
       troveRepableDebtAmount: {
@@ -1080,7 +1080,7 @@ export const SchemaDataFreshnessManager: ContractDataFreshnessManager<typeof Con
         },
         value: makeVar(defaultFieldValue),
         lastFetched: 0,
-        timeout: 1000 * 5,
+        timeout: 1000 * 2,
       },
 
       providedStability: {
@@ -1103,7 +1103,7 @@ export const SchemaDataFreshnessManager: ContractDataFreshnessManager<typeof Con
         },
         value: makeVar(defaultFieldValue),
         lastFetched: 0,
-        timeout: 1000 * 5,
+        timeout: 1000 * 2,
       },
 
       compoundedDeposit: {
@@ -1128,7 +1128,7 @@ export const SchemaDataFreshnessManager: ContractDataFreshnessManager<typeof Con
         },
         value: makeVar(defaultFieldValue),
         lastFetched: 0,
-        timeout: 1000 * 5,
+        timeout: 1000 * 2,
       },
     },
 
@@ -1143,7 +1143,7 @@ export const SchemaDataFreshnessManager: ContractDataFreshnessManager<typeof Con
         },
         value: makeVar(defaultFieldValue),
         lastFetched: 0,
-        timeout: 1000 * 5,
+        timeout: 1000 * 2,
       },
 
       borrowingRate: {
@@ -1158,7 +1158,7 @@ export const SchemaDataFreshnessManager: ContractDataFreshnessManager<typeof Con
         },
         value: makeVar(defaultFieldValue),
         lastFetched: 0,
-        timeout: 1000 * 5,
+        timeout: 1000 * 2,
       },
 
       walletAmount: {
@@ -1170,7 +1170,7 @@ export const SchemaDataFreshnessManager: ContractDataFreshnessManager<typeof Con
         },
         value: makeVar(defaultFieldValue),
         lastFetched: 0,
-        timeout: 1000 * 5,
+        timeout: 1000 * 2,
       },
 
       troveMintedAmount: {
@@ -1193,7 +1193,7 @@ export const SchemaDataFreshnessManager: ContractDataFreshnessManager<typeof Con
         },
         value: makeVar(defaultFieldValue),
         lastFetched: 0,
-        timeout: 1000 * 5,
+        timeout: 1000 * 2,
       },
 
       troveDebtAmount: {
@@ -1216,7 +1216,7 @@ export const SchemaDataFreshnessManager: ContractDataFreshnessManager<typeof Con
         },
         value: makeVar(defaultFieldValue),
         lastFetched: 0,
-        timeout: 1000 * 5,
+        timeout: 1000 * 2,
       },
 
       troveRepableDebtAmount: {
@@ -1242,7 +1242,7 @@ export const SchemaDataFreshnessManager: ContractDataFreshnessManager<typeof Con
         },
         value: makeVar(defaultFieldValue),
         lastFetched: 0,
-        timeout: 1000 * 5,
+        timeout: 1000 * 2,
       },
 
       providedStability: {
@@ -1265,7 +1265,7 @@ export const SchemaDataFreshnessManager: ContractDataFreshnessManager<typeof Con
         },
         value: makeVar(defaultFieldValue),
         lastFetched: 0,
-        timeout: 1000 * 5,
+        timeout: 1000 * 2,
       },
 
       compoundedDeposit: {
@@ -1292,7 +1292,7 @@ export const SchemaDataFreshnessManager: ContractDataFreshnessManager<typeof Con
         },
         value: makeVar(defaultFieldValue),
         lastFetched: 0,
-        timeout: 1000 * 5,
+        timeout: 1000 * 2,
       },
     },
   },
@@ -1303,13 +1303,12 @@ export const SchemaDataFreshnessManager: ContractDataFreshnessManager<typeof Con
         fetch: async (swapPairContract: SwapPair, borrower: AddressLike) => {
           SchemaDataFreshnessManager.SwapPairs[Contracts.SwapPairs.BTC].borrowerAmount.lastFetched = Date.now();
           const userPoolBalance = await swapPairContract.balanceOf(borrower);
-          console.log('userPoolBalance: ', userPoolBalance);
 
           SchemaDataFreshnessManager.SwapPairs[Contracts.SwapPairs.BTC].borrowerAmount.value(userPoolBalance);
         },
         value: makeVar(defaultFieldValue),
         lastFetched: 0,
-        timeout: 1000 * 5,
+        timeout: 1000 * 2,
       },
       swapFee: {
         fetch: async (swapPairContract: SwapPair) => {
@@ -1321,7 +1320,7 @@ export const SchemaDataFreshnessManager: ContractDataFreshnessManager<typeof Con
         },
         value: makeVar(defaultFieldValue),
         lastFetched: 0,
-        timeout: 1000 * 5,
+        timeout: 1000 * 2,
       },
     },
     [Contracts.SwapPairs.USDT]: {
@@ -1334,7 +1333,7 @@ export const SchemaDataFreshnessManager: ContractDataFreshnessManager<typeof Con
         },
         value: makeVar(defaultFieldValue),
         lastFetched: 0,
-        timeout: 1000 * 5,
+        timeout: 1000 * 2,
       },
       swapFee: {
         fetch: async (swapPairContract: SwapPair) => {
@@ -1345,7 +1344,7 @@ export const SchemaDataFreshnessManager: ContractDataFreshnessManager<typeof Con
         },
         value: makeVar(defaultFieldValue),
         lastFetched: 0,
-        timeout: 1000 * 5,
+        timeout: 1000 * 2,
       },
     },
     [Contracts.SwapPairs.STOCK_1]: {
@@ -1358,7 +1357,7 @@ export const SchemaDataFreshnessManager: ContractDataFreshnessManager<typeof Con
         },
         value: makeVar(defaultFieldValue),
         lastFetched: 0,
-        timeout: 1000 * 5,
+        timeout: 1000 * 2,
       },
       swapFee: {
         fetch: async (swapPairContract: SwapPair) => {
@@ -1369,7 +1368,7 @@ export const SchemaDataFreshnessManager: ContractDataFreshnessManager<typeof Con
         },
         value: makeVar(defaultFieldValue),
         lastFetched: 0,
-        timeout: 1000 * 5,
+        timeout: 1000 * 2,
       },
     },
   },
@@ -1387,7 +1386,7 @@ export const SchemaDataFreshnessManager: ContractDataFreshnessManager<typeof Con
       },
       value: makeVar(defaultFieldValue),
       lastFetched: 0,
-      timeout: 1000 * 5,
+      timeout: 1000 * 2,
     },
     recoveryModeActive: {
       fetch: async (fetchSource?: { storagePoolContract: StoragePool }) => {
@@ -1402,7 +1401,7 @@ export const SchemaDataFreshnessManager: ContractDataFreshnessManager<typeof Con
       },
       value: makeVar(false as any),
       lastFetched: 0,
-      timeout: 1000 * 5,
+      timeout: 1000 * 2,
     },
   },
 

@@ -105,7 +105,7 @@ function CollateralRatioVisualization({
     const newRatio =
       addedDebtUSD > 0 ? collateralValue / (debtValue + addedDebtUSD) : (collateralValue - addedDebtUSD) / debtValue;
 
-    return [oldRatio, newRatio];
+    return [isNaN(oldRatio) ? 0 : oldRatio, isNaN(newRatio) ? 0 : newRatio];
   }, [addedDebtUSD, collateralValue, debtValue]);
 
   const isProcessing = loading || !debtData || !collateralData;

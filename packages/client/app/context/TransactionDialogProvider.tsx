@@ -125,14 +125,17 @@ export default function TransactionDialogProvider({ children }: { children: Reac
                   actionAfterMined(client);
                 }
                 if (reloadQueriesAferMined.length > 0) {
-                  client.refetchQueries({ include: reloadQueriesAferMined });
+                  client.refetchQueries({ include: reloadQueriesAferMined }).then((res) => {
+                    // Sometime no update seemingly, why?
+                    console.log('res: ', res);
+                  });
                 }
               })
               .catch((error) => {
                 setStepsState((stepsState) => {
                   const newStepsState = [...stepsState];
                   newStepsState[activeStepSaved] = {
-                    status: 'success',
+                    status: 'error',
                     transactionReceipt: newStepsState[activeStepSaved].transactionReceipt,
                     error,
                   };
@@ -152,15 +155,29 @@ export default function TransactionDialogProvider({ children }: { children: Reac
             });
 
             if (activeStep < steps.length - 1) {
-              setActiveStep((activeStep) => (activeStep as number) + 1);
+              if (!stepsState.some((step) => step.status === 'error')) {
+                setActiveStep((activeStep) => (activeStep as number) + 1);
+              }
             } else {
               setShowConfirmation(true);
-              setTimeout(() => setActiveStep(undefined), 5000);
+              setActiveStep(undefined);
+              setSteps([]);
+              setTimeout(() => setShowConfirmation(false), 5000);
             }
           })
-          .catch((err) => {
-            console.log('Transaction ERROR: ', err);
+          .catch((error) => {
             enqueueSnackbar('Transaction was rejected.', { variant: 'error' });
+            console.log('error: ', error);
+            // FIXME: Show error state, currently broken
+            // setStepsState((stepsState) => {
+            //   const newStepsState = [...stepsState];
+            //   newStepsState[activeStep] = {
+            //     status: 'error',
+            //     transactionReceipt: newStepsState[activeStep].transactionReceipt,
+            //     error,
+            //   };
+            //   return newStepsState;
+            // });
           });
       });
     }
@@ -196,7 +213,7 @@ export default function TransactionDialogProvider({ children }: { children: Reac
       <>
         <Draggable handle={'[class*="MuiDialog-root"]'} cancel={'[class*="MuiDialogContent-root"]'}>
           <Dialog
-            open={activeStep !== undefined}
+            open={activeStep !== undefined || showConfirmation}
             onClose={() => {
               setSteps([]);
               setActiveStep(undefined);

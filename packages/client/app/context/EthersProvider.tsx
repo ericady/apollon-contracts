@@ -44,9 +44,10 @@ declare global {
   }
 }
 
+// TODO: Migrate these assertions
 export const isDebtTokenAddress = (
   address: string,
-): address is '0x1613beb3b2c4f22ee086b2b38c1476a3ce7f78e8' | '0x851356ae760d987e095750cceb3bc6014560891c' => {
+): address is '0x95401dc811bb5740090279ba06cfa8fcf6113778' | '0x998abeb3e57409262ae5b751f60747921b33613e' => {
   return Object.values(Contracts.DebtToken)
     .map((address) => getCheckSum(address))
     .includes(getCheckSum(address) as any);

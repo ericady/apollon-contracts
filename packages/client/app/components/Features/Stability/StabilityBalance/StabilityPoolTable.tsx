@@ -111,7 +111,7 @@ function StabilityPoolTable() {
                       return (
                         <TableRow hover key={index}>
                           <TableCell sx={noBorder ? { borderBottom: 'none', pr: 0 } : { pr: 0 }} align="right">
-                            {providedStability <= 0
+                            {providedStability >= 0
                               ? roundCurrency(dangerouslyConvertBigIntToNumber(providedStability, 12, 6), 5, 5)
                               : null}
                           </TableCell>
@@ -124,12 +124,12 @@ function StabilityPoolTable() {
                             {lostToken && <Label variant="error">{lostToken.symbol}</Label>}
                           </TableCell>
                           <TableCell align="right" sx={noBorder ? { borderBottom: 'none', pl: 0 } : { pl: 0 }}>
-                            {compoundedDeposit <= 0
+                            {compoundedDeposit >= 0
                               ? roundCurrency(dangerouslyConvertBigIntToNumber(compoundedDeposit, 12, 6), 5, 5)
                               : null}
                           </TableCell>
                           <TableCell sx={noBorder ? { borderBottom: 'none', pr: 0 } : { pr: 0 }} align="right">
-                            {stabilityGainedAmount <= 0
+                            {stabilityGainedAmount >= 0
                               ? roundCurrency(dangerouslyConvertBigIntToNumber(stabilityGainedAmount, 12, 6), 5, 5)
                               : null}
                           </TableCell>

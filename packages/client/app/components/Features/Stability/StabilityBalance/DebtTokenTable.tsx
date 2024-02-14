@@ -80,8 +80,10 @@ function DebtTokenTable() {
                 stabilityDepositAPY: {
                   ...debtToken.stabilityDepositAPY,
                   value:
-                    bigIntStringToFloat(debtToken.stabilityDepositAPY.profit) /
-                    bigIntStringToFloat(debtToken.stabilityDepositAPY.volume),
+                    bigIntStringToFloat(debtToken.stabilityDepositAPY.volume) > 0
+                      ? bigIntStringToFloat(debtToken.stabilityDepositAPY.profit) /
+                        bigIntStringToFloat(debtToken.stabilityDepositAPY.volume)
+                      : 0,
                 },
                 walletAmount: dangerouslyConvertBigIntToNumber(debtToken.walletAmount, 12, 6),
                 troveDebtAmount: dangerouslyConvertBigIntToNumber(debtToken.troveDebtAmount, 12, 6),

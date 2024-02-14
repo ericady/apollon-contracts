@@ -7,11 +7,12 @@ import Typography from '@mui/material/Typography';
 import { useEffect, useState } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
 import { IBase } from '../../../../generated/types/TroveManager';
-import { useEthers } from '../../../context/EthersProvider';
+import { isDebtTokenAddress, useEthers } from '../../../context/EthersProvider';
 import { useTransactionDialog } from '../../../context/TransactionDialogProvider';
 import { Contracts } from '../../../context/contracts.config';
 import { GetBorrowerDebtTokensQuery, GetBorrowerDebtTokensQueryVariables } from '../../../generated/gql-types';
 import { GET_BORROWER_COLLATERAL_TOKENS, GET_BORROWER_DEBT_TOKENS } from '../../../queries';
+import { getHints } from '../../../utils/crypto';
 import { dangerouslyConvertBigIntToNumber, floatToBigInt, roundCurrency } from '../../../utils/math';
 import NumberInput from '../../FormControls/NumberInput';
 import CrossIcon from '../../Icons/CrossIcon';
@@ -25,7 +26,13 @@ const RepayDebtDialog = () => {
 
   const {
     address,
-    contracts: { borrowerOperationsContract, debtTokenContracts },
+    contracts: {
+      borrowerOperationsContract,
+      debtTokenContracts,
+      troveManagerContract,
+      sortedTrovesContract,
+      hintHelpersContract,
+    },
   } = useEthers();
   const { setSteps } = useTransactionDialog();
 
@@ -61,12 +68,6 @@ const RepayDebtDialog = () => {
         amount: floatToBigInt(parseFloat(amount)),
       }));
 
-    tokenAmounts.forEach(async ({ tokenAddress, amount }) => {
-      // @ts-ignore
-      const debtTokenContract = debtTokenContracts[tokenAddress] as DebtToken;
-      await debtTokenContract.approve(Contracts.StoragePool, amount);
-    });
-
     setSteps([
       ...tokenAmounts.map(({ tokenAddress, amount }) => ({
         title: `Approve ${data?.debtTokenMetas.find(({ token: { address } }) => address === tokenAddress)?.token
@@ -74,8 +75,12 @@ const RepayDebtDialog = () => {
         transaction: {
           methodCall: async () => {
             // @ts-ignore
-            const debtTokenContract = debtTokenContracts[tokenAddress] as DebtToken;
-            return debtTokenContract.approve(Contracts.StoragePool, amount);
+            if (isDebtTokenAddress(tokenAddress)) {
+              const debtTokenContract = debtTokenContracts[tokenAddress];
+              return debtTokenContract.approve(Contracts.StoragePool, amount);
+            }
+
+            return null as any;
           },
           waitForResponseOf: [],
         },
@@ -83,9 +88,21 @@ const RepayDebtDialog = () => {
       {
         title: 'Repay all debt.',
         transaction: {
-          methodCall: () => {
-            // @ts-ignore TODO: fix this parameters
-            return borrowerOperationsContract.repayDebt(tokenAmounts);
+          methodCall: async () => {
+            const [upperHint, lowerHint] = await getHints(
+              troveManagerContract,
+              sortedTrovesContract,
+              hintHelpersContract,
+              {
+                borrower: address,
+                addedColl: [],
+                addedDebt: [],
+                removedColl: [],
+                removedDebt: tokenAmounts,
+              },
+            );
+
+            return borrowerOperationsContract.repayDebt(tokenAmounts, upperHint, lowerHint);
           },
           // wait for all approvals
           waitForResponseOf: Array.of(tokenAmounts.length).map((_, index) => index),
@@ -97,6 +114,7 @@ const RepayDebtDialog = () => {
     reset();
     setIsOpen(false);
   };
+  // FIXME: Can repay all debt because of precission 107n debt remaining
 
   return (
     <>

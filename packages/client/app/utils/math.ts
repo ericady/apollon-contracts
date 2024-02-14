@@ -19,6 +19,9 @@ export const roundNumber = (value: number, decimals = 2) => {
 };
 
 export const percentageChange = (newValue: number, oldValue: number) => {
+  if (oldValue === 0) {
+    return 0;
+  }
   return (newValue - oldValue) / oldValue;
 };
 
