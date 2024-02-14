@@ -3,6 +3,7 @@ import { MaxUint256, parseUnits, ZeroAddress } from 'ethers';
 
 export default buildModule('ApollonTesting', m => {
   const deadline = m.getParameter('deadline');
+  const testUser = '0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266';
 
   // initial contract deployments
   const contracts = {
@@ -304,6 +305,13 @@ export default buildModule('ApollonTesting', m => {
     ],
     { id: 'addLiquiditySTOCK', after: [stableStockPair, stockApprove, stableApprove] }
   );
+
+  // mint test user assets
+  m.call(BTC, 'unprotectedMint', [testUser, parseUnits('1', 9)], { id: 'mintBTCUser' });
+  m.call(USDT, 'unprotectedMint', [testUser, parseUnits('20000')], { id: 'mintUSDTUser' });
+  m.call(STABLE, 'unprotectedMint', [testUser, parseUnits('15000')], { id: 'mintStableUser' });
+  m.call(STOCK, 'unprotectedMint', [testUser, parseUnits('65')], { id: 'mintStockUser' });
+  m.call(GOV, 'unprotectedMint', [testUser, parseUnits('999999')], { id: 'mintGovUser' });
 
   return {
     ...contracts,
