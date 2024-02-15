@@ -19,7 +19,7 @@ import {
   StabilityPool,
 } from '../../generated/templates/StabilityPoolTemplate/StabilityPool';
 import { PriceFeed } from '../../generated/PriceFeed/PriceFeed';
-// import { log } from '@graphprotocol/graph-ts';
+import { log } from '@graphprotocol/graph-ts';
 
 export function handleCreateUpdateDebtTokenMeta(
   event: ethereum.Event,
@@ -27,6 +27,7 @@ export function handleCreateUpdateDebtTokenMeta(
   govReserveCap: BigInt | null = null,
 ): void {
   let debtTokenMeta = DebtTokenMeta.load(`DebtTokenMeta-${tokenAddress.toHexString()}`);
+  const systemInfo = SystemInfo.load(`SystemInfo`)!;
 
   if (debtTokenMeta === null) {
     debtTokenMeta = new DebtTokenMeta(`DebtTokenMeta-${tokenAddress.toHexString()}`);
@@ -34,14 +35,10 @@ export function handleCreateUpdateDebtTokenMeta(
   }
 
   const tokenContract = DebtToken.bind(tokenAddress);
-  const stabilityManagerAddress = tokenContract.stabilityPoolManagerAddress();
   // FIXME: I need to add them all to the network.json
   // const stabilityManagerAddress = Address.fromString("0xDc64a140Aa3E981100a9becA4E685f962f0cF6C9");
 
-  const debtTokenStabilityPoolManagerContract = StabilityPoolManager.bind(stabilityManagerAddress);
-  const debtTokenStabilityPoolContract = StabilityPool.bind(
-    debtTokenStabilityPoolManagerContract.getStabilityPool(tokenAddress),
-  );
+
 
   debtTokenMeta.token = tokenAddress;
   debtTokenMeta.timestamp = event.block.timestamp;
@@ -50,34 +47,34 @@ export function handleCreateUpdateDebtTokenMeta(
   const tokenPrice = Token.load(tokenAddress)!.priceUSD;
   debtTokenMeta.totalSupplyUSD = totalSupply.times(tokenPrice).div(BigInt.fromI32(10).pow(18));
 
-  const systemInfo = SystemInfo.load(`SystemInfo`)!;
-  const govToken = systemInfo.govToken.toHexString();
-  const stableCoin = systemInfo.stableCoin.toHexString();
+  const govToken = Address.fromBytes(systemInfo.govToken)
+  const stableCoin = Address.fromBytes(systemInfo.stableCoin)
 
-  if (tokenAddress.toHexString() == stableCoin || tokenAddress.toHexString() == govToken) {
-    const borrowerOperationsAddress = tokenContract.borrowerOperationsAddress();
-    const borrowerOperationsContract = BorrowerOperations.bind(borrowerOperationsAddress);
+  if (tokenAddress == stableCoin || tokenAddress == govToken) {
+    const reservePoolContract = ReservePool.bind(Address.fromBytes(systemInfo.reservePool));
 
-    const reservePoolAddress = borrowerOperationsContract.reservePool();
-    const reservePoolContract = ReservePool.bind(reservePoolAddress);
+    if (tokenAddress == stableCoin) {
+      debtTokenMeta.totalReserve = tokenContract.balanceOf(Address.fromBytes(systemInfo.reservePool));
 
-    if (tokenAddress.toHexString() == stableCoin) {
-      debtTokenMeta.totalReserve = tokenContract.balanceOf(reservePoolAddress);
-      // FIXME: govToken is a CollToken now.
-    } else if (tokenAddress.toHexString() == govToken) {
+
+    } else if (tokenAddress == govToken) {
       debtTokenMeta.totalReserve = govReserveCap ? govReserveCap : reservePoolContract.govReserveCap();
     }
   } else {
     debtTokenMeta.totalReserve = BigInt.fromI32(0);
   }
 
-  debtTokenMeta.totalDepositedStability = debtTokenStabilityPoolContract.getTotalDeposit();
+  const stabilityPoolManagerContract = StabilityPoolManager.bind(Address.fromBytes(systemInfo.stabilityPoolManager));
+  const stabilityPool = stabilityPoolManagerContract.getStabilityPool(tokenAddress);
+  
+  const debtTokenStabilityPool = StabilityPool.bind(stabilityPool);
+  debtTokenMeta.totalDepositedStability = debtTokenStabilityPool.getTotalDeposit();
 
   // Just link average but update them atomically.
   debtTokenMeta.stabilityDepositAPY = `StabilityDepositAPY-${tokenAddress.toHexString()}`;
   debtTokenMeta.totalSupplyUSD30dAverage = `TotalSupplyAverage-${tokenAddress.toHexString()}`;
 
-  if (tokenAddress.toHexString() == stableCoin || tokenAddress.toHexString() == govToken) {
+  if (tokenAddress == stableCoin || tokenAddress == govToken) {
     debtTokenMeta.totalReserve30dAverage = `TotalReserveAverage-${tokenAddress.toHexString()}`;
   }
 

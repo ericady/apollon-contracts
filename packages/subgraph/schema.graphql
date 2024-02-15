@@ -8,6 +8,7 @@ type SystemInfo @entity {
   storagePool: Bytes!
   priceFeed: Bytes!
   reservePool: Bytes!
+  stabilityPoolManager: Bytes!
 
   # Chart indexes
   totalValueLockedUSDHistoryIndex: Int!

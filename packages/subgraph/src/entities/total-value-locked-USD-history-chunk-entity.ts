@@ -14,15 +14,15 @@ export function handleCreateTotalValueLockedUSDHistoryChunk(event: ethereum.Even
   const storagePoolContract = StoragePool.bind(systemInfo.storagePool);
   const systemTVL = storagePoolContract['checkRecoveryMode1']().getEntireSystemColl();
 
-  if (lastChunk !== null) {
+  if (lastChunk === null) {
     lastChunk = new TotalValueLockedUSDHistoryChunk(`TotalValueLockedUSDHistoryChunk-0`);
     lastChunk.timestamp = event.block.timestamp;
     lastChunk.size = chunkSize.toI32();
     lastChunk.value = systemTVL;
-    lastChunk!.save();
+    lastChunk.save();
   } else {
     // check if last chunk is older that 1d
-    if (lastChunk!.timestamp.plus(chunkSize) < event.block.timestamp) {
+    if (lastChunk.timestamp.plus(chunkSize) < event.block.timestamp) {
       // FIXME: We disregard that we have to fill up complete chunk in between because the size is 24h
 
       // create new chunk and update index
@@ -37,8 +37,8 @@ export function handleCreateTotalValueLockedUSDHistoryChunk(event: ethereum.Even
     } else {
       // update tvl
 
-      lastChunk!.value = systemTVL;
-      lastChunk!.save();
+      lastChunk.value = systemTVL;
+      lastChunk.save();
     }
   }
 }

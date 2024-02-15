@@ -13,6 +13,7 @@ import {
 import { handleCreateUpdateDebtTokenMeta } from './entities/debt-token-meta-entity';
 import { handleUpdateSystemInfo_stableCoin } from './entities/system-info-entity';
 import { handleCreateToken } from './entities/token-entity';
+import { log } from '@graphprotocol/graph-ts';
 
 export function handleCollTokenAdded(event: CollTokenAddedEvent): void {
   ERC20Template.create(event.params._tokenAddress);
@@ -23,6 +24,7 @@ export function handleCollTokenAdded(event: CollTokenAddedEvent): void {
 }
 
 export function handleDebtTokenAdded(event: DebtTokenAddedEvent): void {
+  log.warning('DebtTokenAdded: {}', [event.params._debtTokenAddress.toHexString()]);
   DebtTokenTemplate.create(event.params._debtTokenAddress);
   const debtTokenManagerContract = TokenManager.bind(event.address);
   const stableCoin = debtTokenManagerContract.getStableCoin();

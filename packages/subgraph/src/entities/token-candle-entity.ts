@@ -7,12 +7,12 @@ import { PriceFeed } from '../../generated/PriceFeed/PriceFeed';
 
 // 1min, 10min, 1hour, 6hour, 1day, 1week
 const CandleSizes = [1, 10, 60, 360, 1440, 10080];
+export const oneEther = BigInt.fromI64(1000000000000000000);
 
 /**
  * Initializes the Singleton once for a new Token
  */
 export function handleCreateTokenCandleSingleton(event: ethereum.Event, tokenAddress: Address): void {
-  log.warning('CREATE CANDLE: {}', [tokenAddress.toHexString()]);
 
   let candleSingleton: TokenCandleSingleton | null;
   // TODO: How to get initialized price?
@@ -59,8 +59,8 @@ export function handleUpdateTokenCandle_low_high(
   const swapPairReserves = SwapPair.bind(swapPair).getReserves();
   const tokenPriceInStable =
     pairPosition === 0
-      ? swapPairReserves.get_reserve0().div(swapPairReserves.get_reserve1())
-      : swapPairReserves.get_reserve1().div(swapPairReserves.get_reserve0());
+      ? swapPairReserves.get_reserve0().times(oneEther).div(swapPairReserves.get_reserve1())
+      : swapPairReserves.get_reserve1().times(oneEther).div(swapPairReserves.get_reserve0());
   const tokenPriceUSD = tokenPriceInStable.times(stablePrice);
 
   for (let i = 0; i < CandleSizes.length; i++) {

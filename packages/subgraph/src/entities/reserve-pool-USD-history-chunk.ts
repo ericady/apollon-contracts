@@ -13,27 +13,27 @@ export function handleCreateReservePoolUSDHistoryChunk(event: ethereum.Event, re
   const systemInfo = SystemInfo.load(`SystemInfo`)!;
 
   const currentIndex = systemInfo.reservePoolUSDHistoryIndex;
-  const stableCoin = systemInfo.stableCoin;
-  const govToken = systemInfo.govToken;
+  const stableCoin = Address.fromBytes(systemInfo.stableCoin);
+  const govToken = Address.fromBytes(systemInfo.govToken);
 
   let lastChunk = ReservePoolUSDHistoryChunk.load(`ReservePoolUSDHistoryChunk-${currentIndex.toString()}`);
 
-  const priceFeedContract = PriceFeed.bind(systemInfo.priceFeed);
+  const priceFeedContract = PriceFeed.bind(Address.fromBytes(systemInfo.priceFeed));
   const govTokenAmount = ReservePool.bind(reservePoolAddress).govReserveCap();
-  const govTokenPriceUSD = priceFeedContract['getUSDValue2'](govToken, govTokenAmount);
+  const govTokenPriceUSD = priceFeedContract.getUSDValue2(govToken, govTokenAmount);
   const stableCoinAmount = DebtToken.bind(stableCoin).balanceOf(reservePoolAddress);
-  const stableCoinPriceUSD = priceFeedContract['getUSDValue2'](stableCoin, stableCoinAmount);
+  const stableCoinPriceUSD = priceFeedContract.getUSDValue2(stableCoin, stableCoinAmount);
   const totalValueReservesUSD = govTokenPriceUSD.plus(stableCoinPriceUSD);
 
-  if (lastChunk !== null) {
+  if (lastChunk === null) {
     lastChunk = new ReservePoolUSDHistoryChunk(`ReservePoolUSDHistoryChunk-0`);
     lastChunk.timestamp = event.block.timestamp;
     lastChunk.size = chunkSize.toI32();
     lastChunk.value = totalValueReservesUSD;
-    lastChunk!.save();
+    lastChunk.save();
   } else {
     // check if last chunk is older that 1d
-    if (lastChunk!.timestamp.plus(chunkSize) < event.block.timestamp) {
+    if (lastChunk.timestamp.plus(chunkSize) < event.block.timestamp) {
       // FIXME: We disregard that we have to fill up complete chunk in between because the size is 24h
 
       // create new chunk and update index
@@ -48,8 +48,8 @@ export function handleCreateReservePoolUSDHistoryChunk(event: ethereum.Event, re
     } else {
       // update tvl
 
-      lastChunk!.value = totalValueReservesUSD;
-      lastChunk!.save();
+      lastChunk.value = totalValueReservesUSD;
+      lastChunk.save();
     }
   }
 }

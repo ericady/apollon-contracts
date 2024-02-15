@@ -48,6 +48,7 @@ export function CustomApolloProvider({ children }: PropsWithChildren<{}>) {
     stabilityPoolManagerContract,
     swapPairContracts,
     storagePoolContract,
+    priceFeedContract
   });
 
   const client = new ApolloClient({
@@ -150,19 +151,16 @@ const getProductionCacheConfig = ({
           read(_, { readField }) {
             const address = readField('address') as Readonly<string>;
 
-            console.log('address: ', address);
             if (address) {
               if (isDebtTokenAddress(address)) {
                 if (isFieldOutdated(SchemaDataFreshnessManager.DebtToken[address], 'priceUSDOracle')) {
                   SchemaDataFreshnessManager.DebtToken[address].priceUSDOracle.fetch(priceFeedContract);
                 }
-                console.log('SchemaDataFreshnessManager.DebtToken[address].priceUSDOracle.value(): ',address,  SchemaDataFreshnessManager.DebtToken[address].priceUSDOracle.value());
                 return SchemaDataFreshnessManager.DebtToken[address].priceUSDOracle.value();
               } else if (isCollateralTokenAddress(address)) {
                 if (isFieldOutdated(SchemaDataFreshnessManager.ERC20[address], 'priceUSDOracle')) {
                   SchemaDataFreshnessManager.ERC20[address].priceUSDOracle.fetch(priceFeedContract);
                 }
-                console.log(' SchemaDataFreshnessManager.ERC20[address].priceUSDOracle.value(): ',address,   SchemaDataFreshnessManager.ERC20[address].priceUSDOracle.value());
                 return SchemaDataFreshnessManager.ERC20[address].priceUSDOracle.value();
               }
             }
@@ -980,6 +978,7 @@ export const SchemaDataFreshnessManager: ContractDataFreshnessManager<typeof Con
           
           const tokenPrice = (await priceFeedContract.getPrice(Contracts.DebtToken.STABLE)).price;
 
+
           SchemaDataFreshnessManager.DebtToken[Contracts.DebtToken.STABLE].priceUSDOracle.value(tokenPrice);
         },
         value: makeVar(defaultFieldValue),
@@ -1147,6 +1146,7 @@ export const SchemaDataFreshnessManager: ContractDataFreshnessManager<typeof Con
           SchemaDataFreshnessManager.DebtToken[Contracts.DebtToken.STOCK_1].priceUSDOracle.lastFetched = Date.now();
 
           const tokenPrice = (await priceFeedContract.getPrice(Contracts.DebtToken.STOCK_1)).price;
+
 
           SchemaDataFreshnessManager.DebtToken[Contracts.DebtToken.STOCK_1].priceUSDOracle.value(tokenPrice);
         },

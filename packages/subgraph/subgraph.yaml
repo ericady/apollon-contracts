@@ -99,6 +99,8 @@ dataSources:
           handler: handleOwnershipTransferred
         - event: StabilityPoolAdded(address)
           handler: handleStabilityPoolAdded
+        - event: StabilityPoolManagerInitiated(address,address,address,address,address)
+          handler: handleStabilityPoolInitiated
       file: ./src/stability-pool-manager.ts
   - kind: ethereum
     name: PriceFeed
@@ -206,6 +208,8 @@ dataSources:
           file: ./abis/BorrowerOperations.json
         - name: ReservePool
           file: ./abis/ReservePool.json
+        - name: PriceFeed
+          file: ./abis/PriceFeed.json
       eventHandlers:
         - event: OwnershipTransferred(indexed address,indexed address)
           handler: handleOwnershipTransferred

@@ -1,6 +1,7 @@
 import { BigInt, Address as EventAddress } from '@graphprotocol/graph-ts/common/numbers';
 import { newMockEvent } from 'matchstick-as';
 import { SystemInfo, Token } from '../generated/schema';
+import { oneEther } from '../src/entities/token-candle-entity';
 
 export const MockDebtTokenAddress = EventAddress.fromString('0x0000000000000000000000000000000000000100');
 export const MockDebtToken_STABLE_Address = EventAddress.fromString('0x0000000000000000000000000000000000000101');
@@ -15,7 +16,6 @@ export const MockReservePoolAddress = EventAddress.fromString('0x000000000000000
 
 export const MockUserAddress = EventAddress.fromString('0x1000000000000000000000000000000000000000');
 
-export const oneEther = BigInt.fromI64(1000000000000000000);
 
 export const initSystemInfo = (): void => {
   const systemInfo = new SystemInfo('SystemInfo');

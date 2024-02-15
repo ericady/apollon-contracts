@@ -14,15 +14,15 @@ export function handleCreateTotalValueMintedUSDHistoryChunk(event: ethereum.Even
   const storagePoolContract = StoragePool.bind(systemInfo.storagePool);
   const systemMintedUSD = storagePoolContract['checkRecoveryMode1']().getEntireSystemDebt();
 
-  if (lastChunk !== null) {
+  if (lastChunk === null) {
     lastChunk = new TotalValueMintedUSDHistoryChunk(`TotalValueMintedUSDHistoryChunk-0`);
     lastChunk.timestamp = event.block.timestamp;
     lastChunk.size = chunkSize.toI32();
     lastChunk.value = systemMintedUSD;
-    lastChunk!.save();
+    lastChunk.save();
   } else {
     // check if last chunk is older that 1d
-    if (lastChunk!.timestamp.plus(chunkSize) < event.block.timestamp) {
+    if (lastChunk.timestamp.plus(chunkSize) < event.block.timestamp) {
       // FIXME: We disregard that we have to fill up complete chunk in between because the size is 24h
 
       // create new chunk and update index
@@ -37,8 +37,8 @@ export function handleCreateTotalValueMintedUSDHistoryChunk(event: ethereum.Even
     } else {
       // update tvl
 
-      lastChunk!.value = systemMintedUSD;
-      lastChunk!.save();
+      lastChunk.value = systemMintedUSD;
+      lastChunk.save();
     }
   }
 }

@@ -54,7 +54,7 @@ export const isDebtTokenAddress = (
     .map((address) => getCheckSum(address))
     .includes(getCheckSum(address) as any);
 };
-export const isStableCoinAddress = (address: string): address is '0x1613beb3b2c4f22ee086b2b38c1476a3ce7f78e8' => {
+export const isStableCoinAddress = (address: string): address is '0x95401dc811bb5740090279ba06cfa8fcf6113778' => {
   return getCheckSum(Contracts.DebtToken.STABLE) === getCheckSum(address);
 };
 

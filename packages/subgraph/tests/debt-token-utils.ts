@@ -1,7 +1,8 @@
 import { Address, BigInt, ethereum } from '@graphprotocol/graph-ts';
 import { createMockedFunction, newMockEvent } from 'matchstick-as';
 import { Approval, Transfer } from '../generated/templates/DebtTokenTemplate/DebtToken';
-import { MockDebtTokenAddress, MockStabilityPoolManagerAddress, oneEther } from './utils';
+import { MockDebtTokenAddress, MockStabilityPoolManagerAddress } from './utils';
+import { oneEther } from '../src/entities/token-candle-entity';
 
 // TODO: Remove me later. This is how to log in AssemblyScript
 // import { Address, BigInt, Bytes, ethereum, log } from '@graphprotocol/graph-ts';
