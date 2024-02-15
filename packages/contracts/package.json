@@ -14,7 +14,8 @@
     "test:p": "hardhat test test/**/*.ts --parallel",
     "coverage": "hardhat coverage",
     "coveralls": "cat coverage/lcov.info | coveralls",
-    "deploy:local:testing": "hardhat run ignition/deployLocal.ts --network localhost"
+    "deploy:local:testing": "hardhat run ignition/deployLocal.ts --network localhost",
+    "seed:local:swaps": "hardhat run ignition/seedSwapHistory.ts --network localhost"
   },
   "keywords": [],
   "author": "",
@@ -43,6 +44,7 @@
     "@types/chai": "^4.3.6",
     "@types/mocha": "^10.0.1",
     "chai": "^4.3.8",
+    "csv-parser": "^3.0.0",
     "dotenv": "^16.3.1",
     "eth-gas-reporter": "^0.2.22",
     "ethers": "^6.7.1",

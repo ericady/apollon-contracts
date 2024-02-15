@@ -40,3 +40,5 @@ coverage
 coverage.json
 
 .env
+
+/ignition/swaps/*
