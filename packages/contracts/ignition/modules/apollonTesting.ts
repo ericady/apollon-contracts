@@ -3,6 +3,7 @@ import { MaxUint256, parseUnits, ZeroAddress } from 'ethers';
 
 export default buildModule('ApollonTesting', m => {
   const deadline = m.getParameter('deadline');
+  const oracleUpdateTime = m.getParameter('oracleUpdateTime');
 
   // initial contract deployments
   const contracts = {
@@ -127,7 +128,7 @@ export default buildModule('ApollonTesting', m => {
 
   // setup mock tellor for testing
   const mockTellor = m.contract('MockTellor', []);
-  m.call(mockTellor, 'setUpdateTime', [deadline]);
+  m.call(mockTellor, 'setUpdateTime', [oracleUpdateTime]);
   const tellorCaller = m.contract('TellorCaller', [mockTellor], {
     after: [mockTellor],
   });

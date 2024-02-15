@@ -340,7 +340,7 @@ contract BorrowerOperations is LiquityBase, Ownable(msg.sender), CheckContract, 
 
       // revert minting if one of the oracles is not trusted
       TokenPrice memory tokenPrice = contractsCache.priceFeed.getTokenPrice(vars.priceCache, _debts[i].tokenAddress);
-      if (!tokenPrice.isPriceTrusted) revert UntrustedOraclesMintingIsFrozen();
+      if (!tokenPrice.isPriceTrusted) revert UntrustedOraclesMintingIsFrozen(tokenPrice.tokenAddress);
     }
 
     (DebtTokenAmount[] memory debtsToAdd, DebtTokenAmount memory stableCoinAmount) = _getDebtTokenAmounts(

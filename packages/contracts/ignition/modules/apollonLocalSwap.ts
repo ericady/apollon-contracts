@@ -2,7 +2,7 @@ import { buildModule } from '@nomicfoundation/hardhat-ignition/modules';
 import apollonTesting from './apollonTesting';
 import { MaxUint256, parseUnits, ZeroAddress } from 'ethers';
 
-export default buildModule('ApollonLocal', m => {
+export default buildModule('ApollonLocalSwap', m => {
   const deadline = m.getParameter('deadline');
   const initialMintUser = m.getParameter('initialMint');
 

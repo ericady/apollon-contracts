@@ -80,7 +80,13 @@
         "type": "error"
     },
     {
-        "inputs": [],
+        "inputs": [
+            {
+                "internalType": "address",
+                "name": "token",
+                "type": "address"
+            }
+        ],
         "name": "UntrustedOraclesMintingIsFrozen",
         "type": "error"
     },

@@ -42,7 +42,7 @@ interface IBorrowerOperations is IBBase {
   error ZeroDebtChange();
   error InsufficientDebtToRepay();
   error ZeroDebtRepay();
-  error UntrustedOraclesMintingIsFrozen();
+  error UntrustedOraclesMintingIsFrozen(address token);
 
   // --- Functions ---
 
