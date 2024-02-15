@@ -157,7 +157,7 @@ contract SwapPair is ISwapPair, SwapERC20, LiquityBase {
     // find stable coin
     address nonStableCoin = token1;
     if (!tokenManager.isDebtToken(nonStableCoin)) return SWAP_BASE_FEE; // no dynamic fee if the pool is not an stable/stock pool
-    if (totalSupply == 0) return SWAP_BASE_FEE; //inital mint
+    if (totalSupply == 0) return SWAP_BASE_FEE; //initial mint
 
     // query prices
     (uint oraclePrice, ) = priceFeed.getPrice(nonStableCoin);

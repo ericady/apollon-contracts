@@ -22,11 +22,13 @@ export const PermitTypes = {
 
 export async function deployTesting() {
   const blockTimestamp = (await ethers.provider.getBlock('latest'))?.timestamp ?? 0;
-  const deadline = blockTimestamp + 60 * 5;
-
+  const [owner] = await ethers.getSigners();
   return hre.ignition.deploy(apollonTesting, {
     parameters: {
-      ApollonTesting: { deadline },
+      ApollonTesting: {
+        deadline: blockTimestamp + 60 * 5,
+        initialMint: owner.address,
+      },
     },
   });
 }

@@ -3,7 +3,6 @@ import { MaxUint256, parseUnits, ZeroAddress } from 'ethers';
 
 export default buildModule('ApollonTesting', m => {
   const deadline = m.getParameter('deadline');
-  const testUser = '0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266';
 
   // initial contract deployments
   const contracts = {
@@ -216,102 +215,6 @@ export default buildModule('ApollonTesting', m => {
     id: 'addGov',
     after: [GOV, tokenLink],
   });
-
-  // setup swap pools
-  const stableMint = m.call(STABLE, 'unprotectedMint', [m.getAccount(0), parseUnits('40000')], {
-    id: 'mintStable',
-  });
-  const stockMint = m.call(STOCK, 'unprotectedMint', [m.getAccount(0), parseUnits('65')], {
-    id: 'mintStock',
-  });
-  const btcMint = m.call(BTC, 'unprotectedMint', [m.getAccount(0), parseUnits('1', 9)], { id: 'mintBTC' });
-  const usdtMint = m.call(USDT, 'unprotectedMint', [m.getAccount(0), parseUnits('10000')], {
-    id: 'mintUSDT',
-  });
-
-  const stableApprove = m.call(STABLE, 'approve', [contracts.swapOperations, MaxUint256], {
-    id: 'approveStable',
-    after: [stableMint],
-  });
-  const stockApprove = m.call(STOCK, 'approve', [contracts.swapOperations, MaxUint256], {
-    id: 'approveStock',
-    after: [stockMint],
-  });
-  const btcApprove = m.call(BTC, 'approve', [contracts.swapOperations, MaxUint256], {
-    id: 'approveBTC',
-    after: [btcMint],
-  });
-  const usdtApprove = m.call(USDT, 'approve', [contracts.swapOperations, MaxUint256], {
-    id: 'approveUSDT',
-    after: [usdtMint],
-  });
-
-  // STABLE - BTC
-  const stableBTCPair = m.call(contracts.swapOperations, 'createPair', [BTC, STABLE], {
-    id: 'createPairBTC',
-  });
-  m.call(
-    contracts.swapOperations,
-    'addLiquidity',
-    [
-      BTC,
-      STABLE,
-      parseUnits('1', 9),
-      parseUnits('20000'),
-      0,
-      0,
-      { upperHint: ZeroAddress, lowerHint: ZeroAddress, maxFeePercentage: 0 },
-      deadline,
-    ],
-    { id: 'addLiquidityBTC', after: [stableBTCPair, btcApprove, stableApprove] }
-  );
-
-  // STABLE - USDT
-  const stableUSDTPair = m.call(contracts.swapOperations, 'createPair', [USDT, STABLE], {
-    id: 'createPairUSDT',
-  });
-  m.call(
-    contracts.swapOperations,
-    'addLiquidity',
-    [
-      USDT,
-      STABLE,
-      parseUnits('10000'),
-      parseUnits('10000'),
-      0,
-      0,
-      { upperHint: ZeroAddress, lowerHint: ZeroAddress, maxFeePercentage: 0 },
-      deadline,
-    ],
-    { id: 'addLiquidityUSDT', after: [stableUSDTPair, usdtApprove, stableApprove] }
-  );
-
-  // STABLE - STOCK
-  const stableStockPair = m.call(contracts.swapOperations, 'createPair', [STOCK, STABLE], {
-    id: 'createPairSTOCK',
-  });
-  m.call(
-    contracts.swapOperations,
-    'addLiquidity',
-    [
-      STOCK,
-      STABLE,
-      parseUnits('65'),
-      parseUnits('10000'),
-      0,
-      0,
-      { upperHint: ZeroAddress, lowerHint: ZeroAddress, maxFeePercentage: 0 },
-      deadline,
-    ],
-    { id: 'addLiquiditySTOCK', after: [stableStockPair, stockApprove, stableApprove] }
-  );
-
-  // mint test user assets
-  m.call(BTC, 'unprotectedMint', [testUser, parseUnits('1', 9)], { id: 'mintBTCUser' });
-  m.call(USDT, 'unprotectedMint', [testUser, parseUnits('20000')], { id: 'mintUSDTUser' });
-  m.call(STABLE, 'unprotectedMint', [testUser, parseUnits('15000')], { id: 'mintStableUser' });
-  m.call(STOCK, 'unprotectedMint', [testUser, parseUnits('65')], { id: 'mintStockUser' });
-  m.call(GOV, 'unprotectedMint', [testUser, parseUnits('999999')], { id: 'mintGovUser' });
 
   return {
     ...contracts,

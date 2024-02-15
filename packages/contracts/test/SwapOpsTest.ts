@@ -10,10 +10,10 @@ import {
   TokenManager,
 } from '../typechain';
 import { expect } from 'chai';
-import { openTrove, getLatestBlockTimestamp, setPrice, deployTesting } from '../utils/testHelper';
+import { openTrove, getLatestBlockTimestamp, setPrice, deployTesting, buildPriceCache } from '../utils/testHelper';
 import { parseUnits } from 'ethers';
 
-describe('SwapOperations', () => {
+describe.only('SwapOperations', () => {
   let signers: SignerWithAddress[];
   let owner: SignerWithAddress;
   let alice: SignerWithAddress;
@@ -127,6 +127,9 @@ describe('SwapOperations', () => {
     STOCK = contracts.STOCK;
     BTC = contracts.BTC;
     ETH = contracts.ETH;
+
+    // to ensure that the oracles is marked das "trusted"
+    await contracts.mockTellor.setUpdateTime(await getLatestBlockTimestamp());
   });
 
   it('should not be possible to mint directly from the borrowerOps', async () => {
@@ -243,7 +246,9 @@ describe('SwapOperations', () => {
       //remove liquidity
       await remove(alice, STOCK, await pair.balanceOf(alice));
       expect(await pair.balanceOf(alice)).to.be.equal(0);
-      expect(await troveManager.getTroveRepayableDebt(alice, STABLE, false)).to.be.equal(0);
+
+      const priceCache = await buildPriceCache(contracts);
+      expect(await troveManager.getTroveRepayableDebt(priceCache, alice, STABLE, false)).to.be.equal(0);
     });
 
     it('huge debts, partial repay expected', async () => {
@@ -259,12 +264,14 @@ describe('SwapOperations', () => {
       //remove liquidity
       await remove(alice, STOCK, await pair.balanceOf(alice));
       expect(await pair.balanceOf(alice)).to.be.equal(0);
-      expect(await troveManager.getTroveRepayableDebt(alice, STABLE, false)).to.be.greaterThan(0);
+
+      const priceCache = await buildPriceCache(contracts);
+      expect(await troveManager.getTroveRepayableDebt(priceCache, alice, STABLE, false)).to.be.greaterThan(0);
     });
   });
 
   describe('add liquidity', () => {
-    it('default uniswap tests STABLE/STOCK', async () => {
+    it.only('default uniswap tests STABLE/STOCK', async () => {
       const amount = parseUnits('1000');
 
       //create pair & add liquidity
@@ -275,6 +282,9 @@ describe('SwapOperations', () => {
       //check reserves
       const res = await pair.getReserves();
       expect(res._reserve0).to.be.equal(res._reserve1);
+
+      //check total supply
+      expect(await pair.totalSupply()).to.be.gt(0);
     });
 
     it('default uniswap tests STABLE/BTC', async () => {

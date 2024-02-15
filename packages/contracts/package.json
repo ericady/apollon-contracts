@@ -14,7 +14,7 @@
     "test:p": "hardhat test test/**/*.ts --parallel",
     "coverage": "hardhat coverage",
     "coveralls": "cat coverage/lcov.info | coveralls",
-    "deploy:local:testing": "hardhat run ignition/deployTesting.ts --network localhost"
+    "deploy:local:testing": "hardhat run ignition/deployLocal.ts --network localhost"
   },
   "keywords": [],
   "author": "",
