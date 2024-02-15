@@ -1,10 +1,11 @@
 import { Address, ethereum } from '@graphprotocol/graph-ts';
 import { SystemInfo } from '../../generated/schema';
 
-const PriceFeedDemo = Address.fromString('0x8A791620dd6260079BF849Dc5567aDC3F2FdC318');
-const StoragePoolDemo = Address.fromString('0x5FC8d32690cc91D4c39d9d3abcBD16989F875707');
-const StableDemo = Address.fromString('0x7a2088a1bFc9d81c55368AE168C2C02570cB814F');
-const ReservePoolDemo = Address.fromString('0x0165878A594ca255338adfa4d48449f69242Eb8F');
+const PriceFeedDemo = Address.fromString('0xa513e6e4b8f2a923d98304ec87f64353c4d5c853');
+const StoragePoolDemo = Address.fromString('0xb7f8bc63bbcad18155201308c8f3540b07f84f5e');
+const StableDemo = Address.fromString('0x1613beb3b2c4f22ee086b2b38c1476a3ce7f78e8');
+const ReservePoolDemo = Address.fromString('0x8a791620dd6260079bf849dc5567adc3f2fdc318');
+const GovTokenDemo = Address.fromString('0x0b306bf915c4d645ff596e518faf3f9669b97016');
 
 export const handleUpdateSystemInfo_stableCoin = (event: ethereum.Event, stableCoin: Address): void => {
   let systemInfo = SystemInfo.load(`SystemInfo`);
@@ -14,6 +15,10 @@ export const handleUpdateSystemInfo_stableCoin = (event: ethereum.Event, stableC
     systemInfo.storagePool = StoragePoolDemo;
     systemInfo.priceFeed = PriceFeedDemo;
     systemInfo.reservePool = ReservePoolDemo;
+    systemInfo.totalValueLockedUSDHistoryIndex = 0;
+    systemInfo.totalValueMintedUSDHistoryIndex = 0;
+    systemInfo.reservePoolUSDHistoryIndex = 0;
+    systemInfo.govToken = GovTokenDemo;
   }
 
   systemInfo.timestamp = event.block.timestamp;
@@ -30,6 +35,10 @@ export const handleUpdateSystemInfo_storagePool = (event: ethereum.Event, storag
     systemInfo.stableCoin = StableDemo;
     systemInfo.priceFeed = PriceFeedDemo;
     systemInfo.reservePool = ReservePoolDemo;
+    systemInfo.totalValueLockedUSDHistoryIndex = 0;
+    systemInfo.totalValueMintedUSDHistoryIndex = 0;
+    systemInfo.reservePoolUSDHistoryIndex = 0;
+    systemInfo.govToken = GovTokenDemo;
   }
 
   systemInfo.timestamp = event.block.timestamp;
@@ -46,6 +55,10 @@ export const handleUpdateSystemInfo_priceFeed = (event: ethereum.Event, priceFee
     systemInfo.stableCoin = StableDemo;
     systemInfo.storagePool = StoragePoolDemo;
     systemInfo.reservePool = ReservePoolDemo;
+    systemInfo.totalValueLockedUSDHistoryIndex = 0;
+    systemInfo.totalValueMintedUSDHistoryIndex = 0;
+    systemInfo.reservePoolUSDHistoryIndex = 0;
+    systemInfo.govToken = GovTokenDemo;
   }
 
   systemInfo.timestamp = event.block.timestamp;
@@ -62,6 +75,10 @@ export const handleUpdateSystemInfo_reservePool = (event: ethereum.Event, reserv
     systemInfo.stableCoin = StableDemo;
     systemInfo.storagePool = StoragePoolDemo;
     systemInfo.priceFeed = PriceFeedDemo;
+    systemInfo.totalValueLockedUSDHistoryIndex = 0;
+    systemInfo.totalValueMintedUSDHistoryIndex = 0;
+    systemInfo.reservePoolUSDHistoryIndex = 0;
+    systemInfo.govToken = GovTokenDemo;
   }
 
   systemInfo.timestamp = event.block.timestamp;

@@ -1,14 +1,14 @@
+import { Address } from '@graphprotocol/graph-ts';
 import {
   OwnershipTransferred as OwnershipTransferredEvent,
   ReserveCapChanged as ReserveCapChangedEvent,
   ReservePoolInitialized as ReservePoolInitializedEvent,
   WithdrewReserves as WithdrewReservesEvent,
 } from '../generated/ReservePool/ReservePool';
+import { SystemInfo } from '../generated/schema';
 import {
-  govToken,
   handleCreateUpdateDebtTokenMeta,
   handleUpdateDebtTokenMeta_totalReserve30dAverage,
-  stableDebtToken,
 } from './entities/debt-token-meta-entity';
 import { handleUpdateSystemInfo_reservePool } from './entities/system-info-entity';
 
@@ -27,8 +27,12 @@ export function handleReservePoolInitialized(event: ReservePoolInitializedEvent)
 }
 
 export function handleWithdrewReserves(event: WithdrewReservesEvent): void {
-  handleCreateUpdateDebtTokenMeta(event, stableDebtToken);
-  handleUpdateDebtTokenMeta_totalReserve30dAverage(event, stableDebtToken, event.params.stableAmount);
+  const systemInfo = SystemInfo.load(`SystemInfo`)!;
+  const stableCoin = Address.fromBytes(systemInfo.stableCoin);
+  const govToken = Address.fromBytes(systemInfo.govToken);
+
+  handleCreateUpdateDebtTokenMeta(event, stableCoin);
+  handleUpdateDebtTokenMeta_totalReserve30dAverage(event, stableCoin, event.params.stableAmount);
 
   handleCreateUpdateDebtTokenMeta(event, govToken);
   handleUpdateDebtTokenMeta_totalReserve30dAverage(event, govToken, event.params.govAmount);

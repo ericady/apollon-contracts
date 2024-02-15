@@ -1,4 +1,5 @@
 // import { log } from '@graphprotocol/graph-ts';
+import { Address } from '@graphprotocol/graph-ts';
 import {
   OwnershipTransferred as OwnershipTransferredEvent,
   PairCreated as PairCreatedEvent,
@@ -13,15 +14,15 @@ export function handleOwnershipTransferred(event: OwnershipTransferredEvent): vo
 
 export function handlePairCreated(event: PairCreatedEvent): void {
   const systemInfo = SystemInfo.load(`SystemInfo`)!;
-  const stableCoin = systemInfo.stableCoin;
+  const stableCoin = Address.fromBytes(systemInfo.stableCoin);
 
-  const poolContainsStableCoin = event.params.token0 === stableCoin || event.params.token1 === stableCoin;
+  const poolContainsStableCoin = event.params.token0 == stableCoin || event.params.token1 == stableCoin;
 
   // We only draw charts for Pool containing the stable coin
   if (poolContainsStableCoin) {
     handleCreateTokenCandleSingleton(
       event,
-      event.params.token0 === stableCoin ? event.params.token1 : event.params.token0,
+      event.params.token0 == stableCoin ? event.params.token1 : event.params.token0,
     );
   }
 

@@ -4,9 +4,15 @@ type SystemInfo @entity {
   id: String!
   timestamp: BigInt!
   stableCoin: Bytes!
+  govToken: Bytes!
   storagePool: Bytes!
   priceFeed: Bytes!
   reservePool: Bytes!
+
+  # Chart indexes
+  totalValueLockedUSDHistoryIndex: Int!
+  totalValueMintedUSDHistoryIndex: Int!
+  reservePoolUSDHistoryIndex: Int!
 }
 
 # TODO: wasa mapper for swap pools PairCreated event
@@ -310,3 +316,33 @@ type TokenCandle @entity(immutable: true) {
 }
 
 #  SMALL BALANCE CHARTS
+
+# current total value locked, each in 1d chunks
+type TotalValueLockedUSDHistoryChunk @entity {
+  # "TotalValueLockedUSDHistoryChunk" + index
+  id: String!
+  timestamp: BigInt!
+  value: BigInt!
+  # interval in seconds. This allows to filter if more/less granularity is needed.
+  size: Int!
+}
+
+# current total value minted, each in 1d chunks
+type TotalValueMintedUSDHistoryChunk @entity {
+  # "TotalValueMintedUSDHistoryChunk" + index
+  id: String!
+  timestamp: BigInt!
+  value: BigInt!
+  # interval in seconds. This allows to filter if more/less granularity is needed.
+  size: Int!
+}
+
+# current total value locked by all reserve pools, each in 1d chunks
+type ReservePoolUSDHistoryChunk @entity {
+  # "ReservePoolUSDHistoryChunk" + index
+  id: String!
+  timestamp: BigInt!
+  value: BigInt!
+  # interval in seconds. This allows to filter if more/less granularity is needed.
+  size: Int!
+}

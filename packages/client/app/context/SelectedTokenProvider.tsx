@@ -7,6 +7,7 @@ import { GetBorrowerDebtTokensQuery, GetBorrowerDebtTokensQueryVariables } from 
 import { GET_BORROWER_DEBT_TOKENS } from '../queries';
 import { useEthers } from './EthersProvider';
 import { Contracts } from './contracts.config';
+import { divBigIntsToFloat } from '../utils/math';
 
 export type SelectedToken = {
   swapFee: bigint;

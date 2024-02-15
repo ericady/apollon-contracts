@@ -10,7 +10,7 @@ import {
 } from '@apollo/client';
 import { AddressLike } from 'ethers';
 import { PropsWithChildren } from 'react';
-import { DebtToken, ERC20, StabilityPoolManager, StoragePool, SwapPair, TroveManager } from '../../generated/types';
+import { DebtToken, ERC20, PriceFeed, StabilityPoolManager, StoragePool, SwapPair, TroveManager } from '../../generated/types';
 import { SystemInfo, TokenFragmentFragment } from '../generated/gql-types';
 import { TOKEN_FRAGMENT } from '../queries';
 import { getCheckSum } from '../utils/crypto';
@@ -30,6 +30,7 @@ export function CustomApolloProvider({ children }: PropsWithChildren<{}>) {
       stabilityPoolManagerContract,
       storagePoolContract,
       collateralTokenContracts,
+      priceFeedContract
     },
     address: borrower,
   } = useEthers();
@@ -130,6 +131,7 @@ const getProductionCacheConfig = ({
   stabilityPoolManagerContract,
   swapPairContracts,
   storagePoolContract,
+  priceFeedContract,
 }: {
   provider: ReturnType<typeof useEthers>['provider'];
   borrower: AddressLike;
@@ -139,6 +141,7 @@ const getProductionCacheConfig = ({
   stabilityPoolManagerContract: ReturnType<typeof useEthers>['contracts']['stabilityPoolManagerContract'];
   swapPairContracts: ReturnType<typeof useEthers>['contracts']['swapPairContracts'];
   storagePoolContract: ReturnType<typeof useEthers>['contracts']['storagePoolContract'];
+  priceFeedContract: ReturnType<typeof useEthers>['contracts']['priceFeedContract'];
 }): { fields: TypePolicies; Query: TypePolicy } => ({
   fields: {
     Token: {
@@ -146,16 +149,20 @@ const getProductionCacheConfig = ({
         priceUSDOracle: {
           read(_, { readField }) {
             const address = readField('address') as Readonly<string>;
+
+            console.log('address: ', address);
             if (address) {
               if (isDebtTokenAddress(address)) {
                 if (isFieldOutdated(SchemaDataFreshnessManager.DebtToken[address], 'priceUSDOracle')) {
-                  SchemaDataFreshnessManager.DebtToken[address].priceUSDOracle.fetch(debtTokenContracts[address]);
+                  SchemaDataFreshnessManager.DebtToken[address].priceUSDOracle.fetch(priceFeedContract);
                 }
+                console.log('SchemaDataFreshnessManager.DebtToken[address].priceUSDOracle.value(): ',address,  SchemaDataFreshnessManager.DebtToken[address].priceUSDOracle.value());
                 return SchemaDataFreshnessManager.DebtToken[address].priceUSDOracle.value();
               } else if (isCollateralTokenAddress(address)) {
                 if (isFieldOutdated(SchemaDataFreshnessManager.ERC20[address], 'priceUSDOracle')) {
-                  SchemaDataFreshnessManager.ERC20[address].priceUSDOracle.fetch(collateralTokenContracts[address]);
+                  SchemaDataFreshnessManager.ERC20[address].priceUSDOracle.fetch(priceFeedContract);
                 }
+                console.log(' SchemaDataFreshnessManager.ERC20[address].priceUSDOracle.value(): ',address,   SchemaDataFreshnessManager.ERC20[address].priceUSDOracle.value());
                 return SchemaDataFreshnessManager.ERC20[address].priceUSDOracle.value();
               }
             }
@@ -543,7 +550,7 @@ export const ContractDataFreshnessManager: {
     getTroveRepayableDebts: {
       fetch: async (troveManagerContract: TroveManager, borrower: AddressLike) => {
         ContractDataFreshnessManager.TroveManager.getTroveRepayableDebts.lastFetched = Date.now();
-        // FIXME: Call so that we can dinstiguish to real repayable
+        
         const troveRepayableDebts = await troveManagerContract['getTroveRepayableDebts(address,bool)'](borrower, false);
 
         const tokenAmounts = troveRepayableDebts.map(([tokenAddress, amount]) => ({
@@ -703,11 +710,12 @@ export const SchemaDataFreshnessManager: ContractDataFreshnessManager<typeof Con
   ERC20: {
     [Contracts.ERC20.BTC]: {
       priceUSDOracle: {
-        fetch: async (collTokenContract: ERC20) => {
+        fetch: async (priceFeedContract: PriceFeed) => {
           SchemaDataFreshnessManager.ERC20[Contracts.ERC20.BTC].priceUSDOracle.lastFetched = Date.now();
 
-          // FIXME: Implement Coll Oracle Prices
-          SchemaDataFreshnessManager.ERC20[Contracts.ERC20.BTC].priceUSDOracle.value(defaultFieldValue);
+          const tokenPrice = (await priceFeedContract.getPrice(Contracts.ERC20.BTC)).price;
+
+          SchemaDataFreshnessManager.ERC20[Contracts.ERC20.BTC].priceUSDOracle.value(tokenPrice);
         },
         value: makeVar(defaultFieldValue),
         lastFetched: 0,
@@ -791,11 +799,12 @@ export const SchemaDataFreshnessManager: ContractDataFreshnessManager<typeof Con
 
     [Contracts.ERC20.GOV]: {
       priceUSDOracle: {
-        fetch: async (collTokenContract: ERC20) => {
+        fetch: async (priceFeedContract: PriceFeed) => {
           SchemaDataFreshnessManager.ERC20[Contracts.ERC20.GOV].priceUSDOracle.lastFetched = Date.now();
 
-          // FIXME: Implement Coll Oracle Prices
-          SchemaDataFreshnessManager.ERC20[Contracts.ERC20.GOV].priceUSDOracle.value(defaultFieldValue);
+          const tokenPrice = (await priceFeedContract.getPrice(Contracts.ERC20.GOV)).price;
+
+          SchemaDataFreshnessManager.ERC20[Contracts.ERC20.GOV].priceUSDOracle.value(tokenPrice);
         },
         value: makeVar(defaultFieldValue),
         lastFetched: 0,
@@ -877,11 +886,12 @@ export const SchemaDataFreshnessManager: ContractDataFreshnessManager<typeof Con
 
     [Contracts.ERC20.USDT]: {
       priceUSDOracle: {
-        fetch: async (collTokenContract: ERC20) => {
+        fetch: async (priceFeedContract: PriceFeed) => {
           SchemaDataFreshnessManager.ERC20[Contracts.ERC20.USDT].priceUSDOracle.lastFetched = Date.now();
 
-          // FIXME: Implement Coll Oracle Prices
-          SchemaDataFreshnessManager.ERC20[Contracts.ERC20.USDT].priceUSDOracle.value(defaultFieldValue);
+          const tokenPrice = (await priceFeedContract.getPrice(Contracts.ERC20.USDT)).price;
+
+          SchemaDataFreshnessManager.ERC20[Contracts.ERC20.USDT].priceUSDOracle.value(tokenPrice);
         },
         value: makeVar(defaultFieldValue),
         lastFetched: 0,
@@ -965,13 +975,12 @@ export const SchemaDataFreshnessManager: ContractDataFreshnessManager<typeof Con
   DebtToken: {
     [Contracts.DebtToken.STABLE]: {
       priceUSDOracle: {
-        fetch: async (debtTokenContract: DebtToken) => {
+        fetch: async (priceFeedContract: PriceFeed) => {
           SchemaDataFreshnessManager.DebtToken[Contracts.DebtToken.STABLE].priceUSDOracle.lastFetched = Date.now();
-          // FIXME:
-          // const oraclePrice = await debtTokenContract.getPrice();
-          const oraclePrice = BigInt(Math.pow(10, 18));
+          
+          const tokenPrice = (await priceFeedContract.getPrice(Contracts.DebtToken.STABLE)).price;
 
-          SchemaDataFreshnessManager.DebtToken[Contracts.DebtToken.STABLE].priceUSDOracle.value(oraclePrice);
+          SchemaDataFreshnessManager.DebtToken[Contracts.DebtToken.STABLE].priceUSDOracle.value(tokenPrice);
         },
         value: makeVar(defaultFieldValue),
         lastFetched: 0,
@@ -1134,12 +1143,12 @@ export const SchemaDataFreshnessManager: ContractDataFreshnessManager<typeof Con
 
     [Contracts.DebtToken.STOCK_1]: {
       priceUSDOracle: {
-        fetch: async (debtTokenContract: DebtToken) => {
+        fetch: async (priceFeedContract: PriceFeed) => {
           SchemaDataFreshnessManager.DebtToken[Contracts.DebtToken.STOCK_1].priceUSDOracle.lastFetched = Date.now();
-          // const oraclePrice = await debtTokenContract.getPrice();
-          const oraclePrice = BigInt(Math.pow(10, 18));
 
-          SchemaDataFreshnessManager.DebtToken[Contracts.DebtToken.STOCK_1].priceUSDOracle.value(oraclePrice);
+          const tokenPrice = (await priceFeedContract.getPrice(Contracts.DebtToken.STOCK_1)).price;
+
+          SchemaDataFreshnessManager.DebtToken[Contracts.DebtToken.STOCK_1].priceUSDOracle.value(tokenPrice);
         },
         value: makeVar(defaultFieldValue),
         lastFetched: 0,
@@ -1411,6 +1420,7 @@ export const SchemaDataFreshnessManager: ContractDataFreshnessManager<typeof Con
   TroveManager: {},
   SortedTroves: {},
   BorrowerOperations: {},
+  PriceFeed: {},
 };
 
 // FIXME: The cache needs to be initialized with the contracts data.

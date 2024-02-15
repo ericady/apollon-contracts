@@ -11,6 +11,7 @@ import {
   DebtToken,
   ERC20,
   HintHelpers,
+  PriceFeed,
   SortedTroves,
   StabilityPoolManager,
   StoragePool,
@@ -30,6 +31,7 @@ import storagePoolAbi from './abis/StoragePool.json';
 import swapOperationsAbi from './abis/SwapOperations.json';
 import swapPairAbi from './abis/SwapPair.json';
 import troveManagerAbi from './abis/TroveManager.json';
+import priceFeedAbi from './abis/PriceFeed.json';
 import { Contracts } from './contracts.config';
 
 // TODO: This is just dummy data and will be exchanged with the real implementation later.
@@ -89,6 +91,7 @@ export const EthersContext = createContext<{
     storagePoolContract: StoragePool;
     sortedTrovesContract: SortedTroves;
     hintHelpersContract: HintHelpers;
+    priceFeedContract: PriceFeed;
   };
   connectWallet: () => void;
 }>({
@@ -138,6 +141,7 @@ export default function EthersProvider({ children }: { children: React.ReactNode
   const [storagePoolContract, setStoragePoolContract] = useState<StoragePool>();
   const [sortedTrovesContract, setSortedTrovesContract] = useState<SortedTroves>();
   const [hintHelpersContract, setHintHelpersContract] = useState<HintHelpers>();
+  const [priceFeedContract, setPriceFeedContract] = useState<PriceFeed>();
 
   const connectWallet = async () => {
     try {
@@ -220,6 +224,10 @@ export default function EthersProvider({ children }: { children: React.ReactNode
         const hintHelpersContract = new Contract(Contracts.HintHelpers, hintHelpersAbi, provider);
         const hintHelpersContractWithSigner = hintHelpersContract.connect(newSigner) as HintHelpers;
         setHintHelpersContract(hintHelpersContractWithSigner);
+
+        const priceFeedContract = new Contract(Contracts.PriceFeed, priceFeedAbi, provider);
+        const priceFeedContractWithSigner = priceFeedContract.connect(newSigner) as PriceFeed;
+        setPriceFeedContract(priceFeedContractWithSigner);
 
         try {
           // Request account access
@@ -341,8 +349,11 @@ export default function EthersProvider({ children }: { children: React.ReactNode
           provider,
         ) as unknown as HintHelpers;
         setHintHelpersContract(hintHelpersContract);
+
+        const priceFeedContract = new Contract(Contracts.PriceFeed, priceFeedAbi, provider) as unknown as PriceFeed;
+        setPriceFeedContract(priceFeedContract);
       } catch (error) {
-        // console.error(error);
+        console.error(error);
       }
     } else {
       enqueueSnackbar('MetaMask extension is not installed. Please install and try again.', {
@@ -366,7 +377,8 @@ export default function EthersProvider({ children }: { children: React.ReactNode
     !borrowerOperationsContract ||
     !storagePoolContract ||
     !sortedTrovesContract ||
-    !hintHelpersContract
+    !hintHelpersContract ||
+    !priceFeedContract 
   )
     return null;
 
@@ -388,6 +400,7 @@ export default function EthersProvider({ children }: { children: React.ReactNode
           storagePoolContract,
           sortedTrovesContract,
           hintHelpersContract,
+          priceFeedContract,
         },
       }}
     >
@@ -412,6 +425,7 @@ export function useEthers(): {
     storagePoolContract: StoragePool;
     sortedTrovesContract: SortedTroves;
     hintHelpersContract: HintHelpers;
+    priceFeedContract: PriceFeed;
   };
   connectWallet: () => void;
 } {

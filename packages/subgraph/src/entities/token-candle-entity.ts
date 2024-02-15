@@ -2,6 +2,8 @@ import { Address, BigInt, ethereum } from '@graphprotocol/graph-ts';
 import { SystemInfo, TokenCandle, TokenCandleSingleton } from '../../generated/schema';
 import { DebtToken } from '../../generated/templates/DebtTokenTemplate/DebtToken';
 import { SwapPair } from '../../generated/templates/SwapPairTemplate/SwapPair';
+import { log } from '@graphprotocol/graph-ts';
+import { PriceFeed } from '../../generated/PriceFeed/PriceFeed';
 
 // 1min, 10min, 1hour, 6hour, 1day, 1week
 const CandleSizes = [1, 10, 60, 360, 1440, 10080];
@@ -10,6 +12,8 @@ const CandleSizes = [1, 10, 60, 360, 1440, 10080];
  * Initializes the Singleton once for a new Token
  */
 export function handleCreateTokenCandleSingleton(event: ethereum.Event, tokenAddress: Address): void {
+  log.warning('CREATE CANDLE: {}', [tokenAddress.toHexString()]);
+
   let candleSingleton: TokenCandleSingleton | null;
   // TODO: How to get initialized price?
   const tokenPrice = BigInt.fromI64(0);
@@ -49,10 +53,8 @@ export function handleUpdateTokenCandle_low_high(
 ): BigInt {
   // calculate price from ratio to stable and oraclePrice
   const systemInfo = SystemInfo.load(`SystemInfo`)!;
-  const stableCoinContract = DebtToken.bind(systemInfo.stableCoin as Address);
-  // FIXME:
-  // const stablePrice = stableCoinContract.getPrice();
-  const stablePrice = BigInt.fromI32(1);
+  const priceFeedContract = PriceFeed.bind(Address.fromBytes(systemInfo.priceFeed));
+  const stablePrice = priceFeedContract.getPrice(Address.fromBytes(systemInfo.stableCoin)).getPrice();
 
   const swapPairReserves = SwapPair.bind(swapPair).getReserves();
   const tokenPriceInStable =
@@ -63,7 +65,7 @@ export function handleUpdateTokenCandle_low_high(
 
   for (let i = 0; i < CandleSizes.length; i++) {
     const candleSingleton = TokenCandleSingleton.load(
-      `TokenCandleSingleton-${swapPair.toHexString()}-${CandleSizes[i].toString()}`,
+      `TokenCandleSingleton-${pairToken.toHexString()}-${CandleSizes[i].toString()}`,
     )!;
 
     if (candleSingleton.timestamp.plus(BigInt.fromI32(CandleSizes[i] * 60)) < event.block.timestamp) {
@@ -94,10 +96,9 @@ export function handleUpdateTokenCandle_volume(
 ): void {
   // calculate price from ratio to stable and oraclePrice
   const systemInfo = SystemInfo.load(`SystemInfo`)!;
-  const stableCoinContract = DebtToken.bind(systemInfo.stableCoin as Address);
-  // FIXME:
-  // const stablePrice = stableCoinContract.getPrice();
-  const stablePrice = BigInt.fromI32(1);
+  const priceFeedContract = PriceFeed.bind(Address.fromBytes(systemInfo.priceFeed));
+  const stablePrice = priceFeedContract.getPrice(Address.fromBytes(systemInfo.stableCoin)).getPrice();
+
   const swapPairReserves = SwapPair.bind(swapPair).getReserves();
   const tokenPriceInStable =
     pairPosition === 0

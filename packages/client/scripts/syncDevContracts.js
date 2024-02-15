@@ -29,6 +29,7 @@ const Contracts = {
   StoragePool: '0xb7f8bc63bbcad18155201308c8f3540b07f84f5e',
   SortedTroves: '0x610178da211fef7d417bc0e6fed39f05609ad788',
   HintHelpers: '0xe7f1725e7734ce288f8367e1bb143e90bb3f0512',
+  PriceFeed: '0xa513e6e4b8f2a923d98304ec87f64353c4d5c853',
 };
 
 // Main async function to interact with the Ethereum blockchain
@@ -73,6 +74,7 @@ async function main() {
         StoragePool: "${Contracts.StoragePool}",
         SortedTroves: "${Contracts.SortedTroves}",
         HintHelpers: "${Contracts.HintHelpers}",
+        PriceFeed: "${Contracts.PriceFeed}",
       } as const;
 
 

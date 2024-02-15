@@ -1,5 +1,4 @@
 import { Address, BigInt, ethereum } from '@graphprotocol/graph-ts';
-import { Address as EventAddress } from '@graphprotocol/graph-ts/common/numbers';
 import { BorrowerOperations } from '../../generated/BorrowerOperations/BorrowerOperations';
 import { ReservePool } from '../../generated/ReservePool/ReservePool';
 import { StabilityPoolManager } from '../../generated/StabilityPoolManager/StabilityPoolManager';
@@ -7,6 +6,7 @@ import {
   DebtTokenMeta,
   StabilityDepositAPY,
   StabilityDepositChunk,
+  SystemInfo,
   Token,
   TotalReserveAverage,
   TotalReserveAverageChunk,
@@ -18,10 +18,8 @@ import {
   StabilityOffsetAddedGainsStruct,
   StabilityPool,
 } from '../../generated/templates/StabilityPoolTemplate/StabilityPool';
+import { PriceFeed } from '../../generated/PriceFeed/PriceFeed';
 // import { log } from '@graphprotocol/graph-ts';
-
-export const stableDebtToken = EventAddress.fromString('0x6c3f90f043a72fa612cbac8115ee7e52bde6e490');
-export const govToken = EventAddress.fromString('0x9f8f72aa9304c8b593d555f12ef6589cc3a579a2');
 
 export function handleCreateUpdateDebtTokenMeta(
   event: ethereum.Event,
@@ -52,16 +50,21 @@ export function handleCreateUpdateDebtTokenMeta(
   const tokenPrice = Token.load(tokenAddress)!.priceUSD;
   debtTokenMeta.totalSupplyUSD = totalSupply.times(tokenPrice).div(BigInt.fromI32(10).pow(18));
 
-  if (tokenAddress === stableDebtToken || tokenAddress === govToken) {
+  const systemInfo = SystemInfo.load(`SystemInfo`)!;
+  const govToken = systemInfo.govToken.toHexString();
+  const stableCoin = systemInfo.stableCoin.toHexString();
+
+  if (tokenAddress.toHexString() == stableCoin || tokenAddress.toHexString() == govToken) {
     const borrowerOperationsAddress = tokenContract.borrowerOperationsAddress();
     const borrowerOperationsContract = BorrowerOperations.bind(borrowerOperationsAddress);
 
     const reservePoolAddress = borrowerOperationsContract.reservePool();
     const reservePoolContract = ReservePool.bind(reservePoolAddress);
 
-    if (tokenAddress === stableDebtToken) {
+    if (tokenAddress.toHexString() == stableCoin) {
       debtTokenMeta.totalReserve = tokenContract.balanceOf(reservePoolAddress);
-    } else if (tokenAddress === govToken) {
+      // FIXME: govToken is a CollToken now.
+    } else if (tokenAddress.toHexString() == govToken) {
       debtTokenMeta.totalReserve = govReserveCap ? govReserveCap : reservePoolContract.govReserveCap();
     }
   } else {
@@ -74,7 +77,7 @@ export function handleCreateUpdateDebtTokenMeta(
   debtTokenMeta.stabilityDepositAPY = `StabilityDepositAPY-${tokenAddress.toHexString()}`;
   debtTokenMeta.totalSupplyUSD30dAverage = `TotalSupplyAverage-${tokenAddress.toHexString()}`;
 
-  if (tokenAddress === stableDebtToken || tokenAddress === govToken) {
+  if (tokenAddress.toHexString() == stableCoin || tokenAddress.toHexString() == govToken) {
     debtTokenMeta.totalReserve30dAverage = `TotalReserveAverage-${tokenAddress.toHexString()}`;
   }
 
@@ -133,12 +136,11 @@ export function handleUpdateDebtTokenMeta_stabilityDepositAPY(
   collGain: StabilityOffsetAddedGainsStruct[],
 ): void {
   const stabilityDepositAPYEntity = StabilityDepositAPY.load(`StabilityDepositAPY-${tokenAddress.toHexString()}`)!;
+ 
+  const systemInfo = SystemInfo.load(`SystemInfo`)!;
+  const priceFeedContract = PriceFeed.bind(Address.fromBytes(systemInfo.priceFeed));
+  const tokenPrice = priceFeedContract.getPrice(tokenAddress).getPrice();
 
-  // Calculate Profit from gained colls and lost debts
-  const tokenContract = DebtToken.bind(tokenAddress);
-  // FIXME:
-  // const tokenPrice = tokenContract.getPrice();
-  const tokenPrice = BigInt.fromI32(1);
   const loss = lostDeposit.times(tokenPrice);
 
   let allGains = BigInt.fromI32(0);
@@ -146,10 +148,10 @@ export function handleUpdateDebtTokenMeta_stabilityDepositAPY(
   for (let i = 0; i < collGain.length; i++) {
     const tokenAddress = collGain[i].tokenAddress;
     const amount = collGain[i].amount;
-    const tokenContract = DebtToken.bind(tokenAddress);
-    // FIXME:
-    // const tokenPrice = tokenContract.getPrice();
-    const tokenPrice = BigInt.fromI32(1);
+
+    const systemInfo = SystemInfo.load(`SystemInfo`)!;
+    const priceFeedContract = PriceFeed.bind(Address.fromBytes(systemInfo.priceFeed));
+    const tokenPrice = priceFeedContract.getPrice(tokenAddress).getPrice();
 
     allGains.plus(tokenPrice.times(amount));
   }
@@ -256,9 +258,11 @@ export const handleUpdateDebtTokenMeta_totalReserve30dAverage = (
 export const handleUpdateDebtTokenMeta_totalSupply30dAverage = (event: ethereum.Event, tokenAddress: Address): void => {
   const debtTokenContract = DebtToken.bind(tokenAddress);
   const totalSupply = debtTokenContract.totalSupply();
-  // FIXME:
-  // const tokenPrice = debtTokenContract.getPrice();
-  const tokenPrice = BigInt.fromI32(1);
+
+  const systemInfo = SystemInfo.load(`SystemInfo`)!;
+  const priceFeedContract = PriceFeed.bind(Address.fromBytes(systemInfo.priceFeed));
+  const tokenPrice = priceFeedContract.getPrice(tokenAddress).getPrice();
+
   const totalSupplyUSD = totalSupply.times(tokenPrice);
 
   // Load Avergae or intialise it

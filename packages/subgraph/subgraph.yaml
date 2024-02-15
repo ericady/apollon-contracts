@@ -281,6 +281,10 @@ templates:
       abis:
         - name: SwapPair
           file: ./abis/SwapPair.json
+        - name: BorrowerOperations
+          file: ./abis/BorrowerOperations.json
+        - name: PriceFeed
+          file: ./abis/PriceFeed.json
       eventHandlers:
         - event: Approval(indexed address,indexed address,uint256)
           handler: handleApproval
@@ -335,6 +339,12 @@ templates:
           file: ./abis/StabilityPoolManager.json
         - name: StabilityPool
           file: ./abis/StabilityPool.json
+        - name: BorrowerOperations
+          file: ./abis/BorrowerOperations.json
+        - name: ReservePool
+          file: ./abis/ReservePool.json
+        - name: PriceFeed
+          file: ./abis/PriceFeed.json
       eventHandlers:
         - event: Approval(indexed address,indexed address,uint256)
           handler: handleApproval

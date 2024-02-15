@@ -7,6 +7,7 @@ import { dangerouslyConvertBigIntToNumber, displayPercentage, percentageChange, 
 
 function TradingViewHeader() {
   const { selectedToken } = useSelectedToken();
+  console.log('selectedToken?.address: ', selectedToken?.address);
 
   const { data } = useQuery<GetSelectedTokenQuery, GetSelectedTokenQueryVariables>(GET_SELECTED_TOKEN, {
     variables: {
@@ -14,6 +15,8 @@ function TradingViewHeader() {
     },
     skip: !selectedToken,
   });
+
+  console.log('data: ', data);
 
   return (
     <div

@@ -59,8 +59,11 @@ export function handleStabilityOffset(event: StabilityOffsetEvent): void {
     event.params.removedDeposit,
     event.params.addedGains,
   );
+
+  const stabilityPoolContract = StabilityPool.bind(event.address);
+  const depositToken = stabilityPoolContract.depositToken();
   // stabilityDepositAPY changed
-  handleCreateUpdateDebtTokenMeta(event, event.address);
+  handleCreateUpdateDebtTokenMeta(event, depositToken);
 }
 
 export function handleStabilityProvided(event: StabilityProvidedEvent): void {
@@ -83,13 +86,12 @@ export function handleStabilityProvided(event: StabilityProvidedEvent): void {
 }
 
 export function handleStabilityWithdrawn(event: StabilityWithdrawnEvent): void {
-  // totalDepositedStability changed
-  // FIXME: re-add me!
-  // ERRO Subgraph error 1/1, code: SubgraphSyncingFailure, error: transaction dfc900524095ebdd4577e295ba53e53cb853457350ec1ae041f16308f9781cad: Mapping aborted at ~lib/@graphprotocol/graph-ts/chain/ethereum.ts, line 675, column 7, with message: Call reverted, probably because an `assert` or `require` in the contract failed, consider using `try_getStabilityPool` to handle this in the mapping.	wasm backtrace:	    0: 0x3a4d - <unknown>!~lib/@graphprotocol/graph-ts/chain/ethereum/ethereum.SmartContract#call	    1: 0x584a - <unknown>!src/entities/debt-token-meta-entity/handleCreateUpdateDebtTokenMeta	    2: 0x5ed7 - <unknown>!src/stability-pool/handleStabilityWithdrawn	 in handler `handleStabilityWithdrawn` at block #128 (074509709c775c95ceb60e72913390d2330e1e8d75e92e9c70d8e939fc1a835f), block_hash: 0x074509709c775c95ceb60e72913390d2330e1e8d75e92e9c70d8e939fc1a835f, block_number: 128, sgd: 1, subgraph_id: QmPcZR4hQWTjXCwb9U3wZREMt3kSfsD7HecqX8WbWTYB2w, component: SubgraphInstanceManage
-  // handleCreateUpdateDebtTokenMeta(event, event.address);
-
   const stabilityPoolContract = StabilityPool.bind(event.address);
   const depositToken = stabilityPoolContract.depositToken();
+
+  // totalDepositedStability changed
+  // ERRO Subgraph error 1/1, code: SubgraphSyncingFailure, error: transaction dfc900524095ebdd4577e295ba53e53cb853457350ec1ae041f16308f9781cad: Mapping aborted at ~lib/@graphprotocol/graph-ts/chain/ethereum.ts, line 675, column 7, with message: Call reverted, probably because an `assert` or `require` in the contract failed, consider using `try_getStabilityPool` to handle this in the mapping.	wasm backtrace:	    0: 0x3a4d - <unknown>!~lib/@graphprotocol/graph-ts/chain/ethereum/ethereum.SmartContract#call	    1: 0x584a - <unknown>!src/entities/debt-token-meta-entity/handleCreateUpdateDebtTokenMeta	    2: 0x5ed7 - <unknown>!src/stability-pool/handleStabilityWithdrawn	 in handler `handleStabilityWithdrawn` at block #128 (074509709c775c95ceb60e72913390d2330e1e8d75e92e9c70d8e939fc1a835f), block_hash: 0x074509709c775c95ceb60e72913390d2330e1e8d75e92e9c70d8e939fc1a835f, block_number: 128, sgd: 1, subgraph_id: QmPcZR4hQWTjXCwb9U3wZREMt3kSfsD7HecqX8WbWTYB2w, component: SubgraphInstanceManage
+  handleCreateUpdateDebtTokenMeta(event, depositToken);
 
   handleCreateBorrowerHistory(
     event,

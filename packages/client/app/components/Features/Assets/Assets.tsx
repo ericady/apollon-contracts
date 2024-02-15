@@ -25,6 +25,7 @@ import {
   dangerouslyConvertBigIntToNumber,
   displayPercentage,
   divBigIntsToFloat,
+  floatToBigInt,
   roundCurrency,
 } from '../../../utils/math';
 import FeatureBox from '../../FeatureBox/FeatureBox';
@@ -74,7 +75,7 @@ function Assets() {
         const pastToken = pastTokenPrices?.tokenCandles.find(
           ({ token: pastToken }) => token.address === pastToken.address,
         );
-        const pastPrice = pastToken?.close ? BigInt(pastToken?.close) : BigInt(0);
+        const pastPrice = pastToken?.close ? BigInt(pastToken?.close) : BigInt(0)
 
         return {
           ...token,
@@ -83,8 +84,8 @@ function Assets() {
           swapFee: BigInt(swapFee),
           // calculate change over last 24h
           change:
-            (bigIntStringToFloat(token.priceUSD) - dangerouslyConvertBigIntToNumber(pastPrice, 9, 9)) /
-            dangerouslyConvertBigIntToNumber(pastPrice, 9, 9),
+          pastPrice > 0 ? (bigIntStringToFloat(token.priceUSD) - dangerouslyConvertBigIntToNumber(pastPrice, 9, 9)) /
+            dangerouslyConvertBigIntToNumber(pastPrice, 9, 9) : 0,
           isFavorite: favoritedAssets.find((address) => token.address === address) !== undefined ? true : false,
           volume30dUSD: BigInt(volume30dUSD.value),
           pool: {
@@ -200,7 +201,7 @@ function Assets() {
                           alignContent: 'center',
                           justifyContent: 'flex-end',
                           gap: 0.5,
-                          color: change < 0 ? 'error.main' : 'success.main',
+                          color: change > 0 ? 'success.main' : 'error.main' ,
                         }}
                       >
                         {displayPercentage(change, 'omit')} <DirectionIcon showIncrease={change > 0} fontSize="small" />

@@ -229,8 +229,8 @@ const Swap = () => {
     const {
       pool: { liqudityPair },
     } = selectedToken!;
-    const liq0 = dangerouslyConvertBigIntToNumber(liqudityPair[0], 0);
-    const liq1 = dangerouslyConvertBigIntToNumber(liqudityPair[1], 0);
+    const liq0 = dangerouslyConvertBigIntToNumber(liqudityPair[0], 9, 9);
+    const liq1 = dangerouslyConvertBigIntToNumber(liqudityPair[1], 9, 9);
     const currentPrice = liq0 / liq1;
 
     let newPriceAfterSwap: number;
