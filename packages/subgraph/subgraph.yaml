@@ -30,6 +30,8 @@ dataSources:
           file: ./abis/TroveManager.json
         - name: StoragePool
           file: ./abis/StoragePool.json
+        - name: ReservePool
+          file: ./abis/ReservePool.json
       eventHandlers:
         - event: LTermsUpdated((address,bool,uint256)[])
           handler: handleLTermsUpdated
@@ -145,6 +147,8 @@ dataSources:
           file: ./abis/BorrowerOperations.json
         - name: StoragePool
           file: ./abis/StoragePool.json
+        - name: ReservePool
+          file: ./abis/ReservePool.json
       eventHandlers:
         - event: OwnershipTransferred(indexed address,indexed address)
           handler: handleOwnershipTransferred
@@ -206,8 +210,8 @@ dataSources:
           file: ./abis/StabilityPool.json
         - name: BorrowerOperations
           file: ./abis/BorrowerOperations.json
-        - name: ReservePool
-          file: ./abis/ReservePool.json
+        - name: StoragePool
+          file: ./abis/StoragePool.json
         - name: PriceFeed
           file: ./abis/PriceFeed.json
       eventHandlers:

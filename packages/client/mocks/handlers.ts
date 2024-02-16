@@ -61,7 +61,6 @@ const JUSD: Omit<Token, 'priceUSDOracle' | 'borrowingRate'> = {
   address: Contracts.DebtToken.STABLE,
   symbol: 'JUSD',
   createdAt: (faker.date.past().getTime() / 1000).toString(),
-  priceUSD: floatToBigInt(faker.number.float({ min: 1, max: 5000, precision: 0.01 })).toString(),
   isPoolToken: faker.datatype.boolean(),
 };
 
@@ -74,7 +73,6 @@ export const tokens: Omit<Token, 'priceUSDOracle' | 'borrowingRate'>[] = Array(1
     symbol: faker.finance.currencyCode(),
     // Unix timestamp in seconds like the API returns it.
     createdAt: (faker.date.past().getTime() / 1000).toString(),
-    priceUSD: floatToBigInt(faker.number.float({ min: 1, max: 5000, precision: 0.01 })).toString(),
     isPoolToken: faker.datatype.boolean(),
   }))
   .concat(JUSD);
@@ -88,7 +86,6 @@ const collateralTokens: Omit<Token, 'priceUSDOracle' | 'borrowingRate'>[] = Obje
   address,
   symbol,
   createdAt: (faker.date.past().getTime() / 1000).toString(),
-  priceUSD: floatToBigInt(faker.number.float({ min: 1, max: 5000, precision: 0.01 })).toString(),
   isPoolToken: faker.datatype.boolean(),
 }));
 
@@ -234,7 +231,7 @@ const pastSwapEvents = Array(pastSwapEventsLength)
       timestamp,
       borrower: faker.finance.ethereumAddress(),
       totalPriceInStable: floatToBigInt(
-        (bigIntStringToFloat(size) * bigIntStringToFloat(token.priceUSD)) / bigIntStringToFloat(JUSD.priceUSD),
+        bigIntStringToFloat(size) * Math.random(),
       ).toString(),
       direction: faker.helpers.enumValue(LongShortDirection),
       size,
@@ -263,7 +260,7 @@ const generateTokenValues = (maxValue: number, tokens: Token[]) => {
   return tokens.map((token, index) => {
     const value = parseFloat(faker.finance.amount(0, leftValue, 2));
     // Last token gets all the left value
-    const amount = index === tokens.length - 1 ? leftValue : value / bigIntStringToFloat(token.priceUSD);
+    const amount = index === tokens.length - 1 ? leftValue : value / Math.random();
     leftValue -= value;
 
     return {
@@ -355,9 +352,9 @@ export const handlers = [
 
   // GetSelectedToken
   graphql.query<{ token: Query['token'] }, QueryTokenArgs>(GET_SELECTED_TOKEN, (req, res, ctx) => {
-    const { address } = req.variables;
+    const { id } = req.variables;
 
-    const token = allTokens.find((token) => token.address === address)!;
+    const token = allTokens.find((token) => token.address === id)!;
 
     return res(ctx.data({ token: token as Token }));
   }),

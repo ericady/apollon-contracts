@@ -24,12 +24,6 @@ type Token @entity {
   symbol: String!
   createdAt: BigInt!
   #
-  # TODO: wasa
-  # PoolPrice, update when pool ratio changes or price feed updates
-  priceUSD: BigInt!
-  # TODO: Do it from the client side, too difficult to implement in the graph, just fetch minute candle
-  # priceUSD24hAgo: BigInt!
-  #
   isPoolToken: Boolean!
 }
 
@@ -48,10 +42,7 @@ type DebtTokenMeta @entity {
   stabilityDepositAPY: StabilityDepositAPY! @relation(name: "StabilityDepositAPYToDebtTokenMeta")
   # event: StabilityProvided StabilityWithdrawn  StabilityOffset
   totalDepositedStability: BigInt!
-  # TODO: wasa Implement the event handlers to update this field
-  # - token: es gibt nur zwei, kannst du hardcoden, oder von reservePool.`stableDebtToken` und reservePool.`govToken`
-  # - deposited: `stableReserveCap` und `govReserveCap`
-  # - event: `WithdrewReserves` und borrowerOps.increaseDebt, dort haben wir aber aktuell kein Event 😟
+  # Only != 0 on the STABLE token
   totalReserve: BigInt!
   totalReserve30dAverage: TotalReserveAverage
   # event StoragePoolValueUpdated
@@ -132,6 +123,9 @@ type CollateralTokenMeta @entity {
   # global
   totalValueLockedUSD: BigInt!
   totalValueLockedUSD30dAverage: TotalValueLockedAverage!
+  # Only != 0 on the GOV token
+  totalReserve: BigInt!
+  totalReserve30dAverage: TotalReserveAverage
 }
 
 # aggregator for 30d average, each chunk is 60min

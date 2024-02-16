@@ -5,7 +5,7 @@ import { DebtToken } from '../../generated/templates/DebtTokenTemplate/DebtToken
 import { ERC20 } from '../../generated/templates/ERC20Template/ERC20';
 // import { log } from '@graphprotocol/graph-ts';
 
-export function handleCreateToken(event: ethereum.Event, tokenAddress: Address, isDebtToken: boolean): void {
+export function handleCreateToken(event: ethereum.Event, tokenAddress: Address, isPoolToken: boolean): void {
   let newToken = new Token(tokenAddress);
 
   if (isDebtToken) {
@@ -24,18 +24,8 @@ export function handleCreateToken(event: ethereum.Event, tokenAddress: Address, 
 
   const systemInfo = SystemInfo.load(`SystemInfo`)!;
   const priceFeedContract = PriceFeed.bind(Address.fromBytes(systemInfo.priceFeed));
-  newToken.priceUSD = priceFeedContract.getPrice(tokenAddress).getPrice();
 
-  // FIXME: Is this correct?
-  newToken.isPoolToken = isDebtToken;
+  newToken.isPoolToken = isPoolToken;
 
   newToken.save();
-}
-
-export function handleUpdateToken_priceUSD(event: ethereum.Event, tokenAddress: Address, priceUSD: BigInt): void {
-  const tokenEntity = Token.load(tokenAddress)!;
-
-  tokenEntity.priceUSD = priceUSD;
-
-  tokenEntity.save();
 }

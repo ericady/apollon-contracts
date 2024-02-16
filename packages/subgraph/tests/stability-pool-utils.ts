@@ -12,13 +12,13 @@ import {
   StabilityProvided,
   StabilityWithdrawn,
 } from '../generated/templates/StabilityPoolTemplate/StabilityPool';
+import { oneEther } from '../src/entities/token-candle-entity';
 import {
   MockDebtTokenAddress,
   MockStabilityPoolAddress,
   MockStabilityPoolManagerAddress,
   MockUserAddress,
 } from './utils';
-import { oneEther } from '../src/entities/token-candle-entity';
 
 export const mockStabilityPool_depositToken = (): void => {
   createMockedFunction(MockStabilityPoolAddress, 'depositToken', 'depositToken():(address)').returns([

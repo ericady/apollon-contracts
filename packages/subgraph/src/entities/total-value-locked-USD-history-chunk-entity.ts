@@ -30,7 +30,7 @@ export function handleCreateTotalValueLockedUSDHistoryChunk(event: ethereum.Even
       systemInfo.totalValueLockedUSDHistoryIndex = currentIndex + 1;
       systemInfo.save();
 
-      newChunk.timestamp = lastChunk!.timestamp.plus(chunkSize);
+      newChunk.timestamp = lastChunk.timestamp.plus(chunkSize);
       newChunk.size = chunkSize.toI32();
       newChunk.value = systemTVL;
       newChunk.save();

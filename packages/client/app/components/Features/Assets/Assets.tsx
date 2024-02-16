@@ -25,7 +25,6 @@ import {
   dangerouslyConvertBigIntToNumber,
   displayPercentage,
   divBigIntsToFloat,
-  floatToBigInt,
   roundCurrency,
 } from '../../../utils/math';
 import FeatureBox from '../../FeatureBox/FeatureBox';
@@ -75,17 +74,18 @@ function Assets() {
         const pastToken = pastTokenPrices?.tokenCandles.find(
           ({ token: pastToken }) => token.address === pastToken.address,
         );
-        const pastPrice = pastToken?.close ? BigInt(pastToken?.close) : BigInt(0)
+        const pastPrice = pastToken?.close ? BigInt(pastToken?.close) : BigInt(0);
 
         return {
           ...token,
-          priceUSD: BigInt(token.priceUSD),
           priceUSD24hAgo: pastPrice,
-          swapFee: BigInt(swapFee),
+          swapFee,
           // calculate change over last 24h
           change:
-          pastPrice > 0 ? (bigIntStringToFloat(token.priceUSD) - dangerouslyConvertBigIntToNumber(pastPrice, 9, 9)) /
-            dangerouslyConvertBigIntToNumber(pastPrice, 9, 9) : 0,
+            pastPrice > 0
+              ? (dangerouslyConvertBigIntToNumber(token.priceUSDOracle, 9, 9) - dangerouslyConvertBigIntToNumber(pastPrice, 9, 9)) /
+                dangerouslyConvertBigIntToNumber(pastPrice, 9, 9)
+              : 0,
           isFavorite: favoritedAssets.find((address) => token.address === address) !== undefined ? true : false,
           volume30dUSD: BigInt(volume30dUSD.value),
           pool: {
@@ -170,7 +170,7 @@ function Assets() {
             </TableHead>
             <TableBody>
               {tokens.map((token) => {
-                const { address, isFavorite, symbol, priceUSD, change, swapFee } = token;
+                const { address, isFavorite, symbol, change, swapFee, pool: { liqudityPair } } = token;
 
                 return (
                   <TableRow
@@ -186,7 +186,7 @@ function Assets() {
                     </TableCell>
                     <TableCell sx={{ p: 0.5 }} align="right">
                       <Typography fontWeight={400}>
-                        {JUSDToken ? roundCurrency(divBigIntsToFloat(priceUSD, BigInt(JUSDToken.priceUSD), 5)) : '-'}
+                        {roundCurrency(divBigIntsToFloat(liqudityPair[1], liqudityPair[0], 5))}
                       </Typography>
                     </TableCell>
                     <TableCell sx={{ p: 0.5 }} align="right" width={60}>
@@ -201,7 +201,7 @@ function Assets() {
                           alignContent: 'center',
                           justifyContent: 'flex-end',
                           gap: 0.5,
-                          color: change > 0 ? 'success.main' : 'error.main' ,
+                          color: change > 0 ? 'success.main' : 'error.main',
                         }}
                       >
                         {displayPercentage(change, 'omit')} <DirectionIcon showIncrease={change > 0} fontSize="small" />

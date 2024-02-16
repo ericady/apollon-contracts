@@ -238,7 +238,7 @@ const CollateralUpdateDialog = ({ buttonVariant, buttonSx = {} }: Props) => {
       const address = [Contracts.ERC20.GOV, Contracts.ERC20.BTC, Contracts.ERC20.USDT][index];
       const { token } = collateralToDeposit.find(({ token }) => token.address === address)!;
 
-      return acc + (isNaN(parseFloat(curr)) ? 0 : parseFloat(curr) * bigIntStringToFloat(token.priceUSD));
+      return acc + (isNaN(parseFloat(curr)) ? 0 : parseFloat(curr) * dangerouslyConvertBigIntToNumber(token.priceUSDOracle, 9, 9));
     }, 0) * (tabValue === 'DEPOSIT' ? -1 : 1);
 
   return (

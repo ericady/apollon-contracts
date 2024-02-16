@@ -30,7 +30,7 @@ export function handleCreateTotalValueMintedUSDHistoryChunk(event: ethereum.Even
       systemInfo.totalValueMintedUSDHistoryIndex = currentIndex + 1;
       systemInfo.save();
 
-      newChunk.timestamp = lastChunk!.timestamp.plus(chunkSize);
+      newChunk.timestamp = lastChunk.timestamp.plus(chunkSize);
       newChunk.size = chunkSize.toI32();
       newChunk.value = systemMintedUSD;
       newChunk.save();

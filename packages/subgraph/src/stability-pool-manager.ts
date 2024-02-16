@@ -1,7 +1,7 @@
 import {
   OwnershipTransferred as OwnershipTransferredEvent,
   StabilityPoolAdded as StabilityPoolAddedEvent,
-  StabilityPoolManagerInitiated as StabilityPoolManagerInitiatedEvent, 
+  StabilityPoolManagerInitiated as StabilityPoolManagerInitiatedEvent,
 } from '../generated/StabilityPoolManager/StabilityPoolManager';
 import { StabilityPoolTemplate } from '../generated/templates';
 import { handleUpdateSystemInfo_stabilityPoolManager } from './entities/system-info-entity';

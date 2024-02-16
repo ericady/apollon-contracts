@@ -9,7 +9,6 @@ type Token {
   address: Bytes!
   symbol: String!
   createdAt: BigInt!
-  priceUSD: BigInt!
   isPoolToken: Boolean!
   # handled by client
   priceUSDOracle: bigint!
@@ -84,7 +83,7 @@ type Query {
   debtTokenMetas(borrower: String): [DebtTokenMeta!]!
   collateralTokenMetas(borrower: String): [CollateralTokenMeta!]!
   # TODO: Rename this for the subgraph query
-  token(address: String!): Token!
+  token(id: String!): Token!
 }
 
 enum LongShortDirection {
@@ -142,7 +141,7 @@ type Pool {
   # client side
   borrowerAmount: bigint!
   # Percent value applied when opening the first position for this pool. Can be negative and positive.
-  swapFee: BigInt!
+  swapFee: bigint!
 }
 
 type PoolVolume30d {

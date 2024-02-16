@@ -3,11 +3,10 @@ import { Box, Typography } from '@mui/material';
 import { useSelectedToken } from '../../context/SelectedTokenProvider';
 import { GetSelectedTokenQuery, GetSelectedTokenQueryVariables } from '../../generated/gql-types';
 import { GET_SELECTED_TOKEN } from '../../queries';
-import { dangerouslyConvertBigIntToNumber, displayPercentage, percentageChange, roundCurrency } from '../../utils/math';
+import { dangerouslyConvertBigIntToNumber, displayPercentage, divBigIntsToFloat, percentageChange, roundCurrency } from '../../utils/math';
 
 function TradingViewHeader() {
-  const { selectedToken } = useSelectedToken();
-  console.log('selectedToken?.address: ', selectedToken?.address);
+  const { selectedToken, tokenRatio, JUSDToken } = useSelectedToken();
 
   const { data } = useQuery<GetSelectedTokenQuery, GetSelectedTokenQueryVariables>(GET_SELECTED_TOKEN, {
     variables: {
@@ -15,8 +14,6 @@ function TradingViewHeader() {
     },
     skip: !selectedToken,
   });
-
-  console.log('data: ', data);
 
   return (
     <div
@@ -48,7 +45,7 @@ function TradingViewHeader() {
         <Typography variant="subtitle1" fontFamily="Space Grotesk Variable">
           Pool
           <Box sx={{ color: 'text.primary', display: 'inline', ml: '8px' }}>
-            {selectedToken ? roundCurrency(dangerouslyConvertBigIntToNumber(selectedToken.priceUSD, 9, 9)) : ' -'}
+            {JUSDToken ? roundCurrency(divBigIntsToFloat(JUSDToken.priceUSDOracle, tokenRatio, 18)) : ' -'}
           </Box>{' '}
           $
         </Typography>
@@ -64,11 +61,11 @@ function TradingViewHeader() {
         <Typography variant="subtitle1" fontFamily="Space Grotesk Variable">
           Premium
           <Box sx={{ color: 'text.primary', display: 'inline', ml: '8px' }}>
-            {data?.token.priceUSDOracle !== undefined && selectedToken
+            {data?.token.priceUSDOracle !== undefined && JUSDToken
               ? displayPercentage(
                   percentageChange(
-                    dangerouslyConvertBigIntToNumber(selectedToken.priceUSD, 9, 9),
                     dangerouslyConvertBigIntToNumber(data.token.priceUSDOracle, 9, 9),
+                    divBigIntsToFloat(JUSDToken.priceUSDOracle, tokenRatio, 18),
                   ),
                   'positive',
                 )
@@ -78,7 +75,7 @@ function TradingViewHeader() {
         <Typography variant="subtitle1" fontFamily="Space Grotesk Variable">
           Swap Fee
           <Box sx={{ color: 'text.primary', display: 'inline', ml: '8px' }}>
-            {selectedToken ? displayPercentage(dangerouslyConvertBigIntToNumber(selectedToken.swapFee, 0, 6)) : ' -'}
+            {selectedToken ? displayPercentage(dangerouslyConvertBigIntToNumber(selectedToken.swapFee, 0, 6), 'omit') : ' -'}
           </Box>
         </Typography>
       </div>

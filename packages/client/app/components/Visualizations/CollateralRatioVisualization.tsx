@@ -87,7 +87,7 @@ function CollateralRatioVisualization({
       .filter(({ troveMintedAmount }) => troveMintedAmount > 0)
       .reduce(
         (acc, { troveMintedAmount, token }) =>
-          acc + dangerouslyConvertBigIntToNumber(troveMintedAmount!, 9, 9) * bigIntStringToFloat(token.priceUSD),
+          acc + dangerouslyConvertBigIntToNumber(troveMintedAmount!, 9, 9) * dangerouslyConvertBigIntToNumber(token.priceUSDOracle, 9, 9),
         0,
       ) ?? 0;
 
@@ -96,7 +96,7 @@ function CollateralRatioVisualization({
       .filter(({ troveLockedAmount }) => troveLockedAmount > 0)
       .reduce(
         (acc, { troveLockedAmount, token }) =>
-          acc + dangerouslyConvertBigIntToNumber(troveLockedAmount!, 9, 9) * bigIntStringToFloat(token.priceUSD),
+          acc + dangerouslyConvertBigIntToNumber(troveLockedAmount!, 9, 9) * dangerouslyConvertBigIntToNumber(token.priceUSDOracle, 9, 9),
         0,
       ) ?? 0;
 

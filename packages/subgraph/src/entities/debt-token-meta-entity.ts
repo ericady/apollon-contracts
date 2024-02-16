@@ -1,6 +1,5 @@
 import { Address, BigInt, ethereum } from '@graphprotocol/graph-ts';
-import { BorrowerOperations } from '../../generated/BorrowerOperations/BorrowerOperations';
-import { ReservePool } from '../../generated/ReservePool/ReservePool';
+import { PriceFeed } from '../../generated/PriceFeed/PriceFeed';
 import { StabilityPoolManager } from '../../generated/StabilityPoolManager/StabilityPoolManager';
 import {
   DebtTokenMeta,
@@ -18,14 +17,8 @@ import {
   StabilityOffsetAddedGainsStruct,
   StabilityPool,
 } from '../../generated/templates/StabilityPoolTemplate/StabilityPool';
-import { PriceFeed } from '../../generated/PriceFeed/PriceFeed';
-import { log } from '@graphprotocol/graph-ts';
 
-export function handleCreateUpdateDebtTokenMeta(
-  event: ethereum.Event,
-  tokenAddress: Address,
-  govReserveCap: BigInt | null = null,
-): void {
+export function handleCreateUpdateDebtTokenMeta(event: ethereum.Event, tokenAddress: Address): void {
   let debtTokenMeta = DebtTokenMeta.load(`DebtTokenMeta-${tokenAddress.toHexString()}`);
   const systemInfo = SystemInfo.load(`SystemInfo`)!;
 
@@ -38,8 +31,6 @@ export function handleCreateUpdateDebtTokenMeta(
   // FIXME: I need to add them all to the network.json
   // const stabilityManagerAddress = Address.fromString("0xDc64a140Aa3E981100a9becA4E685f962f0cF6C9");
 
-
-
   debtTokenMeta.token = tokenAddress;
   debtTokenMeta.timestamp = event.block.timestamp;
 
@@ -47,26 +38,18 @@ export function handleCreateUpdateDebtTokenMeta(
   const tokenPrice = Token.load(tokenAddress)!.priceUSD;
   debtTokenMeta.totalSupplyUSD = totalSupply.times(tokenPrice).div(BigInt.fromI32(10).pow(18));
 
-  const govToken = Address.fromBytes(systemInfo.govToken)
-  const stableCoin = Address.fromBytes(systemInfo.stableCoin)
+  const govToken = Address.fromBytes(systemInfo.govToken);
+  const stableCoin = Address.fromBytes(systemInfo.stableCoin);
 
-  if (tokenAddress == stableCoin || tokenAddress == govToken) {
-    const reservePoolContract = ReservePool.bind(Address.fromBytes(systemInfo.reservePool));
-
-    if (tokenAddress == stableCoin) {
-      debtTokenMeta.totalReserve = tokenContract.balanceOf(Address.fromBytes(systemInfo.reservePool));
-
-
-    } else if (tokenAddress == govToken) {
-      debtTokenMeta.totalReserve = govReserveCap ? govReserveCap : reservePoolContract.govReserveCap();
-    }
+  if (tokenAddress == stableCoin) {
+    debtTokenMeta.totalReserve = tokenContract.balanceOf(Address.fromBytes(systemInfo.reservePool));
   } else {
     debtTokenMeta.totalReserve = BigInt.fromI32(0);
   }
 
   const stabilityPoolManagerContract = StabilityPoolManager.bind(Address.fromBytes(systemInfo.stabilityPoolManager));
   const stabilityPool = stabilityPoolManagerContract.getStabilityPool(tokenAddress);
-  
+
   const debtTokenStabilityPool = StabilityPool.bind(stabilityPool);
   debtTokenMeta.totalDepositedStability = debtTokenStabilityPool.getTotalDeposit();
 
@@ -74,7 +57,7 @@ export function handleCreateUpdateDebtTokenMeta(
   debtTokenMeta.stabilityDepositAPY = `StabilityDepositAPY-${tokenAddress.toHexString()}`;
   debtTokenMeta.totalSupplyUSD30dAverage = `TotalSupplyAverage-${tokenAddress.toHexString()}`;
 
-  if (tokenAddress == stableCoin || tokenAddress == govToken) {
+  if (tokenAddress == stableCoin) {
     debtTokenMeta.totalReserve30dAverage = `TotalReserveAverage-${tokenAddress.toHexString()}`;
   }
 
@@ -133,7 +116,7 @@ export function handleUpdateDebtTokenMeta_stabilityDepositAPY(
   collGain: StabilityOffsetAddedGainsStruct[],
 ): void {
   const stabilityDepositAPYEntity = StabilityDepositAPY.load(`StabilityDepositAPY-${tokenAddress.toHexString()}`)!;
- 
+
   const systemInfo = SystemInfo.load(`SystemInfo`)!;
   const priceFeedContract = PriceFeed.bind(Address.fromBytes(systemInfo.priceFeed));
   const tokenPrice = priceFeedContract.getPrice(tokenAddress).getPrice();

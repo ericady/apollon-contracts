@@ -16,7 +16,6 @@ export const MockReservePoolAddress = EventAddress.fromString('0x000000000000000
 
 export const MockUserAddress = EventAddress.fromString('0x1000000000000000000000000000000000000000');
 
-
 export const initSystemInfo = (): void => {
   const systemInfo = new SystemInfo('SystemInfo');
   systemInfo.storagePool = MockStoragePoolAddress;

@@ -9,8 +9,8 @@ const provider = new JsonRpcProvider('http://0.0.0.0:8545', { name: 'localhost',
 
 const Contracts = {
   DebtToken: {
-    STABLE: '0x95401dc811bb5740090279ba06cfa8fcf6113778',
-    STOCK_1: '0x998abeb3e57409262ae5b751f60747921b33613e',
+    STABLE: '0xf5059a5d33d5853360d16c683c16e67980206f36',
+    STOCK_1: '0x95401dc811bb5740090279ba06cfa8fcf6113778',
   },
   ERC20: {
     BTC: '0x9a676e781a523b5d0c0e43731313a708cb607508',

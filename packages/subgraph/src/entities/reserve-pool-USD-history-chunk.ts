@@ -41,7 +41,7 @@ export function handleCreateReservePoolUSDHistoryChunk(event: ethereum.Event, re
       systemInfo.reservePoolUSDHistoryIndex = currentIndex + 1;
       systemInfo.save();
 
-      newChunk.timestamp = lastChunk!.timestamp.plus(chunkSize);
+      newChunk.timestamp = lastChunk.timestamp.plus(chunkSize);
       newChunk.size = chunkSize.toI32();
       newChunk.value = totalValueReservesUSD;
       newChunk.save();

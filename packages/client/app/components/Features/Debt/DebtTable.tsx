@@ -58,7 +58,7 @@ function DebtTable() {
           chartColor: colorPalette.shift(),
           troveMintedUSD: token.troveMintedAmount
             ? roundNumber(
-                dangerouslyConvertBigIntToNumber(token.troveMintedAmount * BigInt(token.token.priceUSD), 30, 6),
+                dangerouslyConvertBigIntToNumber(token.troveMintedAmount * token.token.priceUSDOracle, 30, 6),
               )
             : 0,
         })) ?? []

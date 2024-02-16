@@ -46,16 +46,16 @@ function LiquidityPoolsTable({ selectedPool, setSelectedPool }: Props) {
       ) =>
         (dangerouslyConvertBigIntToNumber(borrowerAmountB) / bigIntStringToFloat(totalSupplyB)) *
           bigIntStringToFloat(liqA1.totalAmount) *
-          bigIntStringToFloat(liqA1.token.priceUSD) +
+          dangerouslyConvertBigIntToNumber(liqA1.token.priceUSDOracle, 9, 9) +
         (dangerouslyConvertBigIntToNumber(borrowerAmountB) / bigIntStringToFloat(totalSupplyB)) *
           bigIntStringToFloat(liqA2.totalAmount) *
-          bigIntStringToFloat(liqA2.token.priceUSD) -
+          dangerouslyConvertBigIntToNumber(liqA2.token.priceUSDOracle, 9, 9) -
         ((dangerouslyConvertBigIntToNumber(borrowerAmountA) / bigIntStringToFloat(totalSupplyA)) *
           bigIntStringToFloat(liqB1.totalAmount) *
-          bigIntStringToFloat(liqB1.token.priceUSD) +
+          dangerouslyConvertBigIntToNumber(liqB1.token.priceUSDOracle, 9, 9) +
           (dangerouslyConvertBigIntToNumber(borrowerAmountA) / bigIntStringToFloat(totalSupplyA)) *
             bigIntStringToFloat(liqB2.totalAmount) *
-            bigIntStringToFloat(liqB2.token.priceUSD)),
+            dangerouslyConvertBigIntToNumber(liqB2.token.priceUSDOracle, 9, 9)),
     );
   }, [borrowerPoolsData]);
 

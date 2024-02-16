@@ -1,9 +1,7 @@
 import { Address, BigInt, ethereum } from '@graphprotocol/graph-ts';
-import { SystemInfo, TokenCandle, TokenCandleSingleton } from '../../generated/schema';
-import { DebtToken } from '../../generated/templates/DebtTokenTemplate/DebtToken';
-import { SwapPair } from '../../generated/templates/SwapPairTemplate/SwapPair';
-import { log } from '@graphprotocol/graph-ts';
 import { PriceFeed } from '../../generated/PriceFeed/PriceFeed';
+import { SystemInfo, TokenCandle, TokenCandleSingleton } from '../../generated/schema';
+import { SwapPair } from '../../generated/templates/SwapPairTemplate/SwapPair';
 
 // 1min, 10min, 1hour, 6hour, 1day, 1week
 const CandleSizes = [1, 10, 60, 360, 1440, 10080];
@@ -13,7 +11,6 @@ export const oneEther = BigInt.fromI64(1000000000000000000);
  * Initializes the Singleton once for a new Token
  */
 export function handleCreateTokenCandleSingleton(event: ethereum.Event, tokenAddress: Address): void {
-
   let candleSingleton: TokenCandleSingleton | null;
   // TODO: How to get initialized price?
   const tokenPrice = BigInt.fromI64(0);

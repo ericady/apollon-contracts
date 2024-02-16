@@ -65,14 +65,14 @@ function StabilityPoolTable() {
 
   const rewardsTotalInUSD = rewards.reduce(
     (acc, { stabilityGainedAmount, token }) =>
-      acc + dangerouslyConvertBigIntToNumber(stabilityGainedAmount, 9, 9) * bigIntStringToFloat(token.priceUSD),
+      acc + dangerouslyConvertBigIntToNumber(stabilityGainedAmount, 9, 9) * dangerouslyConvertBigIntToNumber(token.priceUSDOracle, 9, 9),
     0,
   );
   const lossTotalInUSD = stabilityLost.reduce(
     (acc, { compoundedDeposit, token, providedStability }) =>
       acc +
       dangerouslyConvertBigIntToNumber(providedStability - compoundedDeposit, 9, 9) *
-        bigIntStringToFloat(token.priceUSD),
+        dangerouslyConvertBigIntToNumber(token.priceUSDOracle, 9, 9),
     0,
   );
 

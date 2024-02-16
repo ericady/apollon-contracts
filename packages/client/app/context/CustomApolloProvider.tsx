@@ -10,7 +10,15 @@ import {
 } from '@apollo/client';
 import { AddressLike } from 'ethers';
 import { PropsWithChildren } from 'react';
-import { DebtToken, ERC20, PriceFeed, StabilityPoolManager, StoragePool, SwapPair, TroveManager } from '../../generated/types';
+import {
+  DebtToken,
+  ERC20,
+  PriceFeed,
+  StabilityPoolManager,
+  StoragePool,
+  SwapPair,
+  TroveManager,
+} from '../../generated/types';
 import { SystemInfo, TokenFragmentFragment } from '../generated/gql-types';
 import { TOKEN_FRAGMENT } from '../queries';
 import { getCheckSum } from '../utils/crypto';
@@ -30,7 +38,7 @@ export function CustomApolloProvider({ children }: PropsWithChildren<{}>) {
       stabilityPoolManagerContract,
       storagePoolContract,
       collateralTokenContracts,
-      priceFeedContract
+      priceFeedContract,
     },
     address: borrower,
   } = useEthers();
@@ -48,7 +56,7 @@ export function CustomApolloProvider({ children }: PropsWithChildren<{}>) {
     stabilityPoolManagerContract,
     swapPairContracts,
     storagePoolContract,
-    priceFeedContract
+    priceFeedContract,
   });
 
   const client = new ApolloClient({
@@ -548,7 +556,7 @@ export const ContractDataFreshnessManager: {
     getTroveRepayableDebts: {
       fetch: async (troveManagerContract: TroveManager, borrower: AddressLike) => {
         ContractDataFreshnessManager.TroveManager.getTroveRepayableDebts.lastFetched = Date.now();
-        
+
         const troveRepayableDebts = await troveManagerContract['getTroveRepayableDebts(address,bool)'](borrower, false);
 
         const tokenAmounts = troveRepayableDebts.map(([tokenAddress, amount]) => ({
@@ -975,9 +983,9 @@ export const SchemaDataFreshnessManager: ContractDataFreshnessManager<typeof Con
       priceUSDOracle: {
         fetch: async (priceFeedContract: PriceFeed) => {
           SchemaDataFreshnessManager.DebtToken[Contracts.DebtToken.STABLE].priceUSDOracle.lastFetched = Date.now();
-          
-          const tokenPrice = (await priceFeedContract.getPrice(Contracts.DebtToken.STABLE)).price;
 
+          const tokenPrice = (await priceFeedContract.getPrice(Contracts.DebtToken.STABLE)).price;
+          
 
           SchemaDataFreshnessManager.DebtToken[Contracts.DebtToken.STABLE].priceUSDOracle.value(tokenPrice);
         },
@@ -1146,7 +1154,6 @@ export const SchemaDataFreshnessManager: ContractDataFreshnessManager<typeof Con
           SchemaDataFreshnessManager.DebtToken[Contracts.DebtToken.STOCK_1].priceUSDOracle.lastFetched = Date.now();
 
           const tokenPrice = (await priceFeedContract.getPrice(Contracts.DebtToken.STOCK_1)).price;
-
 
           SchemaDataFreshnessManager.DebtToken[Contracts.DebtToken.STOCK_1].priceUSDOracle.value(tokenPrice);
         },

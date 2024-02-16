@@ -7,7 +7,6 @@ import { GetBorrowerDebtTokensQuery, GetBorrowerDebtTokensQueryVariables } from 
 import { GET_BORROWER_DEBT_TOKENS } from '../queries';
 import { useEthers } from './EthersProvider';
 import { Contracts } from './contracts.config';
-import { divBigIntsToFloat } from '../utils/math';
 
 export type SelectedToken = {
   swapFee: bigint;
@@ -15,7 +14,7 @@ export type SelectedToken = {
   isFavorite: boolean;
   address: string;
   symbol: string;
-  priceUSD: bigint;
+  priceUSDOracle: bigint;
   priceUSD24hAgo: bigint;
   volume30dUSD: bigint;
   borrowingRate: bigint;
@@ -24,6 +23,7 @@ export type SelectedToken = {
     id: string;
     // Contract address of SwapPair
     address: string;
+    // STABLE is always first
     liqudityPair: bigint[];
   };
 };
@@ -56,14 +56,13 @@ export default function SelectedTokenProvider({ children }: { children: React.Re
   const tokenRatio =
     JUSDToken === undefined || selectedToken === null
       ? ethers.parseEther('1')
-      : (selectedToken!.priceUSD * ethers.parseEther('1')) / BigInt(JUSDToken!.priceUSD);
+      : (selectedToken!.pool.liqudityPair[1] * ethers.parseEther('1')) / selectedToken!.pool.liqudityPair[0] ;
 
   return (
     <SelectedTokenContext.Provider
       value={{
         selectedToken,
         setSelectedToken,
-        // TODO: Maybe use an env for the address instead
         JUSDToken,
         tokenRatio,
       }}

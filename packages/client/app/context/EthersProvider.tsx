@@ -25,13 +25,13 @@ import borrowerOperationsAbi from './abis/BorrowerOperations.json';
 import debtTokenAbi from './abis/DebtToken.json';
 import ERC20Abi from './abis/ERC20.json';
 import hintHelpersAbi from './abis/HintHelpers.json';
+import priceFeedAbi from './abis/PriceFeed.json';
 import sortedTrovesAbi from './abis/SortedTroves.json';
 import stabilityPoolManagerAbi from './abis/StabilityPoolManager.json';
 import storagePoolAbi from './abis/StoragePool.json';
 import swapOperationsAbi from './abis/SwapOperations.json';
 import swapPairAbi from './abis/SwapPair.json';
 import troveManagerAbi from './abis/TroveManager.json';
-import priceFeedAbi from './abis/PriceFeed.json';
 import { Contracts } from './contracts.config';
 
 // TODO: This is just dummy data and will be exchanged with the real implementation later.
@@ -49,12 +49,12 @@ declare global {
 // TODO: Migrate these assertions
 export const isDebtTokenAddress = (
   address: string,
-): address is '0x95401dc811bb5740090279ba06cfa8fcf6113778' | '0x998abeb3e57409262ae5b751f60747921b33613e' => {
+): address is '0xf5059a5d33d5853360d16c683c16e67980206f36' | '0x95401dc811bb5740090279ba06cfa8fcf6113778' => {
   return Object.values(Contracts.DebtToken)
     .map((address) => getCheckSum(address))
     .includes(getCheckSum(address) as any);
 };
-export const isStableCoinAddress = (address: string): address is '0x95401dc811bb5740090279ba06cfa8fcf6113778' => {
+export const isStableCoinAddress = (address: string): address is '0xf5059a5d33d5853360d16c683c16e67980206f36' => {
   return getCheckSum(Contracts.DebtToken.STABLE) === getCheckSum(address);
 };
 
@@ -378,7 +378,7 @@ export default function EthersProvider({ children }: { children: React.ReactNode
     !storagePoolContract ||
     !sortedTrovesContract ||
     !hintHelpersContract ||
-    !priceFeedContract 
+    !priceFeedContract
   )
     return null;
 

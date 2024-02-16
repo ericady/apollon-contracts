@@ -74,7 +74,7 @@ function SetupState({
         change: 0.01,
         isFavorite: true,
         swapFee: BigInt(50000),
-        priceUSD: BigInt(10000000000000000000),
+        priceUSDOracle: BigInt(10000000000000000000),
         symbol,
         priceUSD24hAgo: BigInt(10000000000000000000),
         volume30dUSD: BigInt(100000000000000000000000),

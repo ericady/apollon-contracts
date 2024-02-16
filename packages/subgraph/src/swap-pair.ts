@@ -9,11 +9,9 @@ import {
   Sync as SyncEvent,
   Transfer as TransferEvent,
 } from '../generated/templates/SwapPairTemplate/SwapPair';
-import { handleCreateSwapEvent } from './entities/swap-event-entity';
 import { handleUpdateLiquidity_totalAmount, handleUpdatePool_totalSupply } from './entities/pool-entity';
-import { handleUpdateToken_priceUSD } from './entities/token-entity';
+import { handleCreateSwapEvent } from './entities/swap-event-entity';
 import { handleUpdateTokenCandle_low_high, handleUpdateTokenCandle_volume } from './entities/token-candle-entity';
-import { log } from '@graphprotocol/graph-ts';
 
 export function handleApproval(event: ApprovalEvent): void {}
 
@@ -24,22 +22,21 @@ export function handleBurn(event: BurnEvent): void {
   const systemInfo = SystemInfo.load(`SystemInfo`)!;
   const stableCoin = Address.fromBytes(systemInfo.stableCoin); // This is of type Bytes, so I convert it to Address
 
-    const tokenPrice = handleUpdateTokenCandle_low_high(
-      event,
-      event.address,
-      token0 == stableCoin ? 1 : 0,
-      token0 == stableCoin ? token1 : token0,
-    );
-    handleUpdateToken_priceUSD(event, token0 == stableCoin ? token1 : token0, tokenPrice);
-    // TODO: Maybe always update volume?
-    const volume = token0 == stableCoin ? event.params.amount0 : event.params.amount1;
-    handleUpdateTokenCandle_volume(
-      event,
-      event.address,
-      token0 == stableCoin ? 1 : 0,
-      token0 == stableCoin ? token1 : token0,
-      volume,
-    );
+  const tokenPrice = handleUpdateTokenCandle_low_high(
+    event,
+    event.address,
+    token0 == stableCoin ? 1 : 0,
+    token0 == stableCoin ? token1 : token0,
+  );
+  // TODO: Maybe always update volume?
+  const volume = token0 == stableCoin ? event.params.amount0 : event.params.amount1;
+  handleUpdateTokenCandle_volume(
+    event,
+    event.address,
+    token0 == stableCoin ? 1 : 0,
+    token0 == stableCoin ? token1 : token0,
+    volume,
+  );
 }
 
 export function handleMint(event: MintEvent): void {
@@ -49,22 +46,21 @@ export function handleMint(event: MintEvent): void {
   const systemInfo = SystemInfo.load(`SystemInfo`)!;
   const stableCoin = Address.fromBytes(systemInfo.stableCoin); // This is of type Bytes, so I convert it to Address
 
-    const tokenPrice = handleUpdateTokenCandle_low_high(
-      event,
-      event.address,
-      token0 == stableCoin ? 1 : 0,
-      token0 == stableCoin ? token1 : token0,
-    );
-    handleUpdateToken_priceUSD(event, token0 == stableCoin ? token1 : token0, tokenPrice);
-    // TODO: Maybe always update volume?
-    const volume = token0 == stableCoin ? event.params.amount0 : event.params.amount1;
-    handleUpdateTokenCandle_volume(
-      event,
-      event.address,
-      token0 == stableCoin ? 1 : 0,
-      token0 == stableCoin ? token1 : token0,
-      volume,
-    );
+  const tokenPrice = handleUpdateTokenCandle_low_high(
+    event,
+    event.address,
+    token0 == stableCoin ? 1 : 0,
+    token0 == stableCoin ? token1 : token0,
+  );
+  // TODO: Maybe always update volume?
+  const volume = token0 == stableCoin ? event.params.amount0 : event.params.amount1;
+  handleUpdateTokenCandle_volume(
+    event,
+    event.address,
+    token0 == stableCoin ? 1 : 0,
+    token0 == stableCoin ? token1 : token0,
+    volume,
+  );
 }
 
 export function handleSwap(event: SwapEvent): void {
@@ -77,7 +73,6 @@ export function handleSwap(event: SwapEvent): void {
   const tradeToken = token0 == stableCoin ? token1 : token0;
 
   const tokenPrice = handleUpdateTokenCandle_low_high(event, event.address, token0 == stableCoin ? 1 : 0, tradeToken);
-  handleUpdateToken_priceUSD(event, tradeToken, tokenPrice);
 
   // TODO: Maybe always update volume?
   const volume = token0 == stableCoin ? event.params.amount0In : event.params.amount1In;
@@ -128,29 +123,28 @@ export function handleSync(event: SyncEvent): void {
   const stableCoin = Address.fromBytes(systemInfo.stableCoin); // This is of type Bytes, so I convert it to Address
 
   handleUpdateLiquidity_totalAmount(event, token0, token1, event.params.reserve0, event.params.reserve1);
-    const tokenPrice = handleUpdateTokenCandle_low_high(
-      event,
-      event.address,
-      token0 == stableCoin ? 1 : 0,
-      token0 == stableCoin ? token1 : token0,
-    );
-    handleUpdateToken_priceUSD(event, token0 == stableCoin ? token1 : token0, tokenPrice);
-    // TODO: Maybe always update volume?
-    // FIXME: This looks wrong. Fix it later
-    const swapPairReserves = swapPairContract.getReserves();
-    // add total difference in reserves after sync
-    const volume = swapPairReserves
-      .get_reserve0()
-      .minus(event.params.reserve0)
-      .abs()
-      .plus(swapPairReserves.get_reserve1().minus(event.params.reserve1).abs());
-    handleUpdateTokenCandle_volume(
-      event,
-      event.address,
-      token0 == stableCoin ? 1 : 0,
-      token0 == stableCoin ? token1 : token0,
-      volume,
-    );
+  const tokenPrice = handleUpdateTokenCandle_low_high(
+    event,
+    event.address,
+    token0 == stableCoin ? 1 : 0,
+    token0 == stableCoin ? token1 : token0,
+  );
+  // TODO: Maybe always update volume?
+  // FIXME: This looks wrong. Fix it later
+  const swapPairReserves = swapPairContract.getReserves();
+  // add total difference in reserves after sync
+  const volume = swapPairReserves
+    .get_reserve0()
+    .minus(event.params.reserve0)
+    .abs()
+    .plus(swapPairReserves.get_reserve1().minus(event.params.reserve1).abs());
+  handleUpdateTokenCandle_volume(
+    event,
+    event.address,
+    token0 == stableCoin ? 1 : 0,
+    token0 == stableCoin ? token1 : token0,
+    volume,
+  );
 }
 
 export function handleTransfer(event: TransferEvent): void {

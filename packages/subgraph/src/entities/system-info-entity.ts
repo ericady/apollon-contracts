@@ -93,7 +93,10 @@ export const handleUpdateSystemInfo_reservePool = (event: ethereum.Event, reserv
   systemInfo.save();
 };
 
-export const handleUpdateSystemInfo_stabilityPoolManager = (event: ethereum.Event, stabilityPoolManager: Address): void => {
+export const handleUpdateSystemInfo_stabilityPoolManager = (
+  event: ethereum.Event,
+  stabilityPoolManager: Address,
+): void => {
   let systemInfo = SystemInfo.load(`SystemInfo`);
 
   if (systemInfo === null) {

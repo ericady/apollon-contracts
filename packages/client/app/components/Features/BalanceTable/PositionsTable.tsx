@@ -73,7 +73,7 @@
 //         <TableBody>
 //           {data?.swapEvents.positions.map(
 //             ({ id, direction, swapFee, timestamp, size, token, totalPriceInStable }) => {
-//               const ratioStableCoinNow = token.priceUSD / JUSDToken!.priceUSD;
+//               const ratioStableCoinNow = token.priceUSDOracle / JUSDToken!.priceUSDOracle;
 //               const totalPriceInStableNow = ratioStableCoinNow * size;
 //               const pnl = totalPriceInStableNow - totalPriceInStable;
 

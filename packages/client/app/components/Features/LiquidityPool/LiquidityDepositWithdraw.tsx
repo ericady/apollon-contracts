@@ -55,7 +55,7 @@ function LiquidityDepositWithdraw({ selectedPool }: Props) {
   const { liquidity, borrowerAmount, totalSupply } = selectedPool;
   const [tokenA, tokenB] = liquidity.map((liquidity) => ({
     ...liquidity,
-    token: { ...liquidity.token, priceUSD: bigIntStringToFloat(liquidity.token.priceUSD) },
+    token: { ...liquidity.token, priceUSD: dangerouslyConvertBigIntToNumber(liquidity.token.priceUSDOracle, 9, 9) },
   }));
 
   const {
@@ -355,8 +355,8 @@ function LiquidityDepositWithdraw({ selectedPool }: Props) {
       const tokenAAmount = calculate150PercentTokenValue(
         currentDebtValueUSD,
         currentCollateralValueUSD,
-        { totalAmount: bigIntStringToFloat(tokenA.totalAmount), priceUSD: tokenA.token.priceUSD },
-        { totalAmount: bigIntStringToFloat(tokenB.totalAmount), priceUSD: tokenB.token.priceUSD },
+        { totalAmount: bigIntStringToFloat(tokenA.totalAmount), priceUSD: dangerouslyConvertBigIntToNumber(tokenA.token.priceUSDOracle, 9, 9) },
+        { totalAmount: bigIntStringToFloat(tokenB.totalAmount), priceUSD: dangerouslyConvertBigIntToNumber(tokenB.token.priceUSDOracle, 9, 9) },
         relevantTokenA,
         relevantTokenB,
       );
@@ -382,23 +382,23 @@ function LiquidityDepositWithdraw({ selectedPool }: Props) {
       ? (tokenAAmount
           ? Math.max(
               (parseFloat(tokenAAmount) - dangerouslyConvertBigIntToNumber(relevantTokenA.walletAmount, 9, 9)) *
-                tokenA.token.priceUSD,
+                dangerouslyConvertBigIntToNumber(tokenA.token.priceUSDOracle, 9, 9),
               0,
             )
           : 0) +
         (tokenBAmount
           ? Math.max(
               (parseFloat(tokenBAmount) - dangerouslyConvertBigIntToNumber(relevantTokenB.walletAmount, 9, 9)) *
-                tokenB.token.priceUSD,
+                dangerouslyConvertBigIntToNumber(tokenB.token.priceUSDOracle, 9, 9),
               0,
             )
           : 0)
       : ((relevantTokenA.investedAmount > tokenAAmountForWithdraw
-          ? tokenAAmountForWithdraw * tokenA.token.priceUSD
-          : dangerouslyConvertBigIntToNumber(relevantTokenA.investedAmount, 9, 9) * tokenA.token.priceUSD) +
+          ? tokenAAmountForWithdraw * dangerouslyConvertBigIntToNumber(tokenA.token.priceUSDOracle, 9, 9)
+          : dangerouslyConvertBigIntToNumber(relevantTokenA.investedAmount, 9, 9) * dangerouslyConvertBigIntToNumber(tokenA.token.priceUSDOracle, 9, 9)) +
           (relevantTokenB.investedAmount > tokenBAmountForWithdraw
-            ? tokenBAmountForWithdraw * tokenB.token.priceUSD
-            : dangerouslyConvertBigIntToNumber(relevantTokenB.investedAmount, 9, 9) * tokenB.token.priceUSD)) *
+            ? tokenBAmountForWithdraw * dangerouslyConvertBigIntToNumber(tokenB.token.priceUSDOracle, 9, 9)
+            : dangerouslyConvertBigIntToNumber(relevantTokenB.investedAmount, 9, 9) * dangerouslyConvertBigIntToNumber(tokenB.token.priceUSDOracle, 9, 9))) *
         -1;
 
   return (
