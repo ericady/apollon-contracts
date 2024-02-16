@@ -9,9 +9,10 @@ import {
   Sync as SyncEvent,
   Transfer as TransferEvent,
 } from '../generated/templates/SwapPairTemplate/SwapPair';
-import { handleUpdateLiquidity_totalAmount, handleUpdatePool_totalSupply } from './entities/pool-entity';
+import { handleUpdateLiquidity_totalAmount, handleUpdatePool_totalSupply, handleUpdatePool_volume30dUSD } from './entities/pool-entity';
 import { handleCreateSwapEvent } from './entities/swap-event-entity';
 import { handleUpdateTokenCandle_low_high, handleUpdateTokenCandle_volume } from './entities/token-candle-entity';
+import { PriceFeed } from '../generated/PriceFeed/PriceFeed';
 
 export function handleApproval(event: ApprovalEvent): void {}
 
@@ -113,6 +114,16 @@ export function handleSwap(event: SwapEvent): void {
     stableSize,
     event.params.currentSwapFee,
   );
+  
+  let feeUSD = BigInt.fromI32(0);
+  if (direction === 'LONG') {
+    const stablePrice = PriceFeed.bind(Address.fromBytes(systemInfo.priceFeed)).getPrice(stableCoin).getPrice();
+    feeUSD = stablePrice.times(stableSize).times(event.params.currentSwapFee).div(BigInt.fromI32(10).pow(18 + 6));
+  } else {
+    feeUSD = tokenPrice.times(debtTokenSize).times(event.params.currentSwapFee).div(BigInt.fromI32(10).pow(18 + 6));
+  }
+
+  handleUpdatePool_volume30dUSD(event, stableCoin, tradeToken, stableSize,  feeUSD);
 }
 
 export function handleSync(event: SyncEvent): void {
@@ -122,6 +133,7 @@ export function handleSync(event: SyncEvent): void {
   const systemInfo = SystemInfo.load(`SystemInfo`)!;
   const stableCoin = Address.fromBytes(systemInfo.stableCoin); // This is of type Bytes, so I convert it to Address
 
+  // Because Reserves change
   handleUpdateLiquidity_totalAmount(event, token0, token1, event.params.reserve0, event.params.reserve1);
   const tokenPrice = handleUpdateTokenCandle_low_high(
     event,
@@ -149,8 +161,14 @@ export function handleSync(event: SyncEvent): void {
 
 export function handleTransfer(event: TransferEvent): void {
   const swapPairContract = SwapPair.bind(event.address);
+  const systemInfo = SystemInfo.load(`SystemInfo`)!;
+  const stableCoin = Address.fromBytes(systemInfo.stableCoin); // This is of type Bytes, so I convert it to Address
+
   const token0 = swapPairContract.token0();
   const token1 = swapPairContract.token1();
+  const stableCoinToken = token0 == stableCoin ? token0 : token1;
+  const nonStableCoin = token0 == stableCoin ? token1 : token0;
+
   // // FIXME: Can be optimized because added/substracted value is already included in event. Do it later.
-  handleUpdatePool_totalSupply(event, token0, token1);
+  handleUpdatePool_totalSupply(event, stableCoinToken, nonStableCoin);
 }

@@ -133,6 +133,7 @@ type Pool {
   # SwapPair contract address
   address: Bytes!
   liquidity: [PoolLiquidity!]!
+  # TODO: Still hardcoded to 0%
   liquidityDepositAPY: BigInt!
   volume30dUSD: PoolVolume30d!
   volume30dUSD30dAgo: PoolVolume30d!

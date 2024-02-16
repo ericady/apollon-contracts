@@ -222,12 +222,10 @@ type Pool @entity {
   # TODO: wasa => not sure how to do this yet, lets delay this for now
   liquidityDepositAPY: BigInt!
 
-  # TODO: wasa => We need to aggregate all Deposits/Withdrawals and update every time a new Transaction comes in
   volume30dUSD: PoolVolume30d!
   # once the first PoolEvent of the array is > 24h ago, we can remove it from the array and push it to the 24hAgo field
   volume30dUSD30dAgo: PoolVolume30d!
 
-  # TODO: wasa Proxy Token amount
   totalSupply: BigInt!
 }
 
@@ -247,6 +245,8 @@ type PoolVolumeChunk @entity {
   id: String!
   timestamp: BigInt!
   value: BigInt!
+  # die fee in USD bitte ebenfalls im laufenden durchschnitt mitberechen, diese wird dann notwenidg um die APY zu ermitteln
+  feeUSD: BigInt!
 }
 
 # TODO: wasa not sure about contract/event limitations of the BorrowerHistory, lets analyze this together first before implementation.

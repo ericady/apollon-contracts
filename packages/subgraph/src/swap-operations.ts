@@ -7,7 +7,7 @@ import {
 } from '../generated/SwapOperations/SwapOperations';
 import { SystemInfo } from '../generated/schema';
 import { SwapPairTemplate } from '../generated/templates';
-import { handleCreatePool } from './entities/pool-entity';
+import { handleCreateUpdatePool } from './entities/pool-entity';
 import { handleCreateTokenCandleSingleton } from './entities/token-candle-entity';
 
 export function handleOwnershipTransferred(event: OwnershipTransferredEvent): void {}
@@ -16,18 +16,16 @@ export function handlePairCreated(event: PairCreatedEvent): void {
   const systemInfo = SystemInfo.load(`SystemInfo`)!;
   const stableCoin = Address.fromBytes(systemInfo.stableCoin);
 
-  const poolContainsStableCoin = event.params.token0 == stableCoin || event.params.token1 == stableCoin;
+  const nonStableCoin = event.params.token0 == stableCoin ? event.params.token1 : event.params.token0;
+  const stableCoinToken = event.params.token0 == stableCoin ? event.params.token0 : event.params.token1;
 
-  // We only draw charts for Pool containing the stable coin
-  if (poolContainsStableCoin) {
-    handleCreateTokenCandleSingleton(
-      event,
-      event.params.token0 == stableCoin ? event.params.token1 : event.params.token0,
-    );
-  }
+  handleCreateTokenCandleSingleton(
+    event,
+    nonStableCoin,
+  );
 
   SwapPairTemplate.create(event.params.pair);
-  handleCreatePool(event, event.params.token0, event.params.token1, event.params.pair);
+  handleCreateUpdatePool(event, stableCoinToken, nonStableCoin, event.params.pair);
 }
 
 export function handleSwapOperationsInitialized(event: SwapOperationsInitializedEvent): void {}

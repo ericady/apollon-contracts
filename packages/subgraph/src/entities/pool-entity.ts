@@ -8,85 +8,107 @@ const chunkSize = 60;
 const thirtyDays = BigInt.fromI32(30 * 24 * 60 * 60);
 const totalChunks = 30 * 24;
 
-export function handleCreatePool(event: ethereum.Event, token0: Address, token1: Address, swapPair: Address): void {
-  const poolEntity = new Pool(`Pool-${token0.toHexString()}-${token1.toHexString()}`);
-  poolEntity.address = swapPair;
+export function handleCreateUpdatePool(event: ethereum.Event, stableCoin: Address, nonStableCoin: Address, swapPair: Address): void {
+  let poolEntity = Pool.load(`Pool-${stableCoin.toHexString()}-${nonStableCoin.toHexString()}`);
 
+  // Initialize Pool entity and all the linked averages
+  if (poolEntity === null) {
+    poolEntity = new Pool(`Pool-${stableCoin.toHexString()}-${nonStableCoin.toHexString()}`);
+    poolEntity.address = swapPair;
+
+    //   Aggregator for recent Volume
+    const poolVolume = new PoolVolume30d(event.transaction.hash.concatI32(event.logIndex.toI32()));
+    poolVolume.lastIndex = 1;
+    poolVolume.leadingIndex = 1;
+    poolVolume.value = BigInt.fromI32(0);
+    poolVolume.feeUSD = BigInt.fromI32(0);
+    poolVolume.save();
+    poolEntity.volume30dUSD = poolVolume.id;
+
+    const poolVolume30dAgo = new PoolVolume30d(event.transaction.hash.concatI32(event.logIndex.toI32()));
+    poolVolume30dAgo.lastIndex = 1;
+    poolVolume30dAgo.leadingIndex = 1;
+    poolVolume30dAgo.value = BigInt.fromI32(0);
+    poolVolume30dAgo.feeUSD = BigInt.fromI32(0);
+    poolVolume30dAgo.save();
+    poolEntity.volume30dUSD30dAgo = poolVolume30dAgo.id;
+
+    //   Add first PoolChunk
+    const poolVolumeChunk = new PoolVolumeChunk(`PoolVolumeChunk-${stableCoin.toHexString()}-${nonStableCoin.toHexString()}-1`);
+    poolVolumeChunk.timestamp = event.block.timestamp;
+    poolVolumeChunk.value = BigInt.fromI32(0);
+    poolVolumeChunk.feeUSD = BigInt.fromI32(0);
+    poolVolumeChunk.save();
+
+
+    // Initialize Liquidity
+    const liquidity0 = new PoolLiquidity(stableCoin.concat(nonStableCoin));
+    liquidity0.token = stableCoin;
+    liquidity0.totalAmount = BigInt.fromI32(0);
+    liquidity0.save();
+  
+    const liquidity1 = new PoolLiquidity(nonStableCoin.concat(stableCoin));
+    liquidity1.token = nonStableCoin;
+    liquidity1.totalAmount = BigInt.fromI32(0);
+    liquidity1.save();
+
+    poolEntity.liquidity = [liquidity0.id, liquidity1.id];
+  }
+
+  // Update the general data of the pool
   const swapPairContract = SwapPair.bind(swapPair);
   const reserves = swapPairContract.getReserves();
 
-  const liquidity0 = new PoolLiquidity(token0.concat(token1));
-  liquidity0.token = token0;
+  const liquidity0 = PoolLiquidity.load(poolEntity.liquidity[0])!;
   liquidity0.totalAmount = reserves.value0;
   liquidity0.save();
 
-  const liquidity1 = new PoolLiquidity(token1.concat(token0));
-  liquidity1.token = token1;
+  const liquidity1 = PoolLiquidity.load(poolEntity.liquidity[1])!;
   liquidity1.totalAmount = reserves.value1;
   liquidity1.save();
 
-  poolEntity.liquidity = [liquidity0.id, liquidity1.id];
 
   const totalSupply = swapPairContract.totalSupply();
   poolEntity.totalSupply = totalSupply;
+  // FIXME: DONT KNOW THE CORRECT WAY TO CALCULATE APY YET
   poolEntity.liquidityDepositAPY = BigInt.fromI32(0);
-
-  //   Aggregator for recent Volume
-  const poolVolume = new PoolVolume30d(event.transaction.hash.concatI32(event.logIndex.toI32()));
-  poolVolume.lastIndex = 0;
-  poolVolume.leadingIndex = 0;
-  poolVolume.value = BigInt.fromI32(0);
-  poolVolume.feeUSD = BigInt.fromI32(0);
-  poolVolume.save();
-  poolEntity.volume30dUSD = poolVolume.id;
-
-  const poolVolume30dAgo = new PoolVolume30d(event.transaction.hash.concatI32(event.logIndex.toI32()));
-  poolVolume30dAgo.lastIndex = 0;
-  poolVolume30dAgo.leadingIndex = 0;
-  poolVolume30dAgo.value = BigInt.fromI32(0);
-  poolVolume30dAgo.feeUSD = BigInt.fromI32(0);
-  poolVolume30dAgo.save();
-  poolEntity.volume30dUSD30dAgo = poolVolume30dAgo.id;
-
-  //   Add first PoolChunk
-  const poolVolumeChunk = new PoolVolumeChunk(`PoolVolumeChunk-${token0.toHexString()}-${token1.toHexString()}-0`);
-  poolVolumeChunk.timestamp = event.block.timestamp;
-  poolVolumeChunk.value = BigInt.fromI32(0);
-  poolVolumeChunk.save();
 
   poolEntity.save();
 }
 
 export function handleUpdatePool_volume30dUSD(
   event: ethereum.Event,
-  token0: Address,
-  token1: Address,
+  stableCoin: Address,
+  nonStableCoin: Address,
   value: BigInt,
+  feeUSD: BigInt,
 ): void {
-  const poolEntity = Pool.load(`Pool-${token0.toHexString()}-${token1.toHexString()}`)!;
+  const poolEntity = Pool.load(`Pool-${stableCoin.toHexString()}-${nonStableCoin.toHexString()}`)!;
 
   //   load last VolumeChunk and check if its outdated
   const recentVolume = PoolVolume30d.load(poolEntity.volume30dUSD)!;
 
   const leadingVolumeChunk = PoolVolumeChunk.load(
-    `PoolVolumeChunk-${token0.toHexString()}-${token1.toHexString()}-${recentVolume.leadingIndex}`,
+    `PoolVolumeChunk-${stableCoin.toHexString()}-${nonStableCoin.toHexString()}-${recentVolume.leadingIndex}`,
   )!;
   const leadingChunkIsOutdated = leadingVolumeChunk.timestamp.plus(BigInt.fromI32(chunkSize)).lt(event.block.timestamp);
 
   // create a new chunk
   if (leadingChunkIsOutdated) {
     const newVolumeChunk = new PoolVolumeChunk(
-      `PoolVolumeChunk-${token0.toHexString()}-${token1.toHexString()}-${recentVolume.leadingIndex + 1}`,
-    )!;
+      `PoolVolumeChunk-${stableCoin.toHexString()}-${nonStableCoin.toHexString()}-${recentVolume.leadingIndex + 1}`,
+    );
     // increase timestamp by exactly chunksize
     newVolumeChunk.timestamp = leadingVolumeChunk.timestamp.plus(BigInt.fromI32(chunkSize));
     newVolumeChunk.value = value;
+    newVolumeChunk.feeUSD = feeUSD
     newVolumeChunk.save();
 
     recentVolume.leadingIndex += 1;
   } else {
     // just add it to the leading chunk
     leadingVolumeChunk.value = leadingVolumeChunk.value.plus(value);
+    leadingVolumeChunk.feeUSD = leadingVolumeChunk.feeUSD.plus(feeUSD);
     leadingVolumeChunk.save();
   }
 
@@ -94,11 +116,12 @@ export function handleUpdatePool_volume30dUSD(
   recentVolume.value = recentVolume.value.plus(value);
 
   const lastVolumeChunk = PoolVolumeChunk.load(
-    `PoolVolumeChunk-${token0.toHexString()}-${token1.toHexString()}-${recentVolume.lastIndex}`,
+    `PoolVolumeChunk-${stableCoin.toHexString()}-${nonStableCoin.toHexString()}-${recentVolume.lastIndex}`,
   )!;
   const lastChunkIsOutdated = lastVolumeChunk.timestamp.plus(thirtyDays).lt(event.block.timestamp);
   if (lastChunkIsOutdated) {
     recentVolume.value = recentVolume.value.minus(lastVolumeChunk.value);
+    recentVolume.feeUSD = recentVolume.feeUSD.minus(lastVolumeChunk.feeUSD);
     recentVolume.lastIndex += 1;
 
     const volume30DaysAgo = PoolVolume30d.load(poolEntity.volume30dUSD30dAgo)!;
@@ -106,16 +129,18 @@ export function handleUpdatePool_volume30dUSD(
     // add new chunk that is just older than 30 days
     volume30DaysAgo.leadingIndex += 1;
     volume30DaysAgo.value = volume30DaysAgo.value.plus(lastVolumeChunk.value);
+    volume30DaysAgo.feeUSD = volume30DaysAgo.feeUSD.plus(lastVolumeChunk.feeUSD);
 
     // remove chunk that is older than 60 days
     const lastVolumeChunk30DaysAgo = PoolVolumeChunk.load(
-      `PoolVolumeChunk-${token0.toHexString()}-${token1.toHexString()}-${volume30DaysAgo.lastIndex}`,
+      `PoolVolumeChunk-${stableCoin.toHexString()}-${nonStableCoin.toHexString()}-${volume30DaysAgo.lastIndex}`,
     )!;
     const lastChunkIsOutdated = lastVolumeChunk30DaysAgo.timestamp
       .plus(thirtyDays.times(BigInt.fromI32(2)))
       .lt(event.block.timestamp);
     if (lastChunkIsOutdated) {
       volume30DaysAgo.value = volume30DaysAgo.value.minus(lastVolumeChunk30DaysAgo.value);
+      volume30DaysAgo.feeUSD = volume30DaysAgo.feeUSD.minus(lastVolumeChunk30DaysAgo.feeUSD);
       volume30DaysAgo.lastIndex += 1;
     }
 
@@ -125,6 +150,7 @@ export function handleUpdatePool_volume30dUSD(
   recentVolume.save();
 }
 
+// FIXME: Can it even change at all?????
 export function handleUpdatePool_totalSupply(event: ethereum.Event, token0: Address, token1: Address): void {
   const poolEntity = Pool.load(`Pool-${token0.toHexString()}-${token1.toHexString()}`)!;
 
@@ -137,16 +163,16 @@ export function handleUpdatePool_totalSupply(event: ethereum.Event, token0: Addr
 
 export function handleUpdateLiquidity_totalAmount(
   event: ethereum.Event,
-  token0: Address,
-  token1: Address,
-  reserve0: BigInt,
-  reserve1: BigInt,
+  stableCoin: Address,
+  nonStableCoin: Address,
+  reserveStable: BigInt,
+  reserveNonStable: BigInt,
 ): void {
-  const liquidity0 = PoolLiquidity.load(token0.concat(token1))!;
-  liquidity0.totalAmount = reserve0;
+  const liquidity0 = PoolLiquidity.load(stableCoin.concat(nonStableCoin))!;
+  liquidity0.totalAmount = reserveStable;
   liquidity0.save();
 
-  const liquidity1 = PoolLiquidity.load(token1.concat(token0))!;
-  liquidity1.totalAmount = reserve1;
+  const liquidity1 = PoolLiquidity.load(nonStableCoin.concat(stableCoin))!;
+  liquidity1.totalAmount = reserveNonStable;
   liquidity1.save();
 }
