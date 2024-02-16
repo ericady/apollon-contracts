@@ -10,7 +10,10 @@ import {
   TroveIndexUpdated as TroveIndexUpdatedEvent,
   TroveSnapshotsUpdated as TroveSnapshotsUpdatedEvent,
 } from '../generated/TroveManager/TroveManager';
-import { handleCreateUpdateCollateralTokenMeta } from './entities/collateral-token-meta-entity';
+import { handleCreateUpdateCollateralTokenMeta, handleUpdateCollateralTokenMeta_totalValueLockedUSD30dAverage } from './entities/collateral-token-meta-entity';
+import { handleCreateUpdateDebtTokenMeta } from './entities/debt-token-meta-entity';
+import { handleCreateTotalValueLockedUSDHistoryChunk } from './entities/total-value-locked-USD-history-chunk-entity';
+import { handleCreateTotalValueMintedUSDHistoryChunk } from './entities/total-value-minted-USD-history-chunk-entity';
 
 export function handleLTermsUpdated(event: LTermsUpdatedEvent): void {}
 
@@ -34,5 +37,6 @@ export function handleCollChanged(event: TroveCollChangedEvent): void {
   for (let i = 0; i < event.params._collTokenAddresses.length; i++) {
     // TODO: Loop over troves from the troveManager to get totalValueLockedUSD for any single collToken
     handleCreateUpdateCollateralTokenMeta(event, event.params._collTokenAddresses[i]);
+    handleUpdateCollateralTokenMeta_totalValueLockedUSD30dAverage(event, event.params._collTokenAddresses[i]);
   }
 }

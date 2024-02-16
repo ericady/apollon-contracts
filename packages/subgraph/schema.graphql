@@ -35,7 +35,6 @@ type DebtTokenMeta @entity {
 
   # global
 
-  # TODO: wasa not sure how to calculate the APY, lets discuss this together
   # Es geht bei dieser Metric um einen laufenden 30 Tage Durchschnitt, welcher anzeigt wie viel die depositors in dieser Zeit, aufs Jahr hochgerechenet, verdient haben.
   # Das muss auf dem graphen berechnet werden, über das offset event. Alle offsets der letzten 30 Tage immer zusammenfassen und schauen wie groß der Profit (debt token heraus gezogen, coll token bekommen) war.
   # On creation of the entity we must save just the current APY

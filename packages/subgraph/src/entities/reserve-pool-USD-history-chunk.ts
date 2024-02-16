@@ -45,7 +45,7 @@ export function handleCreateReservePoolUSDHistoryChunk(event: ethereum.Event, re
       newChunk.size = chunkSize.toI32();
       newChunk.value = totalValueReservesUSD;
       newChunk.save();
-    } else {
+    } else if (lastChunk.value < totalValueReservesUSD) {
       // update tvl
 
       lastChunk.value = totalValueReservesUSD;

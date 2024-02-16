@@ -21,14 +21,12 @@ export function handleOwnershipTransferred(event: OwnershipTransferredEvent): vo
 
 export function handleReserveCapChanged(event: ReserveCapChangedEvent): void {
   const systemInfo = SystemInfo.load(`SystemInfo`)!;
-  const stableDebtToken = Address.fromBytes(systemInfo.stableCoin);
+  const stableCoin = Address.fromBytes(systemInfo.stableCoin);
   const govToken = Address.fromBytes(systemInfo.govToken);
 
-  log.warning('ReserveCapChanged stableDebtToken: {}', [stableDebtToken.toHexString()]);
-  // FIXME: Event is emitted before all other events. Can we change that?
-  handleCreateUpdateDebtTokenMeta(event, stableDebtToken);
-  handleUpdateDebtTokenMeta_totalReserve30dAverage(event, stableDebtToken, event.params.newReserveCap);
-  // FIXME: govToken is a CollToken now. It doesnt have a StabilityPool => have reserve on collTokens too.
+  handleCreateUpdateDebtTokenMeta(event, stableCoin);
+  handleUpdateDebtTokenMeta_totalReserve30dAverage(event, stableCoin, event.params.newReserveCap);
+
   handleCreateUpdateCollateralTokenMeta(event, govToken, event.params.newGovReserveCap);
   handleUpdateCollateralTokenMeta_totalReserve30dAverage(event, govToken, event.params.newGovReserveCap);
 
@@ -47,6 +45,8 @@ export function handleWithdrewReserves(event: WithdrewReservesEvent): void {
   handleCreateUpdateDebtTokenMeta(event, stableCoin);
   handleUpdateDebtTokenMeta_totalReserve30dAverage(event, stableCoin, event.params.stableAmount);
 
-  handleCreateUpdateDebtTokenMeta(event, govToken);
-  handleUpdateDebtTokenMeta_totalReserve30dAverage(event, govToken, event.params.govAmount);
+  handleCreateUpdateCollateralTokenMeta(event, govToken, event.params.govAmount);
+  handleUpdateCollateralTokenMeta_totalReserve30dAverage(event, govToken, event.params.govAmount);
+
+  handleCreateReservePoolUSDHistoryChunk(event, event.address);
 }

@@ -35,7 +35,9 @@ export function handleCreateUpdateDebtTokenMeta(event: ethereum.Event, tokenAddr
   debtTokenMeta.timestamp = event.block.timestamp;
 
   const totalSupply = tokenContract.totalSupply();
-  const tokenPrice = Token.load(tokenAddress)!.priceUSD;
+  const priceFeedContract = PriceFeed.bind(Address.fromBytes(systemInfo.priceFeed));
+  const tokenPrice = priceFeedContract.getPrice(tokenAddress).getPrice();
+
   debtTokenMeta.totalSupplyUSD = totalSupply.times(tokenPrice).div(BigInt.fromI32(10).pow(18));
 
   const govToken = Address.fromBytes(systemInfo.govToken);

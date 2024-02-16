@@ -8,7 +8,6 @@ import {
 } from '../generated/TokenManager/TokenManager';
 import { DebtTokenTemplate, ERC20Template } from '../generated/templates';
 import {
-  handleCreateCollateralTokenMeta_totalValueLockedUSD30dAverage,
   handleCreateUpdateCollateralTokenMeta,
 } from './entities/collateral-token-meta-entity';
 import { handleCreateUpdateDebtTokenMeta } from './entities/debt-token-meta-entity';
@@ -20,7 +19,6 @@ export function handleCollTokenAdded(event: CollTokenAddedEvent): void {
   handleCreateToken(event, event.params._tokenAddress, false);
 
   handleCreateUpdateCollateralTokenMeta(event, event.params._tokenAddress);
-  handleCreateCollateralTokenMeta_totalValueLockedUSD30dAverage(event, event.params._tokenAddress);
 }
 
 export function handleDebtTokenAdded(event: DebtTokenAddedEvent): void {

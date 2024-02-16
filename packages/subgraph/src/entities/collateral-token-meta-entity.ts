@@ -21,6 +21,7 @@ export function handleCreateUpdateCollateralTokenMeta(
   if (collateralTokenMeta === null) {
     collateralTokenMeta = new CollateralTokenMeta(`CollateralTokenMeta-${tokenAddress.toHexString()}`);
     createCollateralTokenMeta_totalReserve30dAverage(event, tokenAddress);
+    handleCreateCollateralTokenMeta_totalValueLockedUSD30dAverage(event, tokenAddress);
   }
 
   collateralTokenMeta.token = tokenAddress;
@@ -57,17 +58,15 @@ export const handleCreateCollateralTokenMeta_totalValueLockedUSD30dAverage = (
   event: ethereum.Event,
   tokenAddress: Address,
 ): void => {
-  const collateralTokenMeta = CollateralTokenMeta.load(`CollateralTokenMeta-${tokenAddress.toHexString()}`)!;
-
   const tvlAverage = new TotalValueLockedAverage(`TotalValueLockedAverage-${tokenAddress.toHexString()}`);
-  tvlAverage.value = collateralTokenMeta.totalValueLockedUSD;
+  tvlAverage.value = BigInt.fromI32(0);
   tvlAverage.index = 0;
   tvlAverage.save();
 
   // "TotalValueLockedChunk" + token + index
   const tvlAverageFirstChunk = new TotalValueLockedChunk(`TotalValueLockedChunk-${tokenAddress.toHexString()}-0`);
   tvlAverageFirstChunk.timestamp = event.block.timestamp;
-  tvlAverageFirstChunk.value = collateralTokenMeta.totalValueLockedUSD;
+  tvlAverageFirstChunk.value = BigInt.fromI32(0);
   tvlAverageFirstChunk.save();
 };
 

@@ -1,4 +1,4 @@
-import { BigInt, ethereum } from '@graphprotocol/graph-ts';
+import { Address, BigInt, ethereum } from '@graphprotocol/graph-ts';
 import { StoragePool } from '../../generated/StoragePool/StoragePool';
 import { SystemInfo, TotalValueMintedUSDHistoryChunk } from '../../generated/schema';
 
@@ -11,8 +11,8 @@ export function handleCreateTotalValueMintedUSDHistoryChunk(event: ethereum.Even
 
   let lastChunk = TotalValueMintedUSDHistoryChunk.load(`TotalValueMintedUSDHistoryChunk-${currentIndex.toString()}`);
 
-  const storagePoolContract = StoragePool.bind(systemInfo.storagePool);
-  const systemMintedUSD = storagePoolContract['checkRecoveryMode1']().getEntireSystemDebt();
+  const storagePoolContract = StoragePool.bind(Address.fromBytes(systemInfo.storagePool));
+  const systemMintedUSD = storagePoolContract.checkRecoveryMode1().getEntireSystemDebt();
 
   if (lastChunk === null) {
     lastChunk = new TotalValueMintedUSDHistoryChunk(`TotalValueMintedUSDHistoryChunk-0`);
@@ -34,7 +34,7 @@ export function handleCreateTotalValueMintedUSDHistoryChunk(event: ethereum.Even
       newChunk.size = chunkSize.toI32();
       newChunk.value = systemMintedUSD;
       newChunk.save();
-    } else {
+    } else if (lastChunk.value < systemMintedUSD) {
       // update tvl
 
       lastChunk.value = systemMintedUSD;

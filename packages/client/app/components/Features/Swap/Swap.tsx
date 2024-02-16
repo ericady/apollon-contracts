@@ -282,10 +282,10 @@ const Swap = () => {
                 rules={{
                   required: { value: true, message: 'You need to specify an amount.' },
                   min: { value: 0, message: 'Amount needs to be positive.' },
-                  max: {
+                  max: tradingDirection === 'jUSDAquired' ? {
                     value: dangerouslyConvertBigIntToNumber(relevantToken.walletAmount, 9, 9),
                     message: 'Amount exceeds wallet balance.',
-                  },
+                  } : undefined,
                 }}
                 disabled={!selectedToken}
                 onChange={(e: ChangeEvent<HTMLInputElement>) => {
@@ -315,10 +315,10 @@ const Swap = () => {
                 rules={{
                   required: { value: true, message: 'You need to specify an amount.' },
                   min: { value: 0, message: 'Amount needs to be positive.' },
-                  max: {
+                  max:  tradingDirection === 'jUSDSpent' ? {
                     value: dangerouslyConvertBigIntToNumber(stableWalletAmount, 9, 9),
                     message: 'Amount exceeds wallet balance.',
-                  },
+                  } : undefined,
                 }}
                 disabled={!selectedToken}
                 onChange={(e: ChangeEvent<HTMLInputElement>) => {
