@@ -89,6 +89,28 @@ async function main() {
           .includes(getCheckSum(address) as any);
       };
 
+      export const isDebtTokenAddress = (
+        address: string,
+      ): address is '${Contracts.DebtToken.STABLE}' | '${Contracts.DebtToken.STOCK_1}' => {
+        return Object.values(Contracts.DebtToken)
+          .map((address) => getCheckSum(address))
+          .includes(getCheckSum(address) as any);
+      };
+      export const isStableCoinAddress = (address: string): address is '${Contracts.DebtToken.STABLE}' => {
+        return getCheckSum(Contracts.DebtToken.STABLE) === getCheckSum(address);
+      };
+
+      export const isCollateralTokenAddress = (
+        address: string,
+      ): address is
+        | '${Contracts.ERC20.BTC}'
+        | '${Contracts.ERC20.USDT}'
+        | '${Contracts.ERC20.GOV}' => {
+        return Object.values(Contracts.ERC20)
+          .map((address) => getCheckSum(address))
+          .includes(getCheckSum(address) as any);
+      };
+
       `;
 
     fs.writeFileSync('app/context/contracts.config.ts', contractsLiteral, 'utf-8');

@@ -36,3 +36,25 @@ export const isPoolAddress = (
     .map((address) => getCheckSum(address))
     .includes(getCheckSum(address) as any);
 };
+
+export const isDebtTokenAddress = (
+  address: string,
+): address is '0x84ea74d481ee0a5332c457a4d796187f6ba67feb' | '0x9e545e3c0baab3e08cdfd552c960a1050f373042' => {
+  return Object.values(Contracts.DebtToken)
+    .map((address) => getCheckSum(address))
+    .includes(getCheckSum(address) as any);
+};
+export const isStableCoinAddress = (address: string): address is '0x84ea74d481ee0a5332c457a4d796187f6ba67feb' => {
+  return getCheckSum(Contracts.DebtToken.STABLE) === getCheckSum(address);
+};
+
+export const isCollateralTokenAddress = (
+  address: string,
+): address is
+  | '0x9a676e781a523b5d0c0e43731313a708cb607508'
+  | '0x959922be3caee4b8cd9a407cc3ac1c251c2007b1'
+  | '0x0b306bf915c4d645ff596e518faf3f9669b97016' => {
+  return Object.values(Contracts.ERC20)
+    .map((address) => getCheckSum(address))
+    .includes(getCheckSum(address) as any);
+};

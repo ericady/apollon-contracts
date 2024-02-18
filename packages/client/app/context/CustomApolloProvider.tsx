@@ -23,8 +23,8 @@ import { SystemInfo, TokenFragmentFragment } from '../generated/gql-types';
 import { TOKEN_FRAGMENT } from '../queries';
 import { getCheckSum } from '../utils/crypto';
 import { CustomApolloProvider_DevMode } from './CustomApolloProvider_dev';
-import { isCollateralTokenAddress, isDebtTokenAddress, isStableCoinAddress, useEthers } from './EthersProvider';
-import { Contracts, isPoolAddress } from './contracts.config';
+import { useEthers } from './EthersProvider';
+import { Contracts, isCollateralTokenAddress, isDebtTokenAddress, isPoolAddress, isStableCoinAddress } from './contracts.config';
 
 const defaultFieldValue = BigInt(0);
 

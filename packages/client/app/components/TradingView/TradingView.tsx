@@ -73,6 +73,8 @@ function TradingViewComponent() {
 
   useEffect(() => {
     if (window.TradingView && selectedToken && !currentChart.current) {
+      // seems to fix this._iFrame.contentWindow; is undefined
+      setTimeout(() => {
       // @ts-ignore
       currentChart.current = new TradingView.widget({
         container: 'apollon-trading-view',
@@ -214,7 +216,10 @@ function TradingViewComponent() {
           'linetoolposition.quantityFontFamily': 'Space Grotesk Variable',
         },
       });
+    })
+      
     }
+
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [client, isDarkMode, selectedToken]);

@@ -9,7 +9,7 @@ import Typography from '@mui/material/Typography';
 import { ethers } from 'ethers';
 import { useCallback, useEffect, useState } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
-import { isCollateralTokenAddress, useEthers } from '../../../context/EthersProvider';
+import { useEthers } from '../../../context/EthersProvider';
 import { useSelectedToken } from '../../../context/SelectedTokenProvider';
 import { useTransactionDialog } from '../../../context/TransactionDialogProvider';
 import { GET_BORROWER_COLLATERAL_TOKENS, GET_BORROWER_DEBT_TOKENS } from '../../../queries';
@@ -28,6 +28,7 @@ import NumberInput from '../../FormControls/NumberInput';
 import ForwardIcon from '../../Icons/ForwardIcon';
 import Label from '../../Label/Label';
 import CollateralRatioVisualization, { CRIT_RATIO } from '../../Visualizations/CollateralRatioVisualization';
+import { isCollateralTokenAddress } from '../../../context/contracts.config';
 
 type FieldValues = {
   farmShortValue: string;

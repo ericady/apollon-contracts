@@ -47,27 +47,9 @@ declare global {
 }
 
 // TODO: Migrate these assertions
-export const isDebtTokenAddress = (
-  address: string,
-): address is '0xf5059a5d33d5853360d16c683c16e67980206f36' | '0x95401dc811bb5740090279ba06cfa8fcf6113778' => {
-  return Object.values(Contracts.DebtToken)
-    .map((address) => getCheckSum(address))
-    .includes(getCheckSum(address) as any);
-};
-export const isStableCoinAddress = (address: string): address is '0xf5059a5d33d5853360d16c683c16e67980206f36' => {
-  return getCheckSum(Contracts.DebtToken.STABLE) === getCheckSum(address);
-};
 
-export const isCollateralTokenAddress = (
-  address: string,
-): address is
-  | '0x9a676e781a523b5d0c0e43731313a708cb607508'
-  | '0x959922be3caee4b8cd9a407cc3ac1c251c2007b1'
-  | '0x0b306bf915c4d645ff596e518faf3f9669b97016' => {
-  return Object.values(Contracts.ERC20)
-    .map((address) => getCheckSum(address))
-    .includes(getCheckSum(address) as any);
-};
+
+
 
 type AllDebtTokenContracts = { [Key in keyof (typeof SchemaDataFreshnessManager)['DebtToken']]: DebtToken };
 type AllCollateralTokenContracts = { [Key in keyof (typeof SchemaDataFreshnessManager)['ERC20']]: ERC20 };

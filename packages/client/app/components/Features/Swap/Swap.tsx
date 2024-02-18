@@ -7,11 +7,11 @@ import InputAdornment from '@mui/material/InputAdornment';
 import Typography from '@mui/material/Typography';
 import { ethers } from 'ethers';
 import { ChangeEvent, useEffect, useState } from 'react';
-import { FormProvider, useController, useForm } from 'react-hook-form';
-import { isCollateralTokenAddress, isDebtTokenAddress, useEthers } from '../../../context/EthersProvider';
+import { FormProvider, set, useController, useForm } from 'react-hook-form';
+import { useEthers } from '../../../context/EthersProvider';
 import { useSelectedToken } from '../../../context/SelectedTokenProvider';
 import { useTransactionDialog } from '../../../context/TransactionDialogProvider';
-import { Contracts } from '../../../context/contracts.config';
+import { Contracts, isCollateralTokenAddress, isDebtTokenAddress } from '../../../context/contracts.config';
 import {
   GetBorrowerCollateralTokensQuery,
   GetBorrowerCollateralTokensQueryVariables,
@@ -88,7 +88,7 @@ const Swap = () => {
     },
     reValidateMode: 'onSubmit',
   });
-  const { handleSubmit, setValue, watch, control, trigger } = methods;
+  const { handleSubmit, setValue, watch, control, trigger, reset } = methods;
   const { field: jUSDField } = useController({ name: 'jUSDAmount', control });
   const { field: tokenAmountField } = useController({ name: 'tokenAmount', control });
 
@@ -250,11 +250,8 @@ const Swap = () => {
   };
 
   useEffect(() => {
-    if (jUSDAmount) {
-      handleSwapValueChange('JUSD', jUSDAmount.toString());
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selectedToken]);
+      reset()
+  }, [selectedToken, reset]);
 
   return (
     <FeatureBox
