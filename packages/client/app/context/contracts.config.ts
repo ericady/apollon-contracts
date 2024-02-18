@@ -3,8 +3,8 @@ import { getCheckSum } from '../utils/crypto';
 // TODO: These are the demo/production contracts. Replace them with the real ones.
 export const Contracts = {
   DebtToken: {
-    STABLE: '0xf5059a5d33d5853360d16c683c16e67980206f36',
-    STOCK_1: '0x95401dc811bb5740090279ba06cfa8fcf6113778',
+    STABLE: '0x84ea74d481ee0a5332c457a4d796187f6ba67feb',
+    STOCK_1: '0x9e545e3c0baab3e08cdfd552c960a1050f373042',
   },
   ERC20: {
     BTC: '0x9a676e781a523b5d0c0e43731313a708cb607508',
@@ -15,9 +15,9 @@ export const Contracts = {
   StabilityPoolManager: '0xdc64a140aa3e981100a9beca4e685f962f0cf6c9',
   SwapOperations: '0xa51c1fc2f0d1a1b8494ed1fe312d7c3a78ed91c0',
   SwapPairs: {
-    BTC: '0x43009892f978d7d8e7e73d59000fadbe86b03dfa',
-    USDT: '0xe8f7755d3d96257654b840edbd783168d11e942c',
-    STOCK_1: '0x67fa90d48c24c7342e19c0302b022cf2c33b0288',
+    BTC: '0xb6bc67b5487a76701a759da6b05e6e45365080e8',
+    USDT: '0x874130a8ca6382c50cc84bfd74b03cdd9ac0aa81',
+    STOCK_1: '0x7c887d00a1316ae930c3d3170765f703259562b4',
   },
   BorrowerOperations: '0xcf7ed3acca5a467e9e704c703e8d87f634fb0fc9',
   StoragePool: '0xb7f8bc63bbcad18155201308c8f3540b07f84f5e',
@@ -29,9 +29,9 @@ export const Contracts = {
 export const isPoolAddress = (
   address: string,
 ): address is
-  | '0x43009892f978d7d8e7e73d59000fadbe86b03dfa'
-  | '0xe8f7755d3d96257654b840edbd783168d11e942c'
-  | '0x67fa90d48c24c7342e19c0302b022cf2c33b0288' => {
+  | '0xb6bc67b5487a76701a759da6b05e6e45365080e8'
+  | '0x874130a8ca6382c50cc84bfd74b03cdd9ac0aa81'
+  | '0x7c887d00a1316ae930c3d3170765f703259562b4' => {
   return Object.values(Contracts.SwapPairs)
     .map((address) => getCheckSum(address))
     .includes(getCheckSum(address) as any);

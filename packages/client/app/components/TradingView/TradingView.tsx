@@ -144,14 +144,15 @@ function TradingViewComponent() {
               },
 
               getBars(symbolInfo, resolution, periodParams, onHistoryCallback, onErrorCallback) {
+                // 1min, 10min, 1hour, 6hour, 1day, 1week
+                // const CandleSizes = [1, 10, 60, 360, 1440, 10080];
                 const resolutionMapper = {
-                  '1': 1, // 1 minute in milliseconds
-                  '10': 10, // 5 minutes
-                  '60': 60, // 1 hour
-                  '360': 360, // 6 hour
-                  '1D': 1440, // 1 day
-                  '1W': 10080, // 1 day
-                  // Add more resolutions as needed
+                  '1': 1,
+                  '10': 10,
+                  '60': 60,
+                  '360': 360,
+                  '1D': 1440,
+                  '1W': 10080,
                 };
 
                 client

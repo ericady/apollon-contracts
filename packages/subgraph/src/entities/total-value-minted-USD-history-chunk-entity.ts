@@ -1,6 +1,7 @@
 import { Address, BigInt, ethereum } from '@graphprotocol/graph-ts';
 import { StoragePool } from '../../generated/StoragePool/StoragePool';
 import { SystemInfo, TotalValueMintedUSDHistoryChunk } from '../../generated/schema';
+import { log } from '@graphprotocol/graph-ts';
 
 const chunkSize = BigInt.fromI32(24 * 60 * 60); // 24 hours in seconds
 
@@ -12,7 +13,13 @@ export function handleCreateTotalValueMintedUSDHistoryChunk(event: ethereum.Even
   let lastChunk = TotalValueMintedUSDHistoryChunk.load(`TotalValueMintedUSDHistoryChunk-${currentIndex.toString()}`);
 
   const storagePoolContract = StoragePool.bind(Address.fromBytes(systemInfo.storagePool));
-  const systemMintedUSD = storagePoolContract.checkRecoveryMode1().getEntireSystemDebt();
+  const try_systemMintedUSD = storagePoolContract.try_checkRecoveryMode1();
+
+  if (try_systemMintedUSD.reverted) {
+    log.warning('REVERTED handleCreateTotalValueMintedUSDHistoryChunk: {}, {}', [try_systemMintedUSD.reverted.toString(), event.block.number.toString()])
+  }
+
+  const systemMintedUSD = try_systemMintedUSD.reverted ? BigInt.fromI32(0) : try_systemMintedUSD.value.getEntireSystemDebt();
 
   if (lastChunk === null) {
     lastChunk = new TotalValueMintedUSDHistoryChunk(`TotalValueMintedUSDHistoryChunk-0`);

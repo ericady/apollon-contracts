@@ -10,4 +10,3 @@ export function handlePriceFeedInitialized(event: PriceFeedInitializedEvent): vo
   handleUpdateSystemInfo_priceFeed(event, event.address);
 }
 
-// TODO: Link Address initialization for PriceFeed

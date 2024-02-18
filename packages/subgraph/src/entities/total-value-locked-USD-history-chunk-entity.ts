@@ -1,6 +1,7 @@
 import { Address, BigInt, ethereum } from '@graphprotocol/graph-ts';
 import { StoragePool } from '../../generated/StoragePool/StoragePool';
 import { SystemInfo, TotalValueLockedUSDHistoryChunk } from '../../generated/schema';
+import { log } from '@graphprotocol/graph-ts';
 
 const chunkSize = BigInt.fromI32(24 * 60 * 60); // 24 hours in seconds
 
@@ -12,7 +13,13 @@ export function handleCreateTotalValueLockedUSDHistoryChunk(event: ethereum.Even
   let lastChunk = TotalValueLockedUSDHistoryChunk.load(`TotalValueLockedUSDHistoryChunk-${currentIndex.toString()}`);
 
   const storagePoolContract = StoragePool.bind(Address.fromBytes(systemInfo.storagePool));
-  const systemTVL = storagePoolContract.checkRecoveryMode1().getEntireSystemColl();
+  const try_systemTVL = storagePoolContract.try_checkRecoveryMode1();
+
+  if (try_systemTVL.reverted) {
+    log.warning('REVERTED handleCreateTotalValueLockedUSDHistoryChunk: {}, {}', [try_systemTVL.reverted.toString(), event.block.number.toString()])
+  }
+
+   const systemTVL = try_systemTVL.reverted ? BigInt.fromI32(0) : try_systemTVL.value.getEntireSystemDebt();
 
   if (lastChunk === null) {
     lastChunk = new TotalValueLockedUSDHistoryChunk(`TotalValueLockedUSDHistoryChunk-0`);

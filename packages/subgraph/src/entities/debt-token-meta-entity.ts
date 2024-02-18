@@ -17,6 +17,7 @@ import {
   StabilityOffsetAddedGainsStruct,
   StabilityPool,
 } from '../../generated/templates/StabilityPoolTemplate/StabilityPool';
+// import { log } from '@graphprotocol/graph-ts';
 
 export function handleCreateUpdateDebtTokenMeta(event: ethereum.Event, tokenAddress: Address): void {
   let debtTokenMeta = DebtTokenMeta.load(`DebtTokenMeta-${tokenAddress.toHexString()}`);
@@ -40,7 +41,6 @@ export function handleCreateUpdateDebtTokenMeta(event: ethereum.Event, tokenAddr
 
   debtTokenMeta.totalSupplyUSD = totalSupply.times(tokenPrice).div(BigInt.fromI32(10).pow(18));
 
-  const govToken = Address.fromBytes(systemInfo.govToken);
   const stableCoin = Address.fromBytes(systemInfo.stableCoin);
 
   if (tokenAddress == stableCoin) {

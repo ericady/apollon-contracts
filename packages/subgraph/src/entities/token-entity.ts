@@ -23,7 +23,6 @@ export function handleCreateToken(event: ethereum.Event, tokenAddress: Address, 
   }
 
   const systemInfo = SystemInfo.load(`SystemInfo`)!;
-  const priceFeedContract = PriceFeed.bind(Address.fromBytes(systemInfo.priceFeed));
 
   newToken.isPoolToken = isDebtToken ? true : tokenAddress == Address.fromBytes(systemInfo.govToken);
 
