@@ -10,10 +10,10 @@ import {
   TroveIndexUpdated as TroveIndexUpdatedEvent,
   TroveSnapshotsUpdated as TroveSnapshotsUpdatedEvent,
 } from '../generated/TroveManager/TroveManager';
-import { handleCreateUpdateCollateralTokenMeta, handleUpdateCollateralTokenMeta_totalValueLockedUSD30dAverage } from './entities/collateral-token-meta-entity';
-import { handleCreateUpdateDebtTokenMeta } from './entities/debt-token-meta-entity';
-import { handleCreateTotalValueLockedUSDHistoryChunk } from './entities/total-value-locked-USD-history-chunk-entity';
-import { handleCreateTotalValueMintedUSDHistoryChunk } from './entities/total-value-minted-USD-history-chunk-entity';
+import {
+  handleCreateUpdateCollateralTokenMeta,
+  handleUpdateCollateralTokenMeta_totalValueLockedUSD30dAverage,
+} from './entities/collateral-token-meta-entity';
 
 export function handleLTermsUpdated(event: LTermsUpdatedEvent): void {}
 

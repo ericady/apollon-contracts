@@ -1,4 +1,4 @@
-import { Address, log } from '@graphprotocol/graph-ts';
+import { Address } from '@graphprotocol/graph-ts';
 import {
   OwnershipTransferred as OwnershipTransferredEvent,
   ReserveCapChanged as ReserveCapChangedEvent,

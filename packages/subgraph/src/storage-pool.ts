@@ -11,6 +11,6 @@ export function handleOwnershipTransferred(event: OwnershipTransferredEvent): vo
 }
 
 export function handleStoragePoolValueUpdated(event: StoragePoolValueUpdatedEvent): void {
-  handleCreateTotalValueMintedUSDHistoryChunk(event)
-  handleCreateTotalValueLockedUSDHistoryChunk(event)
+  handleCreateTotalValueMintedUSDHistoryChunk(event);
+  handleCreateTotalValueLockedUSDHistoryChunk(event);
 }

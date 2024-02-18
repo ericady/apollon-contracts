@@ -21,7 +21,6 @@ import { GET_ALL_POOLS, GET_TOKEN_PRICES_24h_AGO } from '../../../queries';
 import { WIDGET_HEIGHTS } from '../../../utils/contants';
 import { getCheckSum } from '../../../utils/crypto';
 import {
-  bigIntStringToFloat,
   dangerouslyConvertBigIntToNumber,
   displayPercentage,
   divBigIntsToFloat,
@@ -83,7 +82,8 @@ function Assets() {
           // calculate change over last 24h
           change:
             pastPrice > 0
-              ? (dangerouslyConvertBigIntToNumber(token.priceUSDOracle, 9, 9) - dangerouslyConvertBigIntToNumber(pastPrice, 9, 9)) /
+              ? (dangerouslyConvertBigIntToNumber(token.priceUSDOracle, 9, 9) -
+                  dangerouslyConvertBigIntToNumber(pastPrice, 9, 9)) /
                 dangerouslyConvertBigIntToNumber(pastPrice, 9, 9)
               : 0,
           isFavorite: favoritedAssets.find((address) => token.address === address) !== undefined ? true : false,
@@ -170,7 +170,14 @@ function Assets() {
             </TableHead>
             <TableBody>
               {tokens.map((token) => {
-                const { address, isFavorite, symbol, change, swapFee, pool: { liqudityPair } } = token;
+                const {
+                  address,
+                  isFavorite,
+                  symbol,
+                  change,
+                  swapFee,
+                  pool: { liqudityPair },
+                } = token;
 
                 return (
                   <TableRow

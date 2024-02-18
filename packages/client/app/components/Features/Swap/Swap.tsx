@@ -7,7 +7,7 @@ import InputAdornment from '@mui/material/InputAdornment';
 import Typography from '@mui/material/Typography';
 import { ethers } from 'ethers';
 import { ChangeEvent, useEffect, useState } from 'react';
-import { FormProvider, set, useController, useForm } from 'react-hook-form';
+import { FormProvider, useController, useForm } from 'react-hook-form';
 import { useEthers } from '../../../context/EthersProvider';
 import { useSelectedToken } from '../../../context/SelectedTokenProvider';
 import { useTransactionDialog } from '../../../context/TransactionDialogProvider';
@@ -250,7 +250,7 @@ const Swap = () => {
   };
 
   useEffect(() => {
-      reset()
+    reset();
   }, [selectedToken, reset]);
 
   return (
@@ -279,10 +279,13 @@ const Swap = () => {
                 rules={{
                   required: { value: true, message: 'You need to specify an amount.' },
                   min: { value: 0, message: 'Amount needs to be positive.' },
-                  max: tradingDirection === 'jUSDAquired' ? {
-                    value: dangerouslyConvertBigIntToNumber(relevantToken.walletAmount, 9, 9),
-                    message: 'Amount exceeds wallet balance.',
-                  } : undefined,
+                  max:
+                    tradingDirection === 'jUSDAquired'
+                      ? {
+                          value: dangerouslyConvertBigIntToNumber(relevantToken.walletAmount, 9, 9),
+                          message: 'Amount exceeds wallet balance.',
+                        }
+                      : undefined,
                 }}
                 disabled={!selectedToken}
                 onChange={(e: ChangeEvent<HTMLInputElement>) => {
@@ -312,10 +315,13 @@ const Swap = () => {
                 rules={{
                   required: { value: true, message: 'You need to specify an amount.' },
                   min: { value: 0, message: 'Amount needs to be positive.' },
-                  max:  tradingDirection === 'jUSDSpent' ? {
-                    value: dangerouslyConvertBigIntToNumber(stableWalletAmount, 9, 9),
-                    message: 'Amount exceeds wallet balance.',
-                  } : undefined,
+                  max:
+                    tradingDirection === 'jUSDSpent'
+                      ? {
+                          value: dangerouslyConvertBigIntToNumber(stableWalletAmount, 9, 9),
+                          message: 'Amount exceeds wallet balance.',
+                        }
+                      : undefined,
                 }}
                 disabled={!selectedToken}
                 onChange={(e: ChangeEvent<HTMLInputElement>) => {

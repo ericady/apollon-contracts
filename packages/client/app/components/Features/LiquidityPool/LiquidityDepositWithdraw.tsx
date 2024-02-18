@@ -11,6 +11,7 @@ import { FormProvider, useForm } from 'react-hook-form';
 import { IBase } from '../../../../generated/types/TroveManager';
 import { useEthers } from '../../../context/EthersProvider';
 import { useTransactionDialog } from '../../../context/TransactionDialogProvider';
+import { isCollateralTokenAddress, isDebtTokenAddress } from '../../../context/contracts.config';
 import {
   CollateralTokenMeta,
   DebtTokenMeta,
@@ -39,7 +40,6 @@ import NumberInput from '../../FormControls/NumberInput';
 import ForwardIcon from '../../Icons/ForwardIcon';
 import Label from '../../Label/Label';
 import CollateralRatioVisualization, { CRIT_RATIO } from '../../Visualizations/CollateralRatioVisualization';
-import { isCollateralTokenAddress, isDebtTokenAddress } from '../../../context/contracts.config';
 
 const SLIPPAGE = 0.02;
 
@@ -356,8 +356,14 @@ function LiquidityDepositWithdraw({ selectedPool }: Props) {
       const tokenAAmount = calculate150PercentTokenValue(
         currentDebtValueUSD,
         currentCollateralValueUSD,
-        { totalAmount: bigIntStringToFloat(tokenA.totalAmount), priceUSD: dangerouslyConvertBigIntToNumber(tokenA.token.priceUSDOracle, 9, 9) },
-        { totalAmount: bigIntStringToFloat(tokenB.totalAmount), priceUSD: dangerouslyConvertBigIntToNumber(tokenB.token.priceUSDOracle, 9, 9) },
+        {
+          totalAmount: bigIntStringToFloat(tokenA.totalAmount),
+          priceUSD: dangerouslyConvertBigIntToNumber(tokenA.token.priceUSDOracle, 9, 9),
+        },
+        {
+          totalAmount: bigIntStringToFloat(tokenB.totalAmount),
+          priceUSD: dangerouslyConvertBigIntToNumber(tokenB.token.priceUSDOracle, 9, 9),
+        },
         relevantTokenA,
         relevantTokenB,
       );
@@ -396,10 +402,12 @@ function LiquidityDepositWithdraw({ selectedPool }: Props) {
           : 0)
       : ((relevantTokenA.investedAmount > tokenAAmountForWithdraw
           ? tokenAAmountForWithdraw * dangerouslyConvertBigIntToNumber(tokenA.token.priceUSDOracle, 9, 9)
-          : dangerouslyConvertBigIntToNumber(relevantTokenA.investedAmount, 9, 9) * dangerouslyConvertBigIntToNumber(tokenA.token.priceUSDOracle, 9, 9)) +
+          : dangerouslyConvertBigIntToNumber(relevantTokenA.investedAmount, 9, 9) *
+            dangerouslyConvertBigIntToNumber(tokenA.token.priceUSDOracle, 9, 9)) +
           (relevantTokenB.investedAmount > tokenBAmountForWithdraw
             ? tokenBAmountForWithdraw * dangerouslyConvertBigIntToNumber(tokenB.token.priceUSDOracle, 9, 9)
-            : dangerouslyConvertBigIntToNumber(relevantTokenB.investedAmount, 9, 9) * dangerouslyConvertBigIntToNumber(tokenB.token.priceUSDOracle, 9, 9))) *
+            : dangerouslyConvertBigIntToNumber(relevantTokenB.investedAmount, 9, 9) *
+              dangerouslyConvertBigIntToNumber(tokenB.token.priceUSDOracle, 9, 9))) *
         -1;
 
   return (

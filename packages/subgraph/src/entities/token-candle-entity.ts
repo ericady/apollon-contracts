@@ -18,7 +18,6 @@ export function handleCreateTokenCandleSingleton(event: ethereum.Event, tokenAdd
 
   const tokenPrice = priceFeedContract.getPrice(tokenAddress).getPrice();
 
-
   for (let i = 0; i < CandleSizes.length; i++) {
     candleSingleton = TokenCandleSingleton.load(
       `TokenCandleSingleton-${tokenAddress.toHexString()}-${CandleSizes[i].toString()}`,
@@ -81,7 +80,6 @@ export function handleUpdateTokenCandle_low_high(
       candleSingleton.save();
     }
   }
-
 }
 
 /**

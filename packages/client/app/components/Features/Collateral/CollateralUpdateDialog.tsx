@@ -27,13 +27,7 @@ import {
 } from '../../../generated/gql-types';
 import { GET_BORROWER_COLLATERAL_TOKENS, GET_BORROWER_DEBT_TOKENS } from '../../../queries';
 import { getHints } from '../../../utils/crypto';
-import {
-  bigIntStringToFloat,
-  dangerouslyConvertBigIntToNumber,
-  displayPercentage,
-  floatToBigInt,
-  roundCurrency,
-} from '../../../utils/math';
+import { dangerouslyConvertBigIntToNumber, displayPercentage, floatToBigInt, roundCurrency } from '../../../utils/math';
 import NumberInput from '../../FormControls/NumberInput';
 import CrossIcon from '../../Icons/CrossIcon';
 import DiamondIcon from '../../Icons/DiamondIcon';
@@ -238,7 +232,10 @@ const CollateralUpdateDialog = ({ buttonVariant, buttonSx = {} }: Props) => {
       const address = [Contracts.ERC20.GOV, Contracts.ERC20.BTC, Contracts.ERC20.USDT][index];
       const { token } = collateralToDeposit.find(({ token }) => token.address === address)!;
 
-      return acc + (isNaN(parseFloat(curr)) ? 0 : parseFloat(curr) * dangerouslyConvertBigIntToNumber(token.priceUSDOracle, 9, 9));
+      return (
+        acc +
+        (isNaN(parseFloat(curr)) ? 0 : parseFloat(curr) * dangerouslyConvertBigIntToNumber(token.priceUSDOracle, 9, 9))
+      );
     }, 0) * (tabValue === 'DEPOSIT' ? -1 : 1);
 
   return (

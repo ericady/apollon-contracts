@@ -24,7 +24,13 @@ import { TOKEN_FRAGMENT } from '../queries';
 import { getCheckSum } from '../utils/crypto';
 import { CustomApolloProvider_DevMode } from './CustomApolloProvider_dev';
 import { useEthers } from './EthersProvider';
-import { Contracts, isCollateralTokenAddress, isDebtTokenAddress, isPoolAddress, isStableCoinAddress } from './contracts.config';
+import {
+  Contracts,
+  isCollateralTokenAddress,
+  isDebtTokenAddress,
+  isPoolAddress,
+  isStableCoinAddress,
+} from './contracts.config';
 
 const defaultFieldValue = BigInt(0);
 
@@ -985,7 +991,6 @@ export const SchemaDataFreshnessManager: ContractDataFreshnessManager<typeof Con
           SchemaDataFreshnessManager.DebtToken[Contracts.DebtToken.STABLE].priceUSDOracle.lastFetched = Date.now();
 
           const tokenPrice = (await priceFeedContract.getPrice(Contracts.DebtToken.STABLE)).price;
-          
 
           SchemaDataFreshnessManager.DebtToken[Contracts.DebtToken.STABLE].priceUSDOracle.value(tokenPrice);
         },

@@ -1,4 +1,3 @@
-import { log } from '@graphprotocol/graph-ts';
 import {
   CollTokenAdded as CollTokenAddedEvent,
   DebtTokenAdded as DebtTokenAddedEvent,
@@ -7,9 +6,7 @@ import {
   TokenManagerInitialized as TokenManagerInitializedEvent,
 } from '../generated/TokenManager/TokenManager';
 import { DebtTokenTemplate, ERC20Template } from '../generated/templates';
-import {
-  handleCreateUpdateCollateralTokenMeta,
-} from './entities/collateral-token-meta-entity';
+import { handleCreateUpdateCollateralTokenMeta } from './entities/collateral-token-meta-entity';
 import { handleCreateUpdateDebtTokenMeta } from './entities/debt-token-meta-entity';
 import { handleUpdateSystemInfo_stableCoin } from './entities/system-info-entity';
 import { handleCreateToken } from './entities/token-entity';

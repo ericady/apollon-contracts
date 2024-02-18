@@ -3,7 +3,13 @@ import { Box, Typography } from '@mui/material';
 import { useSelectedToken } from '../../context/SelectedTokenProvider';
 import { GetSelectedTokenQuery, GetSelectedTokenQueryVariables } from '../../generated/gql-types';
 import { GET_SELECTED_TOKEN } from '../../queries';
-import { dangerouslyConvertBigIntToNumber, displayPercentage, divBigIntsToFloat, percentageChange, roundCurrency } from '../../utils/math';
+import {
+  dangerouslyConvertBigIntToNumber,
+  displayPercentage,
+  divBigIntsToFloat,
+  percentageChange,
+  roundCurrency,
+} from '../../utils/math';
 
 function TradingViewHeader() {
   const { selectedToken, tokenRatio, JUSDToken } = useSelectedToken();
@@ -75,7 +81,9 @@ function TradingViewHeader() {
         <Typography variant="subtitle1" fontFamily="Space Grotesk Variable">
           Swap Fee
           <Box sx={{ color: 'text.primary', display: 'inline', ml: '8px' }}>
-            {selectedToken ? displayPercentage(dangerouslyConvertBigIntToNumber(selectedToken.swapFee, 0, 6), 'omit') : ' -'}
+            {selectedToken
+              ? displayPercentage(dangerouslyConvertBigIntToNumber(selectedToken.swapFee, 0, 6), 'omit')
+              : ' -'}
           </Box>
         </Typography>
       </div>

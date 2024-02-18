@@ -1,4 +1,5 @@
 import { Address, BigInt } from '@graphprotocol/graph-ts';
+import { PriceFeed } from '../generated/PriceFeed/PriceFeed';
 import { SystemInfo } from '../generated/schema';
 import {
   Approval as ApprovalEvent,
@@ -9,10 +10,14 @@ import {
   Sync as SyncEvent,
   Transfer as TransferEvent,
 } from '../generated/templates/SwapPairTemplate/SwapPair';
-import { handleUpdateLiquidity_totalAmount, handleUpdatePool_liquidityDepositAPY, handleUpdatePool_totalSupply, handleUpdatePool_volume30dUSD } from './entities/pool-entity';
+import {
+  handleUpdateLiquidity_totalAmount,
+  handleUpdatePool_liquidityDepositAPY,
+  handleUpdatePool_totalSupply,
+  handleUpdatePool_volume30dUSD,
+} from './entities/pool-entity';
 import { handleCreateSwapEvent } from './entities/swap-event-entity';
 import { handleUpdateTokenCandle_low_high, handleUpdateTokenCandle_volume } from './entities/token-candle-entity';
-import { PriceFeed } from '../generated/PriceFeed/PriceFeed';
 
 export function handleApproval(event: ApprovalEvent): void {}
 
@@ -22,16 +27,10 @@ export function handleBurn(event: BurnEvent): void {
   const token1 = swapPairContract.token1();
   const systemInfo = SystemInfo.load(`SystemInfo`)!;
   const stableCoin = Address.fromBytes(systemInfo.stableCoin); // This is of type Bytes, so I convert it to Address
-  const nonStableCoin =  token0 == stableCoin ? token1 : token0;
+  const nonStableCoin = token0 == stableCoin ? token1 : token0;
 
   const volume = token0 == stableCoin ? event.params.amount0 : event.params.amount1;
-  handleUpdateTokenCandle_volume(
-    event,
-    event.address,
-    token0 == stableCoin ? 1 : 0,
-    nonStableCoin,
-    volume,
-  );
+  handleUpdateTokenCandle_volume(event, event.address, token0 == stableCoin ? 1 : 0, nonStableCoin, volume);
 
   handleUpdatePool_totalSupply(event, stableCoin, nonStableCoin);
 }
@@ -42,16 +41,10 @@ export function handleMint(event: MintEvent): void {
   const token1 = swapPairContract.token1();
   const systemInfo = SystemInfo.load(`SystemInfo`)!;
   const stableCoin = Address.fromBytes(systemInfo.stableCoin); // This is of type Bytes, so I convert it to Address
-  const nonStableCoin =  token0 == stableCoin ? token1 : token0;
+  const nonStableCoin = token0 == stableCoin ? token1 : token0;
 
   const volume = token0 == stableCoin ? event.params.amount0 : event.params.amount1;
-  handleUpdateTokenCandle_volume(
-    event,
-    event.address,
-    token0 == stableCoin ? 1 : 0,
-    nonStableCoin,
-    volume,
-  );
+  handleUpdateTokenCandle_volume(event, event.address, token0 == stableCoin ? 1 : 0, nonStableCoin, volume);
 
   handleUpdatePool_totalSupply(event, stableCoin, nonStableCoin);
 }
@@ -101,26 +94,26 @@ export function handleSwap(event: SwapEvent): void {
     event.params.currentSwapFee,
   );
 
-  handleUpdateTokenCandle_volume(
-    event,
-    event.address,
-    token0 == stableCoin ? 1 : 0,
-    nonStableCoin,
-    stableSize,
-  );
-  
+  handleUpdateTokenCandle_volume(event, event.address, token0 == stableCoin ? 1 : 0, nonStableCoin, stableSize);
+
   let feeUSD = BigInt.fromI32(0);
   if (direction === 'LONG') {
     const stablePrice = PriceFeed.bind(Address.fromBytes(systemInfo.priceFeed)).getPrice(stableCoin).getPrice();
-    feeUSD = stablePrice.times(stableSize).times(event.params.currentSwapFee).div(BigInt.fromI32(10).pow(18 + 6));
+    feeUSD = stablePrice
+      .times(stableSize)
+      .times(event.params.currentSwapFee)
+      .div(BigInt.fromI32(10).pow(18 + 6));
   } else {
     const priceFeedContract = PriceFeed.bind(Address.fromBytes(systemInfo.priceFeed));
     const tokenPrice = priceFeedContract.getPrice(nonStableCoin).getPrice();
 
-    feeUSD = tokenPrice.times(debtTokenSize).times(event.params.currentSwapFee).div(BigInt.fromI32(10).pow(18 + 6));
+    feeUSD = tokenPrice
+      .times(debtTokenSize)
+      .times(event.params.currentSwapFee)
+      .div(BigInt.fromI32(10).pow(18 + 6));
   }
 
-  handleUpdatePool_volume30dUSD(event, stableCoin, nonStableCoin, stableSize,  feeUSD);
+  handleUpdatePool_volume30dUSD(event, stableCoin, nonStableCoin, stableSize, feeUSD);
   handleUpdatePool_liquidityDepositAPY(event, stableCoin, nonStableCoin);
 }
 
@@ -134,14 +127,9 @@ export function handleSync(event: SyncEvent): void {
 
   // Because Reserves change
   handleUpdateLiquidity_totalAmount(event, token0, token1, event.params.reserve0, event.params.reserve1);
-  handleUpdatePool_liquidityDepositAPY(event, stableCoin, nonStableCoin)
+  handleUpdatePool_liquidityDepositAPY(event, stableCoin, nonStableCoin);
 
-  handleUpdateTokenCandle_low_high(
-    event,
-    event.address,
-    token0 == stableCoin ? 1 : 0,
-    nonStableCoin
-  );
+  handleUpdateTokenCandle_low_high(event, event.address, token0 == stableCoin ? 1 : 0, nonStableCoin);
 }
 
 export function handleTransfer(event: TransferEvent): void {

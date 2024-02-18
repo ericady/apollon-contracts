@@ -1,5 +1,4 @@
-import { Address, BigInt, ethereum } from '@graphprotocol/graph-ts';
-import { PriceFeed } from '../../generated/PriceFeed/PriceFeed';
+import { Address, ethereum } from '@graphprotocol/graph-ts';
 import { SystemInfo, Token } from '../../generated/schema';
 import { DebtToken } from '../../generated/templates/DebtTokenTemplate/DebtToken';
 import { ERC20 } from '../../generated/templates/ERC20Template/ERC20';

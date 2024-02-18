@@ -230,9 +230,7 @@ const pastSwapEvents = Array(pastSwapEventsLength)
       id: faker.string.uuid(),
       timestamp,
       borrower: faker.finance.ethereumAddress(),
-      totalPriceInStable: floatToBigInt(
-        bigIntStringToFloat(size) * Math.random(),
-      ).toString(),
+      totalPriceInStable: floatToBigInt(bigIntStringToFloat(size) * Math.random()).toString(),
       direction: faker.helpers.enumValue(LongShortDirection),
       size,
       swapFee: floatToBigInt(faker.number.float({ min: 0.01, max: 0.1, precision: 0.0001 }), 6).toString(),

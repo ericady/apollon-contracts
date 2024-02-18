@@ -6,7 +6,6 @@ import {
   StabilityDepositAPY,
   StabilityDepositChunk,
   SystemInfo,
-  Token,
   TotalReserveAverage,
   TotalReserveAverageChunk,
   TotalSupplyAverage,

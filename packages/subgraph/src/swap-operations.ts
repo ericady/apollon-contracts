@@ -22,11 +22,7 @@ export function handlePairCreated(event: PairCreatedEvent): void {
   SwapPairTemplate.create(event.params.pair);
   handleCreateUpdatePool(event, stableCoinToken, nonStableCoin, event.params.pair);
 
-  handleCreateTokenCandleSingleton(
-    event,
-    nonStableCoin,
-  );
-
+  handleCreateTokenCandleSingleton(event, nonStableCoin);
 }
 
 export function handleSwapOperationsInitialized(event: SwapOperationsInitializedEvent): void {}

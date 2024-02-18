@@ -15,7 +15,6 @@ import {
 } from '../../../../generated/gql-types';
 import { GET_BORROWER_COLLATERAL_TOKENS, GET_BORROWER_DEBT_TOKENS } from '../../../../queries';
 import {
-  bigIntStringToFloat,
   dangerouslyConvertBigIntToNumber,
   displayPercentage,
   percentageChange,
@@ -65,7 +64,9 @@ function StabilityPoolTable() {
 
   const rewardsTotalInUSD = rewards.reduce(
     (acc, { stabilityGainedAmount, token }) =>
-      acc + dangerouslyConvertBigIntToNumber(stabilityGainedAmount, 9, 9) * dangerouslyConvertBigIntToNumber(token.priceUSDOracle, 9, 9),
+      acc +
+      dangerouslyConvertBigIntToNumber(stabilityGainedAmount, 9, 9) *
+        dangerouslyConvertBigIntToNumber(token.priceUSDOracle, 9, 9),
     0,
   );
   const lossTotalInUSD = stabilityLost.reduce(

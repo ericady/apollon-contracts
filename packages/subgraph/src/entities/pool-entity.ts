@@ -1,7 +1,7 @@
 import { Address, BigInt, ethereum } from '@graphprotocol/graph-ts';
+import { PriceFeed } from '../../generated/PriceFeed/PriceFeed';
 import { Pool, PoolLiquidity, PoolVolume30d, PoolVolumeChunk, SystemInfo } from '../../generated/schema';
 import { SwapPair } from '../../generated/templates/SwapPairTemplate/SwapPair';
-import { PriceFeed } from '../../generated/PriceFeed/PriceFeed';
 import { oneEther } from './token-candle-entity';
 // import { log } from '@graphprotocol/graph-ts';
 
@@ -10,7 +10,12 @@ const chunkSize = 60;
 const thirtyDays = BigInt.fromI32(30 * 24 * 60 * 60);
 const totalChunks = 30 * 24;
 
-export function handleCreateUpdatePool(event: ethereum.Event, stableCoin: Address, nonStableCoin: Address, swapPair: Address): void {
+export function handleCreateUpdatePool(
+  event: ethereum.Event,
+  stableCoin: Address,
+  nonStableCoin: Address,
+  swapPair: Address,
+): void {
   let poolEntity = Pool.load(`Pool-${stableCoin.toHexString()}-${nonStableCoin.toHexString()}`);
 
   // Initialize Pool entity and all the linked averages
@@ -36,19 +41,20 @@ export function handleCreateUpdatePool(event: ethereum.Event, stableCoin: Addres
     poolEntity.volume30dUSD30dAgo = poolVolume30dAgo.id;
 
     //   Add first PoolChunk
-    const poolVolumeChunk = new PoolVolumeChunk(`PoolVolumeChunk-${stableCoin.toHexString()}-${nonStableCoin.toHexString()}-1`);
+    const poolVolumeChunk = new PoolVolumeChunk(
+      `PoolVolumeChunk-${stableCoin.toHexString()}-${nonStableCoin.toHexString()}-1`,
+    );
     poolVolumeChunk.timestamp = event.block.timestamp;
     poolVolumeChunk.value = BigInt.fromI32(0);
     poolVolumeChunk.feeUSD = BigInt.fromI32(0);
     poolVolumeChunk.save();
-
 
     // Initialize Liquidity
     const liquidity0 = new PoolLiquidity(stableCoin.concat(nonStableCoin));
     liquidity0.token = stableCoin;
     liquidity0.totalAmount = BigInt.fromI32(0);
     liquidity0.save();
-  
+
     const liquidity1 = new PoolLiquidity(nonStableCoin.concat(stableCoin));
     liquidity1.token = nonStableCoin;
     liquidity1.totalAmount = BigInt.fromI32(0);
@@ -70,7 +76,6 @@ export function handleCreateUpdatePool(event: ethereum.Event, stableCoin: Addres
   const liquidity1 = PoolLiquidity.load(poolEntity.liquidity[1])!;
   liquidity1.totalAmount = reserves.value1;
   liquidity1.save();
-
 
   const totalSupply = swapPairContract.totalSupply();
   poolEntity.totalSupply = totalSupply;
@@ -103,7 +108,7 @@ export function handleUpdatePool_volume30dUSD(
     // increase timestamp by exactly chunksize
     newVolumeChunk.timestamp = leadingVolumeChunk.timestamp.plus(BigInt.fromI32(chunkSize));
     newVolumeChunk.value = value;
-    newVolumeChunk.feeUSD = feeUSD
+    newVolumeChunk.feeUSD = feeUSD;
     newVolumeChunk.save();
 
     recentVolume.leadingIndex += 1;
@@ -152,7 +157,11 @@ export function handleUpdatePool_volume30dUSD(
   recentVolume.save();
 }
 
-export function handleUpdatePool_liquidityDepositAPY(event: ethereum.Event, stableCoin: Address, nonStableCoin: Address): void {
+export function handleUpdatePool_liquidityDepositAPY(
+  event: ethereum.Event,
+  stableCoin: Address,
+  nonStableCoin: Address,
+): void {
   const poolEntity = Pool.load(`Pool-${stableCoin.toHexString()}-${nonStableCoin.toHexString()}`)!;
   const systemInfo = SystemInfo.load(`SystemInfo`)!;
   const priceFeedContract = PriceFeed.bind(Address.fromBytes(systemInfo.priceFeed));

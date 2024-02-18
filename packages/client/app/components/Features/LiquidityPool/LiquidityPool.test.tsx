@@ -1,9 +1,8 @@
 import { render, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { PoolLiquidity } from '../../../generated/gql-types';
 import MockedGetBorrowerLiquidityPools from '../../tests/mockedResponses/GetBorrowerLiquidityPools.mocked.json';
 import { IntegrationWrapper } from '../../tests/test-utils';
-import LiquidityDepositWithdraw, { calculate150PercentTokenValue } from './LiquidityDepositWithdraw';
+import LiquidityDepositWithdraw from './LiquidityDepositWithdraw';
 
 // TODO: Write tests to expect arguments in the contract call once they are concluded
 

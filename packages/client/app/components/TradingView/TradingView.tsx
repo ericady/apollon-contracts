@@ -75,151 +75,149 @@ function TradingViewComponent() {
     if (window.TradingView && selectedToken && !currentChart.current) {
       // seems to fix this._iFrame.contentWindow; is undefined
       setTimeout(() => {
-      // @ts-ignore
-      currentChart.current = new TradingView.widget({
-        container: 'apollon-trading-view',
-        locale: 'en',
-        library_path: 'charting_library/',
+        // @ts-ignore
+        currentChart.current = new TradingView.widget({
+          container: 'apollon-trading-view',
+          locale: 'en',
+          library_path: 'charting_library/',
 
-        datafeed: devMode
-          ? new UDFCompatibleDatafeed('https://demo-feed-data.tradingview.com')
-          : {
-              getQuotes(symbols, onDataCallback, onErrorCallback) {
-                console.log('Quotes', symbols);
-              },
-              searchSymbols(userInput, exchange, symbolType, onResult) {
-                console.log('Search Symbols', userInput, exchange, symbolType);
-              },
-              subscribeBars(symbolInfo, resolution, onTick, listenerGuid, onResetCacheNeededCallback) {
-                updateLatestCandleCallback.current = onTick;
-              },
-              unsubscribeBars(listenerGuid) {
-                updateLatestCandleCallback.current = undefined;
-              },
-              subscribeQuotes(symbols, fastSymbols, onRealtimeCallback, listenerGUID) {
-                console.log('Subscribe Quotes', symbols, fastSymbols, listenerGUID);
-              },
-              unsubscribeQuotes(listenerGUID) {
-                console.log('Unsubscribe Quotes', listenerGUID);
-              },
+          datafeed: devMode
+            ? new UDFCompatibleDatafeed('https://demo-feed-data.tradingview.com')
+            : {
+                getQuotes(symbols, onDataCallback, onErrorCallback) {
+                  console.log('Quotes', symbols);
+                },
+                searchSymbols(userInput, exchange, symbolType, onResult) {
+                  console.log('Search Symbols', userInput, exchange, symbolType);
+                },
+                subscribeBars(symbolInfo, resolution, onTick, listenerGuid, onResetCacheNeededCallback) {
+                  updateLatestCandleCallback.current = onTick;
+                },
+                unsubscribeBars(listenerGuid) {
+                  updateLatestCandleCallback.current = undefined;
+                },
+                subscribeQuotes(symbols, fastSymbols, onRealtimeCallback, listenerGUID) {
+                  console.log('Subscribe Quotes', symbols, fastSymbols, listenerGUID);
+                },
+                unsubscribeQuotes(listenerGUID) {
+                  console.log('Unsubscribe Quotes', listenerGUID);
+                },
 
-              onReady(callback) {
-                const config: DatafeedConfiguration = {
-                  currency_codes: ['USD'],
-                  symbols_types: [],
-                  supported_resolutions: ['1', '10', '60', '360', '1D', '1W'] as ResolutionString[],
-                  supports_marks: false,
-                  supports_timescale_marks: false,
-                  supports_time: false,
-                };
-                callback(config);
-              },
-              // Not enabled yet
-              // searchSymbols()
-
-              resolveSymbol: async (symbolName, onSymbolResolvedCallback, onResolveErrorCallback, extension) => {
-                try {
-                  const symbolInfo: LibrarySymbolInfo = {
-                    ticker: symbolName,
-                    name: symbolName,
-                    full_name: symbolName,
-                    description: '',
-                    type: '',
-                    session: '24x7',
-                    timezone: 'Etc/UTC',
-                    exchange: '',
-                    minmov: 1,
-                    pricescale: 100,
-                    has_intraday: true,
-                    visible_plots_set: 'ohlcv',
-                    has_weekly_and_monthly: true,
+                onReady(callback) {
+                  const config: DatafeedConfiguration = {
+                    currency_codes: ['USD'],
+                    symbols_types: [],
                     supported_resolutions: ['1', '10', '60', '360', '1D', '1W'] as ResolutionString[],
-                    volume_precision: 2,
-                    data_status: 'streaming',
-                    format: 'price',
-                    listed_exchange: '',
+                    supports_marks: false,
+                    supports_timescale_marks: false,
+                    supports_time: false,
                   };
-                  onSymbolResolvedCallback(symbolInfo);
-                } catch (err: any) {
-                  onResolveErrorCallback(err.message);
-                }
-              },
+                  callback(config);
+                },
+                // Not enabled yet
+                // searchSymbols()
 
-              getBars(symbolInfo, resolution, periodParams, onHistoryCallback, onErrorCallback) {
-                // 1min, 10min, 1hour, 6hour, 1day, 1week
-                // const CandleSizes = [1, 10, 60, 360, 1440, 10080];
-                const resolutionMapper = {
-                  '1': 1,
-                  '10': 10,
-                  '60': 60,
-                  '360': 360,
-                  '1D': 1440,
-                  '1W': 10080,
-                };
+                resolveSymbol: async (symbolName, onSymbolResolvedCallback, onResolveErrorCallback, extension) => {
+                  try {
+                    const symbolInfo: LibrarySymbolInfo = {
+                      ticker: symbolName,
+                      name: symbolName,
+                      full_name: symbolName,
+                      description: '',
+                      type: '',
+                      session: '24x7',
+                      timezone: 'Etc/UTC',
+                      exchange: '',
+                      minmov: 1,
+                      pricescale: 100,
+                      has_intraday: true,
+                      visible_plots_set: 'ohlcv',
+                      has_weekly_and_monthly: true,
+                      supported_resolutions: ['1', '10', '60', '360', '1D', '1W'] as ResolutionString[],
+                      volume_precision: 2,
+                      data_status: 'streaming',
+                      format: 'price',
+                      listed_exchange: '',
+                    };
+                    onSymbolResolvedCallback(symbolInfo);
+                  } catch (err: any) {
+                    onResolveErrorCallback(err.message);
+                  }
+                },
 
-                client
-                  .query<GetTradingViewCandlesQuery, GetTradingViewCandlesQueryVariables>({
-                    query: GET_TRADING_VIEW_CANDLES,
-                    variables: {
-                      where: {
-                        // @ts-ignore
-                        candleSize: resolutionMapper[resolution],
-                        timestamp_gte: periodParams.from,
-                        timestamp_lte: periodParams.to,
-                        token: symbolInfo.full_name,
+                getBars(symbolInfo, resolution, periodParams, onHistoryCallback, onErrorCallback) {
+                  // 1min, 10min, 1hour, 6hour, 1day, 1week
+                  // const CandleSizes = [1, 10, 60, 360, 1440, 10080];
+                  const resolutionMapper = {
+                    '1': 1,
+                    '10': 10,
+                    '60': 60,
+                    '360': 360,
+                    '1D': 1440,
+                    '1W': 10080,
+                  };
+
+                  client
+                    .query<GetTradingViewCandlesQuery, GetTradingViewCandlesQueryVariables>({
+                      query: GET_TRADING_VIEW_CANDLES,
+                      variables: {
+                        where: {
+                          // @ts-ignore
+                          candleSize: resolutionMapper[resolution],
+                          timestamp_gte: periodParams.from,
+                          timestamp_lte: periodParams.to,
+                          token: symbolInfo.full_name,
+                        },
                       },
-                    },
-                  })
-                  .then((res) => {
-                    const bars = res.data.tokenCandles.map(({ close, high, low, open, timestamp, volume }) => ({
-                      close: bigIntStringToFloat(close),
-                      high: bigIntStringToFloat(high),
-                      low: bigIntStringToFloat(low),
-                      open: bigIntStringToFloat(open),
-                      time: Number(timestamp),
-                      volume: bigIntStringToFloat(volume),
-                    }));
-                    onHistoryCallback(bars, { noData: false });
-                  })
-                  .catch(() => {
-                    onErrorCallback('Error fetching candles');
-                  });
+                    })
+                    .then((res) => {
+                      const bars = res.data.tokenCandles.map(({ close, high, low, open, timestamp, volume }) => ({
+                        close: bigIntStringToFloat(close),
+                        high: bigIntStringToFloat(high),
+                        low: bigIntStringToFloat(low),
+                        open: bigIntStringToFloat(open),
+                        time: Number(timestamp),
+                        volume: bigIntStringToFloat(volume),
+                      }));
+                      onHistoryCallback(bars, { noData: false });
+                    })
+                    .catch(() => {
+                      onErrorCallback('Error fetching candles');
+                    });
+                },
+
+                // Only updates the most recent bar. Not needed yet.
+                // subscribeBars() also needs unsubscribeBars()
               },
 
-              // Only updates the most recent bar. Not needed yet.
-              // subscribeBars() also needs unsubscribeBars()
-            },
+          // General config
+          symbol: devMode ? 'AAPL' : selectedToken.symbol,
+          autosize: true,
 
-        // General config
-        symbol: devMode ? 'AAPL' : selectedToken.symbol,
-        autosize: true,
+          debug: devMode,
+          theme: isDarkMode ? 'dark' : 'light',
+          // TODO: Maybe implement later for diffing
+          disabled_features: ['header_symbol_search', 'header_compare'],
 
-        debug: devMode,
-        theme: isDarkMode ? 'dark' : 'light',
-        // TODO: Maybe implement later for diffing
-        disabled_features: ['header_symbol_search', 'header_compare'],
-
-        // Override in  light mode because it looks terrible
-        settings_overrides: !isDarkMode
-          ? {
-              'paneProperties.backgroundType': 'solid',
-              'paneProperties.background': '#ffffff',
-              'paneProperties.vertGridProperties.color': 'rgba(42, 46, 57, 0.06)',
-              'paneProperties.horzGridProperties.color': 'rgba(42, 46, 57, 0.06)',
-            }
-          : undefined,
-        overrides: {
-          'linetoolexecution.fontFamily': 'Space Grotesk Variable',
-          'linetoolorder.bodyFontFamily': 'Space Grotesk Variable',
-          'linetoolposition.bodyFontFamily': 'Space Grotesk Variable',
-          'linetoolorder.quantityFontFamily': 'Space Grotesk Variable',
-          'linetoolposition.quantityFontFamily': 'Space Grotesk Variable',
-        },
+          // Override in  light mode because it looks terrible
+          settings_overrides: !isDarkMode
+            ? {
+                'paneProperties.backgroundType': 'solid',
+                'paneProperties.background': '#ffffff',
+                'paneProperties.vertGridProperties.color': 'rgba(42, 46, 57, 0.06)',
+                'paneProperties.horzGridProperties.color': 'rgba(42, 46, 57, 0.06)',
+              }
+            : undefined,
+          overrides: {
+            'linetoolexecution.fontFamily': 'Space Grotesk Variable',
+            'linetoolorder.bodyFontFamily': 'Space Grotesk Variable',
+            'linetoolposition.bodyFontFamily': 'Space Grotesk Variable',
+            'linetoolorder.quantityFontFamily': 'Space Grotesk Variable',
+            'linetoolposition.quantityFontFamily': 'Space Grotesk Variable',
+          },
+        });
       });
-    })
-      
     }
-
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [client, isDarkMode, selectedToken]);

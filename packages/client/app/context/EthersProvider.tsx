@@ -1,8 +1,8 @@
 'use client';
 
 import { Button } from '@mui/material';
-import { Contract, Eip1193Provider, JsonRpcSigner } from 'ethers';
-import { BrowserProvider, JsonRpcProvider } from 'ethers/providers';
+import { Contract, JsonRpcSigner } from 'ethers';
+import { BrowserProvider, Eip1193Provider, JsonRpcProvider } from 'ethers/providers';
 import Link from 'next/link';
 import { useSnackbar } from 'notistack';
 import { createContext, useContext, useEffect, useState } from 'react';
@@ -19,7 +19,6 @@ import {
   SwapPair,
   TroveManager,
 } from '../../generated/types';
-import { getCheckSum } from '../utils/crypto';
 import { SchemaDataFreshnessManager } from './CustomApolloProvider';
 import borrowerOperationsAbi from './abis/BorrowerOperations.json';
 import debtTokenAbi from './abis/DebtToken.json';
@@ -42,14 +41,11 @@ import { Contracts } from './contracts.config';
 
 declare global {
   interface Window {
-    ethereum?: Eip1193Provider;
+    ethereum?: BrowserProvider & Eip1193Provider;
   }
 }
 
 // TODO: Migrate these assertions
-
-
-
 
 type AllDebtTokenContracts = { [Key in keyof (typeof SchemaDataFreshnessManager)['DebtToken']]: DebtToken };
 type AllCollateralTokenContracts = { [Key in keyof (typeof SchemaDataFreshnessManager)['ERC20']]: ERC20 };
@@ -97,12 +93,14 @@ export const EthersContext = createContext<{
 
 // Connetion to local node
 // TODO: Implement testnet once deployed
+const chainId = 31337;
+const rpcUrl = 'http://127.0.0.1:8545';
 const provider =
   process.env.NEXT_PUBLIC_CONTRACT_MOCKING === 'enabled' &&
   typeof window !== 'undefined' &&
   typeof window.ethereum !== 'undefined'
-    ? new JsonRpcProvider('http://0.0.0.0:8545', { name: 'localhost', chainId: 31337 })
-    : new JsonRpcProvider('http://0.0.0.0:8545', { name: 'localhost', chainId: 31337 });
+    ? new JsonRpcProvider(rpcUrl, { name: 'localhost', chainId })
+    : new JsonRpcProvider(rpcUrl, { name: 'localhost', chainId });
 
 // TODO: Implement network change: https://docs.ethers.org/v5/concepts/best-practices/
 // const testNetwork = new Network('goerli', 5);
@@ -226,13 +224,45 @@ export default function EthersProvider({ children }: { children: React.ReactNode
     }
   };
 
-  // Log in automaticall if we know the user already.
+  // TODO: Implement proper network change with parameters
+  const changeNetwork = async () => {
+    if (typeof window.ethereum !== 'undefined') {
+      window.ethereum.request({
+        method: 'wallet_addEthereumChain',
+        params: [
+          {
+            // 31337 in hex
+            chainId: '0x7a69', // A 0x-prefixed hexadecimal chainId,
+            rpcUrls: [rpcUrl],
+            chainName: 'localhost',
+            nativeCurrency: {
+              name: 'STABLE',
+              symbol: 'STABLE',
+              decimals: 18,
+            },
+            // TODO: Must be provided to make it work.
+            blockExplorerUrls: ['https://polygonscan.com/'],
+          },
+        ],
+      });
+    }
+  };
+
   useEffect(() => {
     if (typeof window.ethereum !== 'undefined') {
+      // Log in automaticall if we know the user already.
       window.ethereum.request({ method: 'eth_accounts' }).then((accounts) => {
         if (accounts.length > 0) {
-          connectWallet();
+          connectWallet().then(() => {
+            changeNetwork();
+          });
         }
+      });
+
+      window.ethereum.on('accountsChanged', function () {
+        connectWallet().then(() => {
+          changeNetwork();
+        });
       });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps

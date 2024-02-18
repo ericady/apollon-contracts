@@ -9,4 +9,3 @@ export function handleOwnershipTransferred(event: OwnershipTransferredEvent): vo
 export function handlePriceFeedInitialized(event: PriceFeedInitializedEvent): void {
   handleUpdateSystemInfo_priceFeed(event, event.address);
 }
-

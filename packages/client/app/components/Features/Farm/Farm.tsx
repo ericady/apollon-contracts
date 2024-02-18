@@ -12,23 +12,17 @@ import { FormProvider, useForm } from 'react-hook-form';
 import { useEthers } from '../../../context/EthersProvider';
 import { useSelectedToken } from '../../../context/SelectedTokenProvider';
 import { useTransactionDialog } from '../../../context/TransactionDialogProvider';
+import { isCollateralTokenAddress } from '../../../context/contracts.config';
 import { GET_BORROWER_COLLATERAL_TOKENS, GET_BORROWER_DEBT_TOKENS } from '../../../queries';
 import { WIDGET_HEIGHTS } from '../../../utils/contants';
 import { getHints } from '../../../utils/crypto';
-import {
-  bigIntStringToFloat,
-  dangerouslyConvertBigIntToNumber,
-  displayPercentage,
-  floatToBigInt,
-  roundCurrency,
-} from '../../../utils/math';
+import { dangerouslyConvertBigIntToNumber, displayPercentage, floatToBigInt, roundCurrency } from '../../../utils/math';
 import InfoButton from '../../Buttons/InfoButton';
 import FeatureBox from '../../FeatureBox/FeatureBox';
 import NumberInput from '../../FormControls/NumberInput';
 import ForwardIcon from '../../Icons/ForwardIcon';
 import Label from '../../Label/Label';
 import CollateralRatioVisualization, { CRIT_RATIO } from '../../Visualizations/CollateralRatioVisualization';
-import { isCollateralTokenAddress } from '../../../context/contracts.config';
 
 type FieldValues = {
   farmShortValue: string;

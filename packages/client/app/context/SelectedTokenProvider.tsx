@@ -56,7 +56,7 @@ export default function SelectedTokenProvider({ children }: { children: React.Re
   const tokenRatio =
     JUSDToken === undefined || selectedToken === null
       ? ethers.parseEther('1')
-      : (selectedToken!.pool.liqudityPair[1] * ethers.parseEther('1')) / selectedToken!.pool.liqudityPair[0] ;
+      : (selectedToken!.pool.liqudityPair[1] * ethers.parseEther('1')) / selectedToken!.pool.liqudityPair[0];
 
   return (
     <SelectedTokenContext.Provider
