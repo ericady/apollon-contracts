@@ -152,7 +152,6 @@ type TotalValueLockedChunk @entity {
 #   walletAmount: BigInt!
 #   troveLockedAmount: BigInt!
 
-#   # TODO: This call is made from the client to the contract because there is no event for this
 #   # stabilityGainedAmount: BigInt!
 # }
 
@@ -178,7 +177,6 @@ type PoolLiquidity @entity {
   # unique Byte combination of tokenA + tokenB
   id: Bytes!
   token: Token! @relation(name: "TokenToPoolLiquidity")
-  # TODO: wasa Swap event swapPair.getReserves
   totalAmount: BigInt!
 }
 
@@ -216,10 +214,8 @@ type Pool @entity {
   # Percent value applied when opening the first position for this pool. Can be negative and positive.
   # swapFee: BigInt!
   # Just linked once, always updated for all users
-  # TODO: wasa update the general data on the Pool singletons
   liquidity: [PoolLiquidity!]! @relation(name: "PoolLiquidityToPool")
   # TODO: die fee in USD bitte ebenfalls im laufenden durchschnitt mitberechen, diese wird dann notwenidg um die APY zu ermitteln
-  # TODO: wasa => not sure how to do this yet, lets delay this for now
   liquidityDepositAPY: BigInt!
 
   volume30dUSD: PoolVolume30d!
@@ -249,7 +245,6 @@ type PoolVolumeChunk @entity {
   feeUSD: BigInt!
 }
 
-# TODO: wasa not sure about contract/event limitations of the BorrowerHistory, lets analyze this together first before implementation.
 type TokenAmount @entity(immutable: true) {
   id: Bytes!
   token: Token! @relation(name: "TokenToTokenAmount")
@@ -278,7 +273,6 @@ type BorrowerHistory @entity(immutable: true) {
 
 # CHARTS
 
-# TODO: wasa => I would start with this.
 # 1min, 10min, 1hour, 6hour, 1day, 1week
 # const CandleSizes = [1, 10, 60, 360, 1440, 10080];
 # We add to a singleton cande and then save it as soon as the candlesize is reached

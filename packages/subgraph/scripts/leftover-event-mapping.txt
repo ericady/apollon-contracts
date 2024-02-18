@@ -1,51 +1,43 @@
 contract (borrower-operations)
-  > handleBorrowerOperationsInitialized
-  > handleOwnershipTransferred
-  > handleTroveCreated
-contract (coll-token-manager)
-  > handleCollTokenManagerInitialized
-  > handleOwnershipTransferred
-contract (debt-token-manager)
-  > handleDebtTokenManagerInitialized
   > handleOwnershipTransferred
 contract (debt-token)
   > handleApproval
+contract (erc-20)
+  > handleApproval
+  > handleTransfer
 contract (price-feed)
-  > handleLastGoodPriceUpdated
   > handleOwnershipTransferred
-  > handlePriceFeedStatusChanged
+  > handlePriceFeedInitialized
+contract (reserve-pool)
+  > handleOwnershipTransferred
+  > handleReservePoolInitialized
 contract (stability-pool-manager)
   > handleOwnershipTransferred
   > handleStabilityPoolAdded
-  > handleStabilityPoolManagerInitiated
+  > handleStabilityPoolInitiated
 contract (stability-pool)
   > handleDepositSnapshotUpdated
   > handleEpochUpdated
-  > handleOwnershipTransferred
   > handleP_Updated
   > handleS_Updated
   > handleScaleUpdated
-  > handleStabilityPoolInitialized
 contract (storage-pool)
   > handleOwnershipTransferred
-  > handleStoragePoolInitialized
-  > handleStoragePoolValueUpdated
 contract (swap-operations)
   > handleOwnershipTransferred
   > handleSwapOperationsInitialized
 contract (swap-pair)
   > handleApproval
-  > handleTransfer
+contract (token-manager)
+  > handleOwnershipTransferred
+  > handleTokenManagerInitialized
 contract (trove-manager)
-  > handleBaseRateUpdated
   > handleLTermsUpdated
   > handleLastFeeOpTimeUpdated
-  > handleLiquidationSummary
   > handleOwnershipTransferred
   > handleSystemSnapshotsUpdated
   > handleTotalStakesUpdated
   > handleTroveAppliedRewards
   > handleTroveClosed
   > handleTroveIndexUpdated
-  > handleTroveManagerInitialized
   > handleTroveSnapshotsUpdated

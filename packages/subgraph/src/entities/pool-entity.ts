@@ -1,6 +1,8 @@
 import { Address, BigInt, ethereum } from '@graphprotocol/graph-ts';
-import { Pool, PoolLiquidity, PoolVolume30d, PoolVolumeChunk } from '../../generated/schema';
+import { Pool, PoolLiquidity, PoolVolume30d, PoolVolumeChunk, SystemInfo } from '../../generated/schema';
 import { SwapPair } from '../../generated/templates/SwapPairTemplate/SwapPair';
+import { PriceFeed } from '../../generated/PriceFeed/PriceFeed';
+import { oneEther } from './token-candle-entity';
 // import { log } from '@graphprotocol/graph-ts';
 
 // 15 minutes
@@ -52,6 +54,8 @@ export function handleCreateUpdatePool(event: ethereum.Event, stableCoin: Addres
     liquidity1.totalAmount = BigInt.fromI32(0);
     liquidity1.save();
 
+    poolEntity.liquidityDepositAPY = BigInt.fromI32(0);
+
     poolEntity.liquidity = [liquidity0.id, liquidity1.id];
   }
 
@@ -70,8 +74,6 @@ export function handleCreateUpdatePool(event: ethereum.Event, stableCoin: Addres
 
   const totalSupply = swapPairContract.totalSupply();
   poolEntity.totalSupply = totalSupply;
-  // FIXME: DONT KNOW THE CORRECT WAY TO CALCULATE APY YET
-  poolEntity.liquidityDepositAPY = BigInt.fromI32(0);
 
   poolEntity.save();
 }
@@ -150,9 +152,27 @@ export function handleUpdatePool_volume30dUSD(
   recentVolume.save();
 }
 
-// FIXME: Can it even change at all?????
-export function handleUpdatePool_totalSupply(event: ethereum.Event, token0: Address, token1: Address): void {
-  const poolEntity = Pool.load(`Pool-${token0.toHexString()}-${token1.toHexString()}`)!;
+export function handleUpdatePool_liquidityDepositAPY(event: ethereum.Event, stableCoin: Address, nonStableCoin: Address): void {
+  const poolEntity = Pool.load(`Pool-${stableCoin.toHexString()}-${nonStableCoin.toHexString()}`)!;
+  const systemInfo = SystemInfo.load(`SystemInfo`)!;
+  const priceFeedContract = PriceFeed.bind(Address.fromBytes(systemInfo.priceFeed));
+
+  const liquidity0 = PoolLiquidity.load(stableCoin.concat(nonStableCoin))!;
+  const liquidity0USD = priceFeedContract.getPrice(stableCoin).getPrice().times(liquidity0.totalAmount);
+  const liquidity1 = PoolLiquidity.load(nonStableCoin.concat(stableCoin))!;
+  const liquidity1USD = priceFeedContract.getPrice(nonStableCoin).getPrice().times(liquidity1.totalAmount);
+
+  const totalValueUSD = liquidity0USD.plus(liquidity1USD);
+
+  const recentVolume = PoolVolume30d.load(poolEntity.volume30dUSD)!;
+  const apy = recentVolume.feeUSD.times(BigInt.fromI32(12)).times(oneEther).div(totalValueUSD);
+
+  poolEntity.liquidityDepositAPY = apy;
+  poolEntity.save();
+}
+
+export function handleUpdatePool_totalSupply(event: ethereum.Event, stableCoin: Address, nonStableCoin: Address): void {
+  const poolEntity = Pool.load(`Pool-${stableCoin.toHexString()}-${nonStableCoin.toHexString()}`)!;
 
   const swapPairContract = SwapPair.bind(event.address);
   const totalSupply = swapPairContract.totalSupply();

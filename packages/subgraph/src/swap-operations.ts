@@ -19,13 +19,14 @@ export function handlePairCreated(event: PairCreatedEvent): void {
   const nonStableCoin = event.params.token0 == stableCoin ? event.params.token1 : event.params.token0;
   const stableCoinToken = event.params.token0 == stableCoin ? event.params.token0 : event.params.token1;
 
+  SwapPairTemplate.create(event.params.pair);
+  handleCreateUpdatePool(event, stableCoinToken, nonStableCoin, event.params.pair);
+
   handleCreateTokenCandleSingleton(
     event,
     nonStableCoin,
   );
 
-  SwapPairTemplate.create(event.params.pair);
-  handleCreateUpdatePool(event, stableCoinToken, nonStableCoin, event.params.pair);
 }
 
 export function handleSwapOperationsInitialized(event: SwapOperationsInitializedEvent): void {}

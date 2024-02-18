@@ -86,7 +86,7 @@ const Swap = () => {
       tokenAmount: '',
       maxSlippage: '2',
     },
-    reValidateMode: 'onChange',
+    reValidateMode: 'onSubmit',
   });
   const { handleSubmit, setValue, watch, control, trigger } = methods;
   const { field: jUSDField } = useController({ name: 'jUSDAmount', control });

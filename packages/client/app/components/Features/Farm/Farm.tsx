@@ -52,7 +52,7 @@ const Farm = () => {
       farmShortValue: '',
       maxSlippage: '2',
     },
-    reValidateMode: 'onChange',
+    reValidateMode: 'onSubmit',
   });
   const { handleSubmit, reset, watch } = methods;
 

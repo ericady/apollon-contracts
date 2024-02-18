@@ -12,8 +12,12 @@ export const oneEther = BigInt.fromI64(1000000000000000000);
  */
 export function handleCreateTokenCandleSingleton(event: ethereum.Event, tokenAddress: Address): void {
   let candleSingleton: TokenCandleSingleton | null;
-  // TODO: How to get initialized price?
-  const tokenPrice = BigInt.fromI64(0);
+
+  const systemInfo = SystemInfo.load(`SystemInfo`)!;
+  const priceFeedContract = PriceFeed.bind(Address.fromBytes(systemInfo.priceFeed));
+
+  const tokenPrice = priceFeedContract.getPrice(tokenAddress).getPrice();
+
 
   for (let i = 0; i < CandleSizes.length; i++) {
     candleSingleton = TokenCandleSingleton.load(
@@ -47,7 +51,7 @@ export function handleUpdateTokenCandle_low_high(
   swapPair: Address,
   pairPosition: number,
   pairToken: Address,
-): BigInt {
+): void {
   // calculate price from ratio to stable and oraclePrice
   const systemInfo = SystemInfo.load(`SystemInfo`)!;
   const priceFeedContract = PriceFeed.bind(Address.fromBytes(systemInfo.priceFeed));
@@ -78,7 +82,6 @@ export function handleUpdateTokenCandle_low_high(
     }
   }
 
-  return tokenPriceUSD;
 }
 
 /**
@@ -117,7 +120,7 @@ export function handleUpdateTokenCandle_volume(
   }
 }
 
-export function handleCloseCandle(
+function handleCloseCandle(
   event: ethereum.Event,
   pairToken: Address,
   candleSize: i32,
