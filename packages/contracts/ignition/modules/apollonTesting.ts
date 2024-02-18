@@ -112,19 +112,6 @@ export default buildModule('ApollonTesting', m => {
   const collSurplusPoolLinks = [contracts.liquidationOperations, contracts.borrowerOperations];
   m.call(contracts.collSurplusPool, 'setAddresses', collSurplusPoolLinks, { after: collSurplusPoolLinks });
 
-  // const reservePoolLinks = [contracts.tokenManager, contracts.stabilityPoolManager, contracts.priceFeed];
-  // m.call(
-  //   contracts.reservePool,
-  //   'setAddresses',
-  //   [
-  //     ...reservePoolLinks,
-  //     parseUnits('0.2'), // 20 %
-  //     parseUnits('1000'),
-  //   ],
-  //   {
-  //     after: [...reservePoolLinks, stableKnown, govKnown],
-  //   }
-  // );
 
 
   // setup mock tellor for testing
@@ -213,10 +200,24 @@ export default buildModule('ApollonTesting', m => {
     id: 'addStock',
     after: [STOCK, tokenLink],
   });
-  const govKnown =  m.call(contracts.tokenManager, 'addCollToken', [GOV, 5, true], {
+  const govKnown = m.call(contracts.tokenManager, 'addCollToken', [GOV, 5, true], {
     id: 'addGov',
     after: [GOV, tokenLink],
   });
+
+  const reservePoolLinks = [contracts.tokenManager, contracts.stabilityPoolManager, contracts.priceFeed];
+  m.call(
+    contracts.reservePool,
+    'setAddresses',
+    [
+      ...reservePoolLinks,
+      parseUnits('0.2'), // 20 %
+      parseUnits('1000'),
+    ],
+    {
+      after: [...reservePoolLinks, stableKnown, govKnown],
+    }
+  );
 
   return {
     ...contracts,
