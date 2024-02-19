@@ -6,7 +6,7 @@ import { expect } from 'chai';
 import { AddressLike, ContractTransactionResponse } from 'ethers';
 import { parseUnits } from 'ethers';
 import { AddressZero } from '@ethersproject/constants';
-import apollonTesting from '../ignition/modules/apollonTesting';
+import apollonLocalPools from '../ignition/modules/apollonLocalPools';
 
 export const MAX_BORROWING_FEE = parseUnits('0.05');
 
@@ -23,12 +23,10 @@ export const PermitTypes = {
 export async function deployTesting() {
   const blockTimestamp = (await ethers.provider.getBlock('latest'))?.timestamp ?? 0;
   const [owner] = await ethers.getSigners();
-  return hre.ignition.deploy(apollonTesting, {
+  return hre.ignition.deploy(apollonLocalPools, {
     parameters: {
-      ApollonTesting: {
-        deadline: blockTimestamp + 60 * 5,
-        initialMint: owner.address,
-      },
+      ApollonTesting: { oracleUpdateTime: blockTimestamp },
+      ApollonLocalPools: { deadline: blockTimestamp + 60 * 5 },
     },
   });
 }

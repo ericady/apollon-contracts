@@ -164,8 +164,9 @@ contract SwapPair is ISwapPair, SwapERC20, LiquityBase {
     uint dexPrice = (reserve0 * DECIMAL_PRECISION) / reserve1; // todo does the token digits matter here?
 
     if (oraclePrice < dexPrice) return SWAP_BASE_FEE;
-    uint priceRatio = (oraclePrice * DECIMAL_PRECISION) / dexPrice;
-    return uint32((priceRatio * SWAP_BASE_FEE) / DECIMAL_PRECISION); // todo missing real fee calculation
+    //    uint priceRatio = (oraclePrice * DECIMAL_PRECISION) / dexPrice;
+    //    return uint32((priceRatio * SWAP_BASE_FEE) / DECIMAL_PRECISION); // todo missing real fee calculation
+    return SWAP_BASE_FEE;
   }
 
   // this low-level function should be called from a contract which performs important safety checks

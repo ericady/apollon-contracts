@@ -11,28 +11,28 @@ import swapOpsAbi from '../abi/SwapOperations.json';
   console.log('Seeding swaps...');
 
   const deployer = (await ethers.getSigners())[0];
-  const swapOpsAddress = '0xa51c1fc2f0d1a1b8494ed1fe312d7c3a78ed91c0';
-  const stableCoinAddress = '0x95401dc811bb5740090279ba06cfa8fcf6113778';
+  const swapOpsAddress = '0xA51c1fc2f0D1a1b8494Ed1FE312d7C3a78Ed91C0';
+  const stableCoinAddress = '0x84eA74d481Ee0A5332c457a4d796187F6Ba67fEB';
   const swapMap = {
     BTC: {
-      contract: '0x9a676e781a523b5d0c0e43731313a708cb607508',
+      contract: '0x9A676e781A523b5d0C0e43731313A708CB607508',
       file: 'BTC.csv',
       swaps: [],
-      positionMultiplier: 0.001,
+      positionMultiplier: 0.00001,
       digits: 9,
     },
     USDT: {
-      contract: '0x959922be3caee4b8cd9a407cc3ac1c251c2007b1',
+      contract: '0x959922bE3CAee4b8Cd9a407cc3ac1C251C2007B1',
       file: 'USDT.csv',
       swaps: [],
-      positionMultiplier: 1,
+      positionMultiplier: 0.001,
       digits: 18,
     },
     AAPL: {
-      contract: '0x998abeb3e57409262ae5b751f60747921b33613e',
+      contract: '0x9E545E3C0baAB3E08CdfD552C960A1050f373042',
       file: 'AAPL.csv',
       swaps: [],
-      positionMultiplier: 0.01,
+      positionMultiplier: 0.00001,
       digits: 18,
     },
   };
@@ -64,23 +64,26 @@ import swapOpsAbi from '../abi/SwapOperations.json';
   for (let i = 0; i < swapRows.length; i++) {
     const swapRow = swapRows[i];
 
-    for (const { contract, positionMultiplier, digits } of Object.values(swapMap)) {
-      const price = swapRow[contract];
+    for (const [symbol, { contract, positionMultiplier, digits }] of Object.entries(swapMap)) {
+      const price = swapRow[symbol];
       if (!price) continue;
 
       const isBuy = Math.random() > 0.5;
       const amountIn = isBuy ? price * positionMultiplier : positionMultiplier;
-      await swapOps.swapExactTokensForTokens(
-        parseUnits(amountIn.toString(), digits),
-        0,
-        isBuy ? [stableCoinAddress, contract] : [contract, stableCoinAddress],
-        deployer,
-        deadline
-      );
+
+      try {
+        await swapOps.swapExactTokensForTokens(
+          parseUnits(amountIn.toString(), digits),
+          0,
+          isBuy ? [stableCoinAddress, contract] : [contract, stableCoinAddress],
+          deployer,
+          deadline
+        );
+      } catch (e) {}
     }
 
     await mine(1);
-    if (i % 2000 === 0) console.log(Math.round((i / swapRows.length) * 100) + '%');
+    if (i % 100 === 0) console.log((i / swapRows.length) * 100 + '%');
   }
 
   console.log('Swaps seeded.', swapRows.length);

@@ -2,7 +2,6 @@ import { buildModule } from '@nomicfoundation/hardhat-ignition/modules';
 import { MaxUint256, parseUnits, ZeroAddress } from 'ethers';
 
 export default buildModule('ApollonTesting', m => {
-  const deadline = m.getParameter('deadline');
   const oracleUpdateTime = m.getParameter('oracleUpdateTime');
 
   // initial contract deployments
@@ -111,8 +110,6 @@ export default buildModule('ApollonTesting', m => {
 
   const collSurplusPoolLinks = [contracts.liquidationOperations, contracts.borrowerOperations];
   m.call(contracts.collSurplusPool, 'setAddresses', collSurplusPoolLinks, { after: collSurplusPoolLinks });
-
-
 
   // setup mock tellor for testing
   const mockTellor = m.contract('MockTellor', []);

@@ -426,7 +426,10 @@ contract SwapOperations is ISwapOperations, Ownable(msg.sender), CheckContract, 
     address tokenA,
     address tokenB
   ) internal view returns (uint reserveA, uint reserveB, uint32 swapFee) {
-    ISwapPair pair = ISwapPair(getPair[tokenA][tokenB]);
+    address pairAddress = getPair[tokenA][tokenB];
+    if (pairAddress == address(0)) revert PairDoesNotExist();
+
+    ISwapPair pair = ISwapPair(pairAddress);
     swapFee = pair.getSwapFee();
 
     (uint reserve0, uint reserve1, ) = pair.getReserves();

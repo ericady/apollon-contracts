@@ -2,21 +2,23 @@ import { buildModule } from '@nomicfoundation/hardhat-ignition/modules';
 import apollonTesting from './apollonTesting';
 import { MaxUint256, parseUnits, ZeroAddress } from 'ethers';
 
-export default buildModule('ApollonLocalSwap', m => {
-  const deadline = m.getParameter('deadline');
-  const initialMintUser = m.getParameter('initialMint');
+export default buildModule('ApollonLocalPools', m => {
+  const contracts = m.useModule(apollonTesting);
+  const { BTC, STOCK, STABLE, GOV, USDT, borrowerOperations, swapOperations } = contracts;
 
-  const { BTC, STABLE, STOCK, GOV, USDT, swapOperations } = m.useModule(apollonTesting);
+  const deadline = m.getParameter('deadline');
+  const deployer = m.getAccount(0);
+  const initialMintUser = m.getAccount(0);
 
   // setup swap pools
-  const stableMint = m.call(STABLE, 'unprotectedMint', [m.getAccount(0), parseUnits('40000')], {
+  const stableMint = m.call(STABLE, 'unprotectedMint', [deployer, parseUnits('40000')], {
     id: 'mintStable',
   });
-  const stockMint = m.call(STOCK, 'unprotectedMint', [m.getAccount(0), parseUnits('65')], {
+  const stockMint = m.call(STOCK, 'unprotectedMint', [deployer, parseUnits('65')], {
     id: 'mintStock',
   });
-  const btcMint = m.call(BTC, 'unprotectedMint', [m.getAccount(0), parseUnits('1', 9)], { id: 'mintBTC' });
-  const usdtMint = m.call(USDT, 'unprotectedMint', [m.getAccount(0), parseUnits('10000')], {
+  const btcMint = m.call(BTC, 'unprotectedMint', [deployer, parseUnits('1', 9)], { id: 'mintBTC' });
+  const usdtMint = m.call(USDT, 'unprotectedMint', [deployer, parseUnits('10000')], {
     id: 'mintUSDT',
   });
 
@@ -104,5 +106,5 @@ export default buildModule('ApollonLocalSwap', m => {
   m.call(STOCK, 'unprotectedMint', [initialMintUser, parseUnits('65')], { id: 'mintStockUser' });
   m.call(GOV, 'unprotectedMint', [initialMintUser, parseUnits('999999')], { id: 'mintGovUser' });
 
-  return {};
+  return contracts;
 });
