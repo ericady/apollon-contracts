@@ -173,12 +173,13 @@ contract StabilityPoolManager is Ownable(msg.sender), CheckContract, IStabilityP
     address[] memory collTokenAddresses = tokenManager.getCollTokenAddresses();
 
     collGains = new TokenAmount[](collTokenAddresses.length);
-    for (uint i = 0; i < collTokenAddresses.length; i++)
+    for (uint i = 0; i < collTokenAddresses.length; i++) {
+      uint collGain = 0;
       for (uint ii = 0; ii < stabilityPoolsArray.length; ii++)
-        collGains[i] = TokenAmount(
-          address(stabilityPoolsArray[ii].getDepositToken()),
-          stabilityPoolsArray[ii].getDepositorCollGain(_depositor, collTokenAddresses[i])
-        );
+        collGain += stabilityPoolsArray[ii].getDepositorCollGain(_depositor, collTokenAddresses[i]);
+
+      collGains[i] = TokenAmount(collTokenAddresses[i], collGain);
+    }
 
     return collGains;
   }

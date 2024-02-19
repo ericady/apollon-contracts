@@ -133,6 +133,7 @@ contract LiquidationOperations is LiquityBase, Ownable(msg.sender), CheckContrac
     // move tokens from active pool into the collSurplus, in case there was a capped liquidation
     for (uint i = 0; i < vars.collSurplus.length; i++) {
       if (vars.collSurplus[i].amount == 0) continue;
+
       storagePool.withdrawalValue(
         address(collSurplusPool),
         vars.collSurplus[i].tokenAddress,
@@ -156,12 +157,14 @@ contract LiquidationOperations is LiquityBase, Ownable(msg.sender), CheckContrac
     vars.tokensToRedistribute = new CAmount[](vars.priceCache.collPrices.length + vars.priceCache.debtPrices.length);
     vars.totalCollGasCompensation = new TokenAmount[](vars.priceCache.collPrices.length);
     vars.collSurplus = new TokenAmount[](vars.priceCache.collPrices.length);
+
     for (uint i = 0; i < vars.priceCache.collPrices.length; i++) {
       address collTokenAddress = vars.priceCache.collPrices[i].tokenAddress;
       vars.tokensToRedistribute[i] = CAmount(collTokenAddress, true, 0);
       vars.totalCollGasCompensation[i] = TokenAmount(collTokenAddress, 0);
       vars.collSurplus[i] = TokenAmount(collTokenAddress, 0);
     }
+
     for (uint i = 0; i < vars.priceCache.debtPrices.length; i++)
       vars.tokensToRedistribute[vars.priceCache.collPrices.length + i] = CAmount(
         vars.priceCache.debtPrices[i].tokenAddress,
@@ -195,9 +198,15 @@ contract LiquidationOperations is LiquityBase, Ownable(msg.sender), CheckContrac
     if (vars.ICR >= MCR) {
       // capped trove liquidation (at 1.1 * the total debts value)
       // remaining collateral will stay in the trove
-      _getCappedOffsetVals(
+      _capLiquidatableColl(
         outerVars.priceCache,
         vars.troveCollInUSD,
+        vars.troveDebtInUSDWithoutGasCompensation,
+        vars.troveAmountsIncludingRewards
+      );
+
+      _debtOffset(
+        outerVars.priceCache,
         vars.troveDebtInUSDWithoutGasCompensation,
         vars.troveAmountsIncludingRewards,
         outerVars.remainingStabilities
@@ -205,15 +214,13 @@ contract LiquidationOperations is LiquityBase, Ownable(msg.sender), CheckContrac
 
       // patch the collSurplus claim, tokens will be transferred in the outer scope
       collSurplusPool.accountSurplus(trove, vars.troveAmountsIncludingRewards);
-    } else {
-      // full trove liquidation
-      _getOffsetAndRedistributionVals(
+    } else
+      _debtOffset( // full trove liquidation
         outerVars.priceCache,
         vars.troveDebtInUSDWithoutGasCompensation,
         vars.troveAmountsIncludingRewards,
         outerVars.remainingStabilities
       );
-    }
 
     troveManager.closeTroveByProtocol(
       outerVars.priceCache,
@@ -231,23 +238,16 @@ contract LiquidationOperations is LiquityBase, Ownable(msg.sender), CheckContrac
     // updating TCR
     for (uint a = 0; a < vars.troveAmountsIncludingRewards.length; a++) {
       RAmount memory rAmount = vars.troveAmountsIncludingRewards[a];
+
+      uint offsetUSD = priceFeed.getUSDValue(outerVars.priceCache, rAmount.tokenAddress, rAmount.toOffset);
+      if (rAmount.isColl) outerVars.entireSystemCollInUSD -= offsetUSD;
+      else outerVars.entireSystemDebtInUSD -= offsetUSD;
+
       outerVars.entireSystemCollInUSD -= priceFeed.getUSDValue(
         outerVars.priceCache,
         rAmount.tokenAddress,
         rAmount.gasCompensation
       );
-      if (rAmount.isColl)
-        outerVars.entireSystemCollInUSD -= priceFeed.getUSDValue(
-          outerVars.priceCache,
-          rAmount.tokenAddress,
-          rAmount.toOffset
-        );
-      else
-        outerVars.entireSystemDebtInUSD -= priceFeed.getUSDValue(
-          outerVars.priceCache,
-          rAmount.tokenAddress,
-          rAmount.toOffset
-        );
     }
     outerVars.TCR = LiquityMath._computeCR(outerVars.entireSystemCollInUSD, outerVars.entireSystemDebtInUSD);
     outerVars.isRecoveryMode = outerVars.TCR < CCR;
@@ -318,59 +318,30 @@ contract LiquidationOperations is LiquityBase, Ownable(msg.sender), CheckContrac
     }
   }
 
-  /* In a full liquidation, returns the values for a trove's coll and debt to be offset, and coll and debt to be
-   * redistributed to active troves.
-   */
-  function _getOffsetAndRedistributionVals(
-    PriceCache memory priceCache,
-    uint troveDebtInUSDWithoutGasCompensation,
-    RAmount[] memory troveAmountsIncludingRewards,
-    RemainingStability[] memory remainingStabilities
-  ) internal view {
-    /*
-     * Offset as much debt & collateral as possible against the Stability Pool, and redistribute the remainder
-     * between all active troves.
-     *
-     *  If the trove's debt is larger than the deposited LUSD in the Stability Pool:
-     *
-     *  - Offset an amount of the trove's debt equal to the LUSD in the Stability Pool
-     *  - Send a fraction of the trove's collateral to the Stability Pool, equal to the fraction of its offset debt
-     *
-     */
-
-    // by default the entire coll needs to be redistributed
-    for (uint i = 0; i < troveAmountsIncludingRewards.length; i++) {
-      RAmount memory rAmount = troveAmountsIncludingRewards[i];
-      if (rAmount.isColl) rAmount.toRedistribute = rAmount.toLiquidate;
-    }
-
-    _debtOffset(priceCache, troveDebtInUSDWithoutGasCompensation, troveAmountsIncludingRewards, remainingStabilities);
-  }
-
   // Get its offset coll/debt and gas comp.
-  function _getCappedOffsetVals(
+  function _capLiquidatableColl(
     PriceCache memory priceCache,
     uint troveCollInUSD,
     uint troveDebtInUSDWithoutGasCompensation,
-    RAmount[] memory troveAmountsIncludingRewards,
-    RemainingStability[] memory remainingStabilities
+    RAmount[] memory troveAmountsIncludingRewards
   ) internal view {
     // capping the to be liquidated collateral to 1.1 * the total debts value
-    uint cappedLimit = troveDebtInUSDWithoutGasCompensation * MCR; // total debt * 1.1
+    uint cappedTroveDebtInUSD = (troveDebtInUSDWithoutGasCompensation * MCR) / DECIMAL_PRECISION; // total debt * 1.1
     for (uint i = 0; i < troveAmountsIncludingRewards.length; i++) {
       RAmount memory rAmount = troveAmountsIncludingRewards[i];
       if (!rAmount.isColl) continue; // coll will be handled later in the debts loop
 
       uint collToLiquidateInUSD = priceFeed.getUSDValue(priceCache, rAmount.tokenAddress, rAmount.toLiquidate);
-      uint collToLiquidateInUSDCapped = (cappedLimit * collToLiquidateInUSD) / troveCollInUSD;
-      rAmount.toLiquidate = priceFeed.getAmountFromUSDValue(
+      uint collToLiquidateInUSDCapped = (collToLiquidateInUSD * cappedTroveDebtInUSD) / troveCollInUSD;
+      uint collToLiquidate = priceFeed.getAmountFromUSDValue(
         priceCache,
         rAmount.tokenAddress,
         collToLiquidateInUSDCapped
       );
+      rAmount.collSurplus = rAmount.toLiquidate - collToLiquidate;
+      rAmount.toLiquidate = collToLiquidate;
+      rAmount.toRedistribute = collToLiquidate; // by default the entire coll needs to be redistributed
     }
-
-    _debtOffset(priceCache, troveDebtInUSDWithoutGasCompensation, troveAmountsIncludingRewards, remainingStabilities);
   }
 
   function _debtOffset(
@@ -379,6 +350,12 @@ contract LiquidationOperations is LiquityBase, Ownable(msg.sender), CheckContrac
     RAmount[] memory troveAmountsIncludingRewards,
     RemainingStability[] memory remainingStabilities
   ) internal view {
+    // by default the entire coll needs to be redistributed
+    for (uint i = 0; i < troveAmountsIncludingRewards.length; i++) {
+      RAmount memory rAmount = troveAmountsIncludingRewards[i];
+      if (rAmount.isColl) rAmount.toRedistribute = rAmount.toLiquidate;
+    }
+
     // checking if some debt can be offset by the matching stability pool
     for (uint i = 0; i < troveAmountsIncludingRewards.length; i++) {
       RAmount memory rAmountDebt = troveAmountsIncludingRewards[i];

@@ -8,8 +8,6 @@ import './Interfaces/ISortedTroves.sol';
 import './Interfaces/ITroveManager.sol';
 import './Interfaces/IBorrowerOperations.sol';
 
-import 'hardhat/console.sol';
-
 contract SortedTroves is Ownable(msg.sender), CheckContract, ISortedTroves {
   string public constant NAME = 'SortedTroves';
 

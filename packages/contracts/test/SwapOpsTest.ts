@@ -13,7 +13,7 @@ import { expect } from 'chai';
 import { openTrove, getLatestBlockTimestamp, setPrice, deployTesting, buildPriceCache } from '../utils/testHelper';
 import { parseUnits } from 'ethers';
 
-describe.only('SwapOperations', () => {
+describe('SwapOperations', () => {
   let signers: SignerWithAddress[];
   let owner: SignerWithAddress;
   let alice: SignerWithAddress;
@@ -271,7 +271,7 @@ describe.only('SwapOperations', () => {
   });
 
   describe('add liquidity', () => {
-    it.only('default uniswap tests STABLE/STOCK', async () => {
+    it('default uniswap tests STABLE/STOCK', async () => {
       const amount = parseUnits('1000');
 
       //create pair & add liquidity
