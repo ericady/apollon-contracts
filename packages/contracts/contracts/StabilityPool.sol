@@ -122,22 +122,6 @@ import './Dependencies/CheckContract.sol';
  * Please see the implementation spec in the proof document, which closely follows on from the compounded deposit / ETH gain derivations:
  * https://github.com/liquity/liquity/blob/master/papers/Scalable_Reward_Distribution_with_Compounding_Stakes.pdf
  *
- *
- * --- LQTY ISSUANCE TO STABILITY POOL DEPOSITORS ---
- *
- * An LQTY issuance event occurs at every deposit operation, and every liquidation.
- *
- * Each deposit is tagged with the address of the front end through which it was made.
- *
- * All deposits earn a share of the issued LQTY in proportion to the deposit as a share of total deposits. The LQTY earned
- * by a given deposit, is split between the depositor and the front end through which the deposit was made, based on the front end's kickbackRate.
- *
- * Please see the system Readme for an overview:
- * https://github.com/liquity/dev/blob/main/README.md#lqty-issuance-to-stability-providers
- *
- * We use the same mathematical product-sum approach to track LQTY gains for depositors, where 'G' is the sum corresponding to LQTY gains.
- * The product P (and snapshot P_t) is re-used, as the ratio P/P_t tracks a deposit's depletion due to liquidations.
- *
  */
 contract StabilityPool is LiquityBase, CheckContract, IStabilityPool {
   string public constant NAME = 'StabilityPool';
@@ -282,92 +266,6 @@ contract StabilityPool is LiquityBase, CheckContract, IStabilityPool {
     // update deposit snapshots
     _updateDepositAndSnapshots(user, remainingDeposit);
   }
-
-  //    // --- GOV issuance functions ---
-  //
-  //    function _triggerLQTYIssuance(ICommunityIssuance _communityIssuance) internal {
-  //        uint LQTYIssuance = _communityIssuance.issueLQTY();
-  //       _updateG(LQTYIssuance);
-  //    }
-  //
-  //    function _updateG(uint _LQTYIssuance) internal {
-  //        uint totalLUSD = totalLUSDDeposits; // cached to save an SLOAD
-  //        /*
-  //        * When total deposits is 0, G is not updated. In this case, the LQTY issued can not be obtained by later
-  //        * depositors - it is missed out on, and remains in the balanceof the CommunityIssuance contract.
-  //        *
-  //        */
-  //        if (totalLUSD == 0 || _LQTYIssuance == 0) {return;}
-  //
-  //        uint LQTYPerUnitStaked;
-  //        LQTYPerUnitStaked =_computeLQTYPerUnitStaked(_LQTYIssuance, totalLUSD);
-  //
-  //        uint marginalLQTYGain = LQTYPerUnitStaked.mul(P);
-  //        epochToScaleToG[currentEpoch][currentScale] = epochToScaleToG[currentEpoch][currentScale].add(marginalLQTYGain);
-  //
-  //        emit G_Updated(epochToScaleToG[currentEpoch][currentScale], currentEpoch, currentScale);
-  //    }
-  //
-  //    function _computeLQTYPerUnitStaked(uint _LQTYIssuance, uint _totalLUSDDeposits) internal returns (uint) {
-  //        /*
-  //        * Calculate the LQTY-per-unit staked.  Division uses a "feedback" error correction, to keep the
-  //        * cumulative error low in the running total G:
-  //        *
-  //        * 1) Form a numerator which compensates for the floor division error that occurred the last time this
-  //        * function was called.
-  //        * 2) Calculate "per-unit-staked" ratio.
-  //        * 3) Multiply the ratio back by its denominator, to reveal the current floor division error.
-  //        * 4) Store this error for use in the next correction when this function is called.
-  //        * 5) Note: static analysis tools complain about this "division before multiplication", however, it is intended.
-  //        */
-  //        uint LQTYNumerator = _LQTYIssuance.mul(DECIMAL_PRECISION).add(lastLQTYError);
-  //
-  //        uint LQTYPerUnitStaked = LQTYNumerator.div(_totalLUSDDeposits);
-  //        lastLQTYError = LQTYNumerator.sub(LQTYPerUnitStaked.mul(_totalLUSDDeposits));
-  //
-  //        return LQTYPerUnitStaked;
-  //    }
-  //
-  //    function _payOutLQTYGains(ICommunityIssuance _communityIssuance, address _depositor) internal {
-  //        // Pay out depositor's LQTY gain
-  //        uint depositorLQTYGain = getDepositorLQTYGain(_depositor);
-  //        _communityIssuance.sendLQTY(_depositor, depositorLQTYGain);
-  //        emit LQTYPaidToDepositor(_depositor, depositorLQTYGain);
-  //    }
-  //
-  //    /*
-  //* Calculate the LQTY gain earned by a deposit since its last snapshots were taken.
-  //* Given by the formula:  LQTY = d0 * (G - G(0))/P(0)
-  //* where G(0) and P(0) are the depositor's snapshots of the sum G and product P, respectively.
-  //* d0 is the last recorded deposit value.
-  //*/
-  //    function getDepositorLQTYGain(address _depositor) public view override returns (uint) {
-  //        uint initialDeposit = deposits[_depositor].initialValue;
-  //        if (initialDeposit == 0) {return 0;}
-  //
-  //        Snapshots storage snapshots = depositSnapshots[_depositor];
-  //        uint LQTYGain = _getLQTYGainFromSnapshots(initialDeposit, snapshots);
-  //        return LQTYGain;
-  //    }
-  //
-  //    function _getLQTYGainFromSnapshots(uint initialStake, Snapshots storage snapshots) internal view returns (uint) {
-  //        /*
-  //         * Grab the sum 'G' from the epoch at which the stake was made. The LQTY gain may span up to one scale change.
-  //         * If it does, the second portion of the LQTY gain is scaled by 1e9.
-  //         * If the gain spans no scale change, the second portion will be 0.
-  //         */
-  //        uint128 epochSnapshot = snapshots.epoch;
-  //        uint128 scaleSnapshot = snapshots.scale;
-  //        uint G_Snapshot = snapshots.G;
-  //        uint P_Snapshot = snapshots.P;
-  //
-  //        uint firstPortion = epochToScaleToG[epochSnapshot][scaleSnapshot].sub(G_Snapshot);
-  //        uint secondPortion = epochToScaleToG[epochSnapshot][scaleSnapshot.add(1)].div(SCALE_FACTOR);
-  //
-  //        uint LQTYGain = initialStake.mul(firstPortion.add(secondPortion)).div(P_Snapshot).div(DECIMAL_PRECISION);
-  //
-  //        return LQTYGain;
-  //    }
 
   // --- Liquidation functions ---
 
