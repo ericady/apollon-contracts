@@ -9,6 +9,7 @@ type Props = {
   DebtTokenMeta_troveRepableDebtAmount: bigint;
   DebtTokenMeta_providedStability: bigint;
   DebtTokenMeta_compoundedDeposit: bigint;
+  DebtTokenMeta_troveDebtAmount: bigint;
   CollateralTokenMeta_walletAmount: bigint;
   CollateralTokenMeta_troveLockedAmount: bigint;
   CollateralTokenMeta_stabilityGainedAmount: bigint;
@@ -82,6 +83,7 @@ const getProductionCacheConfig = ({
   DebtTokenMeta_troveMintedAmount = BigInt(10000000000000000000),
   DebtTokenMeta_troveRepableDebtAmount = BigInt(10000000000000000000),
   DebtTokenMeta_walletAmount = BigInt(10000000000000000000),
+  DebtTokenMeta_troveDebtAmount = BigInt(10000000000000000000),
   Pool_borrowerAmount = BigInt(10000000000000000000),
   Pool_swapFee = BigInt(50000),
   SystemInfo_totalCollateralRatio = BigInt(100000000000000000),
@@ -96,6 +98,12 @@ const getProductionCacheConfig = ({
             return Token_priceUSDOracleValue;
           },
         },
+
+        borrowingRate: {
+          read() {
+            return TroveManager_borrowingRate;
+          }
+        }
       },
     },
 
@@ -128,6 +136,12 @@ const getProductionCacheConfig = ({
         compoundedDeposit: {
           read() {
             return DebtTokenMeta_compoundedDeposit;
+          },
+        },
+
+        troveDebtAmount: {
+          read() {
+            return DebtTokenMeta_troveDebtAmount;
           },
         },
       },
