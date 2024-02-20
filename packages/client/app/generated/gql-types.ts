@@ -270,7 +270,7 @@ export type TokenCandle_Filter = {
   timestamp_lte?: InputMaybe<Scalars['Int']['input']>;
   timestamp_not?: InputMaybe<Scalars['Int']['input']>;
   timestamp_not_in?: InputMaybe<Array<Scalars['Int']['input']>>;
-  token?: InputMaybe<Scalars['String']['input']>;
+  token_?: InputMaybe<Token_Filter>;
 };
 
 export enum TokenCandle_OrderBy {
@@ -290,6 +290,11 @@ export enum TokenCandle_OrderBy {
   TokenSymbol = 'token__symbol',
   Volume = 'volume'
 }
+
+export type Token_Filter = {
+  id?: InputMaybe<Scalars['Bytes']['input']>;
+  symbol?: InputMaybe<Scalars['String']['input']>;
+};
 
 export type TotalReserveAverage = {
   __typename: 'TotalReserveAverage';
@@ -385,6 +390,7 @@ export type GetReserveUsdHistoryQuery = { __typename: 'Query', getReserveUSDHist
 
 export type GetTradingViewCandlesQueryVariables = Exact<{
   where: TokenCandle_Filter;
+  first: Scalars['Int']['input'];
 }>;
 
 

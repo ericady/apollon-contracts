@@ -209,8 +209,8 @@ export const GET_RESERVE_USD_HISTORY = gql`
 // TRADING VIEW
 
 export const GET_TRADING_VIEW_CANDLES = gql`
-  query GetTradingViewCandles($where: TokenCandle_filter!) {
-    tokenCandles(where: $where, orderBy: timestamp, orderDirection: desc) {
+  query GetTradingViewCandles($where: TokenCandle_filter!, $first: Int!) {
+    tokenCandles(where: $where, first: $first, orderBy: timestamp, orderDirection: asc) {
       id
       timestamp
       open

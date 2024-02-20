@@ -157,33 +157,33 @@ function TradingViewComponent() {
                     '1W': 10080,
                   };
 
-                  client
-                    .query<GetTradingViewCandlesQuery, GetTradingViewCandlesQueryVariables>({
+                    client.query<GetTradingViewCandlesQuery, GetTradingViewCandlesQueryVariables>({
                       query: GET_TRADING_VIEW_CANDLES,
                       variables: {
+                        first: periodParams.countBack,
                         where: {
                           // @ts-ignore
                           candleSize: resolutionMapper[resolution],
-                          timestamp_gte: periodParams.from,
                           timestamp_lte: periodParams.to,
-                          token: symbolInfo.full_name,
+                          token_: {
+                            id: selectedToken.id,
+                          }
                         },
                       },
                     })
                     .then((res) => {
+                      console.log('res.data.tokenCandles: ', res.data.tokenCandles);
                       const bars = res.data.tokenCandles.map(({ close, high, low, open, timestamp, volume }) => ({
                         close: bigIntStringToFloat(close),
                         high: bigIntStringToFloat(high),
                         low: bigIntStringToFloat(low),
                         open: bigIntStringToFloat(open),
-                        time: Number(timestamp),
+                        time: Number(timestamp) * 1000,
                         volume: bigIntStringToFloat(volume),
                       }));
-                      onHistoryCallback(bars, { noData: false });
+
+                      onHistoryCallback(bars, { noData: bars.length < periodParams.countBack ? true : false});
                     })
-                    .catch(() => {
-                      onErrorCallback('Error fetching candles');
-                    });
                 },
 
                 // Only updates the most recent bar. Not needed yet.

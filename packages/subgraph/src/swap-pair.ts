@@ -129,7 +129,7 @@ export function handleSync(event: SyncEvent): void {
   handleUpdateLiquidity_totalAmount(event, token0, token1, event.params.reserve0, event.params.reserve1);
   handleUpdatePool_liquidityDepositAPY(event, stableCoin, nonStableCoin);
 
-  handleUpdateTokenCandle_low_high(event, event.address, token0 == stableCoin ? 1 : 0, nonStableCoin);
+  handleUpdateTokenCandle_low_high(event, event.address, token0 == stableCoin ? 0 : 1, nonStableCoin);
 }
 
 export function handleTransfer(event: TransferEvent): void {

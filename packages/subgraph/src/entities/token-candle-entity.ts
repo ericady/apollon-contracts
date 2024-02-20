@@ -48,7 +48,7 @@ export function handleCreateTokenCandleSingleton(event: ethereum.Event, tokenAdd
 export function handleUpdateTokenCandle_low_high(
   event: ethereum.Event,
   swapPair: Address,
-  pairPosition: number,
+  pairPositionStable: number,
   pairToken: Address,
 ): void {
   // calculate price from ratio to stable and oraclePrice
@@ -58,10 +58,10 @@ export function handleUpdateTokenCandle_low_high(
 
   const swapPairReserves = SwapPair.bind(swapPair).getReserves();
   const tokenPriceInStable =
-    pairPosition === 0
-      ? swapPairReserves.get_reserve0().times(oneEther).div(swapPairReserves.get_reserve1())
-      : swapPairReserves.get_reserve1().times(oneEther).div(swapPairReserves.get_reserve0());
-  const tokenPriceUSD = tokenPriceInStable.times(stablePrice);
+    pairPositionStable === 0
+    ? swapPairReserves.get_reserve0().times(oneEther).div(swapPairReserves.get_reserve1())
+      : swapPairReserves.get_reserve1().times(oneEther).div(swapPairReserves.get_reserve0())
+  const tokenPriceUSD = tokenPriceInStable.times(stablePrice).div(oneEther);
 
   for (let i = 0; i < CandleSizes.length; i++) {
     const candleSingleton = TokenCandleSingleton.load(
@@ -88,7 +88,7 @@ export function handleUpdateTokenCandle_low_high(
 export function handleUpdateTokenCandle_volume(
   event: ethereum.Event,
   swapPair: Address,
-  pairPosition: number,
+  pairPositionStable: number,
   pairToken: Address,
   additionalTradeVolume: BigInt,
 ): void {
@@ -99,10 +99,11 @@ export function handleUpdateTokenCandle_volume(
 
   const swapPairReserves = SwapPair.bind(swapPair).getReserves();
   const tokenPriceInStable =
-    pairPosition === 0
-      ? swapPairReserves.get_reserve0().div(swapPairReserves.get_reserve1())
-      : swapPairReserves.get_reserve1().div(swapPairReserves.get_reserve0());
-  const tokenPriceUSD = tokenPriceInStable.times(stablePrice);
+    pairPositionStable === 0
+    ? swapPairReserves.get_reserve0().times(oneEther).div(swapPairReserves.get_reserve1())
+      : swapPairReserves.get_reserve1().times(oneEther).div(swapPairReserves.get_reserve0())
+  const tokenPriceUSD = tokenPriceInStable.times(stablePrice).div(oneEther);
+
 
   for (let i = 0; i < CandleSizes.length; i++) {
     const candleSingleton = TokenCandleSingleton.load(

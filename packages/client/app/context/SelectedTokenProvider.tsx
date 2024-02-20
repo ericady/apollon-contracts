@@ -9,6 +9,7 @@ import { useEthers } from './EthersProvider';
 import { Contracts } from './contracts.config';
 
 export type SelectedToken = {
+  id: string;
   swapFee: bigint;
   change: number;
   isFavorite: boolean;

@@ -256,7 +256,12 @@ input TokenCandle_filter {
   timestamp_lte: Int
   timestamp_not: Int
   timestamp_not_in: [Int!]
-  token: String
+  token_: Token_filter
+}
+
+input Token_filter {
+  id: Bytes
+  symbol: String
 }
 
 enum TokenCandle_orderBy {
