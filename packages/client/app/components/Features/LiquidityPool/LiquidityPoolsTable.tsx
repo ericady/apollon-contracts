@@ -45,16 +45,16 @@ function LiquidityPoolsTable({ selectedPool, setSelectedPool }: Props) {
         { totalSupply: totalSupplyB, borrowerAmount: borrowerAmountB, liquidity: [liqB1, liqB2] },
       ) =>
         (dangerouslyConvertBigIntToNumber(borrowerAmountB) / bigIntStringToFloat(totalSupplyB)) *
-          bigIntStringToFloat(liqA1.totalAmount) *
+          bigIntStringToFloat(liqA1.totalAmount, liqA1.token.decimals) *
           dangerouslyConvertBigIntToNumber(liqA1.token.priceUSDOracle, 9, 9) +
         (dangerouslyConvertBigIntToNumber(borrowerAmountB) / bigIntStringToFloat(totalSupplyB)) *
-          bigIntStringToFloat(liqA2.totalAmount) *
+          bigIntStringToFloat(liqA2.totalAmount, liqA2.token.decimals) *
           dangerouslyConvertBigIntToNumber(liqA2.token.priceUSDOracle, 9, 9) -
         ((dangerouslyConvertBigIntToNumber(borrowerAmountA) / bigIntStringToFloat(totalSupplyA)) *
-          bigIntStringToFloat(liqB1.totalAmount) *
+          bigIntStringToFloat(liqB1.totalAmount, liqB1.token.decimals) *
           dangerouslyConvertBigIntToNumber(liqB1.token.priceUSDOracle, 9, 9) +
           (dangerouslyConvertBigIntToNumber(borrowerAmountA) / bigIntStringToFloat(totalSupplyA)) *
-            bigIntStringToFloat(liqB2.totalAmount) *
+            bigIntStringToFloat(liqB2.totalAmount, liqB2.token.decimals) *
             dangerouslyConvertBigIntToNumber(liqB2.token.priceUSDOracle, 9, 9)),
     );
   }, [borrowerPoolsData]);
@@ -131,7 +131,7 @@ function LiquidityPoolsTable({ selectedPool, setSelectedPool }: Props) {
                     }}
                   >
                     <Typography fontWeight={400}>
-                      {roundCurrency(bigIntStringToFloat(tokenA.totalAmount), 5, 5)}
+                      {roundCurrency(bigIntStringToFloat(tokenA.totalAmount, tokenA.token.decimals), 5, 5)}
                       <br />
                       <span
                         data-testid="apollon-liquidity-pool-table-row-borrower-amount-token-a"
@@ -143,7 +143,7 @@ function LiquidityPoolsTable({ selectedPool, setSelectedPool }: Props) {
                         {roundCurrency(
                           dangerouslyConvertBigIntToNumber(
                             (borrowerAmount * BigInt(tokenA.totalAmount)) / BigInt(totalSupply),
-                            12,
+                            tokenA.token.decimals - 6,
                             6,
                           ),
                           5,
@@ -163,7 +163,7 @@ function LiquidityPoolsTable({ selectedPool, setSelectedPool }: Props) {
 
                   <TableCell sx={{ pr: 0, width: '50px', maxWidth: '200px' }}>
                     <Typography fontWeight={400}>
-                      {roundCurrency(bigIntStringToFloat(tokenB.totalAmount), 5, 5)}
+                      {roundCurrency(bigIntStringToFloat(tokenB.totalAmount, tokenB.token.decimals), 5, 5)}
                       <br />
                       <span
                         data-testid="apollon-liquidity-pool-table-row-borrower-amount-token-b"
@@ -175,7 +175,7 @@ function LiquidityPoolsTable({ selectedPool, setSelectedPool }: Props) {
                         {roundCurrency(
                           dangerouslyConvertBigIntToNumber(
                             (borrowerAmount * BigInt(tokenB.totalAmount)) / BigInt(totalSupply),
-                            12,
+                            tokenB.token.decimals - 6,
                             6,
                           ),
                           5,

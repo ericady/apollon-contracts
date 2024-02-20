@@ -96,3 +96,11 @@ export function divBigIntsToFloat(number: bigint, divideBy: bigint, toPrecission
 
   return bigIntStringToFloat(result.toString(), toPrecission);
 }
+
+export function convertToEtherPrecission(bigNumber: bigint, precisionDigits: number) {
+  const scalingFactor = ethers.parseUnits('1', precisionDigits);
+
+  const result = bigNumber * scalingFactor;
+
+  return result;
+}

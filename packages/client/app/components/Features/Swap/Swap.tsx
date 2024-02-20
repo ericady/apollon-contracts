@@ -21,6 +21,7 @@ import {
 import { GET_BORROWER_COLLATERAL_TOKENS, GET_BORROWER_DEBT_TOKENS, GET_BORROWER_SWAPS } from '../../../queries';
 import { WIDGET_HEIGHTS } from '../../../utils/contants';
 import {
+  convertToEtherPrecission,
   dangerouslyConvertBigIntToNumber,
   displayPercentage,
   floatToBigInt,
@@ -228,11 +229,13 @@ const Swap = () => {
   const getPriceImpact = () => {
     const {
       pool: { liqudityPair },
+      decimals,
     } = selectedToken!;
-    const liq0 = dangerouslyConvertBigIntToNumber(liqudityPair[0], 9, 9);
-    const liq1 = dangerouslyConvertBigIntToNumber(liqudityPair[1], 9, 9);
+    const liq0 = dangerouslyConvertBigIntToNumber(liqudityPair[0], 0);
+    const liq1 = dangerouslyConvertBigIntToNumber(convertToEtherPrecission(liqudityPair[1], decimals), 0);
     const currentPrice = liq0 / liq1;
 
+    // TODO: Take a look if this is correct. Diff with FARM
     let newPriceAfterSwap: number;
     if (tradingDirection === 'jUSDSpent') {
       // Calculate new amount of the other token after swap
@@ -252,6 +255,66 @@ const Swap = () => {
   useEffect(() => {
     reset();
   }, [selectedToken, reset]);
+
+  const tokenInput = (
+    <NumberInput
+      name="tokenAmount"
+      data-testid="apollon-swap-token-amount"
+      rules={{
+        required: { value: true, message: 'You need to specify an amount.' },
+        min: { value: 0, message: 'Amount needs to be positive.' },
+        max:
+          tradingDirection === 'jUSDAquired'
+            ? {
+                value: dangerouslyConvertBigIntToNumber(relevantToken.walletAmount, 9, 9),
+                message: 'Amount exceeds wallet balance.',
+              }
+            : undefined,
+      }}
+      disabled={!selectedToken}
+      onChange={(e: ChangeEvent<HTMLInputElement>) => {
+        tokenAmountField.onChange(e);
+        handleSwapValueChange('Token', e.target.value);
+      }}
+      InputProps={{
+        endAdornment: selectedToken && (
+          <InputAdornment position="end">
+            <Label variant="none">{selectedToken.symbol}</Label>
+          </InputAdornment>
+        ),
+      }}
+    />
+  );
+
+  const jUSDInput = (
+    <NumberInput
+      name="jUSDAmount"
+      data-testid="apollon-swap-jusd-amount"
+      rules={{
+        required: { value: true, message: 'You need to specify an amount.' },
+        min: { value: 0, message: 'Amount needs to be positive.' },
+        max:
+          tradingDirection === 'jUSDSpent'
+            ? {
+                value: dangerouslyConvertBigIntToNumber(stableWalletAmount, 9, 9),
+                message: 'Amount exceeds wallet balance.',
+              }
+            : undefined,
+      }}
+      disabled={!selectedToken}
+      onChange={(e: ChangeEvent<HTMLInputElement>) => {
+        jUSDField.onChange(e);
+        handleSwapValueChange('JUSD', e.target.value);
+      }}
+      InputProps={{
+        endAdornment: (
+          <InputAdornment position="end">
+            <Label variant="none">jUSD</Label>
+          </InputAdornment>
+        ),
+      }}
+    />
+  );
 
   return (
     <FeatureBox
@@ -273,33 +336,7 @@ const Swap = () => {
         <FormProvider {...methods}>
           <form onSubmit={handleSubmit(onSubmit)}>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <NumberInput
-                name="tokenAmount"
-                data-testid="apollon-swap-token-amount"
-                rules={{
-                  required: { value: true, message: 'You need to specify an amount.' },
-                  min: { value: 0, message: 'Amount needs to be positive.' },
-                  max:
-                    tradingDirection === 'jUSDAquired'
-                      ? {
-                          value: dangerouslyConvertBigIntToNumber(relevantToken.walletAmount, 9, 9),
-                          message: 'Amount exceeds wallet balance.',
-                        }
-                      : undefined,
-                }}
-                disabled={!selectedToken}
-                onChange={(e: ChangeEvent<HTMLInputElement>) => {
-                  tokenAmountField.onChange(e);
-                  handleSwapValueChange('Token', e.target.value);
-                }}
-                InputProps={{
-                  endAdornment: selectedToken && (
-                    <InputAdornment position="end">
-                      <Label variant="none">{selectedToken.symbol}</Label>
-                    </InputAdornment>
-                  ),
-                }}
-              />
+              {tokenInput}
 
               <ExchangeIcon
                 style={{
@@ -308,34 +345,7 @@ const Swap = () => {
                 }}
               />
 
-              {/* TODO: Add Validation that not more than the wallet amount can be entered. */}
-              <NumberInput
-                name="jUSDAmount"
-                data-testid="apollon-swap-jusd-amount"
-                rules={{
-                  required: { value: true, message: 'You need to specify an amount.' },
-                  min: { value: 0, message: 'Amount needs to be positive.' },
-                  max:
-                    tradingDirection === 'jUSDSpent'
-                      ? {
-                          value: dangerouslyConvertBigIntToNumber(stableWalletAmount, 9, 9),
-                          message: 'Amount exceeds wallet balance.',
-                        }
-                      : undefined,
-                }}
-                disabled={!selectedToken}
-                onChange={(e: ChangeEvent<HTMLInputElement>) => {
-                  jUSDField.onChange(e);
-                  handleSwapValueChange('JUSD', e.target.value);
-                }}
-                InputProps={{
-                  endAdornment: (
-                    <InputAdornment position="end">
-                      <Label variant="none">jUSD</Label>
-                    </InputAdornment>
-                  ),
-                }}
-              />
+              {jUSDInput}
             </div>
 
             {showSlippage && (

@@ -21,6 +21,7 @@ import { GET_ALL_POOLS, GET_TOKEN_PRICES_24h_AGO } from '../../../queries';
 import { WIDGET_HEIGHTS } from '../../../utils/contants';
 import { getCheckSum } from '../../../utils/crypto';
 import {
+  convertToEtherPrecission,
   dangerouslyConvertBigIntToNumber,
   displayPercentage,
   divBigIntsToFloat,
@@ -44,7 +45,7 @@ function Assets() {
     setFavoritedAssets(JSON.parse(window.localStorage.getItem(FAVORITE_ASSETS_LOCALSTORAGE_KEY) ?? '[]'));
   }, []);
 
-  const { selectedToken, setSelectedToken, JUSDToken } = useSelectedToken();
+  const { selectedToken, setSelectedToken } = useSelectedToken();
 
   // TODO: Implement a filter for only JUSD to subgraph
   const { data } = useQuery<GetAllPoolsQuery, GetAllPoolsQueryVariables>(GET_ALL_POOLS);
@@ -193,7 +194,13 @@ function Assets() {
                     </TableCell>
                     <TableCell sx={{ p: 0.5 }} align="right">
                       <Typography fontWeight={400}>
-                        {roundCurrency(divBigIntsToFloat(liqudityPair[1], liqudityPair[0], 5))}
+                        {roundCurrency(
+                          divBigIntsToFloat(
+                            liqudityPair[0],
+                            convertToEtherPrecission(liqudityPair[1], token.decimals),
+                            5,
+                          ),
+                        )}
                       </Typography>
                     </TableCell>
                     <TableCell sx={{ p: 0.5 }} align="right" width={60}>

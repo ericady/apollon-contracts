@@ -16,7 +16,13 @@ import { isCollateralTokenAddress } from '../../../context/contracts.config';
 import { GET_BORROWER_COLLATERAL_TOKENS, GET_BORROWER_DEBT_TOKENS } from '../../../queries';
 import { WIDGET_HEIGHTS } from '../../../utils/contants';
 import { getHints } from '../../../utils/crypto';
-import { dangerouslyConvertBigIntToNumber, displayPercentage, floatToBigInt, roundCurrency } from '../../../utils/math';
+import {
+  convertToEtherPrecission,
+  dangerouslyConvertBigIntToNumber,
+  displayPercentage,
+  floatToBigInt,
+  roundCurrency,
+} from '../../../utils/math';
 import InfoButton from '../../Buttons/InfoButton';
 import FeatureBox from '../../FeatureBox/FeatureBox';
 import NumberInput from '../../FormControls/NumberInput';
@@ -178,10 +184,11 @@ const Farm = () => {
   const getPriceImpact = () => {
     const {
       pool: { liqudityPair },
+      decimals,
     } = selectedToken!;
 
     const liq0 = dangerouslyConvertBigIntToNumber(liqudityPair[0], 0);
-    const liq1 = dangerouslyConvertBigIntToNumber(liqudityPair[1], 0);
+    const liq1 = dangerouslyConvertBigIntToNumber(convertToEtherPrecission(liqudityPair[1], decimals), 0);
 
     const currentPrice = liq0 / liq1;
 

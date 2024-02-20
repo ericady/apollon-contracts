@@ -5,12 +5,14 @@ import { ethers } from 'ethers';
 import { createContext, useContext, useState } from 'react';
 import { GetBorrowerDebtTokensQuery, GetBorrowerDebtTokensQueryVariables } from '../generated/gql-types';
 import { GET_BORROWER_DEBT_TOKENS } from '../queries';
+import { convertToEtherPrecission } from '../utils/math';
 import { useEthers } from './EthersProvider';
 import { Contracts } from './contracts.config';
 
 export type SelectedToken = {
   id: string;
   swapFee: bigint;
+  decimals: number;
   change: number;
   isFavorite: boolean;
   address: string;
@@ -57,7 +59,9 @@ export default function SelectedTokenProvider({ children }: { children: React.Re
   const tokenRatio =
     JUSDToken === undefined || selectedToken === null
       ? ethers.parseEther('1')
-      : (selectedToken!.pool.liqudityPair[1] * ethers.parseEther('1')) / selectedToken!.pool.liqudityPair[0];
+      : (convertToEtherPrecission(selectedToken!.pool.liqudityPair[1], selectedToken.decimals) *
+          ethers.parseEther('1')) /
+        selectedToken!.pool.liqudityPair[0];
 
   return (
     <SelectedTokenContext.Provider

@@ -19,6 +19,7 @@ export const GET_ALL_POOLS = gql`
           symbol
           priceUSDOracle @client
           borrowingRate @client
+          decimals @client
         }
       }
     }
@@ -52,6 +53,7 @@ export const GET_ALL_DEBT_TOKENS = gql`
         address
         symbol
         priceUSDOracle @client
+        decimals @client
       }
     }
   }
@@ -86,6 +88,7 @@ export const GET_BORROWER_DEBT_TOKENS = gql`
         isPoolToken
         borrowingRate @client
         priceUSDOracle @client
+        decimals @client
       }
     }
   }
@@ -102,6 +105,7 @@ export const GET_BORROWER_SWAPS = gql`
         address
         symbol
         priceUSDOracle @client
+        decimals @client
       }
       direction
       size
@@ -123,6 +127,7 @@ export const GET_BORROWER_LIQUIDITY_POOLS = gql`
           address
           symbol
           priceUSDOracle @client
+          decimals @client
         }
         totalAmount
       }
@@ -151,6 +156,7 @@ export const GET_BORROWER_COLLATERAL_TOKENS = gql`
         address
         symbol
         priceUSDOracle @client
+        decimals @client
       }
       walletAmount @client
       troveLockedAmount @client
@@ -177,6 +183,7 @@ export const GET_BORROWER_STABILITY_HISTORY = gql`
           address
           symbol
           priceUSDOracle @client
+          decimals @client
         }
         amount
       }

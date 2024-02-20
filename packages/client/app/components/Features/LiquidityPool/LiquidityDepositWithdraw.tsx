@@ -234,8 +234,10 @@ function LiquidityDepositWithdraw({ selectedPool }: Props) {
       ]);
     } else {
       const percentageFromPool = tokenAAmount / bigIntStringToFloat(totalSupply);
-      const tokenAAmountForWithdraw = percentageFromPool * bigIntStringToFloat(tokenA.totalAmount);
-      const tokenBAmountForWithdraw = percentageFromPool * bigIntStringToFloat(tokenB.totalAmount);
+      const tokenAAmountForWithdraw =
+        percentageFromPool * bigIntStringToFloat(tokenA.totalAmount, tokenA.token.decimals);
+      const tokenBAmountForWithdraw =
+        percentageFromPool * bigIntStringToFloat(tokenB.totalAmount, tokenB.token.decimals);
 
       setSteps([
         {
@@ -305,7 +307,8 @@ function LiquidityDepositWithdraw({ selectedPool }: Props) {
     if (tabValue === 'DEPOSIT') {
       if (fieldName === 'tokenAAmount') {
         const pairValue = roundNumber(
-          (numericValue * bigIntStringToFloat(tokenA.totalAmount)) / bigIntStringToFloat(tokenB.totalAmount),
+          (numericValue * bigIntStringToFloat(tokenA.totalAmount, tokenA.token.decimals)) /
+            bigIntStringToFloat(tokenB.totalAmount, tokenB.token.decimals),
           5,
         );
         setValue('tokenBAmount', pairValue.toString(), {
@@ -314,7 +317,8 @@ function LiquidityDepositWithdraw({ selectedPool }: Props) {
         });
       } else {
         const pairValue = roundNumber(
-          (numericValue * bigIntStringToFloat(tokenB.totalAmount)) / bigIntStringToFloat(tokenA.totalAmount),
+          (numericValue * bigIntStringToFloat(tokenB.totalAmount, tokenB.token.decimals)) /
+            bigIntStringToFloat(tokenA.totalAmount, tokenA.token.decimals),
           5,
         );
 
@@ -357,11 +361,11 @@ function LiquidityDepositWithdraw({ selectedPool }: Props) {
         currentDebtValueUSD,
         currentCollateralValueUSD,
         {
-          totalAmount: bigIntStringToFloat(tokenA.totalAmount),
+          totalAmount: bigIntStringToFloat(tokenA.totalAmount, tokenA.token.decimals),
           priceUSD: dangerouslyConvertBigIntToNumber(tokenA.token.priceUSDOracle, 9, 9),
         },
         {
-          totalAmount: bigIntStringToFloat(tokenB.totalAmount),
+          totalAmount: bigIntStringToFloat(tokenB.totalAmount, tokenB.token.decimals),
           priceUSD: dangerouslyConvertBigIntToNumber(tokenB.token.priceUSDOracle, 9, 9),
         },
         relevantTokenA,
@@ -381,8 +385,8 @@ function LiquidityDepositWithdraw({ selectedPool }: Props) {
 
   // Withdraw
   const percentageFromPool = (tokenAAmount ? parseFloat(tokenAAmount) : 0) / bigIntStringToFloat(totalSupply);
-  const tokenAAmountForWithdraw = percentageFromPool * bigIntStringToFloat(tokenA.totalAmount);
-  const tokenBAmountForWithdraw = percentageFromPool * bigIntStringToFloat(tokenB.totalAmount);
+  const tokenAAmountForWithdraw = percentageFromPool * bigIntStringToFloat(tokenA.totalAmount, tokenA.token.decimals);
+  const tokenBAmountForWithdraw = percentageFromPool * bigIntStringToFloat(tokenB.totalAmount, tokenB.token.decimals);
 
   const addedDebtUSD =
     tabValue === 'DEPOSIT'
@@ -442,7 +446,7 @@ function LiquidityDepositWithdraw({ selectedPool }: Props) {
                     {roundCurrency(
                       dangerouslyConvertBigIntToNumber(
                         (borrowerAmount * BigInt(tokenA.totalAmount)) / BigInt(totalSupply),
-                        12,
+                        tokenA.token.decimals - 6,
                         6,
                       ),
                       5,
@@ -560,7 +564,7 @@ function LiquidityDepositWithdraw({ selectedPool }: Props) {
                     {roundCurrency(
                       dangerouslyConvertBigIntToNumber(
                         (borrowerAmount * BigInt(tokenB.totalAmount)) / BigInt(totalSupply),
-                        12,
+                        tokenB.token.decimals - 6,
                         6,
                       ),
                       5,

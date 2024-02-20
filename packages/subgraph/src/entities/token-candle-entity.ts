@@ -59,8 +59,8 @@ export function handleUpdateTokenCandle_low_high(
   const swapPairReserves = SwapPair.bind(swapPair).getReserves();
   const tokenPriceInStable =
     pairPositionStable === 0
-    ? swapPairReserves.get_reserve0().times(oneEther).div(swapPairReserves.get_reserve1())
-      : swapPairReserves.get_reserve1().times(oneEther).div(swapPairReserves.get_reserve0())
+      ? swapPairReserves.get_reserve0().times(oneEther).div(swapPairReserves.get_reserve1())
+      : swapPairReserves.get_reserve1().times(oneEther).div(swapPairReserves.get_reserve0());
   const tokenPriceUSD = tokenPriceInStable.times(stablePrice).div(oneEther);
 
   for (let i = 0; i < CandleSizes.length; i++) {
@@ -100,10 +100,9 @@ export function handleUpdateTokenCandle_volume(
   const swapPairReserves = SwapPair.bind(swapPair).getReserves();
   const tokenPriceInStable =
     pairPositionStable === 0
-    ? swapPairReserves.get_reserve0().times(oneEther).div(swapPairReserves.get_reserve1())
-      : swapPairReserves.get_reserve1().times(oneEther).div(swapPairReserves.get_reserve0())
+      ? swapPairReserves.get_reserve0().times(oneEther).div(swapPairReserves.get_reserve1())
+      : swapPairReserves.get_reserve1().times(oneEther).div(swapPairReserves.get_reserve0());
   const tokenPriceUSD = tokenPriceInStable.times(stablePrice).div(oneEther);
-
 
   for (let i = 0; i < CandleSizes.length; i++) {
     const candleSingleton = TokenCandleSingleton.load(

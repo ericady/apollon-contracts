@@ -73,7 +73,9 @@ function DebtTable() {
           backgroundColor: isDarkMode ? '#1e1b27' : '#f8f8f8',
         }}
       >
-        <DebtPieVisualization borrowerDebtTokens={borrowerDebtTokens} />
+        <DebtPieVisualization
+          borrowerDebtTokens={borrowerDebtTokens.filter(({ troveMintedAmount }) => troveMintedAmount > 0)}
+        />
       </Box>
       <Box sx={{ width: '100%', borderLeft: '1px solid', borderColor: 'table.border' }}>
         <div style={{ padding: '20px' }}>

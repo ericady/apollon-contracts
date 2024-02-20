@@ -157,7 +157,8 @@ function TradingViewComponent() {
                     '1W': 10080,
                   };
 
-                    client.query<GetTradingViewCandlesQuery, GetTradingViewCandlesQueryVariables>({
+                  client
+                    .query<GetTradingViewCandlesQuery, GetTradingViewCandlesQueryVariables>({
                       query: GET_TRADING_VIEW_CANDLES,
                       variables: {
                         first: periodParams.countBack,
@@ -167,7 +168,7 @@ function TradingViewComponent() {
                           timestamp_lte: periodParams.to,
                           token_: {
                             id: selectedToken.id,
-                          }
+                          },
                         },
                       },
                     })
@@ -182,8 +183,8 @@ function TradingViewComponent() {
                         volume: bigIntStringToFloat(volume),
                       }));
 
-                      onHistoryCallback(bars, { noData: bars.length < periodParams.countBack ? true : false});
-                    })
+                      onHistoryCallback(bars, { noData: bars.length < periodParams.countBack ? true : false });
+                    });
                 },
 
                 // Only updates the most recent bar. Not needed yet.

@@ -70,8 +70,10 @@ function SetupState({
     if (shouldPreselectTokens && !selectedToken) {
       const { address, symbol } = PreselectedTestToken;
       setSelectedToken({
+        id: address,
         address,
         change: 0.01,
+        decimals: 18,
         isFavorite: true,
         swapFee: BigInt(50000),
         priceUSDOracle: BigInt(10000000000000000000),

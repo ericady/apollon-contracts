@@ -13,6 +13,7 @@ type Token {
   # handled by client
   priceUSDOracle: bigint!
   borrowingRate: bigint!
+  decimals: Int!
 }
 
 type DebtTokenMeta {

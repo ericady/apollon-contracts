@@ -199,6 +199,26 @@ const getProductionCacheConfig = ({
             }
           },
         },
+
+        decimals: {
+          read(_, { readField }) {
+            const address = readField('address') as Readonly<string>;
+
+            if (address) {
+              if (isDebtTokenAddress(address)) {
+                if (isFieldOutdated(SchemaDataFreshnessManager.DebtToken[address], 'decimals')) {
+                  SchemaDataFreshnessManager.DebtToken[address].decimals.fetch(debtTokenContracts[address]);
+                }
+                return SchemaDataFreshnessManager.DebtToken[address].decimals.value();
+              } else if (isCollateralTokenAddress(address)) {
+                if (isFieldOutdated(SchemaDataFreshnessManager.ERC20[address], 'decimals')) {
+                  SchemaDataFreshnessManager.ERC20[address].decimals.fetch(collateralTokenContracts[address]);
+                }
+                return SchemaDataFreshnessManager.ERC20[address].decimals.value();
+              }
+            }
+          },
+        },
       },
     },
 
@@ -747,6 +767,19 @@ export const SchemaDataFreshnessManager: ContractDataFreshnessManager<typeof Con
         timeout: 1000 * 2,
       },
 
+      decimals: {
+        fetch: async (collTokenContract: ERC20) => {
+          SchemaDataFreshnessManager.ERC20[Contracts.ERC20.BTC].decimals.lastFetched = Date.now();
+
+          const decimals = await collTokenContract.decimals();
+
+          SchemaDataFreshnessManager.ERC20[Contracts.ERC20.BTC].decimals.value(Number(decimals) as any);
+        },
+        value: makeVar(Number(defaultFieldValue) as any),
+        lastFetched: 0,
+        timeout: 1000 * 3600,
+      },
+
       walletAmount: {
         fetch: async (collTokenContract: ERC20, depositor: AddressLike) => {
           SchemaDataFreshnessManager.ERC20[Contracts.ERC20.BTC].walletAmount.lastFetched = Date.now();
@@ -836,6 +869,19 @@ export const SchemaDataFreshnessManager: ContractDataFreshnessManager<typeof Con
         timeout: 1000 * 2,
       },
 
+      decimals: {
+        fetch: async (collTokenContract: ERC20) => {
+          SchemaDataFreshnessManager.ERC20[Contracts.ERC20.GOV].decimals.lastFetched = Date.now();
+
+          const decimals = await collTokenContract.decimals();
+
+          SchemaDataFreshnessManager.ERC20[Contracts.ERC20.GOV].decimals.value(Number(decimals) as any);
+        },
+        value: makeVar(Number(defaultFieldValue) as any),
+        lastFetched: 0,
+        timeout: 1000 * 3600,
+      },
+
       walletAmount: {
         fetch: async (collTokenContract: ERC20, depositor: AddressLike) => {
           SchemaDataFreshnessManager.ERC20[Contracts.ERC20.GOV].walletAmount.lastFetched = Date.now();
@@ -921,6 +967,19 @@ export const SchemaDataFreshnessManager: ContractDataFreshnessManager<typeof Con
         value: makeVar(defaultFieldValue),
         lastFetched: 0,
         timeout: 1000 * 2,
+      },
+
+      decimals: {
+        fetch: async (collTokenContract: ERC20) => {
+          SchemaDataFreshnessManager.ERC20[Contracts.ERC20.USDT].decimals.lastFetched = Date.now();
+
+          const decimals = await collTokenContract.decimals();
+
+          SchemaDataFreshnessManager.ERC20[Contracts.ERC20.USDT].decimals.value(Number(decimals) as any);
+        },
+        value: makeVar(Number(defaultFieldValue) as any),
+        lastFetched: 0,
+        timeout: 1000 * 3600,
       },
 
       walletAmount: {
@@ -1012,6 +1071,19 @@ export const SchemaDataFreshnessManager: ContractDataFreshnessManager<typeof Con
         value: makeVar(defaultFieldValue),
         lastFetched: 0,
         timeout: 1000 * 2,
+      },
+
+      decimals: {
+        fetch: async (debtTokenContract: DebtToken) => {
+          SchemaDataFreshnessManager.DebtToken[Contracts.DebtToken.STABLE].decimals.lastFetched = Date.now();
+
+          const decimals = await debtTokenContract.decimals();
+
+          SchemaDataFreshnessManager.DebtToken[Contracts.DebtToken.STABLE].decimals.value(Number(decimals) as any);
+        },
+        value: makeVar(Number(defaultFieldValue) as any),
+        lastFetched: 0,
+        timeout: 1000 * 3600,
       },
 
       walletAmount: {
@@ -1180,6 +1252,19 @@ export const SchemaDataFreshnessManager: ContractDataFreshnessManager<typeof Con
         value: makeVar(defaultFieldValue),
         lastFetched: 0,
         timeout: 1000 * 2,
+      },
+
+      decimals: {
+        fetch: async (debtTokenContract: DebtToken) => {
+          SchemaDataFreshnessManager.DebtToken[Contracts.DebtToken.STOCK_1].decimals.lastFetched = Date.now();
+
+          const decimals = await debtTokenContract.decimals();
+
+          SchemaDataFreshnessManager.DebtToken[Contracts.DebtToken.STOCK_1].decimals.value(Number(decimals) as any);
+        },
+        value: makeVar(Number(defaultFieldValue) as any),
+        lastFetched: 0,
+        timeout: 1000 * 3600,
       },
 
       walletAmount: {

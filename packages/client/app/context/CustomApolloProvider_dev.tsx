@@ -4,6 +4,8 @@ import { SystemInfo } from '../generated/gql-types';
 
 type Props = {
   Token_priceUSDOracleValue: bigint;
+  Token_decimals: number;
+  Token_borrowingRate: bigint;
   DebtTokenMeta_walletAmount: bigint;
   DebtTokenMeta_troveMintedAmount: bigint;
   DebtTokenMeta_troveRepableDebtAmount: bigint;
@@ -15,7 +17,6 @@ type Props = {
   CollateralTokenMeta_stabilityGainedAmount: bigint;
   Pool_swapFee: bigint;
   Pool_borrowerAmount: bigint;
-  TroveManager_borrowingRate: bigint;
   SystemInfo_totalCollateralRatio: bigint;
 };
 
@@ -88,7 +89,8 @@ const getProductionCacheConfig = ({
   Pool_swapFee = BigInt(50000),
   SystemInfo_totalCollateralRatio = BigInt(100000000000000000),
   Token_priceUSDOracleValue = BigInt(10000000000000000000),
-  TroveManager_borrowingRate = BigInt(100000000000000000),
+  Token_decimals = 18,
+  Token_borrowingRate = BigInt(100000000000000000),
 }: Partial<Props>): { fields: TypePolicies; Query: TypePolicy } => ({
   fields: {
     Token: {
@@ -101,9 +103,15 @@ const getProductionCacheConfig = ({
 
         borrowingRate: {
           read() {
-            return TroveManager_borrowingRate;
-          }
-        }
+            return Token_borrowingRate;
+          },
+        },
+
+        decimals: {
+          read() {
+            return Token_decimals;
+          },
+        },
       },
     },
 
