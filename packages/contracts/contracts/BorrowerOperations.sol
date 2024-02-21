@@ -142,9 +142,11 @@ contract BorrowerOperations is LiquityBase, Ownable(msg.sender), CheckContract, 
   // --- Borrower Trove Operations ---
 
   function openTrove(TokenAmount[] memory _colls) public override {
-    ContractsCache memory contractsCache = ContractsCache(troveManager, storagePool, tokenManager, priceFeed);
+    _openTrove(msg.sender, _colls);
+  }
 
-    address borrower = msg.sender;
+  function _openTrove(address borrower, TokenAmount[] memory _colls) internal {
+    ContractsCache memory contractsCache = ContractsCache(troveManager, storagePool, tokenManager, priceFeed);
     _requireTroveIsNotActive(contractsCache.troveManager, borrower);
 
     LocalVariables_openTrove memory vars;

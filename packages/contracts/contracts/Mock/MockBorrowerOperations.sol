@@ -3,11 +3,22 @@
 pragma solidity ^0.8.9;
 
 import '../BorrowerOperations.sol';
+import './IMockERC20.sol';
 
 /* Tester contract inherits from TroveManager, and provides external functions 
 for testing the parent's internal functions. */
 
 contract MockBorrowerOperations is BorrowerOperations {
+  function createTestingTrove(address _borrower, TokenAmount[] memory _colls, TokenAmount[] memory _debts) external {
+    for (uint i = 0; i < _colls.length; i++) {
+      IMockERC20 token = IMockERC20(_colls[i].tokenAddress);
+      token.unprotectedMintApprove(_borrower, _colls[i].amount, address(this));
+    }
+
+    _openTrove(_borrower, _colls);
+    _increaseDebt(_borrower, _borrower, _debts, MintMeta(address(0), address(0), MAX_BORROWING_FEE));
+  }
+
   function increaseDebts(TokenAmount[] memory _debts, MintMeta memory _meta) external {
     // separate minting is allowed for better testing
     // _requireCallerIsSwapOperations();
