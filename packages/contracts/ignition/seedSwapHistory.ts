@@ -6,6 +6,7 @@ import fs from 'fs';
 import path from 'path';
 import { parseUnits } from 'ethers';
 import swapOpsAbi from '../abi/SwapOperations.json';
+import swapPairAbi from '../abi/SwapPair.json';
 
 (async () => {
   console.log('Seeding swaps...');
@@ -16,6 +17,7 @@ import swapOpsAbi from '../abi/SwapOperations.json';
   const swapMap = {
     BTC: {
       contract: '0x9A676e781A523b5d0C0e43731313A708CB607508',
+      pool: null,
       file: 'BTC.csv',
       swaps: [],
       positionMultiplier: 0.00001,
@@ -23,6 +25,7 @@ import swapOpsAbi from '../abi/SwapOperations.json';
     },
     USDT: {
       contract: '0x959922bE3CAee4b8Cd9a407cc3ac1C251C2007B1',
+      pool: null,
       file: 'USDT.csv',
       swaps: [],
       positionMultiplier: 0.001,
@@ -30,6 +33,7 @@ import swapOpsAbi from '../abi/SwapOperations.json';
     },
     AAPL: {
       contract: '0x9E545E3C0baAB3E08CdfD552C960A1050f373042',
+      pool: null,
       file: 'AAPL.csv',
       swaps: [],
       positionMultiplier: 0.00001,
@@ -59,31 +63,60 @@ import swapOpsAbi from '../abi/SwapOperations.json';
     swapRows.push(row);
   }
 
-  const deadline = (await getLatestBlockTimestamp()) + 300000;
   const swapOps = await ethers.getContractAt(swapOpsAbi, swapOpsAddress);
+  for (const entry of Object.values(swapMap)) {
+    const poolAddress = await swapOps.getPair(entry.contract, stableCoinAddress);
+    entry.pool = await ethers.getContractAt(swapPairAbi, poolAddress);
+  }
+
+  const deadline = (await getLatestBlockTimestamp()) + 300000;
+  let errors = 0;
   for (let i = 0; i < swapRows.length; i++) {
     const swapRow = swapRows[i];
 
-    for (const [symbol, { contract, positionMultiplier, digits }] of Object.entries(swapMap)) {
-      const price = swapRow[symbol];
-      if (!price) continue;
+    await Promise.all(
+      Object.entries(swapMap).map(async ([symbol, { contract, positionMultiplier, digits, pool }]) => {
+        let targetPrice = swapRow[symbol];
+        if (!targetPrice) {
+          errors++;
+          return;
+        }
+        targetPrice = parseFloat(targetPrice);
 
-      const isBuy = Math.random() > 0.5;
-      const amountIn = isBuy ? price * positionMultiplier : positionMultiplier;
+        const [_stableReserve, _otherReserve] = await pool.getReserves();
+        const stableReserve = Number(_stableReserve) / 1e18;
+        const otherReserve = Number(_otherReserve) / 10 ** digits;
 
-      try {
-        await swapOps.swapExactTokensForTokens(
-          parseUnits(amountIn.toString(), digits),
-          0,
-          isBuy ? [stableCoinAddress, contract] : [contract, stableCoinAddress],
-          deployer,
-          deadline
-        );
-      } catch (e) {}
-    }
+        const currentPrice = stableReserve / otherReserve;
+        const amountIn = Math.sqrt(stableReserve * otherReserve * targetPrice) - stableReserve;
+        if (Math.abs(amountIn) < 0.0005) return;
+        const isBuy = amountIn > 0;
+
+        try {
+          if (isBuy)
+            await swapOps.swapExactTokensForTokens(
+              parseUnits(amountIn.toFixed(6), 18),
+              0,
+              [stableCoinAddress, contract],
+              deployer,
+              deadline
+            );
+          else
+            await swapOps.swapTokensForExactTokens(
+              parseUnits((-1 * amountIn).toFixed(6), digits),
+              parseUnits('999999', digits),
+              [contract, stableCoinAddress],
+              deployer,
+              deadline
+            );
+        } catch (e) {
+          errors++;
+        }
+      })
+    );
 
     await mine(1);
-    if (i % 100 === 0) console.log((i / swapRows.length) * 100 + '%');
+    if (i % 20 === 0) console.log(`${(i / swapRows.length) * 100} %, ${i} blocks/i, ${errors} errors`);
   }
 
   console.log('Swaps seeded.', swapRows.length);
