@@ -1,9 +1,7 @@
-import BedtimeIcon from '@mui/icons-material/Bedtime';
-import LightModeIcon from '@mui/icons-material/LightMode';
-import { PaletteMode, PaletteOptions, ToggleButton, ToggleButtonGroup } from '@mui/material';
-import { Dispatch, SetStateAction } from 'react';
 import DarkModeOutlinedIcon from '@mui/icons-material/DarkModeOutlined';
 import LightModeOutlinedIcon from '@mui/icons-material/LightModeOutlined';
+import { PaletteMode, PaletteOptions, ToggleButton, ToggleButtonGroup } from '@mui/material';
+import { Dispatch, SetStateAction } from 'react';
 
 export const ThemeModeLocalStorageKey = 'apollon-themeMode';
 type Props = {
@@ -34,13 +32,13 @@ function ThemeSwitch({ themeMode, setThemeMode }: Props) {
         disabled={themeMode === 'light'}
         aria-label="toggle light mode"
         sx={{
-          borderRadius: "3px",
+          borderRadius: '4px',
           borderColor: 'background.emphasis',
           backgroundColor: 'background.emphasis',
-          pr: '7px',
-          pl: '14px',
+          pr: '5px',
+          pl: '10px',
           '&.Mui-selected': {
-          borderColor: 'background.emphasis',
+            borderColor: 'background.emphasis',
             backgroundColor: 'background.emphasis',
             '&:hover': {
               backgroundColor: 'background.emphasis',
@@ -60,13 +58,13 @@ function ThemeSwitch({ themeMode, setThemeMode }: Props) {
         disabled={themeMode === 'dark'}
         aria-label="toggle light mode"
         sx={{
-          borderRadius: "3px",
+          borderRadius: '4px',
           borderColor: 'background.emphasis',
           backgroundColor: 'background.emphasis',
-          pl: '7px',
-          pr: '14px',
+          pl: '5px',
+          pr: '10px',
           '&.Mui-selected': {
-          borderColor: 'background.emphasis',
+            borderColor: 'background.emphasis',
             backgroundColor: 'background.emphasis',
             '&:hover': {
               backgroundColor: 'background.emphasis',

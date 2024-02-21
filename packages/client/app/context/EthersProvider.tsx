@@ -53,9 +53,55 @@ type AllSwapPairContracts = {
   [Key in keyof (typeof SchemaDataFreshnessManager)['SwapPairs']]: SwapPair;
 };
 
+export const NETWORKS = [
+  {
+    chainName: 'Localhost',
+    // 31337 in hex
+    chainId: '0x7a69',
+    chainIdNumber: 31337,
+    rpcUrls: ['http://127.0.0.1:8545'],
+    nativeCurrency: {
+      name: 'STABLE',
+      symbol: 'STABLE',
+      decimals: 18,
+    },
+    blockExplorerUrls: ['https://polygonscan.com/'],
+  },
+  {
+    chainName: 'Goerli test network',
+    // 5 in hex
+    chainId: '0x5',
+    chainIdNumber: 5,
+    rpcUrls: ['https://goerli.infura.io/v3/'],
+    nativeCurrency: {
+      name: 'GoerliETH',
+      symbol: 'GoerliETH',
+      decimals: 18,
+    },
+    blockExplorerUrls: ['https://polygonscan.com/'],
+  },
+] as const;
+
+// Connetion to local node
+// TODO: Implement testnet once deployed
+// TODO: This is setting the default network. How to make sure this is correct?
+const defaultNetwork = NETWORKS[0];
+const provider =
+  process.env.NEXT_PUBLIC_CONTRACT_MOCKING === 'enabled' &&
+  typeof window !== 'undefined' &&
+  typeof window.ethereum !== 'undefined'
+    ? new JsonRpcProvider(defaultNetwork.rpcUrls[0], {
+        name: defaultNetwork.chainName,
+        chainId: defaultNetwork.chainIdNumber,
+      })
+    : new JsonRpcProvider(defaultNetwork.rpcUrls[0], {
+        name: defaultNetwork.chainName,
+        chainId: defaultNetwork.chainIdNumber,
+      });
+
 export const EthersContext = createContext<{
   // provider: BrowserProvider | null;
-  provider: JsonRpcProvider | BrowserProvider | null;
+  provider: JsonRpcProvider | BrowserProvider;
   signer: JsonRpcSigner | null;
   address: string;
   contracts: {
@@ -73,7 +119,7 @@ export const EthersContext = createContext<{
   };
   connectWallet: () => void;
 }>({
-  provider: null,
+  provider: provider,
   signer: null,
   address: '',
   contracts: {
@@ -90,17 +136,6 @@ export const EthersContext = createContext<{
   } as any,
   connectWallet: () => {},
 });
-
-// Connetion to local node
-// TODO: Implement testnet once deployed
-const chainId = 31337;
-const rpcUrl = 'http://127.0.0.1:8545';
-const provider =
-  process.env.NEXT_PUBLIC_CONTRACT_MOCKING === 'enabled' &&
-  typeof window !== 'undefined' &&
-  typeof window.ethereum !== 'undefined'
-    ? new JsonRpcProvider(rpcUrl, { name: 'localhost', chainId })
-    : new JsonRpcProvider(rpcUrl, { name: 'localhost', chainId });
 
 // TODO: Implement network change: https://docs.ethers.org/v5/concepts/best-practices/
 // const testNetwork = new Network('goerli', 5);
@@ -224,47 +259,25 @@ export default function EthersProvider({ children }: { children: React.ReactNode
     }
   };
 
-  // TODO: Implement proper network change with parameters
-  const changeNetwork = async () => {
-    if (typeof window.ethereum !== 'undefined') {
-      window.ethereum.request({
-        method: 'wallet_addEthereumChain',
-        params: [
-          {
-            // 31337 in hex
-            chainId: '0x7a69', // A 0x-prefixed hexadecimal chainId,
-            rpcUrls: [rpcUrl],
-            chainName: 'localhost',
-            nativeCurrency: {
-              name: 'STABLE',
-              symbol: 'STABLE',
-              decimals: 18,
-            },
-            // TODO: Must be provided to make it work.
-            blockExplorerUrls: ['https://polygonscan.com/'],
-          },
-        ],
-      });
-    }
-  };
-
   useEffect(() => {
     if (typeof window.ethereum !== 'undefined') {
       // Log in automaticall if we know the user already.
       window.ethereum.request({ method: 'eth_accounts' }).then((accounts) => {
         if (accounts.length > 0) {
-          connectWallet().then(() => {
-            changeNetwork();
-          });
+          connectWallet();
         }
       });
 
-      window.ethereum.on('accountsChanged', function () {
-        connectWallet().then(() => {
-          changeNetwork();
-        });
-      });
+      window.ethereum.on('accountsChanged', connectWallet);
     }
+
+    // Cleanup the listener when the component unmounts
+    return () => {
+      if (typeof window.ethereum !== 'undefined') {
+        window.ethereum.removeListener('accountsChanged', connectWallet);
+      }
+    };
+
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -380,6 +393,8 @@ export default function EthersProvider({ children }: { children: React.ReactNode
   }, [enqueueSnackbar]);
 
   if (
+    // TODO: Handle where MM is not installed
+    !provider ||
     !debtTokenContracts ||
     !collateralTokenContracts ||
     !troveManagerContract ||
@@ -397,7 +412,7 @@ export default function EthersProvider({ children }: { children: React.ReactNode
   return (
     <EthersContext.Provider
       value={{
-        provider,
+        provider: provider!,
         signer,
         address,
         connectWallet,
@@ -422,7 +437,7 @@ export default function EthersProvider({ children }: { children: React.ReactNode
 }
 
 export function useEthers(): {
-  provider: JsonRpcProvider | BrowserProvider | null;
+  provider: JsonRpcProvider | BrowserProvider;
   // provider: BrowserProvider | null;
   signer: JsonRpcSigner | null;
   address: string;

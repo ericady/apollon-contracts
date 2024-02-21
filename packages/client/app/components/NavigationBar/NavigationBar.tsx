@@ -6,6 +6,7 @@ import Toolbar from '@mui/material/Toolbar';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { Dispatch, SetStateAction, SyntheticEvent, useEffect, useState } from 'react';
+import NetworkSwitch from '../Buttons/NetworkSwitch';
 import ThemeSwitch from '../Buttons/ThemeSwitch';
 import EthersAddressLabel from '../EthersAddressLabel/EthersAddressLabel';
 import ApollonLogo from '../Icons/ApollonLogo';
@@ -108,8 +109,10 @@ function NavigationBar({ themeMode, setThemeMode }: Props) {
             <TCRChip />
           </div>
 
-          <div style={{ display: 'flex', alignItems: 'center', gap: '24px' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
             <EthersAddressLabel />
+
+            <NetworkSwitch />
 
             <ThemeSwitch themeMode={themeMode} setThemeMode={setThemeMode} />
           </div>

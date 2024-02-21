@@ -7,7 +7,7 @@ function EthersAddressLabel() {
   const { address, connectWallet } = useEthers();
 
   return address ? (
-    <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+    <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginRight: '18px' }}>
       <img src="assets/svgs/Star24_green.svg" alt="Green colored diamond shape" height="11" typeof="image/svg+xml" />
 
       <Typography variant="titleAlternate">
