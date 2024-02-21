@@ -295,6 +295,8 @@ templates:
           file: ./abis/BorrowerOperations.json
         - name: PriceFeed
           file: ./abis/PriceFeed.json
+        - name: DebtToken
+          file: ./abis/DebtToken.json
       eventHandlers:
         - event: Approval(indexed address,indexed address,uint256)
           handler: handleApproval

@@ -14,12 +14,14 @@ import {
 } from '../../external/charting_library/charting_library';
 import { UDFCompatibleDatafeed } from '../../external/datafeeds/udf/src/udf-compatible-datafeed';
 import {
+  GetAllPoolsQuery,
+  GetAllPoolsQueryVariables,
   GetTradingViewCandlesQuery,
   GetTradingViewCandlesQueryVariables,
   GetTradingViewLatestCandleQuery,
   GetTradingViewLatestCandleQueryVariables,
 } from '../../generated/gql-types';
-import { GET_TRADING_VIEW_CANDLES, GET_TRADING_VIEW_LATEST_CANDLE } from '../../queries';
+import { GET_ALL_POOLS, GET_TRADING_VIEW_CANDLES, GET_TRADING_VIEW_LATEST_CANDLE } from '../../queries';
 import { bigIntStringToFloat } from '../../utils/math';
 import TradingViewHeader from './TradingViewHeader';
 
@@ -39,7 +41,6 @@ function TradingViewComponent() {
   const { data } = useQuery<GetTradingViewLatestCandleQuery, GetTradingViewLatestCandleQueryVariables>(
     GET_TRADING_VIEW_LATEST_CANDLE,
     {
-      // TODO: Can not use Subscriptions. Better alterantive?
       pollInterval: 5000,
       skip: !selectedToken,
       variables: {
@@ -48,6 +49,12 @@ function TradingViewComponent() {
       fetchPolicy: 'network-only',
     },
   );
+
+  const { data: pools } = useQuery<GetAllPoolsQuery, GetAllPoolsQueryVariables>(GET_ALL_POOLS);
+
+  const getSelectedTokenFromQueryData = (symbol: string) => {
+    return pools?.pools.find((pool) => pool.liquidity[1].token.symbol === symbol)?.liquidity[1].token;
+  };
 
   useEffect(() => {
     if (data && updateLatestCandleCallback.current) {
@@ -67,7 +74,7 @@ function TradingViewComponent() {
 
   useEffect(() => {
     if (currentChart.current && selectedToken && !devMode) {
-      currentChart.current.setSymbol(selectedToken.symbol, '1D' as ResolutionString, () => {});
+      currentChart.current.setSymbol(selectedToken.symbol, '1' as ResolutionString, () => {});
     }
   }, [selectedToken]);
 
@@ -117,12 +124,12 @@ function TradingViewComponent() {
                 // Not enabled yet
                 // searchSymbols()
 
-                resolveSymbol: async (symbolName, onSymbolResolvedCallback, onResolveErrorCallback, extension) => {
+                resolveSymbol: async (symbol, onSymbolResolvedCallback, onResolveErrorCallback, extension) => {
                   try {
                     const symbolInfo: LibrarySymbolInfo = {
-                      ticker: symbolName,
-                      name: symbolName,
-                      full_name: symbolName,
+                      ticker: symbol,
+                      name: symbol,
+                      full_name: symbol,
                       description: '',
                       type: '',
                       session: '24x7',
@@ -157,6 +164,8 @@ function TradingViewComponent() {
                     '1W': 10080,
                   };
 
+                  const token = getSelectedTokenFromQueryData(symbolInfo.name)!;
+
                   client
                     .query<GetTradingViewCandlesQuery, GetTradingViewCandlesQueryVariables>({
                       query: GET_TRADING_VIEW_CANDLES,
@@ -167,13 +176,12 @@ function TradingViewComponent() {
                           candleSize: resolutionMapper[resolution],
                           timestamp_lte: periodParams.to,
                           token_: {
-                            id: selectedToken.id,
+                            id: token.id,
                           },
                         },
                       },
                     })
                     .then((res) => {
-                      console.log('res.data.tokenCandles: ', res.data.tokenCandles);
                       const bars = res.data.tokenCandles.map(({ close, high, low, open, timestamp, volume }) => ({
                         close: bigIntStringToFloat(close),
                         high: bigIntStringToFloat(high),
@@ -184,6 +192,10 @@ function TradingViewComponent() {
                       }));
 
                       onHistoryCallback(bars, { noData: bars.length < periodParams.countBack ? true : false });
+                    })
+                    .catch((err) => {
+                      console.error(err);
+                      onErrorCallback("Couldn't fetch current data. Please try again later.");
                     });
                 },
 
