@@ -2,6 +2,8 @@ import BedtimeIcon from '@mui/icons-material/Bedtime';
 import LightModeIcon from '@mui/icons-material/LightMode';
 import { PaletteMode, PaletteOptions, ToggleButton, ToggleButtonGroup } from '@mui/material';
 import { Dispatch, SetStateAction } from 'react';
+import DarkModeOutlinedIcon from '@mui/icons-material/DarkModeOutlined';
+import LightModeOutlinedIcon from '@mui/icons-material/LightModeOutlined';
 
 export const ThemeModeLocalStorageKey = 'apollon-themeMode';
 type Props = {
@@ -25,7 +27,6 @@ function ThemeSwitch({ themeMode, setThemeMode }: Props) {
       aria-label="change theme mode"
       sx={{
         height: '32px',
-        borderColor: 'background.paper',
       }}
     >
       <ToggleButton
@@ -33,23 +34,25 @@ function ThemeSwitch({ themeMode, setThemeMode }: Props) {
         disabled={themeMode === 'light'}
         aria-label="toggle light mode"
         sx={{
-          borderRadius: 25,
-          backgroundColor: 'table.border',
+          borderRadius: "3px",
+          borderColor: 'background.emphasis',
+          backgroundColor: 'background.emphasis',
           pr: '7px',
           pl: '14px',
           '&.Mui-selected': {
-            backgroundColor: 'table.border',
+          borderColor: 'background.emphasis',
+            backgroundColor: 'background.emphasis',
             '&:hover': {
-              backgroundColor: 'table.border',
+              backgroundColor: 'background.emphasis',
             },
           },
           '&:hover': {
-            backgroundColor: 'table.border',
+            backgroundColor: 'background.emphasis',
           },
         }}
       >
         {/* TODO: Add proper icon later */}
-        <LightModeIcon fontSize="small" color={themeMode !== 'light' ? 'disabled' : undefined} />
+        <LightModeOutlinedIcon fontSize="small" color={themeMode !== 'light' ? 'disabled' : undefined} />
       </ToggleButton>
 
       <ToggleButton
@@ -57,23 +60,25 @@ function ThemeSwitch({ themeMode, setThemeMode }: Props) {
         disabled={themeMode === 'dark'}
         aria-label="toggle light mode"
         sx={{
-          borderRadius: 25,
-          backgroundColor: 'table.border',
+          borderRadius: "3px",
+          borderColor: 'background.emphasis',
+          backgroundColor: 'background.emphasis',
           pl: '7px',
           pr: '14px',
           '&.Mui-selected': {
-            backgroundColor: 'table.border',
+          borderColor: 'background.emphasis',
+            backgroundColor: 'background.emphasis',
             '&:hover': {
-              backgroundColor: 'table.border',
+              backgroundColor: 'background.emphasis',
             },
           },
           '&:hover': {
-            backgroundColor: 'table.border',
+            backgroundColor: 'background.emphasis',
           },
         }}
       >
         {/* TODO: Add proper icon later */}
-        <BedtimeIcon fontSize="small" color={themeMode !== 'dark' ? 'disabled' : undefined} />
+        <DarkModeOutlinedIcon fontSize="small" color={themeMode !== 'dark' ? 'disabled' : undefined} />
       </ToggleButton>
     </ToggleButtonGroup>
   );
