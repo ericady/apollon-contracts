@@ -21,6 +21,7 @@ import FeatureBox from '../../../FeatureBox/FeatureBox';
 import DirectionIcon from '../../../Icons/DirectionIcon';
 import Label from '../../../Label/Label';
 import HeaderCell from '../../../Table/HeaderCell';
+import RedemptionDialog from '../../Debt/RedemptionDialog';
 import DebtTokenTableLoader from './DebtTokenTableLoader';
 
 function DebtTokenTable() {
@@ -182,6 +183,8 @@ function DebtTokenTable() {
           </TableBody>
         </Table>
       </TableContainer>
+
+      <RedemptionDialog />
     </FeatureBox>
   );
 }
