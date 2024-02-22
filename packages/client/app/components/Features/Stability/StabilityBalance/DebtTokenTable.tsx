@@ -182,6 +182,7 @@ function DebtTokenTable() {
                 ),
               )}
 
+            {/* FIXME: ALSO ADD THIS TO THE LOADER AND ADD DISABLED STATE TO DIALOGS   */}
             <TableRow>
               <TableCell
                 sx={{ borderBottom: 'none', borderRight: '1px solid', borderColor: 'table.border', padding: '2px' }}

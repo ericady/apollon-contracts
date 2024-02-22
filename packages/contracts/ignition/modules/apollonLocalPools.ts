@@ -101,8 +101,8 @@ export default buildModule('ApollonLocalPools', m => {
 
   // mint test user assets
   m.call(BTC, 'unprotectedMint', [initialMintUser, parseUnits('1', 9)], { id: 'mintBTCUser' });
-  m.call(USDT, 'unprotectedMint', [initialMintUser, parseUnits('10')], { id: 'mintUSDTUser' });
-  m.call(STABLE, 'unprotectedMint', [initialMintUser, parseUnits('5')], { id: 'mintStableUser' });
+  m.call(USDT, 'unprotectedMint', [initialMintUser, parseUnits('20000')], { id: 'mintUSDTUser' });
+  m.call(STABLE, 'unprotectedMint', [initialMintUser, parseUnits('15000')], { id: 'mintStableUser' });
   m.call(STOCK, 'unprotectedMint', [initialMintUser, parseUnits('65')], { id: 'mintStockUser' });
   m.call(GOV, 'unprotectedMint', [initialMintUser, parseUnits('999999')], { id: 'mintGovUser' });
 
