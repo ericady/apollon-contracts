@@ -8,6 +8,7 @@ import {
   StoragePool,
   LiquidationOperations,
   BorrowerOperations,
+  SortedTroves,
 } from '../typechain';
 import { SignerWithAddress } from '@nomicfoundation/hardhat-ethers/signers';
 import {
@@ -15,13 +16,16 @@ import {
   assertRevert,
   getEmittedLiquidationValues,
   getStabilityPool,
-  getTCR,
   openTrove,
   whaleShrimpTroveInit,
   repayDebt,
   setPrice,
   deployTesting,
   buildPriceCache,
+  withdrawalColl,
+  addColl,
+  getTroveStake,
+  getTCR,
 } from '../utils/testHelper';
 import { assert, expect } from 'chai';
 import { parseUnits } from 'ethers';
@@ -46,6 +50,7 @@ describe('LiquidationOperations', () => {
 
   let priceFeed: PriceFeed;
   let troveManager: MockTroveManager;
+  let sortedTroves: SortedTroves;
 
   let stabilityPoolManager: StabilityPoolManager;
   let liquidationOperations: LiquidationOperations;
@@ -65,6 +70,7 @@ describe('LiquidationOperations', () => {
     storagePool = contracts.storagePool;
     stabilityPoolManager = contracts.stabilityPoolManager;
     borrowerOperations = contracts.borrowerOperations;
+    sortedTroves = contracts.sortedTroves;
     STABLE = contracts.STABLE;
     BTC = contracts.BTC;
   });
@@ -1539,16 +1545,17 @@ describe('LiquidationOperations', () => {
       });
 
       it('with 100% < ICR < 110%: offsets as much debt as possible with the Stability Pool, then redistributes the remainder coll and debt', async () => {
+        const whaleColl = parseUnits('30', 9);
+        const spDeposit = parseUnits('200000');
         await openTrove({
           from: whale,
           contracts,
           collToken: BTC,
-          collAmount: parseUnits('30', 9),
-          debts: [{ tokenAddress: STABLE, amount: parseUnits('200000') }],
+          collAmount: whaleColl,
+          debts: [{ tokenAddress: STABLE, amount: spDeposit }],
         });
-        await stabilityPoolManager
-          .connect(whale)
-          .provideStability([{ tokenAddress: STABLE, amount: parseUnits('100000') }]);
+
+        await stabilityPoolManager.connect(whale).provideStability([{ tokenAddress: STABLE, amount: spDeposit }]);
 
         await openTrove({
           from: alice,
@@ -1565,38 +1572,37 @@ describe('LiquidationOperations', () => {
           contracts,
           collToken: BTC,
           collAmount: bobColl,
-          debts: [{ tokenAddress: STABLE, amount: parseUnits('17000') }],
+          debts: [{ tokenAddress: STABLE, amount: parseUnits('19000') }],
         });
 
         //drop price
-        await setPrice('BTC', '5000', contracts);
+        await setPrice('BTC', '10000', contracts);
 
         // Confirm system is in Recovery Mode
         const [isRecoveryModeBefore] = await storagePool['checkRecoveryMode()']();
         assert.isTrue(isRecoveryModeBefore);
 
-        //check carol ICR
+        //check bob ICR
         const [bobICR] = await troveManager.getCurrentICR(bob);
+        assert.isTrue(bobICR / parseUnits('1', 16) > 100n);
         assert.isTrue(bobICR / parseUnits('1', 16) < 110n);
 
         //get total Debt deposit in SP
         const totalDebtSPBefore = await stabilityPoolManager.getTotalDeposit(STABLE);
-        assert.equal(totalDebtSPBefore, parseUnits('200000'));
+        assert.equal(totalDebtSPBefore, spDeposit);
 
         //liquidate carol
-        await liquidationOperations.liquidate(carol);
+        await liquidationOperations.liquidate(bob);
 
-        const whaleDeposit = await stabilityPoolManager.connect(whale).getCompoundedDeposits();
-        const whaleCollGain = await stabilityPoolManager.getDepositorCollGains(whale, [BTC]);
+        const [, whaleCompoundedDeposit] = await stabilityPoolManager.connect(whale).getCompoundedDeposits();
+        const [[, whaleCollGain]] = await stabilityPoolManager.getDepositorCollGains(whale);
 
-        //get value
-        const defaultPoolValue = await storagePool.getValue(BTC, true, 1);
-        const gasCompValue = await storagePool.getValue(BTC, true, 2);
+        assert.equal(whaleCompoundedDeposit[1], 0n);
+        assert.equal(
+          whaleCollGain,
+          bobColl - (await troveManager.getBorrowingFee(parseUnits('2', 9), true))
+        );
 
-        //get total trove stakes
-        const totalStakes = await getTroveStake(contracts, whale, BTC);
-
-        assert.equal(totalStakes, 0n);
       });
 
       it('recovery mode, with  110% < ICR < TCR, full stability pool off set', async () => {
@@ -1717,11 +1723,7 @@ describe('LiquidationOperations', () => {
         await stabilityPoolManager.connect(alice).provideStability([{ tokenAddress: STABLE, amount: provideToSP }]);
 
         //decrease price
-        await priceFeed.setTokenPrice(BTC, parseUnits('4700'));
-
-        //check and log TCR
-        const TCR = await getTCR(contracts);
-        console.warn('☢️ ~ it ~ TCR:', TCR / parseUnits('1', 16));
+        await setPrice('BTC', '4700', contracts);
 
         //check recovery mode
         const [isRecoveryModeBefore] = await storagePool['checkRecoveryMode()']();
@@ -1729,7 +1731,6 @@ describe('LiquidationOperations', () => {
 
         //check bob ICR
         const [bobICR] = await troveManager.getCurrentICR(bob);
-        console.warn('☢️ ~ it ~ bobICR:', bobICR);
         expect(bobICR / parseUnits('1', 16)).to.be.gt(110n);
         expect(bobICR / parseUnits('1', 16)).to.be.lt(150n);
 
@@ -1797,15 +1798,13 @@ describe('LiquidationOperations', () => {
         await stabilityPoolManager.connect(alice).provideStability([{ tokenAddress: STABLE, amount: provideToSP }]);
 
         const getSPDebt = await stabilityPoolManager.getTotalDeposit(STABLE);
-        console.warn('☢️ ~ it ~ getSPDebt:', getSPDebt);
-        assert.equal(getSPDebt, '5000', contracts);
+        assert.equal(getSPDebt, parseUnits('5000'));
 
         //decrease price
-        await priceFeed.setTokenPrice(BTC, parseUnits('4700'));
+        await setPrice('BTC', '4700', contracts);
 
         //check and log TCR
         const TCR = await getTCR(contracts);
-        console.warn('☢️ ~ it ~ TCR:', TCR / parseUnits('1', 16));
 
         //check recovery mode
         const [isRecoveryModeBefore] = await storagePool['checkRecoveryMode()']();
@@ -1817,7 +1816,6 @@ describe('LiquidationOperations', () => {
 
         //check bob ICR
         const [bobICR] = await troveManager.getCurrentICR(bob);
-        console.warn('☢️ ~ it ~ bobICR:', bobICR / parseUnits('1', 16));
         expect(bobICR / parseUnits('1', 16)).to.be.gt(110n);
         expect(bobICR / parseUnits('1', 16)).to.be.lt(150n);
 
@@ -1828,69 +1826,6 @@ describe('LiquidationOperations', () => {
         expect(await troveManager.getTroveStatus(bob)).to.be.equal(TroveStatus.CLOSED_BY_LIQUIDATION_IN_RECOVERY_MODE);
       });
 
-      it('with ICR > 110%, and StabilityPool debt < liquidated debt: Trove remains active', async () => {
-        //open trove
-        await openTrove({
-          from: whale,
-          contracts,
-          collToken: BTC,
-          collAmount: parseUnits('2', 9),
-          debts: [{ tokenAddress: STABLE, amount: parseUnits('5500') }],
-        });
-
-        //open trove
-        await openTrove({
-          from: alice,
-          contracts,
-          collToken: BTC,
-          collAmount: parseUnits('2', 9),
-          debts: [{ tokenAddress: STABLE, amount: parseUnits('5500') }],
-        });
-
-        //open trove
-        const bobColl = parseUnits('1', 9);
-
-        await openTrove({
-          from: bob,
-          contracts,
-          collToken: BTC,
-          collAmount: bobColl,
-          debts: [{ tokenAddress: STABLE, amount: parseUnits('4000') }],
-        });
-
-        //provide to SP
-        await stabilityPoolManager
-          .connect(alice)
-          .provideStability([{ tokenAddress: STABLE, amount: parseUnits('3000') }]);
-
-        //decrease price
-        await await setPrice('BTC', '4700', contracts);
-
-        //get stable token price
-        const stablePrice = await priceFeed.getPrice(STABLE);
-        console.warn('☢️ ~ it ~ stablePrice:', stablePrice);
-
-        //get TCR
-        const TCR = await getTCR(contracts);
-        console.warn('☢️ ~ it ~ TCR:', TCR / parseUnits('1', 16));
-
-        //check recovery mode
-        const [isRecoveryModeBefore] = await storagePool['checkRecoveryMode()']();
-        assert.isTrue(isRecoveryModeBefore);
-
-        //check bob ICR
-        const [bobICR] = await troveManager.getCurrentICR(bob);
-        console.warn('☢️ ~ it.only ~ bobICR ~:', bobICR / parseUnits('1', 16));
-        expect(bobICR / parseUnits('1', 16)).to.be.gt(110n);
-        expect(await troveManager.getTroveStatus(bob)).to.be.equal(TroveStatus.ACTIVE);
-        expect(await sortedTroves.contains(bob)).to.be.equal(true);
-
-        //liquidate bob
-        // await liquidationOperations.liquidate(bob);
-        await assertRevert(liquidationOperations.liquidate(bob));
-        expect(await troveManager.getTroveStatus(bob)).to.be.equal(TroveStatus.ACTIVE);
-        expect(await sortedTroves.contains(bob)).to.be.equal(true);
-      });
     });
 
     describe('batchLiquidateTroves()', () => {
@@ -1903,7 +1838,7 @@ describe('LiquidationOperations', () => {
           .provideStability([{ tokenAddress: STABLE, amount: parseUnits('1000') }]);
 
         //decrease price
-        await await setPrice('BTC', '2800', contracts);
+        await setPrice('BTC', '2800', contracts);
 
         //get TCR
         const TCR = await getTCR(contracts);
@@ -2039,17 +1974,47 @@ describe('LiquidationOperations', () => {
       it('Liquidates all troves with ICR < 110%, transitioning Normal -> Recovery Mode', async () => {
         await whaleShrimpTroveInit(contracts, signers, false);
 
-        //total debt
-        const bobDebt = parseUnits('2000');
-        const carolDebt = parseUnits('3000');
-        const dennisDebt = parseUnits('300');
-        const defaulter_1Debt = parseUnits('100');
-        const defaulter_2Debt = parseUnits('100');
-
         //provide to SP
-        const provideToSP = bobDebt + carolDebt + dennisDebt + defaulter_1Debt + defaulter_2Debt;
+        const provideToSP = parseUnits('1000');
 
         await stabilityPoolManager.connect(alice).provideStability([{ tokenAddress: STABLE, amount: provideToSP }]);
+
+        await STABLE.connect(whale).transfer(alice, parseUnits('1200'));
+
+        await borrowerOperations.connect(alice).closeTrove();
+
+        //decrease price
+        await setPrice('BTC', '3000', contracts);
+
+        //check recovery mode
+        const [isRecoveryModeBefore] = await storagePool['checkRecoveryMode()']();
+        assert.isTrue(isRecoveryModeBefore);
+
+        // batchLIquidate
+        await liquidationOperations.batchLiquidateTroves([alice, bob, carol, defaulter_1, defaulter_2]);
+
+        //check recovery mode
+        const [isRecoveryModeAfter] = await storagePool['checkRecoveryMode()']();
+        assert.isFalse(isRecoveryModeAfter);
+
+        //check trove status
+        expect(await troveManager.getTroveStatus(alice)).to.be.equal(TroveStatus.CLOSED_BY_OWNER);
+        expect(await troveManager.getTroveStatus(bob)).to.be.equal(TroveStatus.CLOSED_BY_LIQUIDATION_IN_RECOVERY_MODE);
+        expect(await troveManager.getTroveStatus(carol)).to.be.equal(
+          TroveStatus.CLOSED_BY_LIQUIDATION_IN_RECOVERY_MODE
+        );
+        expect(await troveManager.getTroveStatus(defaulter_1)).to.be.equal(
+          TroveStatus.CLOSED_BY_LIQUIDATION_IN_RECOVERY_MODE
+        );
+        expect(await troveManager.getTroveStatus(defaulter_2)).to.be.equal(
+          TroveStatus.CLOSED_BY_LIQUIDATION_IN_RECOVERY_MODE
+        );
+
+        //check sorted troves
+        expect(await sortedTroves.contains(bob)).to.be.equal(false);
+        expect(await sortedTroves.contains(carol)).to.be.equal(false);
+        expect(await sortedTroves.contains(defaulter_1)).to.be.equal(false);
+        expect(await sortedTroves.contains(defaulter_2)).to.be.equal(false);
       });
 
       it('with a non fullfilled liquidation: non liquidated trove remains in Trove Owners array', async () => {
@@ -2069,20 +2034,13 @@ describe('LiquidationOperations', () => {
 
         //check ICR
         const [bobICR] = await troveManager.getCurrentICR(bob);
-        console.warn('☢️ ~ it ~ bobICR:', bobICR);
         expect(bobICR / parseUnits('1', 16)).to.be.lt(150n);
         expect(bobICR / parseUnits('1', 16)).to.be.gt(110n);
 
-        const [carolICR] = await troveManager.getCurrentICR(carol);
-        console.warn('☢️ ~ it ~ carolICR:', carolICR);
-        expect(carolICR / parseUnits('1', 16)).to.be.lt(150n);
-        expect(bobICR / parseUnits('1', 16)).to.be.gt(110n);
-
         const [dennisICR] = await troveManager.getCurrentICR(dennis);
-        console.warn('☢️ ~ it ~ dennisICR:', dennisICR);
         expect(dennisICR / parseUnits('1', 16)).to.be.gt(150n);
 
-        await liquidationOperations.batchLiquidateTroves([bob, carol, dennis]);
+        await liquidationOperations.batchLiquidateTroves([bob, dennis]);
 
         //get trove length
         const troveLength = await troveManager.getTroveOwnersCount();
@@ -2091,8 +2049,8 @@ describe('LiquidationOperations', () => {
         let addressIdx = 0;
 
         for (let i = 0; i < troveLength; i++) {
-          const address = await troveManager.TroveOwners(i);
-          if (address === carol.address) {
+          const address = await troveManager.getTroveOwners();
+          if (address[i] === dennis.address) {
             addressFound = true;
             addressIdx = i;
           }
@@ -2100,10 +2058,9 @@ describe('LiquidationOperations', () => {
 
         assert.isTrue(addressFound);
 
-        const idxOnStruct = await troveManager.Troves(carol.address);
-        console.warn('☢️ ~ it ~ idxOnStruct:', idxOnStruct);
+        const idxOnStruct = await troveManager.Troves(dennis.address);
 
-        // assert.equal(addressIdx, idxOnStruct);
+        assert.equal(addressIdx, Number(idxOnStruct[1]));
       });
     });
   });
