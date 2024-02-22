@@ -14,12 +14,13 @@ import {
   DebtToken,
   ERC20,
   PriceFeed,
+  RedemptionOperations as RedemptionOperationsContract,
   StabilityPoolManager,
   StoragePool,
   SwapPair,
   TroveManager,
 } from '../../generated/types';
-import { SystemInfo, TokenFragmentFragment } from '../generated/gql-types';
+import { RedemptionOperations, SystemInfo, TokenFragmentFragment } from '../generated/gql-types';
 import { TOKEN_FRAGMENT } from '../queries';
 import { getCheckSum } from '../utils/crypto';
 import { CustomApolloProvider_DevMode } from './CustomApolloProvider_dev';
@@ -500,6 +501,22 @@ const getProductionCacheConfig = ({
             totalCollateralRatio: SchemaDataFreshnessManager.StoragePool.totalCollateralRatio.value(),
             recoveryModeActive: SchemaDataFreshnessManager.StoragePool.recoveryModeActive.value() as unknown as boolean,
           } as SystemInfo;
+        },
+      },
+
+      getRedemtionOperations: {
+        read: () => {
+          if (isFieldOutdated(SchemaDataFreshnessManager.StoragePool as any, 'totalCollateralRatio')) {
+            SchemaDataFreshnessManager.StoragePool.totalCollateralRatio.fetch({ storagePoolContract });
+          } else if (isFieldOutdated(SchemaDataFreshnessManager.StoragePool as any, 'recoveryModeActive')) {
+            SchemaDataFreshnessManager.StoragePool.recoveryModeActive.fetch({ storagePoolContract });
+          }
+
+          return {
+            __typename: 'RedemptionOperations',
+            id: 'RedemptionOperations',
+            redemptionRateWithDecay: BigInt(0),
+          } as RedemptionOperations;
         },
       },
     },
@@ -1506,6 +1523,20 @@ export const SchemaDataFreshnessManager: ContractDataFreshnessManager<typeof Con
         SchemaDataFreshnessManager.StoragePool.recoveryModeActive.value(isInRecoveryMode as any);
       },
       value: makeVar(false as any),
+      lastFetched: 0,
+      timeout: 1000 * 2,
+    },
+  },
+  RedemptionOperations: {
+    redemptionRateWithDecay: {
+      fetch: async (redemptionOperationsContract: RedemptionOperationsContract) => {
+        SchemaDataFreshnessManager.RedemptionOperations.redemptionRateWithDecay.lastFetched = Date.now();
+
+        const redemptionFee = await redemptionOperationsContract.getRedemptionRateWithDecay();
+
+        SchemaDataFreshnessManager.RedemptionOperations.redemptionRateWithDecay.value(redemptionFee);
+      },
+      value: makeVar(defaultFieldValue),
       lastFetched: 0,
       timeout: 1000 * 2,
     },

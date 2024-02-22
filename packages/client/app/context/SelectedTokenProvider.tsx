@@ -32,7 +32,7 @@ export type SelectedToken = {
 };
 
 export const SelectedTokenContext = createContext<{
-  JUSDToken: GetBorrowerDebtTokensQuery['debtTokenMetas'][number]['token'] & { walletAmount: bigint } | undefined;
+  JUSDToken: (GetBorrowerDebtTokensQuery['debtTokenMetas'][number]['token'] & { walletAmount: bigint }) | undefined;
   tokenRatio: bigint;
   selectedToken: SelectedToken | null;
   setSelectedToken: (asset: SelectedToken) => void;
@@ -55,8 +55,8 @@ export default function SelectedTokenProvider({ children }: { children: React.Re
     },
   });
 
-  const JUSD = data?.debtTokenMetas.find(({ token }) => token.address === Contracts.DebtToken.STABLE)
-  const JUSDToken = JUSD ? {...JUSD.token, walletAmount: JUSD.walletAmount} : undefined
+  const JUSD = data?.debtTokenMetas.find(({ token }) => token.address === Contracts.DebtToken.STABLE);
+  const JUSDToken = JUSD ? { ...JUSD.token, walletAmount: JUSD.walletAmount } : undefined;
 
   const tokenRatio =
     JUSDToken === undefined || selectedToken === null
@@ -79,7 +79,7 @@ export default function SelectedTokenProvider({ children }: { children: React.Re
 }
 
 export function useSelectedToken(): {
-  JUSDToken: GetBorrowerDebtTokensQuery['debtTokenMetas'][number]['token'] & { walletAmount: bigint } | undefined;
+  JUSDToken: (GetBorrowerDebtTokensQuery['debtTokenMetas'][number]['token'] & { walletAmount: bigint }) | undefined;
   tokenRatio: bigint;
   selectedToken: SelectedToken | null;
   setSelectedToken: (asset: SelectedToken) => void;

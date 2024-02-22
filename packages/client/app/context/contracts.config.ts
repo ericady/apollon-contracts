@@ -24,7 +24,7 @@ export const Contracts = {
   SortedTroves: '0x610178da211fef7d417bc0e6fed39f05609ad788',
   HintHelpers: '0xe7f1725e7734ce288f8367e1bb143e90bb3f0512',
   PriceFeed: '0xa513e6e4b8f2a923d98304ec87f64353c4d5c853',
-  RedemtionOperations: '0x2279B7A0a67DB372996a5FaB50D91eAA73d2eBe6',
+  RedemptionOperations: '0x2279B7A0a67DB372996a5FaB50D91eAA73d2eBe6',
 } as const;
 
 export const isPoolAddress = (

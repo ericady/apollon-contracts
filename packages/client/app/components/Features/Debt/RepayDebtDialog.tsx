@@ -2,7 +2,7 @@
 
 import { useQuery } from '@apollo/client';
 import { Box, Dialog, DialogActions, DialogContent, DialogTitle, FormHelperText, IconButton } from '@mui/material';
-import Button from '@mui/material/Button';
+import Button, { ButtonProps } from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
 import { useEffect, useState } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
@@ -21,7 +21,12 @@ import Label from '../../Label/Label';
 
 type FieldValues = Record<string, string>;
 
-const RepayDebtDialog = () => {
+type Props = {
+  buttonVariant?: ButtonProps['variant'];
+  buttonSx?: ButtonProps['sx'];
+};
+
+const RepayDebtDialog = ({ buttonSx = {}, buttonVariant = 'outlined' }: Props) => {
   const [isOpen, setIsOpen] = useState(false);
 
   const {
@@ -120,10 +125,11 @@ const RepayDebtDialog = () => {
     <>
       <Button
         onClick={() => setIsOpen(true)}
-        variant="outlined"
+        variant={buttonVariant}
         sx={{
           width: 'auto',
           padding: '0 50px',
+          ...buttonSx,
         }}
         disabled={!address || !data?.debtTokenMetas.some(({ troveRepableDebtAmount }) => troveRepableDebtAmount > 0)}
       >

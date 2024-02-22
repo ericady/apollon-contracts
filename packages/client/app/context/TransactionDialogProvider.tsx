@@ -211,7 +211,11 @@ export default function TransactionDialogProvider({ children }: { children: Reac
       }}
     >
       <>
-        <Draggable handle={'[class*="MuiDialog-root"]'} cancel={'[class*="MuiDialogContent-root"]'} defaultPosition={{ x: window.innerWidth - 700, y: window.innerHeight - 450  }}>
+        <Draggable
+          handle={'[class*="MuiDialog-root"]'}
+          cancel={'[class*="MuiDialogContent-root"]'}
+          defaultPosition={{ x: window.innerWidth - 700, y: window.innerHeight - 450 }}
+        >
           <Dialog
             open={activeStep !== undefined || showConfirmation}
             onClose={() => {

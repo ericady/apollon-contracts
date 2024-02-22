@@ -120,6 +120,7 @@ export type Query = {
   debtTokenMetas: Array<DebtTokenMeta>;
   getCollateralUSDHistory: Array<Array<Scalars['Int']['output']>>;
   getDebtUSDHistory: Array<Array<Scalars['Int']['output']>>;
+  getRedemtionOperations: RedemptionOperations;
   getReserveUSDHistory: Array<Array<Scalars['Int']['output']>>;
   getSystemInfo: SystemInfo;
   pools: Array<Pool>;
@@ -179,6 +180,12 @@ export type QueryTokenCandlesArgs = {
   orderDirection?: InputMaybe<OrderDirection>;
   skip?: InputMaybe<Scalars['Int']['input']>;
   where?: InputMaybe<TokenCandle_Filter>;
+};
+
+export type RedemptionOperations = {
+  __typename: 'RedemptionOperations';
+  id: Scalars['ID']['output'];
+  redemptionRateWithDecay: Scalars['bigint']['output'];
 };
 
 export type StabilityDepositApy = {
@@ -417,3 +424,8 @@ export type GetSystemInfoQueryVariables = Exact<{ [key: string]: never; }>;
 
 
 export type GetSystemInfoQuery = { __typename: 'Query', getSystemInfo: { __typename: 'SystemInfo', id: string, recoveryModeActive: boolean, totalCollateralRatio: bigint } };
+
+export type GetRedemptionsOperationsQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type GetRedemptionsOperationsQuery = { __typename: 'Query', getRedemtionOperations: { __typename: 'RedemptionOperations', id: string, redemptionRateWithDecay: bigint } };

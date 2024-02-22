@@ -22,6 +22,7 @@ import DirectionIcon from '../../../Icons/DirectionIcon';
 import Label from '../../../Label/Label';
 import HeaderCell from '../../../Table/HeaderCell';
 import RedemptionDialog from '../../Debt/RedemptionDialog';
+import RepayDebtDialog from '../../Debt/RepayDebtDialog';
 import DebtTokenTableLoader from './DebtTokenTableLoader';
 
 function DebtTokenTable() {
@@ -180,11 +181,30 @@ function DebtTokenTable() {
                   </TableRow>
                 ),
               )}
+
+            <TableRow>
+              <TableCell
+                sx={{ borderBottom: 'none', borderRight: '1px solid', borderColor: 'table.border', padding: '2px' }}
+              ></TableCell>
+              <TableCell
+                sx={{ borderBottom: 'none', borderRight: '1px solid', borderColor: 'table.border', padding: '2px' }}
+              ></TableCell>
+              <TableCell
+                sx={{ borderBottom: 'none', borderRight: '1px solid', borderColor: 'table.border', padding: '2px' }}
+              ></TableCell>
+              <TableCell
+                colSpan={2}
+                sx={{ borderBottom: 'none', borderRight: '1px solid', borderColor: 'table.border', padding: '2px' }}
+              >
+                <RepayDebtDialog buttonVariant="text" buttonSx={{ p: '6px 8px', width: '100%' }} />
+              </TableCell>
+              <TableCell style={{ borderBottom: 'none', padding: '2px' }} colSpan={2} align="center">
+                <RedemptionDialog buttonVariant="text" buttonSx={{ p: '6px 8px', width: '230px' }} />
+              </TableCell>
+            </TableRow>
           </TableBody>
         </Table>
       </TableContainer>
-
-      <RedemptionDialog />
     </FeatureBox>
   );
 }

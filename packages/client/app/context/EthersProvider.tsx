@@ -26,13 +26,13 @@ import debtTokenAbi from './abis/DebtToken.json';
 import ERC20Abi from './abis/ERC20.json';
 import hintHelpersAbi from './abis/HintHelpers.json';
 import priceFeedAbi from './abis/PriceFeed.json';
+import redemptionOperationsAbi from './abis/RedemptionOperations.json';
 import sortedTrovesAbi from './abis/SortedTroves.json';
 import stabilityPoolManagerAbi from './abis/StabilityPoolManager.json';
 import storagePoolAbi from './abis/StoragePool.json';
 import swapOperationsAbi from './abis/SwapOperations.json';
 import swapPairAbi from './abis/SwapPair.json';
 import troveManagerAbi from './abis/TroveManager.json';
-import redemptionOperationsAbi from './abis/RedemptionOperations.json';
 import { Contracts } from './contracts.config';
 
 // TODO: This is just dummy data and will be exchanged with the real implementation later.
@@ -249,8 +249,12 @@ export default function EthersProvider({ children }: { children: React.ReactNode
         const priceFeedContract = new Contract(Contracts.PriceFeed, priceFeedAbi, provider);
         const priceFeedContractWithSigner = priceFeedContract.connect(newSigner) as PriceFeed;
         setPriceFeedContract(priceFeedContractWithSigner);
-  
-        const redemptionOperationsContract = new Contract(Contracts.RedemtionOperations, redemptionOperationsAbi, provider);
+
+        const redemptionOperationsContract = new Contract(
+          Contracts.RedemptionOperations,
+          redemptionOperationsAbi,
+          provider,
+        );
         const redemptionOperationsWithSigner = redemptionOperationsContract.connect(newSigner) as RedemptionOperations;
         setRedemptionOperationsContract(redemptionOperationsWithSigner);
 
@@ -388,7 +392,11 @@ export default function EthersProvider({ children }: { children: React.ReactNode
         const priceFeedContract = new Contract(Contracts.PriceFeed, priceFeedAbi, provider) as unknown as PriceFeed;
         setPriceFeedContract(priceFeedContract);
 
-        const redemptionOperationsContract = new Contract(Contracts.RedemtionOperations, redemptionOperationsAbi, provider)  as unknown as RedemptionOperations;
+        const redemptionOperationsContract = new Contract(
+          Contracts.RedemptionOperations,
+          redemptionOperationsAbi,
+          provider,
+        ) as unknown as RedemptionOperations;
         setRedemptionOperationsContract(redemptionOperationsContract);
       } catch (error) {
         console.error(error);
@@ -442,7 +450,7 @@ export default function EthersProvider({ children }: { children: React.ReactNode
           sortedTrovesContract,
           hintHelpersContract,
           priceFeedContract,
-          redemptionOperationsContract
+          redemptionOperationsContract,
         },
       }}
     >

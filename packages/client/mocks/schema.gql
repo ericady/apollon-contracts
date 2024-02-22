@@ -216,8 +216,14 @@ type SystemInfo {
   totalCollateralRatio: bigint!
 }
 
+type RedemptionOperations {
+  id: ID!
+  redemptionRateWithDecay: bigint!
+}
+
 type Query {
   getSystemInfo: SystemInfo!
+  getRedemtionOperations: RedemptionOperations!
 }
 
 # TRADING VIEW

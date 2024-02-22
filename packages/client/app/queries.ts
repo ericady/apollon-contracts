@@ -289,3 +289,12 @@ export const GET_SYSTEMINFO = gql`
     }
   }
 `;
+
+export const GET_REDEMPTIONS_OPERATIONS = gql`
+  query GetRedemptionsOperations {
+    getRedemtionOperations @client {
+      id
+      redemptionRateWithDecay
+    }
+  }
+`;
