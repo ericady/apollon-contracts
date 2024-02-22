@@ -12,6 +12,7 @@ import {
   ERC20,
   HintHelpers,
   PriceFeed,
+  RedemptionOperations,
   SortedTroves,
   StabilityPoolManager,
   StoragePool,
@@ -31,6 +32,7 @@ import storagePoolAbi from './abis/StoragePool.json';
 import swapOperationsAbi from './abis/SwapOperations.json';
 import swapPairAbi from './abis/SwapPair.json';
 import troveManagerAbi from './abis/TroveManager.json';
+import redemptionOperationsAbi from './abis/RedemptionOperations.json';
 import { Contracts } from './contracts.config';
 
 // TODO: This is just dummy data and will be exchanged with the real implementation later.
@@ -116,6 +118,7 @@ export const EthersContext = createContext<{
     sortedTrovesContract: SortedTroves;
     hintHelpersContract: HintHelpers;
     priceFeedContract: PriceFeed;
+    redemptionOperationsContract: RedemptionOperations;
   };
   connectWallet: () => void;
 }>({
@@ -133,6 +136,8 @@ export const EthersContext = createContext<{
     storagePoolContract: undefined,
     sortedTrovesContract: undefined,
     hintHelpersContract: undefined,
+    priceFeedContract: undefined,
+    redemptionOperationsContract: undefined,
   } as any,
   connectWallet: () => {},
 });
@@ -157,6 +162,7 @@ export default function EthersProvider({ children }: { children: React.ReactNode
   const [sortedTrovesContract, setSortedTrovesContract] = useState<SortedTroves>();
   const [hintHelpersContract, setHintHelpersContract] = useState<HintHelpers>();
   const [priceFeedContract, setPriceFeedContract] = useState<PriceFeed>();
+  const [redemptionOperationsContract, setRedemptionOperationsContract] = useState<RedemptionOperations>();
 
   const connectWallet = async () => {
     try {
@@ -243,6 +249,10 @@ export default function EthersProvider({ children }: { children: React.ReactNode
         const priceFeedContract = new Contract(Contracts.PriceFeed, priceFeedAbi, provider);
         const priceFeedContractWithSigner = priceFeedContract.connect(newSigner) as PriceFeed;
         setPriceFeedContract(priceFeedContractWithSigner);
+  
+        const redemptionOperationsContract = new Contract(Contracts.RedemtionOperations, redemptionOperationsAbi, provider);
+        const redemptionOperationsWithSigner = redemptionOperationsContract.connect(newSigner) as RedemptionOperations;
+        setRedemptionOperationsContract(redemptionOperationsWithSigner);
 
         try {
           // Request account access
@@ -377,6 +387,9 @@ export default function EthersProvider({ children }: { children: React.ReactNode
 
         const priceFeedContract = new Contract(Contracts.PriceFeed, priceFeedAbi, provider) as unknown as PriceFeed;
         setPriceFeedContract(priceFeedContract);
+
+        const redemptionOperationsContract = new Contract(Contracts.RedemtionOperations, redemptionOperationsAbi, provider)  as unknown as RedemptionOperations;
+        setRedemptionOperationsContract(redemptionOperationsContract);
       } catch (error) {
         console.error(error);
       }
@@ -405,7 +418,8 @@ export default function EthersProvider({ children }: { children: React.ReactNode
     !storagePoolContract ||
     !sortedTrovesContract ||
     !hintHelpersContract ||
-    !priceFeedContract
+    !priceFeedContract ||
+    !redemptionOperationsContract
   )
     return null;
 
@@ -428,6 +442,7 @@ export default function EthersProvider({ children }: { children: React.ReactNode
           sortedTrovesContract,
           hintHelpersContract,
           priceFeedContract,
+          redemptionOperationsContract
         },
       }}
     >
@@ -453,6 +468,7 @@ export function useEthers(): {
     sortedTrovesContract: SortedTroves;
     hintHelpersContract: HintHelpers;
     priceFeedContract: PriceFeed;
+    redemptionOperationsContract: RedemptionOperations;
   };
   connectWallet: () => void;
 } {

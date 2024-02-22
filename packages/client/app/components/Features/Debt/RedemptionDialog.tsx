@@ -13,7 +13,7 @@ import Label from '../../Label/Label';
 
 type FieldValues = {
   [Contracts.DebtToken.STABLE]: string;
-  redemtionFee: string;
+  redemptionFee: string;
 };
 
 function RedemptionDialog() {
@@ -36,7 +36,7 @@ function RedemptionDialog() {
     reValidateMode: 'onChange',
     defaultValues: {
       [Contracts.DebtToken.STABLE]: '',
-      redemtionFee: '2',
+      redemptionFee: '2',
     },
   });
   const { handleSubmit, setValue, reset, formState } = methods;
@@ -178,8 +178,8 @@ function RedemptionDialog() {
 
                       <div>
                         <NumberInput
-                          name="redemtionFee"
-                          data-testid="apollon-redeem-debt-dialog-redemtionFee-input"
+                          name="redemptionFee"
+                          data-testid="apollon-redeem-debt-dialog-redemptionFee-input"
                           placeholder="max. Redemption Fee"
                           fullWidth
                           rules={{
