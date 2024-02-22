@@ -151,8 +151,10 @@ const Farm = () => {
   const watchFarmShortValue = parseInt(watch('farmShortValue'));
 
   const addedDebtUSD =
-    !isNaN(watchFarmShortValue) && selectedToken
-      ? watchFarmShortValue * dangerouslyConvertBigIntToNumber(selectedToken.priceUSDOracle, 9, 9)
+    !isNaN(watchFarmShortValue) && JUSDToken
+      ? tabValue === 'Long'
+        ? watchFarmShortValue * dangerouslyConvertBigIntToNumber(JUSDToken.priceUSDOracle, 9, 9)
+        : watchFarmShortValue * dangerouslyConvertBigIntToNumber(tokenRatio * JUSDToken.priceUSDOracle, 18 + 9, 9)
       : 0;
   const borrowingFee = tabValue === 'Long' ? JUSDToken?.borrowingRate : selectedToken!.borrowingRate;
 

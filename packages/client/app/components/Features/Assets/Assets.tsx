@@ -123,6 +123,16 @@ function Assets() {
   useEffect(() => {
     if (tokens.length && !selectedToken) {
       // Selectes the first token which is usually a favorited or just the first
+      // We need to wait until all contract infos are loaded though
+      const firstToken = tokens[0];
+      if (
+        firstToken.borrowingRate <= 0 ||
+        firstToken.decimals <= 0 ||
+        firstToken.priceUSDOracle <= 0 ||
+        firstToken.swapFee <= 0
+      ) {
+        return;
+      }
       setSelectedToken(tokens[0]);
     }
   }, [tokens, setSelectedToken, selectedToken]);

@@ -98,7 +98,7 @@ export function divBigIntsToFloat(number: bigint, divideBy: bigint, toPrecission
 }
 
 export function convertToEtherPrecission(bigNumber: bigint, precisionDigits: number) {
-  const scalingFactor = ethers.parseUnits('1', precisionDigits);
+  const scalingFactor = ethers.parseUnits('1', 18 - precisionDigits);
 
   const result = bigNumber * scalingFactor;
 

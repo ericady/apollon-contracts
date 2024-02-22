@@ -1,7 +1,7 @@
 'use client';
 
 import { useQuery } from '@apollo/client';
-import { Skeleton } from '@mui/material';
+import { IconButton, Skeleton } from '@mui/material';
 import Button from '@mui/material/Button';
 import InputAdornment from '@mui/material/InputAdornment';
 import Typography from '@mui/material/Typography';
@@ -45,6 +45,7 @@ type FieldValues = {
 const Swap = () => {
   const [showSlippage, setShowSlippage] = useState(false);
   const [tradingDirection, setTradingDirection] = useState<'jUSDSpent' | 'jUSDAquired'>('jUSDSpent');
+  const [inputToken, setInputToken] = useState<'JUSD' | 'Token'>('JUSD');
 
   const {
     address,
@@ -94,11 +95,11 @@ const Swap = () => {
   const { field: tokenAmountField } = useController({ name: 'tokenAmount', control });
 
   const handleSwapValueChange = (variant: 'JUSD' | 'Token', value: string) => {
-    const numericValue = ethers.parseEther(value);
     const isDefined = !isNaN(parseFloat(value));
 
     if (variant === 'JUSD') {
       if (isDefined) {
+        const numericValue = ethers.parseEther(value);
         setValue(
           'tokenAmount',
           roundNumber(
@@ -110,7 +111,6 @@ const Swap = () => {
             5,
           ).toString(),
         );
-        setTradingDirection('jUSDSpent');
       } else {
         setValue('tokenAmount', '');
       }
@@ -118,6 +118,7 @@ const Swap = () => {
       setValue('jUSDAmount', value);
     } else {
       if (isDefined) {
+        const numericValue = ethers.parseEther(value);
         setValue(
           'jUSDAmount',
           roundNumber(
@@ -129,7 +130,6 @@ const Swap = () => {
             5,
           ).toString(),
         );
-        setTradingDirection('jUSDAquired');
       } else {
         setValue('jUSDAmount', '');
       }
@@ -137,6 +137,7 @@ const Swap = () => {
       setValue('tokenAmount', value);
     }
 
+    setInputToken(variant);
     trigger();
   };
 
@@ -164,13 +165,23 @@ const Swap = () => {
           title: `Swap jUSD for ${selectedToken?.symbol}.`,
           transaction: {
             methodCall: async () => {
-              return swapOperationsContract.swapExactTokensForTokens(
-                floatToBigInt(jUSDAmount),
-                floatToBigInt(tokenAmount * (1 - maxSlippage)),
-                [JUSDToken!.address, selectedToken!.address],
-                address,
-                deadline,
-              );
+              if (inputToken === 'JUSD') {
+                return swapOperationsContract.swapExactTokensForTokens(
+                  floatToBigInt(jUSDAmount),
+                  floatToBigInt(tokenAmount * (1 - maxSlippage), selectedToken!.decimals),
+                  [JUSDToken!.address, selectedToken!.address],
+                  address,
+                  deadline,
+                );
+              } else {
+                return swapOperationsContract.swapTokensForExactTokens(
+                  floatToBigInt(tokenAmount, selectedToken!.decimals),
+                  floatToBigInt(jUSDAmount * (1 + maxSlippage)),
+                  [JUSDToken!.address, selectedToken!.address],
+                  address,
+                  deadline,
+                );
+              }
             },
             waitForResponseOf: [0],
             reloadQueriesAferMined: [GET_BORROWER_COLLATERAL_TOKENS, GET_BORROWER_DEBT_TOKENS, GET_BORROWER_SWAPS],
@@ -206,13 +217,23 @@ const Swap = () => {
           title: `Swap ${selectedToken?.symbol} for jUSD`,
           transaction: {
             methodCall: async () => {
-              return swapOperationsContract.swapExactTokensForTokens(
-                floatToBigInt(tokenAmount),
-                floatToBigInt(jUSDAmount * (1 - maxSlippage)),
-                [selectedToken!.address, JUSDToken!.address],
-                address,
-                deadline,
-              );
+              if (inputToken === 'Token') {
+                return swapOperationsContract.swapExactTokensForTokens(
+                  floatToBigInt(tokenAmount, selectedToken!.decimals),
+                  floatToBigInt(jUSDAmount * (1 - maxSlippage)),
+                  [selectedToken!.address, JUSDToken!.address],
+                  address,
+                  deadline,
+                );
+              } else {
+                return swapOperationsContract.swapTokensForExactTokens(
+                  floatToBigInt(jUSDAmount),
+                  floatToBigInt(tokenAmount * (1 + maxSlippage), selectedToken!.decimals),
+                  [selectedToken!.address, JUSDToken!.address],
+                  address,
+                  deadline,
+                );
+              }
             },
             waitForResponseOf: [0],
             reloadQueriesAferMined: [GET_BORROWER_COLLATERAL_TOKENS, GET_BORROWER_DEBT_TOKENS, GET_BORROWER_SWAPS],
@@ -271,6 +292,8 @@ const Swap = () => {
               }
             : undefined,
       }}
+      focused={inputToken === 'Token'}
+      helperText={tradingDirection === 'jUSDAquired' ? 'Sell' : 'Buy'}
       disabled={!selectedToken}
       onChange={(e: ChangeEvent<HTMLInputElement>) => {
         tokenAmountField.onChange(e);
@@ -301,6 +324,8 @@ const Swap = () => {
               }
             : undefined,
       }}
+      focused={inputToken === 'JUSD'}
+      helperText={tradingDirection === 'jUSDAquired' ? 'Buy' : 'Sell'}
       disabled={!selectedToken}
       onChange={(e: ChangeEvent<HTMLInputElement>) => {
         jUSDField.onChange(e);
@@ -329,23 +354,33 @@ const Swap = () => {
     >
       <div
         style={{
-          height: '247px',
+          height: '268px',
           overflowY: 'scroll',
         }}
       >
         <FormProvider {...methods}>
           <form onSubmit={handleSubmit(onSubmit)}>
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              {tokenInput}
+            <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+              {tradingDirection === 'jUSDSpent' ? tokenInput : jUSDInput}
 
-              <ExchangeIcon
-                style={{
-                  transform: tradingDirection === 'jUSDSpent' ? 'rotate(180deg)' : 'rotate(0deg)',
-                  margin: '0px 10px',
+              <IconButton
+                sx={{ height: 20, width: 20, margin: '8px 10px 0px 10px' }}
+                size="small"
+                disableRipple
+                onClick={() => {
+                  setTradingDirection(tradingDirection === 'jUSDSpent' ? 'jUSDAquired' : 'jUSDSpent');
+                  setValue('jUSDAmount', '');
+                  setValue('tokenAmount', '');
                 }}
-              />
+              >
+                <ExchangeIcon
+                  style={{
+                    transform: 'rotate(180deg)',
+                  }}
+                />
+              </IconButton>
 
-              {jUSDInput}
+              {tradingDirection === 'jUSDSpent' ? jUSDInput : tokenInput}
             </div>
 
             {showSlippage && (

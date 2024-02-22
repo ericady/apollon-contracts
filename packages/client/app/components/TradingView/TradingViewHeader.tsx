@@ -51,7 +51,9 @@ function TradingViewHeader() {
         <Typography variant="subtitle1" fontFamily="Space Grotesk Variable">
           Pool
           <Box sx={{ color: 'text.primary', display: 'inline', ml: '8px' }}>
-            {JUSDToken ? roundCurrency(divBigIntsToFloat(JUSDToken.priceUSDOracle, tokenRatio, 18)) : ' -'}
+            {JUSDToken && selectedToken
+              ? roundCurrency(dangerouslyConvertBigIntToNumber(tokenRatio, selectedToken.decimals - 6, 6))
+              : ' -'}
           </Box>{' '}
           $
         </Typography>

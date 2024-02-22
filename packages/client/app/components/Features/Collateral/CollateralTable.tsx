@@ -143,12 +143,16 @@ function CollateralTable() {
                           />
                         </svg>
                         <Typography color="primary.contrastText" fontWeight={400}>
-                          {roundCurrency(dangerouslyConvertBigIntToNumber(troveLockedAmount!), 5, 5)}
+                          {roundCurrency(
+                            dangerouslyConvertBigIntToNumber(troveLockedAmount!, token.decimals - 6, 6),
+                            5,
+                            5,
+                          )}
                         </Typography>
                       </div>
                     </TableCell>
                     <TableCell align="right">
-                      {roundCurrency(dangerouslyConvertBigIntToNumber(walletAmount!), 5, 5)}
+                      {roundCurrency(dangerouslyConvertBigIntToNumber(walletAmount!, token.decimals - 6, 6), 5, 5)}
                     </TableCell>
                     <TableCell>
                       <Label variant="none">{token.symbol}</Label>
