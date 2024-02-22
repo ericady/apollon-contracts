@@ -2,7 +2,7 @@ import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 import { Typography, useTheme } from '@mui/material';
 import { Cell, Pie, PieChart } from 'recharts';
 import { GetBorrowerCollateralTokensQuery, Token } from '../../generated/gql-types';
-import { roundCurrency } from '../../utils/math';
+import { dangerouslyConvertBigIntToNumber, roundCurrency } from '../../utils/math';
 
 type Props = {
   borrowerCollateralTokens: (GetBorrowerCollateralTokensQuery['collateralTokenMetas'][number] & {
@@ -15,7 +15,8 @@ const CreateRenderCustomizedLabel =
   // eslint-disable-next-line react/display-name
   (isDarkMode: boolean) => (svgPropsAndData: any & { troveValueUSD: number; token: Token; chartColor: string }) => {
     // has all the spread data and some props from the library
-    const { x, y, cx, troveValueUSD, chartColor, token } = svgPropsAndData;
+    const { x, y, cx, troveLockedAmount, chartColor, token } = svgPropsAndData;
+
     const isRight = x > cx;
 
     return (
@@ -42,7 +43,7 @@ const CreateRenderCustomizedLabel =
           textAnchor={x > cx ? 'start' : 'end'}
           dominantBaseline="central"
         >
-          {roundCurrency(troveValueUSD, 5, 5)}
+          {roundCurrency(dangerouslyConvertBigIntToNumber(troveLockedAmount, 9,  9), 5, 5)}
         </text>
       </g>
     );
