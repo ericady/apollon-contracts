@@ -45,6 +45,7 @@ export enum BorrowerHistory_OrderBy {
 
 export type CollateralTokenMeta = {
   __typename: 'CollateralTokenMeta';
+  collSurplusAmount: Scalars['bigint']['output'];
   id: Scalars['ID']['output'];
   stabilityGainedAmount: Scalars['bigint']['output'];
   timestamp: Scalars['BigInt']['output'];
@@ -370,7 +371,7 @@ export type GetBorrowerCollateralTokensQueryVariables = Exact<{
 }>;
 
 
-export type GetBorrowerCollateralTokensQuery = { __typename: 'Query', collateralTokenMetas: Array<{ __typename: 'CollateralTokenMeta', id: string, walletAmount: bigint, troveLockedAmount: bigint, stabilityGainedAmount: bigint, totalValueLockedUSD: string, token: { __typename: 'Token', id: string, address: string, symbol: string, priceUSDOracle: bigint, decimals: number }, totalValueLockedUSD30dAverage: { __typename: 'TotalValueLockedAverage', id: string, value: string } }> };
+export type GetBorrowerCollateralTokensQuery = { __typename: 'Query', collateralTokenMetas: Array<{ __typename: 'CollateralTokenMeta', id: string, walletAmount: bigint, troveLockedAmount: bigint, stabilityGainedAmount: bigint, collSurplusAmount: bigint, totalValueLockedUSD: string, token: { __typename: 'Token', id: string, address: string, symbol: string, priceUSDOracle: bigint, decimals: number }, totalValueLockedUSD30dAverage: { __typename: 'TotalValueLockedAverage', id: string, value: string } }> };
 
 export type GetBorrowerStabilityHistoryQueryVariables = Exact<{
   where: BorrowerHistory_Filter;

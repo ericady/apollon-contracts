@@ -31,6 +31,7 @@ const Contracts = {
   HintHelpers: '0xe7f1725e7734ce288f8367e1bb143e90bb3f0512',
   PriceFeed: '0xa513e6e4b8f2a923d98304ec87f64353c4d5c853',
   RedemptionOperations: '0x2279B7A0a67DB372996a5FaB50D91eAA73d2eBe6',
+  CollSurplus: '0x5FbDB2315678afecb367f032d93F642f64180aa3',
 };
 
 // Main async function to interact with the Ethereum blockchain
@@ -77,6 +78,7 @@ async function main() {
         HintHelpers: "${Contracts.HintHelpers}",
         PriceFeed: "${Contracts.PriceFeed}",
         RedemptionOperations: "${Contracts.RedemptionOperations}",
+        CollSurplus: "${Contracts.CollSurplus}",
       } as const;
 
 

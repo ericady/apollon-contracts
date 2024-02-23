@@ -65,6 +65,7 @@ type CollateralTokenMeta {
   walletAmount: bigint!
   troveLockedAmount: bigint!
   stabilityGainedAmount: bigint!
+  collSurplusAmount: bigint!
 
   # global
   totalValueLockedUSD: BigInt!
