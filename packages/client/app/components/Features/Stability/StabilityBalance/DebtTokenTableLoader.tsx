@@ -1,4 +1,4 @@
-import { Skeleton } from '@mui/material';
+import { Button, Skeleton } from '@mui/material';
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
 import TableCell from '@mui/material/TableCell';
@@ -63,6 +63,45 @@ function DebtTokenTableLoader() {
                   </TableCell>
                 </TableRow>
               ))}
+
+            <TableRow>
+              <TableCell
+                sx={{ borderBottom: 'none', borderRight: '1px solid', borderColor: 'table.border', padding: '2px' }}
+              ></TableCell>
+              <TableCell
+                sx={{ borderBottom: 'none', borderRight: '1px solid', borderColor: 'table.border', padding: '2px' }}
+              ></TableCell>
+              <TableCell
+                sx={{ borderBottom: 'none', borderRight: '1px solid', borderColor: 'table.border', padding: '2px' }}
+              ></TableCell>
+              <TableCell
+                colSpan={2}
+                sx={{ borderBottom: 'none', borderRight: '1px solid', borderColor: 'table.border', padding: '2px' }}
+              >
+                <Button
+                  variant="text"
+                  sx={{
+                    width: '100%',
+                    p: '6px 8px',
+                  }}
+                  disabled
+                >
+                  Repay
+                </Button>
+              </TableCell>
+              <TableCell style={{ borderBottom: 'none', padding: '2px' }} colSpan={2} align="center">
+                <Button
+                  variant="text"
+                  sx={{
+                    p: '6px 8px',
+                    width: '230px',
+                  }}
+                  disabled
+                >
+                  Redeem
+                </Button>
+              </TableCell>
+            </TableRow>
           </TableBody>
         </Table>
       </TableContainer>
