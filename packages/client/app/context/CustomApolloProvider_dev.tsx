@@ -15,6 +15,7 @@ type Props = {
   CollateralTokenMeta_walletAmount: bigint;
   CollateralTokenMeta_troveLockedAmount: bigint;
   CollateralTokenMeta_stabilityGainedAmount: bigint;
+  CollateralTokenMeta_collSurplusAmount: bigint;
   Pool_swapFee: bigint;
   Pool_borrowerAmount: bigint;
   SystemInfo_totalCollateralRatio: bigint;
@@ -79,6 +80,7 @@ const getProductionCacheConfig = ({
   CollateralTokenMeta_stabilityGainedAmount = BigInt(100000000000000000000),
   CollateralTokenMeta_troveLockedAmount = BigInt(100000000000000000000),
   CollateralTokenMeta_walletAmount = BigInt(100000000000000000000),
+  CollateralTokenMeta_collSurplusAmount = BigInt(100000000000000000000),
   DebtTokenMeta_compoundedDeposit = BigInt(7000000000000000000),
   DebtTokenMeta_providedStability = BigInt(10000000000000000000),
   DebtTokenMeta_troveMintedAmount = BigInt(10000000000000000000),
@@ -172,6 +174,12 @@ const getProductionCacheConfig = ({
         stabilityGainedAmount: {
           read() {
             return CollateralTokenMeta_stabilityGainedAmount;
+          },
+        },
+
+        collSurplusAmount: {
+          read() {
+            return CollateralTokenMeta_collSurplusAmount;
           },
         },
       },

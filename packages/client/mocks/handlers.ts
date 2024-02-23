@@ -62,6 +62,7 @@ const JUSD: Omit<Token, 'priceUSDOracle' | 'borrowingRate'> = {
   symbol: 'JUSD',
   createdAt: (faker.date.past().getTime() / 1000).toString(),
   isPoolToken: faker.datatype.boolean(),
+  decimals: 18,
 };
 
 export const tokens: Omit<Token, 'priceUSDOracle' | 'borrowingRate'>[] = Array(10)
@@ -74,6 +75,7 @@ export const tokens: Omit<Token, 'priceUSDOracle' | 'borrowingRate'>[] = Array(1
     // Unix timestamp in seconds like the API returns it.
     createdAt: (faker.date.past().getTime() / 1000).toString(),
     isPoolToken: faker.datatype.boolean(),
+    decimals: 18,
   }))
   .concat(JUSD);
 
@@ -87,10 +89,11 @@ const collateralTokens: Omit<Token, 'priceUSDOracle' | 'borrowingRate'>[] = Obje
   symbol,
   createdAt: (faker.date.past().getTime() / 1000).toString(),
   isPoolToken: faker.datatype.boolean(),
+  decimals: 18,
 }));
 
-const collateralTokenMeta: Omit<CollateralTokenMeta, 'walletAmount' | 'troveLockedAmount' | 'stabilityGainedAmount'>[] =
-  collateralTokens.map<Omit<CollateralTokenMeta, 'walletAmount' | 'troveLockedAmount' | 'stabilityGainedAmount'>>(
+const collateralTokenMeta: Omit<CollateralTokenMeta, 'walletAmount' | 'troveLockedAmount' | 'stabilityGainedAmount' | 'collSurplusAmount'>[] =
+  collateralTokens.map<Omit<CollateralTokenMeta, 'walletAmount' | 'troveLockedAmount' | 'stabilityGainedAmount' | 'collSurplusAmount'>>(
     (collToken) => {
       return {
         __typename: 'CollateralTokenMeta',
@@ -108,7 +111,7 @@ const collateralTokenMeta: Omit<CollateralTokenMeta, 'walletAmount' | 'troveLock
     },
   );
 
-const userColl: Omit<CollateralTokenMeta, 'walletAmount' | 'troveLockedAmount' | 'stabilityGainedAmount'>[] =
+const userColl: Omit<CollateralTokenMeta, 'walletAmount' | 'troveLockedAmount' | 'stabilityGainedAmount' | 'collSurplusAmount'>[] =
   faker.helpers.arrayElements(collateralTokenMeta, { min: 0, max: collateralTokenMeta.length });
 
 // Merge userCollateralTokenMeta and collateralTokenMeta but remove duplicates
