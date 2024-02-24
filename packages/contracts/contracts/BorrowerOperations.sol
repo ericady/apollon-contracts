@@ -658,23 +658,22 @@ contract BorrowerOperations is LiquityBase, Ownable(msg.sender), CheckContract, 
   ) internal {
     _storagePool.addValue(address(_debtToken), false, PoolType.Active, _netDebtIncrease);
 
+    // forward the borrowing fee to the reserve pool (or gov staking)
+    if (_borrowingFee > 0) {
+      uint govStakingPayout = _borrowingFee;
+      uint missingStableForReserveCap = reservePool.stableAmountUntilCap();
+      if (missingStableForReserveCap > 0) {
+        uint reserveTransfer = LiquityMath._min(_borrowingFee, missingStableForReserveCap);
+        govStakingPayout -= reserveTransfer;
+        _debtToken.mint(address(reservePool), reserveTransfer);
+      }
+      if (govStakingPayout > 0) _debtToken.mint(GOV_STAKING_ADDRESS, govStakingPayout);
+      emit PaidBorrowingFee(_tokenRecipient, _borrowingFee);
+    }
+
     // payout issued debt to the recipient
     uint mintAmount = _netDebtIncrease - _borrowingFee;
     if (mintAmount > 0) _debtToken.mint(_tokenRecipient, mintAmount);
-
-    if (_borrowingFee == 0) return;
-
-    // forward the borrowing fee to the reserve pool (or gov staking)
-    uint govStakingPayout = _borrowingFee;
-    uint missingStableForReserveCap = reservePool.stableAmountUntilCap();
-    if (missingStableForReserveCap > 0) {
-      uint reserveTransfer = LiquityMath._min(_borrowingFee, missingStableForReserveCap);
-      govStakingPayout -= reserveTransfer;
-
-      _debtToken.mint(address(reservePool), reserveTransfer);
-    }
-    if (govStakingPayout > 0) _debtToken.mint(GOV_STAKING_ADDRESS, govStakingPayout);
-    emit PaidBorrowingFee(_tokenRecipient, _borrowingFee);
   }
 
   function _poolRepayDebt(

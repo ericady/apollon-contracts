@@ -78,8 +78,10 @@ describe('Reserve Pool', () => {
 
     it('should not receive reserve fee when reached cap', async () => {
       await reservePool.setRelativeStableCap(parseUnits('0.0001'));
+      const preSupply = await STABLE.totalSupply();
+      const reservePoolStableLimit = (preSupply + parseUnits('200')) / 10000n; // adding 200 for the trove opening fee
 
-      const aliceDebt = parseUnits('1000');
+      const aliceDebt = parseUnits('2000');
       await openTrove({
         from: alice,
         contracts,
@@ -89,7 +91,7 @@ describe('Reserve Pool', () => {
       });
 
       const reserveBalAfter = await STABLE.balanceOf(reservePool);
-      expect(reserveBalAfter).to.be.equal((await STABLE.totalSupply()) / 10000n - parseUnits('0.0005'));
+      expect(reserveBalAfter).to.be.equal(reservePoolStableLimit);
     });
   });
 

@@ -714,6 +714,7 @@ describe('BorrowerOperations', () => {
 
       // 2 hours pass
       await fastForwardTime(60 * 60 * 2);
+      await contracts.mockTellor.setUpdateTime(BigInt((await ethers.provider.getBlock('latest'))?.timestamp ?? 0n));
 
       // D withdraws LUSD
       await increaseDebt(dennis, contracts, [{ tokenAddress: STABLE, amount: parseUnits('1') }]);
@@ -724,6 +725,7 @@ describe('BorrowerOperations', () => {
 
       // 1 hour passes
       await fastForwardTime(60 * 60);
+      await contracts.mockTellor.setUpdateTime(BigInt((await ethers.provider.getBlock('latest'))?.timestamp ?? 0n));
 
       // E withdraws LUSD
       await increaseDebt(carol, contracts, [{ tokenAddress: STABLE, amount: parseUnits('1') }]);
@@ -789,6 +791,7 @@ describe('BorrowerOperations', () => {
 
       // 2 hours pass
       await fastForwardTime(7200);
+      await contracts.mockTellor.setUpdateTime(BigInt((await ethers.provider.getBlock('latest'))?.timestamp ?? 0n));
 
       // D withdraws LUSD
       await increaseDebt(alice, contracts, [{ tokenAddress: STABLE, amount: parseUnits('37') }]);
@@ -799,6 +802,7 @@ describe('BorrowerOperations', () => {
 
       // 1 hour passes
       await fastForwardTime(3600);
+      await contracts.mockTellor.setUpdateTime(BigInt((await ethers.provider.getBlock('latest'))?.timestamp ?? 0n));
 
       // E opens trove
       await increaseDebt(bob, contracts, [{ tokenAddress: STABLE, amount: parseUnits('12') }]);
@@ -983,13 +987,13 @@ describe('BorrowerOperations', () => {
       expect(aliceDebtBefore).to.be.gt(0n);
 
       // check before
-      const storagePool_Debt_Before = await storagePool.getEntireSystemDebt();
+      const [, , , storagePool_Debt_Before] = await storagePool.checkRecoveryMode();
       expect(storagePool_Debt_Before).to.be.eq(aliceDebtBefore);
 
       await increaseDebt(alice, contracts, [{ tokenAddress: STABLE, amount: parseUnits('100') }]);
 
       // check after
-      const storagePool_Debt_After = await storagePool.getEntireSystemDebt();
+      const [, , , storagePool_Debt_After] = await storagePool.checkRecoveryMode();
       expect(storagePool_Debt_After - storagePool_Debt_Before).to.be.equal(
         parseUnits('100') + parseUnits('100') / 200n
       );
@@ -1732,6 +1736,7 @@ describe('BorrowerOperations', () => {
 
       // 2 hours pass
       await time.increase(7200);
+      await contracts.mockTellor.setUpdateTime(BigInt((await ethers.provider.getBlock('latest'))?.timestamp ?? 0n));
 
       // D opens trove
       await open(dennis, parseUnits('1', 9), parseUnits('1000'));
@@ -1742,6 +1747,7 @@ describe('BorrowerOperations', () => {
 
       // 1 hour passes
       await time.increase(3600);
+      await contracts.mockTellor.setUpdateTime(BigInt((await ethers.provider.getBlock('latest'))?.timestamp ?? 0n));
 
       // E opens trove
       await open(erin, parseUnits('1', 9), parseUnits('1000'));
@@ -1762,6 +1768,7 @@ describe('BorrowerOperations', () => {
 
       // 2 hours pass
       await time.increase(7200);
+      await contracts.mockTellor.setUpdateTime(BigInt((await ethers.provider.getBlock('latest'))?.timestamp ?? 0n));
 
       // D opens trove
       await open(dennis, parseUnits('1', 9), parseUnits('1000'));
@@ -1772,6 +1779,7 @@ describe('BorrowerOperations', () => {
 
       // 1 hour passes
       await time.increase(3600);
+      await contracts.mockTellor.setUpdateTime(BigInt((await ethers.provider.getBlock('latest'))?.timestamp ?? 0n));
 
       // E opens trove
       await open(erin, parseUnits('1', 9), parseUnits('1000'));
@@ -1838,6 +1846,7 @@ describe('BorrowerOperations', () => {
 
       // 59 minutes pass
       await time.increase(3540);
+      await contracts.mockTellor.setUpdateTime(BigInt((await ethers.provider.getBlock('latest'))?.timestamp ?? 0n));
 
       // Assume Borrower also owns accounts D and E
       // Borrower triggers a fee, before decay interval has passed
@@ -1845,6 +1854,7 @@ describe('BorrowerOperations', () => {
 
       // 1 minute pass
       await time.increase(3540);
+      await contracts.mockTellor.setUpdateTime(BigInt((await ethers.provider.getBlock('latest'))?.timestamp ?? 0n));
 
       // Borrower triggers another fee
       await open(erin, parseUnits('1', 9), parseUnits('1000'));

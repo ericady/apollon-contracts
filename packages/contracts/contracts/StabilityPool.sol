@@ -382,6 +382,7 @@ contract StabilityPool is LiquityBase, CheckContract, IStabilityPool {
       uint currentS = epochToScaleToCollTokenToSum[currentEpochCached][currentScaleCached][tokenAddress];
       uint marginalCollGain = collGainPerUnitStaked[i].amount * currentP;
       uint newS = currentS + marginalCollGain;
+
       epochToScaleToCollTokenToSum[currentEpochCached][currentScaleCached][tokenAddress] = newS;
       emit S_Updated(tokenAddress, newS, currentEpochCached, currentScaleCached);
     }

@@ -241,15 +241,15 @@ contract StabilityPoolManager is Ownable(msg.sender), CheckContract, IStabilityP
       for (uint ii = 0; ii < remainingStability.collGained.length; ii++) {
         if (remainingStability.collGained[ii].tokenAddress == address(stableDebt)) stableCollIndex = ii;
         if (remainingStability.collGained[ii].tokenAddress == address(govToken)) govTokenCollIndex = ii;
-        if (remainingStability.collGained[ii].amount == 0) continue;
 
-        storagePoolCached.withdrawalValue(
-          stabilityPoolAddress,
-          remainingStability.collGained[ii].tokenAddress,
-          true,
-          PoolType.Active,
-          remainingStability.collGained[ii].amount
-        );
+        if (remainingStability.collGained[ii].amount > 0)
+          storagePoolCached.withdrawalValue(
+            stabilityPoolAddress,
+            remainingStability.collGained[ii].tokenAddress,
+            true,
+            PoolType.Active,
+            remainingStability.collGained[ii].amount
+          );
       }
 
       // check possible loss
@@ -288,7 +288,7 @@ contract StabilityPoolManager is Ownable(msg.sender), CheckContract, IStabilityP
           if (stableCollIndex >= remainingStability.collGained.length) {
             // stableCoinIndex not found in prev loop, add to end of array
             TokenAmount[] memory collGained = new TokenAmount[](remainingStability.collGained.length + 1);
-            for (uint ii = 1; ii < remainingStability.collGained.length; ii++)
+            for (uint ii = 0; ii < remainingStability.collGained.length; ii++)
               collGained[ii] = remainingStability.collGained[ii];
 
             collGained[remainingStability.collGained.length] = TokenAmount({

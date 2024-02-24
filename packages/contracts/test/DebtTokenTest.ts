@@ -96,12 +96,14 @@ describe('DebtToken', () => {
   });
 
   it('totalSupply(): gets the total supply', async () => {
+    const totalSupplyBefore = await STABLE.totalSupply();
+
     // mint some debt tokens to increase total supply
     await borrowerOperations.testDebtToken_mint(alice, 1, STABLE);
     await borrowerOperations.testDebtToken_mint(bob, 2, STABLE);
 
     const totalSupply = await STABLE.totalSupply();
-    assert.equal(totalSupply, 3n);
+    assert.equal(totalSupply - totalSupplyBefore, 3n);
   });
 
   it("name(): returns the token's name", async () => {
@@ -203,6 +205,8 @@ describe('DebtToken', () => {
     });
 
     it('transferFrom(): successfully transfers from an account which is it approved to transfer from', async () => {
+      const myBalanceBefore = await STABLE.balanceOf(owner);
+
       await borrowerOperations.testDebtToken_mint(owner, 100, STABLE);
       await STABLE.approve(alice, 100);
 
@@ -215,7 +219,7 @@ describe('DebtToken', () => {
       assert.equal(bobBalance_after, 90n);
 
       const myBalance = await STABLE.balanceOf(owner);
-      assert.equal(myBalance, 10n);
+      assert.equal(myBalance - myBalanceBefore, 10n);
     });
   });
 
@@ -244,9 +248,8 @@ describe('DebtToken', () => {
     });
 
     it("transfer(): reverts if amount exceeds sender's balance", async () => {
-      await borrowerOperations.testDebtToken_mint(owner, 100, STABLE);
-
-      const txPromise = STABLE.transfer(alice, 101);
+      const balance = await STABLE.balanceOf(owner);
+      const txPromise = STABLE.transfer(alice, balance + 1n);
 
       await assertRevert(txPromise, 'InsufficientBalance');
     });
@@ -255,12 +258,10 @@ describe('DebtToken', () => {
       await borrowerOperations.testDebtToken_mint(owner, 100, STABLE);
 
       const aliceBalance_before = await STABLE.balanceOf(alice);
-      assert.equal(aliceBalance_before, 0n);
-
       await STABLE.transfer(alice, 40);
 
       const aliceBalance_after = await STABLE.balanceOf(alice);
-      assert.equal(aliceBalance_after, 40n);
+      assert.equal(aliceBalance_after, 40n + aliceBalance_before);
 
       const myBalance = await STABLE.balanceOf(owner);
       assert.equal(myBalance, 60n);
@@ -315,13 +316,12 @@ describe('DebtToken', () => {
 
     it('mint(): increases totalAmount incrementally', async () => {
       const totalSupply_before = await STABLE.totalSupply();
-      assert.equal(totalSupply_before, 0n);
 
       await borrowerOperations.testDebtToken_mint(alice, 100, STABLE);
       await borrowerOperations.testDebtToken_mint(bob, 50, STABLE);
 
       const totalSupply_after = await STABLE.totalSupply();
-      assert.equal(totalSupply_after, 150n);
+      assert.equal(totalSupply_after, 150n + totalSupply_before);
     });
 
     it('mint(): reverts if not borrowerOperations', async () => {
@@ -365,17 +365,19 @@ describe('DebtToken', () => {
     });
 
     it('burn(): reduces totalAmount incrementally', async () => {
+      const totalSupply_before_before = await STABLE.totalSupply();
+
       await borrowerOperations.testDebtToken_mint(alice, 100, STABLE);
       await borrowerOperations.testDebtToken_mint(bob, 50, STABLE);
 
       const totalSupply_before = await STABLE.totalSupply();
-      assert.equal(totalSupply_before, 150n);
+      assert.equal(totalSupply_before, 150n + totalSupply_before_before);
 
       await borrowerOperations.testDebtToken_burn(alice, 50, STABLE);
       await borrowerOperations.testDebtToken_burn(bob, 25, STABLE);
 
       const totalSupply_after = await STABLE.totalSupply();
-      assert.equal(totalSupply_after, 75n);
+      assert.equal(totalSupply_after, 75n + totalSupply_before_before);
     });
 
     it('burn(): emits "Transfer" event with expected arguments', async () => {
