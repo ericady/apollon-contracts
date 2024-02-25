@@ -223,7 +223,7 @@ export default function EthersProvider({ children }: { children: React.ReactNode
 
         const swapPairContractBTC = new Contract(Contracts.SwapPairs.BTC, swapPairAbi, provider);
         const swapPairContractBTCWithSigner = swapPairContractBTC.connect(newSigner) as SwapPair;
-        const swapPairContractUSDT = new Contract(Contracts.SwapPairs.BTC, swapPairAbi, provider);
+        const swapPairContractUSDT = new Contract(Contracts.SwapPairs.USDT, swapPairAbi, provider);
         const swapPairContractUSDTWithSigner = swapPairContractUSDT.connect(newSigner) as SwapPair;
         const swapPairContractDFI = new Contract(Contracts.SwapPairs.STOCK_1, swapPairAbi, provider);
         const swapPairContractDFIWithSigner = swapPairContractDFI.connect(newSigner) as SwapPair;

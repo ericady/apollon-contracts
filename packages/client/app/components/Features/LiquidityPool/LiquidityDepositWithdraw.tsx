@@ -866,7 +866,8 @@ function LiquidityDepositWithdraw({ selectedPoolId }: Props) {
                   {!isCollateralPair && (
                     <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                       <Typography component="span" style={{ marginRight: '8px' }}>
-                        {tokenAAmountForWithdraw > (foundTokenA as DebtTokenMeta).troveRepableDebtAmount
+                        {tokenAAmountForWithdraw >
+                        dangerouslyConvertBigIntToNumber((foundTokenA as DebtTokenMeta).troveRepableDebtAmount, 12, 6)
                           ? roundCurrency(
                               dangerouslyConvertBigIntToNumber(
                                 (foundTokenA as DebtTokenMeta).troveRepableDebtAmount,
@@ -912,7 +913,8 @@ function LiquidityDepositWithdraw({ selectedPoolId }: Props) {
                   {!isCollateralPair && (
                     <div style={{ display: 'flex', justifyContent: 'space-between' }}>
                       <Typography component="span" style={{ marginRight: '8px' }}>
-                        {tokenBAmountForWithdraw > (foundTokenB as DebtTokenMeta).troveRepableDebtAmount
+                        {tokenBAmountForWithdraw >
+                        dangerouslyConvertBigIntToNumber((foundTokenB as DebtTokenMeta).troveRepableDebtAmount, 12, 6)
                           ? roundCurrency(
                               dangerouslyConvertBigIntToNumber(
                                 (foundTokenB as DebtTokenMeta).troveRepableDebtAmount,
