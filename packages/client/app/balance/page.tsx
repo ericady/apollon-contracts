@@ -1,4 +1,3 @@
-import CollSurplus from '../components/Features/Collateral/CollSurplus';
 import CollateralBalance from '../components/Features/Collateral/CollateralBalance/CollateralBalance';
 import ReservePool from '../components/Features/ReservePool/ReservePool';
 import StabilityBalance from '../components/Features/Stability/StabilityBalance/StabilityBalance';

@@ -21,10 +21,7 @@ type Props = {
   SystemInfo_totalCollateralRatio: bigint;
 };
 
-export function CustomApolloProvider_DevMode({
-  children,
-  ...props
-}: PropsWithChildren<Partial<Props>>) {
+export function CustomApolloProvider_DevMode({ children, ...props }: PropsWithChildren<Partial<Props>>) {
   const cacheConfig = getProductionCacheConfig(props);
 
   const client = new ApolloClient({

@@ -253,7 +253,7 @@ const CollateralUpdateDialog = ({ buttonVariant, buttonSx = {} }: Props) => {
           !collateralToDeposit.some(({ walletAmount, troveLockedAmount }) => walletAmount > 0 || troveLockedAmount > 0)
         }
       >
-        Update
+        Change
       </Button>
       <Dialog
         open={isOpen}
@@ -464,11 +464,11 @@ const CollateralUpdateDialog = ({ buttonVariant, buttonSx = {} }: Props) => {
                   sx={{ borderColor: 'primary.contrastText' }}
                   disabled={tabValue === 'WITHDRAW' && newRatio < CRIT_RATIO}
                 >
-                  Update
+                  Change
                 </Button>
                 {formState.isSubmitted && !formState.isDirty && (
                   <FormHelperText error sx={{ mt: '10px' }} data-testid="apollon-collateral-update-dialog-error">
-                    You must specify at least one token to update.
+                    You must specify at least one token to change.
                   </FormHelperText>
                 )}
               </div>

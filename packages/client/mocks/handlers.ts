@@ -92,27 +92,31 @@ const collateralTokens: Omit<Token, 'priceUSDOracle' | 'borrowingRate'>[] = Obje
   decimals: 18,
 }));
 
-const collateralTokenMeta: Omit<CollateralTokenMeta, 'walletAmount' | 'troveLockedAmount' | 'stabilityGainedAmount' | 'collSurplusAmount'>[] =
-  collateralTokens.map<Omit<CollateralTokenMeta, 'walletAmount' | 'troveLockedAmount' | 'stabilityGainedAmount' | 'collSurplusAmount'>>(
-    (collToken) => {
-      return {
-        __typename: 'CollateralTokenMeta',
-        id: faker.string.uuid(),
-        timestamp: now.toString(),
-        token: collToken as Token,
-        totalValueLockedUSD: floatToBigInt(faker.number.float({ min: 10000, max: 50000, precision: 0.01 })).toString(),
-        totalValueLockedUSD30dAverage: {
-          __typename: 'TotalValueLockedAverage',
-          id: faker.string.uuid(),
-          index: 0,
-          value: floatToBigInt(faker.number.float({ min: 10000, max: 50000, precision: 0.01 })).toString(),
-        },
-      };
+const collateralTokenMeta: Omit<
+  CollateralTokenMeta,
+  'walletAmount' | 'troveLockedAmount' | 'stabilityGainedAmount' | 'collSurplusAmount'
+>[] = collateralTokens.map<
+  Omit<CollateralTokenMeta, 'walletAmount' | 'troveLockedAmount' | 'stabilityGainedAmount' | 'collSurplusAmount'>
+>((collToken) => {
+  return {
+    __typename: 'CollateralTokenMeta',
+    id: faker.string.uuid(),
+    timestamp: now.toString(),
+    token: collToken as Token,
+    totalValueLockedUSD: floatToBigInt(faker.number.float({ min: 10000, max: 50000, precision: 0.01 })).toString(),
+    totalValueLockedUSD30dAverage: {
+      __typename: 'TotalValueLockedAverage',
+      id: faker.string.uuid(),
+      index: 0,
+      value: floatToBigInt(faker.number.float({ min: 10000, max: 50000, precision: 0.01 })).toString(),
     },
-  );
+  };
+});
 
-const userColl: Omit<CollateralTokenMeta, 'walletAmount' | 'troveLockedAmount' | 'stabilityGainedAmount' | 'collSurplusAmount'>[] =
-  faker.helpers.arrayElements(collateralTokenMeta, { min: 0, max: collateralTokenMeta.length });
+const userColl: Omit<
+  CollateralTokenMeta,
+  'walletAmount' | 'troveLockedAmount' | 'stabilityGainedAmount' | 'collSurplusAmount'
+>[] = faker.helpers.arrayElements(collateralTokenMeta, { min: 0, max: collateralTokenMeta.length });
 
 // Merge userCollateralTokenMeta and collateralTokenMeta but remove duplicates
 const userCollateralTokenMeta = [

@@ -66,16 +66,7 @@ function DebtTokenTableLoader() {
 
             <TableRow>
               <TableCell
-                sx={{ borderBottom: 'none', borderRight: '1px solid', borderColor: 'table.border', padding: '2px' }}
-              ></TableCell>
-              <TableCell
-                sx={{ borderBottom: 'none', borderRight: '1px solid', borderColor: 'table.border', padding: '2px' }}
-              ></TableCell>
-              <TableCell
-                sx={{ borderBottom: 'none', borderRight: '1px solid', borderColor: 'table.border', padding: '2px' }}
-              ></TableCell>
-              <TableCell
-                colSpan={2}
+                colSpan={3}
                 sx={{ borderBottom: 'none', borderRight: '1px solid', borderColor: 'table.border', padding: '2px' }}
               >
                 <Button
@@ -89,12 +80,12 @@ function DebtTokenTableLoader() {
                   Repay
                 </Button>
               </TableCell>
-              <TableCell style={{ borderBottom: 'none', padding: '2px' }} colSpan={2} align="center">
+              <TableCell style={{ borderBottom: 'none', padding: '2px' }} colSpan={4} align="center">
                 <Button
                   variant="text"
                   sx={{
                     p: '6px 8px',
-                    width: '230px',
+                    width: '100%',
                   }}
                   disabled
                 >
