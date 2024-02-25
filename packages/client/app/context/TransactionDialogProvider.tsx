@@ -85,7 +85,6 @@ export default function TransactionDialogProvider({ children }: { children: Reac
   const { enqueueSnackbar } = useSnackbar();
   const client = useApolloClient();
 
-  const [showConfirmation, setShowConfirmation] = useState(false);
   const [steps, setSteps] = useState<TransactionStep[]>([]);
   const [stepsState, setStepsState] = useState<StepState[]>([]);
 
@@ -159,10 +158,8 @@ export default function TransactionDialogProvider({ children }: { children: Reac
                 setActiveStep((activeStep) => (activeStep as number) + 1);
               }
             } else {
-              setShowConfirmation(true);
               setActiveStep(undefined);
               setSteps([]);
-              setTimeout(() => setShowConfirmation(false), 5000);
             }
           })
           .catch((error) => {
@@ -217,7 +214,7 @@ export default function TransactionDialogProvider({ children }: { children: Reac
           defaultPosition={{ x: window.innerWidth - 670, y: 50 }}
         >
           <Dialog
-            open={activeStep !== undefined || showConfirmation}
+            open={activeStep !== undefined}
             onClose={() => {
               setSteps([]);
               setActiveStep(undefined);
@@ -237,7 +234,7 @@ export default function TransactionDialogProvider({ children }: { children: Reac
                 boxShadow: 'none',
                 border: '1px solid',
                 borderColor: 'background.paper',
-              }
+              },
             }}
             // @ts-ignore
             componentsProps={{ backdrop: { 'data-testid': 'apollon-transaction-signer-dialog-backdrop' } }}
@@ -253,7 +250,7 @@ export default function TransactionDialogProvider({ children }: { children: Reac
               <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
                 <DiamondIcon isDialog />
                 <Typography variant="h6" display="inline-block">
-                  {showConfirmation ? 'Operation successful.' : `${steps.length} transactions in progress.`}
+                  {`${steps.length} transactions in progress.`}
                 </Typography>
               </div>
               <IconButton
@@ -271,51 +268,39 @@ export default function TransactionDialogProvider({ children }: { children: Reac
               sx={{
                 p: 0,
                 backgroundColor: 'background.default',
-                
               }}
             >
-              {showConfirmation ? (
-                <div style={{ display: 'grid', placeItems: 'center', padding: '20px' }}>
-                  <CheckCircleIcon fontSize="large" color="success" />
-                  <Typography variant="h6" textAlign="center">
-                    All transactions have been confirmed. This window will close automatically now.
-                  </Typography>
-                </div>
-              ) : (
-                <>
-                  <Alert severity="info">
-                    Please sign each transaction and do not close this window until all transactions are confirmed. Some
-                    actions require previous approvals to be mined first and might take some time.
-                  </Alert>
+              <Alert severity="info">
+                Please sign each transaction and do not close this window until all transactions are confirmed. Some
+                actions require previous approvals to be mined first and might take some time.
+              </Alert>
 
-                  <Box sx={{ padding: '20px' }}>
-                    <Stepper activeStep={activeStep} orientation="vertical">
-                      {steps.map(({ title, description, transaction }, index) => (
-                        <Step key={index}>
-                          <StepLabel
-                            StepIconComponent={getIcon(stepsState[index]?.status)}
-                            optional={
-                              stepsState[index]?.status === 'error' ? (
-                                <Typography variant="caption" fontSize={10} color="error">
-                                  Error: {stepsState[index]?.error}
-                                </Typography>
-                              ) : (
-                                description
-                              )
-                            }
-                          >
-                            {title}{' '}
-                            {transaction.waitForResponseOf.length > 0 &&
-                              `(wait until step ${transaction.waitForResponseOf
-                                .map((number) => `"${number}"`)
-                                .join(', ')} resolve first)`}
-                          </StepLabel>
-                        </Step>
-                      ))}
-                    </Stepper>
-                  </Box>
-                </>
-              )}
+              <Box sx={{ padding: '20px' }}>
+                <Stepper activeStep={activeStep} orientation="vertical">
+                  {steps.map(({ title, description, transaction }, index) => (
+                    <Step key={index}>
+                      <StepLabel
+                        StepIconComponent={getIcon(stepsState[index]?.status)}
+                        optional={
+                          stepsState[index]?.status === 'error' ? (
+                            <Typography variant="caption" fontSize={10} color="error">
+                              Error: {stepsState[index]?.error}
+                            </Typography>
+                          ) : (
+                            description
+                          )
+                        }
+                      >
+                        {title}{' '}
+                        {transaction.waitForResponseOf.length > 0 &&
+                          `(wait until step ${transaction.waitForResponseOf
+                            .map((number) => `"${number}"`)
+                            .join(', ')} resolve first)`}
+                      </StepLabel>
+                    </Step>
+                  ))}
+                </Stepper>
+              </Box>
             </DialogContent>
           </Dialog>
         </Draggable>
