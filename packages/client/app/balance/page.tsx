@@ -7,7 +7,6 @@ import PageLayout from '../components/Layout/PageLayout';
 function Balance() {
   return (
     <PageLayout>
-      <CollSurplus />
       <CollateralBalance />
       <StabilityBalance />
       <ReservePool />

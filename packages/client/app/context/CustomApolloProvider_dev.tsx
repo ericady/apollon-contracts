@@ -23,7 +23,6 @@ type Props = {
 
 export function CustomApolloProvider_DevMode({
   children,
-
   ...props
 }: PropsWithChildren<Partial<Props>>) {
   const cacheConfig = getProductionCacheConfig(props);

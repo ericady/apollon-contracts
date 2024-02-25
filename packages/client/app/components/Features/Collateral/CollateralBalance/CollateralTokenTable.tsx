@@ -29,6 +29,7 @@ import HeaderCell from '../../../Table/HeaderCell';
 import CloseTroveDialog from '../CloseTroveDialog';
 import CollateralUpdateDialog from '../CollateralUpdateDialog';
 import CollateralTokenTableLoader from './CollateralTokenTableLoader';
+import CollSurplus from '../CollSurplus';
 
 const CollateralTokenTable = () => {
   const { address } = useEthers();
@@ -46,9 +47,12 @@ const CollateralTokenTable = () => {
     return <CollateralTokenTableLoader />;
   }
 
-  return (
+  return (<>
+      <CollSurplus />
     <FeatureBox title="Collateral Token" noPadding border="full" borderRadius>
       <div>
+
+
         <TableContainer>
           <Table size="small" data-testid="apollon-collateral-token-table">
             <TableHead>
@@ -123,6 +127,9 @@ const CollateralTokenTable = () => {
         </TableContainer>
       </div>
     </FeatureBox>
+
+  </>
+
   );
 };
 

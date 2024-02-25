@@ -44,13 +44,12 @@ function CollSurplus() {
     ]);
   };
 
-  return !hasClaimableColl ? (
-    <Tooltip title="Your trove got liquidated! Claim your collateral surplus." placement="bottom-start" arrow>
+  return hasClaimableColl ? (
+    <Tooltip title="Your trove got liquidated! Claim your collateral surplus." arrow>
       <Button
         variant="outlined"
         onClick={handleClaimCollSurplus}
-        title="Your trove got liquidated! Claim your collateral surplus."
-        sx={{ position: 'fixed', right: '25px', top: '56px', width: '250px' }}
+        sx={{ mb: "20px" }}
       >
         Claim collateral surplus
       </Button>
