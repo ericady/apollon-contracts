@@ -1,7 +1,7 @@
 'use client';
 
 import { useQuery } from '@apollo/client';
-import { Box, FormHelperText, Skeleton } from '@mui/material';
+import { Box, Skeleton } from '@mui/material';
 import Button from '@mui/material/Button';
 import Tab from '@mui/material/Tab';
 import Tabs from '@mui/material/Tabs';
@@ -427,8 +427,6 @@ function LiquidityDepositWithdraw({ selectedPoolId }: Props) {
         foundTokenB,
       );
 
-      console.log('tokenAAmount: ', tokenAAmount);
-
       setValue('tokenAAmount', tokenAAmount.toString(), {
         shouldValidate: true,
         shouldDirty: true,
@@ -752,7 +750,7 @@ function LiquidityDepositWithdraw({ selectedPoolId }: Props) {
                                 parseFloat(tokenBAmount) >
                                   dangerouslyConvertBigIntToNumber(foundTokenB.walletAmount, 9, 9)
                                   ? parseFloat(tokenBAmount) -
-                                      dangerouslyConvertBigIntToNumber(foundTokenB.walletAmount, 12, 9)
+                                      dangerouslyConvertBigIntToNumber(foundTokenB.walletAmount, 12, 6)
                                   : 0,
                                 5,
                                 5,
@@ -799,7 +797,9 @@ function LiquidityDepositWithdraw({ selectedPoolId }: Props) {
                 }}
               >
                 <div style={{ marginTop: 6 }}>
-                  <Label variant="success">MNT-{tokenB.token.symbol}</Label>
+                  <Label variant="success">
+                    {tokenA.token.symbol}-{tokenB.token.symbol}
+                  </Label>
                 </div>
 
                 <div>
@@ -814,6 +814,7 @@ function LiquidityDepositWithdraw({ selectedPoolId }: Props) {
                         value: dangerouslyConvertBigIntToNumber(borrowerAmount, 9, 9),
                         message: 'This amount is greater than your deposited amount.',
                       },
+                      required: 'This field is required.',
                     }}
                   />
                   <div style={{ display: 'flex', justifyContent: 'space-between' }}>
@@ -985,11 +986,6 @@ function LiquidityDepositWithdraw({ selectedPoolId }: Props) {
             >
               Update
             </Button>
-            {formState.isSubmitted && !formState.isDirty && (
-              <FormHelperText error sx={{ mt: '10px' }} data-testid="apollon-liquidity-deposit-withdraw-error">
-                You must specify at least one token to update.
-              </FormHelperText>
-            )}
           </div>
         </form>
       </FormProvider>

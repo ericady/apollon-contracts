@@ -18,7 +18,7 @@ import {
 } from '@mui/material';
 import { ContractTransactionReceipt, ContractTransactionResponse } from 'ethers/contract';
 import { useSnackbar } from 'notistack';
-import { Dispatch, ReactNode, SetStateAction, createContext, useContext, useEffect, useState } from 'react';
+import { ReactNode, createContext, useContext, useEffect, useState } from 'react';
 import Draggable from 'react-draggable';
 import CrossIcon from '../components/Icons/CrossIcon';
 import DiamondIcon from '../components/Icons/DiamondIcon';
@@ -75,10 +75,12 @@ const createDemoSteps = (steps: TransactionStep[]): TransactionStep[] => {
 
 export const TransactionDialogContext = createContext<{
   steps: TransactionStep[];
-  setSteps: Dispatch<SetStateAction<TransactionStep[]>>;
+  setSteps: (steps: TransactionStep[], actionAfterCompleted?: () => void) => void;
+  transactionPending: boolean;
 }>({
   steps: [],
   setSteps: () => {},
+  transactionPending: false,
 });
 
 export default function TransactionDialogProvider({ children }: { children: React.ReactNode }): JSX.Element {
@@ -87,6 +89,8 @@ export default function TransactionDialogProvider({ children }: { children: Reac
 
   const [steps, setSteps] = useState<TransactionStep[]>([]);
   const [stepsState, setStepsState] = useState<StepState[]>([]);
+  const [actionAfterCompleted, setActionAfterCompleted] = useState<() => void>();
+  const [transactionPending, setTransactionPending] = useState(false);
 
   const [activeStep, setActiveStep] = useState<number | undefined>(undefined);
 
@@ -140,6 +144,7 @@ export default function TransactionDialogProvider({ children }: { children: Reac
                   };
                   return newStepsState;
                 });
+                setTransactionPending(false);
               });
 
             setStepsState((stepsState) => {
@@ -158,12 +163,15 @@ export default function TransactionDialogProvider({ children }: { children: Reac
                 setActiveStep((activeStep) => (activeStep as number) + 1);
               }
             } else {
+              actionAfterCompleted?.();
+              setTransactionPending(false);
               setActiveStep(undefined);
               setSteps([]);
             }
           })
           .catch((error) => {
             enqueueSnackbar('Transaction was rejected.', { variant: 'error' });
+            setTransactionPending(false);
             console.log('error: ', error);
             // FIXME: Show error state, currently broken
             // setStepsState((stepsState) => {
@@ -201,10 +209,11 @@ export default function TransactionDialogProvider({ children }: { children: Reac
     <TransactionDialogContext.Provider
       value={{
         steps,
-        // @ts-ignore
-        setSteps: (steps: TransactionStep[]) => {
+        setSteps: (steps: TransactionStep[], actionAfterCompleted?: () => void) => {
+          setActionAfterCompleted(actionAfterCompleted);
           setSteps(createDemoSteps(steps));
         },
+        transactionPending,
       }}
     >
       <>
@@ -245,6 +254,7 @@ export default function TransactionDialogProvider({ children }: { children: Reac
                 justifyContent: 'space-between',
                 alignItems: 'center',
                 backgroundColor: 'background.default',
+                cursor: 'grab',
               }}
             >
               <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
@@ -319,7 +329,8 @@ const CircularProgressSmall = (props: CircularProgressProps) => {
 
 export function useTransactionDialog(): {
   steps: TransactionStep[];
-  setSteps: Dispatch<SetStateAction<TransactionStep[]>>;
+  setSteps: (steps: TransactionStep[], actionAfterCompleted?: () => void) => void;
+  transactionPending: boolean;
 } {
   const context = useContext(TransactionDialogContext);
   if (context === undefined) {
