@@ -23,11 +23,11 @@ import HeaderCell from '../../Table/HeaderCell';
 import LiquidityPoolsTableLoader from './LiquidityPoolsTableLoader';
 
 type Props = {
-  selectedPool: GetBorrowerLiquidityPoolsQuery['pools'][number] | null;
-  setSelectedPool: (pool: GetBorrowerLiquidityPoolsQuery['pools'][number] | null) => void;
+  selectedPoolId: string | null;
+  setSelectedPoolId: (poolId: string | null) => void;
 };
 
-function LiquidityPoolsTable({ selectedPool, setSelectedPool }: Props) {
+function LiquidityPoolsTable({ selectedPoolId, setSelectedPoolId }: Props) {
   const { address } = useEthers();
 
   const { data: borrowerPoolsData, loading } = useQuery<
@@ -62,9 +62,9 @@ function LiquidityPoolsTable({ selectedPool, setSelectedPool }: Props) {
   useEffect(() => {
     // Select first pool by default
     if (allPoolsSorted.length > 0) {
-      setSelectedPool(allPoolsSorted[0]);
+      setSelectedPoolId(allPoolsSorted[0].id);
     }
-  }, [allPoolsSorted, setSelectedPool]);
+  }, [allPoolsSorted, setSelectedPoolId]);
 
   if (!borrowerPoolsData && loading) return <LiquidityPoolsTableLoader />;
 
@@ -114,20 +114,20 @@ function LiquidityPoolsTable({ selectedPool, setSelectedPool }: Props) {
                 <TableRow
                   key={id}
                   data-testid="apollon-liquidity-pool-table-row"
-                  hover={selectedPool?.id !== id}
-                  selected={selectedPool?.id === id}
+                  hover={selectedPoolId !== id}
+                  selected={selectedPoolId === id}
                   sx={{
                     ':hover': {
-                      cursor: selectedPool?.id !== id ? 'pointer' : 'default',
+                      cursor: selectedPoolId !== id ? 'pointer' : 'default',
                     },
                   }}
-                  onClick={() => setSelectedPool(pool)}
+                  onClick={() => setSelectedPoolId(pool.id)}
                 >
                   <TableCell
                     align="right"
                     sx={{
-                      borderLeft: selectedPool?.id === id ? '2px solid #33B6FF' : 'none',
-                      pl: selectedPool?.id === id ? 0 : 2,
+                      borderLeft: selectedPoolId === id ? '2px solid #33B6FF' : 'none',
+                      pl: selectedPoolId === id ? 0 : 2,
                     }}
                   >
                     <Typography fontWeight={400}>

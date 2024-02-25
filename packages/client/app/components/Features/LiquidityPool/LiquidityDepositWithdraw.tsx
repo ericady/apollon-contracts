@@ -13,13 +13,13 @@ import { useEthers } from '../../../context/EthersProvider';
 import { useTransactionDialog } from '../../../context/TransactionDialogProvider';
 import { isCollateralTokenAddress, isDebtTokenAddress } from '../../../context/contracts.config';
 import {
-  CollateralTokenMeta,
   DebtTokenMeta,
   GetBorrowerCollateralTokensQuery,
   GetBorrowerCollateralTokensQueryVariables,
   GetBorrowerDebtTokensQuery,
   GetBorrowerDebtTokensQueryVariables,
   GetBorrowerLiquidityPoolsQuery,
+  GetBorrowerLiquidityPoolsQueryVariables,
 } from '../../../generated/gql-types';
 import {
   GET_BORROWER_COLLATERAL_TOKENS,
@@ -44,7 +44,7 @@ import CollateralRatioVisualization, { CRIT_RATIO } from '../../Visualizations/C
 const SLIPPAGE = 0.02;
 
 type Props = {
-  selectedPool: GetBorrowerLiquidityPoolsQuery['pools'][number];
+  selectedPoolId: string | null;
 };
 
 type FieldValues = {
@@ -52,13 +52,7 @@ type FieldValues = {
   tokenBAmount: string;
 };
 
-function LiquidityDepositWithdraw({ selectedPool }: Props) {
-  const { liquidity, borrowerAmount, totalSupply } = selectedPool;
-  const [tokenA, tokenB] = liquidity.map((liquidity) => ({
-    ...liquidity,
-    token: { ...liquidity.token, priceUSD: dangerouslyConvertBigIntToNumber(liquidity.token.priceUSDOracle, 9, 9) },
-  }));
-
+function LiquidityDepositWithdraw({ selectedPoolId }: Props) {
   const {
     address,
     contracts: {
@@ -94,32 +88,12 @@ function LiquidityDepositWithdraw({ selectedPool }: Props) {
     },
   );
 
-  const foundTokenA = debtTokenData?.debtTokenMetas.find(({ token }) => token.id === tokenA.token.id) ??
-    collTokenData?.collateralTokenMetas.find(({ token }) => token.id === tokenA.token.id) ?? {
-      walletAmount: BigInt(0),
-      troveRepableDebtAmount: BigInt(0),
-    };
-  const relevantTokenA = {
-    ...foundTokenA,
-    // @ts-ignore
-    investedAmount: foundTokenA.troveRepableDebtAmount ?? foundTokenA.troveLockedAmount ?? BigInt(0),
-  } as (DebtTokenMeta | CollateralTokenMeta) & { investedAmount: bigint };
-
-  const foundTokenB = debtTokenData?.debtTokenMetas.find(({ token }) => token.id === tokenB.token.id) ??
-    collTokenData?.collateralTokenMetas.find(({ token }) => token.id === tokenA.token.id) ?? {
-      walletAmount: BigInt(0),
-      troveRepableDebtAmount: BigInt(0),
-    };
-  const relevantTokenB = {
-    ...foundTokenA,
-    // @ts-ignore
-    investedAmount: foundTokenB.troveRepableDebtAmount ?? foundTokenB.troveLockedAmount ?? BigInt(0),
-  } as (DebtTokenMeta | CollateralTokenMeta) & { investedAmount: bigint };
-
-  const handleChange = (_: SyntheticEvent, newValue: 'DEPOSIT' | 'WITHDRAW') => {
-    setTabValue(newValue);
-    reset();
-  };
+  // For Update after TX
+  const { data: borrowerPoolsData, loading } = useQuery<
+    GetBorrowerLiquidityPoolsQuery,
+    GetBorrowerLiquidityPoolsQueryVariables
+  >(GET_BORROWER_LIQUIDITY_POOLS, { variables: { borrower: address } });
+  const selectedPool = borrowerPoolsData?.pools.find(({ id }) => id === selectedPoolId);
 
   const methods = useForm<FieldValues>({
     defaultValues: {
@@ -130,6 +104,59 @@ function LiquidityDepositWithdraw({ selectedPool }: Props) {
     shouldUnregister: true,
   });
   const { handleSubmit, setValue, reset, formState, watch } = methods;
+
+  const ratioChangeCallback = useCallback(
+    (newRatio: number, oldRatio: number, currentDebtValueUSD: number, currentCollateralValueUSD: number) => {
+      setNewRatio(newRatio);
+      setOldRatio(oldRatio);
+      setCurrentDebtValueUSD(currentDebtValueUSD);
+      setCurrentCollateralValueUSD(currentCollateralValueUSD);
+    },
+    [setNewRatio, setOldRatio],
+  );
+
+  useEffect(() => {
+    if (!selectedPool?.borrowerAmount) {
+      setTabValue('DEPOSIT');
+    }
+
+    reset();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedPool]);
+
+  // Wait until pool has been selected
+  if (!selectedPool) return null;
+
+  const { liquidity, borrowerAmount, totalSupply } = selectedPool;
+  const [tokenA, tokenB] = liquidity.map((liquidity) => ({
+    ...liquidity,
+    token: { ...liquidity.token, priceUSD: dangerouslyConvertBigIntToNumber(liquidity.token.priceUSDOracle, 9, 9) },
+  }));
+
+  const isCollateralPair = isCollateralTokenAddress(tokenA.token.id) || isCollateralTokenAddress(tokenB.token.id);
+
+  const foundTokenA = (isDebtTokenAddress(tokenA.token.id)
+    ? debtTokenData?.debtTokenMetas.find(({ token }) => token.id === tokenA.token.id) ?? {
+        walletAmount: BigInt(0),
+        troveRepableDebtAmount: BigInt(0),
+      }
+    : collTokenData?.collateralTokenMetas.find(({ token }) => token.id === tokenA.token.id)) ?? {
+    walletAmount: BigInt(0),
+  };
+
+  const foundTokenB = (isDebtTokenAddress(tokenB.token.id)
+    ? debtTokenData?.debtTokenMetas.find(({ token }) => token.id === tokenB.token.id) ?? {
+        walletAmount: BigInt(0),
+        troveRepableDebtAmount: BigInt(0),
+      }
+    : collTokenData?.collateralTokenMetas.find(({ token }) => token.id === tokenB.token.id)) ?? {
+    walletAmount: BigInt(0),
+  };
+
+  const handleChange = (_: SyntheticEvent, newValue: 'DEPOSIT' | 'WITHDRAW') => {
+    setTabValue(newValue);
+    reset();
+  };
 
   const onSubmit = async (data: FieldValues) => {
     const tokenAAmount = data.tokenAAmount ? parseFloat(data.tokenAAmount) : 0;
@@ -144,7 +171,7 @@ function LiquidityDepositWithdraw({ selectedPool }: Props) {
       },
       {
         tokenAddress: tokenB.token.address,
-        amount: floatToBigInt(tokenBAmount),
+        amount: floatToBigInt(tokenBAmount, tokenB.token.decimals),
       },
     ].filter(({ tokenAddress }) => isCollateralTokenAddress(tokenAddress));
 
@@ -166,9 +193,10 @@ function LiquidityDepositWithdraw({ selectedPool }: Props) {
           transaction: {
             methodCall: async () => {
               if (isDebtTokenAddress(tokenA.token.address)) {
-                return debtTokenContracts[tokenA.token.address].approve(selectedPool.address, tokenAAmount);
-              } else if (isCollateralTokenAddress(tokenA.token.address)) {
-                return collateralTokenContracts[tokenA.token.address].approve(selectedPool.address, tokenAAmount);
+                return debtTokenContracts[tokenA.token.address].approve(
+                  selectedPool.address,
+                  floatToBigInt(tokenAAmount),
+                );
               }
 
               return null as any;
@@ -181,9 +209,15 @@ function LiquidityDepositWithdraw({ selectedPool }: Props) {
           transaction: {
             methodCall: async () => {
               if (isDebtTokenAddress(tokenB.token.address)) {
-                return debtTokenContracts[tokenB.token.address].approve(selectedPool.address, tokenBAmount);
+                return debtTokenContracts[tokenB.token.address].approve(
+                  selectedPool.address,
+                  floatToBigInt(tokenBAmount),
+                );
               } else if (isCollateralTokenAddress(tokenB.token.address)) {
-                return collateralTokenContracts[tokenB.token.address].approve(selectedPool.address, tokenAAmount);
+                return collateralTokenContracts[tokenB.token.address].approve(
+                  selectedPool.address,
+                  floatToBigInt(tokenBAmount, tokenB.token.decimals),
+                );
               }
 
               return null as any;
@@ -282,33 +316,14 @@ function LiquidityDepositWithdraw({ selectedPool }: Props) {
     reset();
   };
 
-  const ratioChangeCallback = useCallback(
-    (newRatio: number, oldRatio: number, currentDebtValueUSD: number, currentCollateralValueUSD: number) => {
-      setNewRatio(newRatio);
-      setOldRatio(oldRatio);
-      setCurrentDebtValueUSD(currentDebtValueUSD);
-      setCurrentCollateralValueUSD(currentCollateralValueUSD);
-    },
-    [setNewRatio, setOldRatio],
-  );
-
-  useEffect(() => {
-    if (!borrowerAmount) {
-      setTabValue('DEPOSIT');
-    }
-
-    reset();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selectedPool]);
-
   const handleInput = (fieldName: keyof FieldValues, value: string) => {
     const numericValue = isNaN(parseFloat(value)) ? 0 : parseFloat(value);
 
     if (tabValue === 'DEPOSIT') {
       if (fieldName === 'tokenAAmount') {
         const pairValue = roundNumber(
-          (numericValue * bigIntStringToFloat(tokenA.totalAmount, tokenA.token.decimals)) /
-            bigIntStringToFloat(tokenB.totalAmount, tokenB.token.decimals),
+          (numericValue * bigIntStringToFloat(tokenB.totalAmount, tokenB.token.decimals)) /
+            bigIntStringToFloat(tokenA.totalAmount, tokenA.token.decimals),
           5,
         );
         setValue('tokenBAmount', pairValue.toString(), {
@@ -317,8 +332,8 @@ function LiquidityDepositWithdraw({ selectedPool }: Props) {
         });
       } else {
         const pairValue = roundNumber(
-          (numericValue * bigIntStringToFloat(tokenB.totalAmount, tokenB.token.decimals)) /
-            bigIntStringToFloat(tokenA.totalAmount, tokenA.token.decimals),
+          (numericValue * bigIntStringToFloat(tokenA.totalAmount, tokenA.token.decimals)) /
+            bigIntStringToFloat(tokenB.totalAmount, tokenB.token.decimals),
           5,
         );
 
@@ -332,28 +347,68 @@ function LiquidityDepositWithdraw({ selectedPool }: Props) {
   };
 
   const fillMaxInputValue = (fieldName: keyof FieldValues) => {
-    if (tabValue === 'DEPOSIT') {
-      if (fieldName === 'tokenAAmount') {
-        setValue(fieldName, dangerouslyConvertBigIntToNumber(relevantTokenA.walletAmount, 9, 9).toString(), {
+    // calculate max value of walletAmount for pool distribution
+    if (isCollateralPair) {
+      if (tabValue === 'DEPOSIT') {
+        const walletAmountAForPool =
+          (dangerouslyConvertBigIntToNumber(foundTokenA.walletAmount, 9, 9) *
+            bigIntStringToFloat(tokenB.totalAmount, tokenB.token.decimals)) /
+          bigIntStringToFloat(tokenA.totalAmount, tokenA.token.decimals);
+
+        if (
+          walletAmountAForPool <
+          dangerouslyConvertBigIntToNumber(foundTokenB.walletAmount, tokenB.token.decimals - 9, 9)
+        ) {
+          setValue('tokenAAmount', dangerouslyConvertBigIntToNumber(foundTokenA.walletAmount, 9, 9).toString(), {
+            shouldValidate: true,
+            shouldDirty: true,
+          });
+          handleInput('tokenAAmount', dangerouslyConvertBigIntToNumber(foundTokenA.walletAmount, 9, 9).toString());
+        } else {
+          setValue('tokenBAmount', dangerouslyConvertBigIntToNumber(foundTokenB.walletAmount, 9, 9).toString(), {
+            shouldValidate: true,
+            shouldDirty: true,
+          });
+          handleInput(
+            'tokenBAmount',
+            dangerouslyConvertBigIntToNumber(foundTokenB.walletAmount, tokenB.token.decimals - 9, 9).toString(),
+          );
+        }
+      } else {
+        setValue(fieldName, dangerouslyConvertBigIntToNumber(borrowerAmount, 9, 9).toString(), {
           shouldValidate: true,
           shouldDirty: true,
         });
-        handleInput(fieldName, dangerouslyConvertBigIntToNumber(relevantTokenA.walletAmount, 9, 9).toString());
-      } else if (fieldName === 'tokenBAmount') {
-        setValue(fieldName, dangerouslyConvertBigIntToNumber(relevantTokenB.walletAmount, 9, 9).toString(), {
-          shouldValidate: true,
-          shouldDirty: true,
-        });
-        handleInput(fieldName, dangerouslyConvertBigIntToNumber(relevantTokenB.walletAmount, 9, 9).toString());
       }
-    } else {
-      setValue(fieldName, dangerouslyConvertBigIntToNumber(borrowerAmount, 9, 9).toString(), {
-        shouldValidate: true,
-        shouldDirty: true,
-      });
+    }
+    // New token can be minted, just will the walletAmount
+    else {
+      if (tabValue === 'DEPOSIT') {
+        if (fieldName === 'tokenAAmount') {
+          setValue(fieldName, dangerouslyConvertBigIntToNumber(foundTokenA.walletAmount, 9, 9).toString(), {
+            shouldValidate: true,
+            shouldDirty: true,
+          });
+          handleInput(fieldName, dangerouslyConvertBigIntToNumber(foundTokenA.walletAmount, 9, 9).toString());
+        } else if (fieldName === 'tokenBAmount') {
+          setValue(fieldName, dangerouslyConvertBigIntToNumber(foundTokenB.walletAmount, 9, 9).toString(), {
+            shouldValidate: true,
+            shouldDirty: true,
+          });
+          handleInput(fieldName, dangerouslyConvertBigIntToNumber(foundTokenB.walletAmount, 9, 9).toString());
+        }
+      } else {
+        setValue(fieldName, dangerouslyConvertBigIntToNumber(borrowerAmount, 9, 9).toString(), {
+          shouldValidate: true,
+          shouldDirty: true,
+        });
+      }
     }
   };
 
+  /**
+   * Can only be called is the pair is a DebtTokenPair
+   */
   const fill150PercentInputValue = () => {
     // Check if current collateral is less than 150% of current debt
     if (currentDebtValueUSD && currentCollateralValueUSD) {
@@ -368,9 +423,11 @@ function LiquidityDepositWithdraw({ selectedPool }: Props) {
           totalAmount: bigIntStringToFloat(tokenB.totalAmount, tokenB.token.decimals),
           priceUSD: dangerouslyConvertBigIntToNumber(tokenB.token.priceUSDOracle, 9, 9),
         },
-        relevantTokenA,
-        relevantTokenB,
+        foundTokenA,
+        foundTokenB,
       );
+
+      console.log('tokenAAmount: ', tokenAAmount);
 
       setValue('tokenAAmount', tokenAAmount.toString(), {
         shouldValidate: true,
@@ -388,31 +445,33 @@ function LiquidityDepositWithdraw({ selectedPool }: Props) {
   const tokenAAmountForWithdraw = percentageFromPool * bigIntStringToFloat(tokenA.totalAmount, tokenA.token.decimals);
   const tokenBAmountForWithdraw = percentageFromPool * bigIntStringToFloat(tokenB.totalAmount, tokenB.token.decimals);
 
-  const addedDebtUSD =
-    tabValue === 'DEPOSIT'
+  // If it is a CollTokenPair there is no Debt to take
+  const addedDebtUSD = !isCollateralPair
+    ? tabValue === 'DEPOSIT'
       ? (tokenAAmount
           ? Math.max(
-              (parseFloat(tokenAAmount) - dangerouslyConvertBigIntToNumber(relevantTokenA.walletAmount, 9, 9)) *
+              (parseFloat(tokenAAmount) - dangerouslyConvertBigIntToNumber(foundTokenA.walletAmount, 9, 9)) *
                 dangerouslyConvertBigIntToNumber(tokenA.token.priceUSDOracle, 9, 9),
               0,
             )
           : 0) +
         (tokenBAmount
           ? Math.max(
-              (parseFloat(tokenBAmount) - dangerouslyConvertBigIntToNumber(relevantTokenB.walletAmount, 9, 9)) *
+              (parseFloat(tokenBAmount) - dangerouslyConvertBigIntToNumber(foundTokenB.walletAmount, 9, 9)) *
                 dangerouslyConvertBigIntToNumber(tokenB.token.priceUSDOracle, 9, 9),
               0,
             )
           : 0)
-      : ((relevantTokenA.investedAmount > tokenAAmountForWithdraw
+      : (((foundTokenA as DebtTokenMeta).troveRepableDebtAmount > tokenAAmountForWithdraw
           ? tokenAAmountForWithdraw * dangerouslyConvertBigIntToNumber(tokenA.token.priceUSDOracle, 9, 9)
-          : dangerouslyConvertBigIntToNumber(relevantTokenA.investedAmount, 9, 9) *
+          : dangerouslyConvertBigIntToNumber((foundTokenA as DebtTokenMeta).troveRepableDebtAmount, 9, 9) *
             dangerouslyConvertBigIntToNumber(tokenA.token.priceUSDOracle, 9, 9)) +
-          (relevantTokenB.investedAmount > tokenBAmountForWithdraw
+          ((foundTokenB as DebtTokenMeta).troveRepableDebtAmount > tokenBAmountForWithdraw
             ? tokenBAmountForWithdraw * dangerouslyConvertBigIntToNumber(tokenB.token.priceUSDOracle, 9, 9)
-            : dangerouslyConvertBigIntToNumber(relevantTokenB.investedAmount, 9, 9) *
+            : dangerouslyConvertBigIntToNumber((foundTokenB as DebtTokenMeta).troveRepableDebtAmount, 9, 9) *
               dangerouslyConvertBigIntToNumber(tokenB.token.priceUSDOracle, 9, 9))) *
-        -1;
+        -1
+    : 0;
 
   return (
     <FeatureBox title="Your Liquidity" noPadding headBorder="bottom" border="full">
@@ -467,35 +526,60 @@ function LiquidityDepositWithdraw({ selectedPool }: Props) {
                     }}
                     rules={{
                       min: { value: 0, message: 'You can only invest positive amounts.' },
+                      max: isCollateralPair
+                        ? {
+                            value: dangerouslyConvertBigIntToNumber(
+                              foundTokenA.walletAmount,
+                              tokenA.token.decimals - 9,
+                              9,
+                            ),
+                            message: 'You wallet does not contain the specified amount.',
+                          }
+                        : undefined,
                       required: 'This field is required.',
                     }}
                   />
 
                   <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                    <div>
-                      <Typography
-                        variant="caption"
-                        data-testid="apollon-collateral-update-dialog-deposit-ether-funds-label"
-                        color="info.main"
-                      >
-                        {tokenAAmount
-                          ? roundCurrency(
-                              parseFloat(tokenAAmount) <
-                                dangerouslyConvertBigIntToNumber(relevantTokenA.walletAmount, 9, 9)
-                                ? parseFloat(tokenAAmount)
-                                : dangerouslyConvertBigIntToNumber(relevantTokenA.walletAmount, 12, 6),
-                              5,
-                              5,
-                            )
-                          : 0}
-                      </Typography>
-                      <Typography variant="label" paragraph>
-                        from Wallet
-                      </Typography>
-                    </div>
+                    {isCollateralPair ? (
+                      <div>
+                        <Typography
+                          variant="caption"
+                          data-testid="apollon-collateral-update-dialog-deposit-ether-funds-label"
+                          color="info.main"
+                        >
+                          {roundCurrency(dangerouslyConvertBigIntToNumber(foundTokenA.walletAmount, 12, 6), 5, 5)}
+                        </Typography>
+                        <Typography variant="label" paragraph>
+                          Wallet
+                        </Typography>
+                      </div>
+                    ) : (
+                      <div>
+                        <Typography
+                          variant="caption"
+                          data-testid="apollon-collateral-update-dialog-deposit-ether-funds-label"
+                          color="info.main"
+                        >
+                          {tokenAAmount
+                            ? roundCurrency(
+                                parseFloat(tokenAAmount) <
+                                  dangerouslyConvertBigIntToNumber(foundTokenA.walletAmount, 9, 9)
+                                  ? parseFloat(tokenAAmount)
+                                  : dangerouslyConvertBigIntToNumber(foundTokenA.walletAmount, 12, 6),
+                                5,
+                                5,
+                              )
+                            : 0}
+                        </Typography>
+                        <Typography variant="label" paragraph>
+                          from Wallet
+                        </Typography>
+                      </div>
+                    )}
 
                     <Button
-                      disabled={relevantTokenA.walletAmount <= 0}
+                      disabled={foundTokenA.walletAmount <= 0}
                       variant="undercover"
                       sx={{ textDecoration: 'underline', p: 0, mt: 0.25, height: 25 }}
                       onClick={() => fillMaxInputValue('tokenAAmount')}
@@ -504,43 +588,46 @@ function LiquidityDepositWithdraw({ selectedPool }: Props) {
                     </Button>
                   </div>
 
-                  <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                    <div>
-                      <Typography
-                        variant="caption"
-                        data-testid="apollon-collateral-update-dialog-deposit-ether-funds-label"
-                        color="info.main"
-                      >
-                        {tokenAAmount
-                          ? roundCurrency(
-                              parseFloat(tokenAAmount) >
-                                dangerouslyConvertBigIntToNumber(relevantTokenA.walletAmount, 9, 9)
-                                ? parseFloat(tokenAAmount) -
-                                    dangerouslyConvertBigIntToNumber(relevantTokenA.walletAmount, 12, 6)
-                                : 0,
-                              5,
-                              5,
-                            )
-                          : 0}
-                      </Typography>
-                      <Typography variant="label" paragraph>
-                        newly minted
-                      </Typography>
-                    </div>
+                  {!isCollateralPair && (
+                    <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                      <div>
+                        <Typography
+                          variant="caption"
+                          data-testid="apollon-collateral-update-dialog-deposit-ether-funds-label"
+                          color="info.main"
+                        >
+                          {tokenAAmount
+                            ? roundCurrency(
+                                parseFloat(tokenAAmount) >
+                                  dangerouslyConvertBigIntToNumber(foundTokenA.walletAmount, 9, 9)
+                                  ? parseFloat(tokenAAmount) -
+                                      dangerouslyConvertBigIntToNumber(foundTokenA.walletAmount, 12, 6)
+                                  : 0,
+                                5,
+                                5,
+                              )
+                            : 0}
+                        </Typography>
+                        <Typography variant="label" paragraph>
+                          newly minted
+                        </Typography>
+                      </div>
 
-                    <Button
-                      disabled={
-                        !currentCollateralValueUSD ||
-                        !currentDebtValueUSD ||
-                        currentCollateralValueUSD / currentDebtValueUSD < 1.5
-                      }
-                      variant="undercover"
-                      sx={{ textDecoration: 'underline', p: 0, mt: 0.25, height: 25 }}
-                      onClick={() => fill150PercentInputValue()}
-                    >
-                      to 150%
-                    </Button>
-                  </div>
+                      <Button
+                        disabled
+                        // disabled={
+                        //   !currentCollateralValueUSD ||
+                        //   !currentDebtValueUSD ||
+                        //   currentCollateralValueUSD / currentDebtValueUSD < 1.5
+                        // }
+                        variant="undercover"
+                        sx={{ textDecoration: 'underline', p: 0, mt: 0.25, height: 25 }}
+                        onClick={() => fill150PercentInputValue()}
+                      >
+                        to 150%
+                      </Button>
+                    </div>
+                  )}
                 </div>
               </Box>
 
@@ -585,35 +672,65 @@ function LiquidityDepositWithdraw({ selectedPool }: Props) {
                     }}
                     rules={{
                       min: { value: 0, message: 'You can only invest positive amounts.' },
+                      // Make sure coll data is already loaded.
+                      max: isCollateralPair
+                        ? {
+                            value: dangerouslyConvertBigIntToNumber(
+                              foundTokenB.walletAmount,
+                              tokenB.token.decimals - 9,
+                              9,
+                            ),
+                            message: 'You wallet does not contain the specified amount.',
+                          }
+                        : undefined,
                       required: 'This field is required.',
                     }}
                   />
 
                   <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                    <div>
-                      <Typography
-                        variant="caption"
-                        data-testid="apollon-collateral-update-dialog-deposit-ether-funds-label"
-                        color="info.main"
-                      >
-                        {tokenBAmount
-                          ? roundCurrency(
-                              parseFloat(tokenBAmount) <
-                                dangerouslyConvertBigIntToNumber(relevantTokenB.walletAmount, 9, 9)
-                                ? parseFloat(tokenBAmount)
-                                : dangerouslyConvertBigIntToNumber(relevantTokenB.walletAmount, 12, 6),
-                              5,
-                              5,
-                            )
-                          : 0}
-                      </Typography>
-                      <Typography variant="label" paragraph>
-                        from Wallet
-                      </Typography>
-                    </div>
+                    {isCollateralPair ? (
+                      <div>
+                        <Typography
+                          variant="caption"
+                          data-testid="apollon-collateral-update-dialog-deposit-ether-funds-label"
+                          color="info.main"
+                        >
+                          {roundCurrency(
+                            dangerouslyConvertBigIntToNumber(foundTokenB.walletAmount, tokenB.token.decimals - 6, 6),
+                            5,
+                            5,
+                          )}
+                        </Typography>
+                        <Typography variant="label" paragraph>
+                          Wallet
+                        </Typography>
+                      </div>
+                    ) : (
+                      <div>
+                        <Typography
+                          variant="caption"
+                          data-testid="apollon-collateral-update-dialog-deposit-ether-funds-label"
+                          color="info.main"
+                        >
+                          {tokenBAmount
+                            ? roundCurrency(
+                                parseFloat(tokenBAmount) <
+                                  dangerouslyConvertBigIntToNumber(foundTokenB.walletAmount, 9, 9)
+                                  ? parseFloat(tokenBAmount)
+                                  : dangerouslyConvertBigIntToNumber(foundTokenB.walletAmount, 12, 6),
+                                5,
+                                5,
+                              )
+                            : 0}
+                        </Typography>
+                        <Typography variant="label" paragraph>
+                          from Wallet
+                        </Typography>
+                      </div>
+                    )}
 
                     <Button
-                      disabled={relevantTokenB.walletAmount <= 0}
+                      disabled={foundTokenB.walletAmount <= 0}
                       variant="undercover"
                       sx={{ textDecoration: 'underline', p: 0, mt: 0.25, height: 25 }}
                       onClick={() => fillMaxInputValue('tokenBAmount')}
@@ -622,43 +739,46 @@ function LiquidityDepositWithdraw({ selectedPool }: Props) {
                     </Button>
                   </div>
 
-                  <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                    <div>
-                      <Typography
-                        variant="caption"
-                        data-testid="apollon-collateral-update-dialog-deposit-ether-funds-label"
-                        color="info.main"
-                      >
-                        {tokenBAmount
-                          ? roundCurrency(
-                              parseFloat(tokenBAmount) >
-                                dangerouslyConvertBigIntToNumber(relevantTokenB.walletAmount, 9, 9)
-                                ? parseFloat(tokenBAmount) -
-                                    dangerouslyConvertBigIntToNumber(relevantTokenB.walletAmount, 12, 9)
-                                : 0,
-                              5,
-                              5,
-                            )
-                          : 0}
-                      </Typography>
-                      <Typography variant="label" paragraph>
-                        newly minted
-                      </Typography>
-                    </div>
+                  {!isCollateralPair && (
+                    <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                      <div>
+                        <Typography
+                          variant="caption"
+                          data-testid="apollon-collateral-update-dialog-deposit-ether-funds-label"
+                          color="info.main"
+                        >
+                          {tokenBAmount
+                            ? roundCurrency(
+                                parseFloat(tokenBAmount) >
+                                  dangerouslyConvertBigIntToNumber(foundTokenB.walletAmount, 9, 9)
+                                  ? parseFloat(tokenBAmount) -
+                                      dangerouslyConvertBigIntToNumber(foundTokenB.walletAmount, 12, 9)
+                                  : 0,
+                                5,
+                                5,
+                              )
+                            : 0}
+                        </Typography>
+                        <Typography variant="label" paragraph>
+                          newly minted
+                        </Typography>
+                      </div>
 
-                    <Button
-                      disabled={
-                        !currentCollateralValueUSD ||
-                        !currentDebtValueUSD ||
-                        currentCollateralValueUSD / currentDebtValueUSD < 1.5
-                      }
-                      variant="undercover"
-                      sx={{ textDecoration: 'underline', p: 0, mt: 0.25, height: 25 }}
-                      onClick={() => fill150PercentInputValue()}
-                    >
-                      to 150%
-                    </Button>
-                  </div>
+                      <Button
+                        disabled
+                        // disabled={
+                        //   !currentCollateralValueUSD ||
+                        //   !currentDebtValueUSD ||
+                        //   currentCollateralValueUSD / currentDebtValueUSD < 1.5
+                        // }
+                        variant="undercover"
+                        sx={{ textDecoration: 'underline', p: 0, mt: 0.25, height: 25 }}
+                        onClick={() => fill150PercentInputValue()}
+                      >
+                        to 150%
+                      </Button>
+                    </div>
+                  )}
                 </div>
               </Box>
             </>
@@ -679,7 +799,7 @@ function LiquidityDepositWithdraw({ selectedPool }: Props) {
                 }}
               >
                 <div style={{ marginTop: 6 }}>
-                  <Label variant="success">MNT-USDT</Label>
+                  <Label variant="success">MNT-{tokenB.token.symbol}</Label>
                 </div>
 
                 <div>
@@ -743,15 +863,25 @@ function LiquidityDepositWithdraw({ selectedPool }: Props) {
                     <Typography variant="label">Payout</Typography>
                   </div>
 
-                  <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                    <Typography component="span" style={{ marginRight: '8px' }}>
-                      {tokenAAmountForWithdraw > relevantTokenA.investedAmount
-                        ? roundCurrency(dangerouslyConvertBigIntToNumber(relevantTokenA.investedAmount, 12, 6), 5, 5)
-                        : roundCurrency(tokenAAmountForWithdraw, 5, 5)}
-                    </Typography>
+                  {!isCollateralPair && (
+                    <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                      <Typography component="span" style={{ marginRight: '8px' }}>
+                        {tokenAAmountForWithdraw > (foundTokenA as DebtTokenMeta).troveRepableDebtAmount
+                          ? roundCurrency(
+                              dangerouslyConvertBigIntToNumber(
+                                (foundTokenA as DebtTokenMeta).troveRepableDebtAmount,
+                                12,
+                                6,
+                              ),
+                              5,
+                              5,
+                            )
+                          : roundCurrency(tokenAAmountForWithdraw, 5, 5)}
+                      </Typography>
 
-                    <Typography variant="label">Debt payed of</Typography>
-                  </div>
+                      <Typography variant="label">Debt payed of</Typography>
+                    </div>
+                  )}
                 </div>
               </div>
 
@@ -779,15 +909,25 @@ function LiquidityDepositWithdraw({ selectedPool }: Props) {
                     <Typography variant="label">Payout</Typography>
                   </div>
 
-                  <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-                    <Typography component="span" style={{ marginRight: '8px' }}>
-                      {tokenBAmountForWithdraw > relevantTokenB.investedAmount
-                        ? roundCurrency(dangerouslyConvertBigIntToNumber(relevantTokenB.investedAmount, 12, 6), 5, 5)
-                        : roundCurrency(tokenBAmountForWithdraw, 5, 5)}
-                    </Typography>
+                  {!isCollateralPair && (
+                    <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                      <Typography component="span" style={{ marginRight: '8px' }}>
+                        {tokenBAmountForWithdraw > (foundTokenB as DebtTokenMeta).troveRepableDebtAmount
+                          ? roundCurrency(
+                              dangerouslyConvertBigIntToNumber(
+                                (foundTokenB as DebtTokenMeta).troveRepableDebtAmount,
+                                12,
+                                6,
+                              ),
+                              5,
+                              5,
+                            )
+                          : roundCurrency(tokenBAmountForWithdraw, 5, 5)}
+                      </Typography>
 
-                    <Typography variant="label">Debt payed of</Typography>
-                  </div>
+                      <Typography variant="label">Debt payed of</Typography>
+                    </div>
+                  )}
                 </div>
               </div>
             </Box>
@@ -882,7 +1022,7 @@ export const calculate150PercentTokenValue = (
   const diffUSD = targetDebtUSD - currentDebtValueUSD;
 
   const tokenBTotokenARatio = tokenA.totalAmount / tokenB.totalAmount;
-  const ratioWithPrice = (tokenBTotokenARatio * tokenB.priceUSD) / tokenA.priceUSD;
+  const ratioWithPrice = (tokenBTotokenARatio * tokenA.priceUSD) / tokenB.priceUSD;
 
   if (relevantDebtTokenA.walletAmount === BigInt(0) && relevantDebtTokenB.walletAmount === BigInt(0)) {
     const diffTokenAUSD = diffUSD / (1 + ratioWithPrice);
@@ -894,13 +1034,12 @@ export const calculate150PercentTokenValue = (
 
   const diffWalletTokenA =
     dangerouslyConvertBigIntToNumber(relevantDebtTokenA.walletAmount, 9, 9) -
-    dangerouslyConvertBigIntToNumber(relevantDebtTokenB.walletAmount, 9, 9) * ratioWithPrice;
-
+    dangerouslyConvertBigIntToNumber(relevantDebtTokenB.walletAmount, 9, 9) * tokenBTotokenARatio * ratioWithPrice;
   if (diffWalletTokenA > 0) {
     // fill tokenB with amount for complete diff
     if (diffUSD < diffWalletTokenA * tokenA.priceUSD) {
       const tokenBAmount = diffUSD / tokenB.priceUSD;
-      const tokenAAmount = (tokenBAmount * tokenB.totalAmount) / tokenA.totalAmount;
+      const tokenAAmount = (tokenBAmount * tokenA.totalAmount) / tokenB.totalAmount;
 
       return tokenAAmount;
     } else {
@@ -911,24 +1050,27 @@ export const calculate150PercentTokenValue = (
 
       return dangerouslyConvertBigIntToNumber(relevantDebtTokenA.walletAmount, 9, 9) + tokenAAmount;
     }
-  } else {
-    const diffWalletTokenBasA = Math.abs(
-      dangerouslyConvertBigIntToNumber(relevantDebtTokenA.walletAmount, 9, 9) -
-        dangerouslyConvertBigIntToNumber(relevantDebtTokenB.walletAmount, 9, 9) * ratioWithPrice,
-    );
+  }
+  // We have more token B than A
+  else {
+    const diffWalletTokenBasA = Math.abs(diffWalletTokenA);
 
+    // Everything comes from TokenA / TokenB is not Minted
     if (diffUSD < diffWalletTokenBasA * tokenA.priceUSD) {
-      // fill tokenA with amount for complete diff
-      const tokenAAmount = diffUSD / tokenA.priceUSD;
+      // fill tokenA with amount for complete diff + wallet amount
+      const tokenAAmountAsDebt = diffUSD / tokenA.priceUSD;
 
-      return tokenAAmount;
+      return tokenAAmountAsDebt + dangerouslyConvertBigIntToNumber(relevantDebtTokenA.walletAmount, 9, 9);
     } else {
       const restDebtToShare = diffUSD - diffWalletTokenBasA * tokenA.priceUSD;
-      let diffTokenAUSD = restDebtToShare / (1 + ratioWithPrice);
+      let diffTokenAUSD = (restDebtToShare * tokenBTotokenARatio) / (1 + ratioWithPrice);
 
       const tokenAAmount = diffTokenAUSD / tokenA.priceUSD;
 
-      return dangerouslyConvertBigIntToNumber(relevantDebtTokenB.walletAmount, 9, 9) * ratioWithPrice + tokenAAmount;
+      return (
+        dangerouslyConvertBigIntToNumber(relevantDebtTokenB.walletAmount, 9, 9) * tokenBTotokenARatio * ratioWithPrice +
+        tokenAAmount
+      );
     }
   }
 };
