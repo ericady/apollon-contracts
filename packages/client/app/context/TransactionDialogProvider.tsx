@@ -214,7 +214,7 @@ export default function TransactionDialogProvider({ children }: { children: Reac
         <Draggable
           handle={'[class*="MuiDialog-root"]'}
           cancel={'[class*="MuiDialogContent-root"]'}
-          defaultPosition={{ x: window.innerWidth - 700, y: window.innerHeight - 450 }}
+          defaultPosition={{ x: window.innerWidth - 670, y: 50 }}
         >
           <Dialog
             open={activeStep !== undefined || showConfirmation}
@@ -228,9 +228,16 @@ export default function TransactionDialogProvider({ children }: { children: Reac
             hideBackdrop // Hides the shaded backdrop
             disableScrollLock
             disableAutoFocus // Prevents backdrop clicks
-            style={{
+            sx={{
               height: 'fit-content', // Ensures that the dialog is
               width: 'fit-content', // exactly the same size as its contents
+            }}
+            PaperProps={{
+              sx: {
+                boxShadow: 'none',
+                border: '1px solid',
+                borderColor: 'background.paper',
+              }
             }}
             // @ts-ignore
             componentsProps={{ backdrop: { 'data-testid': 'apollon-transaction-signer-dialog-backdrop' } }}
@@ -241,9 +248,6 @@ export default function TransactionDialogProvider({ children }: { children: Reac
                 justifyContent: 'space-between',
                 alignItems: 'center',
                 backgroundColor: 'background.default',
-                border: '1px solid',
-                borderColor: 'background.paper',
-                borderBottom: 'none',
               }}
             >
               <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
@@ -267,9 +271,7 @@ export default function TransactionDialogProvider({ children }: { children: Reac
               sx={{
                 p: 0,
                 backgroundColor: 'background.default',
-                border: '1px solid',
-                borderColor: 'background.paper',
-                borderBottom: 'none',
+                
               }}
             >
               {showConfirmation ? (
