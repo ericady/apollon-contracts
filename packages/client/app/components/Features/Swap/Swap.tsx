@@ -252,8 +252,9 @@ const Swap = () => {
       pool: { liqudityPair },
       decimals,
     } = selectedToken!;
-    const liq0 = dangerouslyConvertBigIntToNumber(liqudityPair[0], 0);
-    const liq1 = dangerouslyConvertBigIntToNumber(convertToEtherPrecission(liqudityPair[1], decimals), 0);
+
+    const liq0 = dangerouslyConvertBigIntToNumber(liqudityPair[0], 9, 9);
+    const liq1 = dangerouslyConvertBigIntToNumber(convertToEtherPrecission(liqudityPair[1], decimals), 9, 9);
     const currentPrice = liq0 / liq1;
 
     // TODO: Take a look if this is correct. Diff with FARM
@@ -334,7 +335,7 @@ const Swap = () => {
       InputProps={{
         endAdornment: (
           <InputAdornment position="end">
-            <Label variant="none">jUSD</Label>
+            <Label variant="none">{JUSDToken?.symbol}</Label>
           </InputAdornment>
         ),
       }}
@@ -361,8 +362,7 @@ const Swap = () => {
         <FormProvider {...methods}>
           <form onSubmit={handleSubmit(onSubmit)}>
             <div style={{ display: 'flex', justifyContent: 'space-between' }}>
-              {tradingDirection === 'jUSDSpent' ? tokenInput : jUSDInput}
-
+              {tradingDirection === 'jUSDSpent' ? jUSDInput : tokenInput}
               <IconButton
                 sx={{ height: 20, width: 20, margin: '8px 10px 0px 10px' }}
                 size="small"
@@ -373,14 +373,10 @@ const Swap = () => {
                   setValue('tokenAmount', '');
                 }}
               >
-                <ExchangeIcon
-                  style={{
-                    transform: 'rotate(180deg)',
-                  }}
-                />
+                <ExchangeIcon />
               </IconButton>
 
-              {tradingDirection === 'jUSDSpent' ? jUSDInput : tokenInput}
+              {tradingDirection === 'jUSDSpent' ? tokenInput : jUSDInput}
             </div>
 
             {showSlippage && (
