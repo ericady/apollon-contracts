@@ -35,7 +35,9 @@ function CollSurplus() {
         title: 'Claim your Collateral Surplus.',
         transaction: {
           methodCall: () => {
-            return borrowerOperationsContract.claimCollateral();
+            return borrowerOperationsContract.claimCollateral().catch((err) => {
+              throw new Error(err, { cause: borrowerOperationsContract });
+            });
           },
           waitForResponseOf: [],
           reloadQueriesAferMined: [GET_BORROWER_COLLATERAL_TOKENS],

@@ -65,7 +65,9 @@ const CloseTroveDialog = ({ buttonVariant, buttonSx = {} }: Props) => {
         title: 'Repay all debt and close trove.',
         transaction: {
           methodCall: () => {
-            return borrowerOperationsContract.closeTrove();
+            return borrowerOperationsContract.closeTrove().catch((err) => {
+              throw new Error(err, { cause: borrowerOperationsContract });
+            });
           },
           waitForResponseOf: [],
           reloadQueriesAferMined: [GET_BORROWER_COLLATERAL_TOKENS, GET_BORROWER_DEBT_TOKENS],

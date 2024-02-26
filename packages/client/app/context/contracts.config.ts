@@ -15,9 +15,9 @@ export const Contracts = {
   StabilityPoolManager: '0xdc64a140aa3e981100a9beca4e685f962f0cf6c9',
   SwapOperations: '0xa51c1fc2f0d1a1b8494ed1fe312d7c3a78ed91c0',
   SwapPairs: {
-    BTC: '0x6d09e8227073f36028f87f9ac1863540be036c01',
-    USDT: '0x6fc8d5049fa554c86660e9a06664b87b1405015d',
-    STOCK_1: '0xa3fe5e2fd94cda575722f376eba4816a7eeaf79c',
+    BTC: '0x89b8df39249ab0223c06f9ec658c941eeb468d2d',
+    USDT: '0x2c6cb0ed9cea808aaa11d3ff503b047dd9483132',
+    STOCK_1: '0x6269a5c2e2652d251f0164ff8692876e6ff9b4b4',
   },
   BorrowerOperations: '0xcf7ed3acca5a467e9e704c703e8d87f634fb0fc9',
   StoragePool: '0xb7f8bc63bbcad18155201308c8f3540b07f84f5e',
@@ -31,9 +31,9 @@ export const Contracts = {
 export const isPoolAddress = (
   address: string,
 ): address is
-  | '0x6d09e8227073f36028f87f9ac1863540be036c01'
-  | '0x6fc8d5049fa554c86660e9a06664b87b1405015d'
-  | '0xa3fe5e2fd94cda575722f376eba4816a7eeaf79c' => {
+  | '0x89b8df39249ab0223c06f9ec658c941eeb468d2d'
+  | '0x2c6cb0ed9cea808aaa11d3ff503b047dd9483132'
+  | '0x6269a5c2e2652d251f0164ff8692876e6ff9b4b4' => {
   return Object.values(Contracts.SwapPairs)
     .map((address) => getCheckSum(address))
     .includes(getCheckSum(address) as any);

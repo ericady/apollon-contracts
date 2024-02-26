@@ -100,7 +100,9 @@ const StabilityUpdateDialog = () => {
           title: 'Provide Stability to the Stability Pool.',
           transaction: {
             methodCall: () => {
-              return stabilityPoolManagerContract.provideStability(tokenAmounts);
+              return stabilityPoolManagerContract.provideStability(tokenAmounts).catch((err) => {
+                throw new Error(err, { cause: stabilityPoolManagerContract });
+              });
             },
             // wait for all approvals
             waitForResponseOf: Array.of(tokenAmounts.length).map((_, index) => index),
@@ -114,7 +116,9 @@ const StabilityUpdateDialog = () => {
           title: 'Withdraw Stability from the Stability Pool.',
           transaction: {
             methodCall: () => {
-              return stabilityPoolManagerContract.withdrawStability(tokenAmounts);
+              return stabilityPoolManagerContract.withdrawStability(tokenAmounts).catch((err) => {
+                throw new Error(err, { cause: stabilityPoolManagerContract });
+              });
             },
             waitForResponseOf: [],
             reloadQueriesAferMined: [GET_BORROWER_DEBT_TOKENS],

@@ -242,20 +242,24 @@ function LiquidityDepositWithdraw({ selectedPoolId }: Props) {
                 },
               );
 
-              return swapOperationsContract.addLiquidity(
-                tokenA.token.address,
-                tokenB.token.address,
-                floatToBigInt(tokenAAmount),
-                floatToBigInt(tokenBAmount),
-                floatToBigInt(tokenAAmount * (1 - SLIPPAGE)),
-                floatToBigInt(tokenBAmount * (1 - SLIPPAGE)),
-                {
-                  lowerHint,
-                  upperHint,
-                  maxFeePercentage: _maxMintFeePercentage,
-                },
-                deadline,
-              );
+              return swapOperationsContract
+                .addLiquidity(
+                  tokenA.token.address,
+                  tokenB.token.address,
+                  floatToBigInt(tokenAAmount),
+                  floatToBigInt(tokenBAmount),
+                  floatToBigInt(tokenAAmount * (1 - SLIPPAGE)),
+                  floatToBigInt(tokenBAmount * (1 - SLIPPAGE)),
+                  {
+                    lowerHint,
+                    upperHint,
+                    maxFeePercentage: _maxMintFeePercentage,
+                  },
+                  deadline,
+                )
+                .catch((err) => {
+                  throw new Error(err, { cause: swapOperationsContract });
+                });
             },
             waitForResponseOf: [0, 1],
             reloadQueriesAferMined: [
@@ -291,16 +295,20 @@ function LiquidityDepositWithdraw({ selectedPoolId }: Props) {
                 },
               );
 
-              return swapOperationsContract.removeLiquidity(
-                tokenA.token.address,
-                tokenB.token.address,
-                floatToBigInt(tokenAAmount),
-                floatToBigInt(tokenAAmountForWithdraw * (1 - SLIPPAGE)),
-                floatToBigInt(tokenBAmountForWithdraw * (1 - SLIPPAGE)),
-                upperHint,
-                lowerHint,
-                deadline,
-              );
+              return swapOperationsContract
+                .removeLiquidity(
+                  tokenA.token.address,
+                  tokenB.token.address,
+                  floatToBigInt(tokenAAmount),
+                  floatToBigInt(tokenAAmountForWithdraw * (1 - SLIPPAGE)),
+                  floatToBigInt(tokenBAmountForWithdraw * (1 - SLIPPAGE)),
+                  upperHint,
+                  lowerHint,
+                  deadline,
+                )
+                .catch((err) => {
+                  throw new Error(err, { cause: swapOperationsContract });
+                });
             },
             waitForResponseOf: [],
             reloadQueriesAferMined: [

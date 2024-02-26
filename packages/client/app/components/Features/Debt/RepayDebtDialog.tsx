@@ -107,7 +107,9 @@ const RepayDebtDialog = ({ buttonSx = {}, buttonVariant = 'outlined' }: Props) =
               },
             );
 
-            return borrowerOperationsContract.repayDebt(tokenAmounts, upperHint, lowerHint);
+            return borrowerOperationsContract.repayDebt(tokenAmounts, upperHint, lowerHint).catch((err) => {
+              throw new Error(err, { cause: borrowerOperationsContract });
+            });
           },
           // wait for all approvals
           waitForResponseOf: Array.of(tokenAmounts.length).map((_, index) => index),

@@ -168,7 +168,9 @@ const CollateralUpdateDialog = ({ buttonVariant, buttonSx = {} }: Props) => {
           transaction: {
             methodCall: async () => {
               if (hasNoOpenTrove) {
-                return borrowerOperationsContract.openTrove(tokenAmounts);
+                return borrowerOperationsContract.openTrove(tokenAmounts).catch((err) => {
+                  throw new Error(err, { cause: borrowerOperationsContract });
+                });
               } else {
                 const [upperHint, lowerHint] = await getHints(
                   troveManagerContract,
@@ -183,7 +185,9 @@ const CollateralUpdateDialog = ({ buttonVariant, buttonSx = {} }: Props) => {
                   },
                 );
 
-                return borrowerOperationsContract.addColl(tokenAmounts, upperHint, lowerHint);
+                return borrowerOperationsContract.addColl(tokenAmounts, upperHint, lowerHint).catch((err) => {
+                  throw new Error(err, { cause: borrowerOperationsContract });
+                });
               }
             },
             reloadQueriesAferMined: hasNoOpenTrove
@@ -213,7 +217,9 @@ const CollateralUpdateDialog = ({ buttonVariant, buttonSx = {} }: Props) => {
                 },
               );
 
-              return borrowerOperationsContract.withdrawColl(tokenAmounts, upperHint, lowerHint);
+              return borrowerOperationsContract.withdrawColl(tokenAmounts, upperHint, lowerHint).catch((err) => {
+                throw new Error(err, { cause: borrowerOperationsContract });
+              });
             },
             reloadQueriesAferMined: [GET_BORROWER_COLLATERAL_TOKENS],
             waitForResponseOf: [],

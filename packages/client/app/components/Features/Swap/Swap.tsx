@@ -166,21 +166,30 @@ const Swap = () => {
           transaction: {
             methodCall: async () => {
               if (inputToken === 'JUSD') {
-                return swapOperationsContract.swapExactTokensForTokens(
-                  floatToBigInt(jUSDAmount),
-                  floatToBigInt(tokenAmount * (1 - maxSlippage), selectedToken!.decimals),
-                  [JUSDToken!.address, selectedToken!.address],
-                  address,
-                  deadline,
-                );
+                swapOperationsContract.interface.parseError;
+                return swapOperationsContract
+                  .swapExactTokensForTokens(
+                    floatToBigInt(jUSDAmount),
+                    floatToBigInt(tokenAmount * (1 - maxSlippage), selectedToken!.decimals),
+                    [JUSDToken!.address, selectedToken!.address],
+                    address,
+                    deadline,
+                  )
+                  .catch((err) => {
+                    throw new Error(err, { cause: swapOperationsContract });
+                  });
               } else {
-                return swapOperationsContract.swapTokensForExactTokens(
-                  floatToBigInt(tokenAmount, selectedToken!.decimals),
-                  floatToBigInt(jUSDAmount * (1 + maxSlippage)),
-                  [JUSDToken!.address, selectedToken!.address],
-                  address,
-                  deadline,
-                );
+                return swapOperationsContract
+                  .swapTokensForExactTokens(
+                    floatToBigInt(tokenAmount, selectedToken!.decimals),
+                    floatToBigInt(jUSDAmount * (1 + maxSlippage)),
+                    [JUSDToken!.address, selectedToken!.address],
+                    address,
+                    deadline,
+                  )
+                  .catch((err) => {
+                    throw new Error(err, { cause: swapOperationsContract });
+                  });
               }
             },
             waitForResponseOf: [0],
@@ -218,21 +227,29 @@ const Swap = () => {
           transaction: {
             methodCall: async () => {
               if (inputToken === 'Token') {
-                return swapOperationsContract.swapExactTokensForTokens(
-                  floatToBigInt(tokenAmount, selectedToken!.decimals),
-                  floatToBigInt(jUSDAmount * (1 - maxSlippage)),
-                  [selectedToken!.address, JUSDToken!.address],
-                  address,
-                  deadline,
-                );
+                return swapOperationsContract
+                  .swapExactTokensForTokens(
+                    floatToBigInt(tokenAmount, selectedToken!.decimals),
+                    floatToBigInt(jUSDAmount * (1 - maxSlippage)),
+                    [selectedToken!.address, JUSDToken!.address],
+                    address,
+                    deadline,
+                  )
+                  .catch((err) => {
+                    throw new Error(err, { cause: swapOperationsContract });
+                  });
               } else {
-                return swapOperationsContract.swapTokensForExactTokens(
-                  floatToBigInt(jUSDAmount),
-                  floatToBigInt(tokenAmount * (1 + maxSlippage), selectedToken!.decimals),
-                  [selectedToken!.address, JUSDToken!.address],
-                  address,
-                  deadline,
-                );
+                return swapOperationsContract
+                  .swapTokensForExactTokens(
+                    floatToBigInt(jUSDAmount),
+                    floatToBigInt(tokenAmount * (1 + maxSlippage), selectedToken!.decimals),
+                    [selectedToken!.address, JUSDToken!.address],
+                    address,
+                    deadline,
+                  )
+                  .catch((err) => {
+                    throw new Error(err, { cause: swapOperationsContract });
+                  });
               }
             },
             waitForResponseOf: [0],

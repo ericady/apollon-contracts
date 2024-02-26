@@ -16,7 +16,7 @@ import {
   Stepper,
   Typography,
 } from '@mui/material';
-import { ContractTransactionReceipt, ContractTransactionResponse } from 'ethers/contract';
+import { BaseContract, ContractTransactionReceipt, ContractTransactionResponse } from 'ethers/contract';
 import { useSnackbar } from 'notistack';
 import { ReactNode, createContext, useContext, useEffect, useState } from 'react';
 import Draggable from 'react-draggable';
@@ -115,6 +115,7 @@ export default function TransactionDialogProvider({ children }: { children: Reac
           .then((resultPromise) => {
             // set initial mining state and update it once Promise resolves.
             const activeStepSaved = activeStep;
+            console.log('resultPromise: ', resultPromise);
             resultPromise
               .wait()
               .then((transactionReceipt) => {
@@ -134,18 +135,6 @@ export default function TransactionDialogProvider({ children }: { children: Reac
                   });
                 }
               })
-              .catch((error) => {
-                setStepsState((stepsState) => {
-                  const newStepsState = [...stepsState];
-                  newStepsState[activeStepSaved] = {
-                    status: 'error',
-                    transactionReceipt: newStepsState[activeStepSaved].transactionReceipt,
-                    error,
-                  };
-                  return newStepsState;
-                });
-                setTransactionPending(false);
-              });
 
             setStepsState((stepsState) => {
               const currentStep = activeStep;
@@ -169,20 +158,43 @@ export default function TransactionDialogProvider({ children }: { children: Reac
               setSteps([]);
             }
           })
-          .catch((error) => {
-            enqueueSnackbar('Transaction was rejected.', { variant: 'error' });
+          .catch((error: { message: string; cause?: BaseContract }) => {
+            // Allow interaction from the start
             setTransactionPending(false);
-            console.log('error: ', error);
-            // FIXME: Show error state, currently broken
-            // setStepsState((stepsState) => {
-            //   const newStepsState = [...stepsState];
-            //   newStepsState[activeStep] = {
-            //     status: 'error',
-            //     transactionReceipt: newStepsState[activeStep].transactionReceipt,
-            //     error,
-            //   };
-            //   return newStepsState;
-            // });
+
+            const showError = (errorMessage: string) => {
+              setStepsState((stepsState) => {
+                const newStepsState = [...stepsState];
+                console.log('activeStep: ', activeStep);
+                newStepsState[activeStep] = {
+                  ...newStepsState[activeStep],
+                  status: 'error',
+                  error: errorMessage,
+                };
+                return newStepsState;
+              });
+              setTimeout(() => {
+                setActiveStep(undefined);
+                setSteps([]);
+              }, 10000);
+            };
+
+            if (error.cause) {
+              // Get the "data" bytes to parse the error message
+              const dataRegex = /data="([^"]*)"/;
+              const match = error.message.match(dataRegex);
+              if (match && match[1]) {
+                const errorMessage = error.cause.interface.parseError(match[1]);
+                if (errorMessage) {
+                  enqueueSnackbar(`Error: ${errorMessage.name}`, { variant: 'error' });
+                  showError(errorMessage.name);
+                  return;
+                }
+              }
+            }
+
+            enqueueSnackbar('Transaction was rejected.', { variant: 'error' });
+            showError('Transaction was rejected.');
           });
       });
     }
@@ -227,6 +239,7 @@ export default function TransactionDialogProvider({ children }: { children: Reac
             onClose={() => {
               setSteps([]);
               setActiveStep(undefined);
+              setTransactionPending(false);
             }}
             maxWidth="sm"
             fullWidth

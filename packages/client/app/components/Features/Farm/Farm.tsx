@@ -95,19 +95,23 @@ const Farm = () => {
           title: 'Open Long Position',
           transaction: {
             methodCall: async () => {
-              return swapOperationsContract.openLongPosition(
-                floatToBigInt(farmShortValue),
-                (getExpectedPositionSize() * ethers.parseEther((1 - maxSlippage).toString())) /
-                  ethers.parseUnits('1', 18),
-                selectedToken!.address,
-                address,
-                {
-                  upperHint,
-                  lowerHint,
-                  maxFeePercentage: _maxMintFeePercentage,
-                },
-                deadline,
-              );
+              return swapOperationsContract
+                .openLongPosition(
+                  floatToBigInt(farmShortValue),
+                  (getExpectedPositionSize() * ethers.parseEther((1 - maxSlippage).toString())) /
+                    ethers.parseUnits('1', 18),
+                  selectedToken!.address,
+                  address,
+                  {
+                    upperHint,
+                    lowerHint,
+                    maxFeePercentage: _maxMintFeePercentage,
+                  },
+                  deadline,
+                )
+                .catch((err) => {
+                  throw new Error(err, { cause: swapOperationsContract });
+                });
             },
             waitForResponseOf: [],
             // Only refetch coll tokens if they were part of the swap
@@ -123,19 +127,23 @@ const Farm = () => {
           title: 'Open Short Position',
           transaction: {
             methodCall: async () => {
-              return swapOperationsContract.openShortPosition(
-                (getExpectedPositionSize() * ethers.parseEther((1 - maxSlippage).toString())) /
-                  ethers.parseUnits('1', 18),
-                floatToBigInt(farmShortValue),
-                selectedToken!.address,
-                address,
-                {
-                  upperHint,
-                  lowerHint,
-                  maxFeePercentage: _maxMintFeePercentage,
-                },
-                deadline,
-              );
+              return swapOperationsContract
+                .openShortPosition(
+                  (getExpectedPositionSize() * ethers.parseEther((1 - maxSlippage).toString())) /
+                    ethers.parseUnits('1', 18),
+                  floatToBigInt(farmShortValue),
+                  selectedToken!.address,
+                  address,
+                  {
+                    upperHint,
+                    lowerHint,
+                    maxFeePercentage: _maxMintFeePercentage,
+                  },
+                  deadline,
+                )
+                .catch((err) => {
+                  throw new Error(err, { cause: swapOperationsContract });
+                });
             },
             waitForResponseOf: [],
             // Only refetch coll tokens if they were part of the swap

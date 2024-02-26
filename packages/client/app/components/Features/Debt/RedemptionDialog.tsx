@@ -93,17 +93,21 @@ function RedemptionDialog({ buttonVariant = 'outlined', buttonSx = {} }: Props) 
               Math.round(Math.random() * 100000000000),
             );
 
-            return redemptionOperationsContract.redeemCollateral(
-              ethers.parseEther(redemptionAmount),
-              iterations.map((iteration) => ({
-                trove: iteration[0],
-                upperHint: iteration[1],
-                lowerHint: iteration[2],
-                expectedCR: iteration[3],
-              })),
-              // parse back to percentage
-              ethers.parseUnits(maxFeePercentage, 18 - 2),
-            );
+            return redemptionOperationsContract
+              .redeemCollateral(
+                ethers.parseEther(redemptionAmount),
+                iterations.map((iteration) => ({
+                  trove: iteration[0],
+                  upperHint: iteration[1],
+                  lowerHint: iteration[2],
+                  expectedCR: iteration[3],
+                })),
+                // parse back to percentage
+                ethers.parseUnits(maxFeePercentage, 18 - 2),
+              )
+              .catch((err) => {
+                throw new Error(err, { cause: redemptionOperationsContract });
+              });
           },
           // wait for all approvals
           waitForResponseOf: [],
