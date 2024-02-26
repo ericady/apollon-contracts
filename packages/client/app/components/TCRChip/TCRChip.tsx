@@ -1,5 +1,5 @@
 import { useQuery } from '@apollo/client';
-import { Tooltip } from '@mui/material';
+import { Tooltip, Typography } from '@mui/material';
 import Chip from '@mui/material/Chip';
 import { GetSystemInfoQuery, GetSystemInfoQueryVariables } from '../../generated/gql-types';
 import { GET_SYSTEMINFO } from '../../queries';
@@ -12,12 +12,27 @@ function TCRChip() {
 
   return (
     <Tooltip title="Protocol enters the recovery mode if the TCR falls below 150%, which disables any new token minting and collateral withdrawal.">
-      <Chip
-        label={`TCR ${displayPercentage(
-          dangerouslyConvertBigIntToNumber(data.getSystemInfo.totalCollateralRatio, 9, 9),
-        )}`}
-        color={data.getSystemInfo.recoveryModeActive ? 'warning' : 'default'}
-      />
+      <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginRight: '18px' }}>
+        {data.getSystemInfo.recoveryModeActive ? (
+          <img
+            src="assets/svgs/Star24_warning.svg"
+            alt="Red colored diamond shape"
+            height="11"
+            typeof="image/svg+xml"
+          />
+        ) : (
+          <img
+            src="assets/svgs/Star24_green.svg"
+            alt="Green colored diamond shape"
+            height="11"
+            typeof="image/svg+xml"
+          />
+        )}
+
+        <Typography variant="titleAlternate">
+          {`TCR ${displayPercentage(dangerouslyConvertBigIntToNumber(data.getSystemInfo.totalCollateralRatio, 9, 9))}`}
+        </Typography>
+      </div>
     </Tooltip>
   );
 }

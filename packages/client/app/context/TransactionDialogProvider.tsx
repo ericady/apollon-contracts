@@ -116,25 +116,23 @@ export default function TransactionDialogProvider({ children }: { children: Reac
             // set initial mining state and update it once Promise resolves.
             const activeStepSaved = activeStep;
             console.log('resultPromise: ', resultPromise);
-            resultPromise
-              .wait()
-              .then((transactionReceipt) => {
-                setStepsState((stepsState) => {
-                  const newStepsState = [...stepsState];
-                  newStepsState[activeStepSaved] = { status: 'success', transactionReceipt };
-                  return newStepsState;
-                });
+            resultPromise.wait().then((transactionReceipt) => {
+              setStepsState((stepsState) => {
+                const newStepsState = [...stepsState];
+                newStepsState[activeStepSaved] = { status: 'success', transactionReceipt };
+                return newStepsState;
+              });
 
-                if (actionAfterMined) {
-                  actionAfterMined(client);
-                }
-                if (reloadQueriesAferMined.length > 0) {
-                  client.refetchQueries({ include: reloadQueriesAferMined }).then((res) => {
-                    // Sometime no update seemingly, why?
-                    console.log('res: ', res);
-                  });
-                }
-              })
+              if (actionAfterMined) {
+                actionAfterMined(client);
+              }
+              if (reloadQueriesAferMined.length > 0) {
+                client.refetchQueries({ include: reloadQueriesAferMined }).then((res) => {
+                  // Sometime no update seemingly, why?
+                  console.log('res: ', res);
+                });
+              }
+            });
 
             setStepsState((stepsState) => {
               const currentStep = activeStep;

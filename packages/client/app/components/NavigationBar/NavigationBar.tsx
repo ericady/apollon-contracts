@@ -105,11 +105,11 @@ function NavigationBar({ themeMode, setThemeMode }: Props) {
                 disableRipple
               />
             </Tabs>
-
-            <TCRChip />
           </div>
 
           <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+            <TCRChip />
+
             <EthersAddressLabel />
 
             <NetworkSwitch />
