@@ -2,8 +2,8 @@
   'object' == typeof exports && 'undefined' != typeof module
     ? e(exports)
     : 'function' == typeof define && define.amd
-    ? define(['exports'], e)
-    : e(((t = 'undefined' != typeof globalThis ? globalThis : t || self).TradingView = {}));
+      ? define(['exports'], e)
+      : e(((t = 'undefined' != typeof globalThis ? globalThis : t || self).TradingView = {}));
 })(this, function (t) {
   'use strict';
   function e(t, n) {

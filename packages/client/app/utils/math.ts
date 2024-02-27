@@ -33,8 +33,8 @@ export const displayPercentage = (
   return omitLabel === 'omit'
     ? `${roundCurrency(value * 100, decimals, decimals)}`
     : omitLabel === 'positive'
-    ? `${value > 0 ? '+' : ''}${roundCurrency(value * 100, decimals, decimals)} %`
-    : `${roundCurrency(value * 100, decimals, decimals)} %`;
+      ? `${value > 0 ? '+' : ''}${roundCurrency(value * 100, decimals, decimals)} %`
+      : `${roundCurrency(value * 100, decimals, decimals)} %`;
 };
 
 export function floatToBigInt(floatNumber: number, precision: number = 18) {

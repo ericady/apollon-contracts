@@ -75,8 +75,9 @@ const RepayDebtDialog = ({ buttonSx = {}, buttonVariant = 'outlined' }: Props) =
 
     setSteps([
       ...tokenAmounts.map(({ tokenAddress, amount }) => ({
-        title: `Approve ${data?.debtTokenMetas.find(({ token: { address } }) => address === tokenAddress)?.token
-          .symbol} spending.`,
+        title: `Approve ${
+          data?.debtTokenMetas.find(({ token: { address } }) => address === tokenAddress)?.token.symbol
+        } spending.`,
         transaction: {
           methodCall: async () => {
             // @ts-ignore

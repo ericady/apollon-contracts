@@ -364,9 +364,9 @@ const Swap = () => {
         handleSwapValueChange('JUSD', e.target.value);
       }}
       InputProps={{
-        endAdornment: (
+        endAdornment: JUSDToken && (
           <InputAdornment position="end">
-            <Label variant="none">{JUSDToken?.symbol}</Label>
+            <Label variant="none">{JUSDToken.symbol}</Label>
           </InputAdornment>
         ),
       }}

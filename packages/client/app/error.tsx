@@ -1,9 +1,15 @@
 'use client';
 
 import { Button, Typography } from '@mui/material';
+import * as Sentry from '@sentry/nextjs';
+import { useEffect } from 'react';
 import ApollonLogo from './components/Icons/ApollonLogo';
 
-function error(props: { error: Error; reset: () => void }) {
+function Error(props: { error: Error; reset: () => void }) {
+  useEffect(() => {
+    Sentry.captureException(Error);
+  }, [props.error]);
+
   return (
     <div
       style={{
@@ -45,4 +51,4 @@ function error(props: { error: Error; reset: () => void }) {
   );
 }
 
-export default error;
+export default Error;

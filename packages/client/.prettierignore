@@ -7,3 +7,7 @@ app/context/abis
 types/ethers-contracts
 
 types
+
+# Trading View
+
+public/charting_library

@@ -73,7 +73,7 @@ export function CustomApolloProvider({ children }: PropsWithChildren<{}>) {
     // TODO: replace with our deployed graphql endpoint
     uri: 'http://localhost:8000/subgraphs/name/subgraph',
 
-    connectToDevTools: true,
+    connectToDevTools: process.env.NODE_ENV === 'development',
     cache: new InMemoryCache({
       typePolicies: {
         ...cacheConfig.fields,
@@ -568,8 +568,8 @@ type ContractDataFreshnessManager<T> = {
   [P in keyof T]: T[P] extends Record<string, string>
     ? { [Address in T[P][keyof T[P]]]: ContractData<bigint> }
     : T[P] extends Record<string, object>
-    ? ContractData<T[P]['value']>
-    : ContractData<bigint>;
+      ? ContractData<T[P]['value']>
+      : ContractData<bigint>;
 };
 
 type ResolvedType<T> = T extends Promise<infer R> ? R : T;

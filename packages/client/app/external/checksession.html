@@ -995,8 +995,8 @@
                   (this.year === t.year && this.month === t.month && this.day > t.day)
                   ? 1
                   : this.year === t.year && this.month === t.month && this.day === t.day
-                  ? 0
-                  : -1;
+                    ? 0
+                    : -1;
               }
               before(t) {
                 return -1 === this.compareTo(t);
@@ -1029,16 +1029,16 @@
                 return this._start >= 0
                   ? 0
                   : this._start % t.minutesPerDay == 0
-                  ? -Math.ceil(this._start / t.minutesPerDay)
-                  : -Math.floor(this._start / t.minutesPerDay);
+                    ? -Math.ceil(this._start / t.minutesPerDay)
+                    : -Math.floor(this._start / t.minutesPerDay);
               }
               sessionEndDaysOffset() {
                 const e = this._start + this._length;
                 return e >= 0
                   ? 0
                   : e % t.minutesPerDay == 0
-                  ? -Math.ceil(e / t.minutesPerDay)
-                  : -Math.floor(e / t.minutesPerDay);
+                    ? -Math.ceil(e / t.minutesPerDay)
+                    : -Math.floor(e / t.minutesPerDay);
               }
               isOvernight() {
                 return this._start < 0;

@@ -162,7 +162,6 @@ export default function TransactionDialogProvider({ children }: { children: Reac
             const showError = (errorMessage: string) => {
               setStepsState((stepsState) => {
                 const newStepsState = [...stepsState];
-                console.log('activeStep: ', activeStep);
                 newStepsState[activeStep] = {
                   ...newStepsState[activeStep],
                   status: 'error',
