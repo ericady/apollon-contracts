@@ -55,7 +55,7 @@ const Farm = () => {
     },
     reValidateMode: 'onSubmit',
   });
-  const { handleSubmit, reset, watch } = methods;
+  const { handleSubmit, reset, watch, setError } = methods;
 
   const ratioChangeCallback = useCallback(
     (newRatio: number, oldRatio: number) => {
@@ -75,6 +75,16 @@ const Farm = () => {
     const maxSlippage = parseFloat(data.maxSlippage) / 100;
     const deadline = new Date().getTime() + 1000 * 60 * 2; // 2 minutes
     const _maxMintFeePercentage = floatToBigInt(0.02);
+
+    // validate slippage in case form control is closed
+    if (getPriceImpact() > maxSlippage) {
+      setError('maxSlippage', {
+        type: 'min',
+        message: 'The amount must be above the price impact.',
+      });
+      setShowSlippage(true);
+      return;
+    }
 
     const [upperHint, lowerHint] = await getHints(troveManagerContract, sortedTrovesContract, hintHelpersContract, {
       borrower: address,
@@ -188,8 +198,8 @@ const Farm = () => {
   };
 
   /**
-   * Not exact
-   * TODO: Not adjusted for swap fee
+   * Respects borrowing fee and swap fee by calling getExpectedPositionSize
+   * @returns price impact of input amounts in percent
    */
   const getPriceImpact = () => {
     const {
@@ -197,24 +207,26 @@ const Farm = () => {
       decimals,
     } = selectedToken!;
 
-    const liq0 = dangerouslyConvertBigIntToNumber(liqudityPair[0], 0);
-    const liq1 = dangerouslyConvertBigIntToNumber(convertToEtherPrecission(liqudityPair[1], decimals), 0);
+    const liq0 = dangerouslyConvertBigIntToNumber(liqudityPair[0], 9, 9);
+    const liq1 = dangerouslyConvertBigIntToNumber(convertToEtherPrecission(liqudityPair[1], decimals), 9, 9);
 
     const currentPrice = liq0 / liq1;
 
+    const positionSizeWithFees = dangerouslyConvertBigIntToNumber(getExpectedPositionSize(), 9, 9);
+
     let newPriceAfterSwap: number;
-    if (tabValue === 'Long') {
+    if (tabValue === 'Short') {
       // Calculate new amount of the other token after swap
-      const newY = (liq1 * liq0) / (liq0 + watchFarmShortValue);
-      newPriceAfterSwap = watchFarmShortValue / (liq1 - newY);
+      const newY = (liq1 * liq0) / (liq0 + positionSizeWithFees);
+      newPriceAfterSwap = positionSizeWithFees / (liq1 - newY);
     } else {
       // Calculate new amount of jUSD after swap
-      const newX = (liq0 * liq1) / (liq1 + watchFarmShortValue);
-      newPriceAfterSwap = (liq0 - newX) / watchFarmShortValue;
+      const newX = (liq0 * liq1) / (liq1 + positionSizeWithFees);
+      newPriceAfterSwap = (liq0 - newX) / positionSizeWithFees;
     }
 
     // Calculate price impact
-    const priceImpact = ((newPriceAfterSwap - currentPrice) / currentPrice) * 100; // in percentage
+    const priceImpact = (newPriceAfterSwap - currentPrice) / currentPrice;
     return Math.abs(priceImpact) > 1 ? 1 : Math.abs(priceImpact);
   };
 
@@ -272,7 +284,8 @@ const Farm = () => {
                     data-testid="apollon-farm-slippage-amount"
                     name="maxSlippage"
                     rules={{
-                      min: { value: 0, message: 'Amount needs to be positive.' },
+                      min: { value: getPriceImpact() * 100, message: 'The amount must be above the price impact.' },
+                      max: { value: 100, message: 'Can not specify a greater amount.' },
                     }}
                     label="Max. Slippage"
                     fullWidth

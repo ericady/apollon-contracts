@@ -90,9 +90,15 @@ const Swap = () => {
     },
     reValidateMode: 'onSubmit',
   });
-  const { handleSubmit, setValue, watch, control, trigger, reset } = methods;
+  const { handleSubmit, setValue, watch, control, trigger, reset, setError } = methods;
   const { field: jUSDField } = useController({ name: 'jUSDAmount', control });
   const { field: tokenAmountField } = useController({ name: 'tokenAmount', control });
+
+  const swapFeeFactor = selectedToken
+    ? tradingDirection === 'jUSDSpent'
+      ? floatToBigInt(1, 6) + selectedToken!.swapFee
+      : floatToBigInt(1, 6) - selectedToken!.swapFee
+    : BigInt(1);
 
   const handleSwapValueChange = (variant: 'JUSD' | 'Token', value: string) => {
     const isDefined = !isNaN(parseFloat(value));
@@ -104,7 +110,7 @@ const Swap = () => {
           'tokenAmount',
           roundNumber(
             dangerouslyConvertBigIntToNumber(
-              (numericValue * (floatToBigInt(1, 6) - selectedToken!.swapFee) * ethers.parseUnits('1', 18)) / tokenRatio,
+              (numericValue * swapFeeFactor * ethers.parseUnits('1', 18)) / tokenRatio,
               18,
               6,
             ),
@@ -121,14 +127,7 @@ const Swap = () => {
         const numericValue = ethers.parseEther(value);
         setValue(
           'jUSDAmount',
-          roundNumber(
-            dangerouslyConvertBigIntToNumber(
-              numericValue * tokenRatio * (floatToBigInt(1, 6) - selectedToken!.swapFee),
-              36,
-              6,
-            ),
-            5,
-          ).toString(),
+          roundNumber(dangerouslyConvertBigIntToNumber(numericValue * tokenRatio * swapFeeFactor, 36, 6), 5).toString(),
         );
       } else {
         setValue('jUSDAmount', '');
@@ -146,6 +145,16 @@ const Swap = () => {
     const tokenAmount = parseFloat(data.tokenAmount);
     const maxSlippage = parseFloat(data.maxSlippage) / 100;
     const deadline = new Date().getTime() + 1000 * 60 * 2; // 2 minutes
+
+    // validate slippage in case form control is closed
+    if (getPriceImpact() > maxSlippage) {
+      setError('maxSlippage', {
+        type: 'min',
+        message: 'The amount must be above the price impact.',
+      });
+      setShowSlippage(true);
+      return;
+    }
 
     if (tradingDirection === 'jUSDSpent') {
       setSteps([
@@ -263,7 +272,10 @@ const Swap = () => {
   const jUSDAmount = parseFloat(watch('jUSDAmount'));
   const tokenAmount = parseFloat(watch('tokenAmount'));
 
-  // TODO: Not adjusted for swap fee
+  /**
+   *
+   * @returns price impact of input amounts in percent
+   */
   const getPriceImpact = () => {
     const {
       pool: { liqudityPair },
@@ -277,17 +289,19 @@ const Swap = () => {
     // TODO: Take a look if this is correct. Diff with FARM
     let newPriceAfterSwap: number;
     if (tradingDirection === 'jUSDSpent') {
+      const jUSDAmountWithFee = jUSDAmount * dangerouslyConvertBigIntToNumber(swapFeeFactor, 0, 6);
       // Calculate new amount of the other token after swap
-      const newY = (liq1 * liq0) / (liq0 + jUSDAmount);
-      newPriceAfterSwap = jUSDAmount / (liq1 - newY);
+      const newTokenAmount = (liq1 * liq0) / (liq0 + jUSDAmountWithFee);
+      newPriceAfterSwap = jUSDAmountWithFee / (liq1 - newTokenAmount);
     } else {
+      const tokenAmountWithFee = tokenAmount * dangerouslyConvertBigIntToNumber(swapFeeFactor, 0, 6);
       // Calculate new amount of jUSD after swap
-      const newX = (liq0 * liq1) / (liq1 + tokenAmount);
-      newPriceAfterSwap = (liq0 - newX) / tokenAmount;
+      const newX = (liq0 * liq1) / (liq1 + tokenAmountWithFee);
+      newPriceAfterSwap = (liq0 - newX) / tokenAmountWithFee;
     }
 
     // Calculate price impact
-    const priceImpact = ((newPriceAfterSwap - currentPrice) / currentPrice) * 100; // in percentage
+    const priceImpact = (newPriceAfterSwap - currentPrice) / currentPrice;
     return Math.abs(priceImpact) > 1 ? 1 : Math.abs(priceImpact);
   };
 
@@ -401,7 +415,7 @@ const Swap = () => {
                 name="maxSlippage"
                 data-testid="apollon-swap-slippage-amount"
                 rules={{
-                  min: { value: 0, message: 'Amount needs to be positive.' },
+                  min: { value: getPriceImpact() * 100, message: 'The amount must be above the price impact.' },
                   max: { value: 100, message: 'Can not specify a greater amount.' },
                 }}
                 label="Max. Slippage"
@@ -432,16 +446,7 @@ const Swap = () => {
                 Price per unit:
                 {selectedToken ? (
                   <span>
-                    {roundCurrency(
-                      dangerouslyConvertBigIntToNumber(
-                        tokenRatio * (floatToBigInt(1, 6) - selectedToken.swapFee),
-                        18,
-                        6,
-                      ),
-                      5,
-                      5,
-                    )}{' '}
-                    jUSD
+                    {roundCurrency(dangerouslyConvertBigIntToNumber(tokenRatio * swapFeeFactor, 18, 6), 5, 5)} jUSD
                   </span>
                 ) : (
                   <Skeleton width="120px" />

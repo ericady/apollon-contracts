@@ -114,8 +114,18 @@ export default function TransactionDialogProvider({ children }: { children: Reac
         methodCall()
           .then((resultPromise) => {
             // set initial mining state and update it once Promise resolves.
+            setStepsState((stepsState) => {
+              const currentStep = activeStep;
+              const newStepsState = [...stepsState];
+              newStepsState[currentStep] = {
+                status: 'pending',
+                resultPromise: resultPromise,
+              };
+
+              return newStepsState;
+            });
+
             const activeStepSaved = activeStep;
-            console.log('resultPromise: ', resultPromise);
             resultPromise.wait().then((transactionReceipt) => {
               setStepsState((stepsState) => {
                 const newStepsState = [...stepsState];
@@ -132,17 +142,6 @@ export default function TransactionDialogProvider({ children }: { children: Reac
                   console.log('res: ', res);
                 });
               }
-            });
-
-            setStepsState((stepsState) => {
-              const currentStep = activeStep;
-              const newStepsState = [...stepsState];
-              newStepsState[currentStep] = {
-                status: 'pending',
-                resultPromise: resultPromise,
-              };
-
-              return newStepsState;
             });
 
             if (activeStep < steps.length - 1) {
@@ -302,6 +301,7 @@ export default function TransactionDialogProvider({ children }: { children: Reac
                     <Step key={index}>
                       <StepLabel
                         StepIconComponent={getIcon(stepsState[index]?.status)}
+                        StepIconProps={{ color: stepsState[index]?.status === 'error' ? 'error' : 'primary' }}
                         optional={
                           stepsState[index]?.status === 'error' ? (
                             <Typography variant="caption" fontSize={10} color="error">
