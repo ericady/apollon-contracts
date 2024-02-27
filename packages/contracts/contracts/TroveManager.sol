@@ -822,8 +822,16 @@ contract TroveManager is LiquityBase, Ownable(msg.sender), CheckContract, ITrove
 
     Trove storage trove = Troves[_borrower];
     trove.status = closedStatus;
-    for (uint i = 0; i < trove.debtTokens.length; i++) trove.debts[trove.debtTokens[i]] = 0;
-    for (uint i = 0; i < trove.collTokens.length; i++) trove.colls[trove.collTokens[i]] = 0;
+    for (uint i = 0; i < trove.debtTokens.length; i++) {
+      IDebtToken a = trove.debtTokens[i];
+      trove.debts[a] = 0;
+      trove.debtsRegistered[address(a)] = false;
+    }
+    for (uint i = 0; i < trove.collTokens.length; i++) {
+      address a = trove.collTokens[i];
+      trove.colls[a] = 0;
+      trove.collsRegistered[a] = false;
+    }
     for (uint i = 0; i < _priceCache.collPrices.length; i++) trove.stakes[_priceCache.collPrices[i].tokenAddress] = 0;
     delete trove.debtTokens;
     delete trove.collTokens;

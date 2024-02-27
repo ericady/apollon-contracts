@@ -235,8 +235,7 @@ describe('SortedTroves', () => {
       assert.isFalse(await sortedTroves.contains(carol));
     });
 
-    //TODO: Gives error of low ICR_lt_MCR()
-    it.only('returns true for addresses that opened, closed and then re-opened a trove', async () => {
+    it('returns true for addresses that opened, closed and then re-opened a trove', async () => {
       //open trove
       await openTrove({
         from: whale,
@@ -245,7 +244,6 @@ describe('SortedTroves', () => {
         collAmount: parseUnits('5', 9),
         debts: [{ tokenAddress: STABLE, amount: parseUnits('3000') }],
       });
-
       await openTrove({
         from: alice,
         contracts,
@@ -253,17 +251,13 @@ describe('SortedTroves', () => {
         collAmount: parseUnits('5', 9),
         debts: [{ tokenAddress: STABLE, amount: parseUnits('2000') }],
       });
-
-      const bobColl = parseUnits('1', 9);
-
       await openTrove({
         from: bob,
         contracts,
         collToken: BTC,
-        collAmount: bobColl,
+        collAmount: parseUnits('1', 9),
         debts: [{ tokenAddress: STABLE, amount: parseUnits('1000') }],
       });
-
       await openTrove({
         from: carol,
         contracts,
@@ -299,7 +293,6 @@ describe('SortedTroves', () => {
         collAmount: parseUnits('5', 9),
         debts: [{ tokenAddress: STABLE, amount: parseUnits('2000') }],
       });
-
       await openTrove({
         from: bob,
         contracts,
@@ -307,7 +300,6 @@ describe('SortedTroves', () => {
         collAmount: parseUnits('5', 9),
         debts: [{ tokenAddress: STABLE, amount: parseUnits('1000') }],
       });
-
       await openTrove({
         from: carol,
         contracts,

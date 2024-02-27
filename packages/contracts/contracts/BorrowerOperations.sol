@@ -550,6 +550,7 @@ contract BorrowerOperations is LiquityBase, Ownable(msg.sender), CheckContract, 
     vars.newCompositeDebtInUSD = vars.oldCompositeDebtInUSD;
 
     vars.colls = contractsCache.troveManager.getTroveColl(_borrower);
+
     vars.oldCompositeCollInUSD = _getCompositeColl(contractsCache.priceFeed, vars.priceCache, vars.colls);
     vars.newCompositeCollInUSD = vars.oldCompositeCollInUSD;
 
@@ -782,6 +783,7 @@ contract BorrowerOperations is LiquityBase, Ownable(msg.sender), CheckContract, 
       if (_isDebtIncrease) _requireICRisAboveCCR(_vars.newICR);
     } else {
       // if Normal Mode
+
       _requireICRisAboveMCR(_vars.newICR);
 
       uint collChange = _vars.newCompositeCollInUSD > _vars.oldCompositeCollInUSD
