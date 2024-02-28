@@ -26,6 +26,11 @@ export const formatUnixTimestamp = (timestamp: string, withDelta = true) => {
     : `${day}.${month}.${year} ${hours}:${minutes}`;
 };
 
+export const convertGraphTimestamp = (timestamp: string) => {
+  const numericDate = Number(timestamp) * 1000;
+  return numericDate;
+};
+
 export const generateDateChartTicks = (timestamp: number, tickCount = 4) => {
   const weekInSec = 7 * 24 * 60 * 60;
 

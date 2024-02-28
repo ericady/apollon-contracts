@@ -7,7 +7,8 @@ import { CartesianGrid, Line, LineChart, Tooltip } from 'recharts';
 import { GetReserveUsdHistoryQuery, GetReserveUsdHistoryQueryVariables } from '../../../generated/gql-types';
 import { GET_RESERVE_USD_HISTORY } from '../../../queries';
 import { DARK_BACKGROUND_EMPHASIS, LIGHT_BACKGROUND_EMPHASIS } from '../../../theme';
-import { stdFormatter } from '../../../utils/math';
+import { convertGraphTimestamp } from '../../../utils/date';
+import { bigIntStringToFloat, stdFormatter } from '../../../utils/math';
 import DiagramPlaceholder from '../../Loader/DiagramPlaceholder';
 
 function ReservePoolValueChart() {
@@ -18,9 +19,9 @@ function ReservePoolValueChart() {
 
   const chartData = useMemo(() => {
     return (
-      data?.getReserveUSDHistory.map(([timeStamp, value]) => ({
-        timeStamp,
-        value,
+      data?.reservePoolUSDHistoryChunks.map(({ timestamp, value }) => ({
+        timestamp: convertGraphTimestamp(timestamp),
+        value: bigIntStringToFloat(value),
       })) ?? []
     );
   }, [data]);

@@ -10,7 +10,8 @@ import {
 } from '../../../../generated/gql-types';
 import { GET_COLLATERAL_USD_HISTORY, GET_DEBT_USD_HISTORY } from '../../../../queries';
 import { DARK_BACKGROUND_EMPHASIS, LIGHT_BACKGROUND_EMPHASIS } from '../../../../theme';
-import { stdFormatter } from '../../../../utils/math';
+import { convertGraphTimestamp } from '../../../../utils/date';
+import { bigIntStringToFloat, stdFormatter } from '../../../../utils/math';
 import DiagramPlaceholder from '../../../Loader/DiagramPlaceholder';
 
 function SystemCollateralRatioChart() {
@@ -27,12 +28,13 @@ function SystemCollateralRatioChart() {
 
   const chartData = useMemo(() => {
     return debtMintedData && collateralLockedData
-      ? collateralLockedData.getCollateralUSDHistory.map(([timeStamp, collateralLocked], index) => {
-          const valueMinted = debtMintedData.getDebtUSDHistory[index][1];
+      ? collateralLockedData.totalValueLockedUSDHistoryChunks.map(({ timestamp, value: collateralLocked }, index) => {
+          const valueMinted = debtMintedData.totalValueMintedUSDHistoryChunks[index].value;
 
+          const delta = bigIntStringToFloat(collateralLocked) / bigIntStringToFloat(valueMinted);
           return {
-            timeStamp,
-            value: collateralLocked / valueMinted,
+            timestamp: convertGraphTimestamp(timestamp),
+            value: isNaN(delta) ? 0 : delta,
           };
         })
       : [];

@@ -161,9 +161,58 @@ type Query {
   # with borrower address only the pools are returned, where the borrower has liquidity or rewards
   pools(borrower: String): [Pool!]!
   #
+  totalValueLockedUSDHistoryChunks(
+    first: Int = 90
+    orderBy: TotalValueLockedUSDHistoryChunk_orderBy
+    orderDirection: OrderDirection
+    skip: Int = 0
+  ): [TotalValueLockedUSDHistoryChunk!]!
+  totalValueMintedUSDHistoryChunks(
+    first: Int = 90
+    orderBy: TotalValueMintedUSDHistoryChunk_orderBy
+    orderDirection: OrderDirection
+    skip: Int = 0
+  ): [TotalValueMintedUSDHistoryChunk!]!
+  reservePoolUSDHistoryChunks(
+    first: Int = 90
+    orderBy: ReservePoolUSDHistoryChunk_orderBy
+    orderDirection: OrderDirection
+    skip: Int = 0
+  ): [ReservePoolUSDHistoryChunk!]!
+
   getCollateralUSDHistory: [[Int!]!]! # [[timestamp, value], [...], ...]
   getDebtUSDHistory: [[Int!]!]! # [[timestamp, value], [...], ...]
   getReserveUSDHistory: [[Int!]!]! # [[timestamp, value], [...], ...]
+}
+
+# GLOBAL CHARTS
+enum TotalValueLockedUSDHistoryChunk_orderBy {
+  timestamp
+}
+enum TotalValueMintedUSDHistoryChunk_orderBy {
+  timestamp
+}
+enum ReservePoolUSDHistoryChunk_orderBy {
+  timestamp
+}
+
+type TotalValueLockedUSDHistoryChunk {
+  id: String!
+  size: Int!
+  timestamp: BigInt!
+  value: BigInt!
+}
+type TotalValueMintedUSDHistoryChunk {
+  id: String!
+  size: Int!
+  timestamp: BigInt!
+  value: BigInt!
+}
+type ReservePoolUSDHistoryChunk {
+  id: String!
+  size: Int!
+  timestamp: BigInt!
+  value: BigInt!
 }
 
 type TokenAmount {

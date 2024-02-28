@@ -5,7 +5,8 @@ import { CartesianGrid, Line, LineChart, Tooltip } from 'recharts';
 import { GetDebtUsdHistoryQuery, GetDebtUsdHistoryQueryVariables } from '../../../../generated/gql-types';
 import { GET_DEBT_USD_HISTORY } from '../../../../queries';
 import { DARK_BACKGROUND_EMPHASIS, LIGHT_BACKGROUND_EMPHASIS } from '../../../../theme';
-import { stdFormatter } from '../../../../utils/math';
+import { convertGraphTimestamp } from '../../../../utils/date';
+import { bigIntStringToFloat, stdFormatter } from '../../../../utils/math';
 import DiagramPlaceholder from '../../../Loader/DiagramPlaceholder';
 
 function TotalValueMintedChart() {
@@ -16,9 +17,9 @@ function TotalValueMintedChart() {
 
   const chartData = useMemo(() => {
     return (
-      data?.getDebtUSDHistory.map(([timeStamp, value]) => ({
-        timeStamp,
-        value,
+      data?.totalValueMintedUSDHistoryChunks.map(({ timestamp, value }) => ({
+        timestamp: convertGraphTimestamp(timestamp),
+        value: bigIntStringToFloat(value),
       })) ?? []
     );
   }, [data]);

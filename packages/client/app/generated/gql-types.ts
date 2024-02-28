@@ -125,10 +125,13 @@ export type Query = {
   getReserveUSDHistory: Array<Array<Scalars['Int']['output']>>;
   getSystemInfo: SystemInfo;
   pools: Array<Pool>;
+  reservePoolUSDHistoryChunks: Array<ReservePoolUsdHistoryChunk>;
   swapEvents: Array<SwapEvent>;
   token: Token;
   tokenCandleSingleton: TokenCandleSingleton;
   tokenCandles: Array<TokenCandle>;
+  totalValueLockedUSDHistoryChunks: Array<TotalValueLockedUsdHistoryChunk>;
+  totalValueMintedUSDHistoryChunks: Array<TotalValueMintedUsdHistoryChunk>;
 };
 
 
@@ -153,6 +156,14 @@ export type QueryDebtTokenMetasArgs = {
 
 export type QueryPoolsArgs = {
   borrower?: InputMaybe<Scalars['String']['input']>;
+};
+
+
+export type QueryReservePoolUsdHistoryChunksArgs = {
+  first?: InputMaybe<Scalars['Int']['input']>;
+  orderBy?: InputMaybe<ReservePoolUsdHistoryChunk_OrderBy>;
+  orderDirection?: InputMaybe<OrderDirection>;
+  skip?: InputMaybe<Scalars['Int']['input']>;
 };
 
 
@@ -183,11 +194,39 @@ export type QueryTokenCandlesArgs = {
   where?: InputMaybe<TokenCandle_Filter>;
 };
 
+
+export type QueryTotalValueLockedUsdHistoryChunksArgs = {
+  first?: InputMaybe<Scalars['Int']['input']>;
+  orderBy?: InputMaybe<TotalValueLockedUsdHistoryChunk_OrderBy>;
+  orderDirection?: InputMaybe<OrderDirection>;
+  skip?: InputMaybe<Scalars['Int']['input']>;
+};
+
+
+export type QueryTotalValueMintedUsdHistoryChunksArgs = {
+  first?: InputMaybe<Scalars['Int']['input']>;
+  orderBy?: InputMaybe<TotalValueMintedUsdHistoryChunk_OrderBy>;
+  orderDirection?: InputMaybe<OrderDirection>;
+  skip?: InputMaybe<Scalars['Int']['input']>;
+};
+
 export type RedemptionOperations = {
   __typename: 'RedemptionOperations';
   id: Scalars['ID']['output'];
   redemptionRateWithDecay: Scalars['bigint']['output'];
 };
+
+export type ReservePoolUsdHistoryChunk = {
+  __typename: 'ReservePoolUSDHistoryChunk';
+  id: Scalars['String']['output'];
+  size: Scalars['Int']['output'];
+  timestamp: Scalars['BigInt']['output'];
+  value: Scalars['BigInt']['output'];
+};
+
+export enum ReservePoolUsdHistoryChunk_OrderBy {
+  Timestamp = 'timestamp'
+}
 
 export type StabilityDepositApy = {
   __typename: 'StabilityDepositAPY';
@@ -326,6 +365,30 @@ export type TotalValueLockedAverage = {
   value: Scalars['BigInt']['output'];
 };
 
+export type TotalValueLockedUsdHistoryChunk = {
+  __typename: 'TotalValueLockedUSDHistoryChunk';
+  id: Scalars['String']['output'];
+  size: Scalars['Int']['output'];
+  timestamp: Scalars['BigInt']['output'];
+  value: Scalars['BigInt']['output'];
+};
+
+export enum TotalValueLockedUsdHistoryChunk_OrderBy {
+  Timestamp = 'timestamp'
+}
+
+export type TotalValueMintedUsdHistoryChunk = {
+  __typename: 'TotalValueMintedUSDHistoryChunk';
+  id: Scalars['String']['output'];
+  size: Scalars['Int']['output'];
+  timestamp: Scalars['BigInt']['output'];
+  value: Scalars['BigInt']['output'];
+};
+
+export enum TotalValueMintedUsdHistoryChunk_OrderBy {
+  Timestamp = 'timestamp'
+}
+
 export type GetAllPoolsQueryVariables = Exact<{ [key: string]: never; }>;
 
 
@@ -385,17 +448,17 @@ export type GetBorrowerStabilityHistoryQuery = { __typename: 'Query', borrowerHi
 export type GetCollateralUsdHistoryQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type GetCollateralUsdHistoryQuery = { __typename: 'Query', getCollateralUSDHistory: Array<Array<number>> };
+export type GetCollateralUsdHistoryQuery = { __typename: 'Query', totalValueLockedUSDHistoryChunks: Array<{ __typename: 'TotalValueLockedUSDHistoryChunk', id: string, timestamp: string, value: string }> };
 
 export type GetDebtUsdHistoryQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type GetDebtUsdHistoryQuery = { __typename: 'Query', getDebtUSDHistory: Array<Array<number>> };
+export type GetDebtUsdHistoryQuery = { __typename: 'Query', totalValueMintedUSDHistoryChunks: Array<{ __typename: 'TotalValueMintedUSDHistoryChunk', id: string, timestamp: string, value: string }> };
 
 export type GetReserveUsdHistoryQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type GetReserveUsdHistoryQuery = { __typename: 'Query', getReserveUSDHistory: Array<Array<number>> };
+export type GetReserveUsdHistoryQuery = { __typename: 'Query', reservePoolUSDHistoryChunks: Array<{ __typename: 'ReservePoolUSDHistoryChunk', id: string, timestamp: string, value: string }> };
 
 export type GetTradingViewCandlesQueryVariables = Exact<{
   where: TokenCandle_Filter;

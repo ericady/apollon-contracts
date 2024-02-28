@@ -198,19 +198,31 @@ export const GET_BORROWER_STABILITY_HISTORY = gql`
 
 export const GET_COLLATERAL_USD_HISTORY = gql`
   query GetCollateralUSDHistory {
-    getCollateralUSDHistory
+    totalValueLockedUSDHistoryChunks(orderBy: timestamp, orderDirection: desc) {
+      id
+      timestamp
+      value
+    }
   }
 `;
 
 export const GET_DEBT_USD_HISTORY = gql`
   query GetDebtUSDHistory {
-    getDebtUSDHistory
+    totalValueMintedUSDHistoryChunks(orderBy: timestamp, orderDirection: desc) {
+      id
+      timestamp
+      value
+    }
   }
 `;
 
 export const GET_RESERVE_USD_HISTORY = gql`
   query GetReserveUSDHistory {
-    getReserveUSDHistory
+    reservePoolUSDHistoryChunks(orderBy: timestamp, orderDirection: desc) {
+      id
+      timestamp
+      value
+    }
   }
 `;
 

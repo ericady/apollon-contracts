@@ -41,14 +41,11 @@ const RepayDebtDialog = ({ buttonSx = {}, buttonVariant = 'outlined' }: Props) =
   } = useEthers();
   const { setSteps } = useTransactionDialog();
 
-  const { data } = useQuery<GetBorrowerDebtTokensQuery, GetBorrowerDebtTokensQueryVariables>(
-    GET_BORROWER_DEBT_TOKENS,
-    {
-      variables: {
-        borrower: address,
-      },
+  const { data } = useQuery<GetBorrowerDebtTokensQuery, GetBorrowerDebtTokensQueryVariables>(GET_BORROWER_DEBT_TOKENS, {
+    variables: {
+      borrower: address,
     },
-  );
+  });
 
   const methods = useForm<FieldValues>({ reValidateMode: 'onChange' });
   const { handleSubmit, setValue, reset, formState } = methods;

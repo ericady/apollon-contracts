@@ -131,6 +131,8 @@ type CollateralTokenMeta {
   id: String!
   timestamp: BigInt!
   token: Token!
+  totalReserve: BigInt!
+  totalReserve30dAverage: TotalReserveAverage
   totalValueLockedUSD: BigInt!
   totalValueLockedUSD30dAverage: TotalValueLockedAverage!
 }
@@ -189,6 +191,35 @@ input CollateralTokenMeta_filter {
   token_not_starts_with_nocase: String
   token_starts_with: String
   token_starts_with_nocase: String
+  totalReserve: BigInt
+  totalReserve30dAverage: String
+  totalReserve30dAverage_: TotalReserveAverage_filter
+  totalReserve30dAverage_contains: String
+  totalReserve30dAverage_contains_nocase: String
+  totalReserve30dAverage_ends_with: String
+  totalReserve30dAverage_ends_with_nocase: String
+  totalReserve30dAverage_gt: String
+  totalReserve30dAverage_gte: String
+  totalReserve30dAverage_in: [String!]
+  totalReserve30dAverage_lt: String
+  totalReserve30dAverage_lte: String
+  totalReserve30dAverage_not: String
+  totalReserve30dAverage_not_contains: String
+  totalReserve30dAverage_not_contains_nocase: String
+  totalReserve30dAverage_not_ends_with: String
+  totalReserve30dAverage_not_ends_with_nocase: String
+  totalReserve30dAverage_not_in: [String!]
+  totalReserve30dAverage_not_starts_with: String
+  totalReserve30dAverage_not_starts_with_nocase: String
+  totalReserve30dAverage_starts_with: String
+  totalReserve30dAverage_starts_with_nocase: String
+  totalReserve_gt: BigInt
+  totalReserve_gte: BigInt
+  totalReserve_in: [BigInt!]
+  totalReserve_lt: BigInt
+  totalReserve_lte: BigInt
+  totalReserve_not: BigInt
+  totalReserve_not_in: [BigInt!]
   totalValueLockedUSD: BigInt
   totalValueLockedUSD30dAverage: String
   totalValueLockedUSD30dAverage_: TotalValueLockedAverage_filter
@@ -228,8 +259,12 @@ enum CollateralTokenMeta_orderBy {
   token__createdAt
   token__id
   token__isPoolToken
-  token__priceUSD
   token__symbol
+  totalReserve
+  totalReserve30dAverage
+  totalReserve30dAverage__id
+  totalReserve30dAverage__index
+  totalReserve30dAverage__value
   totalValueLockedUSD
   totalValueLockedUSD30dAverage
   totalValueLockedUSD30dAverage__id
@@ -244,7 +279,7 @@ type DebtTokenMeta {
   token: Token!
   totalDepositedStability: BigInt!
   totalReserve: BigInt!
-  totalReserve30dAverage: TotalReserveAverage!
+  totalReserve30dAverage: TotalReserveAverage
   totalSupplyUSD: BigInt!
   totalSupplyUSD30dAverage: TotalSupplyAverage!
 }
@@ -405,7 +440,6 @@ enum DebtTokenMeta_orderBy {
   token__createdAt
   token__id
   token__isPoolToken
-  token__priceUSD
   token__symbol
   totalDepositedStability
   totalReserve
@@ -435,6 +469,7 @@ enum OrderDirection {
 }
 
 type Pool {
+  address: Bytes!
   id: String!
   liquidity(first: Int = 100, orderBy: PoolLiquidity_orderBy, orderDirection: OrderDirection, skip: Int = 0, where: PoolLiquidity_filter): [PoolLiquidity!]!
   liquidityDepositAPY: BigInt!
@@ -502,7 +537,6 @@ enum PoolLiquidity_orderBy {
   token__createdAt
   token__id
   token__isPoolToken
-  token__priceUSD
   token__symbol
   totalAmount
 }
@@ -573,6 +607,7 @@ enum PoolVolume30d_orderBy {
 }
 
 type PoolVolumeChunk {
+  feeUSD: BigInt!
   id: String!
   timestamp: BigInt!
   value: BigInt!
@@ -582,6 +617,14 @@ input PoolVolumeChunk_filter {
   """Filter for the block changed event."""
   _change_block: BlockChangedFilter
   and: [PoolVolumeChunk_filter]
+  feeUSD: BigInt
+  feeUSD_gt: BigInt
+  feeUSD_gte: BigInt
+  feeUSD_in: [BigInt!]
+  feeUSD_lt: BigInt
+  feeUSD_lte: BigInt
+  feeUSD_not: BigInt
+  feeUSD_not_in: [BigInt!]
   id: String
   id_contains: String
   id_contains_nocase: String
@@ -622,6 +665,7 @@ input PoolVolumeChunk_filter {
 }
 
 enum PoolVolumeChunk_orderBy {
+  feeUSD
   id
   timestamp
   value
@@ -630,6 +674,16 @@ enum PoolVolumeChunk_orderBy {
 input Pool_filter {
   """Filter for the block changed event."""
   _change_block: BlockChangedFilter
+  address: Bytes
+  address_contains: Bytes
+  address_gt: Bytes
+  address_gte: Bytes
+  address_in: [Bytes!]
+  address_lt: Bytes
+  address_lte: Bytes
+  address_not: Bytes
+  address_not_contains: Bytes
+  address_not_in: [Bytes!]
   and: [Pool_filter]
   id: String
   id_contains: String
@@ -720,6 +774,7 @@ input Pool_filter {
 }
 
 enum Pool_orderBy {
+  address
   id
   liquidity
   liquidityDepositAPY
@@ -937,6 +992,34 @@ type Query {
     subgraphError: _SubgraphErrorPolicy_! = deny
     where: Pool_filter
   ): [Pool!]!
+  reservePoolUSDHistoryChunk(
+    """
+    The block at which the query should be executed. Can either be a `{ hash: Bytes }` value containing a block hash, a `{ number: Int }` containing the block number, or a `{ number_gte: Int }` containing the minimum block number. In the case of `number_gte`, the query will be executed on the latest block only if the subgraph has progressed to or past the minimum block number. Defaults to the latest block when omitted.
+    """
+    block: Block_height
+    id: ID!
+
+    """
+    Set to `allow` to receive data even if the subgraph has skipped over errors while syncing.
+    """
+    subgraphError: _SubgraphErrorPolicy_! = deny
+  ): ReservePoolUSDHistoryChunk
+  reservePoolUSDHistoryChunks(
+    """
+    The block at which the query should be executed. Can either be a `{ hash: Bytes }` value containing a block hash, a `{ number: Int }` containing the block number, or a `{ number_gte: Int }` containing the minimum block number. In the case of `number_gte`, the query will be executed on the latest block only if the subgraph has progressed to or past the minimum block number. Defaults to the latest block when omitted.
+    """
+    block: Block_height
+    first: Int = 100
+    orderBy: ReservePoolUSDHistoryChunk_orderBy
+    orderDirection: OrderDirection
+    skip: Int = 0
+
+    """
+    Set to `allow` to receive data even if the subgraph has skipped over errors while syncing.
+    """
+    subgraphError: _SubgraphErrorPolicy_! = deny
+    where: ReservePoolUSDHistoryChunk_filter
+  ): [ReservePoolUSDHistoryChunk!]!
   stabilityDepositAPY(
     """
     The block at which the query should be executed. Can either be a `{ hash: Bytes }` value containing a block hash, a `{ number: Int }` containing the block number, or a `{ number_gte: Int }` containing the minimum block number. In the case of `number_gte`, the query will be executed on the latest block only if the subgraph has progressed to or past the minimum block number. Defaults to the latest block when omitted.
@@ -1329,6 +1412,127 @@ type Query {
     subgraphError: _SubgraphErrorPolicy_! = deny
     where: TotalValueLockedChunk_filter
   ): [TotalValueLockedChunk!]!
+  totalValueLockedUSDHistoryChunk(
+    """
+    The block at which the query should be executed. Can either be a `{ hash: Bytes }` value containing a block hash, a `{ number: Int }` containing the block number, or a `{ number_gte: Int }` containing the minimum block number. In the case of `number_gte`, the query will be executed on the latest block only if the subgraph has progressed to or past the minimum block number. Defaults to the latest block when omitted.
+    """
+    block: Block_height
+    id: ID!
+
+    """
+    Set to `allow` to receive data even if the subgraph has skipped over errors while syncing.
+    """
+    subgraphError: _SubgraphErrorPolicy_! = deny
+  ): TotalValueLockedUSDHistoryChunk
+  totalValueLockedUSDHistoryChunks(
+    """
+    The block at which the query should be executed. Can either be a `{ hash: Bytes }` value containing a block hash, a `{ number: Int }` containing the block number, or a `{ number_gte: Int }` containing the minimum block number. In the case of `number_gte`, the query will be executed on the latest block only if the subgraph has progressed to or past the minimum block number. Defaults to the latest block when omitted.
+    """
+    block: Block_height
+    first: Int = 100
+    orderBy: TotalValueLockedUSDHistoryChunk_orderBy
+    orderDirection: OrderDirection
+    skip: Int = 0
+
+    """
+    Set to `allow` to receive data even if the subgraph has skipped over errors while syncing.
+    """
+    subgraphError: _SubgraphErrorPolicy_! = deny
+    where: TotalValueLockedUSDHistoryChunk_filter
+  ): [TotalValueLockedUSDHistoryChunk!]!
+  totalValueMintedUSDHistoryChunk(
+    """
+    The block at which the query should be executed. Can either be a `{ hash: Bytes }` value containing a block hash, a `{ number: Int }` containing the block number, or a `{ number_gte: Int }` containing the minimum block number. In the case of `number_gte`, the query will be executed on the latest block only if the subgraph has progressed to or past the minimum block number. Defaults to the latest block when omitted.
+    """
+    block: Block_height
+    id: ID!
+
+    """
+    Set to `allow` to receive data even if the subgraph has skipped over errors while syncing.
+    """
+    subgraphError: _SubgraphErrorPolicy_! = deny
+  ): TotalValueMintedUSDHistoryChunk
+  totalValueMintedUSDHistoryChunks(
+    """
+    The block at which the query should be executed. Can either be a `{ hash: Bytes }` value containing a block hash, a `{ number: Int }` containing the block number, or a `{ number_gte: Int }` containing the minimum block number. In the case of `number_gte`, the query will be executed on the latest block only if the subgraph has progressed to or past the minimum block number. Defaults to the latest block when omitted.
+    """
+    block: Block_height
+    first: Int = 100
+    orderBy: TotalValueMintedUSDHistoryChunk_orderBy
+    orderDirection: OrderDirection
+    skip: Int = 0
+
+    """
+    Set to `allow` to receive data even if the subgraph has skipped over errors while syncing.
+    """
+    subgraphError: _SubgraphErrorPolicy_! = deny
+    where: TotalValueMintedUSDHistoryChunk_filter
+  ): [TotalValueMintedUSDHistoryChunk!]!
+}
+
+type ReservePoolUSDHistoryChunk {
+  id: String!
+  size: Int!
+  timestamp: BigInt!
+  value: BigInt!
+}
+
+input ReservePoolUSDHistoryChunk_filter {
+  """Filter for the block changed event."""
+  _change_block: BlockChangedFilter
+  and: [ReservePoolUSDHistoryChunk_filter]
+  id: String
+  id_contains: String
+  id_contains_nocase: String
+  id_ends_with: String
+  id_ends_with_nocase: String
+  id_gt: String
+  id_gte: String
+  id_in: [String!]
+  id_lt: String
+  id_lte: String
+  id_not: String
+  id_not_contains: String
+  id_not_contains_nocase: String
+  id_not_ends_with: String
+  id_not_ends_with_nocase: String
+  id_not_in: [String!]
+  id_not_starts_with: String
+  id_not_starts_with_nocase: String
+  id_starts_with: String
+  id_starts_with_nocase: String
+  or: [ReservePoolUSDHistoryChunk_filter]
+  size: Int
+  size_gt: Int
+  size_gte: Int
+  size_in: [Int!]
+  size_lt: Int
+  size_lte: Int
+  size_not: Int
+  size_not_in: [Int!]
+  timestamp: BigInt
+  timestamp_gt: BigInt
+  timestamp_gte: BigInt
+  timestamp_in: [BigInt!]
+  timestamp_lt: BigInt
+  timestamp_lte: BigInt
+  timestamp_not: BigInt
+  timestamp_not_in: [BigInt!]
+  value: BigInt
+  value_gt: BigInt
+  value_gte: BigInt
+  value_in: [BigInt!]
+  value_lt: BigInt
+  value_lte: BigInt
+  value_not: BigInt
+  value_not_in: [BigInt!]
+}
+
+enum ReservePoolUSDHistoryChunk_orderBy {
+  id
+  size
+  timestamp
+  value
 }
 
 type StabilityDepositAPY {
@@ -1660,6 +1864,34 @@ type Subscription {
     subgraphError: _SubgraphErrorPolicy_! = deny
     where: Pool_filter
   ): [Pool!]!
+  reservePoolUSDHistoryChunk(
+    """
+    The block at which the query should be executed. Can either be a `{ hash: Bytes }` value containing a block hash, a `{ number: Int }` containing the block number, or a `{ number_gte: Int }` containing the minimum block number. In the case of `number_gte`, the query will be executed on the latest block only if the subgraph has progressed to or past the minimum block number. Defaults to the latest block when omitted.
+    """
+    block: Block_height
+    id: ID!
+
+    """
+    Set to `allow` to receive data even if the subgraph has skipped over errors while syncing.
+    """
+    subgraphError: _SubgraphErrorPolicy_! = deny
+  ): ReservePoolUSDHistoryChunk
+  reservePoolUSDHistoryChunks(
+    """
+    The block at which the query should be executed. Can either be a `{ hash: Bytes }` value containing a block hash, a `{ number: Int }` containing the block number, or a `{ number_gte: Int }` containing the minimum block number. In the case of `number_gte`, the query will be executed on the latest block only if the subgraph has progressed to or past the minimum block number. Defaults to the latest block when omitted.
+    """
+    block: Block_height
+    first: Int = 100
+    orderBy: ReservePoolUSDHistoryChunk_orderBy
+    orderDirection: OrderDirection
+    skip: Int = 0
+
+    """
+    Set to `allow` to receive data even if the subgraph has skipped over errors while syncing.
+    """
+    subgraphError: _SubgraphErrorPolicy_! = deny
+    where: ReservePoolUSDHistoryChunk_filter
+  ): [ReservePoolUSDHistoryChunk!]!
   stabilityDepositAPY(
     """
     The block at which the query should be executed. Can either be a `{ hash: Bytes }` value containing a block hash, a `{ number: Int }` containing the block number, or a `{ number_gte: Int }` containing the minimum block number. In the case of `number_gte`, the query will be executed on the latest block only if the subgraph has progressed to or past the minimum block number. Defaults to the latest block when omitted.
@@ -2052,6 +2284,62 @@ type Subscription {
     subgraphError: _SubgraphErrorPolicy_! = deny
     where: TotalValueLockedChunk_filter
   ): [TotalValueLockedChunk!]!
+  totalValueLockedUSDHistoryChunk(
+    """
+    The block at which the query should be executed. Can either be a `{ hash: Bytes }` value containing a block hash, a `{ number: Int }` containing the block number, or a `{ number_gte: Int }` containing the minimum block number. In the case of `number_gte`, the query will be executed on the latest block only if the subgraph has progressed to or past the minimum block number. Defaults to the latest block when omitted.
+    """
+    block: Block_height
+    id: ID!
+
+    """
+    Set to `allow` to receive data even if the subgraph has skipped over errors while syncing.
+    """
+    subgraphError: _SubgraphErrorPolicy_! = deny
+  ): TotalValueLockedUSDHistoryChunk
+  totalValueLockedUSDHistoryChunks(
+    """
+    The block at which the query should be executed. Can either be a `{ hash: Bytes }` value containing a block hash, a `{ number: Int }` containing the block number, or a `{ number_gte: Int }` containing the minimum block number. In the case of `number_gte`, the query will be executed on the latest block only if the subgraph has progressed to or past the minimum block number. Defaults to the latest block when omitted.
+    """
+    block: Block_height
+    first: Int = 100
+    orderBy: TotalValueLockedUSDHistoryChunk_orderBy
+    orderDirection: OrderDirection
+    skip: Int = 0
+
+    """
+    Set to `allow` to receive data even if the subgraph has skipped over errors while syncing.
+    """
+    subgraphError: _SubgraphErrorPolicy_! = deny
+    where: TotalValueLockedUSDHistoryChunk_filter
+  ): [TotalValueLockedUSDHistoryChunk!]!
+  totalValueMintedUSDHistoryChunk(
+    """
+    The block at which the query should be executed. Can either be a `{ hash: Bytes }` value containing a block hash, a `{ number: Int }` containing the block number, or a `{ number_gte: Int }` containing the minimum block number. In the case of `number_gte`, the query will be executed on the latest block only if the subgraph has progressed to or past the minimum block number. Defaults to the latest block when omitted.
+    """
+    block: Block_height
+    id: ID!
+
+    """
+    Set to `allow` to receive data even if the subgraph has skipped over errors while syncing.
+    """
+    subgraphError: _SubgraphErrorPolicy_! = deny
+  ): TotalValueMintedUSDHistoryChunk
+  totalValueMintedUSDHistoryChunks(
+    """
+    The block at which the query should be executed. Can either be a `{ hash: Bytes }` value containing a block hash, a `{ number: Int }` containing the block number, or a `{ number_gte: Int }` containing the minimum block number. In the case of `number_gte`, the query will be executed on the latest block only if the subgraph has progressed to or past the minimum block number. Defaults to the latest block when omitted.
+    """
+    block: Block_height
+    first: Int = 100
+    orderBy: TotalValueMintedUSDHistoryChunk_orderBy
+    orderDirection: OrderDirection
+    skip: Int = 0
+
+    """
+    Set to `allow` to receive data even if the subgraph has skipped over errors while syncing.
+    """
+    subgraphError: _SubgraphErrorPolicy_! = deny
+    where: TotalValueMintedUSDHistoryChunk_filter
+  ): [TotalValueMintedUSDHistoryChunk!]!
 }
 
 type SwapEvent {
@@ -2161,23 +2449,38 @@ enum SwapEvent_orderBy {
   token__createdAt
   token__id
   token__isPoolToken
-  token__priceUSD
   token__symbol
   totalPriceInStable
 }
 
 type SystemInfo {
+  govToken: Bytes!
   id: String!
   priceFeed: Bytes!
+  reservePool: Bytes!
+  reservePoolUSDHistoryIndex: Int!
+  stabilityPoolManager: Bytes!
   stableCoin: Bytes!
   storagePool: Bytes!
   timestamp: BigInt!
+  totalValueLockedUSDHistoryIndex: Int!
+  totalValueMintedUSDHistoryIndex: Int!
 }
 
 input SystemInfo_filter {
   """Filter for the block changed event."""
   _change_block: BlockChangedFilter
   and: [SystemInfo_filter]
+  govToken: Bytes
+  govToken_contains: Bytes
+  govToken_gt: Bytes
+  govToken_gte: Bytes
+  govToken_in: [Bytes!]
+  govToken_lt: Bytes
+  govToken_lte: Bytes
+  govToken_not: Bytes
+  govToken_not_contains: Bytes
+  govToken_not_in: [Bytes!]
   id: String
   id_contains: String
   id_contains_nocase: String
@@ -2209,6 +2512,34 @@ input SystemInfo_filter {
   priceFeed_not: Bytes
   priceFeed_not_contains: Bytes
   priceFeed_not_in: [Bytes!]
+  reservePool: Bytes
+  reservePoolUSDHistoryIndex: Int
+  reservePoolUSDHistoryIndex_gt: Int
+  reservePoolUSDHistoryIndex_gte: Int
+  reservePoolUSDHistoryIndex_in: [Int!]
+  reservePoolUSDHistoryIndex_lt: Int
+  reservePoolUSDHistoryIndex_lte: Int
+  reservePoolUSDHistoryIndex_not: Int
+  reservePoolUSDHistoryIndex_not_in: [Int!]
+  reservePool_contains: Bytes
+  reservePool_gt: Bytes
+  reservePool_gte: Bytes
+  reservePool_in: [Bytes!]
+  reservePool_lt: Bytes
+  reservePool_lte: Bytes
+  reservePool_not: Bytes
+  reservePool_not_contains: Bytes
+  reservePool_not_in: [Bytes!]
+  stabilityPoolManager: Bytes
+  stabilityPoolManager_contains: Bytes
+  stabilityPoolManager_gt: Bytes
+  stabilityPoolManager_gte: Bytes
+  stabilityPoolManager_in: [Bytes!]
+  stabilityPoolManager_lt: Bytes
+  stabilityPoolManager_lte: Bytes
+  stabilityPoolManager_not: Bytes
+  stabilityPoolManager_not_contains: Bytes
+  stabilityPoolManager_not_in: [Bytes!]
   stableCoin: Bytes
   stableCoin_contains: Bytes
   stableCoin_gt: Bytes
@@ -2237,14 +2568,36 @@ input SystemInfo_filter {
   timestamp_lte: BigInt
   timestamp_not: BigInt
   timestamp_not_in: [BigInt!]
+  totalValueLockedUSDHistoryIndex: Int
+  totalValueLockedUSDHistoryIndex_gt: Int
+  totalValueLockedUSDHistoryIndex_gte: Int
+  totalValueLockedUSDHistoryIndex_in: [Int!]
+  totalValueLockedUSDHistoryIndex_lt: Int
+  totalValueLockedUSDHistoryIndex_lte: Int
+  totalValueLockedUSDHistoryIndex_not: Int
+  totalValueLockedUSDHistoryIndex_not_in: [Int!]
+  totalValueMintedUSDHistoryIndex: Int
+  totalValueMintedUSDHistoryIndex_gt: Int
+  totalValueMintedUSDHistoryIndex_gte: Int
+  totalValueMintedUSDHistoryIndex_in: [Int!]
+  totalValueMintedUSDHistoryIndex_lt: Int
+  totalValueMintedUSDHistoryIndex_lte: Int
+  totalValueMintedUSDHistoryIndex_not: Int
+  totalValueMintedUSDHistoryIndex_not_in: [Int!]
 }
 
 enum SystemInfo_orderBy {
+  govToken
   id
   priceFeed
+  reservePool
+  reservePoolUSDHistoryIndex
+  stabilityPoolManager
   stableCoin
   storagePool
   timestamp
+  totalValueLockedUSDHistoryIndex
+  totalValueMintedUSDHistoryIndex
 }
 
 type Token {
@@ -2252,7 +2605,6 @@ type Token {
   createdAt: BigInt!
   id: Bytes!
   isPoolToken: Boolean!
-  priceUSD: BigInt!
   symbol: String!
 }
 
@@ -2316,7 +2668,6 @@ enum TokenAmount_orderBy {
   token__createdAt
   token__id
   token__isPoolToken
-  token__priceUSD
   token__symbol
 }
 
@@ -2461,7 +2812,6 @@ enum TokenCandleSingleton_orderBy {
   token__createdAt
   token__id
   token__isPoolToken
-  token__priceUSD
   token__symbol
   volume
 }
@@ -2573,7 +2923,6 @@ enum TokenCandle_orderBy {
   token__createdAt
   token__id
   token__isPoolToken
-  token__priceUSD
   token__symbol
   volume
 }
@@ -2615,14 +2964,6 @@ input Token_filter {
   isPoolToken_not: Boolean
   isPoolToken_not_in: [Boolean!]
   or: [Token_filter]
-  priceUSD: BigInt
-  priceUSD_gt: BigInt
-  priceUSD_gte: BigInt
-  priceUSD_in: [BigInt!]
-  priceUSD_lt: BigInt
-  priceUSD_lte: BigInt
-  priceUSD_not: BigInt
-  priceUSD_not_in: [BigInt!]
   symbol: String
   symbol_contains: String
   symbol_contains_nocase: String
@@ -2650,7 +2991,6 @@ enum Token_orderBy {
   createdAt
   id
   isPoolToken
-  priceUSD
   symbol
 }
 
@@ -2980,6 +3320,136 @@ input TotalValueLockedChunk_filter {
 
 enum TotalValueLockedChunk_orderBy {
   id
+  timestamp
+  value
+}
+
+type TotalValueLockedUSDHistoryChunk {
+  id: String!
+  size: Int!
+  timestamp: BigInt!
+  value: BigInt!
+}
+
+input TotalValueLockedUSDHistoryChunk_filter {
+  """Filter for the block changed event."""
+  _change_block: BlockChangedFilter
+  and: [TotalValueLockedUSDHistoryChunk_filter]
+  id: String
+  id_contains: String
+  id_contains_nocase: String
+  id_ends_with: String
+  id_ends_with_nocase: String
+  id_gt: String
+  id_gte: String
+  id_in: [String!]
+  id_lt: String
+  id_lte: String
+  id_not: String
+  id_not_contains: String
+  id_not_contains_nocase: String
+  id_not_ends_with: String
+  id_not_ends_with_nocase: String
+  id_not_in: [String!]
+  id_not_starts_with: String
+  id_not_starts_with_nocase: String
+  id_starts_with: String
+  id_starts_with_nocase: String
+  or: [TotalValueLockedUSDHistoryChunk_filter]
+  size: Int
+  size_gt: Int
+  size_gte: Int
+  size_in: [Int!]
+  size_lt: Int
+  size_lte: Int
+  size_not: Int
+  size_not_in: [Int!]
+  timestamp: BigInt
+  timestamp_gt: BigInt
+  timestamp_gte: BigInt
+  timestamp_in: [BigInt!]
+  timestamp_lt: BigInt
+  timestamp_lte: BigInt
+  timestamp_not: BigInt
+  timestamp_not_in: [BigInt!]
+  value: BigInt
+  value_gt: BigInt
+  value_gte: BigInt
+  value_in: [BigInt!]
+  value_lt: BigInt
+  value_lte: BigInt
+  value_not: BigInt
+  value_not_in: [BigInt!]
+}
+
+enum TotalValueLockedUSDHistoryChunk_orderBy {
+  id
+  size
+  timestamp
+  value
+}
+
+type TotalValueMintedUSDHistoryChunk {
+  id: String!
+  size: Int!
+  timestamp: BigInt!
+  value: BigInt!
+}
+
+input TotalValueMintedUSDHistoryChunk_filter {
+  """Filter for the block changed event."""
+  _change_block: BlockChangedFilter
+  and: [TotalValueMintedUSDHistoryChunk_filter]
+  id: String
+  id_contains: String
+  id_contains_nocase: String
+  id_ends_with: String
+  id_ends_with_nocase: String
+  id_gt: String
+  id_gte: String
+  id_in: [String!]
+  id_lt: String
+  id_lte: String
+  id_not: String
+  id_not_contains: String
+  id_not_contains_nocase: String
+  id_not_ends_with: String
+  id_not_ends_with_nocase: String
+  id_not_in: [String!]
+  id_not_starts_with: String
+  id_not_starts_with_nocase: String
+  id_starts_with: String
+  id_starts_with_nocase: String
+  or: [TotalValueMintedUSDHistoryChunk_filter]
+  size: Int
+  size_gt: Int
+  size_gte: Int
+  size_in: [Int!]
+  size_lt: Int
+  size_lte: Int
+  size_not: Int
+  size_not_in: [Int!]
+  timestamp: BigInt
+  timestamp_gt: BigInt
+  timestamp_gte: BigInt
+  timestamp_in: [BigInt!]
+  timestamp_lt: BigInt
+  timestamp_lte: BigInt
+  timestamp_not: BigInt
+  timestamp_not_in: [BigInt!]
+  value: BigInt
+  value_gt: BigInt
+  value_gte: BigInt
+  value_in: [BigInt!]
+  value_lt: BigInt
+  value_lte: BigInt
+  value_not: BigInt
+  value_not_in: [BigInt!]
+}
+
+enum TotalValueMintedUSDHistoryChunk_orderBy {
+  id
+  size
   timestamp
   value
 }
