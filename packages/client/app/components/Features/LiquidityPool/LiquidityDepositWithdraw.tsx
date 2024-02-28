@@ -89,10 +89,10 @@ function LiquidityDepositWithdraw({ selectedPoolId }: Props) {
   );
 
   // For Update after TX
-  const { data: borrowerPoolsData, loading } = useQuery<
-    GetBorrowerLiquidityPoolsQuery,
-    GetBorrowerLiquidityPoolsQueryVariables
-  >(GET_BORROWER_LIQUIDITY_POOLS, { variables: { borrower: address } });
+  const { data: borrowerPoolsData } = useQuery<GetBorrowerLiquidityPoolsQuery, GetBorrowerLiquidityPoolsQueryVariables>(
+    GET_BORROWER_LIQUIDITY_POOLS,
+    { variables: { borrower: address } },
+  );
   const selectedPool = borrowerPoolsData?.pools.find(({ id }) => id === selectedPoolId);
 
   const methods = useForm<FieldValues>({
@@ -103,7 +103,7 @@ function LiquidityDepositWithdraw({ selectedPoolId }: Props) {
     reValidateMode: 'onChange',
     shouldUnregister: true,
   });
-  const { handleSubmit, setValue, reset, formState, watch } = methods;
+  const { handleSubmit, setValue, reset, watch } = methods;
 
   const ratioChangeCallback = useCallback(
     (newRatio: number, oldRatio: number, currentDebtValueUSD: number, currentCollateralValueUSD: number) => {

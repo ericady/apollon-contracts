@@ -156,6 +156,7 @@ export default function TransactionDialogProvider({ children }: { children: Reac
             }
           })
           .catch((error: { message: string; cause?: BaseContract }) => {
+            console.log('error: ', error);
             // Allow interaction from the start
             setTransactionPending(false);
 

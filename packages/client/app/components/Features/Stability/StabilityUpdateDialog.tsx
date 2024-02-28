@@ -77,6 +77,10 @@ const StabilityUpdateDialog = () => {
         amount: floatToBigInt(parseFloat(amount)),
       }));
 
+    if (tokenAmounts.length === 0) {
+      return;
+    }
+
     if (tabValue === 'DEPOSIT') {
       setSteps([
         ...tokenAmounts.map(({ tokenAddress, amount }) => ({
@@ -127,7 +131,7 @@ const StabilityUpdateDialog = () => {
       ]);
     }
 
-    reset();
+    reset(undefined, { keepIsSubmitted: false });
     setIsOpen(false);
   };
 

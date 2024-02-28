@@ -66,7 +66,13 @@ function CollateralTable() {
           ...token,
           chartColor: colorPalette.shift(),
           troveValueUSD: token.troveLockedAmount
-            ? roundNumber(dangerouslyConvertBigIntToNumber(token.troveLockedAmount * token.token.priceUSDOracle, 30, 6))
+            ? roundNumber(
+                dangerouslyConvertBigIntToNumber(
+                  token.troveLockedAmount * token.token.priceUSDOracle,
+                  token.token.decimals + 18 - 6,
+                  6,
+                ),
+              )
             : 0,
         })) ?? []
     );

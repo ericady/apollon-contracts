@@ -41,11 +41,14 @@ const RepayDebtDialog = ({ buttonSx = {}, buttonVariant = 'outlined' }: Props) =
   } = useEthers();
   const { setSteps } = useTransactionDialog();
 
-  const { data } = useQuery<GetBorrowerDebtTokensQuery, GetBorrowerDebtTokensQueryVariables>(GET_BORROWER_DEBT_TOKENS, {
-    variables: {
-      borrower: address,
+  const { data } = useQuery<GetBorrowerDebtTokensQuery, GetBorrowerDebtTokensQueryVariables>(
+    GET_BORROWER_DEBT_TOKENS,
+    {
+      variables: {
+        borrower: address,
+      },
     },
-  });
+  );
 
   const methods = useForm<FieldValues>({ reValidateMode: 'onChange' });
   const { handleSubmit, setValue, reset, formState } = methods;
@@ -72,6 +75,10 @@ const RepayDebtDialog = ({ buttonSx = {}, buttonVariant = 'outlined' }: Props) =
         tokenAddress: address,
         amount: floatToBigInt(parseFloat(amount)),
       }));
+
+    if (tokenAmounts.length === 0) {
+      return;
+    }
 
     setSteps([
       ...tokenAmounts.map(({ tokenAddress, amount }) => ({
@@ -119,10 +126,9 @@ const RepayDebtDialog = ({ buttonSx = {}, buttonVariant = 'outlined' }: Props) =
       },
     ]);
 
-    reset();
+    reset(undefined, { keepIsSubmitted: false });
     setIsOpen(false);
   };
-  // FIXME: Can repay all debt because of precission 107n debt remaining
 
   return (
     <>

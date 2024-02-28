@@ -38,16 +38,9 @@ export const displayPercentage = (
 };
 
 export function floatToBigInt(floatNumber: number, precision: number = 18) {
-  // const factor = Math.pow(10, precision);
-  // const bigIntNumber = BigInt(Math.round(floatNumber * factor));
-  // return bigIntNumber;
-
-  // Convert the float to a string to handle precision
-  const floatString = floatNumber.toFixed(precision);
-
   // Use ethers.js utility to parse the float string into a BigInt
   // This will account for the decimal places and convert accordingly
-  const bigIntValue = ethers.parseUnits(floatString, precision);
+  const bigIntValue = ethers.parseUnits(floatNumber.toString(), precision);
 
   return bigIntValue;
 }
@@ -63,6 +56,14 @@ export function bigIntStringToFloat(bigIntValue: string, decimals = 18) {
   const floatValue = parseFloat(formattedString);
 
   return floatValue;
+}
+
+export function bigIntToFloatString(bigIntValue: bigint, decimals = 18) {
+  // Use ethers.js utility to format the BigInt value into a string
+  // This takes into account the decimal places
+  const formattedString = ethers.formatUnits(bigIntValue, decimals);
+
+  return formattedString;
 }
 
 export function dangerouslyConvertBigIntToNumber(
