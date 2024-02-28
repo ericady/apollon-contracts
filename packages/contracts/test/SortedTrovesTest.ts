@@ -360,8 +360,6 @@ describe('SortedTroves', () => {
     it('Finds the correct insert position given two addresses that loosely bound the correct position', async () => {
       await whaleShrimpTroveInit(contracts, signers, false);
 
-      //   await priceFeed.setTokenPrice(BTC, parseUnits('3000'));
-
       const targetNICR = parseUnits('1500', 16);
 
       const insertPosition = await sortedTroves.findInsertPosition(targetNICR, dennis, defaulter_1);
@@ -388,7 +386,6 @@ describe('SortedTroves', () => {
         ZERO_ADDRESS,
         ZERO_ADDRESS
       );
-      console.warn('☢️ ~ it.only ~ validInsertPosition:', validInsertPosition);
 
       expect(validInsertPosition).to.be.true;
     });
@@ -396,7 +393,7 @@ describe('SortedTroves', () => {
 
   describe('remove():', () => {
     it('fails if id is not in the list', async () => {
-      await assertRevert(sortedTroves.remove(alice.address));
+      await assertRevert(sortedTroves.remove(alice));
     });
   });
 });
