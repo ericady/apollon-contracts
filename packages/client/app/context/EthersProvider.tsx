@@ -86,26 +86,8 @@ export const NETWORKS = [
   },
 ] as const;
 
-// Connetion to local node
-// TODO: Implement testnet once deployed
-// TODO: This is setting the default network. How to make sure this is correct?
-const defaultNetwork = NETWORKS[0];
-const provider =
-  process.env.NEXT_PUBLIC_CONTRACT_MOCKING === 'enabled' &&
-  typeof window !== 'undefined' &&
-  typeof window.ethereum !== 'undefined'
-    ? new JsonRpcProvider(defaultNetwork.rpcUrls[0], {
-        name: defaultNetwork.chainName,
-        chainId: defaultNetwork.chainIdNumber,
-      })
-    : new JsonRpcProvider(defaultNetwork.rpcUrls[0], {
-        name: defaultNetwork.chainName,
-        chainId: defaultNetwork.chainIdNumber,
-      });
-
 export const EthersContext = createContext<{
-  // provider: BrowserProvider | null;
-  provider: JsonRpcProvider | BrowserProvider;
+  provider: JsonRpcProvider | null;
   signer: JsonRpcSigner | null;
   address: string;
   contracts: {
@@ -125,7 +107,7 @@ export const EthersContext = createContext<{
   };
   connectWallet: () => void;
 }>({
-  provider: provider,
+  provider: null,
   signer: null,
   address: '',
   contracts: {
@@ -146,13 +128,9 @@ export const EthersContext = createContext<{
   connectWallet: () => {},
 });
 
-// TODO: Implement network change: https://docs.ethers.org/v5/concepts/best-practices/
-// const testNetwork = new Network('goerli', 5);
-// const newProvider = new BrowserProvider(window.ethereum, testNetwork);
-
 export default function EthersProvider({ children }: { children: React.ReactNode }) {
   const { enqueueSnackbar } = useSnackbar();
-  // const [provider, setProvider] = useState<BrowserProvider | null>(null);
+  const [provider, setProvider] = useState<JsonRpcProvider | null>(null);
   const [signer, setSigner] = useState<JsonRpcSigner | null>(null);
   const [address, setAddress] = useState<string>('');
   const [debtTokenContracts, setDebtTokenContracts] = useState<AllDebtTokenContracts>();
@@ -284,8 +262,65 @@ export default function EthersProvider({ children }: { children: React.ReactNode
     }
   };
 
-  useEffect(() => {
+  function updateProvider(network: (typeof NETWORKS)[number]) {
     if (typeof window.ethereum !== 'undefined') {
+      console.log('network: ', network);
+
+      const newProvider = new JsonRpcProvider(network.rpcUrls[0], {
+        name: network.chainName,
+        chainId: network.chainIdNumber,
+      });
+
+      setProvider(newProvider);
+    }
+  }
+
+  // Initialize the correct provider
+  useEffect(() => {
+    if (typeof window.ethereum !== 'undefined' && provider === null) {
+      window.ethereum.request({ method: 'eth_chainId' }).then((chainIdHex) => {
+        const initNetwork = NETWORKS.find((network) => network.chainId === chainIdHex);
+        if (initNetwork) {
+          updateProvider(initNetwork);
+        }
+        // Could not find network in the list => add it
+        else {
+          const { blockExplorerUrls, chainId, chainIdNumber, chainName, nativeCurrency, rpcUrls } = NETWORKS[0];
+          window
+            .ethereum!.request({
+              method: 'wallet_addEthereumChain',
+              params: [
+                {
+                  // All params must be provided to make it work
+                  chainId,
+                  rpcUrls,
+                  chainName,
+                  nativeCurrency,
+                  blockExplorerUrls,
+                },
+              ],
+            })
+            .then(() => {
+              window.location.reload();
+              // updateProvider(choosenNetwork)
+            });
+        }
+      });
+    } else if (typeof window.ethereum === 'undefined') {
+      enqueueSnackbar('MetaMask extension is not installed. Please install and try again.', {
+        variant: 'error',
+        action: (
+          <Button LinkComponent={Link} href="https://metamask.io/" variant="contained" target="_blank" rel="noreferrer">
+            Install
+          </Button>
+        ),
+      });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  useEffect(() => {
+    if (typeof window.ethereum !== 'undefined' && provider) {
       // Log in automaticall if we know the user already.
       window.ethereum.request({ method: 'eth_accounts' }).then((accounts) => {
         if (accounts.length > 0) {
@@ -304,7 +339,7 @@ export default function EthersProvider({ children }: { children: React.ReactNode
     };
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [provider]);
 
   // This use effect initializes the contracts to do initial read operations.
   useEffect(() => {
@@ -419,17 +454,8 @@ export default function EthersProvider({ children }: { children: React.ReactNode
       } catch (error) {
         console.error(error);
       }
-    } else {
-      enqueueSnackbar('MetaMask extension is not installed. Please install and try again.', {
-        variant: 'error',
-        action: (
-          <Button LinkComponent={Link} href="https://metamask.io/" variant="contained" target="_blank" rel="noreferrer">
-            Install
-          </Button>
-        ),
-      });
     }
-  }, [enqueueSnackbar]);
+  }, [provider]);
 
   if (
     // TODO: Handle where MM is not installed
@@ -480,8 +506,7 @@ export default function EthersProvider({ children }: { children: React.ReactNode
 }
 
 export function useEthers(): {
-  provider: JsonRpcProvider | BrowserProvider;
-  // provider: BrowserProvider | null;
+  provider: JsonRpcProvider | null;
   signer: JsonRpcSigner | null;
   address: string;
   contracts: {

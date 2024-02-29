@@ -26,6 +26,8 @@ function NetworkSwitch() {
 
         .then(() => {
           setCurrentNetwork(choosenNetwork);
+          window.location.reload();
+          // updateProvider(choosenNetwork)
         })
         .catch(() => {
           if (typeof window.ethereum !== 'undefined') {
@@ -45,6 +47,8 @@ function NetworkSwitch() {
               })
               .then(() => {
                 setCurrentNetwork(choosenNetwork);
+                window.location.reload();
+                // updateProvider(choosenNetwork)
               });
           }
         });
@@ -57,6 +61,9 @@ function NetworkSwitch() {
 
       if (currentNetwork) {
         setCurrentNetwork(currentNetwork);
+        // reload page
+        window.location.reload();
+        // updateProvider(currentNetwork)
       }
     };
 
@@ -65,7 +72,7 @@ function NetworkSwitch() {
       window.ethereum.on('chainChanged', handleNetworkChange);
 
       // Get current network once and set switch initially
-      provider.getNetwork().then((currentNetwork) => {
+      provider?.getNetwork().then((currentNetwork) => {
         const network = NETWORKS.find((network) => network.chainIdNumber === Number(currentNetwork.chainId));
         if (network) {
           setCurrentNetwork(network);
