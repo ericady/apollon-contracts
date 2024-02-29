@@ -160,7 +160,6 @@ type Query {
   # without borrower address borrowerLiquidity and borrowerRewards are always undefined
   # with borrower address only the pools are returned, where the borrower has liquidity or rewards
   pools(borrower: String): [Pool!]!
-  # TODO: Implement mocks for them
   totalValueLockedUSDHistoryChunks(
     first: Int = 90
     orderBy: TotalValueLockedUSDHistoryChunk_orderBy
@@ -179,11 +178,6 @@ type Query {
     orderDirection: OrderDirection
     skip: Int = 0
   ): [ReservePoolUSDHistoryChunk!]!
-
-  # TODO: Remove them later
-  getCollateralUSDHistory: [[Int!]!]! # [[timestamp, value], [...], ...]
-  getDebtUSDHistory: [[Int!]!]! # [[timestamp, value], [...], ...]
-  getReserveUSDHistory: [[Int!]!]! # [[timestamp, value], [...], ...]
 }
 
 # GLOBAL CHARTS

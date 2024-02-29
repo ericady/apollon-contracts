@@ -19,12 +19,15 @@ import {
   QueryTokenArgs,
   QueryTokenCandleSingletonArgs,
   QueryTokenCandlesArgs,
+  ReservePoolUsdHistoryChunk,
   SwapEvent,
   SystemInfo,
   Token,
   TokenAmount,
   TokenCandle,
   TokenCandleSingleton,
+  TotalValueLockedUsdHistoryChunk,
+  TotalValueMintedUsdHistoryChunk,
 } from '../app/generated/gql-types';
 import {
   GET_ALL_DEBT_TOKENS,
@@ -247,14 +250,14 @@ const pastSwapEvents = Array(pastSwapEventsLength)
   .sort((a, b) => Number(b.timestamp) - Number(a.timestamp));
 
 // Define a helper function to generate pool price history data
-const generatePoolPriceHistory = (): number[][] => {
-  return Array(60)
+const generatePoolPriceHistory = () => {
+  return Array(90)
     .fill(null)
     .map((_, i) => {
       // Generate a timestamp for each day in the past month
       const timestamp = now - i * oneDayInSeconds;
-      const price = parseFloat(faker.finance.amount(1, 5000, 2));
-      return [timestamp, price];
+      const price = floatToBigInt(faker.number.float({ min: 1, max: 5000, precision: 0.01 })).toString();
+      return [timestamp.toString(), price];
     })
     .reverse(); // reverse to get the timeline in chronological order
 };
@@ -421,20 +424,64 @@ export const handlers = [
   // CHART DATA MOCK
 
   // GetCollateralUSDHistory
-  graphql.query<{ getCollateralUSDHistory: Query['getCollateralUSDHistory'] }>(
+  graphql.query<{ totalValueLockedUSDHistoryChunks: Query['totalValueLockedUSDHistoryChunks'] }>(
     GET_COLLATERAL_USD_HISTORY,
     (req, res, ctx) => {
-      const result = generatePoolPriceHistory();
+      const data = generatePoolPriceHistory();
 
-      return res(ctx.data({ getCollateralUSDHistory: result }));
+      const result = data.map<TotalValueLockedUsdHistoryChunk>(([timestamp, value]) => {
+        return {
+          __typename: 'TotalValueLockedUSDHistoryChunk',
+          id: faker.string.uuid(),
+          timestamp: timestamp,
+          value: value,
+          size: 24 * 60 * 60,
+        };
+      });
+
+      return res(ctx.data({ totalValueLockedUSDHistoryChunks: result }));
     },
   ),
   // GetDebtUSDHistory
-  graphql.query<{ getDebtUSDHistory: Query['getDebtUSDHistory'] }>(GET_DEBT_USD_HISTORY, (req, res, ctx) => {
-    const result = generatePoolPriceHistory();
+  graphql.query<{ totalValueMintedUSDHistoryChunks: Query['totalValueMintedUSDHistoryChunks'] }>(
+    GET_DEBT_USD_HISTORY,
+    (req, res, ctx) => {
+      const data = generatePoolPriceHistory();
 
-    return res(ctx.data({ getDebtUSDHistory: result }));
-  }),
+      const result = data.map<TotalValueMintedUsdHistoryChunk>(([timestamp, value]) => {
+        return {
+          __typename: 'TotalValueMintedUSDHistoryChunk',
+          id: faker.string.uuid(),
+          timestamp: timestamp,
+          value: value,
+          size: 24 * 60 * 60,
+        };
+      });
+
+      return res(ctx.data({ totalValueMintedUSDHistoryChunks: result }));
+    },
+  ),
+
+  // GetReserveUSDHistory
+  graphql.query<{ reservePoolUSDHistoryChunks: Query['reservePoolUSDHistoryChunks'] }>(
+    GET_RESERVE_USD_HISTORY,
+    (req, res, ctx) => {
+      const data = generatePoolPriceHistory();
+
+      const result = data.map<ReservePoolUsdHistoryChunk>(([timestamp, value]) => {
+        return {
+          __typename: 'ReservePoolUSDHistoryChunk',
+          id: faker.string.uuid(),
+          timestamp: timestamp,
+          value: value,
+          size: 24 * 60 * 60,
+        };
+      });
+
+      return res(ctx.data({ reservePoolUSDHistoryChunks: result }));
+    },
+  ),
+
   // GetBorrowerStabilityHistory
   graphql.query<{ borrowerHistories: Query['borrowerHistories'] }, QueryBorrowerHistoriesArgs>(
     GET_BORROWER_STABILITY_HISTORY,
@@ -449,13 +496,6 @@ export const handlers = [
       return res(ctx.data({ borrowerHistories }));
     },
   ),
-
-  // GetReserveUSDHistory
-  graphql.query<{ getReserveUSDHistory: Query['getReserveUSDHistory'] }>(GET_RESERVE_USD_HISTORY, (req, res, ctx) => {
-    const result = generatePoolPriceHistory();
-
-    return res(ctx.data({ getReserveUSDHistory: result }));
-  }),
 
   // GetTradingViewCandles
   graphql.query<{ tokenCandles: Query['tokenCandles'] }, QueryTokenCandlesArgs>(
