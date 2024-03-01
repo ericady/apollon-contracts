@@ -3,31 +3,31 @@ import path from 'path';
 
 // Assuming Contracts object is defined somewhere in your script or imported
 export const Contracts = {
-    DebtToken: {
-      STABLE: '0x84ea74d481ee0a5332c457a4d796187f6ba67feb',
-      STOCK_1: '0x9e545e3c0baab3e08cdfd552c960a1050f373042',
-    },
-    ERC20: {
-      BTC: '0x9a676e781a523b5d0c0e43731313a708cb607508',
-      USDT: '0x959922be3caee4b8cd9a407cc3ac1c251c2007b1',
-      GOV: '0x0b306bf915c4d645ff596e518faf3f9669b97016',
-    },
-    TroveManager: '0x0165878a594ca255338adfa4d48449f69242eb8f',
-    StabilityPoolManager: '0xdc64a140aa3e981100a9beca4e685f962f0cf6c9',
-    SwapOperations: '0xa51c1fc2f0d1a1b8494ed1fe312d7c3a78ed91c0',
-    SwapPairs: {
-      BTC: '0x6d09e8227073f36028f87f9ac1863540be036c01',
-      USDT: '0x6fc8d5049fa554c86660e9a06664b87b1405015d',
-      STOCK_1: '0xa3fe5e2fd94cda575722f376eba4816a7eeaf79c',
-    },
-    BorrowerOperations: '0xcf7ed3acca5a467e9e704c703e8d87f634fb0fc9',
-    StoragePool: '0xb7f8bc63bbcad18155201308c8f3540b07f84f5e',
-    SortedTroves: '0x610178da211fef7d417bc0e6fed39f05609ad788',
-    HintHelpers: '0xe7f1725e7734ce288f8367e1bb143e90bb3f0512',
-    PriceFeed: '0xa513e6e4b8f2a923d98304ec87f64353c4d5c853',
-    RedemptionOperations: '0x2279B7A0a67DB372996a5FaB50D91eAA73d2eBe6',
-    CollSurplus: '0x5FbDB2315678afecb367f032d93F642f64180aa3',
-  };
+  DebtToken: {
+    STABLE: '0x84ea74d481ee0a5332c457a4d796187f6ba67feb',
+    STOCK_1: '0x9e545e3c0baab3e08cdfd552c960a1050f373042',
+  },
+  ERC20: {
+    BTC: '0x9a676e781a523b5d0c0e43731313a708cb607508',
+    USDT: '0x959922be3caee4b8cd9a407cc3ac1c251c2007b1',
+    GOV: '0x0b306bf915c4d645ff596e518faf3f9669b97016',
+  },
+  TroveManager: '0x0165878a594ca255338adfa4d48449f69242eb8f',
+  StabilityPoolManager: '0xdc64a140aa3e981100a9beca4e685f962f0cf6c9',
+  SwapOperations: '0xa51c1fc2f0d1a1b8494ed1fe312d7c3a78ed91c0',
+  SwapPairs: {
+    BTC: '0x6d09e8227073f36028f87f9ac1863540be036c01',
+    USDT: '0x6fc8d5049fa554c86660e9a06664b87b1405015d',
+    STOCK_1: '0xa3fe5e2fd94cda575722f376eba4816a7eeaf79c',
+  },
+  BorrowerOperations: '0xcf7ed3acca5a467e9e704c703e8d87f634fb0fc9',
+  StoragePool: '0xb7f8bc63bbcad18155201308c8f3540b07f84f5e',
+  SortedTroves: '0x610178da211fef7d417bc0e6fed39f05609ad788',
+  HintHelpers: '0xe7f1725e7734ce288f8367e1bb143e90bb3f0512',
+  PriceFeed: '0xa513e6e4b8f2a923d98304ec87f64353c4d5c853',
+  RedemptionOperations: '0x2279B7A0a67DB372996a5FaB50D91eAA73d2eBe6',
+  CollSurplus: '0x5FbDB2315678afecb367f032d93F642f64180aa3',
+};
 
 // Specify the directory where the files will be saved
 const outputDirectory = 'app/context/typePolicies';
@@ -445,30 +445,31 @@ Object.entries(Contracts.SwapPairs).forEach(([tokenName, tokenAddress]) => {
 const policyDirectory = './typePolicies/';
 const targetFilePath = 'app/context/CustomApolloProvider.tsx'; // Update this to your actual file path
 
-
 // Step 1: Generate Import Statements
 const generateImportStatements = () => {
-    let importStatements = '// GENERATED IMPORT CODE START - DO NOT EDIT THIS SECTION MANUALLY\n';
-    Object.keys(Contracts.DebtToken).forEach((key) => {
-        const policyName = `DebtToken_${key}`;
-        importStatements += `import ${policyName} from '${policyDirectory}${policyName}.policy';\n`;
-    });
-    Object.keys(Contracts.ERC20).forEach((key) => {
-        const policyName = `ERC20_${key}`;
-        importStatements += `import ${policyName} from '${policyDirectory}${policyName}.policy';\n`;
-    });
-    Object.keys(Contracts.SwapPairs).forEach((key) => {
-        const policyName = `SwapPairs_${key}`;
-        importStatements += `import ${policyName} from '${policyDirectory}${policyName}.policy';\n`;
-    });
-    importStatements += '// GENERATED IMPORT CODE END\n';
-    return importStatements;
-  };
-  
-  // Step 2: Generate Code Block to Insert
-  const generateCodeBlock = () => {
-    let codeBlock = '  // GENERATED CODE START - DO NOT EDIT THIS SECTION MANUALLY\n';
-    Object.keys(Contracts).filter((key) => key === "DebtToken" || key === "ERC20" || key === "SwapPairs").forEach((key) => {
+  let importStatements = '// GENERATED IMPORT CODE START - DO NOT EDIT THIS SECTION MANUALLY\n';
+  Object.keys(Contracts.DebtToken).forEach((key) => {
+    const policyName = `DebtToken_${key}`;
+    importStatements += `import ${policyName} from '${policyDirectory}${policyName}.policy';\n`;
+  });
+  Object.keys(Contracts.ERC20).forEach((key) => {
+    const policyName = `ERC20_${key}`;
+    importStatements += `import ${policyName} from '${policyDirectory}${policyName}.policy';\n`;
+  });
+  Object.keys(Contracts.SwapPairs).forEach((key) => {
+    const policyName = `SwapPairs_${key}`;
+    importStatements += `import ${policyName} from '${policyDirectory}${policyName}.policy';\n`;
+  });
+  importStatements += '// GENERATED IMPORT CODE END\n';
+  return importStatements;
+};
+
+// Step 2: Generate Code Block to Insert
+const generateCodeBlock = () => {
+  let codeBlock = '  // GENERATED CODE START - DO NOT EDIT THIS SECTION MANUALLY\n';
+  Object.keys(Contracts)
+    .filter((key) => key === 'DebtToken' || key === 'ERC20' || key === 'SwapPairs')
+    .forEach((key) => {
       codeBlock += `  ${key}: {\n`;
       Object.keys(Contracts[key]).forEach((token) => {
         const policyName = `${key}_${token}`;
@@ -476,22 +477,28 @@ const generateImportStatements = () => {
       });
       codeBlock += '  },\n\n';
     });
-    codeBlock += '  // GENERATED CODE END\n';
-    return codeBlock;
-  };
-  
-  // Step 3: Read, Modify, and Write the File
-  const updateTargetFile = (imports, codeBlock) => {
-    const fileContent = fs.readFileSync(targetFilePath, 'utf-8');
-    const replacedImports = fileContent.replace(/\/\/ GENERATED IMPORT CODE START[\s\S]*?\/\/ GENERATED IMPORT CODE END/g, imports);
-    const replacedCodeBlock = replacedImports.replace(/\/\/ GENERATED CODE START[\s\S]*?\/\/ GENERATED CODE END/g, codeBlock);
-    fs.writeFileSync(targetFilePath, replacedCodeBlock, 'utf-8');
-  };
+  codeBlock += '  // GENERATED CODE END\n';
+  return codeBlock;
+};
 
-  const runUpdateProcess = () => {
-    const imports = generateImportStatements();
-    const codeBlock = generateCodeBlock();
-    updateTargetFile(imports, codeBlock);
-  };
-  
-  runUpdateProcess();
+// Step 3: Read, Modify, and Write the File
+const updateTargetFile = (imports, codeBlock) => {
+  const fileContent = fs.readFileSync(targetFilePath, 'utf-8');
+  const replacedImports = fileContent.replace(
+    /\/\/ GENERATED IMPORT CODE START[\s\S]*?\/\/ GENERATED IMPORT CODE END/g,
+    imports,
+  );
+  const replacedCodeBlock = replacedImports.replace(
+    /\/\/ GENERATED CODE START[\s\S]*?\/\/ GENERATED CODE END/g,
+    codeBlock,
+  );
+  fs.writeFileSync(targetFilePath, replacedCodeBlock, 'utf-8');
+};
+
+const runUpdateProcess = () => {
+  const imports = generateImportStatements();
+  const codeBlock = generateCodeBlock();
+  updateTargetFile(imports, codeBlock);
+};
+
+runUpdateProcess();

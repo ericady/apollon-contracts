@@ -22,3 +22,31 @@
 a {
   text-decoration: none;
 }
+
+#apollon-mouse-follower {
+  position: absolute;
+  width: 80vw;
+  height: 6px;
+  translate: -50%;
+  background-color: grey;
+  pointer-events: none; /* Ensures the div doesn't interfere with mouse events */
+}
+
+/* Dynamically attached and destroyed from the document */
+/* Spans the whole screen and captures events */
+#apollon-iframe-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+
+  background: transparent;
+  z-index: 10; /* Ensure it's above the iframe */
+  pointer-events: auto; /* Capture mouse events */
+}
+
+/* Bottom part that is dynamically resized */
+#apollon-drag-queen {
+  height: var(--apollon-drag-queen-height, 330px);
+}

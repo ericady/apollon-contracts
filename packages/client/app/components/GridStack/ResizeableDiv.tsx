@@ -3,51 +3,54 @@
 import DragHandleIcon from '@mui/icons-material/DragHandle';
 import { MouseEventHandler, PropsWithChildren } from 'react';
 
-const minimumHeight = 60;
-const maximumHeight = 800;
-let originalHeight = 0;
-let originalY = 0;
-let originalMouseY = 0;
-
-let element: HTMLElement;
-
-const resize = (event: MouseEvent) => {
-  const height = originalHeight - (event.pageY - originalMouseY);
-  if (height > minimumHeight && height < maximumHeight) {
-    element.style.height = height + 'px';
-    element.style.top = originalY + (event.pageY - originalMouseY) + 'px';
-  }
-};
-
 function ResizeableDiv({ children }: PropsWithChildren<{}>) {
-  const startResize: MouseEventHandler<HTMLDivElement> = (event) => {
-    element = document.getElementById('apollon-drag-queen')!;
+  const startResize: MouseEventHandler<HTMLDivElement> = () => {
+    // Create the div dynamically
+    // foloows the mouse and across the Y axis
+    const follower = document.createElement('div');
+    follower.id = 'apollon-mouse-follower';
+    follower.style.left = '60vw';
 
-    originalHeight = parseFloat(getComputedStyle(element, null).getPropertyValue('height').replace('px', ''));
-    originalY = element.getBoundingClientRect().top;
-    originalMouseY = event.pageY;
+    document.body.appendChild(follower);
 
-    window.addEventListener('mousemove', resize);
+    // Create the div dynamically
+    // ALoows to capture mouse events on top of the iframe
+    const catchMouseOverlay = document.createElement('div');
+    catchMouseOverlay.id = 'apollon-iframe-overlay';
+    document.body.appendChild(catchMouseOverlay);
+
+    // @ts-ignore
+    catchMouseOverlay.addEventListener('mouseup', stopResize);
+
+    // Update the div's position to follow the mouse
+    catchMouseOverlay.addEventListener('mousemove', function (event) {
+      const y = event.clientY; // Vertical position
+      follower.style.top = y + 'px';
+    });
   };
 
-  const stopResize: MouseEventHandler<HTMLDivElement> = () => {
-    const height = element.clientHeight;
-    window.removeEventListener('mousemove', resize);
+  const stopResize: MouseEventHandler<HTMLDivElement> = (event) => {
+    const catchMouseOverlay = document.getElementById('apollon-mouse-follower')!;
+    const follower = document.getElementById('apollon-iframe-overlay')!;
+
     // set css custom property globally to resize the TradingView
-    document.documentElement.style.setProperty('--apollon-drag-queen-height', height + 'px');
+    const distanceToBottom = window.innerHeight - event.clientY;
+    document.documentElement.style.setProperty('--apollon-drag-queen-height', distanceToBottom + 'px');
+
+    // Destroy overlay and follower
+    catchMouseOverlay.remove();
+    follower.remove();
   };
 
   return (
     <>
-      <div onMouseUp={stopResize} style={{ display: 'flex', justifyContent: 'center' }}>
+      <div style={{ display: 'flex', justifyContent: 'center' }}>
         <div onMouseDown={startResize}>
           <DragHandleIcon fontSize="small" sx={{ color: '#46434F', cursor: 'n-resize' }} />
         </div>
       </div>
 
-      <div id="apollon-drag-queen" style={{ height: 330 }}>
-        {children}
-      </div>
+      <div id="apollon-drag-queen">{children}</div>
     </>
   );
 }

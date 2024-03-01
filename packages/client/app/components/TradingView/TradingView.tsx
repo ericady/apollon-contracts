@@ -251,7 +251,6 @@ function TradingViewComponent() {
         // Must have the height fixed in order to resize properly. We adapt via a CSS custom property.
         // Whole screen - navigation - TV header - current table size - resize handler
         style={{ height: 'calc(100vh - 48px - 74px - var(--apollon-drag-queen-height, 330px) - 25px)', width: '100%' }}
-        id="apollon-trading-view-container"
       >
         <div style={{ height: '100%' }} id="apollon-trading-view"></div>
       </div>
