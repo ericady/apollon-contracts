@@ -3,6 +3,7 @@
 pragma solidity ^0.8.9;
 
 import '@openzeppelin/contracts/token/ERC20/IERC20.sol';
+import '@openzeppelin/contracts/token/ERC20/extensions/IERC20Metadata.sol';
 import './Dependencies/LiquityMath.sol';
 import './Dependencies/LiquityBase.sol';
 import './Dependencies/UQ112x112.sol';
@@ -152,12 +153,14 @@ contract SwapPair is ISwapPair, SwapERC20, LiquityBase {
     emit Burn(msg.sender, amount0, amount1, to);
   }
 
-  function _getDexPrice(uint reserve0_, uint reserve1_) internal pure returns (uint) {
-    return (reserve0_ * DECIMAL_PRECISION) / reserve1_;
+  function _getDexPrice(uint reserve0_, uint reserve1_) internal view returns (uint) {
+    uint token0Decimal = IERC20Metadata(token0).decimals();
+    uint token1Decimal = IERC20Metadata(token1).decimals();
+    return (reserve0_ * 10 ** token1Decimal * DECIMAL_PRECISION) / reserve1_ / 10 ** token0Decimal;
   }
 
   function _calc_fee(uint32 val) internal pure returns (uint32 fee) {
-    uint32 precision = 1e6;
+    uint32 precision = 1e4;
     uint32 slope;
     uint32 a;
     uint32 b;
@@ -201,7 +204,7 @@ contract SwapPair is ISwapPair, SwapERC20, LiquityBase {
 
     // query prices
     (uint oraclePrice, ) = priceFeed.getPrice(nonStableCoin);
-    uint preDexPrice = _getDexPrice(reserve0, reserve1); // todo does the token digits matter here?
+    uint preDexPrice = _getDexPrice(reserve0, reserve1);
     uint postDexPrice = _getDexPrice(postReserve0, postReserve1);
 
     if (
