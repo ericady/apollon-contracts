@@ -240,7 +240,7 @@ const generateCollTokenTemplate = (tokenName, tokenAddress) => {
   import { getCheckSum } from "../../utils/crypto";
   import { SchemaDataFreshnessManager, ContractDataFreshnessManager, defaultFieldValue } from "../CustomApolloProvider";
   
-  const ERC_${tokenName} = {
+  const ERC20_${tokenName} = {
     [Contracts.ERC20.${tokenName}]: {
         priceUSDOracle: {
           fetch: async (priceFeedContract: PriceFeed) => {
@@ -365,7 +365,7 @@ const generateCollTokenTemplate = (tokenName, tokenAddress) => {
       },
 }
 
-export default ERC_${tokenName};
+export default ERC20_${tokenName};
 `;
 };
 
@@ -377,7 +377,7 @@ const generateSwapPairTemplate = (pairName, tokenAddress) => {
   import { SwapPair } from "../../../generated/types";
   import { SchemaDataFreshnessManager, defaultFieldValue } from "../CustomApolloProvider";
   
-  const SwapPair_${pairName} = {
+  const SwapPairs_${pairName} = {
     [Contracts.SwapPairs.${pairName}]: {
         borrowerAmount: {
           fetch: async (swapPairContract: SwapPair, borrower: AddressLike) => {
@@ -406,7 +406,7 @@ const generateSwapPairTemplate = (pairName, tokenAddress) => {
       },
 }
 
-export default SwapPair_${pairName};
+export default SwapPairs_${pairName};
 `;
 };
 
@@ -421,16 +421,71 @@ Object.entries(Contracts.DebtToken).forEach(([tokenName, tokenAddress]) => {
 // Iterate over each CollToken and generate a template file
 Object.entries(Contracts.ERC20).forEach(([tokenName, tokenAddress]) => {
   const template = generateCollTokenTemplate(tokenName, tokenAddress);
-  const filePath = path.join(outputDirectory, `CollateralToken_${tokenName}.policy.ts`);
+  const filePath = path.join(outputDirectory, `ERC20_${tokenName}.policy.ts`);
 
   fs.writeFileSync(filePath, template, 'utf-8');
   console.log(`Template for ${tokenName} saved to ${filePath}`);
 });
 // Iterate over each SwapPair and generate a template file
-Object.entries(Contracts.DebtToken).forEach(([tokenName, tokenAddress]) => {
+Object.entries(Contracts.SwapPairs).forEach(([tokenName, tokenAddress]) => {
   const template = generateSwapPairTemplate(tokenName, tokenAddress);
-  const filePath = path.join(outputDirectory, `SwapPair_${tokenName}.policy.ts`);
+  const filePath = path.join(outputDirectory, `SwapPairs_${tokenName}.policy.ts`);
 
   fs.writeFileSync(filePath, template, 'utf-8');
   console.log(`Template for ${tokenName} saved to ${filePath}`);
 });
+
+// Directory where the policy files will be saved
+const policyDirectory = './typePolicies/';
+const targetFilePath = 'app/context/CustomApolloProvider.tsx'; // Update this to your actual file path
+
+
+// Step 1: Generate Import Statements
+const generateImportStatements = () => {
+    let importStatements = '// GENERATED IMPORT CODE START - DO NOT EDIT THIS SECTION MANUALLY\n';
+    Object.keys(Contracts.DebtToken).forEach((key) => {
+        const policyName = `DebtToken_${key}`;
+        importStatements += `import ${policyName} from '${policyDirectory}${policyName}.policy';\n`;
+    });
+    Object.keys(Contracts.ERC20).forEach((key) => {
+        const policyName = `ERC20_${key}`;
+        importStatements += `import ${policyName} from '${policyDirectory}${policyName}.policy';\n`;
+    });
+    Object.keys(Contracts.SwapPairs).forEach((key) => {
+        const policyName = `SwapPairs_${key}`;
+        importStatements += `import ${policyName} from '${policyDirectory}${policyName}.policy';\n`;
+    });
+    importStatements += '// GENERATED IMPORT CODE END\n';
+    return importStatements;
+  };
+  
+  // Step 2: Generate Code Block to Insert
+  const generateCodeBlock = () => {
+    let codeBlock = '  // GENERATED CODE START - DO NOT EDIT THIS SECTION MANUALLY\n';
+    Object.keys(Contracts).filter((key) => key === "DebtToken" || key === "ERC20" || key === "SwapPairs").forEach((key) => {
+      codeBlock += `  ${key}: {\n`;
+      Object.keys(Contracts[key]).forEach((token) => {
+        const policyName = `${key}_${token}`;
+        codeBlock += `    ...${policyName},\n`;
+      });
+      codeBlock += '  },\n\n';
+    });
+    codeBlock += '  // GENERATED CODE END\n';
+    return codeBlock;
+  };
+  
+  // Step 3: Read, Modify, and Write the File
+  const updateTargetFile = (imports, codeBlock) => {
+    const fileContent = fs.readFileSync(targetFilePath, 'utf-8');
+    const replacedImports = fileContent.replace(/\/\/ GENERATED IMPORT CODE START[\s\S]*?\/\/ GENERATED IMPORT CODE END/g, imports);
+    const replacedCodeBlock = replacedImports.replace(/\/\/ GENERATED CODE START[\s\S]*?\/\/ GENERATED CODE END/g, codeBlock);
+    fs.writeFileSync(targetFilePath, replacedCodeBlock, 'utf-8');
+  };
+
+  const runUpdateProcess = () => {
+    const imports = generateImportStatements();
+    const codeBlock = generateCodeBlock();
+    updateTargetFile(imports, codeBlock);
+  };
+  
+  runUpdateProcess();

@@ -86,20 +86,26 @@ const DebtToken_STABLE = {
 
     troveDebtAmount: {
       fetch: async (fetchSource?: { troveManagerContract: TroveManager; borrower: AddressLike }) => {
-        SchemaDataFreshnessManager.DebtToken[Contracts.DebtToken.STABLE].troveDebtAmount.lastFetched = Date.now();
-
         if (fetchSource) {
-          await ContractDataFreshnessManager.TroveManager.getTroveRepayableDebts.fetch(
-            fetchSource.troveManagerContract,
+          SchemaDataFreshnessManager.DebtToken[Contracts.DebtToken.STABLE].troveDebtAmount.lastFetched = Date.now();
+          // Here we get the debt without the non-repayable debts, only applies to STABLE for now
+          const troveRepayableDebts = await fetchSource.troveManagerContract['getTroveRepayableDebts(address,bool)'](
             fetchSource.borrower,
+            true,
           );
-        }
 
-        const repayableDebt = ContractDataFreshnessManager.TroveManager.getTroveRepayableDebts.value.find(
-          ({ tokenAddress }) => getCheckSum(tokenAddress) === getCheckSum(Contracts.DebtToken.STABLE),
-        )?.amount;
-        if (repayableDebt) {
-          SchemaDataFreshnessManager.DebtToken[Contracts.DebtToken.STABLE].troveDebtAmount.value(repayableDebt);
+          const tokenAmounts = troveRepayableDebts.map(([tokenAddress, amount]) => ({
+            tokenAddress,
+            amount,
+          }));
+
+          const debtAmount = tokenAmounts.find(
+            ({ tokenAddress }) => getCheckSum(tokenAddress) === getCheckSum(Contracts.DebtToken.STABLE),
+          )?.amount;
+
+          if (debtAmount) {
+            SchemaDataFreshnessManager.DebtToken[Contracts.DebtToken.STABLE].troveDebtAmount.value(debtAmount);
+          }
         }
       },
       value: makeVar(defaultFieldValue),
