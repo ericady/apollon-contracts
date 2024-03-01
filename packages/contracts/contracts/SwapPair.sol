@@ -156,11 +156,12 @@ contract SwapPair is ISwapPair, SwapERC20, LiquityBase {
     return (reserve0_ * DECIMAL_PRECISION) / reserve1_;
   }
 
-  function _calc_fee(uint val) internal pure returns (uint fee) {
-    uint precision = 1e6;
-    uint slope;
-    uint a;
-    uint b;
+  function _calc_fee(uint32 val) internal pure returns (uint32 fee) {
+    uint32 precision = 1e6;
+    uint32 slope;
+    uint32 a;
+    uint32 b;
+
     // TODO: apply oracle price decimals to val comparing
     if (val < 2) {
       fee = 0;
@@ -205,18 +206,18 @@ contract SwapPair is ISwapPair, SwapERC20, LiquityBase {
     uint preDexPrice = _getDexPrice(reserve0, reserve1); // todo does the token digits matter here?
     uint postDexPrice = _getDexPrice(postReserve0, postReserve1);
 
-    if (postDexPrice > oraclePrice && postDexPrice > preDexPrice) {
+    if (
+      (postDexPrice > oraclePrice && postDexPrice > preDexPrice) ||
+      (postDexPrice < oraclePrice && preDexPrice > postDexPrice)
+    ) {
       // means its a trade against the peg
-      return uint32((preDexPrice + postDexPrice) / 2 - oraclePrice);
-    } else if (postDexPrice < oraclePrice && preDexPrice > postDexPrice) {
-      // also against the peg
-      return uint32((preDexPrice + postDexPrice) / 2 - oraclePrice); // TODO: think about underflow issue, should take abs
+      uint avgDexPrice = (preDexPrice + postDexPrice) / 2;
+      uint priceRatio = (oraclePrice * DECIMAL_PRECISION) / avgDexPrice;
+      uint32 val = uint32((priceRatio * SWAP_BASE_FEE) / DECIMAL_PRECISION);
+      return _calc_fee(val);
     } else {
       return SWAP_BASE_FEE;
     }
-
-    //    uint priceRatio = (oraclePrice * DECIMAL_PRECISION) / dexPrice;
-    //    return uint32((priceRatio * SWAP_BASE_FEE) / DECIMAL_PRECISION); // todo missing real fee calculation
   }
 
   // this low-level function should be called from a contract which performs important safety checks
