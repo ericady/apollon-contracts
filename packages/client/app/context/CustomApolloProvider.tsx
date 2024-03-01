@@ -34,7 +34,7 @@ import { getCheckSum } from '../utils/crypto';
 import { CustomApolloProvider_DevMode } from './CustomApolloProvider_dev';
 import { useEthers } from './EthersProvider';
 
-const defaultFieldValue = BigInt(0);
+export const defaultFieldValue = BigInt(0);
 
 export function CustomApolloProvider({ children }: PropsWithChildren<{}>) {
   const {

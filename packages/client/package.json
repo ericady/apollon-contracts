@@ -17,7 +17,8 @@
     "test:e2e": "NEXT_PUBLIC_API_MOCKING=e2e playwright test",
     "codegen:types": "node scripts/syncAbis.js && graphql-codegen && typechain --target=ethers-v6 --out-dir=generated/types app/context/abis/*.json",
     "codegen:schema": "graphql-codegen -c codegen-get-schema.yml",
-    "codegen:syncDevContracts": "node scripts/syncDevContracts.mjs && prettier --write config.ts"
+    "codegen:syncDevContracts": "node scripts/syncDevContracts.mjs && prettier --write config.ts",
+    "codegen:typePolicies": "node scripts/generatePolicyMappings.mjs && prettier --write app/context/typePolicies"
   },
   "dependencies": {
     "@apollo/client": "3.8.1",
