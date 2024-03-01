@@ -2,7 +2,9 @@ import { makeVar } from '@apollo/client';
 import { AddressLike } from 'ethers';
 import { Contracts } from '../../../config';
 import { SwapPair } from '../../../generated/types';
-import { SchemaDataFreshnessManager, defaultFieldValue } from '../CustomApolloProvider';
+import { SchemaDataFreshnessManager } from '../CustomApolloProvider';
+
+const defaultFieldValue = BigInt(0);
 
 const SwapPairs_USDT = {
   [Contracts.SwapPairs.USDT]: {

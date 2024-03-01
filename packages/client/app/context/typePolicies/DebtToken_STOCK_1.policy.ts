@@ -3,7 +3,9 @@ import { AddressLike } from 'ethers';
 import { Contracts, isStableCoinAddress } from '../../../config';
 import { DebtToken, PriceFeed, StabilityPoolManager, TroveManager } from '../../../generated/types';
 import { getCheckSum } from '../../utils/crypto';
-import { ContractDataFreshnessManager, SchemaDataFreshnessManager, defaultFieldValue } from '../CustomApolloProvider';
+import { ContractDataFreshnessManager, SchemaDataFreshnessManager } from '../CustomApolloProvider';
+
+const defaultFieldValue = BigInt(0);
 
 const DebtToken_STOCK_1 = {
   [Contracts.DebtToken.STOCK_1]: {

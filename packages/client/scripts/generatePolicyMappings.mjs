@@ -45,8 +45,10 @@ const generateDebtTokenTemplate = (tokenName, tokenAddress) => {
   import { Contracts, isStableCoinAddress } from "../../../config";
   import { PriceFeed, TroveManager, DebtToken, StabilityPoolManager } from "../../../generated/types";
   import { getCheckSum } from "../../utils/crypto";
-  import { SchemaDataFreshnessManager, defaultFieldValue, ContractDataFreshnessManager } from "../CustomApolloProvider";
+  import { SchemaDataFreshnessManager, ContractDataFreshnessManager } from "../CustomApolloProvider";
   
+  const defaultFieldValue = BigInt(0);
+
   const DebtToken_${tokenName} = {
   [Contracts.DebtToken.${tokenName}]: {
     priceUSDOracle: {
@@ -238,8 +240,10 @@ const generateCollTokenTemplate = (tokenName, tokenAddress) => {
   import { Contracts, isStableCoinAddress } from "../../../config";
   import { PriceFeed, TroveManager, ERC20, StabilityPoolManager, CollSurplusPool } from "../../../generated/types";
   import { getCheckSum } from "../../utils/crypto";
-  import { SchemaDataFreshnessManager, ContractDataFreshnessManager, defaultFieldValue } from "../CustomApolloProvider";
+  import { SchemaDataFreshnessManager, ContractDataFreshnessManager } from "../CustomApolloProvider";
   
+  const defaultFieldValue = BigInt(0);
+
   const ERC20_${tokenName} = {
     [Contracts.ERC20.${tokenName}]: {
         priceUSDOracle: {
@@ -375,8 +379,10 @@ const generateSwapPairTemplate = (pairName, tokenAddress) => {
   import { AddressLike } from "ethers";
   import { Contracts } from "../../../config";
   import { SwapPair } from "../../../generated/types";
-  import { SchemaDataFreshnessManager, defaultFieldValue } from "../CustomApolloProvider";
+  import { SchemaDataFreshnessManager } from "../CustomApolloProvider";
   
+  const defaultFieldValue = BigInt(0);
+
   const SwapPairs_${pairName} = {
     [Contracts.SwapPairs.${pairName}]: {
         borrowerAmount: {

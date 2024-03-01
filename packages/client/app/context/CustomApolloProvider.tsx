@@ -33,7 +33,7 @@ import SwapPairs_STOCK_1 from './typePolicies/SwapPairs_STOCK_1.policy';
 import SwapPairs_USDT from './typePolicies/SwapPairs_USDT.policy';
 // GENERATED IMPORT CODE END
 
-export const defaultFieldValue = BigInt(0);
+const defaultFieldValue = BigInt(0);
 
 export function CustomApolloProvider({ children }: PropsWithChildren<{}>) {
   const {
