@@ -16,22 +16,11 @@ import { SignerWithAddress } from '@nomicfoundation/hardhat-ethers/signers';
 import {
   TroveStatus,
   assertRevert,
-  getEmittedLiquidationValues,
-  getStabilityPool,
-  getTCR,
-  getTroveStake,
-  openTrove,
   whaleShrimpTroveInit,
-  repayDebt,
-  addColl,
-  withdrawalColl,
-  ZERO_ADDRESS,
   deployTesting,
   setPrice,
 } from '../utils/testHelper';
 import { assert, expect } from 'chai';
-import { parseUnits } from 'ethers';
-import apollonTesting from '../ignition/modules/apollonTesting';
 
 // const NonPayable = artifacts.require('NonPayable.sol')
 
