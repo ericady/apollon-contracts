@@ -7,7 +7,7 @@ import { PropsWithChildren, useEffect, useState } from 'react';
 function MockServer({ children }: PropsWithChildren<{}>) {
   const { replace } = useRouter();
 
-  const [mockStarted, setMockStarted] = useState(false);
+  const [mockStarted, setMockStarted] = useState(process.env.NODE_ENV === 'production');
 
   useEffect(() => {
     if (process.env.NEXT_PUBLIC_API_MOCKING === 'enabled') {
@@ -25,6 +25,7 @@ function MockServer({ children }: PropsWithChildren<{}>) {
 
   useEffect(() => {
     if (mockStarted && location.pathname === '/') {
+      console.log('navigate');
       replace('/spot');
     }
 

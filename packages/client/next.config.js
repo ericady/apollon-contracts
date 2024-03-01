@@ -3,6 +3,7 @@ const nextConfig = {
   // For now we are creating a SPA without performance feature of Next.
   // This comes with some limitations: https://nextjs.org/docs/pages/building-your-application/deploying/static-exports
   // Once we migrate change MUI integration: https://mui.com/material-ui/guides/nextjs/
+  // Can not define a runTime config as this is a static export
   output: 'export',
   reactStrictMode: true,
 };

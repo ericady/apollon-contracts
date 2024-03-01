@@ -119,10 +119,7 @@ export type Query = {
   borrowerHistories: Array<BorrowerHistory>;
   collateralTokenMetas: Array<CollateralTokenMeta>;
   debtTokenMetas: Array<DebtTokenMeta>;
-  getCollateralUSDHistory: Array<Array<Scalars['Int']['output']>>;
-  getDebtUSDHistory: Array<Array<Scalars['Int']['output']>>;
   getRedemtionOperations: RedemptionOperations;
-  getReserveUSDHistory: Array<Array<Scalars['Int']['output']>>;
   getSystemInfo: SystemInfo;
   pools: Array<Pool>;
   reservePoolUSDHistoryChunks: Array<ReservePoolUsdHistoryChunk>;

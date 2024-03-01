@@ -17,10 +17,10 @@ import Tabs from '@mui/material/Tabs';
 import Typography from '@mui/material/Typography';
 import { SyntheticEvent, useCallback, useState } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
+import { Contracts, isCollateralTokenAddress } from '../../../../config';
 import { IBase } from '../../../../generated/types/BorrowerOperations';
 import { useEthers } from '../../../context/EthersProvider';
 import { useTransactionDialog } from '../../../context/TransactionDialogProvider';
-import { Contracts, isCollateralTokenAddress } from '../../../context/contracts.config';
 import {
   GetBorrowerCollateralTokensQuery,
   GetBorrowerCollateralTokensQueryVariables,

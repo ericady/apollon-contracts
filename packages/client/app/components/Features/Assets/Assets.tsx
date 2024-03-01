@@ -9,8 +9,8 @@ import TableContainer from '@mui/material/TableContainer';
 import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import { useEffect, useMemo, useState } from 'react';
+import { Contracts } from '../../../../config';
 import { SelectedToken, useSelectedToken } from '../../../context/SelectedTokenProvider';
-import { Contracts } from '../../../context/contracts.config';
 import {
   GetAllPoolsQuery,
   GetAllPoolsQueryVariables,
@@ -34,8 +34,6 @@ import HeaderCell from '../../Table/HeaderCell';
 import AssetsLoader from './AssetsLoader';
 
 export const FAVORITE_ASSETS_LOCALSTORAGE_KEY = 'favoriteAssets';
-// FIXME: Hardcode address for stability once its there.
-export const JUSD_SYMBOL = 'JUSD';
 
 function Assets() {
   const [favoritedAssets, setFavoritedAssets] = useState<string[]>([]);

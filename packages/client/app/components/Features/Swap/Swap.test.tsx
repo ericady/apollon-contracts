@@ -1,6 +1,6 @@
 import { render, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-import { Contracts } from '../../../context/contracts.config';
+import { Contracts } from '../../../../config';
 import { IntegrationWrapper, PreselectedTestToken } from '../../tests/test-utils';
 import Swap from './Swap';
 

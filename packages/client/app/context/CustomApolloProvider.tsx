@@ -11,6 +11,13 @@ import {
 import { AddressLike } from 'ethers';
 import { PropsWithChildren } from 'react';
 import {
+  Contracts,
+  isCollateralTokenAddress,
+  isDebtTokenAddress,
+  isPoolAddress,
+  isStableCoinAddress,
+} from '../../config';
+import {
   CollSurplusPool,
   DebtToken,
   ERC20,
@@ -26,13 +33,6 @@ import { TOKEN_FRAGMENT } from '../queries';
 import { getCheckSum } from '../utils/crypto';
 import { CustomApolloProvider_DevMode } from './CustomApolloProvider_dev';
 import { useEthers } from './EthersProvider';
-import {
-  Contracts,
-  isCollateralTokenAddress,
-  isDebtTokenAddress,
-  isPoolAddress,
-  isStableCoinAddress,
-} from './contracts.config';
 
 const defaultFieldValue = BigInt(0);
 
@@ -70,8 +70,7 @@ export function CustomApolloProvider({ children }: PropsWithChildren<{}>) {
   });
 
   const client = new ApolloClient({
-    // TODO: replace with our deployed graphql endpoint
-    uri: 'http://localhost:8000/subgraphs/name/subgraph',
+    uri: process.env.NEXT_PUBLIC_GRAPH_ENDPOINT,
 
     connectToDevTools: process.env.NODE_ENV === 'development',
     cache: new InMemoryCache({

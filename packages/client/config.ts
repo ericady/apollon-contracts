@@ -1,6 +1,37 @@
-import { getCheckSum } from '../utils/crypto';
+import { getCheckSum } from './app/utils/crypto';
 
-// TODO: These are the demo/production contracts. Replace them with the real ones.
+// first one is the default network
+export const NETWORKS = [
+  {
+    chainName: 'Localhost',
+    // 31337 in hex
+    chainId: '0x7a69',
+    chainIdNumber: 31337,
+    rpcUrls: ['http://127.0.0.1:8545'],
+    nativeCurrency: {
+      name: 'STABLE',
+      symbol: 'STABLE',
+      decimals: 18,
+    },
+    blockExplorerUrls: ['https://polygonscan.com/'],
+  },
+  {
+    chainName: 'Goerli test network',
+    // 5 in hex
+    chainId: '0x5',
+    chainIdNumber: 5,
+    rpcUrls: ['https://goerli.infura.io/v3/'],
+    nativeCurrency: {
+      name: 'GoerliETH',
+      symbol: 'GoerliETH',
+      decimals: 18,
+    },
+    blockExplorerUrls: ['https://polygonscan.com/'],
+  },
+];
+
+// GENERATED CODE START - DO NOT EDIT THIS SECTION MANUALLY
+
 export const Contracts = {
   DebtToken: {
     STABLE: '0x84ea74d481ee0a5332c457a4d796187f6ba67feb',
@@ -60,3 +91,5 @@ export const isCollateralTokenAddress = (
     .map((address) => getCheckSum(address))
     .includes(getCheckSum(address) as any);
 };
+
+// GENERATED CODE END

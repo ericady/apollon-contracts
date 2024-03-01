@@ -3,13 +3,7 @@ import { Box, Typography } from '@mui/material';
 import { useSelectedToken } from '../../context/SelectedTokenProvider';
 import { GetSelectedTokenQuery, GetSelectedTokenQueryVariables } from '../../generated/gql-types';
 import { GET_SELECTED_TOKEN } from '../../queries';
-import {
-  dangerouslyConvertBigIntToNumber,
-  displayPercentage,
-  divBigIntsToFloat,
-  percentageChange,
-  roundCurrency,
-} from '../../utils/math';
+import { dangerouslyConvertBigIntToNumber, displayPercentage, percentageChange, roundCurrency } from '../../utils/math';
 
 function TradingViewHeader() {
   const { selectedToken, tokenRatio, JUSDToken } = useSelectedToken();
@@ -73,7 +67,7 @@ function TradingViewHeader() {
               ? displayPercentage(
                   percentageChange(
                     dangerouslyConvertBigIntToNumber(data.token.priceUSDOracle, 9, 9),
-                    divBigIntsToFloat(JUSDToken.priceUSDOracle, tokenRatio, 18),
+                    dangerouslyConvertBigIntToNumber(JUSDToken.priceUSDOracle * tokenRatio, 18 + 9, 9),
                   ),
                   'positive',
                 )

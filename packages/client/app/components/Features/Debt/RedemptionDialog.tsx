@@ -13,10 +13,10 @@ import {
 import { ethers } from 'ethers';
 import { useState } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
+import { Contracts } from '../../../../config';
 import { useEthers } from '../../../context/EthersProvider';
 import { useSelectedToken } from '../../../context/SelectedTokenProvider';
 import { useTransactionDialog } from '../../../context/TransactionDialogProvider';
-import { Contracts } from '../../../context/contracts.config';
 import { GetRedemptionsOperationsQuery, GetRedemptionsOperationsQueryVariables } from '../../../generated/gql-types';
 import { GET_BORROWER_DEBT_TOKENS, GET_REDEMPTIONS_OPERATIONS } from '../../../queries';
 import { dangerouslyConvertBigIntToNumber, roundCurrency } from '../../../utils/math';

@@ -3,11 +3,11 @@
 import { useQuery } from '@apollo/client';
 import { ethers } from 'ethers';
 import { createContext, useContext, useState } from 'react';
+import { Contracts } from '../../config';
 import { GetBorrowerDebtTokensQuery, GetBorrowerDebtTokensQueryVariables } from '../generated/gql-types';
 import { GET_BORROWER_DEBT_TOKENS } from '../queries';
 import { convertToEtherPrecission } from '../utils/math';
 import { useEthers } from './EthersProvider';
-import { Contracts } from './contracts.config';
 
 export type SelectedToken = {
   id: string;

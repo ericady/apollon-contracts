@@ -8,10 +8,10 @@ import Typography from '@mui/material/Typography';
 import { ethers } from 'ethers';
 import { ChangeEvent, useEffect, useState } from 'react';
 import { FormProvider, useController, useForm } from 'react-hook-form';
+import { Contracts, isCollateralTokenAddress, isDebtTokenAddress } from '../../../../config';
 import { useEthers } from '../../../context/EthersProvider';
 import { useSelectedToken } from '../../../context/SelectedTokenProvider';
 import { useTransactionDialog } from '../../../context/TransactionDialogProvider';
-import { Contracts, isCollateralTokenAddress, isDebtTokenAddress } from '../../../context/contracts.config';
 import {
   GetBorrowerCollateralTokensQuery,
   GetBorrowerCollateralTokensQueryVariables,

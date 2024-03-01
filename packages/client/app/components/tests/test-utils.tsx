@@ -3,11 +3,11 @@ import { ThemeProvider } from '@emotion/react';
 import { SnackbarProvider } from 'notistack';
 import { PropsWithChildren, useEffect, useMemo, useState } from 'react';
 import 'whatwg-fetch';
+import { Contracts } from '../../../config';
 import { CustomApolloProvider_DevMode } from '../../context/CustomApolloProvider_dev';
 import { EthersContext, useEthers } from '../../context/EthersProvider';
 import SelectedTokenProvider, { useSelectedToken } from '../../context/SelectedTokenProvider';
 import TransactionDialogProvider from '../../context/TransactionDialogProvider';
-import { Contracts } from '../../context/contracts.config';
 import buildTheme from '../../theme';
 import MockedPositionsWithoutBorrower from './mockedResponses/GetDebtTokens.mocked.json';
 

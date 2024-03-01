@@ -1,7 +1,8 @@
 import ArrowDropDownRoundedIcon from '@mui/icons-material/ArrowDropDownRounded';
 import { MenuItem, Select, SelectChangeEvent } from '@mui/material';
 import { useEffect, useState } from 'react';
-import { NETWORKS, useEthers } from '../../context/EthersProvider';
+import { NETWORKS } from '../../../config';
+import { useEthers } from '../../context/EthersProvider';
 
 function NetworkSwitch() {
   const [currentNetwork, setCurrentNetwork] = useState<(typeof NETWORKS)[number]>(NETWORKS[0]);

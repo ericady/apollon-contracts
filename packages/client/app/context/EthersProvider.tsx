@@ -6,6 +6,7 @@ import { BrowserProvider, Eip1193Provider, JsonRpcProvider } from 'ethers/provid
 import Link from 'next/link';
 import { useSnackbar } from 'notistack';
 import { createContext, useContext, useEffect, useState } from 'react';
+import { Contracts, NETWORKS } from '../../config';
 import {
   BorrowerOperations,
   CollSurplusPool,
@@ -35,13 +36,6 @@ import storagePoolAbi from './abis/StoragePool.json';
 import swapOperationsAbi from './abis/SwapOperations.json';
 import swapPairAbi from './abis/SwapPair.json';
 import troveManagerAbi from './abis/TroveManager.json';
-import { Contracts } from './contracts.config';
-
-// TODO: This is just dummy data and will be exchanged with the real implementation later.
-// https://goerli.etherscan.io/token/0x509ee0d083ddf8ac028f2a56731412edd63223b9#writeContract
-// export const contractAddress = '0x509ee0d083ddf8ac028f2a56731412edd63223b9';
-// const testContract = new Contract(contractAddress, contractAbi, newProvider);
-// const contractWithSigner = testContract.connect(newSigner) as DummyContractDataAbi;
 
 declare global {
   interface Window {
@@ -56,35 +50,6 @@ type AllCollateralTokenContracts = { [Key in keyof (typeof SchemaDataFreshnessMa
 type AllSwapPairContracts = {
   [Key in keyof (typeof SchemaDataFreshnessManager)['SwapPairs']]: SwapPair;
 };
-
-export const NETWORKS = [
-  {
-    chainName: 'Localhost',
-    // 31337 in hex
-    chainId: '0x7a69',
-    chainIdNumber: 31337,
-    rpcUrls: ['http://127.0.0.1:8545'],
-    nativeCurrency: {
-      name: 'STABLE',
-      symbol: 'STABLE',
-      decimals: 18,
-    },
-    blockExplorerUrls: ['https://polygonscan.com/'],
-  },
-  {
-    chainName: 'Goerli test network',
-    // 5 in hex
-    chainId: '0x5',
-    chainIdNumber: 5,
-    rpcUrls: ['https://goerli.infura.io/v3/'],
-    nativeCurrency: {
-      name: 'GoerliETH',
-      symbol: 'GoerliETH',
-      decimals: 18,
-    },
-    blockExplorerUrls: ['https://polygonscan.com/'],
-  },
-] as const;
 
 export const EthersContext = createContext<{
   provider: JsonRpcProvider | null;
@@ -264,8 +229,6 @@ export default function EthersProvider({ children }: { children: React.ReactNode
 
   function updateProvider(network: (typeof NETWORKS)[number]) {
     if (typeof window.ethereum !== 'undefined') {
-      console.log('network: ', network);
-
       const newProvider = new JsonRpcProvider(network.rpcUrls[0], {
         name: network.chainName,
         chainId: network.chainIdNumber,

@@ -1,12 +1,23 @@
-// Import ethers from the ethers.js library
-const { JsonRpcProvider } = require('ethers/providers');
-const { Contract } = require('ethers');
-const swapOperationsAbi = require('../app/context/abis/SwapOperations.json');
-const fs = require('fs');
+import { Contract } from 'ethers';
+import { JsonRpcProvider } from 'ethers/providers';
+import fs from 'fs';
+import swapOperationsAbi from '../app/context/abis/SwapOperations.json' assert { type: 'json' };
 
-// Define the connection to your local node
-const provider = new JsonRpcProvider('http://0.0.0.0:8545', { name: 'localhost', chainId: 31337 });
+const defaultNetwork = {
+  chainName: 'Localhost',
+  // 31337 in hex
+  chainId: '0x7a69',
+  chainIdNumber: 31337,
+  rpcUrls: ['http://127.0.0.1:8545'],
+  nativeCurrency: {
+    name: 'STABLE',
+    symbol: 'STABLE',
+    decimals: 18,
+  },
+  blockExplorerUrls: ['https://polygonscan.com/'],
+};
 
+// DEV Contracts
 const Contracts = {
   DebtToken: {
     STABLE: '0x84ea74d481ee0a5332c457a4d796187f6ba67feb',
@@ -34,6 +45,12 @@ const Contracts = {
   CollSurplus: '0x5FbDB2315678afecb367f032d93F642f64180aa3',
 };
 
+// Define the connection to your local node
+const provider = new JsonRpcProvider(defaultNetwork.rpcUrls[0], {
+  name: defaultNetwork.chainName,
+  chainId: defaultNetwork.chainIdNumber,
+});
+
 // Main async function to interact with the Ethereum blockchain
 async function main() {
   try {
@@ -48,12 +65,12 @@ async function main() {
     const STOCK_1_STABLE = (
       await swapOperationsContract.getPair(Contracts.DebtToken.STOCK_1, Contracts.DebtToken.STABLE)
     ).toLowerCase();
+
     console.log('PAIRS: ', BTC_STABLE, USDT_STABLE, STOCK_1_STABLE);
 
-    const contractsLiteral = `
-      import { getCheckSum } from "../utils/crypto";
+    const newContractsExport = `
+      // GENERATED CODE START - DO NOT EDIT THIS SECTION MANUALLY
 
-      // TODO: These are the demo/production contracts. Replace them with the real ones.
       export const Contracts = {
         DebtToken: {
           STABLE: "${Contracts.DebtToken.STABLE}",
@@ -80,7 +97,6 @@ async function main() {
         RedemptionOperations: "${Contracts.RedemptionOperations}",
         CollSurplus: "${Contracts.CollSurplus}",
       } as const;
-
 
       export const isPoolAddress = (
         address: string,
@@ -115,9 +131,34 @@ async function main() {
           .includes(getCheckSum(address) as any);
       };
 
+      // GENERATED CODE END
       `;
 
-    fs.writeFileSync('app/context/contracts.config.ts', contractsLiteral, 'utf-8');
+    // Path to the file
+    const filePath = 'config.ts';
+
+    // Read the current content of the file
+    let fileContent = fs.readFileSync(filePath, 'utf-8');
+
+    // Check if placeholders exist
+    const startMarker = '// GENERATED CODE START - DO NOT EDIT THIS SECTION MANUALLY';
+    const endMarker = '// GENERATED CODE END';
+    const startMarkerIndex = fileContent.indexOf(startMarker);
+    const endMarkerIndex = fileContent.indexOf(endMarker);
+
+    if (startMarkerIndex !== -1 && endMarkerIndex !== -1) {
+      // Replace content between markers
+      fileContent =
+        fileContent.substring(0, startMarkerIndex) +
+        newContractsExport +
+        fileContent.substring(endMarkerIndex + endMarker.length);
+    } else {
+      // Append the new content if markers are not found
+      fileContent += `\n${newContractsExport}`;
+    }
+
+    // Write the updated content back to the file
+    fs.writeFileSync(filePath, fileContent, 'utf-8');
   } catch (error) {
     // Log any errors
     console.error('Error:', error);

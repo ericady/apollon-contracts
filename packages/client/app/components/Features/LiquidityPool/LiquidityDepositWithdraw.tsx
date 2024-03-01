@@ -8,10 +8,10 @@ import Tabs from '@mui/material/Tabs';
 import Typography from '@mui/material/Typography';
 import { SyntheticEvent, useCallback, useEffect, useState } from 'react';
 import { FormProvider, useForm } from 'react-hook-form';
+import { isCollateralTokenAddress, isDebtTokenAddress } from '../../../../config';
 import { IBase } from '../../../../generated/types/TroveManager';
 import { useEthers } from '../../../context/EthersProvider';
 import { useTransactionDialog } from '../../../context/TransactionDialogProvider';
-import { isCollateralTokenAddress, isDebtTokenAddress } from '../../../context/contracts.config';
 import {
   DebtTokenMeta,
   GetBorrowerCollateralTokensQuery,

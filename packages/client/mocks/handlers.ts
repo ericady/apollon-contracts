@@ -1,8 +1,8 @@
 import { faker } from '@faker-js/faker';
 import { ethers } from 'ethers';
 import { graphql } from 'msw';
+import { Contracts } from '../app/../config';
 import { FAVORITE_ASSETS_LOCALSTORAGE_KEY } from '../app/components/Features/Assets/Assets';
-import { Contracts } from '../app/context/contracts.config';
 import {
   BorrowerHistory,
   BorrowerHistoryType,
