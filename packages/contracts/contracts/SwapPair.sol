@@ -152,8 +152,12 @@ contract SwapPair is ISwapPair, SwapERC20, LiquityBase {
     emit Burn(msg.sender, amount0, amount1, to);
   }
 
+  function _getDexPrice(uint reserve0_, uint reserve1_) internal pure returns (uint) {
+    return (reserve0_ * DECIMAL_PRECISION) / reserve1_;
+  }
+
   // fee is returned in 1e6 (SWAP_FEE_PRECISION)
-  function getSwapFee() public view override returns (uint32 swapFee) {
+  function getSwapFee(uint postReserve0, uint postReserve1) public view override returns (uint32 swapFee) {
     // find stable coin
     address nonStableCoin = token1;
     if (!tokenManager.isDebtToken(nonStableCoin)) return SWAP_BASE_FEE; // no dynamic fee if the pool is not an stable/stock pool
@@ -161,12 +165,21 @@ contract SwapPair is ISwapPair, SwapERC20, LiquityBase {
 
     // query prices
     (uint oraclePrice, ) = priceFeed.getPrice(nonStableCoin);
-    uint dexPrice = (reserve0 * DECIMAL_PRECISION) / reserve1; // todo does the token digits matter here?
+    uint preDexPrice = _getDexPrice(reserve0, reserve1); // todo does the token digits matter here?
+    uint postDexPrice = _getDexPrice(postReserve0, postReserve1);
 
-    if (oraclePrice < dexPrice) return SWAP_BASE_FEE;
+    if (postDexPrice > oraclePrice && postDexPrice > preDexPrice) {
+      // means its a trade against the peg
+      return uint32((preDexPrice + postDexPrice) / 2 - oraclePrice);
+    } else if (postDexPrice < oraclePrice && preDexPrice > postDexPrice) {
+      // also against the peg
+      return uint32((preDexPrice + postDexPrice) / 2 - oraclePrice); // TODO: think about underflow issue, should take abs
+    } else {
+      return SWAP_BASE_FEE;
+    }
+
     //    uint priceRatio = (oraclePrice * DECIMAL_PRECISION) / dexPrice;
     //    return uint32((priceRatio * SWAP_BASE_FEE) / DECIMAL_PRECISION); // todo missing real fee calculation
-    return SWAP_BASE_FEE;
   }
 
   // this low-level function should be called from a contract which performs important safety checks
@@ -193,7 +206,7 @@ contract SwapPair is ISwapPair, SwapERC20, LiquityBase {
     uint amount1In = balance1 > reserve1 - amount1Out ? balance1 - (reserve1 - amount1Out) : 0;
     if (amount0In == 0 && amount1In == 0) revert InsufficientInputAmount();
 
-    uint32 currentSwapFee = getSwapFee();
+    uint32 currentSwapFee = getSwapFee(reserve0 + amount0In - amount0Out, reserve1 + amount1In - amount1Out);
     {
       // scope for reserve{0,1}Adjusted, avoids stack too deep errors
       uint balance0Adjusted = balance0 * SWAP_FEE_PRECISION - (amount0In * currentSwapFee);

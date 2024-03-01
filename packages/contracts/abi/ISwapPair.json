@@ -361,7 +361,18 @@
         "type": "function"
     },
     {
-        "inputs": [],
+        "inputs": [
+            {
+                "internalType": "uint256",
+                "name": "postReserve0",
+                "type": "uint256"
+            },
+            {
+                "internalType": "uint256",
+                "name": "postReserve1",
+                "type": "uint256"
+            }
+        ],
         "name": "getSwapFee",
         "outputs": [
             {

@@ -45,7 +45,7 @@ interface ISwapPair is ISwapERC20 {
 
   function price1CumulativeLast() external view returns (uint);
 
-  function getSwapFee() external view returns (uint32 swapFee);
+  function getSwapFee(uint postReserve0, uint postReserve1) external view returns (uint32 swapFee);
 
   // **** OPERATIONS ****
 

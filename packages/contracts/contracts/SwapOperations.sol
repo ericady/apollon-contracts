@@ -430,9 +430,9 @@ contract SwapOperations is ISwapOperations, Ownable(msg.sender), CheckContract, 
     if (pairAddress == address(0)) revert PairDoesNotExist();
 
     ISwapPair pair = ISwapPair(pairAddress);
-    swapFee = pair.getSwapFee();
-
     (uint reserve0, uint reserve1, ) = pair.getReserves();
+    swapFee = pair.getSwapFee(reserve0, reserve1);
+
     (address token0, ) = sortTokens(tokenA, tokenB);
     (reserveA, reserveB) = tokenA == token0 ? (reserve0, reserve1) : (reserve1, reserve0);
   }
