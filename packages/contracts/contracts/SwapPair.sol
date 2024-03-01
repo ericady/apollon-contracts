@@ -162,24 +162,23 @@ contract SwapPair is ISwapPair, SwapERC20, LiquityBase {
     uint32 a;
     uint32 b;
 
-    // TODO: apply oracle price decimals to val comparing
-    if (val < 2) {
+    if (val < 2 * precision) {
       fee = 0;
-    } else if (val < 5) {
+    } else if (val < 5 * precision) {
       // slope = 0.2/3; a=2; b=0;
       slope = precision * 15;
       a = 2 * precision;
-    } else if (val < 7) {
+    } else if (val < 7 * precision) {
       // slope = 0.525; a=5; b=0.2
       slope = (precision * 525) / 1000;
       a = 5 * precision;
       b = precision / 5;
-    } else if (val < 10) {
+    } else if (val < 10 * precision) {
       // slope = 1.25; a=7; b=1.25;
       slope = (precision * 125) / 100;
       a = 7 * precision;
       b = (precision * 125) / 100;
-    } else if (val < 11) {
+    } else if (val < 11 * precision) {
       // slope = 2.5; a=10; b=5;
       slope = (precision * 5) / 2;
       a = precision * 10;
@@ -188,9 +187,8 @@ contract SwapPair is ISwapPair, SwapERC20, LiquityBase {
       fee = 7;
     }
 
-    // TODO: apple fee decimals
     if (slope > 0) {
-      fee = b + (val - a) * slope;
+      fee = b + ((val - a) * slope) / precision;
     }
   }
 
