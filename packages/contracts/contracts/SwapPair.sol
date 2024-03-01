@@ -156,6 +156,43 @@ contract SwapPair is ISwapPair, SwapERC20, LiquityBase {
     return (reserve0_ * DECIMAL_PRECISION) / reserve1_;
   }
 
+  function _calc_fee(uint val) internal pure returns (uint fee) {
+    uint precision = 1e6;
+    uint slope;
+    uint a;
+    uint b;
+    // TODO: apply oracle price decimals to val comparing
+    if (val < 2) {
+      fee = 0;
+    } else if (val < 5) {
+      // slope = 0.2/3; a=2; b=0;
+      slope = precision * 15;
+      a = 2 * precision;
+    } else if (val < 7) {
+      // slope = 0.525; a=5; b=0.2
+      slope = (precision * 525) / 1000;
+      a = 5 * precision;
+      b = precision / 5;
+    } else if (val < 10) {
+      // slope = 1.25; a=7; b=1.25;
+      slope = (precision * 125) / 100;
+      a = 7 * precision;
+      b = (precision * 125) / 100;
+    } else if (val < 11) {
+      // slope = 2.5; a=10; b=5;
+      slope = (precision * 5) / 2;
+      a = precision * 10;
+      b = (precision * 5) / 4;
+    } else {
+      fee = 7;
+    }
+
+    // TODO: apple fee decimals
+    if (slope > 0) {
+      fee = b + (val - a) * slope;
+    }
+  }
+
   // fee is returned in 1e6 (SWAP_FEE_PRECISION)
   function getSwapFee(uint postReserve0, uint postReserve1) public view override returns (uint32 swapFee) {
     // find stable coin
