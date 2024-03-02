@@ -5,7 +5,7 @@ import {
   ReservePoolInitialized as ReservePoolInitializedEvent,
   WithdrewReserves as WithdrewReservesEvent,
 } from '../generated/ReservePool/ReservePool';
-import { SystemInfo } from '../generated/schema';
+import { SystemInfo, Token } from '../generated/schema';
 import {
   handleCreateUpdateCollateralTokenMeta,
   handleUpdateCollateralTokenMeta_totalReserve30dAverage,
@@ -24,13 +24,16 @@ export function handleReserveCapChanged(event: ReserveCapChangedEvent): void {
   const stableCoin = Address.fromBytes(systemInfo.stableCoin);
   const govToken = Address.fromBytes(systemInfo.govToken);
 
-  handleCreateUpdateDebtTokenMeta(event, stableCoin);
-  handleUpdateDebtTokenMeta_totalReserve30dAverage(event, stableCoin, event.params.newReserveCap);
+  // TODO: Maybe we can get rid of this check because it only guardrails the deployment
+  if (Token.load(stableCoin) && Token.load(govToken)) {
+    handleCreateUpdateDebtTokenMeta(event, stableCoin);
+    handleUpdateDebtTokenMeta_totalReserve30dAverage(event, stableCoin, event.params.newReserveCap);
 
-  handleCreateUpdateCollateralTokenMeta(event, govToken, event.params.newGovReserveCap);
-  handleUpdateCollateralTokenMeta_totalReserve30dAverage(event, govToken, event.params.newGovReserveCap);
+    handleCreateUpdateCollateralTokenMeta(event, govToken, event.params.newGovReserveCap);
+    handleUpdateCollateralTokenMeta_totalReserve30dAverage(event, govToken, event.params.newGovReserveCap);
 
-  handleCreateReservePoolUSDHistoryChunk(event, event.address);
+    handleCreateReservePoolUSDHistoryChunk(event, event.address);
+  }
 }
 
 export function handleReservePoolInitialized(event: ReservePoolInitializedEvent): void {

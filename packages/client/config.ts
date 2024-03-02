@@ -111,7 +111,7 @@ export const NETWORKS = [
   // },
 ];
 
-export const Contracts = NETWORKS[1].contracts; // todo @chris, please load dynamically from the current active network
+export const Contracts = NETWORKS[0].contracts; // todo @chris, please load dynamically from the current active network
 
 export const isPoolAddress = (address: string) => {
   return Object.values(Contracts.SwapPairs) // todo @chris, please load dynamically from the current active network

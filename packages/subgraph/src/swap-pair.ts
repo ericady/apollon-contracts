@@ -64,8 +64,8 @@ export function handleSwap(event: SwapEvent): void {
         ? 'SHORT'
         : 'LONG'
       : event.params.amount1In.equals(BigInt.fromI32(0))
-      ? 'SHORT'
-      : 'LONG';
+        ? 'SHORT'
+        : 'LONG';
 
   const stableSize =
     direction === 'LONG'
@@ -73,16 +73,16 @@ export function handleSwap(event: SwapEvent): void {
         ? event.params.amount0In
         : event.params.amount1In
       : token0 == stableCoin
-      ? event.params.amount0Out
-      : event.params.amount1Out;
+        ? event.params.amount0Out
+        : event.params.amount1Out;
   const debtTokenSize =
     direction === 'SHORT'
       ? token0 == stableCoin
         ? event.params.amount1In
         : event.params.amount0In
       : token0 == stableCoin
-      ? event.params.amount1Out
-      : event.params.amount0Out;
+        ? event.params.amount1Out
+        : event.params.amount0Out;
 
   handleCreateSwapEvent(
     event,

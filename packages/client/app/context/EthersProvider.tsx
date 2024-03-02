@@ -1,7 +1,7 @@
 'use client';
 
 import { Button } from '@mui/material';
-import { Contract, JsonRpcSigner } from 'ethers';
+import { Contract, JsonRpcSigner, Network } from 'ethers';
 import { BrowserProvider, Eip1193Provider } from 'ethers/providers';
 import Link from 'next/link';
 import { useSnackbar } from 'notistack';
@@ -36,7 +36,6 @@ import storagePoolAbi from './abis/StoragePool.json';
 import swapOperationsAbi from './abis/SwapOperations.json';
 import swapPairAbi from './abis/SwapPair.json';
 import troveManagerAbi from './abis/TroveManager.json';
-import { Network } from 'ethers';
 
 declare global {
   interface Window {
@@ -223,7 +222,7 @@ export default function EthersProvider({ children }: { children: React.ReactNode
           enqueueSnackbar('You rejected necessary permissions. Please try again.', { variant: 'error' });
         }
       }
-    } catch(error) {
+    } catch (error) {
       console.log('error: ', error);
       enqueueSnackbar('You closed the authentication window. Please try loging in again.', { variant: 'error' });
     }
@@ -235,7 +234,7 @@ export default function EthersProvider({ children }: { children: React.ReactNode
       //   name: network.chainName,
       //   chainId: network.chainIdNumber,
       // });
-      const mmNetwork = new Network(network.chainName, network.chainId)
+      const mmNetwork = new Network(network.chainName, network.chainId);
       const newProvider = new BrowserProvider(window.ethereum, mmNetwork);
       console.log('newProvider: ', newProvider);
 
@@ -272,7 +271,8 @@ export default function EthersProvider({ children }: { children: React.ReactNode
             .then(() => {
               window.location.reload();
               // updateProvider(choosenNetwork)
-            }).catch((error) => {
+            })
+            .catch((error) => {
               console.log('error: ', error);
             });
         }

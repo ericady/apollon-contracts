@@ -2,12 +2,12 @@ import { Address, ethereum } from '@graphprotocol/graph-ts';
 import { SystemInfo } from '../../generated/schema';
 
 // FIXME: Exchange for sensible defaults
-const PriceFeedDemo = Address.fromString('0xa513e6e4b8f2a923d98304ec87f64353c4d5c853');
-const StoragePoolDemo = Address.fromString('0xb7f8bc63bbcad18155201308c8f3540b07f84f5e');
-const StableDemo = Address.fromString('0x95401dc811bb5740090279ba06cfa8fcf6113778');
+const PriceFeedDemo = Address.fromString('0xC4407fbaA0FF4fF5ed89A91860FB9e9d33ea56CC');
+const StoragePoolDemo = Address.fromString('0x7F1667b13768D15fedD4ab3B006B4C2174410593');
+const StableDemo = Address.fromString('0xbEc2096Ef1FDfA8A5c876d900DDD9570d1471572');
 const ReservePoolDemo = Address.fromString('0x8a791620dd6260079bf849dc5567adc3f2fdc318');
-const GovTokenDemo = Address.fromString('0x0b306bf915c4d645ff596e518faf3f9669b97016');
-const StabilityPoolManagerDemo = Address.fromString('0xdc64a140aa3e981100a9beca4e685f962f0cf6c9');
+const GovTokenDemo = Address.fromString('0x61A4Ecb233477d93C45C54f83948B1FF89182B65');
+const StabilityPoolManagerDemo = Address.fromString('0xc581768f944F60c8D711a086Fb45339703090cb3');
 
 export const handleUpdateSystemInfo_stableCoin = (event: ethereum.Event, stableCoin: Address): void => {
   let systemInfo = SystemInfo.load(`SystemInfo`);
