@@ -108,7 +108,7 @@ describe('DebtToken', () => {
 
   it("name(): returns the token's name", async () => {
     const name = await STABLE.name();
-    assert.equal(name, 'STABLE');
+    assert.equal(name, 'Stablecoin');
   });
 
   it("symbol(): returns the token's symbol", async () => {
@@ -134,7 +134,6 @@ describe('DebtToken', () => {
     assert.isFalse(isStockTokenStable);
   });
 
-  // TODO: Can I test this more usefully here?
   it('Initializes PERMIT_TYPEHASH correctly', async () => {
     const hash = await STABLE.permitTypeHash();
     assert.equal(hash, '0x6e71edae12b1b97f4d1f60370fef10105fa2faae0126114a169c64845d6126c9');
