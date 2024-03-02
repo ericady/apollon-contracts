@@ -2,7 +2,6 @@ import '@nomicfoundation/hardhat-ethers';
 import '@nomicfoundation/hardhat-verify';
 import '@nomicfoundation/hardhat-toolbox';
 import '@nomicfoundation/hardhat-network-helpers';
-import '@nomicfoundation/hardhat-ignition-ethers';
 import 'hardhat-abi-exporter';
 import 'hardhat-gas-reporter';
 import 'hardhat-contract-sizer';
@@ -71,12 +70,6 @@ export default {
     disambiguatePaths: false,
     runOnCompile: false,
     strict: true,
-  },
-  ignition: {
-    requiredConfirmations: 1,
-    blockPollingInterval: 100,
-    timeBeforeBumpingFees: 3 * 60 * 1000,
-    maxFeeBumps: 4,
   },
   abiExporter: {
     path: './abi',

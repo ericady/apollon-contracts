@@ -1,12 +1,12 @@
 import { SignerWithAddress } from '@nomicfoundation/hardhat-ethers/signers';
 import { time } from '@nomicfoundation/hardhat-network-helpers';
 import { EIP712, MockDebtToken, MockERC20, StabilityPoolManager } from '../typechain';
-import hre, { ethers } from 'hardhat';
+import { ethers } from 'hardhat';
 import { expect } from 'chai';
 import { AddressLike, ContractTransactionResponse } from 'ethers';
 import { parseUnits } from 'ethers';
 import { AddressZero } from '@ethersproject/constants';
-import apollonLocalPools from '../ignition/modules/apollonLocalPools';
+import deployTestBase, { Contracts, TokenTellorIds } from './deployTestBase';
 
 export const MAX_BORROWING_FEE = parseUnits('0.05');
 
@@ -21,14 +21,7 @@ export const PermitTypes = {
 };
 
 export async function deployTesting() {
-  const blockTimestamp = (await ethers.provider.getBlock('latest'))?.timestamp ?? 0;
-  const [owner] = await ethers.getSigners();
-  return hre.ignition.deploy(apollonLocalPools, {
-    parameters: {
-      ApollonTesting: { oracleUpdateTime: blockTimestamp },
-      ApollonLocalPools: { deadline: blockTimestamp + 60 * 5 },
-    },
-  });
+  return deployTestBase();
 }
 
 export const getDomain = async (token: EIP712) => {
@@ -42,14 +35,7 @@ export const getDomain = async (token: EIP712) => {
 };
 
 export const setPrice = async (tokenLabel: string, price: string, contracts: any) => {
-  const requestId = {
-    BTC: 1,
-    USDT: 2,
-    STABLE: 3,
-    STOCK: 4,
-    GOV: 5,
-  };
-  await contracts.mockTellor.setPrice(requestId[tokenLabel], parseUnits(price, 6));
+  await contracts.tellor.setPrice(TokenTellorIds[tokenLabel], parseUnits(price, 6));
 };
 
 export const openTrove = async ({

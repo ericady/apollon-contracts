@@ -129,7 +129,7 @@ describe('SwapOperations', () => {
     ETH = contracts.ETH;
 
     // to ensure that the oracles is marked das "trusted"
-    await contracts.mockTellor.setUpdateTime(await getLatestBlockTimestamp());
+    await contracts.tellor.setUpdateTime(await getLatestBlockTimestamp());
   });
 
   it('should not be possible to mint directly from the borrowerOps', async () => {

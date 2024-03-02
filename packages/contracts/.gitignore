@@ -1,9 +1,6 @@
 # Buidler contract JSONs
 /artifacts
 
-# localhost deployment
-/ignition/deployments/chain-1337
-
 /bin
 
 # Buidler compilation cache
@@ -41,4 +38,4 @@ coverage.json
 
 .env
 
-/ignition/swaps/*
+/utils/swaps/*

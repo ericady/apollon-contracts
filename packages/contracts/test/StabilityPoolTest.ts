@@ -161,8 +161,9 @@ describe('StabilityPool', () => {
         // price drops: defaulter's Troves fall below MCR, whale doesn't
         await setPrice('BTC', '9500', contracts);
 
-        const stockBefore = (await stabilityPoolManager.getTotalDeposits()).find(d => d.tokenAddress === STOCK.target)
-          ?.amount;
+        const stockBefore = (await stabilityPoolManager.getTotalDeposits()).find(
+          d => d.tokenAddress === STOCK.target
+        )?.amount;
 
         // Troves are closed
         await liquidationOperations.liquidate(defaulter_1);
@@ -838,8 +839,9 @@ describe('StabilityPool', () => {
           .provideStability([{ tokenAddress: STABLE, amount: parseUnits('500') }]);
         expect(await stabilityPool.getDepositorCollGain(alice, BTC)).to.be.equal(0);
 
-        const BTCinSP_Before = (await stabilityPool.getTotalGainedColl()).find(d => d.tokenAddress === BTC.target)
-          ?.amount;
+        const BTCinSP_Before = (await stabilityPool.getTotalGainedColl()).find(
+          d => d.tokenAddress === BTC.target
+        )?.amount;
 
         // Alice attempts second withdrawal
         await stabilityPoolManager
@@ -848,8 +850,9 @@ describe('StabilityPool', () => {
         expect(await stabilityPool.getDepositorCollGain(alice, BTC)).to.be.equal(0);
 
         // Check ETH in pool does not change
-        const BTCinSP_After = (await stabilityPool.getTotalGainedColl()).find(d => d.tokenAddress === BTC.target)
-          ?.amount;
+        const BTCinSP_After = (await stabilityPool.getTotalGainedColl()).find(
+          d => d.tokenAddress === BTC.target
+        )?.amount;
         expect(BTCinSP_Before).to.be.equal(BTCinSP_After);
 
         // Third deposit
@@ -913,8 +916,6 @@ describe('StabilityPool', () => {
         const aliceStabilityPoolStake = parseUnits('1') / 6n; // based on the whaleShrimpTroveInit() setup
         const aliceExpectedBTCGain = (btcStablePoolGain * aliceStabilityPoolStake) / parseUnits('1');
         const aliceBTCGain = await stabilityPool.getDepositorCollGain(alice, BTC);
-
-        console.log(btcStablePoolGain, aliceExpectedBTCGain, aliceBTCGain, aliceExpectedBTCGain - aliceBTCGain);
         expect(aliceExpectedBTCGain - aliceBTCGain).to.be.lt(5000);
 
         //Get ActivePool and StabilityPool Ether before retrieval:
@@ -1153,8 +1154,9 @@ describe('StabilityPool', () => {
 
         const dennisBTCBefore = await BTC.balanceOf(dennis);
         const dennisTroveBTCCollBefore = (await troveManager.getTroveColl(dennis))[0][1];
-        const btcPoolBefore = (await stabilityPool.getTotalGainedColl()).find(d => d.tokenAddress === BTC.target)
-          ?.amount;
+        const btcPoolBefore = (await stabilityPool.getTotalGainedColl()).find(
+          d => d.tokenAddress === BTC.target
+        )?.amount;
 
         // Dennis withdraws his full deposit and ETHGain to his account
         await stabilityPoolManager
@@ -1164,8 +1166,9 @@ describe('StabilityPool', () => {
         // Check withdrawal does not alter Dennis' ETH balance or his trove's collateral
         const dennisBTCAfter = await BTC.balanceOf(dennis);
         const dennisTroveBTCCollAfter = (await troveManager.getTroveColl(dennis))[0][1];
-        const btcPoolAfter = (await stabilityPool.getTotalGainedColl()).find(d => d.tokenAddress === BTC.target)
-          ?.amount;
+        const btcPoolAfter = (await stabilityPool.getTotalGainedColl()).find(
+          d => d.tokenAddress === BTC.target
+        )?.amount;
 
         assert.equal(dennisBTCBefore, dennisBTCAfter);
         assert.equal(dennisTroveBTCCollBefore, dennisTroveBTCCollAfter);
@@ -1287,8 +1290,9 @@ describe('StabilityPool', () => {
         assert.equal(LUSDinSP_After, expectedLUSDinSP);
 
         // Check ETH in SP has reduced to zero
-        const ETHinSP_After = (await stabilityPool.getTotalGainedColl()).find(d => d.tokenAddress === BTC.target)
-          ?.amount;
+        const ETHinSP_After = (await stabilityPool.getTotalGainedColl()).find(
+          d => d.tokenAddress === BTC.target
+        )?.amount;
         expect(ETHinSP_After).to.be.lt(10000);
       });
 
@@ -1370,16 +1374,18 @@ describe('StabilityPool', () => {
         expect(await stabilityPool.getDepositorCollGain(alice, BTC)).to.be.equal(0);
 
         const aliceBTCBefore = await BTC.balanceOf(alice);
-        const btcInSPBefore = (await stabilityPool.getTotalGainedColl()).find(d => d.tokenAddress === BTC.target)
-          ?.amount;
+        const btcInSPBefore = (await stabilityPool.getTotalGainedColl()).find(
+          d => d.tokenAddress === BTC.target
+        )?.amount;
 
         // Alice attempts second withdrawal
         await stabilityPoolManager.connect(alice).withdrawGains();
 
         // Check ETH in pool does not change
         const aliceBTCAfter = await BTC.balanceOf(alice);
-        const btcInSPAfter = (await stabilityPool.getTotalGainedColl()).find(d => d.tokenAddress === BTC.target)
-          ?.amount;
+        const btcInSPAfter = (await stabilityPool.getTotalGainedColl()).find(
+          d => d.tokenAddress === BTC.target
+        )?.amount;
 
         expect(aliceBTCAfter).to.be.equal(aliceBTCBefore);
         expect(btcInSPAfter).to.be.equal(btcInSPBefore);

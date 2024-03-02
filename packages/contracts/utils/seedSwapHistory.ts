@@ -1,5 +1,5 @@
 import { ethers } from 'hardhat';
-import { getLatestBlockTimestamp } from '../utils/testHelper';
+import { getLatestBlockTimestamp } from './testHelper';
 import { mine } from '@nomicfoundation/hardhat-network-helpers';
 import csv from 'csv-parser';
 import fs from 'fs';

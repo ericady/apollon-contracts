@@ -243,9 +243,6 @@ describe('BorrowerOperations', () => {
 
       const L_BTC = await troveManager.liquidatedTokens(BTC, true);
       const L_STABLE = await troveManager.liquidatedTokens(STABLE, false);
-      // console.log('Liquidated Tokens:', L_BTC, L_STABLE);
-      // console.log('Alice PendingReward:', await troveManager.getPendingReward(alice, BTC, true));
-      // console.log('Bob PendingReward:', await troveManager.getPendingReward(bob, BTC, true));
 
       // check Alice and Bob's reward snapshots are zero before they alter their Troves
       const alice_BTCrewardSnapshot_Before = await troveManager.rewardSnapshots(alice, BTC, true);
@@ -263,8 +260,6 @@ describe('BorrowerOperations', () => {
       const bobPendingRewardBTCBefore = await troveManager.getPendingReward(bob, BTC, true);
       const alicePendingRewardStableBefore = await troveManager.getPendingReward(alice, STABLE, false);
       const bobPendingRewardStableBefore = await troveManager.getPendingReward(bob, STABLE, false);
-      // console.log(alicePendingRewardBTC, alicePendingRewardStable);
-      // console.log(bobPendingRewardBTC, bobPendingRewardStable);
       // TODO: Checking liquidation rewards again
       // expect(alicePendingRewardBTC).to.be.equal(0);
       // expect(bobPendingRewardBTC).to.be.equal(0);
@@ -669,7 +664,7 @@ describe('BorrowerOperations', () => {
 
       // last price update is older than 35min, price should become untrusted
       const blockTime = BigInt((await ethers.provider.getBlock('latest'))?.timestamp ?? 0n);
-      await contracts.mockTellor.setUpdateTime(blockTime - 60n * 35n); // - 35min
+      await contracts.tellor.setUpdateTime(blockTime - 60n * 35n); // - 35min
 
       const priceResp = await contracts.priceFeed.getPrice(STOCK);
       expect(priceResp[1]).to.be.equal(false); // check if price is untrusted
@@ -714,7 +709,7 @@ describe('BorrowerOperations', () => {
 
       // 2 hours pass
       await fastForwardTime(60 * 60 * 2);
-      await contracts.mockTellor.setUpdateTime(BigInt((await ethers.provider.getBlock('latest'))?.timestamp ?? 0n));
+      await contracts.tellor.setUpdateTime(BigInt((await ethers.provider.getBlock('latest'))?.timestamp ?? 0n));
 
       // D withdraws LUSD
       await increaseDebt(dennis, contracts, [{ tokenAddress: STABLE, amount: parseUnits('1') }]);
@@ -725,7 +720,7 @@ describe('BorrowerOperations', () => {
 
       // 1 hour passes
       await fastForwardTime(60 * 60);
-      await contracts.mockTellor.setUpdateTime(BigInt((await ethers.provider.getBlock('latest'))?.timestamp ?? 0n));
+      await contracts.tellor.setUpdateTime(BigInt((await ethers.provider.getBlock('latest'))?.timestamp ?? 0n));
 
       // E withdraws LUSD
       await increaseDebt(carol, contracts, [{ tokenAddress: STABLE, amount: parseUnits('1') }]);
@@ -791,7 +786,7 @@ describe('BorrowerOperations', () => {
 
       // 2 hours pass
       await fastForwardTime(7200);
-      await contracts.mockTellor.setUpdateTime(BigInt((await ethers.provider.getBlock('latest'))?.timestamp ?? 0n));
+      await contracts.tellor.setUpdateTime(BigInt((await ethers.provider.getBlock('latest'))?.timestamp ?? 0n));
 
       // D withdraws LUSD
       await increaseDebt(alice, contracts, [{ tokenAddress: STABLE, amount: parseUnits('37') }]);
@@ -802,7 +797,7 @@ describe('BorrowerOperations', () => {
 
       // 1 hour passes
       await fastForwardTime(3600);
-      await contracts.mockTellor.setUpdateTime(BigInt((await ethers.provider.getBlock('latest'))?.timestamp ?? 0n));
+      await contracts.tellor.setUpdateTime(BigInt((await ethers.provider.getBlock('latest'))?.timestamp ?? 0n));
 
       // E opens trove
       await increaseDebt(bob, contracts, [{ tokenAddress: STABLE, amount: parseUnits('12') }]);
@@ -1345,7 +1340,6 @@ describe('BorrowerOperations', () => {
       // Get Alice's pending reward snapshots
       const L_BTC_A_Snapshot = await troveManager.rewardSnapshots(alice, BTC, true);
       const L_StableDebt_A_Snapshot = await troveManager.rewardSnapshots(alice, STABLE, false);
-      console.log(L_BTC_A_Snapshot, L_StableDebt_A_Snapshot);
       // TODO: Check reward snapshots again
       // expect(L_BTC_A_Snapshot).to.be.equal(0);
       // expect(L_StableDebt_A_Snapshot).to.be.equal(0);
@@ -1357,7 +1351,6 @@ describe('BorrowerOperations', () => {
       // Get Alice's pending reward snapshots after Carol's liquidation. Check above 0
       const L_BTC_A_Snapshot_After = await troveManager.rewardSnapshots(alice, BTC, true);
       const L_StableDebt_A_Snapshot_After = await troveManager.rewardSnapshots(alice, STABLE, false);
-      console.log(L_BTC_A_Snapshot_After, L_StableDebt_A_Snapshot_After);
 
       // expect(L_BTC_A_Snapshot).to.be.gt(0);
       // expect(L_StableDebt_A_Snapshot).to.be.gt(0);
@@ -1736,7 +1729,7 @@ describe('BorrowerOperations', () => {
 
       // 2 hours pass
       await time.increase(7200);
-      await contracts.mockTellor.setUpdateTime(BigInt((await ethers.provider.getBlock('latest'))?.timestamp ?? 0n));
+      await contracts.tellor.setUpdateTime(BigInt((await ethers.provider.getBlock('latest'))?.timestamp ?? 0n));
 
       // D opens trove
       await open(dennis, parseUnits('1', 9), parseUnits('1000'));
@@ -1747,7 +1740,7 @@ describe('BorrowerOperations', () => {
 
       // 1 hour passes
       await time.increase(3600);
-      await contracts.mockTellor.setUpdateTime(BigInt((await ethers.provider.getBlock('latest'))?.timestamp ?? 0n));
+      await contracts.tellor.setUpdateTime(BigInt((await ethers.provider.getBlock('latest'))?.timestamp ?? 0n));
 
       // E opens trove
       await open(erin, parseUnits('1', 9), parseUnits('1000'));
@@ -1768,7 +1761,7 @@ describe('BorrowerOperations', () => {
 
       // 2 hours pass
       await time.increase(7200);
-      await contracts.mockTellor.setUpdateTime(BigInt((await ethers.provider.getBlock('latest'))?.timestamp ?? 0n));
+      await contracts.tellor.setUpdateTime(BigInt((await ethers.provider.getBlock('latest'))?.timestamp ?? 0n));
 
       // D opens trove
       await open(dennis, parseUnits('1', 9), parseUnits('1000'));
@@ -1779,7 +1772,7 @@ describe('BorrowerOperations', () => {
 
       // 1 hour passes
       await time.increase(3600);
-      await contracts.mockTellor.setUpdateTime(BigInt((await ethers.provider.getBlock('latest'))?.timestamp ?? 0n));
+      await contracts.tellor.setUpdateTime(BigInt((await ethers.provider.getBlock('latest'))?.timestamp ?? 0n));
 
       // E opens trove
       await open(erin, parseUnits('1', 9), parseUnits('1000'));
@@ -1846,7 +1839,7 @@ describe('BorrowerOperations', () => {
 
       // 59 minutes pass
       await time.increase(3540);
-      await contracts.mockTellor.setUpdateTime(BigInt((await ethers.provider.getBlock('latest'))?.timestamp ?? 0n));
+      await contracts.tellor.setUpdateTime(BigInt((await ethers.provider.getBlock('latest'))?.timestamp ?? 0n));
 
       // Assume Borrower also owns accounts D and E
       // Borrower triggers a fee, before decay interval has passed
@@ -1854,7 +1847,7 @@ describe('BorrowerOperations', () => {
 
       // 1 minute pass
       await time.increase(3540);
-      await contracts.mockTellor.setUpdateTime(BigInt((await ethers.provider.getBlock('latest'))?.timestamp ?? 0n));
+      await contracts.tellor.setUpdateTime(BigInt((await ethers.provider.getBlock('latest'))?.timestamp ?? 0n));
 
       // Borrower triggers another fee
       await open(erin, parseUnits('1', 9), parseUnits('1000'));
