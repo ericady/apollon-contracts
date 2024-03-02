@@ -1,6 +1,5 @@
 # Run the subgraph locally
 
-- `yarn codegen`
 - `yarn workspace @liquity/contracts hardhat node --hostname 0.0.0.0`
 - `yarn workspace @liquity/contracts deploy:local:testing`
 - `docker compose up` (Make extra sure to delete the "data" directory with `sudo rm -r data/` as it persists meta data and will let your subgraph fail silently.)

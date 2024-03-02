@@ -233,20 +233,24 @@ export default async function deployTestBase(): Promise<Contracts> {
   }
   await Promise.all(txs);
 
-  // add tokens to token manager + set initial coin prices
+  // set initial coin prices
   const blockTimestamp = (await ethers.provider.getBlock('latest'))?.timestamp ?? 0;
   await Promise.all([
-    (await contracts.tokenManager.addCollToken(contracts.BTC, TokenTellorIds.BTC, false)).wait(),
-    (await contracts.tokenManager.addCollToken(contracts.USDT, TokenTellorIds.USDT, false)).wait(),
-    (await contracts.tokenManager.addCollToken(contracts.GOV, TokenTellorIds.GOV, true)).wait(),
-    (await contracts.tokenManager.addDebtToken(contracts.STABLE, TokenTellorIds.STABLE)).wait(),
-    (await contracts.tokenManager.addDebtToken(contracts.STOCK, TokenTellorIds.STOCK)).wait(),
     (await contracts.tellor.setUpdateTime(blockTimestamp)).wait(),
     (await contracts.tellor.setPrice(TokenTellorIds.BTC, parseUnits('21000', 6))).wait(),
     (await contracts.tellor.setPrice(TokenTellorIds.USDT, parseUnits('1', 6))).wait(),
     (await contracts.tellor.setPrice(TokenTellorIds.GOV, parseUnits('5', 6))).wait(),
     (await contracts.tellor.setPrice(TokenTellorIds.STABLE, parseUnits('1', 6))).wait(),
     (await contracts.tellor.setPrice(TokenTellorIds.STOCK, parseUnits('150', 6))).wait(),
+  ]);
+
+  // add tokens to token manager
+  await Promise.all([
+    (await contracts.tokenManager.addCollToken(contracts.BTC, TokenTellorIds.BTC, false)).wait(),
+    (await contracts.tokenManager.addCollToken(contracts.USDT, TokenTellorIds.USDT, false)).wait(),
+    (await contracts.tokenManager.addCollToken(contracts.GOV, TokenTellorIds.GOV, true)).wait(),
+    (await contracts.tokenManager.addDebtToken(contracts.STABLE, TokenTellorIds.STABLE)).wait(),
+    (await contracts.tokenManager.addDebtToken(contracts.STOCK, TokenTellorIds.STOCK)).wait(),
   ]);
 
   return contracts;
