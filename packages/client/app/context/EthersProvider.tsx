@@ -2,7 +2,7 @@
 
 import { Button } from '@mui/material';
 import { Contract, JsonRpcSigner } from 'ethers';
-import { BrowserProvider, Eip1193Provider, JsonRpcProvider } from 'ethers/providers';
+import { BrowserProvider, Eip1193Provider } from 'ethers/providers';
 import Link from 'next/link';
 import { useSnackbar } from 'notistack';
 import { createContext, useContext, useEffect, useState } from 'react';
@@ -36,6 +36,7 @@ import storagePoolAbi from './abis/StoragePool.json';
 import swapOperationsAbi from './abis/SwapOperations.json';
 import swapPairAbi from './abis/SwapPair.json';
 import troveManagerAbi from './abis/TroveManager.json';
+import { Network } from 'ethers';
 
 declare global {
   interface Window {
@@ -52,7 +53,7 @@ type AllSwapPairContracts = {
 };
 
 export const EthersContext = createContext<{
-  provider: JsonRpcProvider | null;
+  provider: BrowserProvider | null;
   signer: JsonRpcSigner | null;
   address: string;
   contracts: {
@@ -95,7 +96,7 @@ export const EthersContext = createContext<{
 
 export default function EthersProvider({ children }: { children: React.ReactNode }) {
   const { enqueueSnackbar } = useSnackbar();
-  const [provider, setProvider] = useState<JsonRpcProvider | null>(null);
+  const [provider, setProvider] = useState<BrowserProvider | null>(null);
   const [signer, setSigner] = useState<JsonRpcSigner | null>(null);
   const [address, setAddress] = useState<string>('');
   const [debtTokenContracts, setDebtTokenContracts] = useState<AllDebtTokenContracts>();
@@ -127,7 +128,6 @@ export default function EthersProvider({ children }: { children: React.ReactNode
           [Contracts.DebtToken.STABLE]: debtTokenContractStableWithSigner,
           [Contracts.DebtToken.STOCK_1]: debtTokenContractSTOCK_1WithSigner,
         });
-
         const collateralTokenContractUSDT = new Contract(Contracts.ERC20.USDT, ERC20Abi, provider);
         const collateralTokenContractWithSignerUSDT = collateralTokenContractUSDT.connect(newSigner) as ERC20;
         const collateralTokenContractBTC = new Contract(Contracts.ERC20.BTC, ERC20Abi, provider);
@@ -219,20 +219,25 @@ export default function EthersProvider({ children }: { children: React.ReactNode
           });
           setAddress(accounts[0]);
         } catch (error) {
+          console.log('error: ', error);
           enqueueSnackbar('You rejected necessary permissions. Please try again.', { variant: 'error' });
         }
       }
-    } catch {
+    } catch(error) {
+      console.log('error: ', error);
       enqueueSnackbar('You closed the authentication window. Please try loging in again.', { variant: 'error' });
     }
   };
 
   function updateProvider(network: (typeof NETWORKS)[number]) {
     if (typeof window.ethereum !== 'undefined') {
-      const newProvider = new JsonRpcProvider(network.rpcUrls[0], {
-        name: network.chainName,
-        chainId: network.chainIdNumber,
-      });
+      // const newProvider = new BrowserProvider(network.rpcUrls[0], {
+      //   name: network.chainName,
+      //   chainId: network.chainIdNumber,
+      // });
+      const mmNetwork = new Network(network.chainName, network.chainId)
+      const newProvider = new BrowserProvider(window.ethereum, mmNetwork);
+      console.log('newProvider: ', newProvider);
 
       setProvider(newProvider);
     }
@@ -248,7 +253,8 @@ export default function EthersProvider({ children }: { children: React.ReactNode
         }
         // Could not find network in the list => add it
         else {
-          const { blockExplorerUrls, chainId, chainIdNumber, chainName, nativeCurrency, rpcUrls } = NETWORKS[0];
+          const { blockExplorerUrls, chainId, chainName, nativeCurrency, rpcUrls } = NETWORKS[0];
+
           window
             .ethereum!.request({
               method: 'wallet_addEthereumChain',
@@ -266,6 +272,8 @@ export default function EthersProvider({ children }: { children: React.ReactNode
             .then(() => {
               window.location.reload();
               // updateProvider(choosenNetwork)
+            }).catch((error) => {
+              console.log('error: ', error);
             });
         }
       });
@@ -287,7 +295,7 @@ export default function EthersProvider({ children }: { children: React.ReactNode
       // Log in automaticall if we know the user already.
       window.ethereum.request({ method: 'eth_accounts' }).then((accounts) => {
         if (accounts.length > 0) {
-          connectWallet();
+          // connectWallet();
         }
       });
 
@@ -469,7 +477,7 @@ export default function EthersProvider({ children }: { children: React.ReactNode
 }
 
 export function useEthers(): {
-  provider: JsonRpcProvider | null;
+  provider: BrowserProvider | null;
   signer: JsonRpcSigner | null;
   address: string;
   contracts: {
