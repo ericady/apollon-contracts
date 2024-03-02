@@ -13,9 +13,7 @@ const getSecret = (secretKey: string, defaultValue = '') => {
   let secret = defaultValue;
   if (fs.existsSync(SECRETS_FILE)) {
     const { secrets } = require(SECRETS_FILE);
-    if (secrets[secretKey]) {
-      secret = secrets[secretKey];
-    }
+    if (secrets[secretKey]) secret = secrets[secretKey];
   }
 
   return secret;
@@ -44,6 +42,13 @@ export default {
     localhost: {
       chainId: 31337,
       url: 'http://0.0.0.0:8545',
+    },
+    remote: {
+      chainId: 1337,
+      url: 'http://161.97.170.25:8545',
+      accounts: [
+        getSecret('DEPLOYER_PRIVATEKEY', '0x60ddfe7f579ab6867cbe7a2dc03853dc141d7a4ab6dbefc0dae2d2b1bd4e487f'),
+      ],
     },
     mainnet: {
       url: `https://eth-mainnet.alchemyapi.io/v2/${getSecret('alchemyAPIKey')}`,

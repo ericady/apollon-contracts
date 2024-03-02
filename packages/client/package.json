@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "dev:integration": "yarn codegen:syncDevContracts && next dev",
+    "dev:integration": "next dev",
     "build": "yarn codegen:types && next build",
     "start": "npx serve@latest out",
     "lint": "next lint",
@@ -17,7 +17,6 @@
     "test:e2e": "NEXT_PUBLIC_API_MOCKING=e2e playwright test",
     "codegen:types": "node scripts/syncAbis.js && graphql-codegen && typechain --target=ethers-v6 --out-dir=generated/types app/context/abis/*.json",
     "codegen:schema": "graphql-codegen -c codegen-get-schema.yml",
-    "codegen:syncDevContracts": "node scripts/syncDevContracts.mjs && prettier --write config.ts",
     "codegen:typePolicies": "rm -r app/context/typePolicies/* && node scripts/generatePolicyMappings.mjs && prettier --write app/context"
   },
   "dependencies": {
